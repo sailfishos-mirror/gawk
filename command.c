@@ -2515,7 +2515,7 @@ append_statement(CMDARG *stmt_list, char *stmt)
 			len += strlen(a->a_string) + 1;	/* 1 for ',' */
 		len += EVALSIZE;
 
-		emalloc(s, char *, (len + 2) * sizeof(char), "append_statement");
+		emalloc(s, char *, (len + 1) * sizeof(char), "append_statement");
 		arg = mk_cmdarg(D_string);
 		arg->a_string = s;
 		arg->a_count = len;	/* kludge */
@@ -2542,7 +2542,7 @@ append_statement(CMDARG *stmt_list, char *stmt)
 	ssize = stmt_list->a_count;
 	if (len > ssize - slen) {
 		ssize = slen + len + EVALSIZE;
-		erealloc(s, char *, (ssize + 2) * sizeof(char), "append_statement");
+		erealloc(s, char *, (ssize + 1) * sizeof(char), "append_statement");
 		stmt_list->a_string = s;
 		stmt_list->a_count = ssize;
 	}
@@ -2554,7 +2554,7 @@ append_statement(CMDARG *stmt_list, char *stmt)
 	}
 
 	if (stmt == end_EVAL)
-		erealloc(stmt_list->a_string, char *, slen + 2, "append_statement");
+		erealloc(stmt_list->a_string, char *, slen + 1, "append_statement");
 	return stmt_list;
 
 #undef EVALSIZE
@@ -2592,6 +2592,8 @@ struct cmdtoken cmdtab[] = {
 	gettext_noop("end - end a list of commands or awk statements.") },
 { "eval", "", D_eval, D_EVAL, do_eval,
 	gettext_noop("eval stmt|[p1, p2, ...] - evaluate awk statement(s).") },
+{ "exit", "", D_quit, D_QUIT, do_quit,
+	gettext_noop("exit - (same as quit) exit debugger.") },
 { "finish", "", D_finish, D_FINISH, do_finish,
 	gettext_noop("finish - execute until selected stack frame returns.") },
 { "frame", "f", D_frame, D_FRAME, do_frame,
@@ -2773,7 +2775,11 @@ yyerror(const char *mesg, ...)
 /* yylex --- read a command and turn it into tokens */
 
 static int
+#ifdef USE_EBCDIC
+yylex_ebcdic(void)
+#else
 yylex(void)
+#endif
 {
 	static char *lexptr = NULL;
 	static char *lexend;
@@ -2921,7 +2927,7 @@ again:
 		bool esc_seen = false;
 
 		toklen = lexend - lexptr;
-		emalloc(str, char *, toklen + 2, "yylex");
+		emalloc(str, char *, toklen + 1, "yylex");
 		p = str;
 
 		while ((c = *++lexptr) != '"') {
@@ -3049,6 +3055,39 @@ err:
 	return D_VARIABLE;
 }
 
+/* Convert single-character tokens coming out of yylex() from EBCDIC to
+   ASCII values on-the-fly so that the parse tables need not be regenerated
+   for EBCDIC systems.  */
+#ifdef USE_EBCDIC
+static int
+yylex(void)
+{
+	static char etoa_xlate[256];
+	static int do_etoa_init = 1;
+	int tok;
+
+	if (do_etoa_init)
+	{
+		for (tok = 0; tok < 256; tok++)
+			etoa_xlate[tok] = (char) tok;
+#ifdef HAVE___ETOA_L
+		/* IBM helpfully provides this function.  */
+		__etoa_l(etoa_xlate, sizeof(etoa_xlate));
+#else
+# error "An EBCDIC-to-ASCII translation function is needed for this system"
+#endif
+		do_etoa_init = 0;
+	}
+
+	tok = yylex_ebcdic();
+
+	if (tok >= 0 && tok <= 0xFF)
+		tok = etoa_xlate[tok];
+
+	return tok;
+}
+#endif /* USE_EBCDIC */
+
 /* find_argument --- find index in 'argtab' for a command option */
 
 static int
@@ -3100,7 +3139,7 @@ concat_args(CMDARG *arg, int count)
 		arg = arg->next;
 	}
 
-	emalloc(str, char *, len + 2, "concat_args");
+	emalloc(str, char *, len + 1, "concat_args");
 	n = tmp[0];
 	memcpy(str, n->stptr, n->stlen);
 	p = str + n->stlen;

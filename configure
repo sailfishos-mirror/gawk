@@ -633,6 +633,8 @@ GAWKLIBEXT
 LIBMPFR
 LIBREADLINE
 SOCKET_LIBS
+ENABLE_EXTENSIONS_FALSE
+ENABLE_EXTENSIONS_TRUE
 LIBSIGSEGV_PREFIX
 LTLIBSIGSEGV
 LIBSIGSEGV
@@ -5863,26 +5865,102 @@ pkgextensiondir='${pkglibdir}'
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for z/OS USS compilation" >&5
 $as_echo_n "checking for z/OS USS compilation... " >&6; }
+if ${ac_cv_zos_uss+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
 if test "OS/390" = "`uname`"
 then
-  CFLAGS="$CFLAGS -D_ALL_SOURCE -DZOS_USS -DUSE_EBCDIC"
-  # Must rebuild awkgram.c and command.c from Bison for EBCDIC
-  rm -f awkgram.c command.c
   ac_cv_zos_uss=yes
 else
   ac_cv_zos_uss=no
 fi
+
+fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ac_cv_zos_uss}" >&5
 $as_echo "${ac_cv_zos_uss}" >&6; }
+if test "x$ac_cv_zos_uss" = "xyes"
+then
+    ac_zos_uss_cc_id=unknown
+  echo " $CC " | $EGREP ' (/bin/)?c89 |_' >/dev/null && ac_zos_uss_cc_id=c89
+  echo " $CC " | $EGREP ' (/bin/)?c99 |_' >/dev/null && ac_zos_uss_cc_id=xlc
+  echo " $CC " | $EGREP ' (/bin/)?cc |_'  >/dev/null && ac_zos_uss_cc_id=cc
+  echo " $CC " | $EGREP ' (/bin/)?xlc |_' >/dev/null && ac_zos_uss_cc_id=xlc
+  echo " $CC " | $EGREP ' (/bin/)?xlC |_' >/dev/null && ac_zos_uss_cc_id=xlc++
+  echo " $CC " | $EGREP ' (/bin/)?xlc\+\+ |_' >/dev/null && ac_zos_uss_cc_id=xlc++
+  test "x$GCC" = "xyes" && ac_zos_uss_cc_id=gcc
+    CPPFLAGS="$CPPFLAGS -D_ALL_SOURCE"
+  test "$ac_zos_uss_cc_id" != xlc++ && CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=600"
+  case "$ac_zos_uss_cc_id" in
+  c89)
+                                        if test -n "$_C89_OPTIONS"
+    then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: CC = $CC" >&5
+$as_echo "$as_me: CC = $CC" >&6;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: _C89_OPTIONS = $_C89_OPTIONS" >&5
+$as_echo "$as_me: _C89_OPTIONS = $_C89_OPTIONS" >&6;}
+    else
+      as_fn_error $? "c89-setup-required
+To build GNU Awk using \"c89\", please set
 
+    _C89_OPTIONS=\"-W c,langlvl(stdc99,libext),haltonmsg(CCN3296)\"
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for strerror in -lcposix" >&5
-$as_echo_n "checking for strerror in -lcposix... " >&6; }
-if ${ac_cv_lib_cposix_strerror+:} false; then :
+in your environment, and reconfigure. (The above flags cannot be specified
+in CFLAGS/CPPFLAGS, due to the parentheses.)" "$LINENO" 5
+    fi
+    ;;
+  gcc)
+        ;;
+  cc)
+    as_fn_error $? "cc-invalid
+The z/OS \"cc\" compiler does not build GNU Awk correctly.
+
+If the \"xlc\" or \"c89\" compiler is available, please set CC accordingly
+and reconfigure. (\"xlc\" is the recommended compiler on z/OS.)" "$LINENO" 5
+    ;;
+  xlc*)
+        CFLAGS="$CFLAGS -qlanglvl=stdc99:libext"
+        cat >zos-cc <<EOF
+#!/bin/sh
+#
+# This wrapper script addresses two annoying peculiarities of the IBM
+# xlc/c99 compiler on z/OS:
+#
+# 1. Missing header files are considered warnings by default rather
+#    than fatal errors;
+#
+# 2. Include directories specified with -I are searched _after_ the
+#    system include directories (for #include<> directives) rather
+#    than before.
+#
+# This script allows the code and the build system to assume standard
+# compiler behavior.
+#
+
+PS4='zos-cc: '
+REAL_CC="$CC"
+
+set -x
+\$REAL_CC -qhaltonmsg=CCN3296 -qnosearch "\$@" -qsearch=/usr/include
+EOF
+    chmod +x zos-cc
+    { $as_echo "$as_me:${as_lineno-$LINENO}: wrapping $CC with zos-cc to obtain standard behavior" >&5
+$as_echo "$as_me: wrapping $CC with zos-cc to obtain standard behavior" >&6;}
+    CC="`pwd`/zos-cc"
+    ;;
+  *)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized compiler environment" >&5
+$as_echo "$as_me: WARNING: unrecognized compiler environment" >&2;}
+    ;;
+  esac
+fi # ac_cv_zos_uss = yes
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing strerror" >&5
+$as_echo_n "checking for library containing strerror... " >&6; }
+if ${ac_cv_search_strerror+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcposix  $LIBS"
+  ac_func_search_save_LIBS=$LIBS
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -5901,22 +5979,37 @@ return strerror ();
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cposix_strerror=yes
-else
-  ac_cv_lib_cposix_strerror=no
+for ac_lib in '' cposix; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_strerror=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+    conftest$ac_exeext
+  if ${ac_cv_search_strerror+:} false; then :
+  break
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cposix_strerror" >&5
-$as_echo "$ac_cv_lib_cposix_strerror" >&6; }
-if test "x$ac_cv_lib_cposix_strerror" = xyes; then :
-  LIBS="$LIBS -lcposix"
+done
+if ${ac_cv_search_strerror+:} false; then :
+
+else
+  ac_cv_search_strerror=no
 fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_strerror" >&5
+$as_echo "$ac_cv_search_strerror" >&6; }
+ac_res=$ac_cv_search_strerror
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
-
+fi
 
 # Check whether --enable-largefile was given.
 if test "${enable_largefile+set}" = set; then :
@@ -6138,31 +6231,27 @@ fi
 $as_echo "${gawk_cv_aix_hack}" >&6; }
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Linux/Alpha compilation hacks" >&5
-$as_echo_n "checking for Linux/Alpha compilation hacks... " >&6; }
-if ${gawk_cv_linux_alpha_hack+:} false; then :
-  $as_echo_n "(cached) " >&6
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we are using EBCDIC" >&5
+$as_echo_n "checking if we are using EBCDIC... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if 'a' == 0x81
+gnu_gawk_in_ebcdic
+#endif
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "gnu_gawk_in_ebcdic" >/dev/null 2>&1; then :
+
+$as_echo "#define USE_EBCDIC 1" >>confdefs.h
+
+ use_ebcdic=yes
 else
-
-if test "Linux" = "`uname`" && test "alpha" = "`uname -m`"
-then
-	# this isn't necessarily always true,
-	# the vendor's compiler is also often found
-	if test "$GCC" = yes
-	then
-		CFLAGS="$CFLAGS -mieee"
-		gawk_cv_linux_alpha_hack=yes
-	else
-		gawk_cv_linux_alpha_hack=no
-	fi
-else
-	gawk_cv_linux_alpha_hack=no
+  use_ebcdic=no
 fi
+rm -f conftest*
 
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${gawk_cv_linux_alpha_hack}" >&5
-$as_echo "${gawk_cv_linux_alpha_hack}" >&6; }
-
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $use_ebcdic" >&5
+$as_echo "$use_ebcdic" >&6; }
 
 if test "$ISC" = 1	# will be set by test for ISC
 then
@@ -8388,7 +8477,7 @@ $as_echo "#define HAVE_LC_MESSAGES 1" >>confdefs.h
 
 for ac_header in arpa/inet.h fcntl.h limits.h locale.h libintl.h mcheck.h \
 	netdb.h netinet/in.h stdarg.h stddef.h string.h \
-	sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h \
+	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
 	termios.h stropts.h wchar.h wctype.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
@@ -8733,39 +8822,6 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking return type of signal handlers" >&5
-$as_echo_n "checking return type of signal handlers... " >&6; }
-if ${ac_cv_type_signal+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/types.h>
-#include <signal.h>
-
-int
-main ()
-{
-return *(signal (0, 0)) (0) == 1;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_cv_type_signal=int
-else
-  ac_cv_type_signal=void
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_signal" >&5
-$as_echo "$ac_cv_type_signal" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define RETSIGTYPE $ac_cv_type_signal
-_ACEOF
-
-
 ac_fn_c_check_type "$LINENO" "size_t" "ac_cv_type_size_t" "$ac_includes_default"
 if test "x$ac_cv_type_size_t" = xyes; then :
 
@@ -8875,75 +8931,85 @@ _ACEOF
 
 
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for unsigned long long int" >&5
+$as_echo_n "checking for unsigned long long int... " >&6; }
+if ${ac_cv_type_unsigned_long_long_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+unsigned long long int ull = 18446744073709551615ULL;
+	    typedef int a[(18446744073709551615ULL <= (unsigned long long int) -1
+			   ? 1 : -1)];
+	   int i = 63;
+int
+main ()
+{
+unsigned long long int ullmax = 18446744073709551615ull;
+	    return (ull << 63 | ull >> 63 | ull << i | ull >> i
+		    | ullmax / ull | ullmax % ull);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_type_unsigned_long_long_int=yes
+else
+  ac_cv_type_unsigned_long_long_int=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_unsigned_long_long_int" >&5
+$as_echo "$ac_cv_type_unsigned_long_long_int" >&6; }
+  if test $ac_cv_type_unsigned_long_long_int = yes; then
+
+$as_echo "#define HAVE_UNSIGNED_LONG_LONG_INT 1" >>confdefs.h
+
+  fi
+
+
+
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long long int" >&5
 $as_echo_n "checking for long long int... " >&6; }
 if ${ac_cv_type_long_long_int+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-  /* For now, do not test the preprocessor; as of 2007 there are too many
-         implementations with broken preprocessors.  Perhaps this can
-         be revisited in 2012.  In the meantime, code should not expect
-         #if to work with literals wider than 32 bits.  */
-      /* Test literals.  */
-      long long int ll = 9223372036854775807ll;
-      long long int nll = -9223372036854775807LL;
-      unsigned long long int ull = 18446744073709551615ULL;
-      /* Test constant expressions.   */
-      typedef int a[((-9223372036854775807LL < 0 && 0 < 9223372036854775807ll)
-                     ? 1 : -1)];
-      typedef int b[(18446744073709551615ULL <= (unsigned long long int) -1
-                     ? 1 : -1)];
-      int i = 63;
-int
-main ()
-{
-/* Test availability of runtime routines for shift and division.  */
-      long long int llmax = 9223372036854775807ll;
-      unsigned long long int ullmax = 18446744073709551615ull;
-      return ((ll << 63) | (ll >> 63) | (ll < i) | (ll > i)
-              | (llmax / ll) | (llmax % ll)
-              | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
-              | (ullmax / ull) | (ullmax % ull));
-  ;
-  return 0;
-}
-
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-                          if test "$cross_compiling" = yes; then :
   ac_cv_type_long_long_int=yes
+      if test "x${ac_cv_prog_cc_c99-no}" = xno; then
+        ac_cv_type_long_long_int=$ac_cv_type_unsigned_long_long_int
+        if test $ac_cv_type_long_long_int = yes; then
+                                        if test "$cross_compiling" = yes; then :
+  :
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <limits.h>
-               #ifndef LLONG_MAX
-               # define HALF \
-                        (1LL << (sizeof (long long int) * CHAR_BIT - 2))
-               # define LLONG_MAX (HALF - 1 + HALF)
-               #endif
+                 #ifndef LLONG_MAX
+                 # define HALF \
+                          (1LL << (sizeof (long long int) * CHAR_BIT - 2))
+                 # define LLONG_MAX (HALF - 1 + HALF)
+                 #endif
 int
 main ()
 {
 long long int n = 1;
-               int i;
-               for (i = 0; ; i++)
-                 {
-                   long long int m = n << i;
-                   if (m >> i != n)
-                     return 1;
-                   if (LLONG_MAX / 2 < m)
-                     break;
-                 }
-               return 0;
+                 int i;
+                 for (i = 0; ; i++)
+                   {
+                     long long int m = n << i;
+                     if (m >> i != n)
+                       return 1;
+                     if (LLONG_MAX / 2 < m)
+                       break;
+                   }
+                 return 0;
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
-  ac_cv_type_long_long_int=yes
+
 else
   ac_cv_type_long_long_int=no
 fi
@@ -8951,11 +9017,8 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
-else
-  ac_cv_type_long_long_int=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
+        fi
+      fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_long_long_int" >&5
 $as_echo "$ac_cv_type_long_long_int" >&6; }
@@ -10320,7 +10383,7 @@ $as_echo "$LIBSIGSEGV" >&6; }
 esac
 
 # Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
-for ac_func in atexit btowc fmod getgrent getgroups grantpt \
+for ac_func in __etoa_l atexit btowc fmod getgrent getgroups grantpt \
 	isascii iswctype iswlower iswupper mbrlen \
 	memcmp memcpy memcpy_ulong memmove memset \
 	memset_ulong mkstemp posix_openpt setenv setlocale setsid sigprocmask \
@@ -10387,10 +10450,6 @@ if test "x$enable_extensions" != "xno"; then
 
 		case $host_os in
 	mirbsd* | openedition*)	# OS/390 z/OS POSIX layer
-		cat << \EOF > extension/Makefile
-all dist check clean distclean install uninstall distcheck:
-	@exit 0
-EOF
 		;;
 	*)
 	ac_fn_c_check_header_mongrel "$LINENO" "dlfcn.h" "ac_cv_header_dlfcn_h" "$ac_includes_default"
@@ -10485,6 +10544,14 @@ fi
 		as_fn_error $? "extension support requested, but unavailable" "$LINENO" 5
 	fi
 	enable_extensions=$extensions_supported
+	 if test "x$enable_extensions" = "xyes"; then
+  ENABLE_EXTENSIONS_TRUE=
+  ENABLE_EXTENSIONS_FALSE='#'
+else
+  ENABLE_EXTENSIONS_TRUE='#'
+  ENABLE_EXTENSIONS_FALSE=
+fi
+
 fi
 
 case $host_os in
@@ -10818,7 +10885,46 @@ $as_echo "$_found_readline" >&6; }
 
         if test $_found_readline = yes ; then
 	   case $host_os in
-	   *bsd* )	_combo="$_combo -ltermcap"
+	   *bsd* )	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tgetent in -ltermcap" >&5
+$as_echo_n "checking for tgetent in -ltermcap... " >&6; }
+if ${ac_cv_lib_termcap_tgetent+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltermcap  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char tgetent ();
+int
+main ()
+{
+return tgetent ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_termcap_tgetent=yes
+else
+  ac_cv_lib_termcap_tgetent=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_termcap_tgetent" >&5
+$as_echo "$ac_cv_lib_termcap_tgetent" >&6; }
+if test "x$ac_cv_lib_termcap_tgetent" = xyes; then :
+  _combo="$_combo -ltermcap"
+fi
+
 	  	 ;;
 	   esac
 
@@ -10961,6 +11067,34 @@ if test "x$ac_cv_member_struct_stat_st_blksize" = xyes; then :
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
+_ACEOF
+
+
+fi
+
+ac_fn_c_check_member "$LINENO" "struct passwd" "pw_passwd" "ac_cv_member_struct_passwd_pw_passwd" "
+#include <sys/types.h>
+#include <pwd.h>
+
+"
+if test "x$ac_cv_member_struct_passwd_pw_passwd" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_PASSWD_PW_PASSWD 1
+_ACEOF
+
+
+fi
+
+ac_fn_c_check_member "$LINENO" "struct group" "gr_passwd" "ac_cv_member_struct_group_gr_passwd" "
+#include <sys/types.h>
+#include <grp.h>
+
+"
+if test "x$ac_cv_member_struct_group_gr_passwd" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_GROUP_GR_PASSWD 1
 _ACEOF
 
 
@@ -11457,6 +11591,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${TEST_CROSS_COMPILE_TRUE}" && test -z "${TEST_CROSS_COMPILE_FALSE}"; then
   as_fn_error $? "conditional \"TEST_CROSS_COMPILE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_EXTENSIONS_TRUE}" && test -z "${ENABLE_EXTENSIONS_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_EXTENSIONS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

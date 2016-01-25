@@ -58,7 +58,7 @@ static void init_args(int argc0, int argc, const char *argv0, char **argv);
 static void init_vars(void);
 static NODE *load_environ(void);
 static NODE *load_procinfo(void);
-static RETSIGTYPE catchsig(int sig);
+static void catchsig(int sig);
 #ifdef HAVE_LIBSIGSEGV
 static int catchsegv(void *fault_address, int serious);
 static void catchstackoverflow(int emergency, stackoverflow_context_t scp);
@@ -570,6 +570,10 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-h\t\t\t--help\n"), fp);
 	fputs(_("\t-i includefile\t\t--include=includefile\n"), fp);
 	fputs(_("\t-l library\t\t--load=library\n"), fp);
+	/*
+	 * TRANSLATORS: the "fatal" and "invalid" here are literal
+	 * values, they should not be translated. Thanks.
+	 */
 	fputs(_("\t-L[fatal|invalid]\t--lint[=fatal|invalid]\n"), fp);
 	fputs(_("\t-M\t\t\t--bignum\n"), fp);
 	fputs(_("\t-N\t\t\t--use-lc-numeric\n"), fp);
@@ -888,6 +892,33 @@ load_environ()
 	return ENVIRON_node;
 }
 
+static void
+load_procinfo_argv()
+{
+	NODE *tmp;
+	NODE **aptr;
+	NODE *argv_array;
+	int i;
+
+	tmp = make_string("argv", 4);
+	aptr = assoc_lookup(PROCINFO_node, tmp);
+	unref(tmp);
+	unref(*aptr);
+	getnode(argv_array);
+ 	memset(argv_array, '\0', sizeof(NODE));  /* valgrind wants this */
+	null_array(argv_array);
+	*aptr = argv_array;
+	argv_array->parent_array = PROCINFO_node;
+	argv_array->vname = estrdup("argv", 4);
+	for (i = 0; d_argv[i] != NULL; i++) {
+		tmp = make_number(i);
+		aptr = assoc_lookup(argv_array, tmp);
+		unref(tmp);
+		unref(*aptr);
+		*aptr = make_string(d_argv[i], strlen(d_argv[i]));
+	}
+}
+
 /* load_procinfo --- populate the PROCINFO array */
 
 static NODE *
@@ -987,6 +1018,7 @@ load_procinfo()
 		groupset = NULL;
 	}
 #endif
+	load_procinfo_argv();
 	return PROCINFO_node;
 }
 
@@ -1155,7 +1187,7 @@ arg_assign(char *arg, bool initing)
 
 /* catchsig --- catch signals */
 
-static RETSIGTYPE
+static void
 catchsig(int sig)
 {
 	if (sig == SIGFPE) {

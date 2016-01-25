@@ -13,7 +13,7 @@
 .		if \w'\(rq' .ds rq "\(rq
 .	\}
 .\}
-.TH GAWK 1 "Apr 02 2015" "Free Software Foundation" "Utility Commands"
+.TH GAWK 1 "Jan 14 2016" "Free Software Foundation" "Utility Commands"
 .SH NAME
 gawk \- pattern scanning and processing language
 .SH SYNOPSIS
@@ -444,11 +444,6 @@ mode, with the following additional restrictions:
 escape sequences are not recognized.
 .TP
 \(bu
-Only space and tab act as field separators when
-.B FS
-is set to a single space, newline does not.
-.TP
-\(bu
 You cannot continue lines after
 .B ?
 and
@@ -785,9 +780,6 @@ In the special case that
 .B FS
 is a single space, fields are separated
 by runs of spaces and/or tabs and/or newlines.
-(But see the section
-.BR "POSIX COMPATIBILITY" ,
-below).
 .BR NOTE :
 The value of
 .B IGNORECASE
@@ -1102,15 +1094,11 @@ Use the
 operator to test for these elements.
 The following elements are guaranteed to be available:
 .RS
-.TP \w'\fBPROCINFO["version"]\fR'u+1n
+.TP \w'\fBPROCINFO["strftime"]\fR'u+1n
 \fBPROCINFO["egid"]\fP
 The value of the
 .IR getegid (2)
 system call.
-.TP
-\fBPROCINFO["strftime"]\fP
-The default time format string for
-.BR strftime() .
 .TP
 \fBPROCINFO["errno"]\fP
 The value of
@@ -1135,6 +1123,11 @@ or \fB"FIELDWIDTHS"\fP if field splitting with
 .B FIELDWIDTHS
 is in effect.
 .TP
+\fBPROCINFO["gid"]\fP
+The value of the
+.IR getgid (2)
+system call.
+.TP
 \fBPROCINFO["identifiers"]\fP
 A subarray, indexed by the names of all identifiers used in the
 text of the AWK program.
@@ -1145,7 +1138,7 @@ knows about the identifiers after it has finished parsing the program; they are
 updated while the program runs.
 For each identifier, the value of the element is one of the following:
 .RS
-.TP
+.TP \w'\fB"extension"\fR'u+1n
 \fB"array"\fR
 The identifier is an array.
 .TP
@@ -1170,11 +1163,6 @@ doesn't know yet).
 The identifier is a user-defined function.
 .RE
 .TP
-\fBPROCINFO["gid"]\fP
-The value of the
-.IR getgid (2)
-system call.
-.TP
 \fBPROCINFO["pgrpid"]\fP
 The process group ID of the current process.
 .TP
@@ -1184,10 +1172,92 @@ The process ID of the current process.
 \fBPROCINFO["ppid"]\fP
 The parent process ID of the current process.
 .TP
+\fBPROCINFO["strftime"]\fP
+The default time format string for
+.BR strftime() .
+.TP
 \fBPROCINFO["uid"]\fP
 The value of the
 .IR getuid (2)
 system call.
+.TP
+\fBPROCINFO["version"]\fP
+the version of
+.IR gawk .
+.PP
+The following elements are present if loading dynamic
+extensions is available:
+.TP
+\fBPROCINFO["api_major"]\fP
+The major version of the extension API.
+.TP
+\fBPROCINFO["api_minor"]\fP
+The minor version of the extension API.
+.PP
+The following elements are available if MPFR support is
+compiled into
+.IR gawk\^ :
+.TP
+\fBPROCINFO["gmp_version"]\fP
+The version of the GNU MP library used for arbitrary precision
+number support in
+.IR gawk .
+.TP
+\fBPROCINFO["mpfr_version"]\fP
+The version of the GNU MPFR library used for arbitrary precision
+number support in
+.IR gawk .
+.TP
+\fBPROCINFO["prec_max"]\fP
+The maximum precision supported by the GNU MPFR library for
+arbitrary precision floating-point numbers.
+.TP
+\fBPROCINFO["prec_min"]\fP
+The minimum precision allowed by the GNU MPFR library for
+arbitrary precision floating-point numbers.
+.PP
+The following elements may set by a program to
+change
+.IR gawk 's
+behavior:
+.TP
+\fBPROCINFO["NONFATAL"]\fR
+If this exists, then I/O errors for all output redirections become nonfatal.
+.TP
+\fBPROCINFO["\fIoutput_command\fB", "NONFATAL"]\fR
+Make output errors for
+.I output_name
+be nonfatal.
+.TP
+\fBPROCINFO["\fIcommand\fB", "pty"]\fR
+Use a pseudo-tty for two-way communication with
+.I command
+instead of setting up two one-way pipes.
+.TP
+\fBPROCINFO["\fIinput\fB", "READ_TIMEOUT"]\fR
+The timeout in milliseconds for reading data from
+.IR input ,
+where
+.I input
+is a redirection string or a filename. A value of zero or
+less than zero means no timeout.
+.TP
+\fBPROCINFO["\fIinput\^\fB", "RETRY"]\fR
+If an I/O error that may be retried occurs when reading data from
+.IR input ,
+and this array entry exists, then
+.B getline
+will return \-2 instead of following the default behavior of returning \-1
+and configuring
+.IR input
+to return no further data.
+An I/O error that may be retried is one where
+.IR errno (3)
+has the value EAGAIN, EWOULDBLOCK, EINTR, or ETIMEDOUT.
+This may be useful in conjunction with
+\fBPROCINFO["\fIinput\^\fB", "READ_TIMEOUT"]\fR
+or situations where a file descriptor has been configured to behave in a
+non-blocking fashion.
 .TP
 \fBPROCINFO["sorted_in"]\fP
 If this element exists in
@@ -1209,7 +1279,9 @@ Supported values are
 \fB"@val_num_desc"\fR,
 and
 \fB"@unsorted"\fR.
-The value can also be the name of any comparison function defined
+The value can also be the name (as a
+.IR string )
+of any comparison function defined
 as follows:
 .sp
 .in +5m
@@ -1228,74 +1300,6 @@ are the
 corresponding values of the two elements being compared.
 It should return a number less than, equal to, or greater than 0,
 depending on how the elements of the array are to be ordered.
-.TP
-\fBPROCINFO["input", "READ_TIMEOUT"]\fP
-The timeout in milliseconds for reading data from
-.IR input ,
-where
-.I input
-is a redirection string or a filename. A value of zero or
-less than zero means no timeout.
-.TP
-\fBPROCINFO["input", "RETRY"]\fP
-If an I/O error that may be retried occurs when reading data from
-.IR input ,
-and this array entry exists, then
-.B getline
-will return \-2 instead of following the default behavior of returning \-1
-and configuring
-.IR input
-to return no further data.
-An I/O error that may be retried is one where
-.IR errno (3)
-has the value
-.IR EAGAIN ,
-.IR EWOULDBLOCK ,
-.IR EINTR ,
-or
-.IR ETIMEDOUT .
-This may be useful in conjunction with
-\fBPROCINFO["input", "READ_TIMEOUT"]\fP
-or situations where a file descriptor has been configured to behave in a
-non-blocking fashion.
-.TP
-\fBPROCINFO["mpfr_version"]\fP
-The version of the GNU MPFR library used for arbitrary precision
-number support in
-.IR gawk .
-This entry is not present if MPFR support is not compiled into
-.IR gawk .
-.TP
-\fBPROCINFO["gmp_version"]\fP
-The version of the GNU MP library used for arbitrary precision
-number support in
-.IR gawk .
-This entry is not present if MPFR support is not compiled into
-.IR gawk .
-.TP
-\fBPROCINFO["prec_max"]\fP
-The maximum precision supported by the GNU MPFR library for
-arbitrary precision floating-point numbers.
-This entry is not present if MPFR support is not compiled into
-.IR gawk .
-.TP
-\fBPROCINFO["prec_min"]\fP
-The minimum precision allowed by the GNU MPFR library for
-arbitrary precision floating-point numbers.
-This entry is not present if MPFR support is not compiled into
-.IR gawk .
-.TP
-\fBPROCINFO["api_major"]\fP
-The major version of the extension API.
-This entry is not present if loading dynamic extensions is not available.
-.TP
-\fBPROCINFO["api_minor"]\fP
-The minor version of the extension API.
-This entry is not present if loading dynamic extensions is not available.
-.TP
-\fBPROCINFO["version"]\fP
-the version of
-.IR gawk .
 .RE
 .TP
 .B ROUNDMODE
@@ -1581,9 +1585,9 @@ Vertical tab.
 The character represented by the string of hexadecimal digits following
 the
 .BR \ex .
-As in ISO C, all following hexadecimal digits are considered part of
+Up to two
+following hexadecimal digits are considered part of
 the escape sequence.
-(This feature should tell us something about language design by committee.)
 E.g., \fB"\ex1B"\fR is the \s-1ASCII\s+1 \s-1ESC\s+1 (escape) character.
 .TP
 .BI \e ddd
@@ -1980,7 +1984,7 @@ and
 For example, the name
 .B e
 might be used to represent all of
-\*(lqe,\*(rq \*(lqe\h'-\w:e:u'\',\*(rq and \*(lqe\h'-\w:e:u'\`.\*(rq
+\*(lqe\*(rq, \*(lqe\h'-\w:e:u'\'\*(rq, and \*(lqe\h'-\w:e:u'\`\*(rq.
 In this case,
 .B [[=e=]]
 is a regular expression
@@ -2330,7 +2334,7 @@ command returns 1 on success, 0 on end of file, and \-1 on an error.
 If the
 .IR errno (3)
 value indicates that the I/O operation may be retried,
-and \fBPROCINFO["input", "RETRY"]\fP
+and \fBPROCINFO["\fIinput\^\fP", "RETRY"]\fR
 is set, then \-2 will be returned instead of \-1, and further calls to
 .B getline
 may be attempted.
@@ -4047,7 +4051,7 @@ We thank him.
 .SH COPYING PERMISSIONS
 Copyright \(co 1989, 1991, 1992, 1993, 1994, 1995, 1996,
 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2007, 2009,
-2010, 2011, 2012, 2013, 2014
+2010, 2011, 2012, 2013, 2014, 2015, 2016
 Free Software Foundation, Inc.
 .PP
 Permission is granted to make and distribute verbatim copies of

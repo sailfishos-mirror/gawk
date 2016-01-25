@@ -76,6 +76,10 @@
 #include <netdb.h>
 #endif /* HAVE_NETDB_H */
 
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif	/* HAVE_SYS_SELECT_H */
+
 #ifndef HAVE_GETADDRINFO
 #include "missing_d/getaddrinfo.h"
 #endif
@@ -318,6 +322,8 @@ static NODE *RS = NULL;
 static Regexp *RS_re_yes_case;	/* regexp for RS when ignoring case */
 static Regexp *RS_re_no_case;	/* regexp for RS when not ignoring case */
 static Regexp *RS_regexp;
+
+static const char nonfatal[] = "NONFATAL";
 
 bool RS_is_null;
 
@@ -1096,8 +1102,6 @@ getredirect(const char *str, int len)
 bool
 is_non_fatal_std(FILE *fp)
 {
-	static const char nonfatal[] = "NONFATAL";
-
 	if (in_PROCINFO(nonfatal, NULL, NULL))
 		return true;
 
@@ -1117,8 +1121,8 @@ is_non_fatal_std(FILE *fp)
 bool
 is_non_fatal_redirect(const char *str)
 {
-	return in_PROCINFO("NONFATAL", NULL, NULL) != NULL
-	       || in_PROCINFO(str, "NONFATAL", NULL) != NULL;
+	return in_PROCINFO(nonfatal, NULL, NULL) != NULL
+	       || in_PROCINFO(str, nonfatal, NULL) != NULL;
 }
 
 /* close_one --- temporarily close an open file to re-use the fd */
@@ -1619,12 +1623,8 @@ nextrres:
 }
 #endif /* HAVE_SOCKETS */
 
-/* devopen --- handle /dev/std{in,out,err}, /dev/fd/N, regular files */
 
-/*
- * Strictly speaking, "name" is not a "const char *" because we temporarily
- * change the string.
- */
+/* devopen_simple --- handle "-", /dev/std{in,out,err}, /dev/fd/N */
 
 /*
  * 9/2014: Flow here is a little messy.
@@ -1638,23 +1638,25 @@ nextrres:
  */
 
 int
-devopen(const char *name, const char *mode)
+devopen_simple(const char *name, const char *mode, bool try_real_open)
 {
 	int openfd;
 	char *cp;
 	char *ptr;
 	int flag = 0;
-	struct inet_socket_info isi;
-	int save_errno = 0;
 
-	if (strcmp(name, "-") == 0)
-		return fileno(stdin);
+	if (strcmp(name, "-") == 0) {
+		if (mode[0] == 'r')
+			return fileno(stdin);
+		else
+			return fileno(stdout);
+	}
 
 	flag = str2mode(mode);
 	openfd = INVALID_HANDLE;
 
 	if (do_posix)
-		goto strictopen;
+		goto done;
 
 	if ((openfd = os_devopen(name, flag)) != INVALID_HANDLE) {
 		os_close_on_exec(openfd, name, "file", "");
@@ -1671,7 +1673,7 @@ devopen(const char *name, const char *mode)
 		else if (strcmp(cp, "stderr") == 0 && (flag & O_ACCMODE) == O_WRONLY)
 			openfd = fileno(stderr);
 		else if (do_traditional)
-			goto strictopen;
+			goto done;
 		else if (strncmp(cp, "fd/", 3) == 0) {
 			struct stat sbuf;
 
@@ -1682,9 +1684,37 @@ devopen(const char *name, const char *mode)
 				openfd = INVALID_HANDLE;
 		}
 		/* do not set close-on-exec for inherited fd's */
-		if (openfd != INVALID_HANDLE)
-			return openfd;
-	} else if (do_traditional) {
+	}
+done:
+	if (try_real_open)
+		openfd = open(name, flag, 0666);
+
+	return openfd;
+}
+
+/* devopen --- handle /dev/std{in,out,err}, /dev/fd/N, /inet, regular files */
+
+/*
+ * Strictly speaking, "name" is not a "const char *" because we temporarily
+ * change the string.
+ */
+
+int
+devopen(const char *name, const char *mode)
+{
+	int openfd;
+	char *cp;
+	int flag;
+	struct inet_socket_info isi;
+	int save_errno = 0;
+
+	openfd = devopen_simple(name, mode, false);
+	if (openfd != INVALID_HANDLE)
+		return openfd;
+
+	flag = str2mode(mode);
+
+	if (do_traditional) {
 		goto strictopen;
 	} else if (inetfile(name, & isi)) {
 #ifdef HAVE_SOCKETS
@@ -1769,7 +1799,7 @@ strictopen:
 		   not permitted.  */
 		struct stat buf;
 
-		if (!inetfile(name, NULL)
+		if (! inetfile(name, NULL)
 		    && stat(name, & buf) == 0 && S_ISDIR(buf.st_mode))
 			errno = EISDIR;
 	}
@@ -1834,7 +1864,7 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 	if (find_two_way_processor(str, rp))
 		return true;
 
-#if defined(HAVE_TERMIOS_H) && ! defined(ZOS_USS)
+#if defined(HAVE_TERMIOS_H)
 	/* case 3: use ptys for two-way communications to child */
 	if (! no_ptys && pty_vs_pipe(str)) {
 		static bool initialized = false;
@@ -1935,56 +1965,75 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		goto use_pipes;
 
 	got_the_pty:
-		if ((slave = open(slavenam, O_RDWR)) < 0) {
-			close(master);
-			fatal(_("could not open `%s', mode `%s'"),
-				slavenam, "r+");
-		}
 
-#ifdef I_PUSH
 		/*
-		 * Push the necessary modules onto the slave to
-		 * get terminal semantics.
+		 * We specifically open the slave only in the child. This allows
+		 * certain, er, "limited" systems to work.  The open is specifically
+		 * without O_NOCTTY in order to make the slave become the controlling
+		 * terminal.
 		 */
-		ioctl(slave, I_PUSH, "ptem");
-		ioctl(slave, I_PUSH, "ldterm");
-#endif
-
-		tcgetattr(slave, & st);
-		st.c_iflag &= ~(ISTRIP | IGNCR | INLCR | IXOFF);
-		st.c_iflag |= (ICRNL | IGNPAR | BRKINT | IXON);
-		st.c_oflag &= ~OPOST;
-		st.c_cflag &= ~CSIZE;
-		st.c_cflag |= CREAD | CS8 | CLOCAL;
-		st.c_lflag &= ~(ECHO | ECHOE | ECHOK | NOFLSH | TOSTOP);
-		st.c_lflag |= ISIG;
-
-		/* Set some control codes to default values */
-#ifdef VINTR
-		st.c_cc[VINTR] = '\003';        /* ^c */
-#endif
-#ifdef VQUIT
-		st.c_cc[VQUIT] = '\034';        /* ^| */
-#endif
-#ifdef VERASE
-		st.c_cc[VERASE] = '\177';       /* ^? */
-#endif
-#ifdef VKILL
-		st.c_cc[VKILL] = '\025';        /* ^u */
-#endif
-#ifdef VEOF
-		st.c_cc[VEOF] = '\004'; /* ^d */
-#endif
-		tcsetattr(slave, TCSANOW, & st);
 
 		switch (pid = fork()) {
 		case 0:
 			/* Child process */
 			setsid();
 
+			if ((slave = open(slavenam, O_RDWR)) < 0) {
+				close(master);
+				fatal(_("could not open `%s', mode `%s'"),
+					slavenam, "r+");
+			}
+
+#ifdef I_PUSH
+			/*
+			 * Push the necessary modules onto the slave to
+			 * get terminal semantics.  Check that they aren't
+			 * already there to avoid hangs on said "limited" systems.
+			 */
+#ifdef I_FIND
+			if (ioctl(slave, I_FIND, "ptem") == 0)
+#endif
+				ioctl(slave, I_PUSH, "ptem");
+#ifdef I_FIND
+			if (ioctl(slave, I_FIND, "ldterm") == 0)
+#endif
+				ioctl(slave, I_PUSH, "ldterm");
+#endif
+			tcgetattr(slave, & st);
+
+			st.c_iflag &= ~(ISTRIP | IGNCR | INLCR | IXOFF);
+			st.c_iflag |= (ICRNL | IGNPAR | BRKINT | IXON);
+			st.c_oflag &= ~OPOST;
+			st.c_cflag &= ~CSIZE;
+			st.c_cflag |= CREAD | CS8 | CLOCAL;
+			st.c_lflag &= ~(ECHO | ECHOE | ECHOK | NOFLSH | TOSTOP);
+			st.c_lflag |= ISIG;
+
+			/* Set some control codes to default values */
+#ifdef VINTR
+			st.c_cc[VINTR] = '\003';        /* ^c */
+#endif
+#ifdef VQUIT
+			st.c_cc[VQUIT] = '\034';        /* ^| */
+#endif
+#ifdef VERASE
+			st.c_cc[VERASE] = '\177';       /* ^? */
+#endif
+#ifdef VKILL
+			st.c_cc[VKILL] = '\025';        /* ^u */
+#endif
+#ifdef VEOF
+			st.c_cc[VEOF] = '\004'; /* ^d */
+#endif
+
 #ifdef TIOCSCTTY
+			/*
+			 * This may not necessary anymore given that we
+			 * open the slave in the child, but it doesn't hurt.
+			 */
 			ioctl(slave, TIOCSCTTY, 0);
 #endif
+			tcsetattr(slave, TCSANOW, & st);
 
 			if (close(master) == -1)
 				fatal(_("close of master pty failed (%s)"), strerror(errno));
@@ -2011,17 +2060,9 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		case -1:
 			save_errno = errno;
 			close(master);
-			close(slave);
 			errno = save_errno;
 			return false;
 
-		}
-
-		/* parent */
-		if (close(slave) != 0) {
-			close(master);
-			(void) kill(pid, SIGKILL);
-			fatal(_("close of slave pty failed (%s)"), strerror(errno));
 		}
 
 		rp->pid = pid;
@@ -2060,7 +2101,7 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		first_pty_letter = '\0';	/* reset for next command */
 		return true;
 	}
-#endif /* defined(HAVE_TERMIOS_H) && ! defined(ZOS_USS) */
+#endif /* defined(HAVE_TERMIOS_H) */
 
 use_pipes:
 #ifndef PIPES_SIMULATED		/* real pipes */
@@ -2287,7 +2328,7 @@ wait_any(int interesting)	/* pid of interest, if any */
 	sigaddset(& set, SIGQUIT);
 	sigprocmask(SIG_BLOCK, & set, & oldset);
 #else
-	RETSIGTYPE (*hstat)(int), (*istat)(int), (*qstat)(int);
+	void (*hstat)(int), (*istat)(int), (*qstat)(int);
 
 	istat = signal(SIGINT, SIG_IGN);
 #endif
@@ -2683,6 +2724,7 @@ init_awkpath(path_info *pi)
 			end++;
 		len = end - start;
 		if (len > 0) {
+			/* +2 is correct here; leave room for / */
 			emalloc(p, char *, len + 2, "init_awkpath");
 			memcpy(p, start, len);
 
@@ -3137,7 +3179,7 @@ iop_finish(IOBUF *iop)
 		lintwarn(_("data file `%s' is empty"), iop->public.name);
 	iop->errcode = errno = 0;
 	iop->count = iop->scanoff = 0;
-	emalloc(iop->buf, char *, iop->size += 2, "iop_finish");
+	emalloc(iop->buf, char *, iop->size += 1, "iop_finish");
 	iop->off = iop->buf;
 	iop->dataend = NULL;
 	iop->end = iop->buf + iop->size;
@@ -3169,10 +3211,10 @@ grow_iop_buffer(IOBUF *iop)
 	size_t newsize;
 
 	/*
-	 * Lop off original extra two bytes, double the size,
-	 * add them back.
+	 * Lop off original extra byte, double the size,
+	 * add it back.
 	 */
-	newsize = ((iop->size - 2) * 2) + 2;
+	newsize = ((iop->size - 1) * 2) + 1;
 
 	/* Check for overflow */
 	if (newsize <= iop->size)
@@ -3180,7 +3222,7 @@ grow_iop_buffer(IOBUF *iop)
 
 	/* Make sure there's room for a disk block */
 	if (newsize - valid < iop->readsize)
-		newsize += iop->readsize + 2;
+		newsize += iop->readsize + 1;
 
 	/* Check for overflow, again */
 	if (newsize <= iop->size)

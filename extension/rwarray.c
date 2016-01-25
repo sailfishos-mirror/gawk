@@ -53,17 +53,6 @@
 #define _(msgid)  gettext(msgid)
 #define N_(msgid) msgid
 
-#if defined(ZOS_USS)
-#include <limits.h>
-#define INT32_MAX INT_MAX
-#define INT32_MIN INT_MIN
-#ifndef __uint32_t
-#define __uint32_t 1
-typedef  unsigned long uint32_t;
-#endif
-typedef  long int32_t;
-#endif /* ZOS_USS */
-
 #define MAGIC "awkrulz\n"
 #define MAJOR 3
 #define MINOR 0
@@ -468,8 +457,8 @@ read_value(FILE *fp, awk_value_t *value)
 		len = ntohl(len);
 		value->val_type = AWK_STRING;
 		value->str_value.len = len;
-		value->str_value.str = gawk_malloc(len + 2);
-		memset(value->str_value.str, '\0', len + 2);
+		value->str_value.str = gawk_malloc(len + 1);
+		memset(value->str_value.str, '\0', len + 1);
 
 		if (fread(value->str_value.str, 1, len, fp) != (ssize_t) len) {
 			gawk_free(value->str_value.str);

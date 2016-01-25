@@ -3,7 +3,7 @@
  */
 
 /* 
- * Copyright (C) 1986, 1988, 1989, 1991-2013 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2015 the Free Software Foundation, Inc.
  * 
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -121,7 +121,7 @@ char casetable[] = {
 	C('\360'), C('\361'), C('\362'), C('\363'), C('\364'), C('\365'), C('\366'), C('\367'),
 	C('\370'), C('\371'), C('\372'), C('\373'), C('\374'), C('\375'), C('\376'), C('\377'),
 };
-#elif 'a' == 0x81 /* it's EBCDIC */
+#elif defined(USE_EBCDIC)
 char casetable[] = {
  /*00  NU    SH    SX    EX    PF    HT    LC    DL */
       0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -214,7 +214,7 @@ load_casetable(void)
 	if (cp == NULL || strcmp(cp, "C") == 0 || strcmp(cp, "POSIX") == 0)
 		return;
 
-#ifndef ZOS_USS
+#ifndef USE_EBCDIC
 	/* use of isalpha is ok here (see is_alpha in awkgram.y) */
 	for (i = 0200; i <= 0377; i++) {
 		if (isalpha(i) && islower(i) && i != toupper(i))
@@ -234,13 +234,13 @@ static const char *const nodetypes[] = {
 	"Node_val",
 	"Node_regex",
 	"Node_dynregex",
+	"Node_typedregex",
 	"Node_var",
 	"Node_var_array",
 	"Node_var_new",
 	"Node_param_list",
 	"Node_func",
 	"Node_ext_func",
-	"Node_old_ext_func",
 	"Node_builtin_func",
 	"Node_array_ref",
 	"Node_array_tree",
@@ -331,12 +331,12 @@ static struct optypetab {
 	{ "Op_builtin", NULL },
 	{ "Op_sub_builtin", NULL },
 	{ "Op_ext_builtin", NULL },
-	{ "Op_old_ext_builtin", NULL },	/* temporary */
 	{ "Op_in_array", " in " },
 	{ "Op_func_call", NULL },
 	{ "Op_indirect_func_call", NULL },
 	{ "Op_push", NULL },
 	{ "Op_push_arg", NULL },
+	{ "Op_push_arg_untyped", NULL },
 	{ "Op_push_i", NULL },
 	{ "Op_push_re", NULL },
 	{ "Op_push_array", NULL },
@@ -827,9 +827,9 @@ set_OFS()
 	new_ofs_len = OFS_node->var_value->stlen;
 
 	if (OFS == NULL)
-		emalloc(OFS, char *, new_ofs_len + 2, "set_OFS");
+		emalloc(OFS, char *, new_ofs_len + 1, "set_OFS");
 	else if (OFSlen < new_ofs_len)
-		erealloc(OFS, char *, new_ofs_len + 2, "set_OFS");
+		erealloc(OFS, char *, new_ofs_len + 1, "set_OFS");
 
 	memcpy(OFS, OFS_node->var_value->stptr, OFS_node->var_value->stlen);
 	OFSlen = new_ofs_len;
@@ -1157,7 +1157,7 @@ r_get_lhs(NODE *n, bool reference)
 					array_vname(n));
 		if (n->orig_array->type != Node_var) {
 			n->orig_array->type = Node_var;
-			n->orig_array->var_value = Nnull_string;
+			n->orig_array->var_value = dupnode(Nnull_string);
 		}
 		/* fall through */
 	case Node_var_new:
@@ -1328,7 +1328,13 @@ setup_frame(INSTRUCTION *pc)
 
 		if (m->type == Node_param_list)
 			m = GET_PARAM(m->param_cnt);
-			
+
+		/* $0 needs to be passed by value to a function */
+		if (m == fields_arr[0]) {
+			DEREF(m);
+			m = dupnode(m);
+		}
+
 		switch (m->type) {
 		case Node_var_new:
 		case Node_var_array:
@@ -1352,6 +1358,11 @@ setup_frame(INSTRUCTION *pc)
 			break;
 
 		case Node_val:
+			r->type = Node_var;
+			r->var_value = m;
+			break;
+
+		case Node_typedregex:
 			r->type = Node_var;
 			r->var_value = m;
 			break;

@@ -372,10 +372,10 @@ setup_pattern(const char *pattern, size_t *len)
 {
 	size_t is_multibyte = 0;
 	int c, c2;
-	size_t buflen = 0;
+	size_t buflen;
 	mbstate_t mbs;
 	bool has_anchor = false;
-	char *buf = NULL;
+	char *buf;
 	char *dest;
 	const char *src, *end;
 
@@ -391,21 +391,12 @@ setup_pattern(const char *pattern, size_t *len)
 	 * escaped characters translated, and generate the regex
 	 * from that. 
 	 */
+	buf = (char *) malloc(*len + 1);
 	if (buf == NULL) {
-		buf = (char *) malloc(*len + 2);
-		if (buf == NULL) {
-			fprintf(stderr, "%s: malloc failed\n", __func__);
-			exit(EXIT_FAILURE);
-		}
-		buflen = *len;
-	} else if (*len > buflen) {
-		buf = (char *) realloc(buf, *len + 2);
-		if (buf == NULL) {
-			fprintf(stderr, "%s: realloc failed\n", __func__);
-			exit(EXIT_FAILURE);
-		}
-		buflen = *len;
+		fprintf(stderr, "%s: malloc failed\n", __func__);
+		exit(EXIT_FAILURE);
 	}
+	buflen = *len;
 	dest = buf;
 
 	while (src < end) {
@@ -668,7 +659,7 @@ char casetable[] = {
 	C('\360'), C('\361'), C('\362'), C('\363'), C('\364'), C('\365'), C('\366'), C('\367'),
 	C('\370'), C('\371'), C('\372'), C('\373'), C('\374'), C('\375'), C('\376'), C('\377'),
 };
-#elif 'a' == 0x81 /* it's EBCDIC */
+#elif defined(USE_EBCDIC)
 char casetable[] = {
  /*00  NU    SH    SX    EX    PF    HT    LC    DL */
       0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,

@@ -44,8 +44,6 @@ static long re_parse_field(long, char **, int, NODE *,
 			     Regexp *, Setfunc, NODE *, NODE *, bool);
 static long def_parse_field(long, char **, int, NODE *,
 			      Regexp *, Setfunc, NODE *, NODE *, bool);
-static long posix_def_parse_field(long, char **, int, NODE *,
-			      Regexp *, Setfunc, NODE *, NODE *, bool);
 static long null_parse_field(long, char **, int, NODE *,
 			     Regexp *, Setfunc, NODE *, NODE *, bool);
 static long sc_parse_field(long, char **, int, NODE *,
@@ -163,7 +161,7 @@ rebuild_record()
 	tlen += (NF - 1) * OFSlen;
 	if ((long) tlen < 0)
 		tlen = 0;
-	emalloc(ops, char *, tlen + 2, "rebuild_record");
+	emalloc(ops, char *, tlen + 1, "rebuild_record");
 	cops = ops;
 	ops[0] = '\0';
 	for (i = 1;  i <= NF; i++) {
@@ -528,75 +526,6 @@ def_parse_field(long up_to,	/* parse only up to this field number */
 			break;
 
 		sep = scan;
-	}
-
-	/* everything done, restore original char at *end */
-	*end = sav;
-
-	*buf = scan;
-	return nf;
-}
-
-/*
- * posix_def_parse_field --- default field parsing.
- *
- * This is called both from get_field() and from do_split()
- * via (*parse_field)().  This variation is for when FS is a single space
- * character.  The only difference between this and def_parse_field()
- * is that this one does not allow newlines to separate fields.
- */
-
-static long
-posix_def_parse_field(long up_to,	/* parse only up to this field number */
-	char **buf,	/* on input: string to parse; on output: point to start next */
-	int len,
-	NODE *fs,
-	Regexp *rp ATTRIBUTE_UNUSED,
-	Setfunc set,	/* routine to set the value of the parsed field */
-	NODE *n,
-	NODE *dummy ATTRIBUTE_UNUSED, /* sep_arr not needed here: hence dummy */
-	bool in_middle ATTRIBUTE_UNUSED)
-{
-	char *scan = *buf;
-	long nf = parse_high_water;
-	char *field;
-	char *end = scan + len;
-	char sav;
-
-	if (up_to == UNLIMITED)
-		nf = 0;
-	if (len == 0)
-		return nf;
-
-	/*
-	 * Nasty special case. If FS set to "", return whole record
-	 * as first field. This is not worth a separate function.
-	 */
-	if (fs->stlen == 0) {
-		(*set)(++nf, *buf, len, n);
-		*buf += len;
-		return nf;
-	}
-
-	/* before doing anything save the char at *end */
-	sav = *end;
-	/* because it will be destroyed now: */
-
-	*end = ' ';	/* sentinel character */
-	for (; nf < up_to; scan++) {
-		/*
-		 * special case:  fs is single space, strip leading whitespace 
-		 */
-		while (scan < end && (*scan == ' ' || *scan == '\t'))
-			scan++;
-		if (scan >= end)
-			break;
-		field = scan;
-		while (*scan != ' ' && *scan != '\t')
-			scan++;
-		(*set)(++nf, field, (long)(scan - field), n);
-		if (scan == end)
-			break;
 	}
 
 	/* everything done, restore original char at *end */
@@ -1020,10 +949,7 @@ do_split(int nargs)
 			}
 		} else if (fs->stlen == 1 && (sep->re_flags & CONSTANT) == 0) {
 			if (fs->stptr[0] == ' ') {
-				if (do_posix)
-					parseit = posix_def_parse_field;
-				else
-					parseit = def_parse_field;
+				parseit = def_parse_field;
 			} else
 				parseit = sc_parse_field;
 		} else {
@@ -1138,7 +1064,7 @@ set_FIELDWIDTHS()
 	FIELDWIDTHS[0] = 0;
 	for (i = 1; ; i++) {
 		unsigned long int tmp;
-		if (i + 2 >= fw_alloc) {
+		if (i + 1 >= fw_alloc) {
 			fw_alloc *= 2;
 			erealloc(FIELDWIDTHS, int *, fw_alloc * sizeof(int), "set_FIELDWIDTHS");
 		}
@@ -1274,10 +1200,7 @@ choose_fs_function:
 				sprintf(buf, "[%c\n]", fs->stptr[0]);
 		}
 	} else {
-		if (do_posix)
-			parse_field = posix_def_parse_field;
-		else
-			parse_field = def_parse_field;
+		parse_field = def_parse_field;
 
 		if (fs->stlen == 1) {
 			if (fs->stptr[0] == ' ')
@@ -1598,9 +1521,8 @@ fpat_parse_field(long up_to,	/* parse only up to this field number */
 
 	if (in_middle) {
 		regex_flags |= RE_NO_BOL;
-		non_empty = rp->non_empty;
-	} else
-		non_empty = false;
+	}
+	non_empty = rp->non_empty;
 
 	eosflag = false;
 	need_to_set_sep = true;

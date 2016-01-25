@@ -62,6 +62,7 @@ SEDME2 = sed '/%%Page: 10 10/,/0 Cg EP/d'
 CARDSRC = $(srcdir)/macros $(srcdir)/cardfonts $(srcdir)/colors awkcard.tr
 CARDSRC_N = $(srcdir)/macros $(srcdir)/cardfonts $(srcdir)/no.colors awkcard.tr
 CARDFILES= $(CARDSRC) ad.block awkcard.in setter.outline
+PAPEROPTS= -dpaper=letter -P-pletter
 
 # Use this if your troff can correctly handle macros from 'colors' file
 AWKCARD = awkcard.ps
@@ -77,7 +78,7 @@ gawk.texi: $(srcdir)/gawktexi.in $(srcdir)/sidebar.awk
 
 postscript: gawk.ps gawkinet.ps gawk.1.ps $(AWKCARD)
 
-pdf: postscript gawk.pdf gawkinet.pdf awkcard.pdf gawk.1.pdf
+pdf-local: postscript gawk.pdf gawkinet.pdf awkcard.pdf gawk.1.pdf
 
 gawk.ps: gawk.dvi
 	TEXINPUTS=$(srcdir): dvips -o gawk.ps gawk.dvi
@@ -95,10 +96,10 @@ awkcard.tr: awkcard.in
 	sed 's:SRCDIR:$(srcdir):' < $(srcdir)/awkcard.in > awkcard.tr
 
 awkcard.ps: $(CARDFILES)
-	$(TROFF) $(CARDSRC) | $(SEDME) | cat $(srcdir)/setter.outline - | $(SEDME2) > awkcard.ps
+	$(TROFF) $(PAPEROPTS) $(CARDSRC) | $(SEDME) | cat $(srcdir)/setter.outline - | $(SEDME2) > awkcard.ps
 
 awkcard.nc: $(CARDFILES)
-	$(TROFF) $(CARDSRC_N) | $(SEDME) | cat $(srcdir)/setter.outline - | $(SEDME2) > awkcard.ps && touch awkcard.nc
+	$(TROFF) $(PAPEROPTS) $(CARDSRC_N) | $(SEDME) | cat $(srcdir)/setter.outline - | $(SEDME2) > awkcard.ps && touch awkcard.nc
 
 awkcard.pdf: awkcard.ps
 	ps2pdf awkcard.ps awkcard.pdf

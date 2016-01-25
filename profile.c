@@ -3,7 +3,7 @@
  */
 
 /* 
- * Copyright (C) 1999-2013 the Free Software Foundation, Inc.
+ * Copyright (C) 1999-2015 the Free Software Foundation, Inc.
  * 
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -32,6 +32,8 @@ static void parenthesize(int type, NODE *left, NODE *right);
 static char *pp_list(int nargs, const char *paren, const char *delim);
 static char *pp_group3(const char *s1, const char *s2, const char *s3);
 static char *pp_concat(int nargs);
+static char *pp_string_or_strong_regex(const char *in_str, size_t len, int delim, bool strong_regex);
+static char *pp_strong_regex(const char *in_str, size_t len, int delim);
 static bool is_binary(int type);
 static bool is_scalar(int type);
 static int prec_level(int type);
@@ -48,8 +50,8 @@ const char *redir2str(int redirtype);
 #define DONT_FREE 1
 #define CAN_FREE  2
 
-static RETSIGTYPE dump_and_exit(int signum) ATTRIBUTE_NORETURN;
-static RETSIGTYPE just_dump(int signum);
+static void dump_and_exit(int signum) ATTRIBUTE_NORETURN;
+static void just_dump(int signum);
 
 /* pretty printing related functions and variables */
 
@@ -67,9 +69,29 @@ static long indent_level = 0;
 void
 set_prof_file(const char *file)
 {
+	int fd;
+
 	assert(file != NULL);
-	prof_fp = fopen(file, "w");
+	fd = devopen_simple(file, "w", true);
+	if (fd == INVALID_HANDLE)
+		prof_fp = NULL;
+	else if (fd == fileno(stdout))
+		prof_fp = stdout;
+	else if (fd == fileno(stderr))
+		prof_fp = stderr;
+	else
+		prof_fp = fdopen(fd, "w");
+
 	if (prof_fp == NULL) {
+		/* don't leak file descriptors */
+		int e = errno;
+
+		if (   fd != INVALID_HANDLE
+		    && fd != fileno(stdout)
+		    && fd != fileno(stderr))
+			(void) close(fd);
+
+		errno = e;
 		warning(_("could not open `%s' for writing: %s"),
 				file, strerror(errno));
 		warning(_("sending profile to standard error"));
@@ -295,6 +317,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, bool in_for_header)
 		case Op_push_array:
 		case Op_push:
 		case Op_push_arg:
+		case Op_push_arg_untyped:
 			m = pc->memory;
 			switch (m->type) {
 			case Node_param_list:
@@ -604,14 +627,17 @@ cleanup:
 			break;
 
 		case Op_push_re:
-			if (pc->memory->type != Node_regex)
+			if (pc->memory->type != Node_regex && pc->memory->type != Node_typedregex)
 				break;
 			/* else 
 				fall through */
 		case Op_match_rec:
 		{
 			NODE *re = pc->memory->re_exp;
-			str = pp_string(re->stptr, re->stlen, '/');
+			if (pc->memory->type == Node_regex)
+				str = pp_string(re->stptr, re->stlen, '/');
+			else
+				str = pp_strong_regex(re->stptr, re->stlen, '/');
 			pp_push(pc->opcode, str, CAN_FREE);
 		}
 			break;
@@ -633,6 +659,11 @@ cleanup:
 				txt = t2->pp_str;
 				str = pp_group3(txt, op2str(pc->opcode), restr);
 				pp_free(t2);
+			} else if (m->type == Node_typedregex) {
+				NODE *re = m->re_exp;
+				restr = pp_strong_regex(re->stptr, re->stlen, '/');
+				str = pp_group3(txt, op2str(pc->opcode), restr);
+				efree(restr);
 			} else {
 				NODE *re = m->re_exp;
 				restr = pp_string(re->stptr, re->stlen, '/');
@@ -982,7 +1013,7 @@ pp_string_fp(Func_print print_func, FILE *fp, const char *in_str,
 
 /* just_dump --- dump the profile and function stack and keep going */
 
-static RETSIGTYPE
+static void
 just_dump(int signum)
 {
 	extern INSTRUCTION *code_block;
@@ -996,7 +1027,7 @@ just_dump(int signum)
 
 /* dump_and_exit --- dump the profile, the function stack, and exit */
 
-static RETSIGTYPE
+static void
 dump_and_exit(int signum)
 {
 	just_dump(signum);
@@ -1303,10 +1334,26 @@ parenthesize(int type, NODE *left, NODE *right)
 		pp_parenthesize(right);
 }
 
-/* pp_string --- pretty format a string or regex constant */
+/* pp_string --- pretty format a string or regular regex constant */
 
 char *
 pp_string(const char *in_str, size_t len, int delim)
+{
+	return pp_string_or_strong_regex(in_str, len, delim, false);
+}
+
+/* pp_strong_regex --- pretty format a hard regex constant */
+
+static char *
+pp_strong_regex(const char *in_str, size_t len, int delim)
+{
+	return pp_string_or_strong_regex(in_str, len, delim, true);
+}
+
+/* pp_string_or_strong_regex --- pretty format a string, regex, or hard regex constant */
+
+char *
+pp_string_or_strong_regex(const char *in_str, size_t len, int delim, bool strong_regex)
 {
 	static char str_escapes[] = "\a\b\f\n\r\t\v\\";
 	static char str_printables[] = "abfnrtv\\";
@@ -1339,10 +1386,14 @@ pp_string(const char *in_str, size_t len, int delim)
 		osiz *= 2; \
 	} ofre -= (l)
 
-	osiz = len + 3 + 2; 	/* initial size; 3 for delim + terminating null */
+	/* initial size; 3 for delim + terminating null, 1 for @ */
+	osiz = len + 3 + 1 + (strong_regex == true);
 	emalloc(obuf, char *, osiz, "pp_string");
 	obufout = obuf;
 	ofre = osiz - 1;
+
+	if (strong_regex)
+		*obufout++ = '@';
 
 	*obufout++ = delim;
 	for (; len > 0; len--, str++) {
@@ -1351,10 +1402,9 @@ pp_string(const char *in_str, size_t len, int delim)
 			*obufout++ = '\\';
 			*obufout++ = delim;
 		} else if (*str == '\0') {
-			chksize(4);
-
 			*obufout++ = '\\';
 			*obufout++ = '0';
+			chksize(2);	/* need 2 more chars for this case */
 			*obufout++ = '0';
 			*obufout++ = '0';
 		} else if ((cp = strchr(escapes, *str)) != NULL) {
@@ -1364,7 +1414,7 @@ pp_string(const char *in_str, size_t len, int delim)
 		/* NB: Deliberate use of lower-case versions. */
 		} else if (isascii(*str) && isprint(*str)) {
 			*obufout++ = *str;
-			ofre += 1;
+			ofre += 1;	/* used 1 less than expected */
 		} else {
 			size_t len;
 
@@ -1390,9 +1440,10 @@ pp_number(NODE *n)
 {
 #define PP_PRECISION 6
 	char *str;
-	size_t count;
 
 #ifdef HAVE_MPFR
+	size_t count;
+
 	if (is_mpg_float(n)) {
 		count = mpfr_get_prec(n->mpg_numbr) / 3;	/* ~ 3.22 binary digits per decimal digit */
 		emalloc(str, char *, count, "pp_number");
@@ -1409,9 +1460,19 @@ pp_number(NODE *n)
 	} else
 #endif
 	{
-		count = PP_PRECISION + 10;
-		emalloc(str, char *, count, "pp_number");
-		sprintf(str, "%0.*g", PP_PRECISION, n->numbr);
+		/* Use format_val() to get integral values printed as integers */
+		NODE *s;
+
+		getnode(s);
+		*s = *n;
+		s->flags &= ~STRCUR;
+
+		s = r_format_val("%.6g", 0, s);
+
+		s->stptr[s->stlen] = '\0';
+		str = s->stptr;
+
+		freenode(s);
 	}
 
 	return str;
@@ -1587,7 +1648,7 @@ pp_group3(const char *s1, const char *s2, const char *s3)
 	len1 = strlen(s1);
 	len2 = strlen(s2);
 	len3 = strlen(s3);
-	l = len1 + len2 + len3 + 2;
+	l = len1 + len2 + len3 + 1;
 	emalloc(str, char *, l, "pp_group3");
 	s = str;
 	if (len1 > 0) {

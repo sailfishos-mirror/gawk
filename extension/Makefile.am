@@ -1,7 +1,7 @@
 #
 # extension/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1995-2006, 2012 the Free Software Foundation, Inc.
+# Copyright (C) 1995-2006, 2012-2015 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/..
 
 # This variable insures that aclocal runs
 # correctly after changing configure.ac
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 -I ../m4
 
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f
@@ -118,6 +118,7 @@ uninstall-recursive: uninstall-so
 EXTRA_DIST = build-aux/config.rpath  \
 	ChangeLog \
 	ChangeLog.0 \
+	ext_custom.h \
 	fts.3 \
 	README.fts \
 	rwarray0.c

@@ -41,11 +41,9 @@
 #if defined HAVE_STDBOOL_H || defined _LIBC
 # include <stdbool.h>
 #endif /* HAVE_STDBOOL_H || _LIBC */
-#if !defined(ZOS_USS)
 #if defined HAVE_STDINT_H || defined _LIBC
 # include <stdint.h>
 #endif /* HAVE_STDINT_H || _LIBC */
-#endif /* !ZOS_USS */
 #if defined _LIBC
 # include <bits/libc-lock.h>
 #else
@@ -145,14 +143,10 @@ is_blank (int c)
 # define __mempcpy mempcpy
 # define __wcrtomb wcrtomb
 # define __regfree regfree
-# define attribute_hidden
 #endif /* not _LIBC */
 
-#ifdef __GNUC__
-# define __attribute(arg) __attribute__ (arg)
-#else
-# define __attribute(arg)
-# define __attribute__(arg)	/* GAWK: They left this out. Duh. */
+#if __GNUC__ < 3 + (__GNUC_MINOR__ < 1)
+# define __attribute__(arg)
 #endif
 
 #ifdef GAWK
@@ -163,9 +157,6 @@ is_blank (int c)
 # undef __attribute_warn_unused_result__
 # define __attribute_warn_unused_result__
 #endif
-
-extern const char __re_error_msgid[] attribute_hidden;
-extern const size_t __re_error_msgid_idx[] attribute_hidden;
 
 /* An integer used to represent a set of bits.  It must be unsigned,
    and must be at least as wide as unsigned int.  */
@@ -467,8 +458,38 @@ static unsigned int re_string_context_at (const re_string_t *input, int idx,
 # endif
 #endif
 
+/*
+ * GAWK checks for zero-size allocations everywhere else,
+ * do it here too.
+ */
+#ifndef GAWK
 #define re_malloc(t,n) ((t *) malloc ((n) * sizeof (t)))
 #define re_realloc(p,t,n) ((t *) realloc (p, (n) * sizeof (t)))
+#else
+static void *
+test_malloc(size_t count, const char *file, size_t line)
+{
+	if (count == 0) {
+		fprintf(stderr, "%s:%lu: allocation of zero bytes\n",
+				file, (unsigned long) line);
+		exit(1);
+	}
+	return malloc(count);
+}
+
+static void *
+test_realloc(void *p, size_t count, const char *file, size_t line)
+{
+	if (count == 0) {
+		fprintf(stderr, "%s:%lu: reallocation of zero bytes\n",
+				file, (unsigned long) line);
+		exit(1);
+	}
+	return realloc(p, count);
+}
+#define re_malloc(t,n) ((t *) test_malloc (((n) * sizeof (t)), __FILE__, __LINE__))
+#define re_realloc(p,t,n) ((t *) test_realloc (p, (n) * sizeof (t), __FILE__, __LINE__))
+#endif
 #define re_free(p) free (p)
 
 struct bin_tree_t
@@ -749,7 +770,7 @@ bitset_mask (bitset_t dest, const bitset_t src)
 }
 
 #ifdef RE_ENABLE_I18N
-/* Inline functions for re_string.  */
+/* Functions for re_string.  */
 static int
 internal_function __attribute__ ((pure, unused))
 re_string_char_size_at (const re_string_t *pstr, int idx)
@@ -773,6 +794,10 @@ re_string_wchar_at (const re_string_t *pstr, int idx)
 }
 
 # ifndef NOT_IN_libc
+#  ifdef _LIBC
+#   include <locale/weight.h>
+#  endif
+
 static int
 internal_function __attribute__ ((pure, unused))
 re_string_elem_size_at (const re_string_t *pstr, int idx)
@@ -780,7 +805,6 @@ re_string_elem_size_at (const re_string_t *pstr, int idx)
 #  ifdef _LIBC
   const unsigned char *p, *extra;
   const int32_t *table, *indirect;
-#   include <locale/weight.h>
   uint_fast32_t nrules = _NL_CURRENT_WORD (LC_COLLATE, _NL_COLLATE_NRULES);
 
   if (nrules != 0)

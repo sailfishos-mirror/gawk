@@ -23,7 +23,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk], 4.1.60, bug-gawk@gnu.org, gawk)
+AC_INIT([GNU Awk],[4.1.60],[bug-gawk@gnu.org],[gawk])
 
 # This is a hack. Different versions of install on different systems
 # are just too different. Chuck it and use install-sh.
@@ -39,7 +39,7 @@ then
 	export INSTALL
 fi
 
-AC_PREREQ(2.69)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE([1.15 dist-xz dist-lzip])
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -110,10 +110,19 @@ AC_SUBST([pkgextensiondir], ['${pkglibdir}'])
 
 dnl checks for systems
 AC_ZOS_USS
-AC_ISC_POSIX
+AC_SEARCH_LIBS([strerror],[cposix])
 AC_SYS_LARGEFILE
 GAWK_AC_AIX_TWEAK
-GAWK_AC_LINUX_ALPHA
+
+AC_MSG_CHECKING([if we are using EBCDIC])
+AC_EGREP_CPP([gnu_gawk_in_ebcdic],
+[#if 'a' == 0x81
+gnu_gawk_in_ebcdic
+#endif],
+[AC_DEFINE(USE_EBCDIC, 1, Define to 1 if the character set is EBCDIC)
+ use_ebcdic=yes],
+[use_ebcdic=no])
+AC_MSG_RESULT([$use_ebcdic])
 
 if test "$ISC" = 1	# will be set by test for ISC
 then
@@ -134,7 +143,7 @@ gt_LC_MESSAGES
 dnl checks for header files
 AC_CHECK_HEADERS(arpa/inet.h fcntl.h limits.h locale.h libintl.h mcheck.h \
 	netdb.h netinet/in.h stdarg.h stddef.h string.h \
-	sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h \
+	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
 	termios.h stropts.h wchar.h wctype.h)
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
@@ -153,8 +162,7 @@ AM_CONDITIONAL([TEST_CROSS_COMPILE], [test "x$build_alias" != "x$host_alias"])
 
 dnl checks for typedefs
 AC_TYPE_PID_T
-AC_TYPE_SIGNAL
-AC_SIZE_T
+AC_TYPE_SIZE_T
 AC_TYPE_GETGROUPS
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
@@ -164,30 +172,26 @@ AC_CHECK_TYPE(ssize_t, int)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
 dnl see if time_t is defined in <sys/types.h>
-AC_TRY_COMPILE([#include <sys/types.h>],[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>]], [[
 	time_t foo;
 	foo = 0;
-],
-	AC_DEFINE(TIME_T_IN_SYS_TYPES_H, 1,
-		  [some systems define this type here]))
+]])],[AC_DEFINE(TIME_T_IN_SYS_TYPES_H, 1,
+		  some systems define this type here)],[])
 dnl check for wctype_t in <wctype.h>
-AC_TRY_COMPILE([#include <wctype.h>],[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <wctype.h>]], [[
 	wctype_t foo;
 	foo = 0;
-],
-	AC_DEFINE(HAVE_WCTYPE_T, 1, [systems should define this type here]))
+]])],[AC_DEFINE(HAVE_WCTYPE_T, 1, systems should define this type here)],[])
 dnl check for wint_t in <wctype.h>
-AC_TRY_COMPILE([#include <wctype.h>],[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <wctype.h>]], [[
 	wint_t foo;
 	foo = 0;
-],
-	AC_DEFINE(HAVE_WINT_T, 1, [systems should define this type here]))
+]])],[AC_DEFINE(HAVE_WINT_T, 1, systems should define this type here)],[])
 dnl check for sockaddr_storage
-AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>],[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/socket.h>]], [[
 	struct sockaddr_storage foo;
-],
-	AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1, [newer systems define this type here]))
+]])],[AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1, newer systems define this type here)],[])
 
 dnl Borrwed from rsync, thanks to to Jim Meyering.
 
@@ -210,18 +214,18 @@ AC_DEFUN([TYPE_SOCKLEN_T],
          rsync_cv_socklen_t_equiv=
          for arg2 in "struct sockaddr" void; do
             for t in int size_t unsigned long "unsigned long"; do
-               AC_TRY_COMPILE([
+               AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
 #include <sys/socket.h>
 
                   int getpeername (int, $arg2 *, $t *);
-               ],[
+               ]], [[
                   $t len;
                   getpeername(0,0,&len);
-               ],[
+               ]])],[
                   rsync_cv_socklen_t_equiv="$t"
                   break
-               ])
+               ],[])
             done
          done
 
@@ -266,7 +270,7 @@ osf1)	: ;;
 esac
 
 # Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
-AC_CHECK_FUNCS(atexit btowc fmod getgrent getgroups grantpt \
+AC_CHECK_FUNCS(__etoa_l atexit btowc fmod getgrent getgroups grantpt \
 	isascii iswctype iswlower iswupper mbrlen \
 	memcmp memcpy memcpy_ulong memmove memset \
 	memset_ulong mkstemp posix_openpt setenv setlocale setsid sigprocmask \
@@ -287,10 +291,6 @@ if test "x$enable_extensions" != "xno"; then
 	dnl On MirBSD (and probably other systems), don't even try.
 	case $host_os in
 	mirbsd* | openedition*)	# OS/390 z/OS POSIX layer
-		cat << \EOF > extension/Makefile
-all dist check clean distclean install uninstall distcheck:
-	@exit 0
-EOF
 		;;
 	*)
 	AC_CHECK_HEADER(dlfcn.h,
@@ -322,6 +322,7 @@ EOF
 		AC_MSG_ERROR([extension support requested, but unavailable])
 	fi
 	enable_extensions=$extensions_supported
+	AM_CONDITIONAL([ENABLE_EXTENSIONS], [test "x$enable_extensions" = "xyes"])
 fi
 
 dnl check for how to use getpgrp
@@ -374,6 +375,14 @@ GNUPG_CHECK_MPFR
 
 dnl checks for structure members
 AC_CHECK_MEMBERS([struct stat.st_blksize])
+AC_CHECK_MEMBERS([struct passwd.pw_passwd],,,[
+#include <sys/types.h>
+#include <pwd.h>
+])
+AC_CHECK_MEMBERS([struct group.gr_passwd],,,[
+#include <sys/types.h>
+#include <grp.h>
+])
 AC_STRUCT_TM
 AC_STRUCT_TIMEZONE
 

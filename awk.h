@@ -108,24 +108,12 @@ extern int errno;
 #undef CHARBITS
 #undef INTBITS
 
-#if !defined(ZOS_USS)
 #if HAVE_INTTYPES_H
 # include <inttypes.h>
 #endif
 #if HAVE_STDINT_H
 # include <stdint.h>
 #endif
-#else /* ZOS_USS */
-#include <limits.h>
-#include <sys/time.h>
-#define INT32_MAX INT_MAX
-#define INT32_MIN INT_MIN
-#ifndef __uint32_t
-#define __uint32_t 1
-typedef  unsigned long uint32_t;
-#endif
-typedef  long int32_t;
-#endif /* !ZOS_USS */
 
 /* ----------------- System dependencies (with more includes) -----------*/
 
@@ -159,11 +147,10 @@ typedef int off_t;
 #ifdef NEED_MEMORY_H
 #include <memory.h>
 #endif	/* NEED_MEMORY_H */
-#else	/* not HAVE_STRING_H */
+#endif /* HAVE_STRING_H */
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif	/* HAVE_STRINGS_H */
-#endif	/* not HAVE_STRING_H */
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -277,6 +264,7 @@ typedef enum nodevals {
 	Node_val,		/* node is a value - type in flags */
 	Node_regex,		/* a regexp, text, compiled, flags, etc */
 	Node_dynregex,		/* a dynamic regexp */
+	Node_typedregex,	/* like Node_regex, but is a real type */
 
 	/* symbol table values */
 	Node_var,		/* scalar variable, lnode is value */
@@ -285,7 +273,6 @@ typedef enum nodevals {
 	Node_param_list,	/* lnode is a variable, rnode is more list */
 	Node_func,		/* lnode is param. list, rnode is body */
 	Node_ext_func,		/* extension function, code_ptr is builtin code */
-	Node_old_ext_func,	/* extension function, code_ptr is builtin code */
 	Node_builtin_func,	/* built-in function, main use is for FUNCTAB */
 
 	Node_array_ref,		/* array passed by ref as parameter */
@@ -402,6 +389,37 @@ typedef struct exp_node {
 #		define	MALLOC	0x0001       /* can be free'd */
 
 /* type = Node_val */
+	/*
+	 * STRING and NUMBER are mutually exclusive. They represent the
+	 * type of a value as assigned.
+	 *
+	 * STRCUR and NUMCUR are not mutually exclusive. They represent that
+	 * the particular type of value is up to date.  For example,
+	 *
+	 * 	a = 5		# NUMBER | NUMCUR
+	 * 	b = a ""	# Adds STRCUR to a, since a string value
+	 * 			# is now available. But the type hasn't changed!
+	 *
+	 * 	a = "42"	# STRING | STRCUR
+	 * 	b = a + 0	# Adds NUMCUR to a, since numeric value
+	 * 			# is now available. But the type hasn't changed!
+	 *
+	 * MAYBE_NUM is the joker.  It means "this is string data, but
+	 * the user may have really wanted it to be a number. If we have
+	 * to guess, like in a comparison, turn it into a number."
+	 * For example,    gawk -v a=42 ....
+	 * Here, `a' gets STRING|STRCUR|MAYBE_NUM and then when used where
+	 * a number is needed, it gets turned into a NUMBER and STRING
+	 * is cleared.
+	 *
+	 * WSTRCUR is for efficiency. If in a multibyte locale, and we
+	 * need to do something character based (substr, length, etc.)
+	 * we create the corresponding wide character string and store it,
+	 * and add WSTRCUR to the flags so that we don't have to do the
+	 * conversion more than once.
+	 *
+	 * We hope that the rest of the flags are self-explanatory. :-)
+	 */
 #		define	STRING	0x0002       /* assigned as string */
 #		define	STRCUR	0x0004       /* string value is current */
 #		define	NUMCUR	0x0008       /* numeric value is current */
@@ -631,7 +649,6 @@ typedef enum opcodeval {
 	Op_builtin,
 	Op_sub_builtin,		/* sub, gsub and gensub */
 	Op_ext_builtin,
-	Op_old_ext_builtin,	/* temporary */
 	Op_in_array,		/* boolean test of membership in array */
 
 	/* function call instruction */
@@ -640,6 +657,7 @@ typedef enum opcodeval {
 
 	Op_push,		/* scalar variable */
 	Op_push_arg,		/* variable type (scalar or array) argument to built-in */
+	Op_push_arg_untyped,	/* like Op_push_arg, but for typeof */
 	Op_push_i,		/* number, string */
 	Op_push_re,		/* regex */
 	Op_push_array,
@@ -1178,6 +1196,7 @@ extern void r_unref(NODE *tmp);
 static inline void
 DEREF(NODE *r)
 {
+	assert(r->valref > 0);
 	if (--r->valref == 0)
 		r_unref(r);
 }
@@ -1382,6 +1401,7 @@ extern NODE *do_dcgettext(int nargs);
 extern NODE *do_dcngettext(int nargs);
 extern NODE *do_bindtextdomain(int nargs);
 extern NODE *do_intdiv(int nargs);
+extern NODE *do_typeof(int nargs);
 extern int strncasecmpmbs(const unsigned char *,
 			  const unsigned char *, size_t);
 /* eval.c */
@@ -1420,10 +1440,8 @@ extern NODE **r_get_field(NODE *n, Func_ptr *assign, bool reference);
 /* ext.c */
 extern NODE *do_ext(int nargs);
 void load_ext(const char *lib_name);	/* temporary */
-extern NODE *load_old_ext(SRCFILE *s, const char *init_func, const char *fini_func, NODE *obj);
 extern void close_extensions(void);
 #ifdef DYNAMIC
-extern void make_old_builtin(const char *, NODE *(*)(int), int);
 extern awk_bool_t make_builtin(const awk_ext_func_t *);
 extern NODE *get_argument(int);
 extern NODE *get_actual_argument(int, bool, bool);
@@ -1492,6 +1510,7 @@ extern struct redirect *redirect_string(const char *redir_exp_str,
 extern NODE *do_close(int nargs);
 extern int flush_io(void);
 extern int close_io(bool *stdio_problem);
+extern int devopen_simple(const char *name, const char *mode, bool try_real_open);
 extern int devopen(const char *name, const char *mode);
 extern int srcopen(SRCFILE *s);
 extern char *find_source(const char *src, struct stat *stb, int *errcode, int is_extlib);
@@ -1645,6 +1664,11 @@ extern uintmax_t adjust_uint(uintmax_t n);
 #endif /* ! defined(VMS)) */
 #endif /* WEXITSTATUS */
 
+/* For z/OS, from Dave Pitts. EXIT_FAILURE is normally 8, make it 1. */
+#if defined(EXIT_FAILURE) && EXIT_FAILURE == 8
+# undef EXIT_FAILURE
+#endif
+
 /* EXIT_SUCCESS and EXIT_FAILURE normally come from <stdlib.h> */
 #ifndef EXIT_SUCCESS
 # define EXIT_SUCCESS 0
@@ -1655,16 +1679,6 @@ extern uintmax_t adjust_uint(uintmax_t n);
 /* EXIT_FATAL is specific to gawk, not part of Standard C */
 #ifndef EXIT_FATAL
 # define EXIT_FATAL   2
-#endif
-
-/* For z/OS, from Dave Pitts. EXIT_FAILURE is normally 8, make it 1. */
-#ifdef ZOS_USS
-
-#ifdef EXIT_FAILURE
-#undef EXIT_FAILURE
-#endif
-
-#define EXIT_FAILURE 1
 #endif
 
 /* ------------------ Inline Functions ------------------ */
@@ -1760,6 +1774,9 @@ dupnode(NODE *n)
 static inline NODE *
 force_string(NODE *s)
 {
+	if (s->type == Node_typedregex)
+		return dupnode(s->re_exp);
+
 	if ((s->flags & STRCUR) != 0
 		    && (s->stfmt == -1 || s->stfmt == CONVFMTidx)
 	)
@@ -1782,7 +1799,10 @@ unref(NODE *r)
 static inline NODE *
 force_number(NODE *n)
 {
-	return (n->flags & NUMCUR) ? n : str2number(n);
+	if (n->type == Node_typedregex)
+		return Nnull_string;
+
+	return (n->flags & NUMCUR) != 0 ? n : str2number(n);
 }
 
 #endif /* GAWKDEBUG */

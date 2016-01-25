@@ -93,6 +93,8 @@ EXTRA_DIST = \
 	aryprm7.ok \
 	aryprm8.awk \
 	aryprm8.ok \
+	aryprm9.awk \
+	aryprm9.ok \
 	arysubnm.awk \
 	arysubnm.ok \
 	asgext.awk \
@@ -137,6 +139,7 @@ EXTRA_DIST = \
 	charasbytes.awk \
 	charasbytes.in \
 	charasbytes.ok \
+	checknegtime.awk \
 	childin.awk \
 	childin.in \
 	childin.ok \
@@ -176,6 +179,15 @@ EXTRA_DIST = \
 	datanonl.ok \
 	dbugeval.in \
 	dbugeval.ok \
+	dbugeval2.awk \
+	dbugeval2.in \
+	dbugeval2.ok \
+	dbugtypedre1.awk \
+	dbugtypedre1.in \
+	dbugtypedre1.ok \
+	dbugtypedre2.awk \
+	dbugtypedre2.in \
+	dbugtypedre2.ok \
 	defref.awk \
 	defref.ok \
 	delargv.awk \
@@ -292,6 +304,9 @@ EXTRA_DIST = \
 	fpat3.ok \
 	fpat4.awk \
 	fpat4.ok \
+	fpat5.awk \
+	fpat5.in \
+	fpat5.ok \
 	fpatnull.awk \
 	fpatnull.in \
 	fpatnull.ok \
@@ -380,6 +395,8 @@ EXTRA_DIST = \
 	gnureops.ok \
 	gsubasgn.awk \
 	gsubasgn.ok \
+	gsubind.awk \
+	gsubind.ok \
 	gsubtest.awk \
 	gsubtest.ok \
 	gsubtst2.awk \
@@ -411,6 +428,9 @@ EXTRA_DIST = \
 	icasers.awk \
 	icasers.in \
 	icasers.ok \
+	inpref.awk \
+	inpref.in \
+	inpref.ok \
 	id.awk \
 	id.ok \
 	igncdym.awk \
@@ -507,6 +527,8 @@ EXTRA_DIST = \
 	manglprm.ok \
 	manyfiles.awk \
 	manyfiles.ok \
+	muldimposix.awk \
+	muldimposix.ok \
 	match1.awk \
 	match1.ok \
 	match2.awk \
@@ -532,6 +554,9 @@ EXTRA_DIST = \
 	mbprintf4.ok \
 	mbstr1.awk \
 	mbstr1.ok \
+	mbstr2.awk \
+	mbstr2.in \
+	mbstr2.ok \
 	membug1.awk \
 	membug1.in \
 	membug1.ok \
@@ -574,6 +599,8 @@ EXTRA_DIST = \
 	negexp.ok \
 	negrange.awk \
 	negrange.ok \
+	negtime.awk \
+	negtime.ok \
 	nested.awk \
 	nested.in \
 	nested.ok \
@@ -624,6 +651,8 @@ EXTRA_DIST = \
 	noparms.ok \
 	nors.in \
 	nors.ok \
+	nulinsrc.awk \
+	nulinsrc.ok \
 	nulrsend.awk \
 	nulrsend.in \
 	nulrsend.ok \
@@ -761,10 +790,15 @@ EXTRA_DIST = \
 	range1.awk \
 	range1.in \
 	range1.ok \
+	readbuf.awk \
+	readbuf.ok \
 	readdir.awk \
 	readdir0.awk \
 	readfile2.awk \
 	readfile2.ok \
+	rebrackloc.awk \
+	rebrackloc.in \
+	rebrackloc.ok \
 	rebt8b1.awk \
 	rebt8b1.ok \
 	rebt8b2.awk \
@@ -781,6 +815,9 @@ EXTRA_DIST = \
 	regexpbrack.awk \
 	regexpbrack.in \
 	regexpbrack.ok \
+	regexpbrack2.awk \
+	regexpbrack2.in \
+	regexpbrack2.ok \
 	regexprange.awk \
 	regexprange.ok \
 	reginttrad.awk \
@@ -866,6 +903,8 @@ EXTRA_DIST = \
 	sclifin.ok \
 	shadow.awk \
 	shadow.ok \
+	shadowbuiltin.awk \
+	shadowbuiltin.ok \
 	sort1.awk \
 	sort1.ok \
 	sortempty.awk \
@@ -965,6 +1004,20 @@ EXTRA_DIST = \
 	tweakfld.awk \
 	tweakfld.in \
 	tweakfld.ok \
+	typedregex1.awk \
+	typedregex1.ok \
+	typedregex2.awk \
+	typedregex2.ok \
+	typedregex3.awk \
+	typedregex3.ok \
+	typeof1.awk \
+	typeof1.ok \
+	typeof2.awk \
+	typeof2.ok \
+	typeof3.awk \
+	typeof3.ok \
+	typeof4.awk \
+	typeof4.ok \
 	uninit2.awk \
 	uninit2.ok \
 	uninit3.awk \
@@ -980,6 +1033,10 @@ EXTRA_DIST = \
 	uparrfs.awk \
 	uparrfs.in \
 	uparrfs.ok \
+	watchpoint1.awk \
+	watchpoint1.in \
+	watchpoint1.ok \
+	watchpoint1.script \
 	wideidx.awk \
 	wideidx.in \
 	wideidx.ok \
@@ -1017,7 +1074,7 @@ BASIC_TESTS = \
 	addcomma anchgsub argarray arrayparm arrayprm2 arrayprm3 \
 	arrayref arrymem1 arryref2 arryref3 arryref4 arryref5 arynasty \
 	arynocls aryprm1 aryprm2 aryprm3 aryprm4 aryprm5 aryprm6 aryprm7 \
-	aryprm8 arysubnm asgext awkpath \
+	aryprm8 aryprm9 arysubnm asgext awkpath \
 	back89 backgsub badassign1 badbuild \
 	callparam childin clobber closebad clsflnam compare compare2 concat1 concat2 \
 	concat3 concat4 convfmt \
@@ -1030,18 +1087,20 @@ BASIC_TESTS = \
 	gsubasgn gsubtest gsubtst2 gsubtst3 gsubtst4 gsubtst5 gsubtst6 \
 	gsubtst7 gsubtst8 \
 	hex hsprint \
-	inputred intest intprec iobug1 \
+	inpref inputred intest intprec iobug1 \
 	leaddig leadnl litoct longsub longwrds \
 	manglprm math membug1 messages minusstr mmap8k mtchi18n \
 	nasty nasty2 negexp negrange nested nfldstr nfloop nfneg nfset nlfldsep \
 	nlinstr nlstrina noeffect nofile nofmtch noloop1 noloop2 nonl \
-	noparms nors nulrsend numindex numsubstr \
+	noparms nors nulinsrc nulrsend numindex numsubstr \
 	octsub ofmt ofmta ofmtbig ofmtfidl ofmts ofs1 onlynl opasnidx opasnslf \
 	paramasfunc1 paramasfunc2 \
 	paramdup paramres paramtyp paramuninitglobal parse1 parsefld parseme \
 	pcntplus posix2008sub prdupval prec printf0 printf1 prmarscl prmreuse \
 	prt1eval prtoeval \
-	rand randtest range1 rebt8b1 redfilnm regeq regexpbrack regexprange regrange reindops \
+	rand randtest range1 readbuf rebrackloc rebt8b1 redfilnm \
+	regeq regexpbrack regexpbrack2 \
+	regexprange regrange reindops \
 	reparse resplit rri1 rs rsnul1nl rsnulbig rsnulbig2 rstest1 rstest2 \
 	rstest3 rstest4 rstest5 rswhite \
 	scalar sclforin sclifin sortempty sortglos splitargv splitarr splitdef \
@@ -1058,26 +1117,31 @@ UNIX_TESTS = \
 GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	backw badargs beginfile1 beginfile2 binmode1 charasbytes \
-	colonwarn clos1way crlf dbugeval delsub devfd devfd1 devfd2 dumpvars errno exit \
-	fieldwdth fpat1 fpat2 fpat3 fpat4 fpatnull fsfwfs funlen \
+	colonwarn clos1way crlf dbugeval dbugeval2 dbugtypedre1 dbugtypedre2 delsub \
+	devfd devfd1 devfd2 dumpvars errno exit \
+	fieldwdth fpat1 fpat2 fpat3 fpat4 fpat5 fpatnull fsfwfs funlen \
 	functab1 functab2 functab3 fwtest fwtest2 fwtest3 \
-	genpot gensub gensub2 getlndir gnuops2 gnuops3 gnureops \
+	genpot gensub gensub2 getlndir gnuops2 gnuops3 gnureops gsubind \
 	icasefs icasers id igncdym igncfs ignrcas2 ignrcase \
 	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
 	include include2 indirectbuiltin indirectcall indirectcall2 \
 	lint lintold lintwarn \
-	manyfiles match1 match2 match3 mbstr1 \
-	nastyparm next nondec nondec2 \
+	manyfiles match1 match2 match3 mbstr1 mbstr2 \
+	muldimposix \
+	nastyparm negtime next nondec nondec2 \
 	nonfatal1 nonfatal2 nonfatal3 \
 	patsplit posix printfbad1 printfbad2 printfbad3 printfbad4 printhuge procinfs \
 	profile0 profile1 profile2 profile3 profile4 profile5 profile6 profile7 \
-	profile8 pty1 \
+	profile8 profile9 pty1 \
 	rebuf regnul1 regnul2 regx8bit reginttrad reint reint2 rsgetline rsglstdin rsstart1 \
-	rsstart2 rsstart3 rstest6 shadow sortfor sortu split_after_fpat \
+	rsstart2 rsstart3 rstest6 shadow shadowbuiltin \
+	sortfor sortu split_after_fpat \
 	splitarg4 strftime \
 	strtonum switch2 symtab1 symtab2 symtab3 symtab4 symtab5 symtab6 \
 	symtab7 symtab8 symtab9 \
-	timeout
+	typedregex1 typedregex2 typedregex3 typeof1 typeof2 typeof3 typeof4 \
+	timeout \
+	watchpoint1
 
 EXTRA_TESTS = inftest regtest
 
@@ -1145,7 +1209,7 @@ check:	msg \
 	unix-msg-start   unix-tests      unix-msg-end \
 	extend-msg-start gawk-extensions extend-msg-end \
 	machine-msg-start machine-tests machine-msg-end \
-	charset-msg-start charset-tests charset-msg-end \
+	charset-tests-all \
 	shlib-msg-start  shlib-tests     shlib-msg-end \
 	mpfr-msg-start   mpfr-tests      mpfr-msg-end
 	@$(MAKE) pass-fail || { $(MAKE) diffout; exit 1; }
@@ -1155,6 +1219,17 @@ basic:	$(BASIC_TESTS)
 unix-tests: $(UNIX_TESTS)
 
 gawk-extensions: $(GAWK_EXT_TESTS)
+
+charset-tests-all:
+	@if locale -a | grep -i 'en_US.UTF.*8' > /dev/null && \
+	    locale -a | grep -i 'ru_RU.UTF.*8' > /dev/null && \
+	    locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null  ; \
+	then \
+		$(MAKE) charset-msg-start charset-tests charset-msg-end; \
+	else \
+		echo %%%%%%%%%% Inadequate locale support: skipping charset tests. ; \
+		echo %%%%%%%%%% At least en_US.UTF-8, ru_RU.UTF-8 and ja_JP.UTF-8 are needed. ; \
+	fi
 
 charset-tests: $(LOCALE_CHARSET_TESTS)
 
@@ -1218,12 +1293,12 @@ machine-msg-end:
 
 charset-msg-start:
 	@echo "======== Starting tests that can vary based on character set or locale support ========"
-	@echo "************************************************"
-	@echo "** Some or all of these tests may fail if you **"
-	@echo "** have inadequate or missing locale support  **"
-	@echo "** At least en_US.UTF-8, ru_RU.UTF-8 and      **"
-	@echo "** ja_JP.UTF-8 are needed.                    **"
-	@echo "************************************************"
+	@echo "**************************************************************************"
+	@echo "* Some or all of these tests may fail if you have inadequate or missing  *"
+	@echo "* locale support. At least en_US.UTF-8, ru_RU.UTF-8 and ja_JP.UTF-8 are  *"
+	@echo "* needed. However, if you see this message, the Makefile thinks you have *"
+	@echo "* what you need ...                                                      *"
+	@echo "**************************************************************************"
 
 charset-msg-end:
 	@echo "======== Done with tests that can vary based on character set or locale support ========"
@@ -1706,6 +1781,12 @@ mbstr1::
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+mbstr2::
+	@echo $@
+	@[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 printfbad2: printfbad2.ok
 	@echo $@
 	@$(AWK) --lint -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in 2>&1 | sed 's;$(srcdir)/;;g' >_$@ || echo EXIT CODE: $$?  >>_$@
@@ -1781,6 +1862,11 @@ profile8:
 	@$(AWK) --pretty-print=_$@ -f "$(srcdir)"/$@.awk > /dev/null
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+profile9:
+	@echo $@
+	@$(AWK) --pretty-print=_$@ -f "$(srcdir)"/$@.awk > /dev/null
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 posix2008sub:
 	@echo $@
 	@$(AWK) --posix -f "$(srcdir)"/$@.awk > _$@ 2>&1
@@ -1849,7 +1935,7 @@ mpfrrem:
 
 mpfrmemok1:
 	@echo $@
-	@$(AWK) -p/dev/stdout -M -f "$(srcdir)"/$@.awk 2>&1 | sed 1d > _$@
+	@$(AWK) -p- -M -f "$(srcdir)"/$@.awk 2>&1 | sed 1d > _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 jarebug::
@@ -1953,7 +2039,7 @@ testext::
 
 getfile:
 	@echo $@
-	@$(AWK) -v TESTEXT_QUIET=1 -ltestext -f $(srcdir)/$@.awk $(srcdir)/$@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@AWKPATH="$(srcdir)" $(AWK) -v TESTEXT_QUIET=1 -ltestext -f $@.awk < $(srcdir)/$@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 readdir:
@@ -2056,8 +2142,10 @@ backsmalls2:
 
 dbugeval::
 	@echo $@
-	@$(AWK) --debug -f /dev/null < "$(srcdir)"/$@.in > _$@  2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@if [ -t 0 ]; then \
+	$(AWK) --debug -f /dev/null < "$(srcdir)"/$@.in > _$@  2>&1 || echo EXIT CODE: $$? >>_$@ ; \
+	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
+	fi
 
 printhuge::
 	@echo $@
@@ -2085,14 +2173,44 @@ paramasfunc2::
 	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+negtime::
+	@echo $@
+	@TZ=GMT AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@AWKPATH="$(srcdir)" $(AWK) -f checknegtime.awk "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+dbugtypedre1:
+	@echo $@
+	@AWKPATH="$(srcdir)" $(AWK) -D -f $@.awk < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+dbugtypedre2:
+	@echo $@
+	@AWKPATH="$(srcdir)" $(AWK) -D -f $@.awk < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+dbugeval2:
+	@echo $@
+	@AWKPATH="$(srcdir)" $(AWK) -D -f $@.awk < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+muldimposix::
+	@echo $@
+	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+watchpoint1:
+	@echo $@
+	@AWKPATH="$(srcdir)" $(AWK) -D -f $@.awk $@.in < $@.script >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 # Targets generated for other tests:
 include Maketests
 
-$(srcdir)/Maketests: $(srcdir)/Makefile.am $(srcdir)/Gentests
+Maketests: $(srcdir)/Makefile.am $(srcdir)/Gentests
 	files=`cd "$(srcdir)" && echo *.awk *.in`; \
-	$(AWK) -f "$(srcdir)"/Gentests "$(srcdir)"/Makefile.am $$files > "$(srcdir)"/Maketests
+	$(AWK) -f "$(srcdir)"/Gentests "$(srcdir)"/Makefile.am $$files > $@
 
-clean:
+clean-local:
 	rm -fr _* core core.* fmtspcl.ok junk strftime.ok test1 test2 \
 	seq *~ readfile.ok fork.tmp.* testext.awk fts.ok readdir.ok \
 	mmap8k.ok profile1.ok

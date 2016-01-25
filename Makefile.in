@@ -111,20 +111,21 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@ENABLE_EXTENSIONS_TRUE@am__append_1 = extension
 bin_PROGRAMS = gawk$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/arch.m4 \
 	$(top_srcdir)/m4/codeset.m4 $(top_srcdir)/m4/gettext.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
-	$(top_srcdir)/m4/isc-posix.m4 $(top_srcdir)/m4/lcmessage.m4 \
-	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
-	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libsigsegv.m4 \
-	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/mpfr.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/noreturn.m4 \
-	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
-	$(top_srcdir)/m4/readline.m4 $(top_srcdir)/m4/socket.m4 \
-	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/lcmessage.m4 $(top_srcdir)/m4/lib-ld.m4 \
+	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
+	$(top_srcdir)/m4/libsigsegv.m4 $(top_srcdir)/m4/longlong.m4 \
+	$(top_srcdir)/m4/mpfr.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/noreturn.m4 $(top_srcdir)/m4/po.m4 \
+	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/readline.m4 \
+	$(top_srcdir)/m4/socket.m4 $(top_srcdir)/m4/ulonglong.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -261,7 +262,7 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = . extension doc awklib po test
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/configh.in ABOUT-NLS \
 	AUTHORS COPYING ChangeLog INSTALL NEWS README TODO awkgram.c \
 	command.c compile config.guess config.rpath config.sub depcomp \
@@ -476,19 +477,17 @@ EXTRA_DIST = \
 
 
 # The order to do things in.
+#
 # Build explicitly in "." in order to build gawk first, so
 # that `make check' without a prior `make' works.
+#
+# Build in extension before test so that
+# 	./configure && make check
+# works properly too.
+#
 # Build in awklib after in doc, since we want to extract
 # sample files if doc/gawk.texi changed.
-SUBDIRS = \
-	. \
-	doc \
-	awklib \
-	po \
-	extension \
-	extras \
-	test
-
+SUBDIRS = . $(am__append_1) doc awklib po test
 include_HEADERS = gawkapi.h
 
 # sources for both gawk and dgawk
@@ -1173,17 +1172,21 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS
 # For GNU systems where gawk is awk, add a link to awk.
 # (This is done universally, which may not always be right, but
 # there's no easy way to distinguish GNU from non-GNU systems.)
+#
+# Use the transform, in case --program-prefix=XXX
 install-exec-hook:
 	(cd $(DESTDIR)$(bindir); \
-	$(LN) gawk$(EXEEXT) gawk-$(VERSION)$(EXEEXT) 2>/dev/null ; \
+	name=`echo gawk | sed '$(transform)'` ; \
+	$(LN) $${name}$(EXEEXT) gawk-$(VERSION)$(EXEEXT) 2>/dev/null ; \
 	if [ ! -f awk$(EXEEXT) ]; \
-	then	$(LN_S) gawk$(EXEEXT) awk$(EXEEXT); \
+	then	$(LN_S) $${name}$(EXEEXT) awk$(EXEEXT); \
 	fi; exit 0)
 
 # Undo the above when uninstalling
 uninstall-links:
 	(cd $(DESTDIR)$(bindir); \
-	if [ -f awk$(EXEEXT) ] && cmp awk$(EXEEXT) gawk$(EXEEXT) > /dev/null; then rm -f awk$(EXEEXT); fi ; \
+	name=`echo gawk | sed '$(transform)'` ; \
+	if [ -f awk$(EXEEXT) ] && cmp awk$(EXEEXT) $${name}$(EXEEXT) > /dev/null; then rm -f awk$(EXEEXT); fi ; \
 	rm -f gawk-$(VERSION)$(EXEEXT); exit 0)
 
 uninstall-recursive: uninstall-links
@@ -1222,7 +1225,7 @@ command.c: command.y
 
 # This is for my development & testing.
 efence: gawk
-	$(CC) $(LDFLAGS) -o gawk $$(ls *.o | grep -v '_p.o$$') $(LIBS) -lefence
+	$(CC) $(LDFLAGS) -o gawk $$(ls *.o | grep -v '_p.o$$') $(LDADD) $(LIBS) -lefence
 
 diffout valgrind-scan:
 	@cd test && $(MAKE) $(AM_MAKEFLAGS) $@

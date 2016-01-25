@@ -89,6 +89,11 @@ static void check_comment(void);
 static bool at_seen = false;
 static bool want_source = false;
 static bool want_regexp = false;	/* lexical scanning kludge */
+static enum {
+	FUNC_HEADER,
+	FUNC_BODY,
+	DONT_CHECK
+} want_param_names = DONT_CHECK;	/* ditto */
 static char *in_function;		/* parsing kludge */
 static int rule = 0;
 
@@ -104,8 +109,8 @@ const char *const ruletab[] = {
 static bool in_print = false;	/* lexical scanning kludge for print */
 static int in_parens = 0;	/* lexical scanning kludge for print */
 static int sub_counter = 0;	/* array dimension counter for use in delete */
-static char *lexptr = NULL;		/* pointer to next char during parsing */
-static char *lexend;
+static char *lexptr;		/* pointer to next char during parsing */
+static char *lexend;		/* end of buffer */
 static char *lexptr_begin;	/* keep track of where we were for error msgs */
 static char *lexeme;		/* beginning of lexeme for debugging */
 static bool lexeof;		/* seen EOF for current source? */  
@@ -164,7 +169,7 @@ extern double fmod(double x, double y);
 %}
 
 %token FUNC_CALL NAME REGEXP FILENAME
-%token YNUMBER YSTRING
+%token YNUMBER YSTRING TYPED_REGEXP
 %token RELOP IO_OUT IO_IN
 %token ASSIGNOP ASSIGN MATCHOP CONCAT_OP
 %token SUBSCRIPT
@@ -192,7 +197,7 @@ extern double fmod(double x, double y);
 %left MATCHOP
 %nonassoc RELOP '<' '>' IO_IN IO_OUT
 %left CONCAT_OP
-%left YSTRING YNUMBER
+%left YSTRING YNUMBER TYPED_REGEXP
 %left '+' '-'
 %left '*' '/' '%'
 %right '!' UNARY
@@ -246,6 +251,7 @@ rule
 	  {
 		in_function = NULL;
 		(void) mk_function($1, $2);
+		want_param_names = DONT_CHECK;
 		yyerrok;
 	  }
 	| '@' LEX_INCLUDE source statement_term
@@ -424,7 +430,7 @@ lex_builtin
 	;
 		
 function_prologue
-	: LEX_FUNCTION func_name '(' opt_param_list r_paren opt_nls
+	: LEX_FUNCTION func_name '(' { want_param_names = FUNC_HEADER; } opt_param_list r_paren opt_nls
 	  {
 		/*
 		 *  treat any comments between BOF and the first function
@@ -443,13 +449,14 @@ function_prologue
 		}
 		func_first = false;
 		$1->source_file = source;
-		if (install_function($2->lextok, $1, $4) < 0)
+		if (install_function($2->lextok, $1, $5) < 0)
 			YYABORT;
 		in_function = $2->lextok;
 		$2->lextok = NULL;
 		bcfree($2);
-		/* $4 already free'd in install_function */
+		/* $5 already free'd in install_function */
 		$$ = $1;
+		want_param_names = FUNC_BODY;
 	  }
 	;
 
@@ -490,6 +497,28 @@ regexp
 		  $$->memory = n;
 		}
 	;
+
+typed_regexp
+	: TYPED_REGEXP
+		{
+		  NODE *n, *exp;
+		  char *re;
+		  size_t len;
+
+		  re = $1->lextok;
+		  $1->lextok = NULL;
+		  len = strlen(re);
+
+		  exp = make_str_node(re, len, ALREADY_MALLOCED);
+		  n = make_regnode(Node_typedregex, exp);
+		  if (n == NULL) {
+			unref(exp);
+			YYABORT;
+		  }
+		  $$ = $1;
+		  $$->opcode = Op_push_re;
+		  $$->memory = n;
+		}
 
 a_slash
 	: '/'
@@ -1186,6 +1215,15 @@ case_value
 	  {	$$ = $1; }
 	| regexp  
 	  {
+		if ($1->memory->type == Node_regex)
+			$1->opcode = Op_push_re;
+		else
+			$1->opcode = Op_push;
+		$$ = $1;
+	  }
+	| typed_regexp
+	  {
+		assert($1->memory->type == Node_typedregex);
 		$1->opcode = Op_push_re;
 		$$ = $1;
 	  }
@@ -1274,9 +1312,12 @@ param_list
 	  }
 	| param_list comma NAME
 	  {
-		$3->param_count =  $1->lasti->param_count + 1;
-		$$ = list_append($1, $3);
-		yyerrok;
+		if ($1 != NULL && $3 != NULL) {
+			$3->param_count =  $1->lasti->param_count + 1;
+			$$ = list_append($1, $3);
+			yyerrok;
+		} else
+			$$ = NULL;
 	  }
 	| error
 	  { $$ = NULL; }
@@ -1331,6 +1372,48 @@ expression_list
 	  }
 	;
 
+opt_fcall_expression_list
+	: /* empty */
+	  { $$ = NULL; }
+	| fcall_expression_list
+	  { $$ = $1; }
+	;
+
+fcall_expression_list
+	: fcall_exp
+	  {	$$ = mk_expression_list(NULL, $1); }
+	| fcall_expression_list comma fcall_exp
+	  {
+		$$ = mk_expression_list($1, $3);
+		yyerrok;
+	  }
+	| error
+	  { $$ = NULL; }
+	| fcall_expression_list error
+	  {
+		/*
+		 * Returning the expression list instead of NULL lets
+		 * snode get a list of arguments that it can count.
+		 */
+		$$ = $1;
+	  }
+	| fcall_expression_list error fcall_exp
+	  {
+		/* Ditto */
+		$$ = mk_expression_list($1, $3);
+	  }
+	| fcall_expression_list comma error
+	  {
+		/* Ditto */
+		$$ = $1;
+	  }
+	;
+
+fcall_exp
+	: exp { $$ = $1; }
+	| typed_regexp { $$ = list_create($1); }
+	;
+
 /* Expressions, not including the comma operator.  */
 exp
 	: variable assign_operator exp %prec ASSIGNOP
@@ -1340,10 +1423,27 @@ exp
 				_("regular expression on right of assignment"));
 		$$ = mk_assignment($1, $3, $2);
 	  }
+	| variable ASSIGN typed_regexp %prec ASSIGNOP
+	  {
+		$$ = mk_assignment($1, list_create($3), $2);
+	  }
 	| exp LEX_AND exp
 	  {	$$ = mk_boolean($1, $3, $2); }
 	| exp LEX_OR exp
 	  {	$$ = mk_boolean($1, $3, $2); }
+	| exp MATCHOP typed_regexp
+	  {
+		if ($1->lasti->opcode == Op_match_rec)
+			warning_ln($2->source_line,
+				_("regular expression on left of `~' or `!~' operator"));
+
+		assert($3->opcode == Op_push_re
+			&& $3->memory->type == Node_typedregex);
+		/* RHS is @/.../ */
+		$2->memory = $3->memory;
+		bcfree($3);
+		$$ = list_append($1, $2);
+	  }
 	| exp MATCHOP exp
 	  {
 		if ($1->lasti->opcode == Op_match_rec)
@@ -1351,6 +1451,7 @@ exp
 				_("regular expression on left of `~' or `!~' operator"));
 
 		if ($3->lasti == $3->nexti && $3->nexti->opcode == Op_match_rec) {
+			/* RHS is /.../ */
 			$2->memory = $3->nexti->memory;
 			bcfree($3->nexti);	/* Op_match_rec */
 			bcfree($3);			/* Op_list */
@@ -1421,7 +1522,7 @@ common_exp
 
 		if ($1->lasti->opcode == Op_concat) {
 			/* multiple (> 2) adjacent strings optimization */
-			is_simple_var = ($1->lasti->concat_flag & CSVAR);
+			is_simple_var = ($1->lasti->concat_flag & CSVAR) != 0;
 			count = $1->lasti->expr_count + 1;
 			$1->lasti->opcode = Op_no_op;
 		} else {
@@ -1443,7 +1544,7 @@ common_exp
 			n1 = force_string(n1);
 			n2 = force_string(n2);
 			nlen = n1->stlen + n2->stlen;
-			erealloc(n1->stptr, char *, nlen + 2, "constant fold");
+			erealloc(n1->stptr, char *, nlen + 1, "constant fold");
 			memcpy(n1->stptr + n1->stlen, n2->stptr, n2->stlen);
 			n1->stlen = nlen;
 			n1->stptr[nlen] = '\0';
@@ -1586,13 +1687,13 @@ non_post_simp_exp
 	   }
 	| '(' exp r_paren
 	  { $$ = $2; }
-	| LEX_BUILTIN '(' opt_expression_list r_paren
+	| LEX_BUILTIN '(' opt_fcall_expression_list r_paren
 	  {
 		$$ = snode($3, $1);
 		if ($$ == NULL)
 			YYABORT;
 	  }
-	| LEX_LENGTH '(' opt_expression_list r_paren
+	| LEX_LENGTH '(' opt_fcall_expression_list r_paren
 	  {
 		$$ = snode($3, $1);
 		if ($$ == NULL)
@@ -1701,14 +1802,14 @@ func_call
 	;
 
 direct_func_call
-	: FUNC_CALL '(' opt_expression_list r_paren
+	: FUNC_CALL '(' opt_fcall_expression_list r_paren
 	  {
 		NODE *n;
 
 		if (! at_seen) {
 			n = lookup($1->func_name);
 			if (n != NULL && n->type != Node_func
-			    && n->type != Node_ext_func && n->type != Node_old_ext_func) {
+			    && n->type != Node_ext_func) {
 				error_ln($1->source_line,
 					_("attempt to use non-function `%s' in function call"),
 						$1->func_name);
@@ -1899,7 +2000,7 @@ struct token {
 	NODE *(*ptr2)(int);	/* alternate arbitrary-precision function */
 };
 
-#if 'a' == 0x81 /* it's EBCDIC */
+#ifdef USE_EBCDIC
 /* tokcompare --- lexicographically compare token names for sorting */
 
 static int
@@ -1954,9 +2055,6 @@ static const struct token tokentab[] = {
 {"eval",	Op_symbol,	 LEX_EVAL,	0,		0,	0},
 {"exit",	Op_K_exit,	 LEX_EXIT,	0,		0,	0},
 {"exp",		Op_builtin,	 LEX_BUILTIN,	A(1),		do_exp,	MPF(exp)},
-#ifdef DYNAMIC
-{"extension",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2)|A(3),	do_ext,	0},
-#endif
 {"fflush",	Op_builtin,	 LEX_BUILTIN,	A(0)|A(1), do_fflush,	0},
 {"for",		Op_K_for,	 LEX_FOR,	BREAK|CONTINUE,	0,	0},
 {"func",	Op_func, LEX_FUNCTION,	NOT_POSIX|NOT_OLD,	0,	0},
@@ -2003,6 +2101,7 @@ static const struct token tokentab[] = {
 {"systime",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(0),	do_systime,	0},
 {"tolower",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_tolower,	0},
 {"toupper",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_toupper,	0},
+{"typeof",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1),	do_typeof,	0},
 {"while",	Op_K_while,	 LEX_WHILE,	BREAK|CONTINUE,	0,	0},
 {"xor",		Op_builtin,    LEX_BUILTIN,	GAWKX,		do_xor,	MPF(xor)},
 };
@@ -2178,7 +2277,6 @@ yyerror(const char *m, ...)
 	char *buf;
 	int count;
 	static char end_of_file_line[] = "(END OF FILE)";
-	char save;
 
 	print_included_from();
 
@@ -2188,7 +2286,8 @@ yyerror(const char *m, ...)
 		if (thisline == NULL) {
 			cp = lexeme;
 			if (*cp == '\n') {
-				cp--;
+				if (cp > lexptr_begin)
+					cp--;
 				mesg = _("unexpected newline or end of string");
 			}
 			for (; cp != lexptr_begin && *cp != '\n'; --cp)
@@ -2199,6 +2298,8 @@ yyerror(const char *m, ...)
 		}
 		/* NL isn't guaranteed */
 		bp = lexeme;
+		if (bp < thisline)
+			bp = thisline + 1;
 		while (bp < lexend && *bp && *bp != '\n')
 			bp++;
 	} else {
@@ -2206,25 +2307,17 @@ yyerror(const char *m, ...)
 		bp = thisline + strlen(thisline);
 	}
 
-	/*
-	 * Saving and restoring *bp keeps valgrind happy,
-	 * since the guts of glibc uses strlen, even though
-	 * we're passing an explict precision. Sigh.
-	 *
-	 * 8/2003: We may not need this anymore.
-	 */
-	save = *bp;
-	*bp = '\0';
-
 	msg("%.*s", (int) (bp - thisline), thisline);
 
-	*bp = save;
 	va_start(args, m);
 	if (mesg == NULL)
 		mesg = m;
 
-	count = (bp - thisline) + strlen(mesg) + 2 + 1;
-	emalloc(buf, char *, count, "yyerror");
+	count = strlen(mesg) + 1;
+	if (lexptr != NULL)
+		count += (lexeme - thisline) + 2;
+	emalloc(buf, char *, count+1, "yyerror");
+	memset(buf, 0, count+1);
 
 	bp = buf;
 
@@ -2475,7 +2568,7 @@ add_srcfile(enum srctype stype, char *src, SRCFILE *thisfile, bool *already_incl
 	if (stype == SRC_CMDLINE || stype == SRC_STDIN)
 		return do_add_srcfile(stype, src, NULL, thisfile);
 
-	path = find_source(src, & sbuf, &errno_val, stype == SRC_EXTLIB);
+	path = find_source(src, & sbuf, & errno_val, stype == SRC_EXTLIB);
 	if (path == NULL) {
 		if (errcode) {
 			*errcode = errno_val;
@@ -2976,7 +3069,7 @@ again:
 				0 : work_ring_idx + 1;
 			cur_char_ring[work_ring_idx] = 0;
 		}
-		if (check_for_bad)
+		if (check_for_bad || *lexptr == '\0')
 			check_bad_char(*lexptr);
 
 		return (int) (unsigned char) *lexptr++;
@@ -2985,7 +3078,7 @@ again:
 			if (lexeof)
 				return END_FILE;
 			if (lexptr && lexptr < lexend) {
-				if (check_for_bad)
+				if (check_for_bad || *lexptr == '\0')
 					check_bad_char(*lexptr);
 				return ((int) (unsigned char) *lexptr++);
 			}
@@ -3170,7 +3263,11 @@ newline_eof()
 /* yylex --- Read the input and turn it into tokens. */
 
 static int
+#ifdef USE_EBCDIC
+yylex_ebcdic(void)
+#else
 yylex(void)
+#endif
 {
 	int c;
 	bool seen_e = false;		/* These are for numbers */
@@ -3183,6 +3280,7 @@ yylex(void)
 	bool inhex = false;
 	bool intlstr = false;
 	AWKNUM d;
+	bool collecting_typed_regexp = false;
 
 #define GET_INSTRUCTION(op) bcalloc(op, 1, sourceline)
 
@@ -3217,23 +3315,27 @@ yylex(void)
 
 	lexeme = lexptr;
 	thisline = NULL;
+collect_regexp:
 	if (want_regexp) {
 		int in_brack = 0;	/* count brackets, [[:alnum:]] allowed */
+		int b_index = -1;
+		int cur_index = 0;
+
 		/*
-		 * Counting brackets is non-trivial. [[] is ok,
-		 * and so is [\]], with a point being that /[/]/ as a regexp
-		 * constant has to work.
+		 * Here is what's ok with brackets:
 		 *
-		 * Do not count [ or ] if either one is preceded by a \.
-		 * A `[' should be counted if
-		 *  a) it is the first one so far (in_brack == 0)
-		 *  b) it is the `[' in `[:'
-		 * A ']' should be counted if not preceded by a \, since
-		 * it is either closing `:]' or just a plain list.
-		 * According to POSIX, []] is how you put a ] into a set.
-		 * Try to handle that too.
+		 * [..[..] []] [^]] [.../...]
+		 * [...\[...] [...\]...] [...\/...]
+		 * 
+		 * (Remember that all of the above are inside /.../)
 		 *
-		 * The code for \ handles \[ and \].
+		 * The code for \ handles \[, \] and \/.
+		 *
+		 * Otherwise, track the first open [ position, and if
+		 * an embedded ] occurs, allow it to pass through
+		 * if it's right after the first [ or after [^.
+		 *
+		 * Whew!
 		 */
 
 		want_regexp = false;
@@ -3241,19 +3343,26 @@ yylex(void)
 		for (;;) {
 			c = nextc(false);
 
+			cur_index = tok - tokstart;
 			if (gawk_mb_cur_max == 1 || nextc_is_1stbyte) switch (c) {
 			case '[':
-				/* one day check for `.' and `=' too */
-				if (nextc(false) == ':' || in_brack == 0)
+				if (nextc(false) == ':' || in_brack == 0) {
 					in_brack++;
+					if (in_brack == 1)
+						b_index = tok - tokstart;
+				}
 				pushback();
 				break;
 			case ']':
-				if (tok[-1] == '['
-				    || (tok[-2] == '[' && tok[-1] == '^'))
-					/* do nothing */;
-				else
+				if (in_brack > 0
+				    && (cur_index == b_index + 1 
+					|| (cur_index == b_index + 2 && tok[-1] == '^')))
+					; /* do nothing */
+				else {
 					in_brack--;
+					if (in_brack == 0)
+						b_index = -1;
+				}
 				break;
 			case '\\':
 				if ((c = nextc(false)) == END_FILE) {
@@ -3293,7 +3402,13 @@ end_regexp:
 								peek);
 					}
 				}
-				return lasttok = REGEXP;
+				if (collecting_typed_regexp) {
+					collecting_typed_regexp = false;
+					lasttok = TYPED_REGEXP;
+				} else
+					lasttok = REGEXP;
+
+				return lasttok;
 			case '\n':
 				pushback();
 				yyerror(_("unterminated regexp"));
@@ -3351,6 +3466,13 @@ retry:
 		return lasttok = NEWLINE;
 
 	case '@':
+		c = nextc(true);
+		if (c == '/') {
+			want_regexp = true;
+			collecting_typed_regexp = true;
+			goto collect_regexp;
+		}
+		pushback();
 		at_seen = true;
 		return lasttok = '@';
 
@@ -3429,6 +3551,10 @@ retry:
 		c = nextc(true);
 		pushback();
 		if (c == '[') {
+			if (do_traditional)
+				fatal(_("multidimensional arrays are a gawk extension"));
+			if (do_lint)
+				lintwarn(_("multidimensional arrays are a gawk extension"));
 			yylval = GET_INSTRUCTION(Op_sub_array);
 			lasttok = ']';
 		} else {
@@ -3890,6 +4016,33 @@ retry:
 				&& lasttok != '@')
 			goto out;
 
+		/* allow parameter names to shadow the names of gawk extension built-ins */
+		if ((tokentab[mid].flags & GAWKX) != 0) {
+			NODE *f;
+
+			switch (want_param_names) {
+			case FUNC_HEADER:
+				/* in header, defining parameter names */
+				goto out;
+			case FUNC_BODY:
+				/* in body, name must be in symbol table for it to be a parameter */
+				if ((f = lookup(tokstart)) != NULL) {
+					if (f->type == Node_builtin_func)
+						break;
+					else
+						goto out;
+				}
+				/* else
+					fall through */
+			case DONT_CHECK:
+				/* regular code */
+				break;
+			default:
+				cant_happen();
+				break;
+			}
+		}
+
 		if (do_lint) {
 			if ((tokentab[mid].flags & GAWKX) != 0 && (warntab[mid] & GAWKX) == 0) {
 				lintwarn(_("`%s' is a gawk extension"),
@@ -4003,6 +4156,41 @@ out:
 #undef GET_INSTRUCTION
 #undef NEWLINE_EOF
 }
+
+/* It's EBCDIC in a Bison grammar, run for the hills!
+
+   Or, convert single-character tokens coming out of yylex() from EBCDIC to
+   ASCII values on-the-fly so that the parse tables need not be regenerated
+   for EBCDIC systems.  */
+#ifdef USE_EBCDIC
+static int
+yylex(void)
+{
+	static char etoa_xlate[256];
+	static int do_etoa_init = 1;
+	int tok;
+
+	if (do_etoa_init)
+	{
+		for (tok = 0; tok < 256; tok++)
+			etoa_xlate[tok] = (char) tok;
+#ifdef HAVE___ETOA_L
+		/* IBM helpfully provides this function.  */
+		__etoa_l(etoa_xlate, sizeof(etoa_xlate));
+#else
+# error "An EBCDIC-to-ASCII translation function is needed for this system"
+#endif
+		do_etoa_init = 0;
+	}
+
+	tok = yylex_ebcdic();
+
+	if (tok >= 0 && tok <= 0xFF)
+		tok = etoa_xlate[tok];
+
+	return tok;
+}
+#endif /* USE_EBCDIC */
 
 /* snode --- instructions for builtin functions. Checks for arg. count
              and supplies defaults where possible. */
@@ -4139,10 +4327,10 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 			if (arg->nexti == arg->lasti && arg->nexti->opcode == Op_push)
 				arg->nexti->opcode = Op_push_arg;	/* argument may be array */
  		}
-	} else if (r->builtin == do_isarray) {
+	} else if (r->builtin == do_isarray || r->builtin == do_typeof) {
 		arg = subn->nexti;
 		if (arg->nexti == arg->lasti && arg->nexti->opcode == Op_push)
-			arg->nexti->opcode = Op_push_arg;	/* argument may be array */
+			arg->nexti->opcode = Op_push_arg_untyped;	/* argument may be untyped */
 	} else if (r->builtin == do_intdiv
 #ifdef HAVE_MPFR
 		   || r->builtin == MPF(intdiv)
@@ -4337,10 +4525,12 @@ valinfo(NODE *n, Func_print print_func, FILE *fp)
 {
 	if (n == Nnull_string)
 		print_func(fp, "uninitialized scalar\n");
-	else if (n->flags & STRING) {
+	else if (n->type == Node_typedregex)
+		print_func(fp, "@/%.*s/\n", n->re_exp->stlen, n->re_exp->stptr);
+	else if ((n->flags & STRING) != 0) {
 		pp_string_fp(print_func, fp, n->stptr, n->stlen, '"', false);
 		print_func(fp, "\n");
-	} else if (n->flags & NUMBER) {
+	} else if ((n->flags & NUMBER) != 0) {
 #ifdef HAVE_MPFR
 		if (is_mpg_float(n))
 			print_func(fp, "%s\n", mpg_fmt("%.17R*g", ROUND_MODE, n->mpg_numbr));
@@ -4349,10 +4539,10 @@ valinfo(NODE *n, Func_print print_func, FILE *fp)
 		else
 #endif
 		print_func(fp, "%.17g\n", n->numbr);
-	} else if (n->flags & STRCUR) {
+	} else if ((n->flags & STRCUR) != 0) {
 		pp_string_fp(print_func, fp, n->stptr, n->stlen, '"', false);
 		print_func(fp, "\n");
-	} else if (n->flags & NUMCUR) {
+	} else if ((n->flags & NUMCUR) != 0) {
 #ifdef HAVE_MPFR
 		if (is_mpg_float(n))
 			print_func(fp, "%s\n", mpg_fmt("%.17R*g", ROUND_MODE, n->mpg_numbr));
@@ -4721,7 +4911,7 @@ make_regnode(int type, NODE *exp)
 	n->type = type;
 	n->re_cnt = 1;
 
-	if (type == Node_regex) {
+	if (type == Node_regex || type == Node_typedregex) {
 		n->re_reg = make_regexp(exp->stptr, exp->stlen, false, true, false);
 		if (n->re_reg == NULL) {
 			freenode(n);
@@ -4729,6 +4919,7 @@ make_regnode(int type, NODE *exp)
 		}
 		n->re_exp = exp;
 		n->re_flags = CONSTANT;
+		n->valref = 1;
 	}
 	return n;
 }
@@ -4744,6 +4935,8 @@ mk_rexp(INSTRUCTION *list)
 	ip = list->nexti;
 	if (ip == list->lasti && ip->opcode == Op_match_rec)
 		ip->opcode = Op_push_re;
+	else if (ip == list->lasti && ip->opcode == Op_push_re)
+		; /* do nothing --- @/.../ */
 	else {
 		ip = instruction(Op_push_re);
 		ip->memory = make_regnode(Node_dynregex, NULL);
@@ -5060,14 +5253,12 @@ mk_condition(INSTRUCTION *cond, INSTRUCTION *ifp, INSTRUCTION *true_branch,
 	 */
 
 	INSTRUCTION *ip;
+	bool setup_else_part = true;
 
 	if (false_branch == NULL) {
 		false_branch = list_create(instruction(Op_no_op));
-		if (elsep != NULL) {		/* else { } */
-			if (do_pretty_print)
-				(void) list_prepend(false_branch, elsep);
-			else
-				bcfree(elsep);
+		if (elsep == NULL) {		/* else { } */
+			setup_else_part = false;
 		}
 	} else {
 		/* assert(elsep != NULL); */
@@ -5075,6 +5266,9 @@ mk_condition(INSTRUCTION *cond, INSTRUCTION *ifp, INSTRUCTION *true_branch,
 		/* avoid a series of no_op's: if .. else if .. else if .. */
 		if (false_branch->lasti->opcode != Op_no_op)
 			(void) list_append(false_branch, instruction(Op_no_op));
+	}
+
+	if (setup_else_part) {
 		if (do_pretty_print) {
 			(void) list_prepend(false_branch, elsep);
 			false_branch->nexti->branch_end = false_branch->lasti;
@@ -5320,7 +5514,7 @@ optimize_assignment(INSTRUCTION *exp)
 		switch (i2->opcode) {
 		case Op_concat:
 			if (i2->nexti->opcode == Op_push_lhs    /* l.h.s is a simple variable */
-				&& (i2->concat_flag & CSVAR)        /* 1st exp in r.h.s is a simple variable;
+				&& (i2->concat_flag & CSVAR) != 0   /* 1st exp in r.h.s is a simple variable;
 				                                     * see Op_concat in the grammer above.
 				                                     */
 				&& i2->nexti->memory == exp->nexti->memory	 /* and the same as in l.h.s */
@@ -5780,7 +5974,8 @@ check_special(const char *name)
 {
 	int low, high, mid;
 	int i;
-#if 'a' == 0x81 /* it's EBCDIC */
+	int non_standard_flags = 0;
+#ifdef USE_EBCDIC
 	static bool did_sort = false;
 
 	if (! did_sort) {
@@ -5790,6 +5985,11 @@ check_special(const char *name)
 		did_sort = true;
 	}
 #endif
+
+	if (do_traditional)
+		non_standard_flags |= GAWKX;
+	if (do_posix)
+		non_standard_flags |= NOT_POSIX;
 
 	low = 0;
 	high = (sizeof(tokentab) / sizeof(tokentab[0])) - 1;
@@ -5804,8 +6004,7 @@ check_special(const char *name)
 		else if (i > 0)		/* token > mid */
 			low = mid + 1;
 		else {
-			if ((do_traditional && (tokentab[mid].flags & GAWKX))
-					|| (do_posix && (tokentab[mid].flags & NOT_POSIX)))
+			if ((tokentab[mid].flags & non_standard_flags) != 0)
 				return -1;
 			return mid;
 		}

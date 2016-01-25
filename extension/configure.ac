@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 2012-2014 the Free Software Foundation, Inc.
+dnl Copyright (C) 2012-2015 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -23,12 +23,13 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk Bundled Extensions], 4.1.1, bug-gawk@gnu.org, gawk-extensions)
+AC_INIT([GNU Awk Bundled Extensions],[4.1.3],[bug-gawk@gnu.org],[gawk-extensions])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 
 AC_USE_SYSTEM_EXTENSIONS
+AC_ZOS_USS
 
 INSTALL="$ac_aux_dir/install-sh -c"
 export INSTALL
@@ -41,7 +42,7 @@ AC_CHECK_MEMBERS([struct stat.st_blksize])
 AM_PROG_AR
 AC_SYS_LARGEFILE
 AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
+LT_INIT
 dnl AC_PROG_INSTALL
 
 AC_SUBST([pkgextensiondir], ['${libdir}/gawk'])
@@ -63,13 +64,13 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-AC_CHECK_HEADERS(fnmatch.h limits.h sys/time.h sys/select.h sys/param.h)
+AC_CHECK_HEADERS(fnmatch.h limits.h sys/time.h sys/select.h sys/param.h sys/statvfs.h)
 AC_HEADER_DIRENT
 AC_HEADER_MAJOR
 AC_HEADER_TIME
 
 AC_CHECK_FUNCS(fdopendir fnmatch gettimeofday \
-		getdtablesize nanosleep select GetSystemTimeAsFileTime)
+		getdtablesize nanosleep select statvfs GetSystemTimeAsFileTime)
 
 GAWK_FUNC_DIRFD
 GAWK_PREREQ_DIRFD
@@ -78,6 +79,7 @@ dnl checks for compiler characteristics
 AC_C_INLINE
 
 AC_CONFIG_HEADERS([config.h:configh.in])
+AH_BOTTOM([#include "ext_custom.h"])
 
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT

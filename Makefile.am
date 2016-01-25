@@ -59,18 +59,23 @@ EXTRA_DIST = \
 	ylwrap
 
 # The order to do things in.
+#
 # Build explicitly in "." in order to build gawk first, so
 # that `make check' without a prior `make' works.
+#
+# Build in extension before test so that
+# 	./configure && make check
+# works properly too.
+#
 # Build in awklib after in doc, since we want to extract
 # sample files if doc/gawk.texi changed.
-SUBDIRS = \
-	. \
-	doc \
-	awklib \
-	po \
-	extension \
-	extras \
-	test
+SUBDIRS = .
+
+if ENABLE_EXTENSIONS
+SUBDIRS += extension
+endif
+
+SUBDIRS += doc awklib po test
 
 # what to make and install
 bin_PROGRAMS = gawk
@@ -155,17 +160,21 @@ RM = rm -f
 # For GNU systems where gawk is awk, add a link to awk.
 # (This is done universally, which may not always be right, but
 # there's no easy way to distinguish GNU from non-GNU systems.)
+#
+# Use the transform, in case --program-prefix=XXX
 install-exec-hook:
 	(cd $(DESTDIR)$(bindir); \
-	$(LN) gawk$(EXEEXT) gawk-$(VERSION)$(EXEEXT) 2>/dev/null ; \
+	name=`echo gawk | sed '$(transform)'` ; \
+	$(LN) $${name}$(EXEEXT) gawk-$(VERSION)$(EXEEXT) 2>/dev/null ; \
 	if [ ! -f awk$(EXEEXT) ]; \
-	then	$(LN_S) gawk$(EXEEXT) awk$(EXEEXT); \
+	then	$(LN_S) $${name}$(EXEEXT) awk$(EXEEXT); \
 	fi; exit 0)
 
 # Undo the above when uninstalling
 uninstall-links:
 	(cd $(DESTDIR)$(bindir); \
-	if [ -f awk$(EXEEXT) ] && cmp awk$(EXEEXT) gawk$(EXEEXT) > /dev/null; then rm -f awk$(EXEEXT); fi ; \
+	name=`echo gawk | sed '$(transform)'` ; \
+	if [ -f awk$(EXEEXT) ] && cmp awk$(EXEEXT) $${name}$(EXEEXT) > /dev/null; then rm -f awk$(EXEEXT); fi ; \
 	rm -f gawk-$(VERSION)$(EXEEXT); exit 0)
 
 uninstall-recursive: uninstall-links
@@ -204,7 +213,7 @@ command.c: command.y
 
 # This is for my development & testing.
 efence: gawk
-	$(CC) $(LDFLAGS) -o gawk $$(ls *.o | grep -v '_p.o$$') $(LIBS) -lefence
+	$(CC) $(LDFLAGS) -o gawk $$(ls *.o | grep -v '_p.o$$') $(LDADD) $(LIBS) -lefence
 
 diffout valgrind-scan:
 	@cd test && $(MAKE) $(AM_MAKEFLAGS) $@

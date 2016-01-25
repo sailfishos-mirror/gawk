@@ -3,7 +3,7 @@
  */
 
 /* 
- * Copyright (C) 2012-2014 the Free Software Foundation, Inc.
+ * Copyright (C) 2012-2015 the Free Software Foundation, Inc.
  * 
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -827,7 +827,7 @@ r_make_string(const gawk_api_t *api,	/* needed for emalloc */
 	result->str_value.len = length;
 
 	if (duplicate) {
-		emalloc(cp, char *, length + 2, "r_make_string");
+		emalloc(cp, char *, length + 1, "r_make_string");
 		memcpy(cp, string, length);
 		cp[length] = '\0';
 		result->str_value.str = cp;

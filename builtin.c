@@ -481,6 +481,12 @@ do_isarray(int nargs)
 {
 	NODE *tmp;
 	int ret = 1;
+	static bool warned = false;
+
+	if (do_lint && ! warned) {
+		warned = true;
+		lintwarn(_("`isarray' is deprecated. Use `typeof' instead"));
+	}
 
 	tmp = POP();
 	if (tmp->type != Node_var_array) {
@@ -1847,7 +1853,7 @@ do_substr(int nargs)
 		 * way to do things.
 		 */
 		memset(& mbs, 0, sizeof(mbs));
-		emalloc(substr, char *, (length * gawk_mb_cur_max) + 2, "do_substr");
+		emalloc(substr, char *, (length * gawk_mb_cur_max) + 1, "do_substr");
 		wp = t1->wstptr + indx;
 		for (cp = substr; length > 0; length--) {
 			result = wcrtomb(cp, *wp, & mbs);
@@ -1872,7 +1878,7 @@ do_strftime(int nargs)
 	NODE *t1, *t2, *t3, *ret;
 	struct tm *tm;
 	time_t fclock;
-	long clock_val;
+	double clock_val;
 	char *bufp;
 	size_t buflen, bufsize;
 	char buf[BUFSIZ];
@@ -1881,6 +1887,8 @@ do_strftime(int nargs)
 	int do_gmt;
 	NODE *val = NULL;
 	NODE *sub = NULL;
+	static const time_t time_t_min = TYPE_MINIMUM(time_t);
+	static const time_t time_t_max = TYPE_MAXIMUM(time_t);
 
 	/* set defaults first */
 	format = def_strftime_format;	/* traditional date format */
@@ -1920,10 +1928,25 @@ do_strftime(int nargs)
 			if (do_lint && (t2->flags & (NUMCUR|NUMBER)) == 0)
 				lintwarn(_("strftime: received non-numeric second argument"));
 			(void) force_number(t2);
-			clock_val = get_number_si(t2);
-			if (clock_val < 0)
-				fatal(_("strftime: second argument less than 0 or too big for time_t"));
+			clock_val = get_number_d(t2);
 			fclock = (time_t) clock_val;
+			/*
+			 * Protect against negative value being assigned
+			 * to unsigned time_t.
+			 */
+			if (clock_val < 0 && fclock > 0) {
+				if (do_lint)
+					lintwarn(_("strftime: second argument less than 0 or too big for time_t"));
+				return make_string("", 0);
+			}
+
+			/* And check that the value is in range */
+			if (clock_val < time_t_min || clock_val > time_t_max) {
+				if (do_lint)
+					lintwarn(_("strftime: second argument out of range for time_t"));
+				return make_string("", 0);
+			}
+
 			DEREF(t2);
 		}
 
@@ -1946,6 +1969,9 @@ do_strftime(int nargs)
 		tm = gmtime(& fclock);
 	else
 		tm = localtime(& fclock);
+
+	if (tm == NULL)
+		return make_string("", 0);
 
 	bufp = buf;
 	bufsize = sizeof(buf);
@@ -2118,7 +2144,9 @@ do_print(int nargs, int redirtype)
 			fatal(_("attempt to use array `%s' in a scalar context"), array_vname(tmp));
 		}
 
-		if ((tmp->flags & (NUMBER|STRING)) == NUMBER) {
+		if (tmp->type == Node_typedregex)
+				args_array[i] = force_string(tmp);
+		else if ((tmp->flags & (NUMBER|STRING)) == NUMBER) {
 			if (OFMTidx == CONVFMTidx)
 				args_array[i] = force_string(tmp);
 			else
@@ -2577,7 +2605,7 @@ do_match(int nargs)
 
 					sprintf(buff, "%d", ii);
 					ilen = strlen(buff);
-					amt = ilen + subseplen + strlen("length") + 2;
+					amt = ilen + subseplen + strlen("length") + 1;
 	
 					if (oldamt == 0) {
 						emalloc(buf, char *, amt, "do_match");
@@ -2751,42 +2779,42 @@ do_sub(int nargs, unsigned int flags)
 	int ampersands;
 	int matches = 0;
 	Regexp *rp;
-	NODE *s;		/* subst. pattern */
-	NODE *t;		/* string to make sub. in; $0 if none given */
+	NODE *rep_node;		/* replacement text */
+	NODE *target;		/* string to make sub. in; $0 if none given */
 	NODE *tmp;
 	NODE **lhs = NULL;
 	long how_many = 1;	/* one substitution for sub, also gensub default */
-	int global;
+	bool global;
 	long current;
 	bool lastmatchnonzero;
 	char *mb_indices = NULL;
 	
 	if ((flags & GENSUB) != 0) {
 		double d;
-		NODE *t1;
+		NODE *glob_flag;
 
 		tmp = PEEK(3);
 		rp = re_update(tmp);
 
-		t = POP_STRING();	/* original string */
+		target = POP_STRING();	/* original string */
 
-		t1 = POP_SCALAR();	/* value of global flag */
-		if ((t1->flags & (STRCUR|STRING)) != 0) {
-			if (t1->stlen > 0 && (t1->stptr[0] == 'g' || t1->stptr[0] == 'G'))
+		glob_flag = POP_SCALAR();	/* value of global flag */
+		if ((glob_flag->flags & (STRCUR|STRING)) != 0) {
+			if (glob_flag->stlen > 0 && (glob_flag->stptr[0] == 'g' || glob_flag->stptr[0] == 'G'))
 				how_many = -1;
 			else {
-				(void) force_number(t1);
-				d = get_number_d(t1);
-				if ((t1->flags & NUMCUR) != 0)
+				(void) force_number(glob_flag);
+				d = get_number_d(glob_flag);
+				if ((glob_flag->flags & NUMCUR) != 0)
 					goto set_how_many;
 
 				warning(_("gensub: third argument `%.*s' treated as 1"),
-						(int) t1->stlen, t1->stptr);
+						(int) glob_flag->stlen, glob_flag->stptr);
 				how_many = 1;
 			}
 		} else {
-			(void) force_number(t1);
-			d = get_number_d(t1);
+			(void) force_number(glob_flag);
+			d = get_number_d(glob_flag);
 set_how_many:
 			if (d < 1)
 				how_many = 1;
@@ -2797,10 +2825,8 @@ set_how_many:
 			if (d <= 0)
 				warning(_("gensub: third argument %g treated as 1"), d);
 		}
-		DEREF(t1);
-
+		DEREF(glob_flag);
 	} else {
-
 		/* take care of regexp early, in case re_update is fatal */
 
 		tmp = PEEK(2);
@@ -2812,30 +2838,30 @@ set_how_many:
 		/* original string */
 
 		if ((flags & LITERAL) != 0)
-			t = POP_STRING();
+			target = POP_STRING();
 		else {
 			lhs = POP_ADDRESS();
-			t = force_string(*lhs);
+			target = force_string(*lhs);
 		}
 	}
 
 	global = (how_many == -1);
 
-	s = POP_STRING();	/* replacement text */
+	rep_node = POP_STRING();	/* replacement text */
 	decr_sp();		/* regexp, already updated above */
 
 	/* do the search early to avoid work on non-match */
-	if (research(rp, t->stptr, 0, t->stlen, RE_NEED_START) == -1 ||
-			RESTART(rp, t->stptr) > t->stlen)
+	if (research(rp, target->stptr, 0, target->stlen, RE_NEED_START) == -1 ||
+			RESTART(rp, target->stptr) > target->stlen)
 		goto done;
 
-	t->flags |= STRING;
+	target->flags |= STRING;
 
-	text = t->stptr;
-	textlen = t->stlen;
+	text = target->stptr;
+	textlen = target->stlen;
 
-	repl = s->stptr;
-	replend = repl + s->stlen;
+	repl = rep_node->stptr;
+	replend = repl + rep_node->stlen;
 	repllen = replend - repl;
 
 	ampersands = 0;
@@ -2853,6 +2879,7 @@ set_how_many:
 		index_multibyte_buffer(repl, mb_indices, repllen);
 	}
 
+	/* compute length of replacement string, number of ampersands */
 	for (scan = repl; scan < replend; scan++) {
 		if ((gawk_mb_cur_max == 1 || (repllen > 0 && mb_indices[scan - repl] == 1))
 		    && (*scan == '&')) {
@@ -2897,24 +2924,32 @@ set_how_many:
 
 	lastmatchnonzero = false;
 
-	/* guesstimate how much room to allocate; +2 forces > 0 */
-	buflen = textlen + (ampersands + 1) * repllen + 2;
-	emalloc(buf, char *, buflen + 2, "do_sub");
+	/* guesstimate how much room to allocate; +1 forces > 0 */
+	buflen = textlen + (ampersands + 1) * repllen + 1;
+	emalloc(buf, char *, buflen + 1, "do_sub");
 	buf[buflen] = '\0';
-	buf[buflen + 1] = '\0';
 
 	bp = buf;
 	for (current = 1;; current++) {
 		matches++;
-		matchstart = t->stptr + RESTART(rp, t->stptr);
-		matchend = t->stptr + REEND(rp, t->stptr);
+		matchstart = target->stptr + RESTART(rp, target->stptr);
+		matchend = target->stptr + REEND(rp, target->stptr);
 
 		/*
 		 * create the result, copying in parts of the original
-		 * string 
+		 * string. note that length of replacement string can
+		 * vary since ampersand is actual text of regexp match.
 		 */
-		len = matchstart - text + repllen
-		      + ampersands * (matchend - matchstart);
+
+		/*
+		 * add 1 to len to handle "empty" case where
+		 * matchend == matchstart and we force a match on a single
+		 * char.  Use 'matchend - text' instead of 'matchstart - text'
+		 * because we may not actually make any substitution depending
+		 * on the 'global' and 'how_many' values.
+		 */
+		len = matchend - text + repllen
+		      + ampersands * (matchend - matchstart) + 1;
 		sofar = bp - buf;
 		while (buflen < (sofar + len + 1)) {
 			buflen *= 2;
@@ -2961,13 +2996,13 @@ set_how_many:
 					if (flags & GENSUB) {	/* gensub, behave sanely */
 						if (isdigit((unsigned char) scan[1])) {
 							int dig = scan[1] - '0';
-							if (dig < NUMSUBPATS(rp, t->stptr) && SUBPATSTART(rp, tp->stptr, dig) != -1) {
+							if (dig < NUMSUBPATS(rp, target->stptr) && SUBPATSTART(rp, tp->stptr, dig) != -1) {
 								char *start, *end;
 		
-								start = t->stptr
-								      + SUBPATSTART(rp, t->stptr, dig);
-								end = t->stptr
-								      + SUBPATEND(rp, t->stptr, dig);
+								start = target->stptr
+								      + SUBPATSTART(rp, target->stptr, dig);
+								end = target->stptr
+								      + SUBPATEND(rp, target->stptr, dig);
 
 								for (cp = start; cp < end; cp++)
 									*bp++ = *cp;
@@ -3021,19 +3056,29 @@ set_how_many:
 		textlen = text + textlen - matchend;
 		text = matchend;
 
+#if 0
+		if (bp - buf > sofar + len)
+			fprintf(stderr, "debug: len = %zu, but used %ld\n", len, (long)((bp - buf) - (long)sofar));
+#endif
+
 		if ((current >= how_many && ! global)
 		    || ((long) textlen <= 0 && matchstart == matchend)
-		    || research(rp, t->stptr, text - t->stptr, textlen, RE_NEED_START) == -1)
+		    || research(rp, target->stptr, text - target->stptr, textlen, RE_NEED_START) == -1)
 			break;
 
 	}
 	sofar = bp - buf;
-	if (buflen - sofar - textlen - 1) {
-		buflen = sofar + textlen + 2;
+	if (buflen < (sofar + textlen + 1)) {
+		buflen = sofar + textlen + 1;
 		erealloc(buf, char *, buflen, "do_sub");
 		bp = buf + sofar;
 	}
-	for (scan = matchend; scan < text + textlen; scan++)
+	/*
+	 * Note that text == matchend, since that assignment is made before
+	 * exiting the 'for' loop above. Thus we copy in the rest of the
+	 * original string.
+	 */
+	for (scan = text; scan < text + textlen; scan++)
 		*bp++ = *scan;
 	*bp = '\0';
 	textlen = bp - buf;
@@ -3042,7 +3087,7 @@ set_how_many:
 		efree(mb_indices);
 
 done:
-	DEREF(s);
+	DEREF(rep_node);
 
 	if ((matches == 0 || (flags & LITERAL) != 0) && buf != NULL) {
 		efree(buf); 
@@ -3052,18 +3097,18 @@ done:
 	if (flags & GENSUB) {
 		if (matches > 0) {
 			/* return the result string */
-			DEREF(t);
+			DEREF(target);
 			assert(buf != NULL);
 			return make_str_node(buf, textlen, ALREADY_MALLOCED);	
 		}
 
 		/* return the original string */
-		return t;
+		return target;
 	}
 
 	/* For a string literal, must not change the original string. */
 	if ((flags & LITERAL) != 0)
-		DEREF(t);
+		DEREF(target);
 	else if (matches > 0) {
 		unref(*lhs);
 		*lhs = make_str_node(buf, textlen, ALREADY_MALLOCED);	
@@ -3102,7 +3147,8 @@ call_sub(const char *name, int nargs)
 		 * push replace
 		 * push $0
 		 */
-		regex = make_regnode(Node_regex, regex);
+		if (regex->type != Node_typedregex)
+			regex = make_regnode(Node_regex, regex);
 		PUSH(regex);
 		PUSH(replace);
 		lhs = r_get_field(zero, (Func_ptr *) 0, true);
@@ -3126,7 +3172,8 @@ call_sub(const char *name, int nargs)
 		 *	 nargs++
 		 * }
 		 */
-		regex = make_regnode(Node_regex, regex);
+		if (regex->type != Node_typedregex)
+			regex = make_regnode(Node_regex, regex);
 		PUSH(regex);
 		PUSH(replace);
 		PUSH(glob_flag);
@@ -3137,9 +3184,9 @@ call_sub(const char *name, int nargs)
 			PUSH(rhs);
 			nargs++;
 		}
-		PUSH(rhs);
+		else
+			PUSH(rhs);
 	}
-
 
 	unref(zero);
 	result = do_sub(nargs, flags);
@@ -3163,7 +3210,8 @@ call_match(int nargs)
 
 	/* Don't need to pop the string just to push it back ... */
 
-	regex = make_regnode(Node_regex, regex);
+	if (regex->type != Node_typedregex)
+		regex = make_regnode(Node_regex, regex);
 	PUSH(regex);
 
 	if (array)
@@ -3191,7 +3239,8 @@ call_split_func(const char *name, int nargs)
 
 	if (nargs >= 3) {
 		regex = POP_STRING();
-		regex = make_regnode(Node_regex, regex);
+		if (regex->type != Node_typedregex)
+			regex = make_regnode(Node_regex, regex);
 	} else {
 		if (name[0] == 's') {
 			regex = make_regnode(Node_regex, FS_node->var_value);
@@ -3818,6 +3867,50 @@ do_intdiv(int nargs)
 	return make_number((AWKNUM) 0.0);
 }
 
+/* do_typeof --- return a string with the type of the arg */
+
+NODE *
+do_typeof(int nargs)
+{
+	NODE *arg;
+	char *res = "unknown";
+	bool deref = true;
+
+	arg = POP();
+	switch (arg->type) {
+	case Node_var_array:
+		/* Node_var_array is never UPREF'ed */
+		res = "array";
+		deref = false;
+		break;
+	case Node_typedregex:
+		res = "regexp";
+		break;
+	case Node_val:
+	case Node_var:
+		if (arg == Nnull_string)
+			res = "unassigned";
+		else if ((arg->flags & STRING) != 0) {
+			res = "string";
+			if ((arg->flags & MAYBE_NUM) != 0)
+				res = "strnum";
+		} else if ((arg->flags & NUMBER) != 0)
+			res = "number";
+		break;
+	case Node_var_new:
+		res = "untyped";
+		deref = false;
+		break;
+	default:
+		fatal(_("typeof: unknown argument type `%s'"),
+				nodetype2str(arg->type));
+		break;
+	}
+
+	if (deref)
+		DEREF(arg);
+	return make_string(res, strlen(res));
+}
 
 /* mbc_byte_count --- return number of bytes for corresponding numchars multibyte characters */
 

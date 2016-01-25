@@ -1736,6 +1736,8 @@ watchpoint_triggered(struct list_item *w)
 		/* new != NULL */
 		if (t2->type == Node_val)
 			w->cur_value = dupnode(t2);
+		else if (t2->type == Node_typedregex)
+			w->cur_value = dupnode(t2);
 		else {
 			w->flags |= CUR_IS_ARRAY;
 			w->cur_size = (t2->type == Node_var_array) ? assoc_length(t2) : 0;
@@ -1748,6 +1750,7 @@ watchpoint_triggered(struct list_item *w)
 			w->flags |= CUR_IS_ARRAY;
 			w->cur_size = assoc_length(t2);
 		} else
+			/* works for Node_typedregex too */
 			w->cur_value = dupnode(t2);
 	}
 
@@ -1790,6 +1793,8 @@ initialize_watch_item(struct list_item *w)
 		} else if (symbol->type == Node_var_array) {
 			w->flags |= CUR_IS_ARRAY;
 			w->cur_size = assoc_length(symbol);
+		} else if (symbol->type == Node_typedregex) {
+			w->cur_value = dupnode(symbol);
 		} /* else
 			can't happen */
 	}
@@ -3653,8 +3658,20 @@ debug_pre_execute(INSTRUCTION **pi)
 
 	assert(sourceline > 0);
 
-	if (check_breakpoint(pi)
-			|| check_watchpoint()
+	/*
+	 * 11/2015: This used to check breakpoints first, but that could
+	 * produce strange behavior, where a watchpoint doesn't print until
+	 * some time after the data changed.  This reworks things so that
+	 * watchpoints are checked first. It's a bit of a hack, but
+	 * the behavior for the user is more logical.
+	 */
+	if (check_watchpoint()) {
+		next_command();	/* return to debugger interface */
+		if (stop.command == D_return)
+			*pi = stop.pc;	/* jump to this instruction */
+		else if (cur_pc->opcode == Op_breakpoint)
+			cur_pc = cur_pc->nexti;    /* skip past the breakpoint instruction */
+	} else if (check_breakpoint(pi)
 			|| (stop.check_func && stop.check_func(pi))) {
 		next_command();	/* return to debugger interface */
 		if (stop.command == D_return)
@@ -3703,6 +3720,9 @@ print_memory(NODE *m, NODE *func, Func_print print_func, FILE *fp)
 		print_func(fp, " [%s]", flags2str(m->flags));
 		break;
 
+	case Node_typedregex:
+		print_func(fp, "@");
+		/* fall through */
 	case Node_regex:
 		pp_string_fp(print_func, fp, m->re_exp->stptr, m->re_exp->stlen, '/', false);
 		break;
@@ -3982,6 +4002,7 @@ print_instruction(INSTRUCTION *pc, Func_print print_func, FILE *fp, int in_dump)
 	case Op_push_i:
 	case Op_push:
 	case Op_push_arg:
+	case Op_push_arg_untyped:
 	case Op_push_param:
 	case Op_push_array:
 	case Op_push_re:
@@ -4205,10 +4226,10 @@ gprintf(FILE *fp, const char *format, ...)
 #define GPRINTF_BUFSIZ 512
 	if (buf == NULL) {
 		buflen = GPRINTF_BUFSIZ;
-		emalloc(buf, char *, (buflen + 2) * sizeof(char), "gprintf");
+		emalloc(buf, char *, buflen * sizeof(char), "gprintf");
 	} else if (buflen - bl < GPRINTF_BUFSIZ/2) {
 		buflen += GPRINTF_BUFSIZ;
-		erealloc(buf, char *, (buflen + 2) * sizeof(char), "gprintf");
+		erealloc(buf, char *, buflen * sizeof(char), "gprintf");
 	}	 
 #undef GPRINTF_BUFSIZ
 	
@@ -4227,7 +4248,7 @@ gprintf(FILE *fp, const char *format, ...)
 
 		/* enlarge buffer, and try again */ 
 		buflen *= 2;
-		erealloc(buf, char *, (buflen + 2) * sizeof(char), "gprintf");
+		erealloc(buf, char *, buflen * sizeof(char), "gprintf");
 	}
 
 	bl = 0;
@@ -4267,7 +4288,7 @@ gprintf(FILE *fp, const char *format, ...)
 static int
 serialize_subscript(char *buf, int buflen, struct list_item *item)
 {
-	int bl = 0, nchar, i;
+	int bl, nchar, i;
 	NODE *sub;
 
 	nchar = snprintf(buf, buflen, "%d%c%d%c%s%c%d%c",
@@ -4277,7 +4298,7 @@ serialize_subscript(char *buf, int buflen, struct list_item *item)
 		return 0;
 	else if (nchar >= buflen)	/* need larger buffer */
 		return nchar;
- 	bl += nchar;
+ 	bl = nchar;
 	for (i = 0; i < item->num_subs; i++) {
 		sub = item->subs[i];
 		nchar = snprintf(buf + bl, buflen - bl, "%lu%c%s%c",
@@ -4356,7 +4377,7 @@ serialize(int type)
 
 	if (buf == NULL) {	/* first time */
 		buflen = SERIALIZE_BUFSIZ;
-		emalloc(buf, char *, buflen + 2, "serialize");
+		emalloc(buf, char *, buflen + 1, "serialize");
 	}
 	bl = 0;
 
@@ -4365,7 +4386,7 @@ serialize(int type)
 		if (buflen - bl < SERIALIZE_BUFSIZ/2) {
 enlarge_buffer:
 			buflen *= 2;
-			erealloc(buf, char *, buflen + 2, "serialize");
+			erealloc(buf, char *, buflen + 1, "serialize");
 		}
 
 #undef SERIALIZE_BUFSIZ
@@ -4466,7 +4487,7 @@ enlarge_buffer:
 			}
 
 			if (nchar > 0) {	/* non-empty commands list */
-				nchar += (strlen("commands ") + 20 + strlen("end") + 2); /* 20 for cnum (an int) */
+				nchar += (strlen("commands ") + 20 + strlen("end") + 1); /* 20 for cnum (an int) */
 				if (nchar > buflen - bl) {
 					buflen = bl + nchar;
 					erealloc(buf, char *, buflen + 3, "serialize");

@@ -17,6 +17,10 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif /* HAVE_STDINT_H */
+
 static reg_errcode_t match_ctx_init (re_match_context_t *cache, int eflags,
 				     int n) internal_function;
 static void match_ctx_clean (re_match_context_t *mctx) internal_function;
@@ -51,8 +55,7 @@ static int re_search_stub (struct re_pattern_buffer *bufp,
 			   int ret_len) internal_function;
 static unsigned re_copy_regs (struct re_registers *regs, regmatch_t *pmatch,
 			      int nregs, int regs_allocated) internal_function;
-static reg_errcode_t prune_impossible_nodes (re_match_context_t *mctx)
-     internal_function;
+static reg_errcode_t prune_impossible_nodes (re_match_context_t *mctx);
 static int check_matching (re_match_context_t *mctx, int fl_longest_match,
 			   int *p_match_first) internal_function;
 static int check_halt_state_context (const re_match_context_t *mctx,
@@ -302,7 +305,7 @@ compat_symbol (libc, __compat_regexec, regexec, GLIBC_2_0);
    concerned.
 
    If REGS is not NULL, and BUFP->no_sub is not set, the offsets of the match
-   and all groups is stroed in REGS.  (For the "_2" variants, the offsets are
+   and all groups is stored in REGS.  (For the "_2" variants, the offsets are
    computed relative to the concatenation, not relative to the individual
    strings.)
 
@@ -623,7 +626,7 @@ re_exec (s)
 
 /* Searches for a compiled pattern PREG in the string STRING, whose
    length is LENGTH.  NMATCH, PMATCH, and EFLAGS have the same
-   mingings with regexec.  START, and RANGE have the same meanings
+   meaning as with regexec.  START, and RANGE have the same meanings
    with re_search.
    Return REG_NOERROR if we find a match, and REG_NOMATCH if not,
    otherwise return the error code.
@@ -691,7 +694,8 @@ re_search_internal (preg, string, length, start, range, stop, nmatch, pmatch,
   fl_longest_match = (nmatch != 0 || dfa->nbackref);
 
   err = re_string_allocate (&mctx.input, string, length, dfa->nodes_len + 1,
-			    preg->translate, preg->syntax & RE_ICASE, dfa);
+			    preg->translate, (preg->syntax & RE_ICASE) != 0,
+			    dfa);
   if (BE (err != REG_NOERROR, 0))
     goto free_return;
   mctx.input.stop = stop;
@@ -908,7 +912,7 @@ re_search_internal (preg, string, length, start, range, stop, nmatch, pmatch,
 	    goto free_return;
 	}
 
-      /* At last, add the offset to the each registers, since we slided
+      /* At last, add the offset to each register, since we slid
 	 the buffers so that we could assume that the matching starts
 	 from 0.  */
       for (reg_idx = 0; reg_idx < nmatch; ++reg_idx)
@@ -958,9 +962,7 @@ re_search_internal (preg, string, length, start, range, stop, nmatch, pmatch,
 }
 
 static reg_errcode_t
-__attribute_warn_unused_result__
-prune_impossible_nodes (mctx)
-     re_match_context_t *mctx;
+prune_impossible_nodes (re_match_context_t *mctx)
 {
   const re_dfa_t *const dfa = mctx->dfa;
   int halt_node, match_last;
@@ -1055,7 +1057,7 @@ prune_impossible_nodes (mctx)
    since initial states may have constraints like "\<", "^", etc..  */
 
 static inline re_dfastate_t *
-__attribute ((always_inline)) internal_function
+__attribute__ ((always_inline)) internal_function
 acquire_init_state_context (reg_errcode_t *err, const re_match_context_t *mctx,
 			    int idx)
 {
@@ -2416,7 +2418,7 @@ merge_state_with_log (reg_errcode_t *err, re_match_context_t *mctx,
 /* Skip bytes in the input that correspond to part of a
    multi-byte match, then look in the log for a state
    from which to restart matching.  */
-re_dfastate_t *
+static re_dfastate_t *
 internal_function
 find_recover_state (reg_errcode_t *err, re_match_context_t *mctx)
 {
@@ -2445,7 +2447,7 @@ find_recover_state (reg_errcode_t *err, re_match_context_t *mctx)
 /* From the node set CUR_NODES, pick up the nodes whose types are
    OP_OPEN_SUBEXP and which have corresponding back references in the regular
    expression. And register them to use them later for evaluating the
-   correspoding back references.  */
+   corresponding back references.  */
 
 static reg_errcode_t
 internal_function
@@ -3381,7 +3383,7 @@ build_trtable (const re_dfa_t *dfa, re_dfastate_t *state)
   if (BE (ndests <= 0, 0))
     {
       if (dests_node_malloced)
-	free (dests_alloc);
+	re_free (dests_alloc);
       /* Return 0 in case of an error, 1 otherwise.  */
       if (ndests == 0)
 	{
@@ -3413,18 +3415,18 @@ build_trtable (const re_dfa_t *dfa, re_dfastate_t *state)
   else
 #endif
     {
-      dest_states = (re_dfastate_t **)
-	malloc (ndests * 3 * sizeof (re_dfastate_t *));
+      dest_states =
+	re_malloc (re_dfastate_t *, ndests * 3);
       if (BE (dest_states == NULL, 0))
 	{
 out_free:
 	  if (dest_states_malloced)
-	    free (dest_states);
+	    re_free (dest_states);
 	  re_node_set_free (&follows);
 	  for (i = 0; i < ndests; ++i)
 	    re_node_set_free (dests_node + i);
 	  if (dests_node_malloced)
-	    free (dests_alloc);
+	    re_free (dests_alloc);
 	  return 0;
 	}
       dest_states_malloced = true;
@@ -3555,14 +3557,14 @@ out_free:
     }
 
   if (dest_states_malloced)
-    free (dest_states);
+    re_free (dest_states);
 
   re_node_set_free (&follows);
   for (i = 0; i < ndests; ++i)
     re_node_set_free (dests_node + i);
 
   if (dests_node_malloced)
-    free (dests_alloc);
+    re_free (dests_alloc);
 
   return 1;
 }
@@ -4225,7 +4227,7 @@ match_ctx_clean (re_match_context_t *mctx)
 	  re_free (top->path->array);
 	  re_free (top->path);
 	}
-      free (top);
+      re_free (top);
     }
 
   mctx->nsub_tops = 0;

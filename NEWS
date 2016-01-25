@@ -48,8 +48,54 @@ Changes from 4.1.x to 4.2.0
 11. Gawk now supports retryable I/O via PROCINFO[input-file, "RETRY"]; see
     the manual.
 
-12. The API minor version has been increased to two; the get_file()
+12. The API minor version has been increased to 2; the get_file()
     API provides access to open redirections. Also see the manual.
+
+13. Revisions in the POSIX standard remove the special case for POSIX
+    mode when FS = " " where newline was not a field separator. The code
+    and doc have been updated.
+
+14. Gawk now supports strongly typed regexp constants. Such constants
+    look like @/.../.  You can assign them to variables, pass them to
+    functions, use them in ~, !~ and the case part of a switch statement.
+    More details are provided in the manual.
+
+15. The new typeof() function can be used to indicate if a variable or
+    array element is an array, regexp, string or number.  The isarray()
+    function is deprecated in favor of typeof().
+
+16. As promised when 4.1 was released, the old extension mechanism,
+    using the `extension' function, is now gone.
+
+17. Support for GNU/Linux on Alpha systems has been removed.
+
+Changes from 4.1.3 to 4.1.x
+---------------------------
+
+1. Updated to GNU autoconf 2.69, automake 1.15, gettext 0.19.5.1.
+
+2. z/OS support updated.
+
+3. At the beginning of each statement, the debugger now checks and
+   reports watchpoints that have fired before checking for breakpoints.
+   This gives more natural behavior to the user.
+
+4. The "exit" command has been added to the debugger as an alias
+   for "quit".
+
+5. AIX 7.1 should pass the test suite now.  Similar for Minix.
+
+6. VMS support has been updated.
+
+Changes from 4.1.2 to 4.1.3
+---------------------------
+
+1. Regexp parsing with extra brackets should now be working again. There
+   are several new tests to keep this stuff on track.
+
+2. Updated to latest config.guess and config.sub.
+
+3. A (small) number of bugs have been fixed. See the ChangeLog.
 
 Changes from 4.1.1 to 4.1.2
 ---------------------------
@@ -101,7 +147,14 @@ Changes from 4.1.1 to 4.1.2
     with the names of any functions. Gawk has checked for the former
     since 3.1.7. With --posix, it now also checks for the latter.
 
-XX. A number of bugs have been fixed. See the ChangeLog.
+13. The test suite should check for necessary locales and skip the tests
+    where it matters if support isn't what it should be.
+
+14. Gawk now expects to be compiled on a system with multibyte character
+    support.  Systems without such support, at least at the C language
+    level, are so obsolete as to not be worth supporting anymore.
+
+15. A number of bugs have been fixed. See the ChangeLog.
 
 Changes from 4.1.0 to 4.1.1
 ---------------------------

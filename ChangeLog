@@ -1,3 +1,607 @@
+2016-01-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Document VMS support updated.
+
+2016-01-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Regex: treat [x] as x if x is a unibyte encoding error.
+	This change removes an ifdef GAWK.
+
+	* lib/regcomp.c (parse_byte) [ !_LIBC && RE_ENABLE_I18N]: New function.
+	(build_range_exp) [ !_LIBC && RE_ENABLE_I18N]: Use it.
+	From Paul Eggert  <eggert@cs.ucla.edu>.
+
+2016-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regexec.c (prune_impossible_nodes): Remove all attributes, on
+	both declaration and definition.  Fixes a Linux Mint 17 compilation
+	braino reported by Antonio Colombo.
+	* regex_internal.h (test_malloc): Add cast to silence a warning
+	on the same system.
+	(test_realloc): Ditto.
+
+2016-01-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.h [attribute_hidden]: Remove definition.
+	* regcomp.c [attribute_hidden]: Remove uses. Not needed since
+	the variables are static. Thanks to Paul Eggert for pointing
+	this out.
+
+2016-01-18         Paul Eggert  <eggert@cs.ucla.edu>
+
+	Diagnose ERE '()|\1'
+	Problem reported by Hanno Boeck in: http://bugs.gnu.org/21513
+
+	* lib/regcomp.c (parse_reg_exp): While parsing alternatives, keep
+	track of the set of previously-completed subexpressions available
+	before the first alternative, and restore this set just before
+	parsing each subsequent alternative.  This lets us diagnose the
+	invalid back-reference in the ERE '()|\1'.
+
+	Unrelated:  General minor cleanups (spelling, code) from Gnulib:
+
+	* regex.h, regex_internal.c, regex_internal.h, regexec.c: Minor
+	cleanups.
+
+2016-01-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* eval.c (r_get_lhs): If original array was Node_var_new,
+	assign value that is dupnode of Nnull_string and not
+	Nnull_string directly. Fixes core dump reported by
+	ruyk <Lonely.ruyk@mail.ru>.
+
+	Unrelated:
+
+	* ChangeLog: Cleanup spurious extra whitespace.
+
+2016-01-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac (GAWK_AC_LINUX_ALPHA): Remove call.
+	* configure: Regenerated.
+	* NEWS: Document removal of support for GNU/Linux on Alpha.
+
+2016-01-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c (add_utf8_anychar): Minor change in declaration of
+	utf8_classes to keep Tiny CC happy.  Also syncs with grep.
+	* dfa.h: Sync with grep (update copyright year).
+
+2015-12-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (mk_condition): Revise to correctly handle
+	empty else part for pretty printing. Bug report by
+	ziyunfei <446240525@qq.com>.
+
+2015-12-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* io.c (nonfatal): New static constant string.
+	* is_non_fatal, is_non_fatal_redirect: Use it.
+
+2015-12-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* io.c (two_way_open): Remove unneeded close of slave in the
+	parent.
+
+2015-12-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile.c (pp_number): Move count into ifdef for MPFR. Avoids
+	an unused variable warning if not compiling for MPFR.
+
+	Unrelated:
+
+	* io.c (two_way_open): If using a pty instead of pipes, open the
+	slave in the child. Fixes AIX and doesn't seem to break GNU/Linux.
+
+2015-11-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* command.y (cmdtab): Add "exit" as synonym for "quit".
+	Suggested by Joep van Delft <joepvandelft@xs4all.nl>.
+	* NEWS: Document this.
+
+2015-11-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* debug.c (debug_pre_execute): Fix to check watchpoints before
+	checking breakpoints. Gives more natural behavior for the user.
+	* NEWS: Document this.
+	Issue reported by Joep van Delft <joepvandelft@xs4all.nl>.
+
+2015-10-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (nextc): Don't allow '\0' even if check_for_bad
+	is false. Fixes a problem reported by Hanno Boeck <hanno@hboeck.de>.
+
+	Unrelated:
+
+	* dfa.c: Sync with GNU grep.
+
+2015-10-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): Fix invalid write problems.
+	Reported by Hanno Boeck <hanno@hboeck.de>.
+	Only appeared in master. Harumph.
+
+2015-10-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (SUBDIRS): Fix ordering so that
+	make check directly after configure works properly.
+	Thanks to Michal Jaegermann <michal.jnn@gmail.com>
+	for the report.
+
+	Unrelated:
+
+	* dfa.c: Sync with GNU grep.
+
+2015-10-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): Fix invalid read problems.
+	Reported by Hanno Boeck <hanno@hboeck.de>.
+
+2015-10-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Bump version to 4.1.3a.
+
+2015-09-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): Diagnose multidimensional arrays for
+	traditional/posix (fatal) or lint. Thanks to Ed Morton
+	for the bug report.
+
+2015-09-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub, config.rpath: Updated.
+
+2015-09-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* field.c (fpat_parse_field): Always use rp->non_empty instead
+	of only if in_middle. The latter can be true even if we've
+	already parsed part of the record. Thanks to Ed Morton
+	for the bug report.
+
+2015-09-11	Daniel Richard G.	<skunk@iSKUNK.ORG>
+
+	* regcomp.h: Include strings.h, wrapped in ifdef. Revise
+	defines for BTOWC.
+	* regex_internal.h: Remove ZOS_USS bracketing ifdefs.
+
+2015-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile.c (pp_num): Use format_val to print integral values
+	as integers. Thanks to Hermann Peifer for the report.
+
+2015-08-28	Daniel Richard G.	<skunk@iSKUNK.ORG>
+
+	* Makefile.am, configure.ac: Use an Automake conditional to
+	enable/disable the "extensions" subdirectory instead of
+	producing a stub Makefile therein from the configure script.
+	* awk.h, custom.h, regex_internal.h: Removed z/OS-specific code
+	that is no longer needed due to improvements in Gawk's general
+	Autotools support.
+	* awk.h: Allow <strings.h> to be #included together with
+	<string.h> as this is required on some systems (z/OS).
+	* io.c, configure.ac: <sys/select.h> is needed for select()
+	and related bits on z/OS.
+	* awk.h: Handle the redefinition of EXIT_FAILURE on z/OS in a
+	more elegant/general way.
+	* awkgram.y, command.y, configure.ac, eval.c,
+	helpers/testdfa.c: Define and use the USE_EBCDIC cpp symbol
+	instead of checking the value of 'a' whenever we want to know
+	if we're on an EBCDIC system. Also, don't assume that z/OS
+	necessarily means EBCDIC, as the compiler does have an ASCII
+	mode (-qascii).
+	* awkgram.y, command.y, configure.ac: On EBCDIC systems,
+	convert singleton EBCDIC characters in the input stream to
+	ASCII on the fly so that the generated awkgram.c/command.c in
+	the distributed sources can be used, i.e. we don't have to
+	require the user to build Bison and re-generate those files
+	themselves. This implementation uses a z/OS-specific function
+	(__etoa_l()) to do the conversion, but support for other
+	systems can be added in the future as necessary.
+	* io.c: No need to protect this block of "#if
+	defined(HAVE_TERMIOS_H)" code from z/OS; it works just fine
+	there.
+	* configure.ac: Check for the "struct passwd.pw_passwd" and
+	"struct group.gr_passwd" fields and conditionalize their use,
+	as they don't exist on z/OS.  Needed for doc/gawktexi.in.
+
+2015-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* node.c (str2wstr): Upon finding an invalid character, if
+	using UTF-8, use the replacement character instead of skipping
+	it. Helps match() and other functions work better in the face
+	of unexpected data.  Make the lint warning an unconditional
+	warning.
+
+	Unrelated:
+
+	* awk.h: Add explanatory comment on the flags related to
+	types and values.
+	* mpfr.c (mpg_force_number): If setting NUMBER, clear STRING also
+	when clearing MAYBE_NUM.
+	(set_PREC): Check STRCUR instead of STRING.
+	* node.c (r_force_number): If setting NUMBER, clear STRING also
+	when clearing MAYBE_NUM.
+
+2015-08-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c (dfamust): Restore c90 compat by moving some
+	variable declarations to the top of the routine.
+
+2015-08-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep. Yet again, again.
+
+2015-08-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep. Yet again.
+
+2015-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2015-07-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2015-07-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.h, dfa.c: Sync with GNU grep.
+
+2015-06-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): If gawk extension function is found as
+	a function in a user-defined function body, treat it normally.
+	Makes eval "print and(a, 1)" work in the debugger again.
+	Thanks, yet again, to Hermann Peifer.
+	* interpret.h (r_interpret): Op_subscript. UPREF if the
+	element value is a typed regexp.  Thanks to Hermann Peifer.
+
+2015-06-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Improve memory tracking of typed regexps.
+
+	* awkgram.y (make_regnode): Set valref to 1.
+	* interpret.h (r_interpret): Have Op_push_re upref typed regexp.
+	* builtin.c (do_typeof): OK to deref typed regex.
+	* awk.h (force_string): Do dupnode on the regexp text.
+
+2015-06-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Remove support for old-style extensions.
+
+	* awk.h (Node_old_ext_func, Op_old_ext_func): Removed.
+	Remove all uses throughout the code.
+	(load_old_ext, make_old_builtin): Remove declarations.
+	* ext.c (load_old_ext, make_old_builtin): Removed.
+	* awkgram.y (tokentab): Remove "extension" entry.
+	* eval.c (Node_old_ext_funci, Op_old_ext_func): Remove from tables.
+	* interpret.h (interpret): Remove stuff for old extensions.
+
+	Unrelated:
+
+	* builtin.c (do_typeof): Add support for strnum, distinguish
+	untyped from unassigned, use "string" and "number". Thanks to
+	Hermann Peifer for suggesting inclusion of strnum.
+
+2015-06-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Further work straightening out memory management for typeof.
+
+	* awk.h (DEREF): Add an assert.
+	* builtin.c (do_typeof): Add comments, cases where not to deref.
+	* debug.c (print_instruction): Add Op_push_arg_untyped.
+	* interpret.h (r_interpret): Additional comments / tweaks for
+	Op_push_arg_untyped.
+
+	Unrelated. Make `x = @/foo/ ; print x' print something.
+
+	* builtin.c (do_print): Check for Node_typedregex and handle it.
+	Needed for adding test code.
+
+	Unrelated. Typo fix.
+
+	* debug.c (initialize_watch_item): Dupnode the right thing.
+
+2015-06-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (snode): Make isarray not scalarize untyped parameters
+	also.
+	* profile.c (pprint): Add Op_push_arg_untyped.
+
+	Improve debugger support for typed regexps.
+	Thanks to Hermann Peifer for the bug report.
+
+	* awkgram.y (valinfo): Add support for Node_typedregex.
+	* debug.c (watchpoint_triggerred): Handle Node_typedregex.
+	(initialize_watch_item): Ditto.
+	(print_memory): Ditto.
+
+	Fix typeof to work on subarrays.  Thanks, yet again, to
+	Hermann Peifer for the bug report.
+
+	* builtin.c (do_typeof): Don't deref Node_var_array.
+
+2015-06-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fixes for typeof - Don't let typeof change an untyped variable
+	into a scalar.
+
+	* awk.h (opcodeval): Add Op_push_arg_untyped.
+	* awkgram.y (snode): Separate out case for do_typeof, use
+	Op_push_arg_untyped.
+	* builtin.c (do_typeof): Arg will be equal to Nnull_string
+	if it's untyped.
+	* eval.c (optypes): Add Op_push_arg_untyped.
+	* interpret.h (r_interpret): Add Op_push_arg_untyped handling.
+
+2015-06-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_isarray): Minor edit to lint warning.
+	* TODO: Updated.
+
+2015-06-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c, regex_internal.h, regexec.c: Sync with GLIBC.
+
+	Unrelated:
+
+	* regex_internal.c, regexec.c: __attribute --> __attribute__.
+
+	Related:
+
+	* regex_internal.h: Clean up defines for non-GCC for attribute;
+	essentially sync it with GLIBC.
+
+2015-06-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y: Finish converting "hard" regex to "typed" regex.
+
+2015-05-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* field.c (posix_def_parse_field): Removed. It's no longer
+	needed after updates to the POSIX standard. Thanks to
+	Michael Klement <michael.klement@usa.net> for pointing this out.
+
+2015-05-26  Paul Eggert  <eggert@Penguin.CS.UCLA.EDU>
+
+	* floatcomp.c (count_trailing_zeros): New function.
+	This compiles to a single TZCNT instruction on the x86-64.
+	(adjust_uint): Use it to keep more high-order bits when
+	some of the lowest-order bits are zero.  This implements
+	the documented behavior: "If the result cannot be represented
+	exactly as a C 'double', leading nonzero bits are removed one by
+	one until it can be represented exactly."
+
+2015-05-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c: Fix offsets so error messages come out correct
+	once again.
+
+2015-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.3: Release tar ball made.
+
+2015-05-15         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* symbol.c (load_symbols): Plug minor memory leak by calling unref(tmp)
+	on "identifiers" string after assoc_lookup is done with it.
+
+2015-05-15         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* main.c (load_procinfo_argv): New function to save argv array values
+	in PROCINFO["argv"][0..argc-1].
+	(load_procinfo): Call load_procinfo_argv.
+
+2015-05-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h, awkgram.y, builtin.c, eval.c profile.c, re.c:
+	Change Node_hardregex to Node_typedregex everywhere.
+
+2015-05-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): Yet Another Fix for parsing bracket
+	expressions. Thanks yet again to Andrew Schorr. Maybe it's
+	even finally nailed down now.
+
+	Unrelated:
+
+	* config.guess, config.sub: Get latest versions.
+
+	Make profiling for hard regexes work.
+
+	* profile.c (pp_string_or_hard_regex): Renamed from pp_string.
+	Add bool param for hard regex and add @ if so.
+	(pp_string): New function, calls pp_string_or_hard_regex.
+	(pp_hard_regex): New function, calls pp_string_or_hard_regex.
+	(pprint): Adjust to print a hard regex correctly.
+
+2015-05-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y: Make sure values are not null in param list.
+	Avoids core dump for `function f(func, a) {}'. Thanks to
+	Tibor Palinkas <libmawk@igor2.repo.hu>.
+
+2015-04-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Take --program-prefix into account when
+	installing/uninstalling the symlinks, especially 'awk'.
+	Thanks to Steffen Nurpmeso <sdaoden@yandex.com> for
+	the report.
+
+	Unrelated:
+
+	* awkgram.y (yylex): Yet Another Fix for parsing bracket
+	expressions. Thanks again to Andrew Schorr.
+
+2015-04-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.2: Release tar ball made.
+
+2015-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (isarray): Add lint warning that isarray()
+	is deprecated.
+
+2015-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): Rework the bracket handling from zero.
+	Thanks to Michal Jaegermann for yet another test case.
+
+	Unrelated:
+
+	* eval.c (setup_frame): Restore call-by-value for $0. This was
+	necessitated by the changes on 2014-11-11 for conserving
+	memory use. Thanks to Andrew Schorr for the report and isolating
+	the cause of the problem.
+
+2015-04-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yylex): Make change of Jan 7 for parsing regexps
+	work better. Thanks to Nelson Beebe.
+
+2015-04-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with grep.
+
+2015-04-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_strftime): For bad time_t values, return "".
+
+2015-04-16         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* node.c (r_force_number): If strtod sets errno, then force the
+	numeric value in node->numbr to zero. For subnormal values, strtod
+	sets errno but does not return zero, and we don't want to retain
+	those subnormal values.
+
+2015-04-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Let parameter names shadow the names of gawk additional built-ins.
+	Make it actually work.
+
+	* awkgram.y (want_param_names): Now an enum, there are three states.
+	(grammar): Set states properly.
+	(yylex): Improve checking logic.
+
+2015-04-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Updated by autoupdate.
+	* configure, aclocal.m4: Regenerated.
+	* io.c, main.c, profile.c: Removed use of RETSIGTYPE.
+
+2015-04-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_strftime): Use a double for the timestamp and
+	check that the value is within range for a time_t.
+
+	Unrelated:
+
+	* regex_internal.h (test_malloc, test_realloc): Use %lu in printf
+	format for error messages. Thanks to Michal Jaegermann for
+	pointing this out.
+
+	Unrelated:
+
+	* NEWS: Updated.
+
+2015-04-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Let parameter names shadow the names of gawk additional built-ins.
+
+	* awkgram.y (want_param_names): New variable.
+	(yylex): Check it before returning a built-in token.
+	(grammar): Set and clear it in the right places.
+
+2015-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_strftime): Restore checking for negative result and
+	add check that time_t is > 0 --- means we're assigning a negative value
+	to an unsigned time_t. Thanks again to Glaudiston Gomes da Silva
+	<glaudistong@gmail.com>.
+
+	If localtime() or gmtime() return NULL, return a null string.
+	Thanks to Andrew Schorr.
+
+	Unrelated:
+	* builtin.c (call_sub): Fix for indirect gensub, 3 args now works.
+
+	Unrelated:
+
+	* builtin.c (do_sub): Improve some variable names for readability
+	and add / expand some comments.
+
+	Unrelated:
+
+	* builtin.c (call_sub, call_match, call_split_func): Allow for
+	regex to be Node_hardregex.
+
+2015-04-14         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+		   Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_sub): Make computations smarter; initial len
+	to malloc, test for final amount after all matches done and
+	need to copy in the final part of the original string.
+
+2015-04-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c (analyze): Prevent malloc(0).
+	* regex_internal.h (test_malloc, test_realloc): New functions
+	that check for zero count.
+	(re_malloc, re_realloc): Adjust to call the new functions for gawk.
+	* regexec.c (buid_trtable, match_ctx_clean): Replace malloc/free
+	with re_malloc/re_free.
+
+	Unrelated:
+
+	* builtin.c (do_strftime): Disable checking timestamp value for less
+	than zero. Allows times before the epoch to work with strftime.
+	Thanks to Glaudiston Gomes da Silva <glaudistong@gmail.com>
+	for raising the issue.
+
+2015-04-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (efence): Make this link again.
+	Thanks to Michal Jaegermann for pointing out the problem.
+
+2015-04-09         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* awkgram.y (yyerror): Rationalize buffer size computations. Remove
+	old valgrind workarounds.
+	* debug.c (gprintf): Rationalize buffer size computations.
+	(serialize_subscript): Ditto.
+	* io.c (iop_finish): Rationalize buffer size computations.
+	* profile.c (pp_string): Correct space allocation computation.
+
+2015-04-08        John E. Malmberg       <wb8tyw@qsl.net>
+
+	* custom.h: VMS shares some code paths with ZOS_USS in
+	building gawkfts extension.
+
+2015-04-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Factor out opening of /dev/XXX files from /inet.
+	Enable interpretation of special filenames for profiling output.
+
+	* awk.h (devopen_simple): Add declaration.
+	* io.c (devopen_simple): New routine.
+	(devopen): Call devopen_simple as appropriate.
+	* profile.c (set_prof_file): Call devopen_simple as appropriate,
+	some additonal logic to hande fd to fp conversion.
+
+	Unrelated:
+
+	* main.c (usage): Add a comment for translators.
+
+2015-04-08  Eli Zaretskii  <eliz@gnu.org>
+
+	* profile.c (set_prof_file): Interpret a file name of "-" to mean
+	standard output.
+
+2015-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (force_number): Add `!= 0' check to bitwise operation.
+	* awkgram.y: Same, many places.
+	(check_special): Simplify code for checking extension flags.
+
 2015-04-05         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* awkgram.y (install_builtins): If do_traditional is true, do not
@@ -7,6 +611,14 @@
 	a global variable that is not valid in traditional or posix mode.
 	Thanks to Andrew Schorr for finding the problem and supplying
 	initial code; I did it slightly differently.
+
+2015-04-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (force_string): If hard_regex, return string text of the regex.
+	(force_string, force_number): If hard_regex, return Nnull_string.
+	* awkgram.y: Fix ~ and !~ with @/.../.
+	* eval.c (setup_frame): Handle a hard regex.
+	* re.c (avoid_dfa): Ditto.
 
 2015-04-02         Andrew J. Schorr     <aschorr@telemetry-investments.com>
 
@@ -72,6 +684,24 @@
 	* interpret.h (r_interpret): If calling do_sub, do it through
 	call_sub_func().
 
+2015-03-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (re_update): Handle hard regex - for sub/gsub/gensub.
+	* awkgram.y (grammar): Add support for hard_regex with ~ and !~;
+	allowed only on the right hand side.
+	(mk_rexp): Handle a hard regex.
+
+2015-03-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_typeof): Be smarter about checking for uninitialized
+	values; can now detect and return "untyped" for such values.
+	* awkgram.y (yylex): Collect @/.../ entirely in the lexer and return
+	a new terminal (HARD_REGEX).
+	(regexp): Reverted to just a regular awk regexp constant.
+	(hard_regexp): New nonterminal, can be used only in direct
+	assignment and as an argument in function call. New set of nonterminals
+	for function call expression lists.  More work still to do.
+
 2015-03-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* config.guess, config.sub: Updated, from libtool 2.4.6.
@@ -112,6 +742,20 @@
 	* configure.ac: Use AC_SEARCH_LIBS instead of AC_CHECK_LIB. This fixes
 	a long-standing problem where `-lm' was used twice in the final
 	compilation line.
+
+2015-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Start on making regexp a real type.
+
+	* awk.h (Node_hardregex): New node type.
+	(do_typeof): Add declaration.
+	* awkgram.y: Make @/.../ a hard regex.
+	(tokentab): New entry for typeof() function.
+	(snode): Try to handle typeof().
+	(make_regnode): Handle Node_hardregex.
+	* builtin.c (do_typeof): New function.
+	* eval.c (nodetypes): Add Node_hardregex.
+	* re.c (re_update): Check for hardregex too in assert.
 
 2015-02-24         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -339,6 +983,33 @@
 
 	* profile.c (pprint): Be sure to set ip2 in all paths
 	through the code. Thanks to GCC 4.9 for the warning.
+
+2014-12-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_sub): Do not waste a byte at the end of a string.
+
+2014-12-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (yyerror): Do not waste a byte at the end of a string.
+	* builtin.c (do_match): Ditto.
+	* command.y (append_statement): Ditto.
+	* debug.c (gprintf, serialize): Ditto.
+	* field.c (set_FIELDWIDTHS): Ditto.
+	* io.c.c (grow_iop_buffer): Ditto.
+	* profile.c (pp_string, pp_group3): Ditto.
+
+2014-12-14         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* array.c (concat_exp): Do not waste a byte at the end of a string.
+	* awkgram.y (common_exp): Ditto.
+	* builtin.c (do_substr): Ditto.
+	* eval.c (set_OFS): Ditto.
+	* field.c (rebuild_record): Ditto.
+	* gawkapi.h (r_make_string): Ditto.
+	* interpret.h (r_interpret): Ditto for Op_assign_concat.
+	* node.c (r_format_val, r_dupnode, make_str_node, str2wstr, wstr2str):
+	Ditto.
+	* re.c (make_regexp): Ditto.
 
 2014-12-20         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -914,7 +1585,7 @@
 
 	* builtin.c (format_tree): Don't need to check return value of
 	wctombr for -2. Thanks to Eli Zaretskii for pointing this out.
-	
+
 	Unrelated:
 
 	* gawkapi.h: Fix doc for API get_record - errcode needs to
@@ -2425,7 +3096,7 @@
 
 	* awk.h (SRCFILE): New field fini_func.
 	* ext.c (load_ext): Takes an additional argument to look up and
-	save the clean up routine in SRCFILE struct. 
+	save the clean up routine in SRCFILE struct.
 	(INIT_FUNC, FINI_FUNC): Defines for default init and fini routine
 	names.
 	(do_ext): Use default for the name of the init or fini routine if
@@ -2440,8 +3111,8 @@
 
 	Unrelated:
 
-	* interpret.h (Op_arrayfor_init): Use assoc_length for array size. 
-	
+	* interpret.h (Op_arrayfor_init): Use assoc_length for array size.
+
 2012-04-19         John Haque      <j.eh@mchsi.com>
 
 	Enhanced array interface to support transparent implementation
@@ -2467,7 +3138,7 @@
 	(null_array_func): Add length and store routine entries.
 	* str_array.c (str_array_func): Same.
 	* cint_array.c (cint_array_func): Same.
-	* int_array.c (int_array_func): Same. 
+	* int_array.c (int_array_func): Same.
 	* eval.c (optypetab): Add Op_subscript_assign.
 	* profile.c (pprint): Add case Op_subscript_assign.
 	* interpret.h (set_array, set_idx): New variables to keep track
@@ -3650,7 +4321,7 @@
 	* main.c: Change --arbitrary-precision to --bignum.
 
 2012-04-02         John Haque      <j.eh@mchsi.com>
-	
+
 	Add support for arbitrary-precision arithmetic.
 
 	* mpfr.c: New file.
@@ -3681,7 +4352,7 @@
 	* eval.c (register_exec_hook): New function to manage interpreter hooks.
 	(num_exec_hook, pre_execute, post_execute): New and adjusted definitions.
 	(h_interpret): Renamed from debug_interpret.
-	(init_interpret): Changed to use the new name.  
+	(init_interpret): Changed to use the new name.
 	(flags2str): New entries for MPFN and MPZN.
 	(cmp_nodes): Reworked to use seperate routine for numeric comparisons.
 	(set_IGNORECASE, set_BINMODE, set_LINT, update_NR, update_FNR,
@@ -3827,7 +4498,7 @@
 
 2012-01-13         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* dfa.c [is_valid_unibtye_character]: Fix from GNU grep to 
+	* dfa.c [is_valid_unibtye_character]: Fix from GNU grep to
 	bug reported by me from Scott Deifik for DJGPP.
 
 2012-01-03         Arnold D. Robbins     <arnold@skeeve.com>
@@ -4171,7 +4842,7 @@
 	(do_traditional, do_posix, do_intervals, do_intl,
 	do_non_decimal_data, do_profiling, do_dump_vars,
 	do_tidy_mem, do_sandbox, do_lint,
-	do_lint_old): Defined as macros.	
+	do_lint_old): Defined as macros.
 	* main.c: Remove definitions of the do_XX variables. Add
 	do_flags definition.
 	* debug.c (execute_code, do_eval, parse_condition): Save
@@ -4203,7 +4874,7 @@
 	(Node_ahash, NUMIND): Nuked.
 	* eval.c (r_interpret): Adjust cases Op_subscript,
 	Op_subscript_lhs, Op_store_var and Op_arrayfor_incr.
-	* node.c (dupnode, unref): Removed code related to Node_ahash. 
+	* node.c (dupnode, unref): Removed code related to Node_ahash.
 	* str_array.c: New file to handle array with string indices.
 	* int_array.c: New file to handle array with integer indices.
 	* cint_array.c: New file. Special handling of arrays with
@@ -4256,7 +4927,7 @@
 	cases Op_K_getline, Op_after_beginfile, Op_after_endfile,
 	Op_newfile and Op_K_exit.
 	* io.c (after_beginfile): When skipping a file using nextfile,
-	return zero in case there was an error opening the file. 
+	return zero in case there was an error opening the file.
 	(has_endfile): Nuke global variable.
 	(inrec): Add a second argument to pass errno to the calling
 	routine.
@@ -4337,7 +5008,7 @@
 2011-07-15         John Haque      <j.eh@mchsi.com>
 
 	* awk.h (Op_sub_builtin): New opcode.
-	(GSUB, GENSUB, AFTER_ASSIGN, LITERAL): New flags for 
+	(GSUB, GENSUB, AFTER_ASSIGN, LITERAL): New flags for
 	Op_sub_builtin.
 	* awkgram.y (struct tokentab): Change opcode to	Op_sub_builtin
 	for sub, gsub and gensub.
@@ -4345,7 +5016,7 @@
 	* builtin.c (do_sub, do_gsub, do_gensub): Nuke.
 	(sub_common): Renamed to do_sub. Relocate gensub argument
 	handling code from do_gensub to here; Simplify the code a
-	little bit. 
+	little bit.
 	* eval.c (r_interpret): Handle Op_sub_builtin. Avoid field
 	re-splitting or $0 rebuilding if (g)sub target string is
 	a field and no substitutions were done.
@@ -4368,7 +5039,7 @@
 2011-07-15         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* awk.h: Typo fix: "loner" --> longer. Thanks to Nelson Beebe.
-	* builtin.c (efwrite): Fix flushing test back to what it was 
+	* builtin.c (efwrite): Fix flushing test back to what it was
 	in 3.1.8. Thanks to Strefil <strefil@yandex.ru> for the problem
 	report.
 	* configure.ac: Bump version to 4.0.0a for stable branch.

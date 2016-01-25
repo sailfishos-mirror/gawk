@@ -3,7 +3,7 @@
  */
 
 /* 
- * Copyright (C) 1986, 1988, 1989, 1991-2014 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2015 the Free Software Foundation, Inc.
  * 
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -144,6 +144,7 @@ top:
 
 		case Op_push:
 		case Op_push_arg:
+		case Op_push_arg_untyped:
 		{
 			NODE *save_symbol;
 			bool isparam = false;
@@ -175,19 +176,23 @@ top:
 
 			case Node_var_new:
 uninitialized_scalar:
-				m->type = Node_var;
-				m->var_value = dupnode(Nnull_string);
+				if (op != Op_push_arg_untyped) {
+					/* convert untyped to scalar */
+					m->type = Node_var;
+					m->var_value = dupnode(Nnull_string);
+				}
 				if (do_lint)
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
 						_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
-				m = dupnode(Nnull_string);
+				if (op != Op_push_arg_untyped)
+					m = dupnode(Nnull_string);
 				PUSH(m);
 				break;
 
 			case Node_var_array:
-				if (op == Op_push_arg)
+				if (op == Op_push_arg || op == Op_push_arg_untyped)
 					PUSH(m);
 				else
 					fatal(_("attempt to use array `%s' in a scalar context"),
@@ -263,7 +268,7 @@ uninitialized_scalar:
 					r = r->var_value;
 			}
 
-			if (r->type == Node_val)
+			if (r->type == Node_val || r->type == Node_typedregex)
 				UPREF(r);
 			PUSH(r);
 			break;
@@ -709,7 +714,7 @@ mod:
 			if (t1 != t2 && t1->valref == 1 && (t1->flags & MPFN) == 0) {
 				size_t nlen = t1->stlen + t2->stlen;
 
-				erealloc(t1->stptr, char *, nlen + 2, "r_interpret");
+				erealloc(t1->stptr, char *, nlen + 1, "r_interpret");
 				memcpy(t1->stptr + t1->stlen, t2->stptr, t2->stlen);
 				t1->stlen = nlen;
 				t1->stptr[nlen] = '\0';
@@ -719,7 +724,7 @@ mod:
 					size_t wlen = t1->wstlen + t2->wstlen;
 
 					erealloc(t1->wstptr, wchar_t *,
-							sizeof(wchar_t) * (wlen + 2), "r_interpret");
+							sizeof(wchar_t) * (wlen + 1), "r_interpret");
 					memcpy(t1->wstptr + t1->wstlen, t2->wstptr, t2->wstlen);
 					t1->wstlen = wlen;
 					t1->wstptr[wlen] = L'\0';
@@ -730,9 +735,10 @@ mod:
 				size_t nlen = t1->stlen + t2->stlen;  
 				char *p;
 
-				emalloc(p, char *, nlen + 2, "r_interpret");
+				emalloc(p, char *, nlen + 1, "r_interpret");
 				memcpy(p, t1->stptr, t1->stlen);
 				memcpy(p + t1->stlen, t2->stptr, t2->stlen);
+				/* N.B. No NUL-termination required, since make_str_node will do it. */
 				unref(*lhs);
 				t1 = *lhs = make_str_node(p, nlen, ALREADY_MALLOCED); 
 			}
@@ -942,7 +948,6 @@ arrayfor:
 			break;
 
 		case Op_ext_builtin:
-		case Op_old_ext_builtin:
 		{
 			int arg_count = pc->expr_count;
 			awk_value_t result;
@@ -985,6 +990,8 @@ arrayfor:
 				r = POP_STRING();
 				unref(m->re_exp);
 				m->re_exp = r;
+			} else if (m->type == Node_typedregex) {
+				UPREF(m);
 			}
 			PUSH(m);
 			break;
@@ -1078,8 +1085,7 @@ match_re:
 				PUSH(r);
 				break;
 			} else if (f->type != Node_func) {
-				if (   f->type == Node_ext_func
-				    || f->type == Node_old_ext_func) {
+				if (f->type == Node_ext_func) {
 					/* code copied from below, keep in sync */
 					INSTRUCTION *bc;
 					char *fname = pc->func_name;
@@ -1090,10 +1096,7 @@ match_re:
 
 					bc = f->code_ptr;
 					assert(bc->opcode == Op_symbol);
-					if (f->type == Node_ext_func)
-						npc[0].opcode = Op_ext_builtin;	/* self modifying code */
-					else
-						npc[0].opcode = Op_old_ext_builtin;	/* self modifying code */
+					npc[0].opcode = Op_ext_builtin;	/* self modifying code */
 					npc[0].extfunc = bc->extfunc;
 					npc[0].expr_count = arg_count;		/* actual argument count */
 					npc[1] = pc[1];
@@ -1119,12 +1122,12 @@ match_re:
 			f = pc->func_body;
 			if (f == NULL) {
 				f = lookup(pc->func_name);
-				if (f == NULL || (f->type != Node_func && f->type != Node_ext_func && f->type != Node_old_ext_func))
+				if (f == NULL || (f->type != Node_func && f->type != Node_ext_func))
 					fatal(_("function `%s' not defined"), pc->func_name);
 				pc->func_body = f;     /* save for next call */
 			}
 
-			if (f->type == Node_ext_func || f->type == Node_old_ext_func) {
+			if (f->type == Node_ext_func) {
 				/* keep in sync with indirect call code */
 				INSTRUCTION *bc;
 				char *fname = pc->func_name;
@@ -1132,10 +1135,7 @@ match_re:
 
 				bc = f->code_ptr;
 				assert(bc->opcode == Op_symbol);
-				if (f->type == Node_ext_func)
-					pc->opcode = Op_ext_builtin;	/* self modifying code */
-				else
-					pc->opcode = Op_old_ext_builtin;	/* self modifying code */
+				pc->opcode = Op_ext_builtin;	/* self modifying code */
 				pc->extfunc = bc->extfunc;
 				pc->expr_count = arg_count;		/* actual argument count */
 				(pc + 1)->func_name = fname;	/* name of the builtin */
