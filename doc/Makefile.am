@@ -24,7 +24,7 @@
 
 ## process this file with automake to produce Makefile.in
 
-info_TEXINFOS = gawk.texi gawkinet.texi
+info_TEXINFOS = gawk.texi gawkinet.texi using-git.texi
 
 man_MANS = gawk.1
 
@@ -51,7 +51,7 @@ EXTRA_DIST = ChangeLog ChangeLog.0 README.card ad.block setter.outline \
 	bc_notes
 
 # Get rid of generated files when cleaning
-CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf awkcard.pdf gawk.1.pdf
+CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf using-git.pdf awkcard.pdf gawk.1.pdf
 
 MAKEINFO = @MAKEINFO@ --no-split --force
 
@@ -77,7 +77,7 @@ AWKCARD = awkcard.ps
 gawk.texi: $(srcdir)/gawktexi.in $(srcdir)/sidebar.awk
 	awk -f $(srcdir)/sidebar.awk < $(srcdir)/gawktexi.in > gawk.texi
 
-postscript: gawk.ps gawkinet.ps gawk.1.ps $(AWKCARD)
+postscript: gawk.ps gawkinet.ps using-git.ps gawk.1.ps $(AWKCARD)
 
 pdf-local: postscript gawk.pdf gawkinet.pdf awkcard.pdf gawk.1.pdf
 
@@ -86,6 +86,9 @@ gawk.ps: gawk.dvi
 
 gawkinet.ps: gawkinet.dvi
 	TEXINPUTS=$(srcdir): dvips -o gawkinet.ps gawkinet.dvi
+
+using-git.ps: using-git.dvi
+	TEXINPUTS=$(srcdir): dvips -o using-git.ps using-git.dvi
 
 gawk.1.ps: gawk.1
 	-groff -man $(srcdir)/gawk.1 > gawk.1.ps
