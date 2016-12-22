@@ -765,7 +765,9 @@ typedef struct exp_instruction {
 		NODE *dn;
 		struct exp_instruction *di;
 		NODE *(*fptr)(int);
-		awk_value_t *(*efptr)(int, awk_value_t *);
+		awk_value_t *(*efptr)(int num_actual_args,
+					awk_value_t *result,
+					struct awk_ext_func *finfo);
 		long dl;
 		char *name;
 	} d;
@@ -776,6 +778,7 @@ typedef struct exp_instruction {
 		void (*aptr)(void);
 		struct exp_instruction *xi;
 		struct break_point *bpt;
+		awk_ext_func_t *exf;
 	} x;
 
 	short source_line;
@@ -790,6 +793,8 @@ typedef struct exp_instruction {
 #define builtin_idx     d.dl
 
 #define expr_count      x.xl
+
+#define c_func		x.exf
 
 #define target_continue d.di
 #define target_jmp      d.di
