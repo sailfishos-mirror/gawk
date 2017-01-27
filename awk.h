@@ -1058,8 +1058,7 @@ struct block_header {
 };
 
 enum block_id {
-	BLOCK_INVALID = 0,	/* not legal */
-	BLOCK_NODE,
+	BLOCK_NODE = 0,
 	BLOCK_BUCKET,
 	BLOCK_MAX	/* count */
 };
