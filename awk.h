@@ -460,6 +460,7 @@ typedef struct exp_node {
 #		define	XARRAY		0x10000
 #		define	NUMCONSTSTR	0x20000	/* have string value for numeric constant */
 #		define  REGEX           0x40000 /* this is a typed regex */
+#		define  LOCAL           0x80000 /* this is a truly a local var */
 } NODE;
 
 #define vname sub.nodep.name

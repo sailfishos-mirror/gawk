@@ -450,6 +450,7 @@ flags2str(int flagval)
 		{ XARRAY, "XARRAY" },
 		{ NUMCONSTSTR, "NUMCONSTSTR" },
 		{ REGEX, "REGEX" },
+		{ LOCAL, "LOCAL" },
 		{ 0,	NULL },
 	};
 
@@ -1299,6 +1300,7 @@ setup_frame(INSTRUCTION *pc)
 			/* local variable */
 			r->type = Node_var_new;
 			r->vname = fp[i].param;
+			r->flags |= LOCAL;
 			continue;
 		}
 

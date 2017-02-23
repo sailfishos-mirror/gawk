@@ -538,6 +538,8 @@ EXTRA_DIST = \
 	intprec.ok \
 	iobug1.awk \
 	iobug1.ok \
+	islocal.awk \
+	islocal.ok \
 	jarebug.awk \
 	jarebug.in \
 	jarebug.ok \
@@ -1263,6 +1265,7 @@ LOCALE_CHARSET_TESTS = \
 
 SHLIB_TESTS = \
 	apiterm fnmatch filefuncs fork fork2 fts functab4 getfile inplace1 inplace2 inplace3 \
+	islocal \
 	ordchr ordchr2 readdir readfile readfile2 revout revtwoway rwarray testext time
 
 # List of the tests which should be run with --lint option:

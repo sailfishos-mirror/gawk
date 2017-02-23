@@ -1,7 +1,7 @@
 #
 # extension/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1995-2006, 2012-2015 the Free Software Foundation, Inc.
+# Copyright (C) 1995-2006, 2012-2017 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -39,6 +39,7 @@ pkgextension_LTLIBRARIES =	\
 	fnmatch.la	\
 	fork.la		\
 	inplace.la	\
+	islocal.la	\
 	ordchr.la	\
 	readdir.la	\
 	readfile.la	\
@@ -68,6 +69,10 @@ fork_la_LIBADD        = $(MY_LIBS)
 inplace_la_SOURCES    = inplace.c
 inplace_la_LDFLAGS    = $(MY_MODULE_FLAGS)
 inplace_la_LIBADD     = $(MY_LIBS)
+
+islocal_la_SOURCES    = islocal.c
+islocal_la_LDFLAGS    = $(MY_MODULE_FLAGS)
+islocal_la_LIBADD     = $(MY_LIBS)
 
 ordchr_la_SOURCES     = ordchr.c
 ordchr_la_LDFLAGS     = $(MY_MODULE_FLAGS)

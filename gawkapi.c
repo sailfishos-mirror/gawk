@@ -67,6 +67,9 @@ api_get_argument(awk_ext_id_t id, size_t count,
 	if (arg == NULL)
 		return awk_false;
 
+	// check if this was a truly local variable
+	result->is_local = (arg->flags & LOCAL) != 0;
+
 	/* if type is undefined */
 	if (arg->type == Node_var_new) {
 		if (wanted == AWK_UNDEFINED)
