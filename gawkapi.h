@@ -326,7 +326,7 @@ typedef struct awk_value {
 		awk_scalar_t	scl;
 		awk_value_cookie_t vc;
 	} u;
-	int is_local;	/* true if parameter was a truly local variable */
+	awk_bool_t is_local;	/* true if parameter was a truly local variable */
 #define str_value	u.s
 #define strnum_value	str_value
 #define regex_value	str_value
