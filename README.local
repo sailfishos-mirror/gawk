@@ -1,0 +1,28 @@
+Fri Feb 24 11:25:25 IST 2017
+============================
+
+This branch was an attempt to make it possible for an extension
+function to distinguish those function parameters that are
+truly local from those may have had an uninitialized variable
+passed to them. That part of it worked, see test/islocal.awk.
+
+However, it's not complete. As Andrew Schorr pointed out,
+this program did not work:
+
+	function foo(x) {
+	   print islocal(x)
+	   x = 1
+	   print islocal(x)
+	   x++
+	   print islocal(x)
+	}
+
+	BEGIN {
+	   foo()
+	}
+
+As this feature wasn't seen to be very compelling, and making it
+work well would be too much work, this branch is being abandoned.
+
+Arnold Robbins
+arnold@skeeve.com
