@@ -372,6 +372,7 @@ typedef struct exp_node {
 #endif
 			char *sp;
 			size_t slen;
+			long sref;
 			int idx;
 			wchar_t *wsp;
 			size_t wslen;
@@ -380,10 +381,6 @@ typedef struct exp_node {
 	} sub;
 	NODETYPE type;
 	unsigned int flags;
-
-	// We access valref for both Node_val and Node_regex values,
-	// so it needs to be outside the union.
-	long valref;
 
 /* type = Node_val */
 	/*
@@ -492,6 +489,7 @@ typedef struct exp_node {
  */
 #define stptr	sub.val.sp
 #define stlen	sub.val.slen
+#define valref	sub.val.sref
 #define stfmt	sub.val.idx
 #define wstptr	sub.val.wsp
 #define wstlen	sub.val.wslen
