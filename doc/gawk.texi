@@ -665,6 +665,7 @@ particular records in a file and perform operations upon them.
                                         strings with @samp{<}, etc.
 * Variable Typing::                     String type versus numeric type.
 * Comparison Operators::                The comparison operators.
+* IEEE 754 Special Values::             Comparing IEEE 754 Special Floating-Point Values and Regular Numbers.
 * POSIX String Comparison::             String comparison with POSIX rules.
 * Boolean Ops::                         Combining comparison expressions using
                                         boolean operators @samp{||} (``or''),
@@ -12560,6 +12561,7 @@ compares variables.
 @menu
 * Variable Typing::             String type versus numeric type.
 * Comparison Operators::        The comparison operators.
+* IEEE 754 Special Values::     Comparing IEEE 754 Special Floating-Point Values and Regular Numbers.
 * POSIX String Comparison::     String comparison with POSIX rules.
 @end menu
 
@@ -13015,6 +13017,76 @@ One special place where @code{/foo/} is @emph{not} an abbreviation for
 @samp{!~}.
 @xref{Using Constant Regexps},
 where this is discussed in more detail.
+
+@c FIXME: Add indexing here and in other places in the doc.
+@node IEEE 754 Special Values
+@subsubsection Comparing IEEE 754 Special Floating-Point Values and Regular Numbers
+
+Modern computing platforms use floating-point arithmatic as defined by the
+IEEE 754 standard (@strong{FIXME: web link or two here}).  Besides regular
+numbers, like @minus{}57 and 42, the standard defines two ``special''
+values: @dfn{Infinity}, and @dfn{Not-A-Number}.  (The latter is usally
+referred to as a @dfn{NaN}.)  These special values come in both positive
+and negative flavors.
+
+Infinity values are easy to understand: negative infinity is smaller
+than any other possible negative value, and postive infinity is greater
+than any other possible positive value.
+
+NaN values are harder to comprehend.  They represent impossible values.
+A canonical example is
+@iftex
+@math{\sqrt{-1}}.
+@end iftex
+@ifdocbook
+@docbook
+&radic;&minus;1.
+@end docbook
+@end ifdocbook
+@ifhtml
+@html
+<span style="white-space: nowrap; font-size:larger">
+&radic;<span style="text-decoration:overline;">&nbsp;&minus;1&nbsp;</span>.
+</span>
+@end html
+@end ifhtml
+@ifinfo
+@samp{sqrt(-1)}.
+@end ifinfo
+This value doesn't exist, so the result of calling @samp{sqrt(-1)} is a NaN.
+
+When comparing infinity values with @code{<}, @code{<=}, and so on,
+the results make sense.  But when comparing NaN values, things are
+more surprising. In particular, @emph{the only comparison that returns
+true for a NaN is} @code{!=}.  Every other comparison returns false.
+Most surprising of all, is that if you have two NaN values, they do
+@strong{not} compare equal!  They are not equal to each other, even if
+obtained in the same way. Consider this file, @file{nan.awk}:
+
+@example
+BEGIN @{
+    nan1 = sqrt(-1)
+    nan2 = sqrt(-1)
+    print nan1, nan2
+    print "nan1 == nan2 -->", (nan1 == nan2)
+    print "nan1 != nan2 -->", (nan1 != nan2)
+@}
+@end example
+
+@noindent
+Here is what happens when it's run:
+
+@example
+$ @kbd{gawk -f nan.awk}
+@print{} gawk: x.awk:2: warning: sqrt: called with negative argument -1
+@print{} gawk: x.awk:3: warning: sqrt: called with negative argument -1
+@print{} -nan -nan
+@print{} nan1 == nan2 --> 0
+@print{} nan1 != nan2 --> 1
+@end example
+
+In short, remember that computer arithmetic is @emph{not} the same
+as paper-and-pencil arithmetic!
 
 @node POSIX String Comparison
 @subsubsection String Comparison Based on Locale Collating Order

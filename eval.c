@@ -24,10 +24,8 @@
  */
 
 #include "awk.h"
+#include <math.h>
 
-extern double pow(double x, double y);
-extern double modf(double x, double *yp);
-extern double fmod(double x, double y);
 NODE **fcall_list = NULL;
 long fcall_count = 0;
 int currule = 0;
@@ -1489,13 +1487,84 @@ eval_condition(NODE *t)
 }
 
 typedef enum {
-	SCALAR_EQ_NEQ,
-	SCALAR_RELATIONAL
+	SCALAR_EQ,
+	SCALAR_NE,
+	SCALAR_LT,
+	SCALAR_LE,
+	SCALAR_GT,
+	SCALAR_GE,
 } scalar_cmp_t;
+
+#ifdef HAVE_MPFR
+/* mpg_cmp_scalars -- compare two MPG / MPFR nodes on the stack */
+
+static inline bool
+mpg_cmp_scalars(NODE *t1, NODE *t2, scalar_cmp_t comparison_type)
+{
+	// Do regular comparison of mpg numbers
+
+	int ret = 0;
+	if (is_mpg_float(t1)) {
+		if (mpfr_nan_p(t1->mpg_numbr))
+			return (comparison_type == SCALAR_NE);	// true for !=, false for everything else
+		else if (is_mpg_float(t2)) {
+			if (mpfr_nan_p(t2->mpg_numbr))
+				return (comparison_type == SCALAR_NE);	// true for !=, false for everything else
+			ret = mpfr_cmp(t1->mpg_numbr, t2->mpg_numbr);
+			// fall through to switch
+		} else if (is_mpg_integer(t2)) {
+			ret = mpfr_cmp_z(t1->mpg_numbr, t2->mpg_i);
+			// fall through to switch
+		} else
+			assert(false);
+	} else if (is_mpg_float(t2)) {
+		if (mpfr_nan_p(t2->mpg_numbr))
+			return (comparison_type == SCALAR_NE);	// true for !=, false for everything else
+		ret = mpfr_cmp_z(t2->mpg_numbr, t1->mpg_i);
+		// fall through to switch
+	} else if (is_mpg_integer(t1)) {
+		ret =  mpz_cmp(t1->mpg_i, t2->mpg_i);
+		// fall through to switch
+	} else {
+		// t1 and t2 are AWKNUMs
+		ret = cmp_awknums(t1, t2);
+		// fall through to switch
+	}
+
+	bool result = false;
+	switch (comparison_type) {
+	case SCALAR_EQ:
+		result = (ret == 0);
+		break;
+	case SCALAR_NE:
+		result = (ret != 0);
+		break;
+	case SCALAR_LT:
+		result = (ret <  0);
+		break;
+	case SCALAR_LE:
+		result = (ret <= 0);
+		break;
+	case SCALAR_GT:
+		result = (ret >  0);
+		break;
+	case SCALAR_GE:
+		result = (ret >= 0);
+		break;
+	default:
+		fatal(_("mpg_cmp_scalars: bad value for comparison_type: %d"),
+			comparison_type);
+		break;
+	}
+
+	return result;
+
+}
+#endif
 
 /* cmp_scalars -- compare two nodes on the stack */
 
-static inline int
+static inline bool
 cmp_scalars(scalar_cmp_t comparison_type)
 {
 	NODE *t1, *t2;
@@ -1507,10 +1576,77 @@ cmp_scalars(scalar_cmp_t comparison_type)
 		DEREF(t2);
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t1));
 	}
-	di = cmp_nodes(t1, t2, comparison_type == SCALAR_EQ_NEQ);
+
+
+	fixtype(t1);
+	fixtype(t2);
+
+	bool result = false;
+#ifdef HAVE_MPFR
+	if (is_mpg_number(t1) || is_mpg_number(t2)) {
+		result = mpg_cmp_scalars(t1, t2, comparison_type);
+	} else
+#endif
+	if (isnan(t1->numbr) || isnan(t2->numbr))
+		result = (comparison_type == SCALAR_NE);	// true for !=, false for everything else
+	else if (isinf(t1->numbr) || isinf(t2->numbr)) {
+		switch (comparison_type) {
+		case SCALAR_EQ:
+			result = (t1->numbr == t2->numbr);
+			break;
+		case SCALAR_NE:
+			result = (t1->numbr != t2->numbr);
+			break;
+		case SCALAR_LT:
+			result = (t1->numbr <  t2->numbr);
+			break;
+		case SCALAR_LE:
+			result = (t1->numbr <= t2->numbr);
+			break;
+		case SCALAR_GT:
+			result = (t1->numbr >  t2->numbr);
+			break;
+		case SCALAR_GE:
+			result = (t1->numbr >= t2->numbr);
+			break;
+		default:
+			fatal(_("cmp_scalars: bad value for comparison_type: %d"),
+				comparison_type);
+			break;
+		}
+	} else {
+		di = cmp_nodes(t1, t2,
+			comparison_type == SCALAR_EQ || comparison_type == SCALAR_NE);
+
+		switch (comparison_type) {
+		case SCALAR_EQ:
+			result = (di == 0);
+			break;
+		case SCALAR_NE:
+			result = (di != 0);
+			break;
+		case SCALAR_LT:
+			result = (di <  0);
+			break;
+		case SCALAR_LE:
+			result = (di <= 0);
+			break;
+		case SCALAR_GT:
+			result = (di >  0);
+			break;
+		case SCALAR_GE:
+			result = (di >= 0);
+			break;
+		default:
+			fatal(_("cmp_scalars: bad value for comparison_type: %d"),
+				comparison_type);
+			break;
+		}
+	}
+
 	DEREF(t1);
 	DEREF(t2);
-	return di;
+	return result;
 }
 
 /* op_assign --- assignment operators excluding = */
