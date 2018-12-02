@@ -53,11 +53,28 @@ static int isnoeffect(OPCODE type);
 static INSTRUCTION *make_assignable(INSTRUCTION *ip);
 static void dumpintlstr(const char *str, size_t len);
 static void dumpintlstr2(const char *str1, size_t len1, const char *str2, size_t len2);
-static int include_source(INSTRUCTION *file);
-static int load_library(INSTRUCTION *file);
+static bool include_source(INSTRUCTION *file, void **srcfile_p);
+static bool load_library(INSTRUCTION *file, void **srcfile_p);
 static void next_sourcefile(void);
 static char *tokexpand(void);
 static NODE *set_profile_text(NODE *n, const char *str, size_t len);
+static INSTRUCTION *trailing_comment;
+static INSTRUCTION *outer_comment;
+static INSTRUCTION *interblock_comment;
+static INSTRUCTION *pending_comment;
+
+#ifdef DEBUG_COMMENTS
+static void
+debug_print_comment_s(const char *name, INSTRUCTION *comment, int line)
+{
+	if (comment != NULL)
+		fprintf(stderr, "%d: %s: <%.*s>\n", line, name,
+				(int) (comment->memory->stlen - 1),
+				comment->memory->stptr);
+}
+#define debug_print_comment(comment) \
+	 debug_print_comment_s(# comment, comment, __LINE__)
+#endif
 
 #define instruction(t)	bcalloc(t, 1, 0)
 
@@ -84,8 +101,8 @@ static void check_funcs(void);
 
 static ssize_t read_one_line(int fd, void *buffer, size_t count);
 static int one_line_close(int fd);
-static void split_comment(void);
-static void check_comment(void);
+static void merge_comments(INSTRUCTION *c1, INSTRUCTION *c2);
+static INSTRUCTION *make_braced_statements(INSTRUCTION *lbrace, INSTRUCTION *stmts, INSTRUCTION *rbrace);
 static void add_sign_to_num(NODE *n, char sign);
 
 static bool at_seen = false;
@@ -152,21 +169,10 @@ static INSTRUCTION *ip_endfile;
 static INSTRUCTION *ip_beginfile;
 INSTRUCTION *main_beginfile;
 
-static INSTRUCTION *comment = NULL;
-static INSTRUCTION *prior_comment = NULL;
-static INSTRUCTION *comment_to_save = NULL;
-static INSTRUCTION *program_comment = NULL;
-static INSTRUCTION *function_comment = NULL;
-static INSTRUCTION *block_comment = NULL;
-
-static bool func_first = true;
-static bool first_rule = true;
-
 static inline INSTRUCTION *list_create(INSTRUCTION *x);
 static inline INSTRUCTION *list_append(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_prepend(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_merge(INSTRUCTION *l1, INSTRUCTION *l2);
-static inline INSTRUCTION *add_pending_comment(INSTRUCTION *stmt);
 
 extern double fmod(double x, double y);
 
@@ -214,12 +220,22 @@ extern double fmod(double x, double y);
 
 program
 	: /* empty */
+	  { $$ = NULL; }
 	| program rule
 	  {
 		rule = 0;
 		yyerrok;
 	  }
 	| program nls
+	  {
+		if ($2 != NULL) {
+			if ($1 == NULL)
+				outer_comment = $2;
+			else
+				interblock_comment = $2;
+		}
+		$$ = $1;
+	  }
 	| program LEX_EOF
 	  {
 		next_sourcefile();
@@ -239,7 +255,10 @@ rule
 	: pattern action
 	  {
 		(void) append_rule($1, $2);
-		first_rule = false;
+		if (pending_comment != NULL) {
+			interblock_comment = pending_comment;
+			pending_comment = NULL;
+		}
 	  }
 	| pattern statement_term
 	  {
@@ -249,26 +268,41 @@ rule
 		} else if ($1 == NULL) {
 			msg(_("each rule must have a pattern or an action part"));
 			errcount++;
-		} else		/* pattern rule with non-empty pattern */
+		} else {	/* pattern rule with non-empty pattern */
+			if ($2 != NULL)
+				list_append($1, $2);
 			(void) append_rule($1, NULL);
+		}
 	  }
 	| function_prologue action
 	  {
 		in_function = NULL;
 		(void) mk_function($1, $2);
 		want_param_names = DONT_CHECK;
+		if (pending_comment != NULL) {
+			interblock_comment = pending_comment;
+			pending_comment = NULL;
+		}
 		yyerrok;
 	  }
 	| '@' LEX_INCLUDE source statement_term
 	  {
 		want_source = false;
 		at_seen = false;
+		if ($3 != NULL && $4 != NULL) {
+			SRCFILE *s = (SRCFILE *) $3;
+			s->comment = $4;
+		}
 		yyerrok;
 	  }
 	| '@' LEX_LOAD library statement_term
 	  {
 		want_source = false;
 		at_seen = false;
+		if ($3 != NULL && $4 != NULL) {
+			SRCFILE *s = (SRCFILE *) $3;
+			s->comment = $4;
+		}
 		yyerrok;
 	  }
 	;
@@ -276,11 +310,13 @@ rule
 source
 	: FILENAME
 	  {
-		if (include_source($1) < 0)
+		void *srcfile = NULL;
+
+		if (! include_source($1, & srcfile))
 			YYABORT;
 		efree($1->lextok);
 		bcfree($1);
-		$$ = NULL;
+		$$ = (INSTRUCTION *) srcfile;
 	  }
 	| FILENAME error
 	  { $$ = NULL; }
@@ -291,11 +327,13 @@ source
 library
 	: FILENAME
 	  {
-		if (load_library($1) < 0)
+		void *srcfile;
+
+		if (! load_library($1, & srcfile))
 			YYABORT;
 		efree($1->lextok);
 		bcfree($1);
-		$$ = NULL;
+		$$ = (INSTRUCTION *) srcfile;
 	  }
 	| FILENAME error
 	  { $$ = NULL; }
@@ -307,94 +345,77 @@ pattern
 	: /* empty */
 	  {
 		rule = Rule;
-		if (comment != NULL) {
-			$$ = list_create(comment);
-			comment = NULL;
-		} else
-			$$ = NULL;
+		$$ = NULL;
 	  }
 	| exp
 	  {
 		rule = Rule;
-		if (comment != NULL) {
-			$$ = list_prepend($1, comment);
-			comment = NULL;
-		} else
-			$$ = $1;
 	  }
 
-	| exp ',' opt_nls exp
+	| exp comma exp
 	  {
 		INSTRUCTION *tp;
 
 		add_lint($1, LINT_assign_in_cond);
-		add_lint($4, LINT_assign_in_cond);
+		add_lint($3, LINT_assign_in_cond);
 
 		tp = instruction(Op_no_op);
 		list_prepend($1, bcalloc(Op_line_range, !!do_pretty_print + 1, 0));
 		$1->nexti->triggered = false;
-		$1->nexti->target_jmp = $4->nexti;
+		$1->nexti->target_jmp = $3->nexti;
 
 		list_append($1, instruction(Op_cond_pair));
 		$1->lasti->line_range = $1->nexti;
 		$1->lasti->target_jmp = tp;
 
-		list_append($4, instruction(Op_cond_pair));
-		$4->lasti->line_range = $1->nexti;
-		$4->lasti->target_jmp = tp;
+		list_append($3, instruction(Op_cond_pair));
+		$3->lasti->line_range = $1->nexti;
+		$3->lasti->target_jmp = tp;
 		if (do_pretty_print) {
 			($1->nexti + 1)->condpair_left = $1->lasti;
-			($1->nexti + 1)->condpair_right = $4->lasti;
+			($1->nexti + 1)->condpair_right = $3->lasti;
 		}
-		if (comment != NULL) {
-			$$ = list_append(list_merge(list_prepend($1, comment), $4), tp);
-			comment = NULL;
-		} else
-			$$ = list_append(list_merge($1, $4), tp);
+		/* Put any comments in front of the range expression */
+		if ($2 != NULL)
+			$$ = list_append(list_merge(list_prepend($1, $2), $3), tp);
+		else
+			$$ = list_append(list_merge($1, $3), tp);
 		rule = Rule;
 	  }
 	| LEX_BEGIN
 	  {
 		static int begin_seen = 0;
 
-		func_first = false;
 		if (do_lint_old && ++begin_seen == 2)
 			warning_ln($1->source_line,
 				_("old awk does not support multiple `BEGIN' or `END' rules"));
 
 		$1->in_rule = rule = BEGIN;
 		$1->source_file = source;
-		check_comment();
 		$$ = $1;
 	  }
 	| LEX_END
 	  {
 		static int end_seen = 0;
 
-		func_first = false;
 		if (do_lint_old && ++end_seen == 2)
 			warning_ln($1->source_line,
 				_("old awk does not support multiple `BEGIN' or `END' rules"));
 
 		$1->in_rule = rule = END;
 		$1->source_file = source;
-		check_comment();
 		$$ = $1;
 	  }
 	| LEX_BEGINFILE
 	  {
-		func_first = false;
 		$1->in_rule = rule = BEGINFILE;
 		$1->source_file = source;
-		check_comment();
 		$$ = $1;
 	  }
 	| LEX_ENDFILE
 	  {
-		func_first = false;
 		$1->in_rule = rule = ENDFILE;
 		$1->source_file = source;
-		check_comment();
 		$$ = $1;
 	  }
 	;
@@ -402,11 +423,17 @@ pattern
 action
 	: l_brace statements r_brace opt_semi opt_nls
 	  {
-		INSTRUCTION *ip;
-		if ($2 == NULL)
-			ip = list_create(instruction(Op_no_op));
-		else
-			ip = $2;
+		INSTRUCTION *ip = make_braced_statements($1, $2, $3);
+
+		if ($3 != NULL && $5 != NULL) {
+			merge_comments($3, $5);
+			pending_comment = $3;
+		} else if ($3 != NULL) {
+			pending_comment = $3;
+		} else if ($5 != NULL) {
+			pending_comment = $5;
+		}
+
 		$$ = ip;
 	  }
 	;
@@ -437,33 +464,21 @@ lex_builtin
 function_prologue
 	: LEX_FUNCTION func_name '(' { want_param_names = FUNC_HEADER; } opt_param_list r_paren opt_nls
 	  {
-		/*
-		 *  treat any comments between BOF and the first function
-		 *  definition (with no intervening BEGIN etc block) as
-		 *  program comments.  Special kludge: iff there are more
-		 *  than one such comments, treat the last as a function
-		 *  comment.
-		 */
-		if (prior_comment != NULL) {
-			comment_to_save = prior_comment;
-			prior_comment = NULL;
-		} else if (comment != NULL) {
-			comment_to_save = comment;
-			comment = NULL;
-		} else
-			comment_to_save = NULL;
-
-		if (comment_to_save != NULL && func_first
-		    && strstr(comment_to_save->memory->stptr, "\n\n") != NULL)
-			split_comment();
-
-		/* save any other pre-function comment as function comment  */
-		if (comment_to_save != NULL) {
-			function_comment = comment_to_save;
-			comment_to_save = NULL;
+		INSTRUCTION *func_comment = NULL;
+		// Merge any comments found in the parameter list with those
+		// following the function header, associate the whole shebang
+		// with the function as one block comment.
+		if ($5 != NULL && $5->comment != NULL) {
+			if ($7 != NULL) {
+				merge_comments($5->comment, $7);
+			}
+			func_comment = $5->comment;
+		} else if ($7 != NULL) {
+			func_comment = $7;
 		}
-		func_first = false;
+
 		$1->source_file = source;
+		$1->comment = func_comment;
 		if (install_function($2->lextok, $1, $5) < 0)
 			YYABORT;
 		in_function = $2->lextok;
@@ -536,61 +551,25 @@ a_slash
 
 statements
 	: /* empty */
-	  {
-		if (prior_comment != NULL) {
-			$$ = list_create(prior_comment);
-			prior_comment = NULL;
-		} else if (comment != NULL) {
-			$$ = list_create(comment);
-			comment = NULL;
-		} else
-			$$ = NULL;
-	  }
+	  { $$ = NULL; }
 	| statements statement
 	  {
 		if ($2 == NULL) {
-			if (prior_comment != NULL) {
-				$$ = list_append($1, prior_comment);
-				prior_comment = NULL;
-				if (comment != NULL) {
-					$$ = list_append($$, comment);
-					comment = NULL;
-				}
-			} else if (comment != NULL) {
-				$$ = list_append($1, comment);
-				comment = NULL;
-			} else
-				$$ = $1;
+			$$ = $1;
 		} else {
 			add_lint($2, LINT_no_effect);
 			if ($1 == NULL) {
-				if (prior_comment != NULL) {
-					$$ = list_append($2, prior_comment);
-					prior_comment = NULL;
-					if (comment != NULL) {
-						$$ = list_append($$, comment);
-						comment = NULL;
-					}
-				} else if (comment != NULL) {
-					$$ = list_append($2, comment);
-					comment = NULL;
-				} else
-					$$ = $2;
+				$$ = $2;
 			} else {
-				if (prior_comment != NULL) {
-					list_append($2, prior_comment);
-					prior_comment = NULL;
-					if (comment != NULL) {
-						list_append($2, comment);
-						comment = NULL;
-					}
-				} else if (comment != NULL) {
-					list_append($2, comment);
-					comment = NULL;
-				}
 				$$ = list_merge($1, $2);
 			}
 		}
+
+		if (trailing_comment != NULL) {
+			$$ = list_append($$, trailing_comment);
+			trailing_comment = NULL;
+		}
+
 		yyerrok;
 	  }
 	| statements error
@@ -598,15 +577,27 @@ statements
 	;
 
 statement_term
-	: nls
-	| semi opt_nls
+	: nls		{ $$ = $1; }
+	| semi opt_nls	{ $$ = $2; }
 	;
 
 statement
 	: semi opt_nls
-	  { $$ = NULL; }
+	  {
+		if ($2 != NULL) {
+			INSTRUCTION *ip;
+
+			merge_comments($2, NULL);
+			ip = list_create(instruction(Op_no_op));
+			$$ = list_append(ip, $2); 
+		} else
+			$$ = NULL;
+	  }
 	| l_brace statements r_brace
-	  { $$ = $2; }
+	  {
+		trailing_comment = $3;	// NULL or comment
+		$$ = make_braced_statements($1, $2, $3);
+	  }
 	| if_statement
 	  {
 		if (do_pretty_print)
@@ -632,8 +623,9 @@ statement
 		if ($7 != NULL) {
 			curr = $7->nexti;
 			bcfree($7);	/* Op_list */
-		} /*  else
-				curr = NULL; */
+		}
+		/*  else
+			curr = NULL; */
 
 		for (; curr != NULL; curr = nextc) {
 			INSTRUCTION *caseexp = curr->case_exp;
@@ -689,16 +681,33 @@ statement
 
 		ip = $3;
 		if (do_pretty_print) {
+			// first merge comments
+			INSTRUCTION *head_comment = NULL;
+
+			if ($5 != NULL && $6 != NULL) {
+				merge_comments($5, $6);
+				head_comment = $5;
+			} else if ($5 != NULL)
+				head_comment = $5;
+			else
+				head_comment = $6;
+
+			$1->comment = head_comment;
+
 			(void) list_prepend(ip, $1);
 			(void) list_prepend(ip, instruction(Op_exec_count));
 			$1->target_break = tbreak;
 			($1 + 1)->switch_start = cexp->nexti;
 			($1 + 1)->switch_end = cexp->lasti;
-		}/* else
-				$1 is NULL */
+			($1 + 1)->switch_end->comment = $9;
+		}
+		/* else
+			$1 is NULL */
 
 		(void) list_append(cexp, dflt);
 		(void) list_merge(ip, cexp);
+		if ($8 != NULL)
+			(void) list_append(cstmt, $8);
 		$$ = list_merge(ip, cstmt);
 
 		break_allowed--;
@@ -733,8 +742,17 @@ statement
 			$1->target_continue = tcont;
 			($1 + 1)->while_body = ip->lasti;
 			(void) list_prepend(ip, $1);
-		}/* else
-				$1 is NULL */
+		}
+		/* else
+			$1 is NULL */
+
+		if ($5 != NULL) {
+			if ($6 == NULL)
+				$6 = list_create(instruction(Op_no_op));
+
+			$5->memory->comment_type = BLOCK_COMMENT;
+			$6 = list_prepend($6, $5);
+		}
 
 		if ($6 != NULL)
 			(void) list_merge(ip, $6);
@@ -769,8 +787,13 @@ statement
 			ip = list_merge($3, $6);
 		else
 			ip = list_prepend($6, instruction(Op_no_op));
+
+		if ($2 != NULL)
+			(void) list_prepend(ip, $2);
+
 		if (do_pretty_print)
 			(void) list_prepend(ip, instruction(Op_exec_count));
+
 		(void) list_append(ip, instruction(Op_jmp_true));
 		ip->lasti->target_jmp = ip->nexti;
 		$$ = list_append(ip, tbreak);
@@ -785,7 +808,10 @@ statement
 			($1 + 1)->doloop_cond = tcont;
 			$$ = list_prepend(ip, $1);
 			bcfree($4);
-		} /* else
+			if ($8 != NULL)
+				$1->comment = $8;
+		}
+		/* else
 			$1 and $4 are NULLs */
 	  }
 	| LEX_FOR '(' NAME LEX_IN simple_variable r_paren opt_nls statement
@@ -801,7 +827,8 @@ statement
 				&& strcmp($8->nexti->memory->vname, var_name) == 0
 		) {
 
-		/* Efficiency hack.  Recognize the special case of
+		/*
+		 * Efficiency hack.  Recognize the special case of
 		 *
 		 * 	for (iggy in foo)
 		 * 		delete foo[iggy]
@@ -833,6 +860,10 @@ statement
 				bcfree($3);
 				bcfree($4);
 				bcfree($5);
+				if ($7 != NULL) {
+					merge_comments($7, NULL);
+					$8 = list_prepend($8, $7);
+				}
 				$$ = $8;
 			} else
 				goto regular_loop;
@@ -867,8 +898,9 @@ regular_loop:
 				$1->target_continue = tcont;
 				$1->target_break = tbreak;
 				(void) list_append(ip, $1);
-			} /* else
-					$1 is NULL */
+			}
+			/* else
+				$1 is NULL */
 
 			/* add update_FOO instruction if necessary */
 			if ($4->array_var->type == Node_var && $4->array_var->var_update) {
@@ -889,8 +921,15 @@ regular_loop:
 				($1 + 1)->forloop_body = ip->lasti;
 			}
 
-			if ($8 != NULL)
+			if ($7 != NULL)
+				merge_comments($7, NULL);
+
+			if ($8 != NULL) {
+				if ($7 != NULL)
+					$8 = list_prepend($8, $7);
 				(void) list_merge(ip, $8);
+			} else if ($7 != NULL)
+				(void) list_append(ip, $7);
 
 			(void) list_append(ip, instruction(Op_jmp));
 			ip->lasti->target_jmp = $4;
@@ -903,6 +942,20 @@ regular_loop:
 	  }
 	| LEX_FOR '(' opt_simple_stmt semi opt_nls exp semi opt_nls opt_simple_stmt r_paren opt_nls statement
 	  {
+		if ($5 != NULL) {
+			merge_comments($5, NULL);
+			$1->comment = $5;
+		}
+		if ($8 != NULL) {
+			merge_comments($8, NULL);
+			if ($1->comment == NULL) {
+				$8->memory->comment_type = FOR_COMMENT;
+				$1->comment = $8;
+			} else
+				$1->comment->comment = $8;
+		}
+		if ($11 != NULL)
+			$12 = list_prepend($12, $11);
 		$$ = mk_for_loop($1, $3, $6, $9, $12);
 
 		break_allowed--;
@@ -910,6 +963,20 @@ regular_loop:
 	  }
 	| LEX_FOR '(' opt_simple_stmt semi opt_nls semi opt_nls opt_simple_stmt r_paren opt_nls statement
 	  {
+		if ($5 != NULL) {
+			merge_comments($5, NULL);
+			$1->comment = $5;
+		}
+		if ($7 != NULL) {
+			merge_comments($7, NULL);
+			if ($1->comment == NULL) {
+				$7->memory->comment_type = FOR_COMMENT;
+				$1->comment = $7;
+			} else
+				$1->comment->comment = $7;
+		}
+		if ($10 != NULL)
+			$11 = list_prepend($11, $10);
 		$$ = mk_for_loop($1, $3, (INSTRUCTION *) NULL, $8, $11);
 
 		break_allowed--;
@@ -921,7 +988,6 @@ regular_loop:
 			$$ = list_prepend($1, instruction(Op_exec_count));
 		else
 			$$ = $1;
-		$$ = add_pending_comment($$);
 	  }
 	;
 
@@ -933,8 +999,8 @@ non_compound_stmt
 				_("`break' is not allowed outside a loop or switch"));
 		$1->target_jmp = NULL;
 		$$ = list_create($1);
-		$$ = add_pending_comment($$);
-
+		if ($2 != NULL)
+			$$ = list_append($$, $2);
 	  }
 	| LEX_CONTINUE statement_term
 	  {
@@ -943,8 +1009,8 @@ non_compound_stmt
 				_("`continue' is not allowed outside a loop"));
 		$1->target_jmp = NULL;
 		$$ = list_create($1);
-		$$ = add_pending_comment($$);
-
+		if ($2 != NULL)
+			$$ = list_append($$, $2);
 	  }
 	| LEX_NEXT statement_term
 	  {
@@ -954,7 +1020,8 @@ non_compound_stmt
 				_("`next' used in %s action"), ruletab[rule]);
 		$1->target_jmp = ip_rec;
 		$$ = list_create($1);
-		$$ = add_pending_comment($$);
+		if ($2 != NULL)
+			$$ = list_append($$, $2);
 	  }
 	| LEX_NEXTFILE statement_term
 	  {
@@ -966,7 +1033,8 @@ non_compound_stmt
 		$1->target_newfile = ip_newfile;
 		$1->target_endfile = ip_endfile;
 		$$ = list_create($1);
-		$$ = add_pending_comment($$);
+		if ($2 != NULL)
+			$$ = list_append($$, $2);
 	  }
 	| LEX_EXIT opt_exp statement_term
 	  {
@@ -982,7 +1050,8 @@ non_compound_stmt
 			$$->nexti->memory = dupnode(Nnull_string);
 		} else
 			$$ = list_append($2, $1);
-		$$ = add_pending_comment($$);
+		if ($3 != NULL)
+			$$ = list_append($$, $3);
 	  }
 	| LEX_RETURN
 	  {
@@ -995,10 +1064,16 @@ non_compound_stmt
 			$$->nexti->memory = dupnode(Nnull_string);
 		} else
 			$$ = list_append($3, $1);
-
-		$$ = add_pending_comment($$);
+		if ($4 != NULL)
+			$$ = list_append($$, $4);
 	  }
 	| simple_stmt statement_term
+	  {
+		if ($2 != NULL)
+			$$ = list_append($1, $2);
+		else
+			$$ = $1;
+	  }
 	;
 
 	/*
@@ -1018,7 +1093,7 @@ simple_stmt
 		 * which is faster for these two cases.
 		 */
 
-		if ($1->opcode == Op_K_print &&
+		if (do_optimize && $1->opcode == Op_K_print &&
 			($3 == NULL
 				|| ($3->lasti->opcode == Op_field_spec
 					&& $3->nexti->nexti->nexti == $3->lasti
@@ -1106,7 +1181,6 @@ regular_print:
 				}
 			}
 		}
-		$$ = add_pending_comment($$);
 	  }
 
 	| LEX_DELETE NAME { sub_counter = 0; } delete_subscript_list
@@ -1141,7 +1215,6 @@ regular_print:
 			$1->expr_count = sub_counter;
 			$$ = list_append(list_append($4, $2), $1);
 		}
-		$$ = add_pending_comment($$);
 	  }
 	| LEX_DELETE '(' NAME ')'
 		  /*
@@ -1172,12 +1245,10 @@ regular_print:
 			else if ($3->memory == func_table)
 				fatal(_("`delete' is not allowed with FUNCTAB"));
 		}
-		$$ = add_pending_comment($$);
 	  }
 	| exp
 	  {
 		$$ = optimize_assignment($1);
-		$$ = add_pending_comment($$);
 	  }
 	;
 
@@ -1212,6 +1283,7 @@ case_statement
 			(void) list_prepend(casestmt, instruction(Op_exec_count));
 		$1->case_exp = $2;
 		$1->case_stmt = casestmt;
+		$1->comment = $4;
 		bcfree($3);
 		$$ = $1;
 	  }
@@ -1224,6 +1296,7 @@ case_statement
 			(void) list_prepend(casestmt, instruction(Op_exec_count));
 		bcfree($2);
 		$1->case_stmt = casestmt;
+		$1->comment = $3;
 		$$ = $1;
 	  }
 	;
@@ -1305,23 +1378,51 @@ output_redir
 if_statement
 	: LEX_IF '(' exp r_paren opt_nls statement
 	  {
+		if ($5 != NULL)
+			$1->comment = $5;
 		$$ = mk_condition($3, $1, $6, NULL, NULL);
 	  }
 	| LEX_IF '(' exp r_paren opt_nls statement
 	     LEX_ELSE opt_nls statement
 	  {
+		if ($5 != NULL)
+			$1->comment = $5;
+		if ($8 != NULL)
+			$7->comment = $8;
 		$$ = mk_condition($3, $1, $6, $7, $9);
 	  }
 	;
 
 nls
 	: NEWLINE
+	  {
+		$$ = $1;
+	  }
 	| nls NEWLINE
+	  {
+		if ($1 != NULL && $2 != NULL) {
+			if ($1->memory->comment_type == EOL_COMMENT) {
+				assert($2->memory->comment_type == BLOCK_COMMENT);
+				$1->comment = $2;	// chain them
+			} else {
+				merge_comments($1, $2);
+			}
+
+			$$ = $1;
+		} else if ($1 != NULL) {
+			$$ = $1;
+		} else if ($2 != NULL) {
+			$$ = $2;
+		} else
+			$$ = NULL;
+	  }
 	;
 
 opt_nls
 	: /* empty */
+	  { $$ = NULL; }
 	| nls
+	  { $$ = $1; }
 	;
 
 input_redir
@@ -1350,9 +1451,17 @@ param_list
 	| param_list comma NAME
 	  {
 		if ($1 != NULL && $3 != NULL) {
-			$3->param_count =  $1->lasti->param_count + 1;
+			$3->param_count = $1->lasti->param_count + 1;
 			$$ = list_append($1, $3);
 			yyerrok;
+
+			// newlines are allowed after commas, catch any comments
+			if ($2 != NULL) {
+				if ($1->comment != NULL)
+					merge_comments($1->comment, $2);
+				else
+					$1->comment = $2;
+			}
 		} else
 			$$ = NULL;
 	  }
@@ -1384,6 +1493,8 @@ expression_list
 	  {	$$ = mk_expression_list(NULL, $1); }
 	| expression_list comma exp
 	  {
+		if ($2 != NULL)
+			$1->lasti->comment = $2;
 		$$ = mk_expression_list($1, $3);
 		yyerrok;
 	  }
@@ -1405,6 +1516,8 @@ expression_list
 	| expression_list comma error
 	  {
 		/* Ditto */
+		if ($2 != NULL)
+			$1->lasti->comment = $2;
 		$$ = $1;
 	  }
 	;
@@ -1421,6 +1534,8 @@ fcall_expression_list
 	  {	$$ = mk_expression_list(NULL, $1); }
 	| fcall_expression_list comma fcall_exp
 	  {
+		if ($2 != NULL)
+			$1->lasti->comment = $2;
 		$$ = mk_expression_list($1, $3);
 		yyerrok;
 	  }
@@ -1442,6 +1557,8 @@ fcall_expression_list
 	| fcall_expression_list comma error
 	  {
 		/* Ditto */
+		if ($2 != NULL)
+			$1->comment = $2;
 		$$ = $1;
 	  }
 	;
@@ -2006,15 +2123,16 @@ opt_incdec
 	  {
 		$1->opcode = Op_postdecrement;
 	  }
-	| /* empty */	{ $$ = NULL; }
+	| /* empty */
+	  { $$ = NULL; }
 	;
 
 l_brace
-	: '{' opt_nls
+	: '{' opt_nls { $$ = $2; }
 	;
 
 r_brace
-	: '}' opt_nls	{ yyerrok; }
+	: '}' opt_nls	{ $$ = $2; yyerrok; }
 	;
 
 r_paren
@@ -2023,6 +2141,7 @@ r_paren
 
 opt_semi
 	: /* empty */
+	  { $$ = NULL; }
 	| semi
 	;
 
@@ -2035,7 +2154,7 @@ colon
 	;
 
 comma
-	: ',' opt_nls	{ yyerrok; }
+	: ',' opt_nls	{ $$ = $2; yyerrok; }
 	;
 %%
 
@@ -2115,8 +2234,8 @@ static const struct token tokentab[] = {
 {"exp",		Op_builtin,	 LEX_BUILTIN,	A(1),		do_exp,	MPF(exp)},
 {"fflush",	Op_builtin,	 LEX_BUILTIN,	A(0)|A(1), do_fflush,	0},
 {"for",		Op_K_for,	 LEX_FOR,	BREAK|CONTINUE,	0,	0},
-{"func",	Op_func, LEX_FUNCTION,	NOT_POSIX|NOT_OLD,	0,	0},
-{"function",Op_func, LEX_FUNCTION,	NOT_OLD,	0,	0},
+{"func",	Op_func, 	LEX_FUNCTION,	NOT_POSIX|NOT_OLD,	0,	0},
+{"function",	Op_func, 	LEX_FUNCTION,	NOT_OLD,	0,	0},
 {"gensub",	Op_sub_builtin,	 LEX_BUILTIN,	GAWKX|A(3)|A(4), 0,	0},
 {"getline",	Op_K_getline_redir,	 LEX_GETLINE,	NOT_OLD,	0,	0},
 {"gsub",	Op_sub_builtin,	 LEX_BUILTIN,	NOT_OLD|A(2)|A(3), 0,	0},
@@ -2475,11 +2594,12 @@ mk_program()
 				cp = end_block;
 			else
 				cp = list_merge(begin_block, end_block);
-			if (program_comment != NULL) {
-				(void) list_prepend(cp, program_comment);
+
+			if (interblock_comment != NULL) {
+				(void) list_append(cp, interblock_comment);
+				interblock_comment = NULL;
 			}
-			if (comment != NULL)
-				(void) list_append(cp, comment);
+
 			(void) list_append(cp, ip_atexit);
 			(void) list_append(cp, instruction(Op_stop));
 
@@ -2512,12 +2632,16 @@ mk_program()
 	if (begin_block != NULL)
 		cp = list_merge(begin_block, cp);
 
-	if (program_comment != NULL) {
-		(void) list_prepend(cp, program_comment);
+	if (outer_comment != NULL) {
+		cp = list_merge(list_create(outer_comment), cp);
+		outer_comment = NULL;
 	}
-	if (comment != NULL) {
-		(void) list_append(cp, comment);
+
+	if (interblock_comment != NULL) {
+		(void) list_append(cp, interblock_comment);
+		interblock_comment = NULL;
 	}
+
 	(void) list_append(cp, ip_atexit);
 	(void) list_append(cp, instruction(Op_stop));
 
@@ -2525,10 +2649,6 @@ out:
 	/* delete the Op_list, not needed */
 	tmp = cp->nexti;
 	bcfree(cp);
-	/* these variables are not used again but zap them anyway.  */
-	comment = NULL;
-	function_comment = NULL;
-	program_comment = NULL;
 	return tmp;
 
 #undef begin_block
@@ -2703,33 +2823,35 @@ add_srcfile(enum srctype stype, char *src, SRCFILE *thisfile, bool *already_incl
 
 /* include_source --- read program from source included using `@include' */
 
-static int
-include_source(INSTRUCTION *file)
+static bool
+include_source(INSTRUCTION *file, void **srcfile_p)
 {
 	SRCFILE *s;
 	char *src = file->lextok;
 	int errcode;
 	bool already_included;
 
+	*srcfile_p = NULL;
+
 	if (do_traditional || do_posix) {
 		error_ln(file->source_line, _("@include is a gawk extension"));
-		return -1;
+		return false;
 	}
 
 	if (strlen(src) == 0) {
 		if (do_lint)
 			lintwarn_ln(file->source_line, _("empty filename after @include"));
-		return 0;
+		return true;
 	}
 
 	s = add_srcfile(SRC_INC, src, sourcefile, &already_included, &errcode);
 	if (s == NULL) {
 		if (already_included)
-			return 0;
+			return true;
 		error_ln(file->source_line,
 			_("can't open source file `%s' for reading (%s)"),
 			src, errcode ? strerror(errcode) : _("reason unknown"));
-		return -1;
+		return false;
 	}
 
 	/* save scanner state for the current sourcefile */
@@ -2748,42 +2870,53 @@ include_source(INSTRUCTION *file)
 	lasttok = 0;
 	lexeof = false;
 	eof_warned = false;
-	return 0;
+	*srcfile_p = (void *) s;
+	return true;
 }
 
 /* load_library --- load a shared library */
 
-static int
-load_library(INSTRUCTION *file)
+static bool
+load_library(INSTRUCTION *file, void **srcfile_p)
 {
 	SRCFILE *s;
 	char *src = file->lextok;
 	int errcode;
 	bool already_included;
 
+	*srcfile_p = NULL;
+
 	if (do_traditional || do_posix) {
 		error_ln(file->source_line, _("@load is a gawk extension"));
-		return -1;
+		return false;
 	}
+
 
 	if (strlen(src) == 0) {
 		if (do_lint)
 			lintwarn_ln(file->source_line, _("empty filename after @load"));
-		return 0;
+		return true;
 	}
 
-	s = add_srcfile(SRC_EXTLIB, src, sourcefile, &already_included, &errcode);
-	if (s == NULL) {
-		if (already_included)
-			return 0;
-		error_ln(file->source_line,
-			_("can't open shared library `%s' for reading (%s)"),
-			src, errcode ? strerror(errcode) : _("reason unknown"));
-		return -1;
+	if (do_pretty_print && ! do_profile) {
+		// create a fake one, don't try to open the file
+		s = do_add_srcfile(SRC_EXTLIB, src, src, sourcefile);
+	} else {
+		s = add_srcfile(SRC_EXTLIB, src, sourcefile, &already_included, &errcode);
+		if (s == NULL) {
+			if (already_included)
+				return true;
+			error_ln(file->source_line,
+				_("can't open shared library `%s' for reading (%s)"),
+				src, errcode ? strerror(errcode) : _("reason unknown"));
+			return false;
+		}
+
+		load_ext(s->fullpath);
 	}
 
-	load_ext(s->fullpath);
-	return 0;
+	*srcfile_p = (void *) s;
+	return true;
 }
 
 /* next_sourcefile --- read program from the next source in srcfiles */
@@ -3191,37 +3324,23 @@ pushback(void)
 	(! lexeof && lexptr && lexptr > lexptr_begin ? lexptr-- : lexptr);
 }
 
-/* check_comment --- check for block comment */
-
-void
-check_comment(void)
-{
-	if (comment != NULL) {
-		if (first_rule) {
-			program_comment = comment;
-		} else
-			block_comment = comment;
-		comment = NULL;
-	}
-	first_rule = false;
-}
-
 /*
  * get_comment --- collect comment text.
  * 	Flag = EOL_COMMENT for end-of-line comments.
- * 	Flag = FULL_COMMENT for self-contained comments.
+ * 	Flag = BLOCK_COMMENT for self-contained comments.
  */
 
-int
-get_comment(int flag)
+static int
+get_comment(enum commenttype flag, INSTRUCTION **comment_instruction)
 {
 	int c;
 	int sl;
+	char *p1;
+	char *p2;
+
 	tok = tokstart;
 	tokadd('#');
 	sl = sourceline;
-	char *p1;
-	char *p2;
 
 	while (true) {
 		while ((c = nextc(false)) != '\n' && c != END_FILE) {
@@ -3257,9 +3376,6 @@ get_comment(int flag)
 			break;
 	}
 
-	if (comment != NULL)
-		prior_comment = comment;
-
 	/* remove any trailing blank lines (consecutive \n) from comment */
 	p1 = tok - 1;
 	p2 = tok - 2;
@@ -3269,49 +3385,18 @@ get_comment(int flag)
 		tok--;
 	}
 
-	comment = bcalloc(Op_comment, 1, sl);
-	comment->source_file = source;
-	comment->memory = make_str_node(tokstart, tok - tokstart, 0);
-	comment->memory->comment_type = flag;
+	(*comment_instruction) = bcalloc(Op_comment, 1, sl);
+	(*comment_instruction)->source_file = source;
+	(*comment_instruction)->memory = make_str_node(tokstart, tok - tokstart, 0);
+	(*comment_instruction)->memory->comment_type = flag;
 
 	return c;
-}
-
-/* split_comment --- split initial comment text into program and function parts */
-
-static void
-split_comment(void)
-{
-	char *p;
-	int l;
-	NODE *n;
-
-	p = comment_to_save->memory->stptr;
-	l = comment_to_save->memory->stlen - 3;
-	/* have at least two comments so split at last blank line (\n\n)  */
-	while (l >= 0) {
-		if (p[l] == '\n' && p[l+1] == '\n') {
-			function_comment = comment_to_save;
-			n = function_comment->memory;
-			function_comment->memory = make_string(p + l + 2, n->stlen - l - 2);
-			/* create program comment  */
-			program_comment = bcalloc(Op_comment, 1, sourceline);
-			program_comment->source_file = comment_to_save->source_file;
-			p[l + 2] = 0;
-			program_comment->memory = make_str_node(p, l + 2, 0);
-			comment_to_save = NULL;
-			freenode(n);
-			break;
-		}
-		else
-			l--;
-	}
 }
 
 /* allow_newline --- allow newline after &&, ||, ? and : */
 
 static void
-allow_newline(void)
+allow_newline(INSTRUCTION **new_comment)
 {
 	int c;
 
@@ -3323,8 +3408,8 @@ allow_newline(void)
 		}
 		if (c == '#') {
 			if (do_pretty_print && ! do_profile) {
-			/* collect comment byte code iff doing pretty print but not profiling.  */
-				c = get_comment(EOL_COMMENT);
+				/* collect comment byte code iff doing pretty print but not profiling.  */
+				c = get_comment(EOL_COMMENT, new_comment);
 			} else {
 				while ((c = nextc(false)) != '\n' && c != END_FILE)
 					continue;
@@ -3391,6 +3476,7 @@ yylex(void)
 	bool intlstr = false;
 	AWKNUM d;
 	bool collecting_typed_regexp = false;
+	static int qm_col_count = 0;
 
 #define GET_INSTRUCTION(op) bcalloc(op, 1, sourceline)
 
@@ -3555,18 +3641,25 @@ retry:
 		return lasttok = NEWLINE;
 
 	case '#':		/* it's a comment */
+		yylval = NULL;
 		if (do_pretty_print && ! do_profile) {
 			/*
 			 * Collect comment byte code iff doing pretty print
 			 * but not profiling.
 			 */
-			if (lasttok == NEWLINE || lasttok == 0)
-				c = get_comment(FULL_COMMENT);
-			else
-				c = get_comment(EOL_COMMENT);
+			INSTRUCTION *new_comment;
 
-			if (c == END_FILE)
-				return lasttok = NEWLINE_EOF;
+			if (lasttok == NEWLINE || lasttok == 0)
+				c = get_comment(BLOCK_COMMENT, & new_comment);
+			else
+				c = get_comment(EOL_COMMENT, & new_comment);
+
+			yylval = new_comment;
+
+			if (c == END_FILE) {
+				pushback();
+				return lasttok = NEWLINE;
+			}
 		} else {
 			while ((c = nextc(false)) != '\n') {
 				if (c == END_FILE)
@@ -3595,7 +3688,10 @@ retry:
 		 * Use it at your own risk. We think it's a bad idea, which
 		 * is why it's not on by default.
 		 */
+		yylval = NULL;
 		if (! do_traditional) {
+			INSTRUCTION *new_comment;
+
 			/* strip trailing white-space and/or comment */
 			while ((c = nextc(true)) == ' ' || c == '\t' || c == '\r')
 				continue;
@@ -3607,9 +3703,11 @@ retry:
 					lintwarn(
 		_("use of `\\ #...' line continuation is not portable"));
 				}
-				if (do_pretty_print && ! do_profile)
-					c = get_comment(EOL_COMMENT);
-				else {
+				if (do_pretty_print && ! do_profile) {
+					c = get_comment(EOL_COMMENT, & new_comment);
+					yylval = new_comment;
+					return lasttok = c;
+				} else {
 					while ((c = nextc(false)) != '\n')
 						if (c == END_FILE)
 							break;
@@ -3630,11 +3728,20 @@ retry:
 		}
 		break;
 
-	case ':':
 	case '?':
+		qm_col_count++;
+		// fall through
+	case ':':
 		yylval = GET_INSTRUCTION(Op_cond_exp);
-		if (! do_posix)
-			allow_newline();
+		if (qm_col_count > 0) {
+			if (! do_posix) {
+				INSTRUCTION *new_comment = NULL;
+				allow_newline(& new_comment);
+				yylval->comment = new_comment;
+			}
+			if (c == ':')
+				qm_col_count--;
+		}
 		return lasttok = c;
 
 		/*
@@ -4056,7 +4163,10 @@ retry:
 	case '&':
 		if ((c = nextc(true)) == '&') {
 			yylval = GET_INSTRUCTION(Op_and);
-			allow_newline();
+			INSTRUCTION *new_comment = NULL;
+			allow_newline(& new_comment);
+			yylval->comment = new_comment;
+
 			return lasttok = LEX_AND;
 		}
 		pushback();
@@ -4066,11 +4176,15 @@ retry:
 	case '|':
 		if ((c = nextc(true)) == '|') {
 			yylval = GET_INSTRUCTION(Op_or);
-			allow_newline();
+			INSTRUCTION *new_comment = NULL;
+			allow_newline(& new_comment);
+			yylval->comment = new_comment;
+
 			return lasttok = LEX_OR;
 		} else if (! do_traditional && c == '&') {
 			yylval = GET_INSTRUCTION(Op_symbol);
 			yylval->redir_type = redirect_twoway;
+
 			return lasttok = (in_print && in_parens == 0 ? IO_OUT : IO_IN);
 		}
 		pushback();
@@ -4260,8 +4374,11 @@ out:
 		yylval->lextok = tokkey;
 
 #define SMART_ALECK	1
-		if (SMART_ALECK && do_lint
-		    && ! goto_warned && strcasecmp(tokkey, "goto") == 0) {
+		if (SMART_ALECK
+		    && do_lint
+		    && ! goto_warned
+		    && tolower(tokkey[0]) == 'g'
+		    && strcasecmp(tokkey, "goto") == 0) {
 			goto_warned = true;
 			lintwarn(_("`goto' considered harmful!"));
 		}
@@ -4734,19 +4851,26 @@ mk_function(INSTRUCTION *fi, INSTRUCTION *def)
 
 	/* add any pre-function comment to start of action for profile.c  */
 
-	if (function_comment != NULL) {
-		function_comment->source_line = 0;
-		(void) list_prepend(def, function_comment);
-		function_comment = NULL;
+	if (interblock_comment != NULL) {
+		interblock_comment->source_line = 0;
+		merge_comments(interblock_comment, fi->comment);
+		fi->comment = interblock_comment;
+		interblock_comment = NULL;
 	}
 
-	/* add an implicit return at end;
+	/*
+	 * Add an implicit return at end;
 	 * also used by 'return' command in debugger
 	 */
 
 	(void) list_append(def, instruction(Op_push_i));
 	def->lasti->memory = dupnode(Nnull_string);
 	(void) list_append(def, instruction(Op_K_return));
+
+	if (trailing_comment != NULL) {
+		(void) list_append(def, trailing_comment);
+		trailing_comment = NULL;
+	}
 
 	if (do_pretty_print)
 		(void) list_prepend(def, instruction(Op_exec_count));
@@ -5451,12 +5575,11 @@ append_rule(INSTRUCTION *pattern, INSTRUCTION *action)
 		(rp + 1)->lasti = action->lasti;
 		(rp + 2)->first_line = pattern->source_line;
 		(rp + 2)->last_line = lastline;
-		if (block_comment != NULL) {
-			ip = list_prepend(list_prepend(action, block_comment), rp);
-			block_comment = NULL;
-		} else
-			ip = list_prepend(action, rp);
-
+		ip = list_prepend(action, rp);
+		if (interblock_comment != NULL) {
+			ip = list_prepend(ip, interblock_comment);
+			interblock_comment = NULL;
+		}
 	} else {
 		rp = bcalloc(Op_rule, 3, 0);
 		rp->in_rule = Rule;
@@ -5482,14 +5605,20 @@ append_rule(INSTRUCTION *pattern, INSTRUCTION *action)
 				(rp + 2)->last_line = find_line(pattern, LAST_LINE);
 				action = list_create(instruction(Op_K_print_rec));
 				if (do_pretty_print)
-					(void) list_prepend(action, instruction(Op_exec_count));
+					action = list_prepend(action, instruction(Op_exec_count));
 			} else
 				(rp + 2)->last_line = lastline;
 
-			if (do_pretty_print) {
-				(void) list_prepend(pattern, instruction(Op_exec_count));
-				(void) list_prepend(action, instruction(Op_exec_count));
+			if (interblock_comment != NULL) {	// was after previous action
+				pattern = list_prepend(pattern, interblock_comment);
+				interblock_comment = NULL;
 			}
+
+			if (do_pretty_print) {
+				pattern = list_prepend(pattern, instruction(Op_exec_count));
+				action = list_prepend(action, instruction(Op_exec_count));
+			}
+
  			(rp + 1)->firsti = action->nexti;
 			(rp + 1)->lasti = tp;
 			ip = list_append(
@@ -5861,8 +5990,9 @@ mk_for_loop(INSTRUCTION *forp, INSTRUCTION *init, INSTRUCTION *cond,
 		forp->target_break = tbreak;
 		forp->target_continue = tcont;
 		ret = list_prepend(ret, forp);
-	} /* else
-			forp is NULL */
+	}
+	/* else
+		forp is NULL */
 
 	return ret;
 }
@@ -6074,26 +6204,6 @@ list_merge(INSTRUCTION *l1, INSTRUCTION *l2)
 	l1->lasti = l2->lasti;
 	bcfree(l2);
 	return l1;
-}
-
-/* add_pending_comment --- add a pending comment to a statement */
-
-static inline INSTRUCTION *
-add_pending_comment(INSTRUCTION *stmt)
-{
-	INSTRUCTION *ret = stmt;
-
-	if (prior_comment != NULL) {
-		if (function_comment != prior_comment)
-			ret = list_append(stmt, prior_comment);
-		prior_comment = NULL;
-	} else if (comment != NULL && comment->memory->comment_type == EOL_COMMENT) {
-		if (function_comment != comment)
-			ret = list_append(stmt, comment);
-		comment = NULL;
-	}
-
-	return ret;
 }
 
 /* See if name is a special token. */
@@ -6334,4 +6444,92 @@ set_profile_text(NODE *n, const char *str, size_t len)
 	}
 
 	return n;
+}
+
+/*
+ * merge_comments --- merge c2 into c1 and free c2 if successful.
+ *	Allow c2 to be NULL, in which case just merged chained
+ *	comments in c1.
+ */
+
+static void
+merge_comments(INSTRUCTION *c1, INSTRUCTION *c2)
+{
+	assert(c1->opcode == Op_comment);
+
+	if (c1->comment == NULL && c2 == NULL)	// nothing to do
+		return;
+
+	size_t total = c1->memory->stlen;
+	if (c1->comment != NULL)
+		total += 1 /* \n */ + c1->comment->memory->stlen;
+
+	if (c2 != NULL) {
+		assert(c2->opcode == Op_comment);
+		total += 1 /* \n */ + c2->memory->stlen;
+		if (c2->comment != NULL)
+			total += c2->comment->memory->stlen + 1;
+	}
+
+	char *buffer;
+	emalloc(buffer, char *, total + 1, "merge_comments");
+
+	strcpy(buffer, c1->memory->stptr);
+	if (c1->comment != NULL) {
+		strcat(buffer, "\n");
+		strcat(buffer, c1->comment->memory->stptr);
+	}
+
+	if (c2 != NULL) {
+		strcat(buffer, "\n");
+		strcat(buffer, c2->memory->stptr);
+		if (c2->comment != NULL) {
+			strcat(buffer, "\n");
+			strcat(buffer, c2->comment->memory->stptr);
+		}
+
+		unref(c2->memory);
+		if (c2->comment != NULL) {
+			unref(c2->comment->memory);
+			bcfree(c2->comment);
+			c2->comment = NULL;
+		}
+		bcfree(c2);
+	}
+
+	c1->memory->comment_type = BLOCK_COMMENT;
+	free(c1->memory->stptr);
+	c1->memory->stptr = buffer;
+	c1->memory->stlen = strlen(buffer);
+
+	// now free everything else
+	if (c1->comment != NULL) {
+		unref(c1->comment->memory);
+		bcfree(c1->comment);
+		c1->comment = NULL;
+	}
+}
+
+/* make_braced_statements --- handle `l_brace statements r_brace' with comments */
+
+static INSTRUCTION *
+make_braced_statements(INSTRUCTION *lbrace, INSTRUCTION *stmts, INSTRUCTION *rbrace)
+{
+	INSTRUCTION *ip;
+
+	if (stmts == NULL)
+		ip = list_create(instruction(Op_no_op));
+	else
+		ip = stmts;
+
+	if (lbrace != NULL) {
+		INSTRUCTION *comment2 = lbrace->comment;
+		if (comment2 != NULL) {
+			ip = list_prepend(ip, comment2);
+			lbrace->comment = NULL;
+		}
+		ip = list_prepend(ip, lbrace);
+	}
+
+	return ip;
 }

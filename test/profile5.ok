@@ -3,7 +3,7 @@ BEGIN {
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	############################################################################
 	BINMODE = "rw"
 	SUBSEP = "\000"
 	_NULARR[""]
@@ -24,7 +24,7 @@ BEGIN {
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	#############################################################################
 	_delay_perfmsdelay = 11500
 }
 
@@ -36,12 +36,13 @@ BEGIN {
 BEGIN {
 }
 
-BEGIN {	###########################################################################
+###########################################################################
+BEGIN {
 	_addlib("_EXTFN")
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	#############################################################################
 	delete _XCHR
 	delete _ASC
 	delete _CHR
@@ -101,7 +102,7 @@ BEGIN {
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	#############################################################################
 	_SYS_STDCON = "CON"
 	_CON_WIDTH = match(_cmd("MODE " _SYS_STDCON " 2>NUL"), /Columns:[ \t]*([0-9]+)/, A) ? strtonum(A[1]) : 80
 }
@@ -111,7 +112,7 @@ BEGIN {
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	#############################################################################
 	if (_SYS_STDOUT == "") {
 		_SYS_STDOUT = "/dev/stdout"
 	}
@@ -133,7 +134,7 @@ BEGIN {
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	#############################################################################
 	_tInBy = "\212._tInBy"
 	_tgenuid_init()
 	_UIDS[""]
@@ -165,7 +166,7 @@ BEGIN {
 }
 
 #___________________________________________________________________________________
-BEGIN {
+BEGIN {	#############################################################################
 	if (_gawk_scriptlevel < 1) {
 		_ERRLOG_TF = 1
 		_ERRLOG_VF = 1
@@ -186,7 +187,8 @@ BEGIN {
 	_shortcut_init()
 }
 
-BEGIN {	#########################################################
+#########################################################
+BEGIN {
 	_addlib("_eXTFN")
 }
 
@@ -195,7 +197,8 @@ BEGIN {
 	_extfn_init()
 }
 
-BEGIN {	############################################################
+############################################################
+BEGIN {
 	_addlib("_sHARE")
 }
 
@@ -282,7 +285,7 @@ BEGIN {
 
 #BootDevice               BuildNumber  BuildType            Caption                                      CodeSet  CountryCode  CreationClassName      CSCreationClassName   CSDVersion      CSName  CurrentTimeZone  DataExecutionPrevention_32BitApplications  DataExecutionPrevention_Available  DataExecutionPrevention_Drivers  DataExecutionPrevention_SupportPolicy  Debug  Description  Distributed  EncryptionLevel  ForegroundApplicationBoost  FreePhysicalMemory  FreeSpaceInPagingFiles  FreeVirtualMemory  InstallDate                LargeSystemCache  LastBootUpTime             LocalDateTime              Locale  Manufacturer           MaxNumberOfProcesses  MaxProcessMemorySize  MUILanguages  Name                                                                                  NumberOfLicensedUsers  NumberOfProcesses  NumberOfUsers  OperatingSystemSKU  Organization  OSArchitecture  OSLanguage  OSProductSuite  OSType  OtherTypeDescription  PAEEnabled  PlusProductID  PlusVersionNumber  Primary  ProductType  RegisteredUser  SerialNumber             ServicePackMajorVersion  ServicePackMinorVersion  SizeStoredInPagingFiles  Status  SuiteMask  SystemDevice             SystemDirectory      SystemDrive  TotalSwapSpaceSize  TotalVirtualMemorySize  TotalVisibleMemorySize  Version   WindowsDirectory
 #\Device\HarddiskVolume1  7601         Multiprocessor Free  Microsoft Windows Server 2008 R2 Enterprise  1252     1            Win32_OperatingSystem  Win32_ComputerSystem  Service Pack 1  CPU     180              TRUE                                       TRUE                               TRUE                             3                                      FALSE               FALSE        256              0                           6925316             33518716                41134632           20110502192745.000000+180                    20130426120425.497469+180  20130510134606.932000+180  0409    Microsoft Corporation  -1                    8589934464            {"en-US"}     Microsoft Windows Server 2008 R2 Enterprise |C:\Windows|\Device\Harddisk0\Partition2  0                      116                2              10                                64-bit          1033        274             18                                                                          TRUE     3            Windows User    55041-507-2389175-84833  1                        0                        33554432                 OK      274        \Device\HarddiskVolume2  C:\Windows\system32  C:                               50311020                16758448                6.1.7601  C:\Windows
-BEGIN {
+BEGIN {	############################################################################
 	a = ENVIRON["EGAWK_CMDLINE"]
 	gsub(/^[ \t]*/, "", a)
 	a = _lib_CMDLN(a)
@@ -302,13 +305,13 @@ BEGIN {
 }
 
 #_____________________________________________________________________________
-END {
+END {	########################################################################
 	_EXIT()
 }
 
 #_______________________________________________________________________
 ########################################################################
-END {
+END {	###############################################################################
 	if (_gawk_scriptlevel < 1) {
 		close(_errlog_file)
 		p = _Zimport(_rdfile(_errlog_file), _N())
@@ -329,7 +332,7 @@ END {
 #_____________________________________________________________________________
 # _rQBRO(ptr)				- Returns brothers total quantity.			[TESTED]
 #						If !ptr then returns "".
-END {
+END {	###############################################################################
 	if (_gawk_scriptlevel < 1) {
 		if (! _fileio_notdeltmpflag) {
 			_FILEIO_TMPATHS[_FILEIO_TMPRD]
@@ -629,7 +632,7 @@ END {
 #	var	_gawk_scriptlevel
 #___________________________________________________________________________________
 ####################################################################################
-END {
+END {	###############################################################################
 	if (_constatstrln > 0) {
 		_constat()
 	}
@@ -757,8 +760,8 @@ function _DS(c, t, P, a, A)
 {
 	######################################################
 	switch (c) {
+	#___________________________________________________________
 	case "_lib_CMDLN":
-		#___________________________________________________________
 		return t
 		#_____________________________________________________
 	case "_lib_APPLY":
@@ -922,14 +925,15 @@ function _FILEIO(c, t, P, A)
 }
 
 ############################################################
+
+#_____________________________________________________________________________
 function _FILEVER(c, t, P, a, A)
 {
-	#_____________________________________________________________________________
+	#################################################
 	switch (c) {
+	#___________________________________________________________
 	case "_lib_CMDLN":
-		#################################################
 		return t
-		#___________________________________________________________
 		#_____________________________________________________
 	case "_lib_APPLY":
 		return 
@@ -1494,11 +1498,13 @@ function _addlist(A, v)
 }
 
 ############################################
+
+#_______________________________________________________________________
 function _bearray(A)
 {
-	#_______________________________________________________________________
+	####################################################
 	if (isarray(A) || (A == 0 && A == "")) {
-		return 1	####################################################
+		return 1
 	}
 }
 
@@ -2534,10 +2540,12 @@ function _ffaccr(A, t, p, P)
 }
 
 ##################
+
+#_______________________________________________________________________
 function _fframe(A, t, p)
 {
-	#_______________________________________________________________________
-	return _fframe_i0(A, t, p, A[""])	#################################################
+	#################################################
+	return _fframe_i0(A, t, p, A[""])
 }
 
 #___________________________________________________________
@@ -2874,14 +2882,15 @@ function _formatstrd_init()
 }
 
 #__________________________________________________________________________________
+
+####################################################################################
+
+
+
+
+#___________________________________________________________________________________
 function _formatstrs(t)
 {
-	####################################################################################
-	
-	
-	
-	
-	#___________________________________________________________________________________
 	_formatstrq0 = split(t, _FORMATSTRA, /['\x00-\x1F\x80-\xFF]/, _FORMATSTRB)
 	_formatstrs0 = ""
 	for (t = 1; t < _formatstrq0; t++) {
@@ -3026,8 +3035,8 @@ function _getchrln(s, w)
 	#################################################
 	if (s == "") {
 		return 
+		#if ( w!=w+0 || w<0 )	w=_CON_WIDTH
 	}
-	#if ( w!=w+0 || w<0 )	w=_CON_WIDTH
 	if (length(s) < w) {
 		if (s in _GETCHRLN) {
 			if (length(_getchrlnt0 = _GETCHRLN[s]) >= w) {
@@ -3453,9 +3462,10 @@ function _insframe(A, f)
 }
 
 ########################
+
+#_________________________________________________________________
 function _inspass(A, f)
 {
-	#_________________________________________________________________
 	A[f] = A[""]
 	A[""] = f
 }
@@ -3782,9 +3792,10 @@ function _newdir(f)
 }
 
 ##############################
+
+#_______________________________________________________________________
 function _nop(p0, p1, p2, p3)
 {
-	#_______________________________________________________________________
 }
 
 #_____________________________________________________
@@ -4202,14 +4213,15 @@ function _qstrq(t)
 }
 
 ################################################################
+
+#_____________________________________________________________________________
 function _rEG(c, t, P, a, A)
 {
-	#_____________________________________________________________________________
+	#####################################################
 	switch (c) {
+	#___________________________________________________________
 	case "_lib_CMDLN":
-		#####################################################
 		return t
-		#___________________________________________________________
 		#_____________________________________________________
 	case "_lib_APPLY":
 		return 
@@ -4255,10 +4267,12 @@ function _rFCHLD(p)
 }
 
 ######################## p="", !v
+
+#_______________________________________________________________________
 function _rLBRO(p)
 {
-	#_______________________________________________________________________
-	if (p) {	######################################################
+	######################################################
+	if (p) {
 		if (p in _tPARENT) {
 			return _tLCHLD[_tPARENT[p]]
 		}
@@ -4271,10 +4285,12 @@ function _rLBRO(p)
 }
 
 ######################## p=""
+
+#_______________________________________________________________________
 function _rLCHLD(p)
 {
-	#_______________________________________________________________________
-	if ((p) && (p in _tLCHLD)) {	#####################################################
+	#####################################################
+	if ((p) && (p in _tLCHLD)) {
 		return _tLCHLD[p]
 	}
 	return ""
@@ -4288,40 +4304,48 @@ function _rLINK(p)
 }
 
 ######################## p=""
+
+#_______________________________________________________________________
 function _rNEXT(p)
 {
-	#_______________________________________________________________________
-	if ((p) && (p in _tNEXT)) {	######################################################
+	######################################################
+	if ((p) && (p in _tNEXT)) {
 		return _tNEXT[p]
 	}
 	return ""
 }
 
 ######################## p=""
+
+#_______________________________________________________________________
 function _rPARENT(p)
 {
-	#_______________________________________________________________________
-	if ((p) && (p in _tPARENT)) {	####################################################
+	####################################################
+	if ((p) && (p in _tPARENT)) {
 		return _tPARENT[p]
 	}
 	return ""
 }
 
 ######################## p=""
+
+#_______________________________________________________________________
 function _rPREV(p)
 {
-	#_______________________________________________________________________
-	if ((p) && (p in _tPREV)) {	######################################################
+	######################################################
+	if ((p) && (p in _tPREV)) {
 		return _tPREV[p]
 	}
 	return ""
 }
 
 ######################## p=""
+
+#_______________________________________________________________________
 function _rQBRO(p, c, p1)
 {
-	#_______________________________________________________________________
-	if (p) {	################################################
+	################################################
+	if (p) {
 		if (p in _tPARENT) {
 			return _tQCHLD[_tPARENT[p]]
 		}
@@ -4341,10 +4365,12 @@ function _rQBRO(p, c, p1)
 }
 
 ######################## p=""
+
+#_______________________________________________________________________
 function _rQCHLD(p)
 {
-	#_______________________________________________________________________
-	if ((p) && (p in _tQCHLD)) {	#####################################################
+	#####################################################
+	if ((p) && (p in _tQCHLD)) {
 		return _tQCHLD[p]
 	}
 	return ""
@@ -4909,14 +4935,15 @@ function _rxpfn(R, t, p, i, f, A)
 }
 
 ##############################################################
+
+#_____________________________________________________________________________
 function _sHARE(c, t, P, a, A)
 {
-	#_____________________________________________________________________________
+	###################################################
 	switch (c) {
+	#___________________________________________________________
 	case "_lib_CMDLN":
-		###################################################
 		return t
-		#___________________________________________________________
 		#_____________________________________________________
 	case "_lib_APPLY":
 		return 
@@ -4936,14 +4963,15 @@ function _sHARE(c, t, P, a, A)
 }
 
 ################################################################
+
+#_____________________________________________________________________________
 function _sYS(c, t, P, a, A)
 {
-	#_____________________________________________________________________________
+	#####################################################
 	switch (c) {
+	#___________________________________________________________
 	case "_lib_CMDLN":
-		#####################################################
 		return t
-		#___________________________________________________________
 		#_____________________________________________________
 	case "_lib_APPLY":
 		return 
@@ -5004,9 +5032,9 @@ function _setmpath(p, a)
 	if ((p) && (a = _filerd(p))) {
 		if (_FILEIO_TMPRD) {
 			_FILEIO_TMPATHS[_FILEIO_TMPRD]
+			#if ( _filexist(a) ) _del(a)
+			#_cmd("rd " a " /S /Q 2>NUL"); _cmd("del " a " /Q 2>NUL")
 		}
-		#if ( _filexist(a) ) _del(a)
-		#_cmd("rd " a " /S /Q 2>NUL"); _cmd("del " a " /Q 2>NUL")
 		return (_FILEIO_TMPRD = a)
 	} else {
 		return _warning("`" p "': cannot set temporary folder" (ERRNO ? (": " ERRNO) : ""))
@@ -5051,27 +5079,26 @@ function _shortcut(D, S)
 	if (isarray(D)) {
 		if (isarray(S)) {
 			_addarrmask(D, S, _SHORTCUTWSTRUC)
-		} else if (S == 0 && S == "") {	# array,array2*		- copy from array2 to array shorcut-specific elements
-			_addarrmask(D, _SHORTCUTDEFAULT, _SHORTCUTWSTRUC)
-		} else if (_isnotfileptr(S)) {	# array*			- define shortcut-specific elements in array by default values
-			_addarrmask(D, _[S], _SHORTCUTWSTRUC)
+		} else if (S == 0 && S == "") {
+			_addarrmask(D, _SHORTCUTDEFAULT, _SHORTCUTWSTRUC)	# array,array2*		- copy from array2 to array shorcut-specific elements
+		} else if (_isnotfileptr(S)) {
+			_addarrmask(D, _[S], _SHORTCUTWSTRUC)	# array*			- define shortcut-specific elements in array by default values
 		} else if (_rd_shortcut(D, S)) {
-			return 	# array,ptr*		- copy from array _[ptr] to array shorcut-specific elements
-		}
+			return 
+		}		# array,ptr*		- copy from array _[ptr] to array shorcut-specific elements
 	} else if (D == 0 && D == "") {
-		return _NOP	# array,filepath*		- define in array shortcut-specific elements by reading its from shortcut file filepath(load shortcut)
-		# -*				- no action(return -)
+		return _NOP	# -*				- no action(return -)
 	} else if (_isnotfileptr(D)) {
 		if (isarray(S)) {
-			_addarrmask(_[D], S, _SHORTCUTWSTRUC)
-		} else if (S == 0 && S == "") {	# ptr,array*		- copy from array to array _[ptr] shorcut-specific elements
-			_addarrmask(_[D], _SHORTCUTDEFAULT, _SHORTCUTWSTRUC)
-		} else if (_isnotfileptr(S)) {	# ptr*			- define shortcut-specifc elements in array _[ptr] by default values
-			_addarrmask(_[D], _[S], _SHORTCUTWSTRUC)
+			_addarrmask(_[D], S, _SHORTCUTWSTRUC)	# array,filepath*		- define in array shortcut-specific elements by reading its from shortcut file filepath(load shortcut)
+		} else if (S == 0 && S == "") {
+			_addarrmask(_[D], _SHORTCUTDEFAULT, _SHORTCUTWSTRUC)	# ptr,array*		- copy from array to array _[ptr] shorcut-specific elements
+		} else if (_isnotfileptr(S)) {
+			_addarrmask(_[D], _[S], _SHORTCUTWSTRUC)	# ptr*			- define shortcut-specifc elements in array _[ptr] by default values
 		} else if (_rd_shortcut(_[D], S)) {
-			return 	# ptr,ptr2*			- copy from array _[ptr2] to array _[ptr] shorcut-specific elements
-		}
-	} else {	# ptr,filepath*		- define in array _[ptr] shortcut-specific elements by reading its from shortcut file filepath(load shortcut)
+			return 
+		}		# ptr,ptr2*			- copy from array _[ptr2] to array _[ptr] shorcut-specific elements
+	} else {
 		if (isarray(S) && _wr_shortcut(D, S)) {
 			return 	# filepath,array*		- [over]write shorcut file filepath; shortcut parameters will be defined by shortcut-specific elements in array(save shortcut)
 		} else if (S == 0 && S == "" && _wr_shortcut(D, _SHORTCUTDEFAULT)) {
@@ -5080,7 +5107,8 @@ function _shortcut(D, S)
 			return 	# filepath,ptr*		- [over]write shorcut file filepath; shortcut parameters will be defined by shortcut-specific elements in array _[ptr](save shortcut)
 		} else if (_rd_shortcut(_SHRTCUTA1, S) || _wr_shortcut(D, _SHRTCUTA1)) {
 			return 
-		}	}	# filepath,filepath2*	- [over]write shorcut file filepath; shortcut parameters will be defined from shortcut file filepath2(copy shortcut)
+		}		# ptr,filepath*		- define in array _[ptr] shortcut-specific elements by reading its from shortcut file filepath(load shortcut)
+	}	# filepath,filepath2*	- [over]write shorcut file filepath; shortcut parameters will be defined from shortcut file filepath2(copy shortcut)
 	return 1
 }
 
@@ -5433,8 +5461,8 @@ function _sysinfo(D, h)
 function _tOBJ(c, t, P)
 {
 	switch (c) {
+	#___________________________________________________________
 	case "_lib_CMDLN":
-		#___________________________________________________________
 		return t
 		#___________________________________________________________
 	case "_lib_APPLY":
@@ -6291,30 +6319,34 @@ function _th0(p, p1, p2, p3)
 }
 
 ##########################################
+
+#_________________________________________________________________
 function _th1(p0, p, p2, p3)
 {
-	#_________________________________________________________________
 	return p
 }
 
 ##############################
+
+#_________________________________________________________________
 function _th10(p0, p1)
 {
-	#_________________________________________________________________
 	return (p1 p0)
 }
 
 ##############################
+
+#_________________________________________________________________
 function _th2(p0, p1, r, p3)
 {
-	#_________________________________________________________________
 	return p
 }
 
 ##############################
+
+#_________________________________________________________________
 function _th3(p0, p1, p2, r)
 {
-	#_________________________________________________________________
 	return p
 }
 
@@ -7234,10 +7266,10 @@ function _wFBRO(p, v, a)
 			}			######################## p=ptr, v=0
 			return v
 		}
-	} else {	######################## p=ptr, v=""
+	} else {
 		if (p == 0) {
 			return v	######################## p=0
-		}
+		}		######################## p=ptr, v=""
 		if (v) {
 			return _texclude(v)	######################## p="", v=ptr	- exclude v
 		}
@@ -7325,10 +7357,10 @@ function _wFCHLD(p, v, a)
 			}
 			return v
 		}
-	} else {	######################## p=ptr, v="" > ignore action
+	} else {
 		if (p == 0) {
 			return v	######################## p=0
-		}
+		}		######################## p=ptr, v="" > ignore action
 		return v
 	}
 }
@@ -7436,10 +7468,10 @@ function _wLBRO(p, v, a)
 			}			######################## p=ptr, v=0
 			return v
 		}
-	} else {	######################## p=ptr, v=""
+	} else {
 		if (p == 0) {
 			return v	######################## p=0
-		}
+		}		######################## p=ptr, v=""
 		if (v) {
 			return _texclude(v)	######################## p="", v=ptr	- exclude v
 		}
@@ -7527,10 +7559,10 @@ function _wLCHLD(p, v, a)
 			}
 			return v
 		}
-	} else {	######################## p=ptr, v="" > ignore action
+	} else {
 		if (p == 0) {
 			return v	######################## p=0
-		}
+		}		######################## p=ptr, v="" > ignore action
 		return v
 	}
 }
@@ -7606,10 +7638,10 @@ function _wNEXT(p, v, a, b)
 			}			######################## p=ptr, v=0
 			return v
 		}
-	} else {	######################## p=ptr, v=""
+	} else {
 		if (p == 0) {
 			return v	######################## p=0
-		}
+		}		######################## p=ptr, v=""
 		if (v) {
 			return _texclude(v)	######################## p="", v=ptr	- exclude v
 		}
@@ -7688,10 +7720,10 @@ function _wPREV(p, v, a, b)
 			}			######################## p=ptr, v=0
 			return v
 		}
-	} else {	######################## p=ptr, v=""
+	} else {
 		if (p == 0) {
 			return v	######################## p=0
-		}
+		}		######################## p=ptr, v=""
 		if (v) {
 			return _texclude(v)	######################## p="", v=ptr	- exclude v
 		}
@@ -7712,10 +7744,10 @@ function _wQCHLD(p, v)
 	#############################################
 	if (p) {
 		if (v) {
-		} else {	######################## p=ptr, v=ptr
+		} else {
 			if (v == 0) {
 				if (p in _tFCHLD) {	######################## p=ptr, v=0 > delete all chld
-					v = _tFCHLD[p]
+					v = _tFCHLD[p]	######################## p=ptr, v=ptr
 					delete _tFCHLD[p]
 					delete _tLCHLD[p]
 					delete _tQCHLD[p]
@@ -7726,9 +7758,9 @@ function _wQCHLD(p, v)
 			}
 			return v
 		}
-	} else {	######################## p=ptr, v="" > ignore action
+	} else {
 		if (p == 0) {
-			return v
+			return v	######################## p=ptr, v="" > ignore action
 		}		######################## p=0
 		return v
 	}

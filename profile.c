@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1999-2017 the Free Software Foundation, Inc.
+ * Copyright (C) 1999-2018 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -37,7 +37,7 @@ static char *pp_typed_regex(const char *in_str, size_t len, int delim);
 static bool is_binary(int type);
 static bool is_scalar(int type);
 static int prec_level(int type);
-static void pp_push(int type, char *s, int flag);
+static void pp_push(int type, char *s, int flag, INSTRUCTION *comment);
 static NODE *pp_pop(void);
 static void print_comment(INSTRUCTION *pc, long in);
 const char *redir2str(int redirtype);
@@ -45,6 +45,7 @@ const char *redir2str(int redirtype);
 #define pp_str	vname
 #define pp_len	sub.nodep.reserved
 #define pp_next	rnode
+#define pp_comment	sub.nodep.x.cmnt
 
 #define DONT_FREE 1
 #define CAN_FREE  2
@@ -59,6 +60,15 @@ static NODE *func_params;	/* function parameters */
 static FILE *prof_fp;	/* where to send the profile */
 
 static long indent_level = 0;
+
+static const char tabs[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+static const size_t tabs_len = sizeof(tabs) - 1;
+
+#define check_indent_level() \
+	if (indent_level + 1 > tabs_len) \
+		/* We're allowed to be snarky, occasionally. */ \
+		fatal(_("Program indentation level too deep. Consider refactoring your code"));
+
 
 #define SPACEOVER	0
 
@@ -159,7 +169,7 @@ indent_out(void)
 /* pp_push --- push a pretty printed string onto the stack */
 
 static void
-pp_push(int type, char *s, int flag)
+pp_push(int type, char *s, int flag, INSTRUCTION *comment)
 {
 	NODE *n;
 	getnode(n);
@@ -168,6 +178,7 @@ pp_push(int type, char *s, int flag)
 	n->flags = flag;
 	n->type = type;
 	n->pp_next = pp_stack;
+	n->pp_comment = comment;
 	pp_stack = n;
 }
 
@@ -238,9 +249,9 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 
 			if (rule != Rule) {
 				/* Allow for pre-non-rule-block comment  */
-				if (pc->nexti != (pc +1)->firsti
+				if (pc->nexti != (pc+1)->firsti
 				    && pc->nexti->opcode == Op_comment
-				    && pc->nexti->memory->comment_type == FULL_COMMENT)
+				    && pc->nexti->memory->comment_type == BLOCK_COMMENT)
 					print_comment(pc->nexti, -1);
 				ip1 = (pc + 1)->firsti;
 				ip2 = (pc + 1)->lasti;
@@ -302,9 +313,9 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 		case Op_push_i:
 			m = pc->memory;
 			if (m == Nnull_string)	/* optional return or exit value; don't print 0 or "" */
-				pp_push(pc->opcode, m->stptr, DONT_FREE);
+				pp_push(pc->opcode, m->stptr, DONT_FREE, pc->comment);
 			else if ((m->flags & NUMBER) != 0)
-				pp_push(pc->opcode, pp_number(m), CAN_FREE);
+				pp_push(pc->opcode, pp_number(m), CAN_FREE, pc->comment);
 			else {
 				str = pp_string(m->stptr, m->stlen, '"');
 				if ((m->flags & INTLSTR) != 0) {
@@ -312,13 +323,13 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 					str = pp_group3("_", tmp, "");
 					efree(tmp);
 				}
-				pp_push(pc->opcode, str, CAN_FREE);
+				pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			}
 			break;
 
 		case Op_store_var:
 			if (pc->initval != NULL)
-				pp_push(Op_push_i, pp_node(pc->initval), CAN_FREE);
+				pp_push(Op_push_i, pp_node(pc->initval), CAN_FREE, pc->comment);
 			/* fall through */
 		case Op_store_sub:
 		case Op_assign_concat:
@@ -331,14 +342,14 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 			m = pc->memory;
 			switch (m->type) {
 			case Node_param_list:
-				pp_push(pc->opcode, func_params[m->param_cnt].param, DONT_FREE);
+				pp_push(pc->opcode, func_params[m->param_cnt].param, DONT_FREE, pc->comment);
 				break;
 
 			case Node_var:
 			case Node_var_new:
 			case Node_var_array:
 				if (m->vname != NULL)
-					pp_push(pc->opcode, m->vname, DONT_FREE);
+					pp_push(pc->opcode, m->vname, DONT_FREE, pc->comment);
  				else
 					fatal(_("internal error: %s with null vname"),
 							nodetype2str(m->type));
@@ -390,7 +401,7 @@ cleanup:
 			str = pp_group3(t1->pp_str, tmp, "");
 			efree(tmp);
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_and:
@@ -399,10 +410,24 @@ cleanup:
 			t2 = pp_pop();
 			t1 = pp_pop();
 			parenthesize(pc->opcode, t1, t2);
-			str = pp_group3(t1->pp_str, op2str(pc->opcode), t2->pp_str);
+			if (pc->comment == NULL)
+				str = pp_group3(t1->pp_str, op2str(pc->opcode), t2->pp_str);
+			else {
+				check_indent_level();
+
+				size_t len = strlen(t1->pp_str)
+						+ strlen(op2str(pc->opcode)) + strlen(t2->pp_str)	// foo && bar
+						+ indent_level + 1				// indent
+						+ pc->comment->memory->stlen + 3;		// tab comment
+
+				emalloc(str, char *, len, "pprint");
+				sprintf(str, "%s%s%s%.*s %s", t1->pp_str, op2str(pc->opcode),
+						pc->comment->memory->stptr,
+						(int) (indent_level + 1), tabs, t2->pp_str);
+			}
 			pp_free(t1);
 			pp_free(t2);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			pc = pc->target_jmp;
 			break;
 
@@ -424,14 +449,14 @@ cleanup:
 			str = pp_group3(t1->pp_str, op2str(pc->opcode), tmp);
 			efree(tmp);
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_parens:
 			t1 = pp_pop();
 			str = pp_group3("(", t1->pp_str, ")");
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_plus:
@@ -452,7 +477,7 @@ cleanup:
 			str = pp_group3(t1->pp_str, op2str(pc->opcode), t2->pp_str);
 			pp_free(t1);
 			pp_free(t2);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_preincrement:
@@ -465,7 +490,7 @@ cleanup:
 			else
 				str = pp_group3(t1->pp_str, op2str(pc->opcode), "");
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_field_spec:
@@ -483,7 +508,7 @@ cleanup:
 			/* optypes table (eval.c) includes space after ! */
 			str = pp_group3(op2str(pc->opcode), t1->pp_str, "");
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_assign:
@@ -498,7 +523,7 @@ cleanup:
 			str = pp_group3(t2->pp_str, op2str(pc->opcode), t1->pp_str);
 			pp_free(t2);
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_store_field:
@@ -515,7 +540,7 @@ cleanup:
 
 		case Op_concat:
 			str = pp_concat(pc->expr_count);
-			pp_push(Op_concat, str, CAN_FREE);
+			pp_push(Op_concat, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_K_delete:
@@ -560,7 +585,7 @@ cleanup:
 				pp_free(t2);
 			}
 			pp_free(t1);
-			pp_push(Op_in_array, str, CAN_FREE);
+			pp_push(Op_in_array, str, CAN_FREE, pc->comment);
 		}
 			break;
 
@@ -595,7 +620,7 @@ cleanup:
 			tmp = pp_list(pc->expr_count, "()", ", ");
 			str = pp_group3(fname, tmp, "");
 			efree(tmp);
-			pp_push(Op_sub_builtin, str, CAN_FREE);
+			pp_push(Op_sub_builtin, str, CAN_FREE, pc->comment);
 		}
 			break;
 
@@ -614,7 +639,7 @@ cleanup:
 					efree(tmp);
 				} else
 					str = pp_group3(fname, "()", "");
-				pp_push(Op_builtin, str, CAN_FREE);
+				pp_push(Op_builtin, str, CAN_FREE, pc->comment);
 			} else
 				fatal(_("internal error: builtin with null fname"));
 		}
@@ -624,7 +649,8 @@ cleanup:
 		case Op_K_printf:
 		case Op_K_print_rec:
 			if (pc->opcode == Op_K_print_rec)
-				tmp = pp_group3(" ", op2str(Op_field_spec), "0");
+				// instead of `print $0', just `print'
+				tmp = strdup("");
 			else if (pc->redir_type != 0)
 				tmp = pp_list(pc->expr_count, "()", ", ");
 			else {
@@ -660,7 +686,7 @@ cleanup:
 				assert((pc->memory->flags & REGEX) != 0);
 				str = pp_typed_regex(pc->memory->stptr, pc->memory->stlen, '/');
 			}
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 		}
 			break;
 
@@ -692,7 +718,7 @@ cleanup:
 				efree(restr);
 			}
 			pp_free(t1);
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 		}
 			break;
 
@@ -720,7 +746,7 @@ cleanup:
 				pp_free(t2);
 			} else
 				str = tmp;
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
 
 		case Op_indirect_func_call:
@@ -745,7 +771,7 @@ cleanup:
 				t1 = pp_pop();	/* indirect var */
 				pp_free(t1);
 			}
-			pp_push(pc->opcode, str, CAN_FREE);
+			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 		}
 			break;
 
@@ -786,7 +812,7 @@ cleanup:
 			str = pp_group3(t1->pp_str, ", ", t2->pp_str);
 			pp_free(t1);
 			pp_free(t2);
-			pp_push(Op_line_range, str, CAN_FREE);
+			pp_push(Op_line_range, str, CAN_FREE, pc->comment);
 			pc = ip1->condpair_right;
 			break;
 
@@ -820,13 +846,34 @@ cleanup:
 			indent(SPACEOVER);
 			t1 = pp_pop();
 			fprintf(prof_fp, "} %s (%s)", op2str(Op_K_while), t1->pp_str);
+			if (pc->comment)
+				fprintf(prof_fp, "\t%s", pc->comment->memory->stptr);
+			else {
+				end_line(pc->target_break);
+				skip_comment = true;
+			}
 			pp_free(t1);
-			end_line(pc->target_break);
-			skip_comment = true;
 			pc = pc->target_break;
 			break;
 
 		case Op_K_for:
+		{
+			INSTRUCTION *comment1 = NULL, *comment2 = NULL;
+
+			if (pc->comment != NULL) {
+				comment1 = pc->comment;
+				pc->comment = NULL;
+				if (comment1 != NULL && comment1->comment != NULL) {
+					comment2 = comment1->comment;
+					comment1->comment = NULL;
+				}
+				if (comment2 == NULL && comment1->memory->comment_type == FOR_COMMENT) {
+					comment2 = comment1;
+					comment2->memory->comment_type = EOL_COMMENT;
+					comment1 = NULL;
+				}
+			}
+
 			ip1 = pc + 1;
 			indent(ip1->forloop_body->exec_count);
 			fprintf(prof_fp, "%s (", op2str(pc->opcode));
@@ -834,11 +881,18 @@ cleanup:
 			/* If empty for looop header, print it a little more nicely. */
 			if (   pc->nexti->opcode == Op_no_op
 			    && ip1->forloop_cond == pc->nexti
-			    && pc->target_continue->opcode == Op_jmp) {
+			    && pc->target_continue->opcode == Op_jmp
+			    && comment1 == NULL && comment2 == NULL) {
 				fprintf(prof_fp, ";;");
 			} else {
 				pprint(pc->nexti, ip1->forloop_cond, IN_FOR_HEADER);
 				fprintf(prof_fp, "; ");
+
+				if (comment1 != NULL) {
+					print_comment(comment1, 0);
+					indent(ip1->forloop_body->exec_count);
+					indent(1);
+				}
 
 				if (ip1->forloop_cond->opcode == Op_no_op &&
 						ip1->forloop_cond->nexti == ip1->forloop_body)
@@ -848,6 +902,12 @@ cleanup:
 					t1 = pp_pop();
 					fprintf(prof_fp, "%s; ", t1->pp_str);
 					pp_free(t1);
+				}
+
+				if (comment2 != NULL) {
+					print_comment(comment2, 0);
+					indent(ip1->forloop_body->exec_count);
+					indent(1);
 				}
 
 				pprint(pc->target_continue, pc->target_break, IN_FOR_HEADER);
@@ -863,6 +923,7 @@ cleanup:
 			end_line(pc->target_break);
 			skip_comment = true;
 			pc = pc->target_break;
+		}
 			break;
 
 		case Op_K_arrayfor:
@@ -901,10 +962,14 @@ cleanup:
 			pprint(pc->nexti, ip1->switch_start, NO_PPRINT_FLAGS);
 			t1 = pp_pop();
 			fprintf(prof_fp, "%s) {\n", t1->pp_str);
+			if (pc->comment)
+				print_comment(pc->comment, 0);
 			pp_free(t1);
 			pprint(ip1->switch_start, ip1->switch_end, NO_PPRINT_FLAGS);
 			indent(SPACEOVER);
 			fprintf(prof_fp, "}\n");
+			if (ip1->switch_end->comment)
+				print_comment(ip1->switch_end->comment, 0);
 			pc = pc->target_break;
 			break;
 
@@ -914,13 +979,20 @@ cleanup:
 			if (pc->opcode == Op_K_case) {
 				t1 = pp_pop();
 				fprintf(prof_fp, "%s %s:", op2str(pc->opcode), t1->pp_str);
-				pc = end_line(pc);
 				pp_free(t1);
-			} else {
+			} else
 				fprintf(prof_fp, "%s:", op2str(pc->opcode));
-				pc = end_line(pc);
-			}
+
 			indent_in();
+			if (pc->comment != NULL) {
+				if (pc->comment->memory->comment_type == EOL_COMMENT)
+					fprintf(prof_fp, "\t%s", pc->comment->memory->stptr);
+				else {
+					fprintf(prof_fp, "\n");
+					print_comment(pc->comment, indent_level);
+				}
+			} else
+				fprintf(prof_fp, "\n");
 			pprint(pc->stmt_start->nexti, pc->stmt_end->nexti, NO_PPRINT_FLAGS);
 			indent_out();
 			break;
@@ -937,6 +1009,8 @@ cleanup:
 				fprintf(prof_fp, " # %ld", ip1->exec_count);
 			ip1 = end_line(ip1);
 			indent_in();
+			if (pc->comment != NULL)
+				print_comment(pc->comment, indent_level);
 			pprint(ip1->nexti, pc->branch_else, NO_PPRINT_FLAGS);
 			indent_out();
 			pc = pc->branch_else;
@@ -944,7 +1018,7 @@ cleanup:
 				indent(SPACEOVER);
 				fprintf(prof_fp, "}");
 				if (pc->nexti->nexti->opcode != Op_comment
-				    || pc->nexti->nexti->memory->comment_type == FULL_COMMENT)
+				    || pc->nexti->nexti->memory->comment_type == BLOCK_COMMENT)
 					fprintf(prof_fp, "\n");
 				/* else
 				 	It will be printed at the top. */
@@ -980,6 +1054,8 @@ cleanup:
 				end_line(pc);
 				skip_comment = true;
 				indent_in();
+				if (pc->comment != NULL)
+					print_comment(pc->comment, indent_level);
 				pprint(pc->nexti, pc->branch_end, NO_PPRINT_FLAGS);
 				indent_out();
 				indent(SPACEOVER);
@@ -999,6 +1075,9 @@ cleanup:
 		{
 			NODE *f, *t, *cond;
 			size_t len;
+			INSTRUCTION *qm_comment = NULL, *colon_comment = NULL;
+
+			qm_comment = pc->comment;
 
 			pprint(pc->nexti, pc->branch_if, NO_PPRINT_FLAGS);
 			ip1 = pc->branch_if;
@@ -1006,6 +1085,7 @@ cleanup:
 			ip1 = pc->branch_else->nexti;
 
 			pc = ip1->nexti;
+			colon_comment = pc->comment;
 			assert(pc->opcode == Op_cond_exp);
 			pprint(pc->nexti, pc->branch_end, NO_PPRINT_FLAGS);
 
@@ -1013,14 +1093,77 @@ cleanup:
 			t = pp_pop();
 			cond = pp_pop();
 
-			len =  f->pp_len + t->pp_len + cond->pp_len + 12;
-			emalloc(str, char *, len, "pprint");
-			sprintf(str, "%s ? %s : %s", cond->pp_str, t->pp_str, f->pp_str);
+			/*
+			 * This stuff handles comments that come after a ?, :, or both.
+			 * Allowing newlines after ? and : is a gawk extension.
+			 * Theoretically this is fragile, since ?: expressions can be nested.
+			 * In practice, it's not, since if there was a comment following ? or :
+			 * in the original code, then it wasn't nested.
+			 */
+
+			len = f->pp_len + t->pp_len + cond->pp_len + 12;
+			if (qm_comment == NULL && colon_comment == NULL) {
+				// easy case
+				emalloc(str, char *, len, "pprint");
+				sprintf(str, "%s ? %s : %s", cond->pp_str, t->pp_str, f->pp_str);
+			} else if (qm_comment != NULL && colon_comment != NULL) {
+				check_indent_level();
+				len += qm_comment->memory->stlen +		// comments
+					colon_comment->memory->stlen +
+					2 * (indent_level + 1) + 3 +		// indentation
+					t->pp_len + 6;
+				emalloc(str, char *, len, "pprint");
+				sprintf(str,
+					"%s ? %s"	// cond ? comment
+					"%.*s   %s"	// indent true-part
+					" : %s"		// : comment
+					"%.*s   %s",	// indent false-part
+					cond->pp_str,	// condition
+					qm_comment->memory->stptr,	// comment
+					(int) (indent_level + 1), tabs,		// indent
+					t->pp_str,			// true part
+					colon_comment->memory->stptr,	// comment
+					(int) (indent_level + 1), tabs,		// indent
+					f->pp_str			// false part
+					);
+			} else if (qm_comment != NULL) {
+				check_indent_level();
+				len += qm_comment->memory->stlen +	// comment
+					1 * (indent_level + 1) + 3 +	// indentation
+					t->pp_len + 3;
+				emalloc(str, char *, len, "pprint");
+				sprintf(str,
+					"%s ? %s"	// cond ? comment
+					"%.*s   %s"	// indent true-part
+					" : %s",	// : false-part
+					cond->pp_str,	// condition
+					qm_comment->memory->stptr,	// comment
+					(int) (indent_level + 1), tabs,		// indent
+					t->pp_str,			// true part
+					f->pp_str			// false part
+					);
+			} else {
+				check_indent_level();
+				len += colon_comment->memory->stlen +		// comment
+					1 * (indent_level + 1) + 3 +		// indentation
+					t->pp_len + 3;
+				emalloc(str, char *, len, "pprint");
+				sprintf(str,
+					"%s ? %s"	// cond ? true-part
+					" : %s"		// : comment
+					"%.*s   %s",	// indent false-part
+					cond->pp_str,			// condition
+					t->pp_str,			// true part
+					colon_comment->memory->stptr,	// comment
+					(int) (indent_level + 1), tabs,		// indent
+					f->pp_str			// false part
+					);
+			}
 
 			pp_free(cond);
 			pp_free(t);
 			pp_free(f);
-			pp_push(Op_cond_exp, str, CAN_FREE);
+			pp_push(Op_cond_exp, str, CAN_FREE, pc->comment);
 			pc = pc->branch_end;
 		}
 			break;
@@ -1065,7 +1208,7 @@ end_line(INSTRUCTION *ip)
 	return ret;
 }
 
-/* pp_string_fp --- printy print a string to the fp */
+/* pp_string_fp --- pretty print a string to the fp */
 
 /*
  * This routine concentrates string pretty printing in one place,
@@ -1124,17 +1267,59 @@ print_lib_list(FILE *prof_fp)
 {
 	SRCFILE *s;
 	static bool printed_header = false;
+	const char *indent = "";
+	bool found = false;
+
+	if (do_profile)
+		indent = "\t";
 
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
 		if (s->stype == SRC_EXTLIB) {
-			if (! printed_header) {
+			if (do_profile && ! printed_header) {
 				printed_header = true;
-				fprintf(prof_fp, _("\t# Loaded extensions (-l and/or @load)\n\n"));
+				fprintf(prof_fp, _("%s# Loaded extensions (-l and/or @load)\n\n"), indent);
 			}
-			fprintf(prof_fp, "\t@load \"%s\"\n", s->src);
+			found = true;
+			fprintf(prof_fp, "%s@load \"%s\"", indent, s->src);
+			if (s->comment != NULL) {
+				fprintf(prof_fp, "\t");
+				print_comment(s->comment, indent_level + 1);
+			} else
+				fprintf(prof_fp, "\n");
 		}
 	}
-	if (printed_header)	/* we found some */
+	if (found)	/* we found some */
+		fprintf(prof_fp, "\n");
+}
+
+/* print_include_list --- print a list of all files included */
+
+static void
+print_include_list(FILE *prof_fp)
+{
+	SRCFILE *s;
+	static bool printed_header = false;
+	bool found = false;
+
+	if (do_profile)
+		return;
+
+	for (s = srcfiles->next; s != srcfiles; s = s->next) {
+		if (s->stype == SRC_INC) {
+			if (! printed_header) {
+				printed_header = true;
+				fprintf(prof_fp, _("\n# Included files (-i and/or @include)\n\n"));
+			}
+			found = true;
+			fprintf(prof_fp, "# @include \"%s\"", s->src);
+			if (s->comment != NULL) {
+				fprintf(prof_fp, "\t");
+				print_comment(s->comment, indent_level + 1);
+			} else
+				fprintf(prof_fp, "\n");
+		}
+	}
+	if (found)	/* we found some */
 		fprintf(prof_fp, "\n");
 }
 
@@ -1158,8 +1343,17 @@ print_comment(INSTRUCTION* pc, long in)
 			after_newline = false;
 		}
 		putc(*text, prof_fp);
-		if (*text == '\n')
-			after_newline = true;
+		after_newline = (*text == '\n');
+	}
+
+	if (pc->comment) {
+		// chaining should only be two deep
+		assert(pc->comment->comment == NULL);
+		// if first was EOL comment, next must be block comment,
+		// it needs to be indented.
+		if (pc->memory->comment_type == EOL_COMMENT)
+			in++;
+		print_comment(pc->comment, in);
 	}
 }
 
@@ -1181,6 +1375,7 @@ dump_prog(INSTRUCTION *code)
 		fprintf(prof_fp, _("\t# gawk profile, created %s\n"), ctime(& now));
 	print_lib_list(prof_fp);
 	pprint(code, NULL, NO_PPRINT_FLAGS);
+	print_include_list(prof_fp);
 }
 
 /* prec_level --- return the precedence of an operator, for paren tests */
@@ -1535,6 +1730,7 @@ pp_list(int nargs, const char *paren, const char *delim)
 	size_t len;
 	size_t delimlen;
 	int i;
+	INSTRUCTION *comment = NULL;
 
 	if (pp_args == NULL) {
 		npp_args = nargs;
@@ -1552,12 +1748,17 @@ pp_list(int nargs, const char *paren, const char *delim)
 		for (i = 1; i <= nargs; i++) {
 			r = pp_args[i] = pp_pop();
 			len += r->pp_len + delimlen;
+			if (r->pp_comment != NULL) {
+				comment = (INSTRUCTION *) r->pp_comment;
+				len += comment->memory->stlen + indent_level + 1;	// comment\n ident
+			}
 		}
 		if (paren != NULL) {
 			assert(strlen(paren) == 2);
 			len += 2;
 		}
 	}
+	comment = NULL;
 
 	emalloc(str, char *, len + 1, "pp_list");
 	s = str;
@@ -1572,6 +1773,14 @@ pp_list(int nargs, const char *paren, const char *delim)
 			if (delimlen > 0) {
 				memcpy(s, delim, delimlen);
 				s += delimlen;
+			}
+			if (r->pp_comment != NULL) {
+				check_indent_level();
+				comment = (INSTRUCTION *) r->pp_comment;
+				memcpy(s, comment->memory->stptr, comment->memory->stlen);
+				s += comment->memory->stlen;
+				memcpy(s, tabs, indent_level + 1);
+				s += indent_level + 1;
 			}
 			r = pp_args[i];
 			memcpy(s, r->pp_str, r->pp_len);
@@ -1736,10 +1945,8 @@ pp_func(INSTRUCTION *pc, void *data ATTRIBUTE_UNUSED)
 	fprintf(prof_fp, "\n");
 
 	/* print any function comment */
-	if (fp->opcode == Op_comment && fp->source_line == 0) {
-		print_comment(fp, -1);	/* -1 ==> don't indent */
-		fp = fp->nexti;
-	}
+	if (pc->comment != NULL)
+		print_comment(pc->comment, -1);	/* -1 ==> don't indent */
 
 	indent(pc->nexti->exec_count);
 	fprintf(prof_fp, "%s %s(", op2str(Op_K_function), func->vname);

@@ -1,7 +1,30 @@
+2018-11-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (first_rule, func_first): Remove unused variables.
+	(Grammar): Simplify rule for range pattern.
+
+2018-11-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (debug_print_comment): New macro and function.
+	(load_library): Rework to not try to open the file if pretty printing.
+	(append_rule): Adjust handling of interblock_comment.
+
+2018-11-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (Grammar): In rule for function, set interblock_comment.
+	(mk_function): Hook interblock_comment onto fi->comment, merge it
+	with the existing one first, if any. Append trailing_comment.
+
 2018-11-26         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* main.c (platform_name): Add os390. Treat Cygwin and Mac OS X
 	as POSIX, per discussion with the dev team.
+
+	Unrelated:
+
+	* profile.c (print_comment): Indent for chained comment.
+	* awkgram.y (load_library): Return early if just pretty printing.
+	(yylex): Fix handling of ?: and allow_newline etc.
 
 2018-11-25         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -13,6 +36,12 @@
 2018-11-25         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* config.sub: Updated from GNULIB.
+
+2018-11-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (interblock_comment, pending_comment): New variables.
+	(Grammar, mk_program, add_rule): Adjust to use them. Changes
+	handle comments at the outermost level, between blocks and functions.
 
 2018-11-24         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -34,6 +63,47 @@
 2018-11-11         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* main.c (usage): Improve output for -Z in the help.
+2018-11-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (outer_comment): New variable.
+	(Grammar): More changes. We now get the simple case of leading
+	and trailing comments, but not all the cases.
+
+2018-11-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (trailing_comment): New variable.
+	(Grammar): For `action', append both trailing comments. This may
+	change. For `statements', append the value of `trailing_comment'
+	if set. At `statement := l_brace statements rbrace' save
+	trailing_comment from r_brace.
+	(make_braced_statements): Don't append the comment from r_brace
+	to the statement list.
+
+2018-10-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (NODE): New field: sub.nodep.x.cmnt, holds comment for
+	expressions being pretty-printed.
+	* awkgram.y (Grammar): For expression lists, save any comment
+	that came after a comma in the list.
+	* profile.c (pp_push): Accept a fourth argument which is any
+	comment associated with the expression. Either it's there or
+	it's NULL. Save it in the pp_comment field of the node being pushed.
+	(tabs, tabs_len, check_indent_level): Made into static globals.
+	(pprint): Adjust all calls to pp_push(). Fix parenthesization
+	for casts in string lengthes when indenting.
+	(pp_list): If a popped item has a comment, include it and the
+	following indentation in the formatted result.
+
+2018-10-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (include_source): Add second parameter to return
+	SRCFILE pointer.
+	(Grammar): For @include, save the comment for later dumping
+	along with the list of include files.
+	(make_include_comment): Removed. No longer used.
+	* profile.c: Update copyright year.
+	(print_include_list): New function.
+	(dump_prog): Call it.
 
 2018-10-24         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -43,10 +113,120 @@
 
 	* config.sub: Updated from GNULIB.
 
+2018-10-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (SRCFILE): Add comment field for comments on @load statements.
+	* awkgram.y (include_source): Type change to boolean.
+	(load_library): Type change to boolean, additiona parameter to
+	bring the SRCFILE struct up to where we can add the comment into it.
+	(make_include_comment): New function. Not used yet.
+	(Grammar): Add comment for @load statements. Start on preserving
+	@include statements and their comments for eventual inclusion
+	into the pretty-printed code.
+	* profile.c (print_lib_list): Made a little smarter about printing
+	the header and indentation. Print the comment if there is one.
+
+2018-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (commenttype): Add FOR_COMMENT.
+	* awkgram.y (Grammar): Handle all the opt_nls cases in
+	regular for statements.
+	* debug.c (print_instruction): Print the comments in Op_K_for.
+	* profile.c (pprint): Handle printing comments.
+
+2018-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated.
+	* awkgram.y (Grammar): Distinguish `print' and `print $0' in
+	what gets profiled / pretty-printed.
+	* profile.c (pprint): For case and default, add final newline
+	if there is no comment to print.
+
+2018-10-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (Grammar): Improve comment handling for many plain
+	statements. Improve handling for case and default.
+	Handle comments in `for (iggy in foo)' loops.
+	(yylex): After a colon, only allow newline if was part of ?:.
+	(merge_comments): Improve coding so we don't get two newlines
+	at the end of a merged comment.
+	* debug.c (print_instruction): Handle comments for case and default.
+	Simplify printing of comments.
+	* profile.c (pprint): Handle comments for case and default.
+	Remove compiler warning in Op_and/Op_or handling.
+
+2018-10-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (Grammar): Add comment handling for do...while.
+	Regularize comments about `else ...'.
+	* debug.c (print_instruction): Improve handling of comments for
+	do-while and switch, and in general.
+	* profile.c (pprint): Revise for do...while.
+
+2018-10-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (make_braced_statements): New function.
+	(Grammar): Use it in the right places instead of inline code.
+	* debug.c (print_instruction): For Op_comment, fix type string.
+	* profile.c (pprint): Move tabs and tabs_len to top of function.
+	For Op_and and Op_or, handle comments.  Use new check_indent_level
+	for Op_and, Op_or and Op_cond_exp.
+
 2018-10-10         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* debug.c (print_instruction): For Op_comment, use print_func
 	instead of fprintf to print the comment type.
+
+2018-10-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (Grammar): For statement -> { statements }, fix comment
+	handling.  For `if' statement add comment support.
+	* profile.c (pp_print): Print comments associated with `if' and `else'.
+
+2018-10-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (Grammar): Fix handling of empty statement (just a semi-
+	colon).
+	(merge_comments): If no chained comment and no second comment,
+	just return early.
+
+2018-10-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (enum commenttype): New enum.
+	(NODE): Add it to sub.val.
+	(EOL_COMMENT, FULL_COMMENT): Replaced with above enum values.
+	* awkgram.y (Grammar): Finish up handling comments in function headers
+	and bodies. Get trailing comments at end of program
+	(get_comment): When doing comments, if we got EOF, push it back so that
+	multiple comments get merged together.
+	(merge_comments): Allow second parameter to be NULL.
+	* profile.c (pp_print): Change to use above enum everywhere. For
+	Op_K_print_rec produce plain `print' instead of `print $0'. Handle
+	comments in ?:. Handle printing function comments.
+	(print_comment): Simplify `after_newline' assignment.  Add assertion
+	that chaining is only two deep.
+
+2018-10-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (action): Improve handling of comments attached
+	to braces. Helps with function bodies.
+
+2018-10-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (merge_comments): Change return type to void. Adjust calls.
+	(Grammar): For action, pull comments out of braces and stick
+	into the list. For function_prologue, get comments from parameters
+	and ending newline, merge, and save.  Wherever nls and opt_nls
+	are used, be sure to pass their values up via $$. For various
+	cases that can be empty, explicitly set $$ = NULL.
+	* profile.c (pprint): Get switch working.  Get ?: working.
+	(print_comment): Print any chained comment.
+	(pp_func): Start revising.
+
+2018-10-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y: Range expressions, enable comment stuff.
+	Switch statement: start on comment handling.
 
 2018-10-01         Nelson H.F. Beebe     <beebe@math.utah.edu>
 
@@ -74,6 +254,23 @@
 
 	* awk.h: Add `#if !defined(__SUNPRO_C)' around check for non-ANSI
 	compilers.  Needed for some Solaris systems.
+
+2018-09-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (INSTRUCTION): Add comment field to carry
+	comment around during parsing.
+	* awkgram.y (merge_comments): New function.
+	(split_comment, check_comment, comment, prior_comment,
+	comment_to_save, program_comment, function_comment,
+	block_comment): Removed.
+	(grammar): Remove old code and start passing the comment
+	up via yylval and the newlines in the grammar.
+
+2018-09-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y: Undo change of 2016-11-28 to make switch
+	head a separate production, in preparation for revamping
+	comment handling.
 
 2018-09-21         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1755,6 +1952,10 @@
 	Unrelated:
 
 	* dfa.c: Sync with GNULIB. Twice in one day.
+
+	Unrelated: Start improving profiling comments for switch/case.
+
+	* awkgram.y (switch_head): New production.
 
 2016-11-21         Arnold D. Robbins     <arnold@skeeve.com>
 

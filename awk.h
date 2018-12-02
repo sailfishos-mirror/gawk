@@ -295,6 +295,12 @@ typedef union bucket_item {
 	} hi;
 } BUCKET;
 
+enum commenttype {
+	EOL_COMMENT = 1,
+	BLOCK_COMMENT,
+	FOR_COMMENT	// special case
+};
+
 /* string hash table */
 #define ahnext		hs.next
 #define	ahname_str	hs.str	/* private memory */
@@ -338,6 +344,7 @@ typedef struct exp_node {
 				struct exp_node *extra;
 				void (*aptr)(void);
 				long xl;
+				void *cmnt;	// used by pretty printer
 			} x;
 			char *name;
 			size_t reserved;
@@ -366,6 +373,7 @@ typedef struct exp_node {
 			wchar_t *wsp;
 			size_t wslen;
 			struct exp_node *typre;
+			enum commenttype comtype;
 		} val;
 	} sub;
 	NODETYPE type;
@@ -563,9 +571,7 @@ typedef struct exp_node {
 #define alevel     sub.nodep.x.xl
 
 /* Op_comment	*/
-#define comment_type	sub.val.idx
-#define EOL_COMMENT 1
-#define FULL_COMMENT 2
+#define comment_type	sub.val.comtype
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
@@ -762,6 +768,7 @@ typedef struct exp_instruction {
 		awk_ext_func_t *exf;
 	} x;
 
+	struct exp_instruction *comment;
 	short source_line;
 	short pool_size;	// memory management in symbol.c
 	OPCODE opcode;
@@ -1007,6 +1014,7 @@ typedef struct srcfile {
 	char *lexeme;
 	char *lexptr_begin;
 	int lasttok;
+	INSTRUCTION *comment;	/* comment on @load line */
 } SRCFILE;
 
 // structure for INSTRUCTION pool, needed mainly for debugger
