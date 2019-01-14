@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2018 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2019 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -4048,11 +4048,13 @@ do_intdiv(int nargs)
 	lhs = assoc_lookup(result, sub);
 	unref(*lhs);
 	*lhs = make_number((AWKNUM) quotient);
+	unref(sub);
 
 	sub = make_string("remainder", 9);
 	lhs = assoc_lookup(result, sub);
 	unref(*lhs);
 	*lhs = make_number((AWKNUM) remainder);
+	unref(sub);
 
 	DEREF(denominator);
 	DEREF(numerator);
@@ -4090,6 +4092,9 @@ do_typeof(int nargs)
 			NODE **lhs = assoc_lookup(dbg, sub);
 			unref(*lhs);
 			*lhs = make_string(arg->array_funcs->name, strlen(arg->array_funcs->name));
+			if (dbg->astore != NULL)
+				(*dbg->astore)(dbg, sub);
+			unref(sub);
 		}
 		break;
 	case Node_val:
@@ -4125,6 +4130,9 @@ do_typeof(int nargs)
 			NODE **lhs = assoc_lookup(dbg, sub);
 			unref(*lhs);
 			*lhs = make_string(s, strlen(s));
+			if (dbg->astore != NULL)
+				(*dbg->astore)(dbg, sub);
+			unref(sub);
 		}
 		break;
 	case Node_var_new:
