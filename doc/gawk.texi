@@ -9705,7 +9705,7 @@ printf "%4.3f", 1950
 @end example
 
 @noindent
-prints @samp{1950.000}, with a total of four significant figures, three of
+prints @samp{1950.000}, with a minimum of four significant figures, three of
 which follow the decimal point.
 (The @samp{4.3} represents two modifiers,
 discussed in the next @value{SUBSECTION}.)
@@ -31130,6 +31130,12 @@ items on the list.
 Evaluate @var{awk statements} in the context of the running program.
 You can do anything that an @command{awk} program would do: assign
 values to variables, call functions, and so on.
+
+@quotation NOTE
+Do to implementation constraintss, using @code{eval} to call a
+user-defined function that returns a value does not work, generating
+an error message.  We hope to one day remove this constraint.
+@end quotation
 
 @item @code{eval} @var{param}, @dots{}
 @itemx @var{awk statements}
