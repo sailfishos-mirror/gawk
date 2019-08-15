@@ -1,3 +1,25 @@
+2019-08-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Revert a6df7afc605079df7d85318846a522ef64aaa44d, change of
+	2016-05-03, which used realloc to shrink the buffer, in an
+	attempt to save memory.  In actuality, it could cause increased
+	memory usage, even though there was no memory leak. See
+	https://lists.gnu.org/archive/html/bug-gawk/2019-08/msg00003.html
+	and the rest of thread for more detail.
+
+	* builtin.c (format_tree): Don't use realloc, just call
+	make_str_node with the original buffer. Remove `olen_final'
+	variable and its use.
+
+2019-08-15         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	Reduce memory usage by only compiling the IGNORECASE version of
+	regexp when it's actually needed.
+
+	* awkgram.y (make_regnode): Only compile the regular version.
+	* re.c (re_cache_get): New function.
+	(re_update): Use it as appropriate.
+
 2019-07-23         Koichi Murase         <myoga.murase@gmail.com>
 
 	* builtin.c (do_xor): Remove unneeded local variable `i'. Simplify
