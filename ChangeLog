@@ -1,3 +1,28 @@
+2019-09-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile.c (pp_list, pp_concat): Fix use-after-free errors
+	in both routines. Thanks to valgrind and Andy's MEMDEBUG code.
+
+2019-09-01         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* awk.h (block_header): Add cnt field even when MEMDEBUG is not
+	defined, and add a name field.
+	* node.c (nextfree): Initialize new name field.
+	(more_blocks): Bump nextfree[id].cnt by BLOCKCHUNK.
+	* builtin.c (do_typeof): When the 1st argument is PROCINFO and the
+	2nd arg is provided, return new "count_<blah>" fields containing
+	the memory allocation accounts of the various block types.
+
+2019-08-30         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* configure.ac (.developing): Add -DMEMDEBUG to CFLAGS.
+	* awk.h (block_header): If MEMDEBUG is defined, add cnt field
+	to track the number of allocations.
+	(getblock, freeblock): When MEMDEBUG is defined, replace these
+	macros with calls to new functions r_getblock and r_freeblock.
+	* node.c (r_getblock, r_freeblock): New functions that simply
+	use malloc and free when MEMDEBUG is defined.
+
 2019-08-30         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
 	* interpret.h (r_interpret): For Op_match_rec, unref if a
