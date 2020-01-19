@@ -288,6 +288,11 @@ uninitialized_scalar:
 				}
 				if (r->type == Node_var)
 					r = r->var_value;
+				else if (r->type == Node_var_new) {
+					// variable may exist but have never been set.
+					r->var_value = dupnode(Nnull_string);
+					r = r->var_value;
+				}
 			}
 
 			if (r->type == Node_val)
@@ -741,7 +746,10 @@ mod:
 
 			if (t1 != *lhs) {
 				unref(*lhs);
-				*lhs = dupnode(t1);
+				if (t1->valref == 1)
+					*lhs = t1;
+				else
+					*lhs = dupnode(t1);
 			}
 
 			if (t1 != t2 && t1->valref == 1 && (t1->flags & (MALLOC|MPFN|MPZN)) == MALLOC) {

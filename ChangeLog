@@ -1,3 +1,46 @@
+2020-01-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile.c (pp_top): New macro.
+	(pprint): Be smarter for print[f] with redirection that was
+	parenthesized, to not print `printf(("hello\n")) > "..."'.
+
+	Unrelated:
+	* compile, config.guess, config.rpath, config.sub, depcomp: Updated
+	from GNULIB.
+
+2020-01-14         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* cint_array.c (cint_array_init): Fix off-by-one error in array 
+	bounds overflow check for an NHAT value set in the environment.
+	Thanks to Michael Builov <mbuilov@gmail.com> for the report.
+
+2020-01-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix a number of subtle memory leaks. Thanks to the
+	combination of MEMDEBUG and valgrind for finding them.
+
+	* builtin.c (do_print): Unref tmp if force_string_ofmt
+	returned something different.
+	(call_sub, call_match, call_split_func): Free any
+	created regexp.
+	* debug.c (do_eval): Free the node holding the @eval function
+	when done with it.
+	* field.c (init_fields): Create fields_arr[0] and Nnull_field
+	in a rational fashion.
+	* interpret.h (Op_assign_concat): Handle newly created node
+	better.
+
+	Unrelated:
+
+	* interpret.h (Op_subscript): When retrieving from SYMTAB, check
+	for Node_var_new; variables can exist but have not been assigned
+	a value. Thanks to Denis Shirokov <cosmogen@gmail.com> for the report.
+
+	Unrelated:
+
+	* builtin.c (do_typeof): Handle Node_array_ref also. Thanks to
+	Denis Shirokov <cosmogen@gmail.com> for the report.
+
 2019-12-22         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* config.guess: Updated from GNULIB.
