@@ -36,10 +36,10 @@ char envsep = ':';
 
 /* gawk_name --- pull out the "gawk" part from how the OS called us */
 
-char *
+const char *
 gawk_name(const char *filespec)
 {
-	char *p;
+	const char *p;
 
 	/* "path/name" -> "name" */
 	p = strrchr(filespec, '/');

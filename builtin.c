@@ -4287,6 +4287,7 @@ char *
 format_nan_inf(NODE *n, char format)
 {
 	static char buf[100];
+	double val = n->numbr;
 
 #ifdef HAVE_MPFR
 	if (is_mpg_integer(n))
@@ -4306,7 +4307,6 @@ format_nan_inf(NODE *n, char format)
 	/* else
 		fallthrough */
 #endif
-	double val = n->numbr;
 
 	if (isnan(val)) {
 		strcpy(buf, signbit(val) != 0 ? "-nan" : "+nan");

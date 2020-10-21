@@ -217,7 +217,7 @@
 #define at_eof(iop)     (((iop)->flag & IOP_AT_EOF) != 0)
 #define has_no_data(iop)        ((iop)->dataend == NULL)
 #define no_data_left(iop)	((iop)->off >= (iop)->dataend)
-#define buffer_has_all_data(iop) ((iop)->dataend - (iop)->off == (iop)->public.sbuf.st_size)
+#define buffer_has_all_data(iop) ((iop)->dataend - (iop)->off == (iop)->public_.sbuf.st_size)
 
 /*
  * The key point to the design is to split out the code that searches through
@@ -310,7 +310,7 @@ static bool inetfile(const char *str, size_t len, struct inet_socket_info *isn);
 
 static NODE *in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx);
 static long get_read_timeout(IOBUF *iop);
-static ssize_t read_with_timeout(int fd, char *buf, size_t size);
+static ssize_t read_with_timeout(int fd, void *buf, size_t size);
 
 static bool read_can_timeout = false;
 static long read_timeout;
@@ -415,7 +415,7 @@ after_beginfile(IOBUF **curfile)
 		int errcode;
 		bool valid;
 
-		fname = iop->public.name;
+		fname = iop->public_.name;
 		errcode = iop->errcode;
 		valid = iop->valid;
 		errno = 0;
@@ -461,7 +461,7 @@ nextfile(IOBUF **curfile, bool skipping)
 
 	if (iop != NULL) {
 		if (at_eof(iop)) {
-			assert(iop->public.fd != INVALID_HANDLE);
+			assert(iop->public_.fd != INVALID_HANDLE);
 			(void) iop_close(iop);
 			*curfile = NULL;
 			return 1;	/* run endfile block */
@@ -510,7 +510,7 @@ nextfile(IOBUF **curfile, bool skipping)
 				update_ERRNO_int(errno);
 			iop = iop_alloc(fd, fname, errcode);
 			*curfile = iop_finish(iop);
-			if (iop->public.fd == INVALID_HANDLE)
+			if (iop->public_.fd == INVALID_HANDLE)
 				iop->errcode = errcode;
 			else if (iop->valid)
 				iop->errcode = 0;
@@ -537,7 +537,7 @@ nextfile(IOBUF **curfile, bool skipping)
 		iop = iop_alloc(fileno(stdin), fname, 0);
 		*curfile = iop_finish(iop);
 
-		if (iop->public.fd == INVALID_HANDLE) {
+		if (iop->public_.fd == INVALID_HANDLE) {
 			errcode = errno;
 			errno = 0;
 			update_ERRNO_int(errno);
@@ -659,21 +659,21 @@ iop_close(IOBUF *iop)
 	 * So we remap the standard file to /dev/null.
 	 * Thanks to Jim Meyering for the suggestion.
 	 */
-	if (iop->public.close_func != NULL)
-		iop->public.close_func(&iop->public);
+	if (iop->public_.close_func != NULL)
+		iop->public_.close_func(&iop->public_);
 
-	if (iop->public.fd != INVALID_HANDLE) {
-		if (iop->public.fd == fileno(stdin)
-		    || iop->public.fd == fileno(stdout)
-		    || iop->public.fd == fileno(stderr))
-			ret = remap_std_file(iop->public.fd);
+	if (iop->public_.fd != INVALID_HANDLE) {
+		if (iop->public_.fd == fileno(stdin)
+		    || iop->public_.fd == fileno(stdout)
+		    || iop->public_.fd == fileno(stderr))
+			ret = remap_std_file(iop->public_.fd);
 		else
-			ret = closemaybesocket(iop->public.fd);
+			ret = closemaybesocket(iop->public_.fd);
 	}
 
 	if (ret == -1)
-		warning(_("close of fd %d (`%s') failed: %s"), iop->public.fd,
-				iop->public.name, strerror(errno));
+		warning(_("close of fd %d (`%s') failed: %s"), iop->public_.fd,
+				iop->public_.name, strerror(errno));
 	/*
 	 * Be careful -- $0 may still reference the buffer even though
 	 * an explicit close is being done; in the future, maybe we
@@ -735,12 +735,12 @@ redflags2str(int flags)
 
 static void
 check_duplicated_redirections(const char *name, size_t len,
-		redirect_flags_t oldflags, redirect_flags_t newflags)
+		redirect_flags_t oflags, redirect_flags_t nflags)
 {
 	static struct mixture {
-		redirect_flags_t common;
-		redirect_flags_t mode;
-		redirect_flags_t other_mode;
+		int common;
+		int mode;
+		int other_mode;
 		const char *message;
 	} mixtures[] = {
 		{ RED_FILE, RED_READ, RED_WRITE,
@@ -767,6 +767,9 @@ check_duplicated_redirections(const char *name, size_t len,
 			gettext_noop("`%.*s' used for output pipe and two-way pipe") },
 	};
 	int i = 0, j = sizeof(mixtures) / sizeof(mixtures[0]);
+
+	int oldflags = oflags;
+	int newflags = nflags;
 
 	oldflags &= ~(RED_NOBUF|RED_EOF|RED_PTY);
 	newflags &= ~(RED_NOBUF|RED_EOF|RED_PTY);
@@ -798,8 +801,8 @@ redirect_string(const char *str, size_t explen, bool not_string,
 		int redirtype, int *errflg, int extfd, bool failure_fatal)
 {
 	struct redirect *rp;
-	redirect_flags_t tflag = RED_NONE;
-	redirect_flags_t outflag = RED_NONE;
+	int tflag = RED_NONE;
+	int outflag = RED_NONE;
 	const char *direction = "to";
 	const char *mode;
 	int fd;
@@ -896,7 +899,8 @@ redirect_string(const char *str, size_t explen, bool not_string,
 		if (strlen(rp->value) == explen
 		    && memcmp(rp->value, str, explen) == 0) {
 			if (do_lint) {
-				check_duplicated_redirections(rp->value, explen, rp->flag, tflag);
+				check_duplicated_redirections(rp->value, explen,
+						(redirect_flags_t) rp->flag, (redirect_flags_t) tflag);
 			}
 
 			if (((rp->flag & ~(RED_NOBUF|RED_EOF|RED_PTY)) == tflag
@@ -920,7 +924,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 		newstr[explen] = '\0';
 		str = newstr;
 		rp->value = newstr;
-		rp->flag = tflag;
+		rp->flag =  (redirect_flags_t) tflag;
 		init_output_wrapper(& rp->output);
 		rp->output.name = str;
 		rp->iop = NULL;
@@ -1336,7 +1340,7 @@ close_rp(struct redirect *rp, two_way_close_type how)
 			if ((rp->flag & RED_SOCKET) != 0 && rp->iop != NULL) {
 #ifdef HAVE_SOCKETS
 				if ((rp->flag & RED_TCP) != 0)
-					(void) shutdown(rp->iop->public.fd, SHUT_RD);
+					(void) shutdown(rp->iop->public_.fd, SHUT_RD);
 #endif /* HAVE_SOCKETS */
 				(void) iop_close(rp->iop);
 			} else
@@ -2810,7 +2814,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 		if (! do_traditional && rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		(void) pclose(current);
-		rp->iop->public.fd = INVALID_HANDLE;
+		rp->iop->public_.fd = INVALID_HANDLE;
 		iop_close(rp->iop);
 		rp->iop = NULL;
 		current = NULL;
@@ -2824,10 +2828,10 @@ gawk_popen(const char *cmd, struct redirect *rp)
 static int
 gawk_pclose(struct redirect *rp)
 {
-	int rval, aval, fd = rp->iop->public.fd;
+	int rval, aval, fd = rp->iop->public_.fd;
 
 	if (rp->iop != NULL) {
-		rp->iop->public.fd = dup(fd);	  /* kludge to allow close() + pclose() */
+		rp->iop->public_.fd = dup(fd);	  /* kludge to allow close() + pclose() */
 		rval = iop_close(rp->iop);
 	}
 	rp->iop = NULL;
@@ -3216,12 +3220,12 @@ find_input_parser(IOBUF *iop)
 	awk_input_parser_t *ip, *ip2;
 
 	/* if already associated with an input parser, bail out early */
-	if (iop->public.get_record != NULL)
+	if (iop->public_.get_record != NULL)
 		return;
 
 	ip = ip2 = NULL;
 	for (ip2 = ip_head; ip2 != NULL; ip2 = ip2->next) {
-		if (ip2->can_take_file(& iop->public)) {
+		if (ip2->can_take_file(& iop->public_)) {
 			if (ip == NULL)
 				ip = ip2;	/* found first one */
 			else
@@ -3231,9 +3235,9 @@ find_input_parser(IOBUF *iop)
 	}
 
 	if (ip != NULL) {
-		if (! ip->take_control_of(& iop->public))
+		if (! ip->take_control_of(& iop->public_))
 			warning(_("input parser `%s' failed to open `%s'"),
-					ip->name, iop->public.name);
+					ip->name, iop->public_.name);
 		else
 			iop->valid = true;
 	}
@@ -3327,7 +3331,7 @@ find_two_way_processor(const char *name, struct redirect *rp)
 	awk_two_way_processor_t *tw, *tw2;
 
 	/* if already associated with i/o, bail out early */
-	if (   (rp->iop != NULL && rp->iop->public.fd != INVALID_HANDLE)
+	if (   (rp->iop != NULL && rp->iop->public_.fd != INVALID_HANDLE)
 	    || rp->output.fp != NULL)
 		return false;
 
@@ -3345,7 +3349,7 @@ find_two_way_processor(const char *name, struct redirect *rp)
 	if (tw != NULL) {
 		if (rp->iop == NULL)
 			rp->iop = iop_alloc(INVALID_HANDLE, name, 0);
-		if (! tw->take_control_of(name, & rp->iop->public, & rp->output)) {
+		if (! tw->take_control_of(name, & rp->iop->public_, & rp->output)) {
 			warning(_("two way processor `%s' failed to open `%s'"),
 					tw->name, name);
 			return false;
@@ -3384,12 +3388,12 @@ find_two_way_processor(const char *name, struct redirect *rp)
  * iop->valid should be set to false in this case.
  *
  * Otherwise, after the second stage, iop->errcode should be
- * zero, iop->valid should be true, and iop->public.fd should
+ * zero, iop->valid should be true, and iop->public_.fd should
  * not be INVALID_HANDLE.
  *
  * The third stage is to set up the rest of the IOBUF for
  * use by get_a_record(). In this case, iop->valid must
- * be true already, and iop->public.fd cannot be INVALID_HANDLE.
+ * be true already, and iop->public_.fd cannot be INVALID_HANDLE.
  *
  * Checking for input parsers for command line files is delayed
  * to after_beginfile() so that the BEGINFILE rule has an
@@ -3407,18 +3411,18 @@ iop_alloc(int fd, const char *name, int errno_val)
 
 	ezalloc(iop, IOBUF *, sizeof(IOBUF), "iop_alloc");
 
-	iop->public.fd = fd;
-	iop->public.name = name;
-	iop->public.read_func = ( ssize_t(*)() ) read;
+	iop->public_.fd = fd;
+	iop->public_.name = name;
+	iop->public_.read_func = ( ssize_t(*)(int, void *, size_t) ) read;
 	iop->valid = false;
 	iop->errcode = errno_val;
 
 	if (fd != INVALID_HANDLE)
-		fstat(fd, & iop->public.sbuf);
+		fstat(fd, & iop->public_.sbuf);
 #if defined(__EMX__) || defined(__MINGW32__)
 	else if (errno_val == EISDIR) {
-		iop->public.sbuf.st_mode = (_S_IFDIR | _S_IRWXU);
-		iop->public.fd = FAKE_FD_VALUE;
+		iop->public_.sbuf.st_mode = (_S_IFDIR | _S_IRWXU);
+		iop->public_.fd = FAKE_FD_VALUE;
 	}
 #endif
 
@@ -3432,8 +3436,8 @@ iop_finish(IOBUF *iop)
 {
 	bool isdir = false;
 
-	if (iop->public.fd != INVALID_HANDLE) {
-		if (os_isreadable(& iop->public, & isdir))
+	if (iop->public_.fd != INVALID_HANDLE) {
+		if (os_isreadable(& iop->public_, & isdir))
 			iop->valid = true;
 		else {
 			if (isdir)
@@ -3450,10 +3454,10 @@ iop_finish(IOBUF *iop)
 				 * The fcntl call works for Windows, too.
 				 */
 #if defined(F_GETFL)
-				if (fcntl(iop->public.fd, F_GETFL) >= 0)
+				if (fcntl(iop->public_.fd, F_GETFL) >= 0)
 #endif
-					(void) close(iop->public.fd);
-				iop->public.fd = INVALID_HANDLE;
+					(void) close(iop->public_.fd);
+				iop->public_.fd = INVALID_HANDLE;
 			}
 			/*
 			 * Don't close directories: after_beginfile(),
@@ -3462,15 +3466,15 @@ iop_finish(IOBUF *iop)
 		}
 	}
 
-	if (! iop->valid || iop->public.fd == INVALID_HANDLE)
+	if (! iop->valid || iop->public_.fd == INVALID_HANDLE)
 		return iop;
 
-	if (os_isatty(iop->public.fd))
+	if (os_isatty(iop->public_.fd))
 		iop->flag |= IOP_IS_TTY;
 
-	iop->readsize = iop->size = optimal_bufsize(iop->public.fd, & iop->public.sbuf);
-	if (do_lint && S_ISREG(iop->public.sbuf.st_mode) && iop->public.sbuf.st_size == 0)
-		lintwarn(_("data file `%s' is empty"), iop->public.name);
+	iop->readsize = iop->size = optimal_bufsize(iop->public_.fd, & iop->public_.sbuf);
+	if (do_lint && S_ISREG(iop->public_.sbuf.st_mode) && iop->public_.sbuf.st_size == 0)
+		lintwarn(_("data file `%s' is empty"), iop->public_.name);
 	iop->errcode = errno = 0;
 	iop->count = iop->scanoff = 0;
 	emalloc(iop->buf, char *, iop->size += 1, "iop_finish");
@@ -3851,7 +3855,7 @@ find_longest_terminator:
 static inline int
 retryable(IOBUF *iop)
 {
-	return PROCINFO_node && in_PROCINFO(iop->public.name, "RETRY", NULL);
+	return PROCINFO_node && in_PROCINFO(iop->public_.name, "RETRY", NULL);
 }
 
 /* errno_io_retry --- Does the I/O error indicate that the operation should be retried later? */
@@ -3907,10 +3911,10 @@ get_a_record(char **out,        /* pointer to pointer to data */
 	if (read_can_timeout)
 		read_timeout = get_read_timeout(iop);
 
-	if (iop->public.get_record != NULL) {
+	if (iop->public_.get_record != NULL) {
 		char *rt_start;
 		size_t rt_len;
-		int rc = iop->public.get_record(out, &iop->public, errcode,
+		int rc = iop->public_.get_record(out, &iop->public_, errcode,
 						&rt_start, &rt_len,
 						field_width);
 		if (rc == EOF)
@@ -3926,7 +3930,7 @@ get_a_record(char **out,        /* pointer to pointer to data */
 
         /* fill initial buffer */
 	if (has_no_data(iop) || no_data_left(iop)) {
-		iop->count = iop->public.read_func(iop->public.fd, iop->buf, iop->readsize);
+		iop->count = iop->public_.read_func(iop->public_.fd, iop->buf, iop->readsize);
 		if (iop->count == 0) {
 			iop->flag |= IOP_AT_EOF;
 			return EOF;
@@ -4005,7 +4009,7 @@ get_a_record(char **out,        /* pointer to pointer to data */
 		amt_to_read = MIN(amt_to_read, SSIZE_MAX);
 #endif
 
-		iop->count = iop->public.read_func(iop->public.fd, iop->dataend, amt_to_read);
+		iop->count = iop->public_.read_func(iop->public_.fd, iop->dataend, amt_to_read);
 		if (iop->count == -1) {
 			*errcode = errno;
 			if (errno_io_retry() && retryable(iop))
@@ -4362,7 +4366,7 @@ get_read_timeout(IOBUF *iop)
 	long tmout = 0;
 
 	if (PROCINFO_node != NULL) {
-		const char *name = iop->public.name;
+		const char *name = iop->public_.name;
 		NODE *val = NULL;
 		static NODE *full_idx = NULL;
 		static const char *last_name = NULL;
@@ -4387,8 +4391,8 @@ get_read_timeout(IOBUF *iop)
 		tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
 
 	/* overwrite read routine only if an extension has not done so */
-	if ((iop->public.read_func == ( ssize_t(*)() ) read) && tmout > 0)
-		iop->public.read_func = read_with_timeout;
+	if ((iop->public_.read_func == ( ssize_t(*)(int, void *, size_t) ) read) && tmout > 0)
+		iop->public_.read_func = read_with_timeout;
 
 	return tmout;
 }
@@ -4399,7 +4403,7 @@ get_read_timeout(IOBUF *iop)
  */
 
 static ssize_t
-read_with_timeout(int fd, char *buf, size_t size)
+read_with_timeout(int fd, void *buf, size_t size)
 {
 #if ! defined(VMS)
 	fd_set readfds;

@@ -261,8 +261,8 @@ static const char *const nodetypes[] = {
  */
 
 static struct optypetab {
-	char *desc;
-	char *operator;
+	const char *desc;
+	const char *oper;
 } optypes[] = {
 	{ "Op_illegal", NULL },
 	{ "Op_times", " * " },
@@ -420,8 +420,8 @@ const char *
 op2str(OPCODE op)
 {
 	if (op >= Op_illegal && op < Op_final) {
-		if (optypes[(int) op].operator != NULL)
-			return optypes[(int) op].operator;
+		if (optypes[(int) op].oper != NULL)
+			return optypes[(int) op].oper;
 		else
 			fatal(_("opcode %s not an operator or keyword"),
 					optypes[(int) op].desc);
@@ -1009,7 +1009,7 @@ set_TEXTDOMAIN()
 void
 update_ERRNO_int(int errcode)
 {
-	char *cp;
+	const char *cp;
 
 	update_PROCINFO_num("errno", errcode);
 	if (errcode) {

@@ -111,7 +111,8 @@ null_array(NODE *symbol)
 	symbol->type = Node_var_array;
 	symbol->array_funcs = & null_array_func;
 	symbol->buckets = NULL;
-	symbol->table_size = symbol->array_size = 0;
+	symbol->table_size = 0;
+	symbol->array_size = 0;
 	symbol->array_capacity = 0;
 	symbol->flags = 0;
 
@@ -1303,7 +1304,7 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 	static const struct qsort_funcs {
 		const char *name;
 		qsort_compfunc comp_func;
-		assoc_kind_t kind;
+		int kind;
 	} sort_funcs[] = {
 { "@ind_str_asc",	sort_up_index_string,	AINDEX|AISTR|AASC },
 { "@ind_num_asc",	sort_up_index_number,	AINDEX|AINUM|AASC },
@@ -1325,13 +1326,12 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 
 	NODE **list;
 	NODE akind;
-	unsigned long num_elems, j;
-	int elem_size, qi;
+	int elem_size, qi, j, num_elems;
 	qsort_compfunc cmp_func = 0;
 	INSTRUCTION *code = NULL;
 	extern int currule;
 	int save_rule = 0;
-	assoc_kind_t assoc_kind = ANONE;
+	int assoc_kind = ANONE;
 
 	elem_size = 1;
 

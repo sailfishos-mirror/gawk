@@ -2219,10 +2219,10 @@ comma
 %%
 
 struct token {
-	const char *operator;	/* text to match */
-	OPCODE value;			/*  type */
-	int class;				/* lexical class */
-	unsigned flags;			/* # of args. allowed and compatability */
+	const char *oper;	/* text to match */
+	OPCODE value;		/*  type */
+	int lex_class;		/* lexical class */
+	unsigned flags;		/* # of args. allowed and compatability */
 #	define	ARGS	0xFF	/* 0, 1, 2, 3 args allowed (any combination */
 #	define	A(n)	(1<<(n))
 #	define	VERSION_MASK	0xFF00	/* old awk is zero */
@@ -2248,7 +2248,7 @@ tokcompare(const void *l, const void *r)
 	lhs = (struct token *) l;
 	rhs = (struct token *) r;
 
-	return strcmp(lhs->operator, rhs->operator);
+	return strcmp(lhs->oper, rhs->oper);
 }
 #endif
 
@@ -2371,10 +2371,10 @@ getfname(NODE *(*fptr)(int), bool prepend_awk)
 	for (i = 0; i < j; i++) {
 		if (tokentab[i].ptr == fptr || tokentab[i].ptr2 == fptr) {
 			if (prepend_awk && (tokentab[i].flags & GAWKX) != 0) {
-				sprintf(buf, "awk::%s", tokentab[i].operator);
+				sprintf(buf, "awk::%s", tokentab[i].oper);
 				return buf;
 			}
-			return tokentab[i].operator;
+			return tokentab[i].oper;
 		}
 	}
 
@@ -2948,7 +2948,7 @@ include_source(INSTRUCTION *file, void **srcfile_p)
 	sourcefile->lexptr_begin = lexptr_begin;
 	sourcefile->lexeme = lexeme;
 	sourcefile->lasttok = lasttok;
-	sourcefile->namespace = current_namespace;
+	sourcefile->name_space = current_namespace;
 
 	/* included file becomes the current source */
 	sourcefile = s;
@@ -3064,7 +3064,7 @@ next_sourcefile()
 		lexeme = sourcefile->lexeme;
 		sourceline = sourcefile->srclines;
 		source = sourcefile->src;
-		set_current_namespace(sourcefile->namespace);
+		set_current_namespace(sourcefile->name_space);
 	} else {
 		lexptr = NULL;
 		sourceline = 0;
@@ -3090,7 +3090,7 @@ get_src_buf()
 	 * avoids problems with some ancient systems where
 	 * the types of arguments to read() aren't up to date.
 	 */
-	static ssize_t (*readfunc)() = 0;
+	static ssize_t (*readfunc)(int, void *, size_t) = 0;
 
 	if (readfunc == NULL) {
 		char *cp = getenv("AWKREADFUNC");
@@ -3101,7 +3101,7 @@ get_src_buf()
 			 * cast is to remove warnings on systems with
 			 * different return types for read.
 			 */
-			readfunc = ( ssize_t(*)() ) read;
+			readfunc = ( ssize_t(*)(int, void *, size_t) ) read;
 		else
 			readfunc = read_one_line;
 	}
@@ -4350,9 +4350,9 @@ retry:
 	/* See if it is a special token. */
 	if ((mid = check_qualified_special(tokstart)) >= 0) {
 		static int warntab[sizeof(tokentab) / sizeof(tokentab[0])];
-		int class = tokentab[mid].class;
+		int lex_class = tokentab[mid].lex_class;
 
-		switch (class) {
+		switch (lex_class) {
 		case LEX_EVAL:
 		case LEX_INCLUDE:
 		case LEX_LOAD:
@@ -4393,12 +4393,12 @@ retry:
 		if (do_lint) {
 			if (do_lint_extensions && (tokentab[mid].flags & GAWKX) != 0 && (warntab[mid] & GAWKX) == 0) {
 				lintwarn(_("`%s' is a gawk extension"),
-					tokentab[mid].operator);
+					tokentab[mid].oper);
 				warntab[mid] |= GAWKX;
 			}
 			if ((tokentab[mid].flags & NOT_POSIX) != 0 && (warntab[mid] & NOT_POSIX) == 0) {
 				lintwarn(_("POSIX does not allow `%s'"),
-					tokentab[mid].operator);
+					tokentab[mid].oper);
 				warntab[mid] |= NOT_POSIX;
 			}
 		}
@@ -4406,7 +4406,7 @@ retry:
 				 && (warntab[mid] & NOT_OLD) == 0
 		) {
 			lintwarn(_("`%s' is not supported in old awk"),
-					tokentab[mid].operator);
+					tokentab[mid].oper);
 			warntab[mid] |= NOT_OLD;
 		}
 
@@ -4415,7 +4415,7 @@ retry:
 		if ((tokentab[mid].flags & CONTINUE) != 0)
 			continue_allowed++;
 
-		switch (class) {
+		switch (lex_class) {
 		case LEX_NAMESPACE:
 		case LEX_INCLUDE:
 		case LEX_LOAD:
@@ -4444,7 +4444,7 @@ retry:
 		case LEX_DO:
 		case LEX_SWITCH:
 			if (! do_pretty_print)
-				return lasttok = class;
+				return lasttok = lex_class;
 			/* fall through */
 		case LEX_CASE:
 			yylval = bcalloc(tokentab[mid].value, 2, sourceline);
@@ -4474,11 +4474,11 @@ retry:
 		default:
 make_instruction:
 			yylval = GET_INSTRUCTION(tokentab[mid].value);
-			if (class == LEX_BUILTIN || class == LEX_LENGTH)
+			if (lex_class == LEX_BUILTIN || lex_class == LEX_LENGTH)
 				yylval->builtin_idx = mid;
 			break;
 		}
-		return lasttok = class;
+		return lasttok = lex_class;
 	}
 out:
 	if (want_param_names == FUNC_HEADER)
@@ -4573,24 +4573,24 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 	args_allowed = tokentab[idx].flags & ARGS;
 	if (args_allowed && (args_allowed & A(nexp)) == 0) {
 		yyerror(_("%d is invalid as number of arguments for %s"),
-				nexp, tokentab[idx].operator);
+				nexp, tokentab[idx].oper);
 		return NULL;
 	}
 
 	/* special processing for sub, gsub and gensub */
 
 	if (tokentab[idx].value == Op_sub_builtin) {
-		const char *operator = tokentab[idx].operator;
+		const char *oper= tokentab[idx].oper;
 
 		r->sub_flags = 0;
 
 		arg = subn->nexti;		/* first arg list */
 		(void) mk_rexp(arg);
 
-		if (strcmp(operator, "gensub") != 0) {
+		if (strcmp(oper, "gensub") != 0) {
 			/* sub and gsub */
 
-			if (strcmp(operator, "gsub") == 0)
+			if (strcmp(oper, "gsub") == 0)
 				r->sub_flags |= GSUB;
 
 			arg = arg->lasti->nexti;	/* 2nd arg list */
@@ -4608,12 +4608,12 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 			if (ip->opcode == Op_push_i) {
 				if (do_lint)
 					lintwarn(_("%s: string literal as last argument of substitute has no effect"),
-						operator);
+						oper);
 				r->sub_flags |=	LITERAL;
 			} else {
 				if (make_assignable(ip) == NULL)
 					yyerror(_("%s third parameter is not a changeable object"),
-						operator);
+						oper);
 				else
 					ip->do_reference = true;
 			}
@@ -5261,7 +5261,7 @@ variable(int location, char *name, NODETYPE type)
 /* make_regnode --- make a regular expression node */
 
 NODE *
-make_regnode(int type, NODE *exp)
+make_regnode(NODETYPE type, NODE *exp)
 {
 	NODE *n;
 
@@ -6386,9 +6386,9 @@ check_special(const char *name)
 	high = (sizeof(tokentab) / sizeof(tokentab[0])) - 1;
 	while (low <= high) {
 		mid = (low + high) / 2;
-		i = *name - tokentab[mid].operator[0];
+		i = *name - tokentab[mid].oper[0];
 		if (i == 0)
-			i = strcmp(name, tokentab[mid].operator);
+			i = strcmp(name, tokentab[mid].oper);
 
 		if (i < 0)		/* token < mid */
 			high = mid - 1;
@@ -6463,7 +6463,7 @@ lookup_builtin(const char *name)
 	if (mid == -1)
 		return NULL;
 
-	switch (tokentab[mid].class) {
+	switch (tokentab[mid].lex_class) {
 	case LEX_BUILTIN:
 	case LEX_LENGTH:
 		break;
@@ -6500,10 +6500,10 @@ install_builtins(void)
 
 	j = sizeof(tokentab) / sizeof(tokentab[0]);
 	for (i = 0; i < j; i++) {
-		if (   (tokentab[i].class == LEX_BUILTIN
-		        || tokentab[i].class == LEX_LENGTH)
+		if (   (tokentab[i].lex_class == LEX_BUILTIN
+		        || tokentab[i].lex_class == LEX_LENGTH)
 		    && (tokentab[i].flags & flags_that_must_be_clear) == 0) {
-			(void) install_symbol(tokentab[i].operator, Node_builtin_func);
+			(void) install_symbol(tokentab[i].oper, Node_builtin_func);
 		}
 	}
 }
@@ -6759,7 +6759,7 @@ check_qualified_special(char *token)
 			return i;
 
 		tok = & tokentab[i];
-		if ((tok->flags & GAWKX) != 0 && tok->class == LEX_BUILTIN)
+		if ((tok->flags & GAWKX) != 0 && tok->lex_class == LEX_BUILTIN)
 			return -1;
 		else
 			return i;
@@ -6787,7 +6787,7 @@ check_qualified_special(char *token)
 	if (strcmp(ns, "awk") == 0) {
 		i = check_special(subname);
 		if (i >= 0) {
-			if ((tokentab[i].flags & GAWKX) != 0 && tokentab[i].class == LEX_BUILTIN)
+			if ((tokentab[i].flags & GAWKX) != 0 && tokentab[i].lex_class == LEX_BUILTIN)
 				;	// gawk additional builtin function, is ok
 			else
 				error_ln(sourceline, _("using reserved identifier `%s' as second component of a qualified name is not allowed"), subname);

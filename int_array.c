@@ -447,7 +447,7 @@ removed:
 static NODE **
 int_copy(NODE *symbol, NODE *newsymb)
 {
-	BUCKET **old, **new, **pnew;
+	BUCKET **old, **newtab, **pnew;
 	BUCKET *chain, *newchain;
 	int j;
 	unsigned long i, cursize;
@@ -458,12 +458,12 @@ int_copy(NODE *symbol, NODE *newsymb)
 	cursize = symbol->array_size;
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *), "int_copy");
+	ezalloc(newtab, BUCKET **, cursize * sizeof(BUCKET *), "int_copy");
 
 	old = symbol->buckets;
 
 	for (i = 0; i < cursize; i++) {
-		for (chain = old[i], pnew = & new[i]; chain != NULL;
+		for (chain = old[i], pnew = & newtab[i]; chain != NULL;
 				chain = chain->ainext
 		) {
 			getbucket(newchain);
@@ -507,7 +507,7 @@ int_copy(NODE *symbol, NODE *newsymb)
 		newsymb->xarray = NULL;
 
 	newsymb->table_size = symbol->table_size;
-	newsymb->buckets = new;
+	newsymb->buckets = newtab;
 	newsymb->array_size = cursize;
 	newsymb->flags = symbol->flags;
 
@@ -803,7 +803,7 @@ int_insert(NODE *symbol, long k, uint32_t hash1)
 static void
 grow_int_table(NODE *symbol)
 {
-	BUCKET **old, **new;
+	BUCKET **old, **newtab;
 	BUCKET *chain, *next;
 	int i, j;
 	unsigned long oldsize, newsize, k;
@@ -841,10 +841,10 @@ grow_int_table(NODE *symbol)
 	}
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *), "grow_int_table");
+	ezalloc(newtab, BUCKET **, newsize * sizeof(BUCKET *), "grow_int_table");
 
 	old = symbol->buckets;
-	symbol->buckets = new;
+	symbol->buckets = newtab;
 	symbol->array_size = newsize;
 
 	/* brand new hash table */

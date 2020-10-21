@@ -126,14 +126,16 @@ typedef enum awk_bool {
  * terms of bytes. The fields[0].skip value indicates how many bytes (or
  * characters) to skip before $1, and fields[0].len is the length of $1, etc.
  */
+struct awk_field_info {
+	size_t	skip;	/* amount to skip before field starts */
+	size_t	len;	/* length of field */
+};
 
 typedef struct {
 	awk_bool_t	use_chars;	/* false ==> use bytes */
 	size_t		nf;
-	struct awk_field_info {
-		size_t	skip;	/* amount to skip before field starts */
-		size_t	len;	/* length of field */
-	} fields[1];		/* actual dimension should be nf */
+	/* actual dimension should be nf */
+	struct awk_field_info fields[1];
 } awk_fieldwidth_info_t;
 
 /*
@@ -190,7 +192,7 @@ typedef struct awk_input {
 	 * No argument prototype on read_func to allow for older systems
 	 * whose headers are not up to date.
 	 */
-	ssize_t (*read_func)();
+	ssize_t (*read_func)(int, void *, size_t);
 
 	/*
 	 * The close_func is called to allow the parser to free private data.
@@ -401,14 +403,15 @@ typedef struct awk_value {
  * one at a time, using the separate API for that purpose.
  */
 
+enum awk_element_actions {
+	AWK_ELEMENT_DEFAULT = 0,	/* set by gawk */
+	AWK_ELEMENT_DELETE = 1		/* set by extension if
+					   should be deleted */
+};
 typedef struct awk_element {
 	/* convenience linked list pointer, not used by gawk */
 	struct awk_element *next;
-	enum {
-		AWK_ELEMENT_DEFAULT = 0,	/* set by gawk */
-		AWK_ELEMENT_DELETE = 1		/* set by extension if
-						   should be deleted */
-	} flags;
+	enum awk_element_actions flags;
 	awk_value_t	index;
 	awk_value_t	value;
 } awk_element_t;

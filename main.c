@@ -96,7 +96,7 @@ char *TEXTDOMAIN;
  *	set_CONVFMT -> fmt_index -> force_string: gets NULL CONVFMT
  * Fun, fun, fun, fun.
  */
-char *CONVFMT = "%.6g";
+const char *CONVFMT = "%.6g";
 
 NODE *Nnull_string;		/* The global null string */
 
@@ -129,8 +129,9 @@ SRCFILE *srcfiles; /* source files */
 /*
  * structure to remember variable pre-assignments
  */
+enum assign_type { PRE_ASSIGN = 1, PRE_ASSIGN_FS } type;
 struct pre_assign {
-	enum assign_type { PRE_ASSIGN = 1, PRE_ASSIGN_FS } type;
+	enum assign_type type;
 	char *val;
 };
 
@@ -145,14 +146,14 @@ static void parse_args(int argc, char **argv);
 static void set_locale_stuff(void);
 static bool stopped_early = false;
 
-enum do_flag_values do_flags = 0;
+int do_flags = 0;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
 static int do_nostalgia = false;	/* provide a blast from the past */
 static int do_binary = false;		/* hands off my data! */
 static int do_version = false;		/* print version info */
 static const char *locale = "";		/* default value to setlocale */
-static char *locale_dir = LOCALEDIR;	/* default locale dir */
+static const char *locale_dir = LOCALEDIR;	/* default locale dir */
 
 int use_lc_numeric = false;	/* obey locale for decimal point */
 

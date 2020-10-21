@@ -332,6 +332,84 @@ typedef struct {
 	afunc_t store;
 } array_funcs_t;
 
+enum reflagvals {
+	CONSTANT = 1,
+	FS_DFLT  = 2,
+};
+
+enum flagvals {
+/* type = Node_val */
+	/*
+	 * STRING and NUMBER are mutually exclusive, except for the special
+	 * case of an uninitialized value, represented internally by
+	 * Nnull_string. They represent the type of a value as assigned.
+	 * Nnull_string has both STRING and NUMBER attributes, but all other
+	 * scalar values should have precisely one of these bits set.
+	 *
+	 * STRCUR and NUMCUR are not mutually exclusive. They represent that
+	 * the particular type of value is up to date.  For example,
+	 *
+	 * 	a = 5		# NUMBER | NUMCUR
+	 * 	b = a ""	# Adds STRCUR to a, since a string value
+	 * 			# is now available. But the type hasn't changed!
+	 *
+	 * 	a = "42"	# STRING | STRCUR
+	 * 	b = a + 0	# Adds NUMCUR to a, since numeric value
+	 * 			# is now available. But the type hasn't changed!
+	 *
+	 * USER_INPUT is the joker.  When STRING|USER_INPUT is set, it means
+	 * "this is string data, but the user may have really wanted it to be a
+	 * number. If we have to guess, like in a comparison, turn it into a
+	 * number if the string is indeed numeric."
+	 * For example,    gawk -v a=42 ....
+	 * Here, `a' gets STRING|STRCUR|USER_INPUT and then when used where
+	 * a number is needed, it gets turned into a NUMBER and STRING
+	 * is cleared. In that case, we leave the USER_INPUT in place, so
+	 * the combination NUMBER|USER_INPUT means it is a strnum a.k.a. a
+	 * "numeric string".
+	 *
+	 * WSTRCUR is for efficiency. If in a multibyte locale, and we
+	 * need to do something character based (substr, length, etc.)
+	 * we create the corresponding wide character string and store it,
+	 * and add WSTRCUR to the flags so that we don't have to do the
+	 * conversion more than once.
+	 *
+	 * The NUMINT flag may be used with a value of any type -- NUMBER,
+	 * STRING, or STRNUM. It indicates that the string representation
+	 * equals the result of sprintf("%ld", <numeric value>). So, for
+	 * example, NUMINT should NOT be set if it's a strnum or string value
+	 * where the string is " 1" or "01" or "+1" or "1.0" or "0.1E1". This
+	 * is a hint to indicate that an integer array optimization may be
+	 * used when this value appears as a subscript.
+	 *
+	 * We hope that the rest of the flags are self-explanatory. :-)
+	 */
+	MALLOC	= 0x0001,       /* stptr can be free'd, i.e. not a field node pointing into a shared buffer */
+	STRING	= 0x0002,       /* assigned as string */
+	STRCUR	= 0x0004,       /* string value is current */
+	NUMCUR	= 0x0008,       /* numeric value is current */
+	NUMBER	= 0x0010,       /* assigned as number */
+	USER_INPUT = 0x0020,    /* user input: if NUMERIC then
+				 * a NUMBER */
+	INTLSTR	= 0x0040,       /* use localized version */
+	NUMINT	= 0x0080,       /* numeric value is an integer */
+	INTIND	= 0x0100,	/* integral value is array index;
+				 * lazy conversion to string.
+				 */
+	WSTRCUR	= 0x0200,       /* wide str value is current */
+	MPFN	= 0x0400,       /* arbitrary-precision floating-point number */
+	MPZN	= 0x0800,       /* arbitrary-precision integer */
+	NO_EXT_SET = 0x1000,    /* extension cannot set a value for this variable */
+	NULL_FIELD = 0x2000,    /* this is the null field */
+
+/* type = Node_var_array */
+	ARRAYMAXED	= 0x4000,       /* array is at max size */
+	HALFHAT		= 0x8000,       /* half-capacity Hashed Array Tree;
+					 * See cint_array.c */
+	XARRAY		= 0x10000,
+	NUMCONSTSTR	= 0x20000,	/* have string value for numeric constant */
+	REGEX           = 0x40000,	/* this is a typed regex */
+} flags;
 /*
  * NOTE - this struct is a rather kludgey -- it is packed to minimize
  * space usage, at the expense of cleanliness.  Alter at own risk.
@@ -363,10 +441,7 @@ typedef struct exp_node {
 			size_t reserved;
 			struct exp_node *rn;
 			unsigned long cnt;
-			enum reflagvals {
-				CONSTANT = 1,
-				FS_DFLT  = 2,
-			} reflags;
+			int reflags;
 		} nodep;
 
 		struct {
@@ -390,79 +465,7 @@ typedef struct exp_node {
 		} val;
 	} sub;
 	NODETYPE type;
-	enum flagvals {
-	/* type = Node_val */
-		/*
-		 * STRING and NUMBER are mutually exclusive, except for the special
-		 * case of an uninitialized value, represented internally by
-		 * Nnull_string. They represent the type of a value as assigned.
-		 * Nnull_string has both STRING and NUMBER attributes, but all other
-		 * scalar values should have precisely one of these bits set.
-		 *
-		 * STRCUR and NUMCUR are not mutually exclusive. They represent that
-		 * the particular type of value is up to date.  For example,
-		 *
-		 * 	a = 5		# NUMBER | NUMCUR
-		 * 	b = a ""	# Adds STRCUR to a, since a string value
-		 * 			# is now available. But the type hasn't changed!
-		 *
-		 * 	a = "42"	# STRING | STRCUR
-		 * 	b = a + 0	# Adds NUMCUR to a, since numeric value
-		 * 			# is now available. But the type hasn't changed!
-		 *
-		 * USER_INPUT is the joker.  When STRING|USER_INPUT is set, it means
-		 * "this is string data, but the user may have really wanted it to be a
-		 * number. If we have to guess, like in a comparison, turn it into a
-		 * number if the string is indeed numeric."
-		 * For example,    gawk -v a=42 ....
-		 * Here, `a' gets STRING|STRCUR|USER_INPUT and then when used where
-		 * a number is needed, it gets turned into a NUMBER and STRING
-		 * is cleared. In that case, we leave the USER_INPUT in place, so
-		 * the combination NUMBER|USER_INPUT means it is a strnum a.k.a. a
-		 * "numeric string".
-		 *
-		 * WSTRCUR is for efficiency. If in a multibyte locale, and we
-		 * need to do something character based (substr, length, etc.)
-		 * we create the corresponding wide character string and store it,
-		 * and add WSTRCUR to the flags so that we don't have to do the
-		 * conversion more than once.
-		 *
-		 * The NUMINT flag may be used with a value of any type -- NUMBER,
-		 * STRING, or STRNUM. It indicates that the string representation
-		 * equals the result of sprintf("%ld", <numeric value>). So, for
-		 * example, NUMINT should NOT be set if it's a strnum or string value
-		 * where the string is " 1" or "01" or "+1" or "1.0" or "0.1E1". This
-		 * is a hint to indicate that an integer array optimization may be
-		 * used when this value appears as a subscript.
-		 *
-		 * We hope that the rest of the flags are self-explanatory. :-)
-		 */
-		MALLOC	= 0x0001,       /* stptr can be free'd, i.e. not a field node pointing into a shared buffer */
-		STRING	= 0x0002,       /* assigned as string */
-		STRCUR	= 0x0004,       /* string value is current */
-		NUMCUR	= 0x0008,       /* numeric value is current */
-		NUMBER	= 0x0010,       /* assigned as number */
-		USER_INPUT = 0x0020,    /* user input: if NUMERIC then
-					 * a NUMBER */
-		INTLSTR	= 0x0040,       /* use localized version */
-		NUMINT	= 0x0080,       /* numeric value is an integer */
-		INTIND	= 0x0100,	/* integral value is array index;
-					 * lazy conversion to string.
-					 */
-		WSTRCUR	= 0x0200,       /* wide str value is current */
-		MPFN	= 0x0400,       /* arbitrary-precision floating-point number */
-		MPZN	= 0x0800,       /* arbitrary-precision integer */
-		NO_EXT_SET = 0x1000,    /* extension cannot set a value for this variable */
-		NULL_FIELD = 0x2000,    /* this is the null field */
-
-	/* type = Node_var_array */
-		ARRAYMAXED	= 0x4000,       /* array is at max size */
-		HALFHAT		= 0x8000,       /* half-capacity Hashed Array Tree;
-						 * See cint_array.c */
-		XARRAY		= 0x10000,
-		NUMCONSTSTR	= 0x20000,	/* have string value for numeric constant */
-		REGEX           = 0x40000,	/* this is a typed regex */
-	} flags;
+	int flags;
 	long valref;
 } NODE;
 
@@ -929,8 +932,15 @@ typedef struct exp_instruction {
 /* Op_store_var */
 #define initval         x.xn
 
+enum iobuf_flags {
+	IOP_IS_TTY	= 1,
+	IOP_AT_EOF	= 2,
+	IOP_CLOSED	= 4,
+	IOP_AT_START	= 8,
+};
+
 typedef struct iobuf {
-	awk_input_buf_t public;	/* exposed to extensions */
+	awk_input_buf_t public_;	/* exposed to extensions */
 	char *buf;              /* start data buffer */
 	char *off;              /* start of current record in buffer */
 	char *dataend;          /* first byte in buffer to hold new data,
@@ -944,33 +954,31 @@ typedef struct iobuf {
 	bool valid;
 	int errcode;
 
-	enum iobuf_flags {
-		IOP_IS_TTY	= 1,
-		IOP_AT_EOF	= 2,
-		IOP_CLOSED	= 4,
-		IOP_AT_START	= 8,
-	} flag;
+	int flag;
 } IOBUF;
 
 typedef void (*Func_ptr)(void);
 
 /* structure used to dynamically maintain a linked-list of open files/pipes */
+enum redirect_flags {
+	RED_NONE	= 0,
+	RED_FILE	= 1,
+	RED_PIPE	= 2,
+	RED_READ	= 4,
+	RED_WRITE	= 8,
+	RED_APPEND	= 16,
+	RED_NOBUF	= 32,
+	RED_USED	= 64,	/* closed temporarily to reuse fd */
+	RED_EOF		= 128,
+	RED_TWOWAY	= 256,
+	RED_PTY		= 512,
+	RED_SOCKET	= 1024,
+	RED_TCP		= 2048,
+};
+typedef enum redirect_flags redirect_flags_t;
+
 struct redirect {
-	enum redirect_flags {
-		RED_NONE	= 0,
-		RED_FILE	= 1,
-		RED_PIPE	= 2,
-		RED_READ	= 4,
-		RED_WRITE	= 8,
-		RED_APPEND	= 16,
-		RED_NOBUF	= 32,
-		RED_USED	= 64,	/* closed temporarily to reuse fd */
-		RED_EOF		= 128,
-		RED_TWOWAY	= 256,
-		RED_PTY		= 512,
-		RED_SOCKET	= 1024,
-		RED_TCP		= 2048,
-	} flag;
+	int flag;
 	char *value;
 	FILE *ifp;	/* input fp, needed for PIPES_SIMULATED */
 	IOBUF *iop;
@@ -981,7 +989,7 @@ struct redirect {
 	const char *mode;
 	awk_output_buf_t output;
 };
-typedef enum redirect_flags redirect_flags_t;
+
 
 /* values for BINMODE, used as bit flags */
 
@@ -995,18 +1003,19 @@ enum binmode_values {
 /*
  * structure for our source, either a command line string or a source file.
  */
+enum srctype {
+	SRC_CMDLINE = 1,
+	SRC_STDIN,
+	SRC_FILE,
+	SRC_INC,
+	SRC_EXTLIB
+};
 
 typedef struct srcfile {
 	struct srcfile *next;
 	struct srcfile *prev;
 
-	enum srctype {
-		SRC_CMDLINE = 1,
-		SRC_STDIN,
-		SRC_FILE,
-		SRC_INC,
-		SRC_EXTLIB
-	} stype;
+	enum srctype stype;
 	char *src;	/* name on command line or include statement */
 	char *fullpath;	/* full path after AWKPATH search */
 	time_t mtime;
@@ -1026,7 +1035,7 @@ typedef struct srcfile {
 	char *lexptr_begin;
 	int lasttok;
 	INSTRUCTION *comment;	/* comment on @load line */
-	const char *namespace;
+	const char *name_space;
 } SRCFILE;
 
 // structure for INSTRUCTION pool, needed mainly for debugger
@@ -1105,7 +1114,7 @@ extern int OFSlen;
 extern char *ORS;
 extern int ORSlen;
 extern char *OFMT;
-extern char *CONVFMT;
+extern const char *CONVFMT;
 extern int CONVFMTidx;
 extern int OFMTidx;
 #ifdef HAVE_MPFR
@@ -1145,7 +1154,8 @@ extern bool do_itrace;	/* separate so can poke from a debugger */
 
 extern SRCFILE *srcfiles; /* source files */
 
-extern enum do_flag_values {
+enum do_flag_values {
+	DO_FLAG_NONE       = 0x00000,
 	DO_LINT_INVALID	   = 0x00001,	/* only warn about invalid */
 	DO_LINT_EXTENSIONS = 0x00002,	/* warn about gawk extensions */
 	DO_LINT_ALL	   = 0x00004,	/* warn about all things */
@@ -1162,7 +1172,8 @@ extern enum do_flag_values {
 	DO_PROFILE	   = 0x02000,	/* profile the program */
 	DO_DEBUG	   = 0x04000,	/* debug the program */
 	DO_MPFR		   = 0x08000,	/* arbitrary-precision floating-point math */
-} do_flags;
+};
+extern int do_flags;
 
 #define do_traditional      (do_flags & DO_TRADITIONAL)
 #define do_posix            (do_flags & DO_POSIX)
@@ -1338,7 +1349,7 @@ DEREF(NODE *r)
 
 extern void *r_getblock(int id);
 extern void r_freeblock(void *, int id);
-#define getblock(p, id, ty)	(void) (p = r_getblock(id))
+#define getblock(p, id, ty)	(void) (p = (ty) r_getblock(id))
 #define freeblock(p, id)	(void) (r_freeblock(p, id))
 
 #else /* MEMDEBUG */
@@ -1449,7 +1460,7 @@ extern bool is_alpha(int c);
 extern bool is_alnum(int c);
 extern bool is_letter(int c);
 extern bool is_identchar(int c);
-extern NODE *make_regnode(int type, NODE *exp);
+extern NODE *make_regnode(NODETYPE type, NODE *exp);
 extern bool validate_qualified_name(char *token);
 /* builtin.c */
 extern double double_to_int(double d);
@@ -1584,7 +1595,7 @@ extern void print_ext_versions(void);
 extern void free_api_string_copies(void);
 
 /* gawkmisc.c */
-extern char *gawk_name(const char *filespec);
+extern const char *gawk_name(const char *filespec);
 extern void os_arg_fixup(int *argcp, char ***argvp);
 extern int os_devopen(const char *name, int flag);
 extern void os_close_on_exec(int fd, const char *name, const char *what, const char *dir);

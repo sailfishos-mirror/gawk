@@ -71,7 +71,7 @@ api_get_argument(awk_ext_id_t id, size_t count,
 	/* if type is undefined */
 	if (arg->type == Node_var_new) {
 		if (wanted == AWK_UNDEFINED)
-			return true;
+			return awk_true;
 		else if (wanted == AWK_ARRAY) {
 			goto array;
 		} else {
@@ -82,7 +82,7 @@ api_get_argument(awk_ext_id_t id, size_t count,
 	/* at this point, we have real type */
 	if (arg->type == Node_var_array || arg->type == Node_array_ref) {
 		if (wanted != AWK_ARRAY && wanted != AWK_UNDEFINED)
-			return false;
+			return awk_false;
 		goto array;
 	} else
 		goto scalar;
@@ -148,6 +148,7 @@ awk_value_to_node(const awk_value_t *retval)
 {
 	NODE *ext_ret_val = NULL;
 	NODE *v;
+	int tval = 0;
 
 	if (retval == NULL)
 		fatal(_("awk_value_to_node: received null retval"));
@@ -169,7 +170,7 @@ awk_value_to_node(const awk_value_t *retval)
 			if (! do_mpfr)
 				fatal(_("awk_value_to_node: not in MPFR mode"));
 			ext_ret_val = make_number_node(MPFN);
-			int tval = mpfr_set(ext_ret_val->mpg_numbr, (mpfr_ptr) retval->num_ptr, ROUND_MODE);
+			tval = mpfr_set(ext_ret_val->mpg_numbr, (mpfr_ptr) retval->num_ptr, ROUND_MODE);
 			IEEE_FMT(ext_ret_val->mpg_numbr, tval);
 #else
 			fatal(_("awk_value_to_node: MPFR not supported"));
@@ -1228,7 +1229,7 @@ api_release_flattened_array(awk_ext_id_t id,
 		awk_array_t a_cookie,
 		awk_flat_array_t *data)
 {
-	NODE *array = a_cookie;
+	NODE *array = (NODE *) a_cookie;
 	NODE **list;
 	size_t i, j, k;
 
@@ -1367,7 +1368,7 @@ api_get_file(awk_ext_id_t id, const char *name, size_t namelen, const char *file
 			currule = save_rule;
 			source = save_source;
 		}
-		*ibufp = &curfile->public;
+		*ibufp = &curfile->public_;
 		*obufp = NULL;
 
 		return awk_true;
@@ -1416,7 +1417,7 @@ api_get_file(awk_ext_id_t id, const char *name, size_t namelen, const char *file
 	if ((f = redirect_string(name, namelen, 0, redirtype, &flag, fd, false)) == NULL)
 		return awk_false;
 
-	*ibufp = f->iop ? & f->iop->public : NULL;
+	*ibufp = f->iop ? & f->iop->public_ : NULL;
 	*obufp = f->output.fp ? & f->output : NULL;
 	return awk_true;
 }

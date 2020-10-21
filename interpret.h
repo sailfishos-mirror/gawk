@@ -1250,7 +1250,7 @@ match_re:
 			JUMPTO(ni);
 
 		case Op_K_getline_redir:
-			r = do_getline_redir(pc->into_var, pc->redir_type);
+			r = do_getline_redir(pc->into_var, (enum redirval) pc->redir_type);
 			PUSH(r);
 			break;
 
@@ -1348,7 +1348,7 @@ match_re:
 					update_ERRNO_int(errcode);
 					if (do_traditional || ! pc->has_endfile)
 						fatal(_("error reading input file `%s': %s"),
-						curfile->public.name, strerror(errcode));
+						curfile->public_.name, strerror(errcode));
 				}
 
 				JUMPTO(ni);

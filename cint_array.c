@@ -398,20 +398,20 @@ xremove:
 static NODE **
 cint_copy(NODE *symbol, NODE *newsymb)
 {
-	NODE **old, **new;
+	NODE **old, **newtab;
 	size_t i;
 
 	assert(symbol->nodes != NULL);
 
 	/* allocate new table */
-	ezalloc(new, NODE **, INT32_BIT * sizeof(NODE *), "cint_copy");
+	ezalloc(newtab, NODE **, INT32_BIT * sizeof(NODE *), "cint_copy");
 
 	old = symbol->nodes;
 	for (i = NHAT; i < INT32_BIT; i++) {
 		if (old[i] == NULL)
 			continue;
-		new[i] = make_node(Node_array_tree);
-		tree_copy(newsymb, old[i], new[i]);
+		newtab[i] = make_node(Node_array_tree);
+		tree_copy(newsymb, old[i], newtab[i]);
 	}
 
 	if (symbol->xarray != NULL) {
@@ -424,7 +424,7 @@ cint_copy(NODE *symbol, NODE *newsymb)
 	} else
 		newsymb->xarray = NULL;
 
-	newsymb->nodes = new;
+	newsymb->nodes = newtab;
 	newsymb->table_size = symbol->table_size;
 	newsymb->array_capacity = symbol->array_capacity;
 	newsymb->flags = symbol->flags;
@@ -443,7 +443,7 @@ cint_list(NODE *symbol, NODE *t)
 	unsigned long k = 0, num_elems, list_size;
 	size_t j, ja, jd;
 	int elem_size = 1;
-	assoc_kind_t assoc_kind;
+	int assoc_kind;
 
 	num_elems = symbol->table_size;
 	if (num_elems == 0)
@@ -482,7 +482,7 @@ cint_list(NODE *symbol, NODE *t)
 		tn = symbol->nodes[j];
 		if (tn == NULL)
 			continue;
-		k += tree_list(tn, list + k, assoc_kind);
+		k += tree_list(tn, list + k, (assoc_kind_t) assoc_kind);
 		if (k >= list_size)
 			return list;
 	}
@@ -936,15 +936,15 @@ tree_list(NODE *tree, NODE **list, assoc_kind_t assoc_kind)
 static void
 tree_copy(NODE *newsymb, NODE *tree, NODE *newtree)
 {
-	NODE **old, **new;
+	NODE **old, **newtab;
 	size_t j, hsize;
 
 	hsize = tree->array_size;
 	if ((tree->flags & HALFHAT) != 0)
 		hsize /= 2;
 
-	ezalloc(new, NODE **, hsize * sizeof(NODE *), "tree_copy");
-	newtree->nodes = new;
+	ezalloc(newtab, NODE **, hsize * sizeof(NODE *), "tree_copy");
+	newtree->nodes = newtab;
 	newtree->array_base = tree->array_base;
 	newtree->array_size = tree->array_size;
 	newtree->table_size = tree->table_size;
@@ -955,11 +955,11 @@ tree_copy(NODE *newsymb, NODE *tree, NODE *newtree)
 		if (old[j] == NULL)
 			continue;
 		if (old[j]->type == Node_array_tree) {
-			new[j] = make_node(Node_array_tree);
-			tree_copy(newsymb, old[j], new[j]);
+			newtab[j] = make_node(Node_array_tree);
+			tree_copy(newsymb, old[j], newtab[j]);
 		} else {
-			new[j] = make_node(Node_array_leaf);
-			leaf_copy(newsymb, old[j], new[j]);
+			newtab[j] = make_node(Node_array_leaf);
+			leaf_copy(newsymb, old[j], newtab[j]);
 		}
 	}
 }
@@ -1136,12 +1136,12 @@ leaf_remove(NODE *symbol, NODE *array, long k)
 static void
 leaf_copy(NODE *newsymb, NODE *array, NODE *newarray)
 {
-	NODE **old, **new;
+	NODE **old, **newtab;
 	long size, i;
 
 	size = array->array_size;
-	ezalloc(new, NODE **, size * sizeof(NODE *), "leaf_copy");
-	newarray->nodes = new;
+	ezalloc(newtab, NODE **, size * sizeof(NODE *), "leaf_copy");
+	newarray->nodes = newtab;
 	newarray->array_size = size;
 	newarray->array_base = array->array_base;
 	newarray->flags = array->flags;
@@ -1152,13 +1152,13 @@ leaf_copy(NODE *newsymb, NODE *array, NODE *newarray)
 		if (old[i] == NULL)
 			continue;
 		if (old[i]->type == Node_val)
-			new[i] = dupnode(old[i]);
+			newtab[i] = dupnode(old[i]);
 		else {
 			NODE *r;
 			r = make_array();
 			r->vname = estrdup(old[i]->vname, strlen(old[i]->vname));
 			r->parent_array = newsymb;
-			new[i] = assoc_copy(old[i], r);
+			newtab[i] = assoc_copy(old[i], r);
 		}
 	}
 }
