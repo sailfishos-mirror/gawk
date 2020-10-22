@@ -322,7 +322,7 @@ str_remove(NODE *symbol, NODE *subs)
 static NODE **
 str_copy(NODE *symbol, NODE *newsymb)
 {
-	BUCKET **old, **new, **pnew;
+	BUCKET **old, **newtab, **pnew;
 	BUCKET *chain, *newchain;
 	unsigned long cursize, i;
 
@@ -332,12 +332,12 @@ str_copy(NODE *symbol, NODE *newsymb)
 	cursize = symbol->array_size;
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *), "str_copy");
+	ezalloc(newtab, BUCKET **, cursize * sizeof(BUCKET *), "str_copy");
 
 	old = symbol->buckets;
 
 	for (i = 0; i < cursize; i++) {
-		for (chain = old[i], pnew = & new[i]; chain != NULL;
+		for (chain = old[i], pnew = & newtab[i]; chain != NULL;
 				chain = chain->ahnext
 		) {
 			NODE *oldval, *newsubs;
@@ -373,7 +373,7 @@ str_copy(NODE *symbol, NODE *newsymb)
 	}
 
 	newsymb->table_size = symbol->table_size;
-	newsymb->buckets = new;
+	newsymb->buckets = newtab;
 	newsymb->array_size = cursize;
 	newsymb->flags = symbol->flags;
 	return NULL;
@@ -633,7 +633,7 @@ str_find(NODE *symbol, NODE *s1, size_t code1, unsigned long hash1)
 static void
 grow_table(NODE *symbol)
 {
-	BUCKET **old, **new;
+	BUCKET **old, **newtab;
 	BUCKET *chain, *next;
 	int i, j;
 	unsigned long oldsize, newsize, k;
@@ -672,10 +672,10 @@ grow_table(NODE *symbol)
 	}
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *), "grow_table");
+	ezalloc(newtab, BUCKET **, newsize * sizeof(BUCKET *), "grow_table");
 
 	old = symbol->buckets;
-	symbol->buckets = new;
+	symbol->buckets = newtab;
 	symbol->array_size = newsize;
 
 	/* brand new hash table, set things up and return */
@@ -697,8 +697,8 @@ grow_table(NODE *symbol)
 			hash1 = chain->ahcode % newsize;
 
 			/* remove from old list, add to new */
-			chain->ahnext = new[hash1];
-			new[hash1] = chain;
+			chain->ahnext = newtab[hash1];
+			newtab[hash1] = chain;
 		}
 	}
 	efree(old);

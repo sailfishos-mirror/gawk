@@ -50,6 +50,10 @@ struct localeinfo
   wint_t sbctowc[UCHAR_MAX + 1];
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 extern void init_localeinfo (struct localeinfo *);
 
 /* Maximum number of characters that can be the case-folded
@@ -58,3 +62,7 @@ extern void init_localeinfo (struct localeinfo *);
 enum { CASE_FOLDED_BUFSIZE = 32 };
 
 extern int case_folded_counterparts (wint_t, wchar_t[CASE_FOLDED_BUFSIZE]);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus

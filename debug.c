@@ -3051,7 +3051,7 @@ next_step(CMDARG *arg, int cmd)
 		stop.repeat_count = arg->a_int;
 	else
 		stop.repeat_count = 1;
-	stop.command = (argtype) cmd;
+	stop.command = (enum argtype) cmd;
 	return true;
 }
 
@@ -3231,7 +3231,7 @@ do_finish(CMDARG *arg ATTRIBUTE_UNUSED, int cmd)
 	fprintf(out_fp, _("Run until return from "));
 	print_numbered_frame(cur_frame);
 	stop.check_func = check_finish;
-	stop.command = (argtype) cmd;
+	stop.command = (enum argtype) cmd;
 	stop.print_ret = true;
 	return true;
 }
@@ -3279,7 +3279,7 @@ do_return(CMDARG *arg, int cmd)
 	assert(stop.fcall_count >= 0);
 	stop.pc = (func->code_ptr + 1)->lasti;
 	assert(stop.pc->opcode == Op_K_return);
-	stop.command = (argtype) cmd;
+	stop.command = (enum argtype) cmd;
 
 	stop.check_func = check_return;
 
@@ -3342,7 +3342,7 @@ do_until(CMDARG *arg, int cmd)
 		stop.sourceline = sourceline;
 		stop.fcall_count = fcall_count - cur_frame;
 		stop.check_func = check_until;
-		stop.command = (argtype) cmd;
+		stop.command = (enum argtype) cmd;
 		return true;
 	}
 
@@ -3381,7 +3381,7 @@ func:
 				stop.pc = ip;
 				stop.fcall_count = fcall_count - cur_frame;
 				stop.check_func = check_until;
-				stop.command = (argtype) cmd;
+				stop.command = (enum argtype) cmd;
 				return true;
 			}
 		}
@@ -3402,7 +3402,7 @@ func:
 			stop.pc = ip;
 			stop.fcall_count = fcall_count - cur_frame;
 			stop.check_func = check_until;
-			stop.command = (argtype) cmd;
+			stop.command = (enum argtype) cmd;
 			return true;
 		}
 		if (ip == (rp + 1)->lasti)

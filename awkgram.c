@@ -75,6 +75,8 @@
 
 #include "awk.h"
 
+#include <math.h>
+
 #if defined(__STDC__) && __STDC__ < 1	/* VMS weirdness, maybe elsewhere */
 #define signed /**/
 #endif
@@ -227,8 +229,6 @@ static inline INSTRUCTION *list_create(INSTRUCTION *x);
 static inline INSTRUCTION *list_append(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_prepend(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_merge(INSTRUCTION *l1, INSTRUCTION *l2);
-
-extern double fmod(double x, double y);
 
 #define YYSTYPE INSTRUCTION *
 

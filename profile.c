@@ -179,7 +179,7 @@ pp_push(int type, char *s, int flag, INSTRUCTION *comment)
 	n->pp_str = s;
 	n->pp_len = strlen(s);
 	n->flags = flag;
-	n->type = type;
+	n->type = (NODETYPE) type;
 	n->pp_next = pp_stack;
 	n->pp_comment = comment;
 	pp_stack = n;

@@ -25,9 +25,8 @@
 
 #include "awk.h"
 
-extern double pow(double x, double y);
-extern double modf(double x, double *yp);
-extern double fmod(double x, double y);
+#include <math.h>
+
 NODE **fcall_list = NULL;
 long fcall_count = 0;
 int currule = 0;

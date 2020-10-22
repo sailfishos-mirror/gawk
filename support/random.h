@@ -40,4 +40,13 @@ typedef          long gawk_int32_t;
 #define uint32_t gawk_uint32_t
 #define int32_t  gawk_int32_t
 
-extern long random (void);
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+extern char *initstate(unsigned long seed, char *state, long n);
+extern char *setstate(char *state);
+extern long random(void);
+extern void srandom(unsigned long seed);
+#ifdef __cplusplus
+}
+#endif // __cplusplus

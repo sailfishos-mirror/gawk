@@ -62,7 +62,6 @@ r_force_number(NODE *n)
 	char *cpend;
 	char save;
 	char *ptr;
-	extern double strtod();
 
 	if ((n->flags & NUMCUR) != 0)
 		return n;

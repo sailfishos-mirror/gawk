@@ -24,6 +24,11 @@
 
 struct localeinfo; /* See localeinfo.h.  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+
 /* Element of a list of strings, at least one of which is known to
    appear in any R.E. matching the DFA. */
 struct dfamust
@@ -131,3 +136,6 @@ extern void dfawarn (const char *);
    takes a single argument, a NUL-terminated string describing the error.
    The user must supply a dfaerror.  */
 extern _Noreturn void dfaerror (const char *);
+#ifdef __cplusplus
+}
+#endif // __cplusplus

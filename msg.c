@@ -156,6 +156,9 @@ set_loc(const char *file, int line)
 
 /* r_fatal --- print a fatal error message */
 
+#ifdef __cplusplus
+extern "C"
+#endif /* __cplusplus */
 void
 r_fatal(const char *mesg, ...)
 {

@@ -68,12 +68,6 @@
 static size_t mbc_byte_count(const char *ptr, size_t numchars);
 static size_t mbc_char_count(const char *ptr, size_t numbytes);
 
-/* Can declare these, since we always use the random shipped with gawk */
-extern char *initstate(unsigned long seed, char *state, long n);
-extern char *setstate(char *state);
-extern long random(void);
-extern void srandom(unsigned long seed);
-
 extern NODE **args_array;
 extern int max_args;
 extern NODE **fields_arr;

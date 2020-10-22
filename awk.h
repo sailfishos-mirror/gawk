@@ -409,7 +409,7 @@ enum flagvals {
 	XARRAY		= 0x10000,
 	NUMCONSTSTR	= 0x20000,	/* have string value for numeric constant */
 	REGEX           = 0x40000,	/* this is a typed regex */
-} flags;
+};
 /*
  * NOTE - this struct is a rather kludgey -- it is packed to minimize
  * space usage, at the expense of cleanliness.  Alter at own risk.
@@ -1039,13 +1039,14 @@ typedef struct srcfile {
 } SRCFILE;
 
 // structure for INSTRUCTION pool, needed mainly for debugger
+struct instruction_mem_pool {
+	struct instruction_block *block_list;
+	INSTRUCTION *free_space;	// free location in active block
+	INSTRUCTION *free_list;
+};
 typedef struct instruction_pool {
 #define MAX_INSTRUCTION_ALLOC	4	// we don't call bcalloc with more than this
-	struct instruction_mem_pool {
-		struct instruction_block *block_list;
-		INSTRUCTION *free_space;	// free location in active block
-		INSTRUCTION *free_list;
-	} pool[MAX_INSTRUCTION_ALLOC];
+	struct instruction_mem_pool pool[MAX_INSTRUCTION_ALLOC];
 } INSTRUCTION_POOL;
 
 /* structure for execution context */
@@ -1693,7 +1694,11 @@ extern void msg (const char *mesg, ...) ATTRIBUTE_PRINTF_1;
 extern void error (const char *mesg, ...) ATTRIBUTE_PRINTF_1;
 extern void r_warning (const char *mesg, ...) ATTRIBUTE_PRINTF_1;
 extern void set_loc (const char *file, int line);
-extern void r_fatal (const char *mesg, ...) ATTRIBUTE_PRINTF_1;
+extern
+#ifdef __cplusplus
+"C"
+#endif /* __cplusplus */
+void r_fatal (const char *mesg, ...) ATTRIBUTE_PRINTF_1;
 #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2)
 extern void (*lintfunc)(const char *mesg, ...) ATTRIBUTE_PRINTF_1;
 #else
