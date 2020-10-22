@@ -4069,7 +4069,7 @@ NODE *
 do_typeof(int nargs)
 {
 	NODE *arg;
-	char *res = NULL;
+	const char *res = NULL;
 	bool deref = true;
 	NODE *dbg;
 

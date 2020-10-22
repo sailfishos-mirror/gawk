@@ -31,7 +31,7 @@ extern INSTRUCTION *main_beginfile;
 extern int currule;
 
 static awk_bool_t node_to_awk_value(NODE *node, awk_value_t *result, awk_valtype_t wanted);
-static char *valtype2str(awk_valtype_t type);
+static const char *valtype2str(awk_valtype_t type);
 static NODE *ns_lookup(const char *name_space, const char *name, char **full_name);
 
 /*
@@ -1560,13 +1560,13 @@ print_ext_versions(void)
 
 /* valtype2str --- return a printable representation of a value type */
 
-static char *
+static const char *
 valtype2str(awk_valtype_t type)
 {
 	static char buf[100];
 
 	// Important: keep in same order as in gawkapi.h!
-	static char *values[] = {
+	static const char *values[] = {
 		"AWK_UNDEFINED",
 		"AWK_NUMBER",
 		"AWK_STRING",

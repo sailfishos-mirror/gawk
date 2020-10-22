@@ -781,7 +781,7 @@ cleanup:
 		case Op_indirect_func_call:
 		case Op_func_call:
 		{
-			char *pre;
+			const char *pre;
  			int pcount;
 			bool malloced = false;
 			char *fname = adjust_namespace(pc->func_name, & malloced);
