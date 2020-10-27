@@ -2961,8 +2961,8 @@ do_getline(int into_variable, IOBUF *iop)
 
 typedef struct {
 	const char *envname;
-	char **dfltp;		/* pointer to address of default path */
-	char **awkpath;		/* array containing library search paths */
+	const char **dfltp;	/* pointer to address of default path */
+	const char **awkpath;	/* array containing library search paths */
 	int max_pathlen;	/* length of the longest item in awkpath */
 } path_info;
 
@@ -2981,8 +2981,9 @@ static path_info pi_awklibpath = {
 static void
 init_awkpath(path_info *pi)
 {
-	char *path;
-	char *start, *end, *p;
+	const char *path;
+	const char *start, *end;
+	char *p;
 	int len, i;
 	int max_path;		/* (# of allocated paths)-1 */
 
@@ -2991,12 +2992,12 @@ init_awkpath(path_info *pi)
 		path = pi->dfltp[0];
 
 	/* count number of separators */
-	for (max_path = 0, p = path; *p; p++)
+	for (max_path = 0, p = (char *) path; *p; p++)
 		if (*p == envsep)
 			max_path++;
 
 	// +3 --> 2 for null entries at front and end of path, 1 for NULL end of list
-	ezalloc(pi->awkpath, char **, (max_path + 3) * sizeof(char *), "init_awkpath");
+	ezalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *), "init_awkpath");
 
 	start = path;
 	i = 0;

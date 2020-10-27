@@ -178,6 +178,13 @@ extern void *memset_ulong(void *dest, int val, unsigned long l);
 /* same thing for warning */
 #define warning (*(set_loc(__FILE__, __LINE__),r_warning))
 
+// This macro lets GDB print the bits in bit flag enums when compiled with C.
+#ifdef __cplusplus
+#define ENUM(enumtag) int
+#else
+#define ENUM(enumtag) enum enumtag
+#endif /* __cplusplus */
+
 #ifdef HAVE_MPFR
 #include <gmp.h>
 #include <mpfr.h>
@@ -441,7 +448,7 @@ typedef struct exp_node {
 			size_t reserved;
 			struct exp_node *rn;
 			unsigned long cnt;
-			int reflags;
+			ENUM(reflagvals) reflags;
 		} nodep;
 
 		struct {
@@ -465,7 +472,7 @@ typedef struct exp_node {
 		} val;
 	} sub;
 	NODETYPE type;
-	int flags;
+	ENUM(flagvals) flags;
 	long valref;
 } NODE;
 
@@ -954,7 +961,7 @@ typedef struct iobuf {
 	bool valid;
 	int errcode;
 
-	int flag;
+	ENUM(iobuf_flags) flag;
 } IOBUF;
 
 typedef void (*Func_ptr)(void);
@@ -978,7 +985,7 @@ enum redirect_flags {
 typedef enum redirect_flags redirect_flags_t;
 
 struct redirect {
-	int flag;
+	ENUM(redirect_flags) flag;
 	char *value;
 	FILE *ifp;	/* input fp, needed for PIPES_SIMULATED */
 	IOBUF *iop;
@@ -1226,10 +1233,10 @@ extern bool do_ieee_fmt;	/* emulate IEEE 754 floating-point format */
 extern const char *myname;
 extern const char def_strftime_format[];
 
-extern char quote;
-extern char *defpath;
-extern char *deflibpath;
-extern char envsep;
+extern const char quote;
+extern const char *defpath;
+extern const char *deflibpath;
+extern const char envsep;
 
 extern char casetable[];	/* for case-independent regexp matching */
 
