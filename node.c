@@ -267,7 +267,7 @@ r_format_val(const char *format, int index, NODE *s)
 		 */
 		long num = (long) val;
 
-		if (num < NVAL && num >= 0) {
+		if (num < (long) NVAL && num >= 0) {
 			sp = (char *) values[num];
 			s->stlen = 1;
 		} else {

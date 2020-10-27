@@ -1156,7 +1156,7 @@ getredirect(const char *str, int len)
 	struct redirect *rp;
 
 	for (rp = red_head; rp != NULL; rp = rp->next)
-		if (strlen(rp->value) == len && memcmp(rp->value, str, len) == 0)
+		if (strlen(rp->value) == (size_t) len && memcmp(rp->value, str, len) == 0)
 			return rp;
 
 	return NULL;
@@ -3768,7 +3768,7 @@ again:
 	if (RSre->maybe_long) {
 		char *matchend = iop->off + reend;
 
-		if (iop->dataend - matchend < RS->stlen)
+		if ((size_t) (iop->dataend - matchend) < RS->stlen)
 			return TERMNEAREND;
 	}
 

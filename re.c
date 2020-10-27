@@ -49,7 +49,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	int c, c2;
 	static bool first = true;
 	static bool no_dfa = false;
-	int i;
+	size_t i;
 	static struct dfa* dfaregs[2] = { NULL, NULL };
 	static bool nul_warned = false;
 

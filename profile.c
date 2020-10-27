@@ -62,7 +62,7 @@ static NODE *pp_stack = NULL;
 static NODE *func_params;	/* function parameters */
 static FILE *prof_fp;	/* where to send the profile */
 
-static long indent_level = 0;
+static size_t indent_level = 0;
 
 static const char tabs[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 static const size_t tabs_len = sizeof(tabs) - 1;
@@ -137,7 +137,7 @@ init_profiling_signals()
 static void
 indent(unsigned long long count)
 {
-	int i;
+	size_t i;
 
 	if (do_profile) {
 		if (count == 0)

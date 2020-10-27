@@ -1319,7 +1319,7 @@ mpg_tofloat(mpfr_ptr mf, mpz_ptr mz)
 	 * Always set the precision to avoid hysteresis, since do_mpfr_func
 	 * may copy our precision.
 	 */
-	if (prec != mpfr_get_prec(mf))
+	if (prec != (size_t) mpfr_get_prec(mf))
 		mpfr_set_prec(mf, prec);
 
 	mpfr_set_z(mf, mz, ROUND_MODE);
