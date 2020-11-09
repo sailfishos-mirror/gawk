@@ -312,7 +312,7 @@ static NODE **
 int_clear(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
 {
 	unsigned long i;
-	int j;
+	size_t j;
 	BUCKET *b, *next;
 	NODE *r;
 
@@ -354,7 +354,7 @@ int_remove(NODE *symbol, NODE *subs)
 	uint32_t hash1;
 	BUCKET *b, *prev = NULL;
 	long k;
-	int i;
+	size_t i;
 	NODE *xn = symbol->xarray;
 
 	if (symbol->table_size == 0 || symbol->buckets == NULL)
@@ -449,7 +449,7 @@ int_copy(NODE *symbol, NODE *newsymb)
 {
 	BUCKET **old, **newtab, **pnew;
 	BUCKET *chain, *newchain;
-	int j;
+	size_t j;
 	unsigned long i, cursize;
 
 	assert(symbol->buckets != NULL);
@@ -521,10 +521,12 @@ static NODE**
 int_list(NODE *symbol, NODE *t)
 {
 	NODE **list = NULL;
-	unsigned long num_elems, list_size, i, k = 0;
+	unsigned long list_size, i, k = 0;
+	long num_elems;
 	BUCKET *b;
 	NODE *r, *subs, *xn;
-	int j, elem_size = 1;
+	int elem_size = 1;
+	size_t j;
 	long num;
 	static char buf[100];
 	assoc_kind_t assoc_kind;
@@ -758,7 +760,7 @@ static inline NODE **
 int_find(NODE *symbol, long k, uint32_t hash1)
 {
 	BUCKET *b;
-	int i;
+	size_t i;
 
 	assert(symbol->buckets != NULL);
 	for (b = symbol->buckets[hash1]; b != NULL; b = b->ainext) {
@@ -805,7 +807,7 @@ grow_int_table(NODE *symbol)
 {
 	BUCKET **old, **newtab;
 	BUCKET *chain, *next;
-	int i, j;
+	size_t i, j;
 	unsigned long oldsize, newsize, k;
 
 	/*

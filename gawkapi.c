@@ -1175,7 +1175,7 @@ api_flatten_array_typed(awk_ext_id_t id,
 		awk_valtype_t index_type, awk_valtype_t value_type)
 {
 	NODE **list;
-	size_t i, j;
+	int i, j;
 	NODE *array = (NODE *) a_cookie;
 	size_t alloc_size;
 
@@ -1237,7 +1237,7 @@ api_release_flattened_array(awk_ext_id_t id,
 	    || array->type != Node_var_array
 	    || data == NULL
 	    || array != (NODE *) data->opaque1
-	    || data->count != array->table_size
+	    || (int)data->count != array->table_size
 	    || data->opaque2 == NULL)
 		return awk_false;
 

@@ -37,7 +37,7 @@ extern NODE **is_integer(NODE *symbol, NODE *subs);
  * THRESHOLD    ---  Maximum capacity waste; THRESHOLD >= 2^(NHAT + 1).
  */
 
-static int NHAT = 10;
+static size_t NHAT = 10;
 static long THRESHOLD;
 
 /*
@@ -203,7 +203,8 @@ cint_lookup(NODE *symbol, NODE *subs)
 {
 	NODE **lhs;
 	long k;
-	int h1 = -1, m, li;
+	int h1 = -1;
+	size_t m, li;
 	NODE *tn, *xn;
 	long cint_size, capacity;
 
@@ -440,7 +441,8 @@ cint_list(NODE *symbol, NODE *t)
 {
 	NODE **list = NULL;
 	NODE *tn, *xn;
-	unsigned long k = 0, num_elems, list_size;
+	unsigned long k = 0, list_size;
+	long num_elems;
 	size_t j, ja, jd;
 	int elem_size = 1;
 	int assoc_kind;
@@ -742,8 +744,8 @@ tree_lookup(NODE *symbol, NODE *tree, long k, int m, long base)
 {
 	NODE **lhs;
 	NODE *tn;
-	int i, n;
-	size_t size;
+	int i;
+	size_t size, n;
 	long num = k;
 
 	/*
@@ -765,7 +767,7 @@ tree_lookup(NODE *symbol, NODE *tree, long k, int m, long base)
 		tree->array_base = base;
 		tree->array_size = size;
 		tree->table_size = 0;	/* # of elements in the array */
-		if (n > m/2) {
+		if (n > ((unsigned)m)/2) {
 			/* only first half of the array used */
 			actual_size /= 2;
 			tree->flags |= HALFHAT;

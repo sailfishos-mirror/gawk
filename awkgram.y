@@ -3082,7 +3082,7 @@ get_src_buf()
 	int n;
 	char *scan;
 	bool newfile;
-	int savelen;
+	size_t savelen;
 	struct stat sbuf;
 
 	/*

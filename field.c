@@ -281,12 +281,12 @@ set_record(const char *buf, int cnt, const awk_fieldwidth_info_t *fw)
 	 * to place a sentinel at the end, we make sure
 	 * databuf_size is > cnt after allocation.
 	 */
-	if (cnt >= databuf_size) {
+	if ((unsigned long) cnt >= databuf_size) {
 		do {
 			if (databuf_size > MAX_SIZE/2)
 				fatal(_("input record too large"));
 			databuf_size *= 2;
-		} while (cnt >= databuf_size);
+		} while ((unsigned long) cnt >= databuf_size);
 		erealloc(databuf, char *, databuf_size, "set_record");
 		memset(databuf, '\0', databuf_size);
 	}
@@ -783,7 +783,7 @@ fw_parse_field(long up_to,	/* parse only up to this field number */
 	bool in_middle ATTRIBUTE_UNUSED)
 {
 	char *scan = *buf;
-	long nf = parse_high_water;
+	unsigned long nf = parse_high_water;
 	char *end = scan + len;
 	const awk_fieldwidth_info_t *fw;
 	mbstate_t mbs;
@@ -804,7 +804,7 @@ fw_parse_field(long up_to,	/* parse only up to this field number */
 		 * in practice.
 		 */
 		memset(&mbs, 0, sizeof(mbstate_t));
-		while (nf < up_to && scan < end) {
+		while (nf < (unsigned long) up_to && scan < end) {
 			if (nf >= fw->nf) {
 				*buf = end;
 				return nf;
@@ -815,17 +815,17 @@ fw_parse_field(long up_to,	/* parse only up to this field number */
 			scan += flen;
 		}
 	} else {
-		while (nf < up_to && scan < end) {
+		while (nf < (unsigned long) up_to && scan < end) {
 			if (nf >= fw->nf) {
 				*buf = end;
 				return nf;
 			}
 			skiplen = fw->fields[nf].skip;
-			if (skiplen > end - scan)
+			if (skiplen > (size_t) (end - scan))
 				skiplen = end - scan;
 			scan += skiplen;
 			flen = fw->fields[nf].len;
-			if (flen > end - scan)
+			if (flen > (size_t) (end - scan))
 				flen = end - scan;
 			(*set)(++nf, scan, (long) flen, n);
 			scan += flen;

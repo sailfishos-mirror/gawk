@@ -585,7 +585,8 @@ print_lines(char *src, int start_line, int nlines)
 	}
 
 	for (i = start_line; i < start_line + nlines; i++) {
-		int supposed_len, len;
+		int supposed_len;
+		size_t len;
 		char *p;
 
 		sprintf(linebuf, "%-8d", i);
@@ -1079,8 +1080,7 @@ print_array(volatile NODE *arr, char *arr_name)
 {
 	NODE *subs;
 	NODE **list;
-	int i;
-	size_t num_elems = 0;
+	size_t i, num_elems = 0;
 	volatile NODE *r;
 	volatile int ret = 0;
 	volatile jmp_buf pager_quit_tag_stack;
@@ -4340,7 +4340,7 @@ gprintf(FILE *fp, const char *format, ...)
 	static size_t buflen = 0;
 	static int bl = 0;
 	char *p, *q;
-	int nchar;
+	size_t nchar;
 
 #define GPRINTF_BUFSIZ 512
 	if (buf == NULL) {
@@ -4372,11 +4372,11 @@ gprintf(FILE *fp, const char *format, ...)
 
 	bl = 0;
 	for (p = buf; (q = strchr(p, '\n')) != NULL; p = q + 1) {
-		int sz = (int) (q - p);
+		size_t sz = (q - p);
 
 		while (sz > 0) {
-			int cnt;
-			cnt = sz > screen_width ? screen_width : sz;
+			size_t cnt;
+			cnt = sz > ((size_t) screen_width) ? screen_width : sz;
 
 			/* do not print partial line before scrolling */
 			if (cnt < sz && (pager_lines_printed == (screen_height - 2)))

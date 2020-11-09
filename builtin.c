@@ -640,7 +640,7 @@ format_tree(
 /* copy 'l' bytes from 's' to 'obufout' checking for space in the process */
 /* difference of pointers should be of ptrdiff_t type, but let us be kind */
 #define bchunk(s, l) if (l) { \
-	while ((l) > ofre) { \
+	while (((size_t)(l)) > ofre) { \
 		size_t olen = obufout - obuf; \
 		erealloc(obuf, char *, osiz * 2, "format_tree"); \
 		ofre += osiz; \
@@ -666,7 +666,7 @@ format_tree(
 }
 
 /* Is there space for something L big in the buffer? */
-#define chksize(l)  if ((l) >= ofre) { \
+#define chksize(l)  if (((size_t)(l)) >= ofre) { \
 	size_t olen = obufout - obuf; \
 	size_t delta = osiz+l-ofre; \
 	erealloc(obuf, char *, osiz + delta, "format_tree"); \
@@ -785,7 +785,7 @@ format_tree(
 		msg(_("fatal: must use `count$' on all formats or none")); \
 		arg = 0; /* shutup the compiler */ \
 		goto out; \
-	} else if (cur_arg >= num_args) { \
+	} else if (cur_arg >= (size_t) num_args) { \
 		arg = 0; /* shutup the compiler */ \
 		toofew = true; \
 		break; \

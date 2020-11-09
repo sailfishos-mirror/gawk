@@ -824,7 +824,7 @@ set_OFS()
 
 	if (OFS == NULL)
 		emalloc(OFS, char *, new_ofs_len + 1, "set_OFS");
-	else if (OFSlen < new_ofs_len)
+	else if ((size_t) OFSlen < new_ofs_len)
 		erealloc(OFS, char *, new_ofs_len + 1, "set_OFS");
 
 	memcpy(OFS, OFS_node->var_value->stptr, OFS_node->var_value->stlen);

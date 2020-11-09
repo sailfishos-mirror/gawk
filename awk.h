@@ -1032,7 +1032,7 @@ typedef struct srcfile {
 	char *buf;
 	int *line_offset;	/* offset to the beginning of each line */
 	int fd;
-	int maxlen;	/* size of the longest line */
+	size_t maxlen;	/* size of the longest line */
 
 	void (*fini_func)();	/* dynamic extension of type SRC_EXTLIB */
 
