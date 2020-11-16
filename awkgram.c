@@ -5584,7 +5584,7 @@ get_src_buf()
 	int n;
 	char *scan;
 	bool newfile;
-	int savelen;
+	size_t savelen;
 	struct stat sbuf;
 
 	/*
@@ -5724,7 +5724,7 @@ get_src_buf()
 			 * of the available space.
 			 */
 
-			if (savelen > sourcefile->bufsize / 2) { /* long line or token  */
+			if (savelen > sourcefile->bufsize / 2u) { /* long line or token  */
 				sourcefile->bufsize *= 2;
 				erealloc(sourcefile->buf, char *, sourcefile->bufsize, "get_src_buf");
 				scan = sourcefile->buf + (scan - lexptr_begin);

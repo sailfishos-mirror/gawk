@@ -525,7 +525,7 @@ cint_dump(NODE *symbol, NODE *ndump)
 		fprintf(output_fp, "flags: %s\n", flags2str(symbol->flags));
 	}
 	indent(indent_level);
-	fprintf(output_fp, "NHAT: %d\n", NHAT);
+	fprintf(output_fp, "NHAT: %lu\n", NHAT);
 	indent(indent_level);
 	fprintf(output_fp, "THRESHOLD: %ld\n", THRESHOLD);
 	indent(indent_level);

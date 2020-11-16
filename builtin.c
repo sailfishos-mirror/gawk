@@ -1151,7 +1151,7 @@ out0:
 				prec = arg->stlen;
 			else {
 				char_count = mbc_char_count(arg->stptr, arg->stlen);
-				if (! have_prec || prec > char_count)
+				if (! have_prec || (size_t) prec > char_count)
 					prec = char_count;
 			}
 			cp = arg->stptr;
@@ -1196,14 +1196,14 @@ out0:
 			 * Use snprintf return value to tell if there
 			 * is enough room in the buffer or not.
 			 */
-			while ((i = snprintf(cpbufs[1].buf,
+			while ((size_t)(i = snprintf(cpbufs[1].buf,
 					     cpbufs[1].bufsize, "%.0f",
 					     tmpval)) >=
 			       cpbufs[1].bufsize) {
 				if (cpbufs[1].buf == cpbufs[1].stackbuf)
 					cpbufs[1].buf = NULL;
 				if (i > 0) {
-					cpbufs[1].bufsize += ((i > cpbufs[1].bufsize) ?
+					cpbufs[1].bufsize += (((size_t)i > cpbufs[1].bufsize) ?
 							      i : cpbufs[1].bufsize);
 				}
 				else
@@ -1574,19 +1574,19 @@ mpf1:
 #ifdef HAVE_MPFR
 			case MP_INT_WITH_PREC:
 				sprintf(cp, "*.*Z%c", cs1);
-				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
+				while ((size_t)(nc = mpfr_snprintf(obufout, ofre, cpbuf,
 					     (int) fw, (int) prec, zi)) >= ofre)
 					chksize(nc)
 				break;
 			case MP_INT_WITHOUT_PREC:
 				sprintf(cp, "*Z%c", cs1);
-				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
+				while ((size_t)(nc = mpfr_snprintf(obufout, ofre, cpbuf,
 					     (int) fw, zi)) >= ofre)
 					chksize(nc)
 				break;
 			case MP_FLOAT:
 				sprintf(cp, "*.*R*%c", cs1);
-				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
+				while ((size_t)(nc = mpfr_snprintf(obufout, ofre, cpbuf,
 					     (int) fw, (int) prec, ROUND_MODE, mf)) >= ofre)
 					chksize(nc)
 				break;
@@ -1594,7 +1594,7 @@ mpf1:
 			default:
 				if (have_prec || tolower(cs1) != 'a') {
 					sprintf(cp, "*.*%c", cs1);
-					while ((nc = snprintf(obufout, ofre, cpbuf,
+					while ((size_t)(nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw, (int) prec,
 						     (double) tmpval)) >= ofre)
 						chksize(nc)
@@ -1602,7 +1602,7 @@ mpf1:
 					// For %a and %A, use the default precision if it
 					// wasn't supplied by the user.
 					sprintf(cp, "*%c", cs1);
-					while ((nc = snprintf(obufout, ofre, cpbuf,
+					while ((size_t)(nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw,
 						     (double) tmpval)) >= ofre)
 						chksize(nc)
@@ -1636,7 +1636,7 @@ mpf1:
 		if (need_format)
 			lintwarn(
 			_("[s]printf: format specifier does not have control letter"));
-		if (cur_arg < num_args)
+		if (cur_arg < (size_t)num_args)
 			lintwarn(
 			_("too many arguments supplied for format string"));
 	}
@@ -2062,7 +2062,7 @@ do_strftime(int nargs)
 		 * format string, it's not failing for lack of room.
 		 * Thanks to Paul Eggert for pointing out this issue.
 		 */
-		if (buflen > 0 || bufsize >= 1024 * formatlen)
+		if (buflen > 0 || bufsize >= (size_t)(1024 * formatlen))
 			break;
 		bufsize *= 2;
 		if (bufp == buf)
@@ -2698,7 +2698,7 @@ do_match(int nargs)
 			subsepstr = SUBSEP_node->var_value->stptr;
 			subseplen = SUBSEP_node->var_value->stlen;
 
-			for (ii = 0; ii < NUMSUBPATS(rp, t1->stptr); ii++) {
+			for (ii = 0; (size_t)ii < NUMSUBPATS(rp, t1->stptr); ii++) {
 				/*
 				 * Loop over all the subpats; some of them may have
 				 * matched even if all of them did not.
@@ -2948,7 +2948,7 @@ do_sub(int nargs, unsigned int flags)
 
 	/* do the search early to avoid work on non-match */
 	if (research(rp, target->stptr, 0, target->stlen, RE_NEED_START) == -1 ||
-			RESTART(rp, target->stptr) > target->stlen)
+			(size_t)RESTART(rp, target->stptr) > target->stlen)
 		goto done;
 
 	target->flags |= STRING;
@@ -3093,7 +3093,7 @@ do_sub(int nargs, unsigned int flags)
 				) {
 					if (flags & GENSUB) {	/* gensub, behave sanely */
 						if (isdigit((unsigned char) scan[1])) {
-							int dig = scan[1] - '0';
+							size_t dig = scan[1] - '0';
 							if (dig < NUMSUBPATS(rp, target->stptr) && SUBPATSTART(rp, tp->stptr, dig) != -1) {
 								char *start, *end;
 
