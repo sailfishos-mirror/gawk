@@ -3707,7 +3707,7 @@ again:
 		 * If still room in buffer, skip over null match
 		 * and restart search. Otherwise, return.
 		 */
-		if (bp + iop->scanoff < iop->dataend) {
+		if (bp + iop->scanoff <= iop->dataend) {
 			bp += iop->scanoff;
 			goto again;
 		}
