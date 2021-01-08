@@ -52,6 +52,7 @@
 #include <limits.h>
 #include <ctype.h>
 #include <setjmp.h>
+#include <math.h>
 
 #include "gettext.h"
 #define _(msgid)  gettext(msgid)

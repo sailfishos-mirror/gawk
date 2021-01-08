@@ -792,7 +792,7 @@ do_mpfr_atan2(int nargs)
 
 static inline NODE *
 do_mpfr_func(const char *name,
-		int (*mpfr_func)(mpfr_ptr, mpfr_srcptr, mpfr_rnd_t),	/* putting argument types just gets the compiler confused */
+		int (*mpfr_func)(mpfr_ptr, mpfr_srcptr, mpfr_rnd_t),
 		int nargs)
 {
 	NODE *t1, *res;

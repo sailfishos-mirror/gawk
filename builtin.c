@@ -29,7 +29,6 @@
 #if defined(HAVE_FCNTL_H)
 #include <fcntl.h>
 #endif
-#include <math.h>
 #include "random.h"
 #include "floatmagic.h"
 
