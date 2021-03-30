@@ -637,6 +637,7 @@ load_symbols()
 					break;
 				}
 			}
+			unref(list[j]);	// the index string
 		}
 		efree(list);
 	}
