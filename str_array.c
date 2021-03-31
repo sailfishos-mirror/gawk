@@ -215,7 +215,7 @@ str_lookup(NODE *symbol, NODE *subs)
 	symbol->buckets[hash1] = b;
 	b->ahname_str = estrdup(subs->stptr, subs->stlen);
 	b->ahname_len = subs->stlen;
-	DEREF(subs);
+	unref(subs);
 	b->ahvalue = dupnode(Nnull_string);
 	b->ahcode = code1;
 	return & (b->ahvalue);
@@ -537,7 +537,7 @@ str_dump(NODE *symbol, NODE *ndump)
 
 				tmp = make_string(b->ahname_str, b->ahname_len);
 				assoc_info(tmp, b->ahvalue, ndump, aname);
-				DEREF(tmp);
+				unref(tmp);
 			}
 		}
 	}

@@ -412,6 +412,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		emalloc(table, NODE **, (func_count + 1) * sizeof(NODE *), "get_symbols");
 
 		for (i = count = 0; i < max; i += 2) {
+			unref(list[i]);	// the index string
 			r = list[i+1];
 			if (r->type == Node_ext_func || r->type == Node_builtin_func)
 				continue;
@@ -429,6 +430,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		emalloc(table, NODE **, (var_count + 1 + 1 + 1) * sizeof(NODE *), "get_symbols");
 
 		for (i = count = 0; i < max; i += 2) {
+			unref(list[i]);	// the index string
 			r = list[i+1];
 			if (r->type == Node_val)	/* non-variable in SYMTAB */
 				continue;
@@ -602,6 +604,7 @@ load_symbols()
 		if (max == 0)
 			continue;
 		for (j = 0; j < max; j += 2) {
+			unref(list[j]);	// the index string
 			r = list[j+1];
 			if (   r->type == Node_ext_func
 			    || r->type == Node_func
@@ -637,7 +640,6 @@ load_symbols()
 					break;
 				}
 			}
-			unref(list[j]);	// the index string
 		}
 		efree(list);
 	}
@@ -688,8 +690,10 @@ check_param_names(void)
 
 	for (i = 0; i < max; i += 2) {
 		f = list[i+1];
-		if (f->type == Node_builtin_func || f->param_cnt == 0)
+		if (f->type == Node_builtin_func || f->param_cnt == 0) {
+			unref(list[i]);	// free the index string
 			continue;
+		}
 
 		/* loop over each param in function i */
 		for (j = 0; j < f->param_cnt; j++) {
@@ -707,6 +711,7 @@ check_param_names(void)
 				result = false;
 			}
 		}
+		unref(list[i]);	// free the index string
 	}
 
 	efree(list);
