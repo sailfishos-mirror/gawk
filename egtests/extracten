@@ -1,0 +1,14 @@
+:
+#set -xv
+
+echo "* Extracting in $s/en from the English gawktexi.in"
+cd $s
+# for existing directory, just replace the programs, leave what is there already
+from=$doclib
+if [ ! -d "en" ]
+then
+	mkdir en
+fi
+cd en
+cp $doclib/gawktexi.in gawktexi.in
+gawk -f $b/extracten.awk gawktexi.in

@@ -1,0 +1,864 @@
+:
+# / main
+# ...for customisation
+#
+print_help() {
+	echo "*"
+	echo "Choose by number one or more tests to try"
+	echo "e.g.: 1-5,14,26-30"
+	echo "If a suffix is given, e.g.: 1e or: h"
+	echo "alone or after the list of numbers"
+	echo "h -- will just print this help text"
+	echo "d -- will invoke ${vim}diff for a test file in both languages"
+	echo "b -- will invoke $vim for a test file"
+	echo "e -- will invoke $vim for a test file"
+	echo "w -- will tell where a module is"
+	echo "q,Q,quit,x,ZZ,zz -- will exit from gawkeg"
+	echo "Everything else just has no effect"
+}
+
+do_addresses() {
+	echo "*"
+	echo "* Tested by simple_csv"
+	do_simple_csv
+}
+
+do_alarm() {
+	echo "*"
+	now=`date "+%H:%M"`
+	echo "now   is $now"
+	# fails on 23:59
+	echo "*"
+	later=`date "+%H %M"|gawk ' { if ( $2 < 59 ) { printf("%2.2d:%2.2d",$1,$2+1); } else { printf("%2.2d",$1+1,0);} } '`
+	echo "later is $later"
+	echo "*"
+	echo "gawk -f alarm.awk -f gettime.awk $later \"testing alarm for $later\" 5 1"
+	      gawk -f alarm.awk -f gettime.awk $later  "testing alarm for $later"  5 1
+}
+
+do_anagram() {
+	echo "*"
+	echo "gawk -f anagram.awk /usr/share/dict/words | grep '^com'"
+	      gawk -f anagram.awk /usr/share/dict/words | grep '^com'
+}
+
+do_arraymax() {
+	echo "*"
+	echo "cat $miscdir/arraymax.data"
+	      cat $miscdir/arraymax.data
+	echo "*"
+	echo "* in the output, the written numbers should be in order"
+	echo "*"
+	echo "gawk -f arraymax.awk $miscdir/arraymax.data"
+	      gawk -f arraymax.awk $miscdir/arraymax.data
+}
+
+do_arraymax_data() {
+	echo "*"
+	echo "* Tested by arraymax.awk"
+	do_arraymax
+}
+
+do_assert() {
+	echo 'BEGIN {  for ( i=1; i<=4; i++ ) { a[i]=i ; b[i]=i } for ( i=1; i<=4; i++) { c=a[i] ; { for (j=4; j>=1; j-- ) { d=b[j] ; print "c = ",c,"d =",d;  assert(c<=d, "c<=d" ) } } } exit }' > $testpgm
+	echo "*"
+	echo "gawk -f $testpgm -f assert.awk"
+	      gawk -f $testpgm -f assert.awk
+}
+
+do_awksed() {
+	echo "*"
+	echo "head -5 /etc/hosts"
+	      head -5 /etc/hosts
+	echo "*"
+	echo "head -5 /etc/hosts|gawk -f awksed.awk 0 ZZZ"
+	      head -5 /etc/hosts|gawk -f awksed.awk 0 ZZZ
+}
+
+do_bits2str() {
+	echo "*"
+	echo "* Tested by testbits.awk"
+	do_testbits
+}
+
+do_class_data1() {
+	echo "*"
+	echo "* Tested by indirectcall.awk"
+	do_indirectcall
+}
+
+do_class_data2() {
+	echo "*"
+	echo "* Tested by quicksort.awk"
+	do_quicksort
+}
+
+do_cliff_rand() {
+	echo 'BEGIN { for ( i=1; i<=10; i++ ) print cliff_rand() ; exit } ' > $testpgm
+	echo "*"
+	echo "gawk -f cliff_rand.awk -f $testpgm"
+	      gawk -f cliff_rand.awk -f $testpgm
+}
+
+do_ctime() {
+	echo 'BEGIN { print ctime(); for ( i=1; i<=20000000; i++ ) a++; print "after " a " empty loops"; print ctime() } ' > $testpgm
+	echo "*"
+	echo "gawk -f $testpgm -f ctime.awk"
+	      gawk -f $testpgm -f ctime.awk
+}
+
+do_cut() {
+	echo "*"
+	echo "echo abcdefghijklmnopqrstuwwxyz 0123456789 | gawk -f getopt.awk  -f cut.awk -f join.awk -- -c2-8"
+	      echo abcdefghijklmnopqrstuwwxyz 0123456789 | gawk -f getopt.awk  -f cut.awk -f join.awk -- -c2-8
+	echo "*"
+	echo "echo abcdefghijklmnopqrstuwwxyz@0123456789 | gawk -f getopt.awk  -f cut.awk -f join.awk -- -f2 -d@"
+	      echo abcdefghijklmnopqrstuwwxyz@0123456789 | gawk -f getopt.awk  -f cut.awk -f join.awk -- -f2 -d@
+	echo "*"
+	echo "echo abcdefghijklmnopqrstuwwxyz 0123456789 | gawk -f getopt.awk  -f cut.awk -f join.awk -- -c24-32"
+	      echo abcdefghijklmnopqrstuwwxyz 0123456789 | gawk -f getopt.awk  -f cut.awk -f join.awk -- -c24-32
+}
+
+do_dupword() {
+	echo "*"
+	echo "echo \"a a a b c c c d e e e f g g h iii iii j kkk kkk\"|gawk -f dupword.awk"
+	      echo  "a a a b c c c d e e e f g g h iii iii j kkk kkk" |gawk -f dupword.awk
+}
+
+do_egrep() {
+	echo "*"
+	echo "head -5 /etc/hosts"
+	      head -5 /etc/hosts
+	echo "*"
+	echo "head -5 /etc/hosts|gawk -f getopt.awk -f egrep.awk -- 127"
+	      head -5 /etc/hosts|gawk -f getopt.awk -f egrep.awk -- 127
+	echo "*"
+	echo "head -5 /etc/hosts|gawk -f getopt.awk -f egrep.awk -- -n 127"
+	      head -5 /etc/hosts|gawk -f getopt.awk -f egrep.awk -- -n 127
+	echo "*"
+	echo "head -5 /etc/hosts|gawk -f getopt.awk -f egrep.awk -- -c 127"
+	      head -5 /etc/hosts|gawk -f getopt.awk -f egrep.awk -- -c 127
+	echo "*"
+	echo "gawk -f getopt.awk -f egrep.awk -- IGNORECASE *.awk"
+	      gawk -f getopt.awk -f egrep.awk -- IGNORECASE *.awk
+}
+
+do_extract() {
+	echo "*"
+	echo "* extract.awk is implicitly tested when running gawkeg:"
+	echo "* it is used to build the test libraries."
+	echo "* If there are problems they should be reported during"
+	echo "* the initialization of the gawkeg shell script"
+}
+
+do_findpat() {
+	echo "*"
+	echo "cat $miscdir/findpat.data"
+	      cat $miscdir/findpat.data
+	echo "*"
+	echo "gawk -f findpat.awk $miscdir/findpat.data"
+	      gawk -f findpat.awk $miscdir/findpat.data
+}
+
+do_findpat_data() {
+	echo "*"
+	echo "* Tested by findpat.awk"
+	do_findpat
+	return
+}
+
+do_ftrans() {
+	echo "*"
+	echo " FILENAME != _oldfilename_ && _filename_ != FILENAME { if (_oldfilename_ != \"\") endfile(_oldfilename_) ; _oldfilename_ = FILENAME ; beginfile(FILENAME) } function beginfile(filename){ print \"in beginfile for \" filename ; nin=0 } function endfile(filename){ print \"in endfile   for \" filename \" \" nin \" record\" } { nin++ } ">$testpgm
+	echo "gawk -f ftrans.awk -f $testpgm wc.awk cut.awk pi.awk"
+	      gawk -f ftrans.awk -f $testpgm wc.awk cut.awk pi.awk
+}
+
+do_getopt() {
+	echo "*"
+	echo "gawk -f getopt.awk -v _getopt_test=1 -- -a -cbARG bax -x -y -zfoo"
+	      gawk -f getopt.awk -v _getopt_test=1 -- -a -cbARG bax -x -y -zfoo
+}
+
+do_gettime() {
+	echo "*"
+	echo "* Tested by alarm.awk"
+	do_alarm
+}
+
+do_getlocaltime() {
+	echo "*"
+	echo "* Tested by alarm.awk"
+	echo "*"
+	echo "* getlocaltime routine is contained in gettime.awk"
+	do_alarm
+}
+
+do_grcat() {
+	echo "*"
+	echo "gcc -o $tmplib/grcat ../lib/grcat.c -DHAVE_GETGRENT"
+	      gcc -o $tmplib/grcat ../lib/grcat.c -DHAVE_GETGRENT
+	echo "*"
+	echo "$tmplib/grcat|head"
+	      $tmplib/grcat|head
+}
+
+do_groupawk() {
+	echo "*"
+	echo "* Tested by id"
+	do_id
+}
+
+do_guide() {
+	# the first time you really convert the messages
+	echo "*"
+	echo "gawk --gen-pot -f guide.awk >$datadir/guide.pot"
+	      gawk --gen-pot -f guide.awk >$datadir/guide.pot 
+	echo "# if the file is not existing yet, save this file as $datadir/$poname.po" >>$datadir/guide.pot
+	echo "*"
+	echo "$vim $datadir/guide.pot"
+	      wait_go_ahead
+	      $vim $datadir/guide.pot
+	echo "*"
+	echo "*"
+	echo "msgfmt $datadir/$poname.po -o $podir/LC_MESSAGES/guide.mo"
+	      msgfmt $datadir/$poname.po -o $podir/LC_MESSAGES/guide.mo
+	echo "*"
+	echo "* Translated messages:"
+	echo "gawk -f guide.awk"
+	      gawk -f guide.awk
+	echo "*"
+	echo "* Original messages:"
+	echo "gawk --posix -f guide.awk -f libintl.awk"
+	      gawk --posix -f guide.awk -f libintl.awk 
+}
+
+do_guide_po() {
+	echo "*"
+	echo "* Tested by guide"
+	do_guide
+}
+
+do_guide_mellow() {
+	echo "*"
+	echo "* Tested by guide"
+	do_guide
+}
+
+do_guide_pot() {
+	echo "*"
+	echo "* Tested by guide"
+	do_guide
+}
+
+do_have_mpfr() {
+	echo "*"
+	echo "BEGIN { fpbits = 123 ; PREC = fpbits ; if (! adequate_math_precision(fpbits)) { print \"Error: insufficient computation precision available.\"; print \"Try again with the -M argument?\"; exit 1 } else { print \"Computation precision should be enough.\"; exit } }" > $testpgm
+	echo "gawk -f have_mpfr.awk -f $testpgm"
+	      gawk -f have_mpfr.awk -f $testpgm
+	echo "*"
+	echo "gawk -M -f have_mpfr.awk -f $testpgm"
+	      gawk -M -f have_mpfr.awk -f $testpgm
+}
+
+do_histsort() {
+	echo "*"
+	# history has a line number before each entry
+	echo "history|tail -30|cut -c8-|gawk -f histsort.awk|sort"
+	      history|tail -30|cut -c8-|gawk -f histsort.awk|sort
+}
+
+do_id() {
+	echo "*"
+	if [ ! -s "$tmplib/grcat" ]
+	then
+		echo "* compiling grcat"
+		echo "gcc -o $tmplib/grcat ../lib/grcat.c -DHAVE_GETGRENT"
+	      	      gcc -o $tmplib/grcat ../lib/grcat.c -DHAVE_GETGRENT
+	fi
+	echo "* state where grcat is and load group functions"
+	echo "gawk -v lib=$tmplib ' \$1==\"_gr_awklib\"  { print \$1,\$2,lib; next } { print } ' ../lib/groupawk.in > $testpgm"
+	      gawk -v lib=$tmplib '   $1=="_gr_awklib"   { print $1 " " $2 " \"" lib "/\"";   next } { print } ' ../lib/groupawk.in > $testpgm
+	echo "*"
+	echo "gawk -f getopt.awk -f $testpgm -f passwdawk.in -f id.awk -- "
+	      gawk -f getopt.awk -f $testpgm -f passwdawk.in -f id.awk --
+	echo "*"
+	echo "gawk -f getopt.awk -f $testpgm -f passwdawk.in -f id.awk -- -g"
+	      gawk -f getopt.awk -f $testpgm -f passwdawk.in -f id.awk -- -g
+	echo "*"
+	echo "gawk -f getopt.awk -f $testpgm -f passwdawk.in -f id.awk -- -G"
+	      gawk -f getopt.awk -f $testpgm -f passwdawk.in -f id.awk -- -G
+}
+
+do_igawk() {
+	echo "*"
+	echo "* testing using the cut.awk program (requires getopt and join)"
+	echo "*"
+	echo "echo \"@include getopt.awk\"  >$testpgm"
+	      echo  "@include getopt.awk"   >$testpgm
+	echo "echo \"@include join.awk\"   >>$testpgm"
+	      echo  "@include join.awk"    >>$testpgm
+	echo "cat cut.awk >> $testpgm"
+	      cat cut.awk >> $testpgm
+	echo "*"
+	echo "echo abcdefghijklmnopqrstuwwxyz 0123456789 | igawk.sh -f $testpgm -- -c2-8"
+	      echo abcdefghijklmnopqrstuwwxyz 0123456789 | igawk.sh -f $testpgm -- -c2-8
+}
+
+do_indirectcall() {
+	echo "*"
+	echo "gawk -f indirectcall.awk $datadir/class_data1"
+	      gawk -f indirectcall.awk $datadir/class_data1
+}
+
+do_inplace() {
+	echo "*"
+	echo "echo \"one two three four\"|gawk -i inplace '{ gsub(/three/, "3") }; { print }'"
+	echo        "one two three four" |gawk -i inplace '{ gsub(/three/, "3") }; { print }'
+	echo "*"
+	echo "head -5 $datadir/mail-list > $testpgm"
+	      head -5 $datadir/mail-list > $testpgm
+	echo "*"
+	echo "cat $testpgm"
+	      cat $testpgm
+	echo "*"
+	echo "gawk -i inplace '{ gsub(/gmail/, \"ZZZZZ\") }; { gsub(\"555\", \"999\") } { print }' $testpgm"
+	      gawk -i inplace '{ gsub(/gmail/,  "ZZZZZ" ) }; { gsub( "555",   "999" ) } { print }' $testpgm
+	echo "*"
+	echo "cat $testpgm"
+	      cat $testpgm
+}
+
+do_intdiv0() {
+	echo "*"
+	echo "BEGIN { intdiv0(123456789,45678,res); for ( i in res ) print i,res[i] ; print res[\"quotient\"]*45678+res[\"remainder\"] ; exit; }" >$testpgm
+	echo "cat $testpgm"
+	      cat $testpgm
+	echo "gawk -f $testpgm -f intdiv0.awk"
+	      gawk -f $testpgm -f intdiv0.awk
+}
+
+do_inventory_shipped() {
+	echo "*"
+	echo "* inventory-shipped is used as input to a few sample programs"
+	echo "*"
+	echo "gawk '\$1 ~ /J/ { print \$0 }' $datadir/inventory-shipped"
+	      gawk ' $1 ~ /J/ { print  $0 }' $datadir/inventory-shipped
+	echo "*"
+}
+
+do_join() {
+	echo 'BEGIN {  for ( i=1; i<=9; i++ ) a[i]=i ; for ( i in a ) print a[i] ; print "* joining only from 2 to 8"; joined=join(a,2,8,"_|_"); print joined; exit; }' > $testpgm
+	echo "*"
+	echo "gawk -f $testpgm -f join.awk"
+	      gawk -f $testpgm -f join.awk
+}
+
+do_labels() {
+	echo "*"
+	echo "BEGIN { for (i=1; i<=35; i++ ) { gen_label(); } exit; } function gen_label() { nlab++; printf \"Given-Name \"; for ( j=1; j<=8; j++ ) { printf nlab; } print \"\"; print \"Broad Street,\",nlab; print \"12345 Somewhere\"; print \"KY\"; print \"\"; }" >$testpgm
+	echo "* creating a \"label\" file"
+	echo "gawk -f \$testpgm >../../labels.txt"
+	      gawk -f  $testpgm >../../labels.txt
+	echo "* calling the labels.awk program"
+	echo "gawk -f labels.awk ../../labels.txt >../../labels.out"
+	      gawk -f labels.awk ../../labels.txt >../../labels.out
+	echo "* invoking $vim to view output of labels.awk"
+	      wait_go_ahead
+	      $vim -o ../../labels.txt ../../labels.out
+	      rm -f   ../../labels.txt ../../labels.out
+
+}
+
+do_libintl() {
+	echo "*"
+	echo "* Tested by guide"
+	do_guide
+}
+
+do_mail_list() {
+	echo "*"
+	echo "* mail-list is used as input to a few sample programs"
+	echo "*"
+	echo "gawk '/li/ { print \$0 }' $datadir/mail-list"
+	      gawk '/li/ { print  $0 }' $datadir/mail-list
+}
+
+do_noassign() {
+	echo "*"
+	echo "* preparing a test program"
+	echo "BEGIN { print \"==>\",a,b,c,\"<==\"; exit }"
+	echo "BEGIN { print \"==>\",a,b,c,\"<==\"; exit }" > $testpgm
+	echo "* no assignments"
+	echo "gawk -v No_command_assign=1 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm"
+	      gawk -v No_command_assign=1 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm
+	echo "* use assignments"
+	echo "gawk -v No_command_assign=0 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm"
+	      gawk -v No_command_assign=0 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm
+}
+
+do_ns_passwd() {
+	if [ ! -s "$tmplib/pwcat" ]
+	then
+		echo "* compiling pwcat"
+		echo "gcc -o $tmplib/pwcat ../lib/pwcat.c -DHAVE_GETGRENT"
+	      	      gcc -o $tmplib/pwcat ../lib/pwcat.c -DHAVE_GETGRENT
+	fi
+	echo "*"
+	echo "* state where pwcat is and load group functions"
+	echo "gawk -v lib=$tmplib ' \$1==\"Awklib\"  { print \$1,\$2,lib; next } { print } ' ../lib/passwdawk.in > $testpgm"
+	      gawk -v lib=$tmplib '   $1=="Awklib"   { print $1 " " $2 " \"" lib "/\"";   next } { print } ' ../lib/passwdawk.in > $testpgm
+	echo "BEGIN { while ((p = getpwent()) != \"\") print p ; exit }" >> $testpgm
+	echo "gawk -f $testpgm|head"
+	      gawk -f $testpgm|head
+}
+
+do_ord() {
+	echo "*"
+	echo "BEGIN { print \"hit ENTER to exit\"; for (;;) { printf(\"enter a character: \") ; if (getline var <= 0) break ; if ( var==\"\" ) break ; printf(\"ord(%s) = %d\n\", var, ord(var)) ; printf(\"chr(%d) = %s\n\", ord(var), chr(ord(var))) } exit }" >$testpgm
+	echo "gawk -f ord.awk -f $testpgm"
+	      gawk -f ord.awk -f $testpgm
+}
+
+do_passwdawk() {
+	echo "*"
+	echo "* Tested by ns_passwd.awk"
+	do_ns_passwd
+}
+
+do_pi() {
+	echo "*"
+	echo "* just a few decimals for testing"
+	if [ "$lang" = "en" ]
+	then
+	echo "gawk ' \$1==\"digits\"  { print \$1,\$2,60; next } { print } ' pi.awk > $testpgm"
+	      gawk '  $1=="digits"    { print $1,$2,60; next   } { print } ' pi.awk > $testpgm
+	fi
+	if [ "$lang" = "it" ]
+	then
+	echo "gawk ' \$1==\"cifre\"  { print \$1,\$2,60; next } { print } ' pi.awk > $testpgm"
+	      gawk '  $1=="cifre"    { print $1,$2,60; next   } { print } ' pi.awk > $testpgm
+	fi
+	echo "gawk -M -v PREC=1000 -f intdiv0.awk  -f $testpgm"
+	      gawk -M -v PREC=1000 -f intdiv0.awk  -f $testpgm
+	echo "3141592653589793238462643383279502884197169399375105820974944 ...from the Internet"
+}
+
+do_processarray() {
+	echo "*"
+	echo "* test array:"
+	echo "a[1] = 1"
+	echo "a[2][1] = 21"
+	echo "a[2][2] = 22"
+	echo "a[3] = 3"
+	echo "a[4][1][1] = 411"
+	echo "a[4][2] = 42"
+	echo "BEGIN { a[1] = 1; a[2][1] = 21; a[2][2] = 22; a[3] = 3; a[4][1][1] = 411; a[4][2] = 42; process_array(a, \"a\", \"do_print\", 0) } ; function do_print(name, element) { printf \"%s = %s\n\", name, element }" > $testpgm
+	echo "*"
+	echo "gawk -f processarray.awk -f $testpgm"
+	      gawk -f processarray.awk -f $testpgm
+}
+
+do_pwcat() {
+	echo "*"
+	echo "gcc -o $tmplib/pwcat ../lib/pwcat.c -DHAVE_GETGRENT"
+	      gcc -o $tmplib/pwcat ../lib/pwcat.c -DHAVE_GETGRENT
+	echo "*"
+	echo "$tmplib/pwcat|head"
+	      $tmplib/pwcat|head
+}
+
+do_quicksort() {
+	echo "*"
+	echo "gawk -f quicksort.awk -f indirectcall.awk $datadir/class_data2"
+              gawk -f quicksort.awk -f indirectcall.awk $datadir/class_data2
+	return
+}
+
+do_readable() {
+	echo "*"
+	echo "BEGIN{ for ( i=1; i<ARGC; i++ ) { print i,ARGV[i]; } }" >$testpgm
+	echo "gawk -f readable.awk -f $testpgm /root/.vimrc $HOME/.vimrc /root/.netrc $HOME/.netrc"
+	      gawk -f readable.awk -f $testpgm /root/.vimrc $HOME/.vimrc /root/.netrc $HOME/.netrc
+}
+
+do_readfile() {
+	echo "*"
+	echo "@load \"readfile\"; BEGIN { contents = readfile(\"/etc/hosts\"); if (contents == \"\" && ERRNO != \"\") { print(\"problem reading file\", ERRNO) > \"/dev/stderr\" } else { print length(contents) } }" > $testpgm
+	echo "* using as test file /etc/hosts"
+	echo "* its length in bytes is:"
+	     wc -c /etc/hosts
+	echo "* running the test program:"
+	     gawk -f $testpgm
+}
+
+do_rewind() {
+	echo "*"
+	echo "* test data"
+	echo "printf \"a\nb\nc\nd\ne\n\" > $testdata"
+	      printf  "a\nb\nc\nd\ne\n"  > $testdata
+	echo "echo \"FNR == 3 && ! rewound { rewound = 1; rewind() } { print FILENAME, FNR, \$0 }\" >$testpgm"
+	      echo  "FNR == 3 && ! rewound { rewound = 1; rewind() } { print FILENAME, FNR, \$0 }"  >$testpgm
+	echo "* It should restart after reaching c"
+	echo "gawk -f rewind.awk -f $testpgm $testdata"
+	      gawk -f rewind.awk -f $testpgm $testdata
+}
+
+do_round() {
+	echo "*"
+	echo "* test data"
+	echo "printf \"0.5\n1.5\n2.5\n3.5\n4.5\n5.5\" > $testdata"
+	      printf  "0.5\n1.5\n2.5\n3.5\n4.5\n5.5"  > $testdata
+	      echo "echo  { print \$0, \"====>\", round(\$0); printf(\"regular: %2.1d\n\",\$0); }  > $testpgm"
+	            echo "{ print \$0, \"====>\", round(\$0); printf(\"regular: %2.1d\n\",\$0); }" > $testpgm
+	echo "gawk -f round.awk -f $testpgm $testdata"
+	      gawk -f round.awk -f $testpgm $testdata
+}
+
+do_sample() {
+	echo "*"
+	echo "* Tested by test_csv"
+	do_test_csv
+}
+
+do_shellquote() {
+	echo "*"
+	echo "* test data"
+	echo "LANG=en_US.88591 metaflac --set-tag=TITLE='Whoope! That'\"'\"'s Great' file.flac" > $testdata
+	echo "cat $testdata"
+	      cat $testdata
+	echo "{ RET=shell_quote(\$0); print RET; }" > $testpgm
+	echo "*"
+	echo "gawk -f shellquote.awk -f $testpgm $testdata"
+	      gawk -f shellquote.awk -f $testpgm $testdata
+}
+
+do_simple_csv() {
+	echo "*"
+	echo "cat $miscdir/addresses.csv"
+	      cat $miscdir/addresses.csv
+	echo "*"
+	echo "gawk -f simple-csv.awk $miscdir/addresses.csv"
+	      gawk -f simple-csv.awk $miscdir/addresses.csv
+}
+
+do_split() {
+	echo "*"
+	echo " cleanup just in case"
+	echo " rm -f ../../gawkeg*"
+	       rm -f ../../gawkeg*
+	echo "gawk -f getopt.awk -f split.awk -- -l 5 /etc/hosts ../../gawkeg"
+	      gawk -f getopt.awk -f split.awk -- -l 5 /etc/hosts ../../gawkeg
+	      wc -l ../../gawkeg*
+	echo "*"
+	echo " cleanup just in case"
+	echo " rm -f ../../gawkeg*"
+	       rm -f ../../gawkeg*
+	echo "gawk -f getopt.awk -f split.awk -- -b 100 /etc/hosts ../../gawkeg"
+	      gawk -f getopt.awk -f split.awk -- -b 100 /etc/hosts ../../gawkeg
+	      wc -c ../../gawkeg*
+}
+
+do_strtonum() {
+	echo "*"
+	echo "* using test program"
+	echo "BEGIN { a[1] = \"25\"; a[2] = \".31\"; a[3] = \"0123\"; a[4] = \"0xdeadBEEF\"; a[5] = \"123.45\"; a[6] = \"1.e3\"; a[7] = \"1.32\"; a[8] = \"1.32E2\"; for (i = 1; i in a; i++) print a[i], strtonum(a[i]), mystrtonum(a[i]); exit}" >$testpgm
+	echo "gawk -f strtonum.awk -f $testpgm"
+	      gawk -f strtonum.awk -f $testpgm
+	echo "*"
+	echo "* using gawk function"
+	echo "BEGIN { a[1] = \"25\"; a[2] = \".31\"; a[3] = \"0123\"; a[4] = \"0xdeadBEEF\"; a[5] = \"123.45\"; a[6] = \"1.e3\"; a[7] = \"1.32\"; a[8] = \"1.32E2\"; for (i = 1; i in a; i++) print a[i], strtonum(a[i]), strtonum(a[i]); exit}" >$testpgm
+	echo "gawk -f $testpgm"
+	      gawk -f $testpgm
+}
+
+do_tee() {
+	echo "*"
+	echo "* on the screen"
+	echo "head -5 /etc/hosts|gawk -f tee.awk $testdata"
+	      head -5 /etc/hosts|gawk -f tee.awk $testdata
+	echo "*"
+	echo "* on the file"
+	echo "cat $testdata"
+	      cat $testdata
+}
+
+do_test_csv() {
+	echo "*"
+	echo "* test data"
+	printf  "p,\"q,r\",s\np,\"q\"\"r\",s\np,\"q,\"\"r\",s\np,\"\",s\np,,s\n"   >$testdata
+	echo "cat $testdata"
+	      cat $testdata
+	echo "*"
+	gawk -f test-csv.awk $testdata
+}
+
+do_testbits() {
+	echo "*"
+	echo "gawk ' $0 ~ \"BEGIN\" { print_it=1; } print_it==1 { print } ' testbits.awk"
+	      gawk ' $0 ~  "BEGIN"  { print_it=1; } print_it==1 { print } ' testbits.awk
+	echo "*"
+	echo "gawk -f testbits.awk"
+	      gawk -f testbits.awk
+	# ideally it should be:
+	#echo "gawk -f testbits.awk -f bits2str.awk"
+	#      gawk -f testbits.awk -f bits2str.awk
+}
+
+do_translate() {
+	echo "*"
+	echo "input:"
+	      head -5 /etc/hosts
+	echo "head -5 /etc/hosts|gawk -f translate.awk 1 \"#\""
+	echo "*"
+	echo "output:"
+	      head -5 /etc/hosts|gawk -f translate.awk 1 "#"
+}
+
+do_uniq() {
+	echo "*"
+	printf "a a\nb b\nb b\nc c\nc c\nc c\n" > $testdata
+	echo "* input file"
+	      cat $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f join.awk -f uniq.awk -- $testdata"
+	      gawk -f getopt.awk -f join.awk -f uniq.awk -- $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f join.awk -f uniq.awk -- -d $testdata"
+	      gawk -f getopt.awk -f join.awk -f uniq.awk -- -d $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f join.awk -f uniq.awk -- -c $testdata"
+	      gawk -f getopt.awk -f join.awk -f uniq.awk -- -c $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f join.awk -f uniq.awk -- -f 1 $testdata"
+	      gawk -f getopt.awk -f join.awk -f uniq.awk -- -f 1 $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f join.awk -f uniq.awk -- -s 2 $testdata"
+	      gawk -f getopt.awk -f join.awk -f uniq.awk -- -s 2 $testdata
+}
+
+do_walkarray() {
+	echo "*"
+	echo "* test array:"
+	echo "a[1] = 1"
+	echo "a[2][1] = 21"
+	echo "a[2][2] = 22"
+	echo "a[3] = 3"
+	echo "a[4][1][1] = 411"
+	echo "a[4][2] = 42"
+	echo "BEGIN { a[1] = 1; a[2][1] = 21; a[2][2] = 22; a[3] = 3; a[4][1][1] = 411; a[4][2] = 42; walk_array(a, \"a\") };" > $testpgm
+	echo "*"
+	echo "gawk -f walkarray.awk -f $testpgm"
+	      gawk -f walkarray.awk -f $testpgm
+}
+
+do_wc() {
+	echo "*"
+	echo "gawk -f getopt.awk -f ftrans.awk -f wc.awk -- /etc/hosts"
+	      gawk -f getopt.awk -f ftrans.awk -f wc.awk -- /etc/hosts
+	echo "*"
+	echo "* using a multibyte file"
+        echo ":set langmap=ΑA,ΒB,ΨC,ΔD,ΕE,ΦF,ΓG,ΗH,ΙI,ΞJ,ΚK,ΛL,ΜM,ΝN,ΟO,ΠP,QQ,ΡR,ΣS,ΤT,ΘU,ΩV,WW,ΧX,ΥY,ΖZ,αa,βb,ψc,δd,εe,φf,γg,ηh,ιi,ξj,κk,λl,μm,νn,οo,πp,qq,ρr,σs,τt,θu,ωv,ςw,χx,υy,ζz" > $testdata
+	echo "*"
+	echo "cat $testdata"
+	      cat $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f ftrans.awk -f wc.awk -- -c $testdata"
+	      gawk -f getopt.awk -f ftrans.awk -f wc.awk -- -c $testdata
+	echo "*"
+	echo "gawk -f getopt.awk -f ftrans.awk -f wc.awk -- -m $testdata"
+	      gawk -f getopt.awk -f ftrans.awk -f wc.awk -- -m $testdata
+}
+
+do_wordfreq() {
+	echo "*"
+	printf "a a\nb b\nb b\nc c\nc c\nc c\n" > $testdata
+	echo "* input file"
+	      cat $testdata
+	echo "gawk -f wordfreq.awk $testdata|sort -k2nr"
+	      gawk -f wordfreq.awk $testdata|sort -k2nr
+}
+
+do_zerofile() {
+	echo "*"
+	echo "function zerofile(file,number){ print \"ignoring file number\",number,\"which has length zero:\",file }" > $testpgm
+	echo "gawk -f $testpgm -f zerofile.awk /etc/hosts /dev/null /etc/hosts /dev/null /etc/hosts /dev/null"
+	      gawk -f $testpgm -f zerofile.awk /etc/hosts /dev/null /etc/hosts /dev/null /etc/hosts /dev/null
+}
+
+wait_go_ahead() {
+	echo "*"
+	echo "* Hit ENTER to proceed..."
+	read nothing
+	if [ "$nothing" = "q" -o "$nothing" = "Q" -o "$nothing" = "zz" -o "$nothing" = "ZZ" -o "$nothing" = "quit" -o "$nothing" = "x" ]
+	then
+		go_away
+	fi
+}
+
+go_away() {
+	#echo exiting, as per request
+	if [ -f "$testpgm" ]
+	then
+		rm -f $testpgm
+	fi
+	if [ -f "$testdata" ]
+	then
+		rm -f $testdata
+	fi
+	# this one should always be there
+	rm -f ../../egidx.awk
+	# these could be there or not
+	rm -f ../../gawkeg*
+	figlet done
+	exit
+}
+
+# set -xv
+#
+# main
+#
+# this script tests gawk programs that are in the eg directory
+# needs gawkextlib-1.0.4
+# needs gawk-mbs-snapshot.tar
+#
+# editor to use
+export vim=vim
+# the programs etc are extracted inside this directory
+export s=$t
+if [ ! -d "$s" ]
+then
+	mkdir $s
+fi
+# scripts etc. are in this directory
+export b=$d/dat/bin
+# parms: it or en, defaults to en
+if [ "$1" = "it" ]
+then
+	export lang=it
+	export LANGUAGE=it_IT.UTF-8
+	export podir=it_IT.UTF-8
+	export poname=guide-it
+	export doclib=$d/cache/gawk/doc/it
+	. $b/extractit
+else
+	export lang=en
+	export LANGUAGE=C.UTF-8
+	export podir=C.UTF-8
+	export poname=guide-mellow
+	export doclib=$d/cache/gawk/doc
+	. $b/extracten
+fi
+# depending on the language...
+export AWKPATH=.:$s/$lang/eg/lib:$s/$lang/eg/misc:$s/$lang/eg/prog
+export AWKLIBPATH=.:/usr/local/lib/gawk
+export datadir=$s/$lang/eg/data
+export miscdir=$s/$lang/eg/misc
+# for testing po / pot -- used only for Italian
+cd $s
+cp $b/guide-it.po $lang/eg/data
+# name of directory where grcat and pwcat are
+export tmplib=$s/$lang
+# name of a temporary program needed sometimes
+export testpgm=$tmplib/testpgm.awk
+# name of a temporary program needed sometimes
+export testdata=$tmplib/testdata.txt
+# working directory during the test
+cd $s/$lang/eg/prog
+# check that the extract.awk pgm is equal to the one from gawktexi.in
+cat extract.awk     >$testpgm
+cat ../lib/join.awk>>$testpgm
+diff $testpgm $b/extract$lang.awk
+if [ "$?" -ne 0 ]
+then
+	echo "*"
+	echo "* Beware, the extract.awk program is not the same contained in gawktexi.in"
+	echo "*"
+fi
+
+cd $s/$lang/eg
+list=`find . -type f|gawk -f $b/gawkeg.awk -v lang=$lang|sort`
+cd $s/$lang/eg/prog
+
+while	[ true ]
+do
+	# the parameter for scegli is the number of columns
+	scelta=`$b/scegli $list 4`
+        sublst=`$b/extract 1 "$scelta"`
+	#echo $sublst
+        subcmd=`$b/extract 2 "$scelta"`
+	#echo $subcmd
+	# done with
+	if [ "$subcmd" = "q" -o "$subcmd" = "Q" -o "$subcmd" = "zz" -o "$subcmd" = "ZZ" -o "$subcmd" = "quit" -o "$subcmd" = "x" ]
+	then
+		go_away
+	fi
+	# browse/edit
+	if [ "$subcmd" = "b" -o "$subcmd" = "e" ]
+	then
+		#echo $sublst
+		for i in $sublst
+		do
+			subrou=`echo $i|gawk -v t="true" -f ../../egidx.awk`
+			basename=`basename $subrou`
+			figlet $basename
+			echo "*"
+			echo "* Browsing/editing $i"
+			$vim $subrou
+			wait_go_ahead
+		done
+		continue
+	fi
+	# vimdiff
+	if [ "$subcmd" = "d" -a "$sublst" != "" ]
+	then
+		#echo $sublst
+		for i in $sublst
+		do
+			subrou=`echo $i|gawk -v t="true" -f ../../egidx.awk`
+			figlet $subrou
+			echo "*"
+			echo "* viewing differences in $i"
+			echo "*"
+			other=`echo $i|gawk -v t="alte" -f ../../egidx.awk`
+			echo $subrou $other
+			${vim}diff -c ":color blue" $subrou $other
+			wait_go_ahead
+		done
+		continue
+	fi
+	# where is the program
+	if [ "$subcmd" = "w" -a "$sublst" != "" ]
+	then
+		for i in $sublst
+		do
+			echo $i is:
+			echo $i|gawk -v t="true" -f ../../egidx.awk
+			echo $i|gawk -v t="alte" -f ../../egidx.awk
+		done
+		wait_go_ahead
+		continue
+	fi
+	if [ "$subcmd" = "h" -a "$sublst" == "" ]
+	then
+		print_help
+		wait_go_ahead
+		continue
+	fi
+	if [ "$subcmd" != "" ]
+	then
+		continue
+	fi
+	# every other $subcmd does nothing
+	#echo $sublst
+	for i in $sublst
+	do
+		subrou=`echo $i|cut -f 1 -d"."`
+		figlet $subrou
+		echo "*"
+		echo "* Testing $i"
+		do_$subrou
+		wait_go_ahead
+	done
+done
+
