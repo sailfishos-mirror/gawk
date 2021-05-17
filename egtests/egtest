@@ -1,4 +1,27 @@
 :
+#
+# this script tests all the scripts/programs,
+# contained in the gawk book,
+# that are extracted in the eg directory
+# by the extract.awk script
+#
+# it will work only under Linux/Unix
+# it will work only when invoked in the distribution directory
+# (that way the location of the gawktexi.in files is known)
+#
+# it can be executed by any user, provided it has access
+# to the gawk distribution directories
+# practically useful for the "readable.awk" test
+#
+# to run all the examples it needs:
+# gawk
+# gawkextlib-1.0.4
+# gawk-mbs-snapshot.tar
+# gcc
+# vim/vimdiff
+# the files:
+# /usr/share/dict/words
+#
 # / main
 # ...for customisation
 #
@@ -7,13 +30,13 @@ print_help() {
 	echo "Choose by number one or more tests to try"
 	echo "e.g.: 1-5,14,26-30"
 	echo "If a suffix is given, e.g.: 1e or: h"
-	echo "alone or after the list of numbers"
+	echo "(alone or after a list of numbers)"
 	echo "h -- will just print this help text"
 	echo "d -- will invoke ${vim}diff for a test file in both languages"
-	echo "b -- will invoke $vim for a test file"
-	echo "e -- will invoke $vim for a test file"
+	echo "b -- will invoke ${vim} for a test file"
+	echo "e -- will invoke ${vim} for a test file"
 	echo "w -- will tell where a module is"
-	echo "q,Q,quit,x,ZZ,zz -- will exit from gawkeg"
+	echo "q,Q,quit,x,ZZ,zz -- will exit from egtest"
 	echo "Everything else just has no effect"
 }
 
@@ -145,10 +168,10 @@ do_egrep() {
 
 do_extract() {
 	echo "*"
-	echo "* extract.awk is implicitly tested when running gawkeg:"
+	echo "* extract.awk is implicitly tested when running $0:"
 	echo "* it is used to build the test libraries."
 	echo "* If there are problems they should be reported during"
-	echo "* the initialization of the gawkeg shell script"
+	echo "* the initialization of the $0 shell script"
 }
 
 do_findpat() {
@@ -172,6 +195,33 @@ do_ftrans() {
 	echo " FILENAME != _oldfilename_ && _filename_ != FILENAME { if (_oldfilename_ != \"\") endfile(_oldfilename_) ; _oldfilename_ = FILENAME ; beginfile(FILENAME) } function beginfile(filename){ print \"in beginfile for \" filename ; nin=0 } function endfile(filename){ print \"in endfile   for \" filename \" \" nin \" record\" } { nin++ } ">$testpgm
 	echo "gawk -f ftrans.awk -f $testpgm wc.awk cut.awk pi.awk"
 	      gawk -f ftrans.awk -f $testpgm wc.awk cut.awk pi.awk
+}
+
+do_gen_float_table() {
+	# the programs are in test-programs
+	echo "*"
+	echo "* testing floating-point management in C, Gawk, Python"
+	echo "* C"
+	echo "gcc -o $tmplib/gen-float-table ../test-programs/gen-float-table.c -lm"
+	      gcc -o $tmplib/gen-float-table ../test-programs/gen-float-table.c -lm
+	echo "$tmplib/gen-float-table >$tmplib/C.out"
+	      $tmplib/gen-float-table >$tmplib/C.out
+	echo "*"
+	echo "* Gawk"
+	echo "gawk -f ../test-programs/gen-float-table.awk >$tmplib/Gawk.out"
+	      gawk -f ../test-programs/gen-float-table.awk >$tmplib/Gawk.out
+	echo "*"
+	echo "* Python"
+	echo "$python ../test-programs/gen-float-table.py >$tmplib/Python.out" 
+	      $python ../test-programs/gen-float-table.py >$tmplib/Python.out 
+	echo "*"
+	echo "...comparing the output from the three programs:"
+	echo "*"
+	echo "$vimdiff $tmplib/*.out"
+	wait_go_ahead
+	      $vimdiff $tmplib/*.out
+
+
 }
 
 do_getopt() {
@@ -210,25 +260,30 @@ do_groupawk() {
 }
 
 do_guide() {
-	# the first time you really convert the messages
+	#
+	# the message is already converted...
+	#
+	echo "*"
+	echo "* beware, the messages have been converted already"
+	echo "* they are shown just to check the conversion"
 	echo "*"
 	echo "gawk --gen-pot -f guide.awk >$datadir/guide.pot"
 	      gawk --gen-pot -f guide.awk >$datadir/guide.pot 
-	echo "# if the file is not existing yet, save this file as $datadir/$poname.po" >>$datadir/guide.pot
 	echo "*"
-	echo "$vim $datadir/guide.pot"
+	echo "$vim -o $datadir/guide.pot $datadir/$poname.po"
 	      wait_go_ahead
-	      $vim $datadir/guide.pot
-	echo "*"
+	      $vim -o $datadir/guide.pot $datadir/$poname.po
 	echo "*"
 	echo "msgfmt $datadir/$poname.po -o $podir/LC_MESSAGES/guide.mo"
 	      msgfmt $datadir/$poname.po -o $podir/LC_MESSAGES/guide.mo
 	echo "*"
 	echo "* Translated messages:"
+	echo "*"
 	echo "gawk -f guide.awk"
 	      gawk -f guide.awk
 	echo "*"
 	echo "* Original messages:"
+	echo "*"
 	echo "gawk --posix -f guide.awk -f libintl.awk"
 	      gawk --posix -f guide.awk -f libintl.awk 
 }
@@ -264,8 +319,8 @@ do_have_mpfr() {
 do_histsort() {
 	echo "*"
 	# history has a line number before each entry
-	echo "history|tail -30|cut -c8-|gawk -f histsort.awk|sort"
-	      history|tail -30|cut -c8-|gawk -f histsort.awk|sort
+	echo "history|tail -20|cut -c8-|gawk -f histsort.awk|sort"
+	      history|tail -20|cut -c8-|gawk -f histsort.awk|sort
 }
 
 do_id() {
@@ -316,17 +371,17 @@ do_inplace() {
 	echo "echo \"one two three four\"|gawk -i inplace '{ gsub(/three/, "3") }; { print }'"
 	echo        "one two three four" |gawk -i inplace '{ gsub(/three/, "3") }; { print }'
 	echo "*"
-	echo "head -5 $datadir/mail-list > $testpgm"
-	      head -5 $datadir/mail-list > $testpgm
+	echo "head -5 $datadir/mail-list > $testdata"
+	      head -5 $datadir/mail-list > $testdata
 	echo "*"
-	echo "cat $testpgm"
-	      cat $testpgm
+	echo "cat $testdata"
+	      cat $testdata
 	echo "*"
-	echo "gawk -i inplace '{ gsub(/gmail/, \"ZZZZZ\") }; { gsub(\"555\", \"999\") } { print }' $testpgm"
-	      gawk -i inplace '{ gsub(/gmail/,  "ZZZZZ" ) }; { gsub( "555",   "999" ) } { print }' $testpgm
+	echo "gawk -i inplace '{ gsub(/gmail/, \"ZZZZZ\") }; { gsub(\"555\", \"999\") } { print }' $testdata"
+	      gawk -i inplace '{ gsub(/gmail/,  "ZZZZZ" ) }; { gsub( "555",   "999" ) } { print }' $testdata
 	echo "*"
-	echo "cat $testpgm"
-	      cat $testpgm
+	echo "cat $testdata"
+	      cat $testdata
 }
 
 do_intdiv0() {
@@ -358,15 +413,15 @@ do_labels() {
 	echo "*"
 	echo "BEGIN { for (i=1; i<=35; i++ ) { gen_label(); } exit; } function gen_label() { nlab++; printf \"Given-Name \"; for ( j=1; j<=8; j++ ) { printf nlab; } print \"\"; print \"Broad Street,\",nlab; print \"12345 Somewhere\"; print \"KY\"; print \"\"; }" >$testpgm
 	echo "* creating a \"label\" file"
-	echo "gawk -f \$testpgm >../../labels.txt"
-	      gawk -f  $testpgm >../../labels.txt
+	echo "gawk -f \$testpgm >$s/$lang/labels.txt"
+	      gawk -f  $testpgm >$s/$lang/labels.txt
 	echo "* calling the labels.awk program"
-	echo "gawk -f labels.awk ../../labels.txt >../../labels.out"
-	      gawk -f labels.awk ../../labels.txt >../../labels.out
+	echo "gawk -f labels.awk $s/$lang/labels.txt >$s/$lang/labels.out"
+	      gawk -f labels.awk $s/$lang/labels.txt >$s/$lang/labels.out
 	echo "* invoking $vim to view output of labels.awk"
 	      wait_go_ahead
-	      $vim -o ../../labels.txt ../../labels.out
-	      rm -f   ../../labels.txt ../../labels.out
+	      $vim -o $s/$lang/labels.txt $s/$lang/labels.out
+	      rm -f   $s/$lang/labels.txt $s/$lang/labels.out
 
 }
 
@@ -545,18 +600,18 @@ do_simple_csv() {
 do_split() {
 	echo "*"
 	echo " cleanup just in case"
-	echo " rm -f ../../gawkeg*"
-	       rm -f ../../gawkeg*
-	echo "gawk -f getopt.awk -f split.awk -- -l 5 /etc/hosts ../../gawkeg"
-	      gawk -f getopt.awk -f split.awk -- -l 5 /etc/hosts ../../gawkeg
-	      wc -l ../../gawkeg*
+	echo " rm -f $s/$lang/egtest*"
+	       rm -f $s/$lang/egtest*
+	echo "gawk -f getopt.awk -f split.awk -- -l 5 /etc/hosts $s/$lang/egtest"
+	      gawk -f getopt.awk -f split.awk -- -l 5 /etc/hosts $s/$lang/egtest
+	      wc -l $s/$lang/egtest*
 	echo "*"
 	echo " cleanup just in case"
-	echo " rm -f ../../gawkeg*"
-	       rm -f ../../gawkeg*
-	echo "gawk -f getopt.awk -f split.awk -- -b 100 /etc/hosts ../../gawkeg"
-	      gawk -f getopt.awk -f split.awk -- -b 100 /etc/hosts ../../gawkeg
-	      wc -c ../../gawkeg*
+	echo " rm -f $s/$lang/egtest*"
+	       rm -f $s/$lang/egtest*
+	echo "gawk -f getopt.awk -f split.awk -- -b 100 /etc/hosts $s/$lang/egtest"
+	      gawk -f getopt.awk -f split.awk -- -b 100 /etc/hosts $s/$lang/egtest
+	      wc -c ../../egtest*
 }
 
 do_strtonum() {
@@ -692,106 +747,174 @@ wait_go_ahead() {
 	read nothing
 	if [ "$nothing" = "q" -o "$nothing" = "Q" -o "$nothing" = "zz" -o "$nothing" = "ZZ" -o "$nothing" = "quit" -o "$nothing" = "x" ]
 	then
-		go_away
+		rm -rf $s
+		exit
 	fi
-}
-
-go_away() {
-	#echo exiting, as per request
-	if [ -f "$testpgm" ]
-	then
-		rm -f $testpgm
-	fi
-	if [ -f "$testdata" ]
-	then
-		rm -f $testdata
-	fi
-	# this one should always be there
-	rm -f ../../egidx.awk
-	# these could be there or not
-	rm -f ../../gawkeg*
-	figlet done
-	exit
 }
 
 # set -xv
 #
 # main
 #
-# this script tests gawk programs that are in the eg directory
-# needs gawkextlib-1.0.4
-# needs gawk-mbs-snapshot.tar
-#
 # editor to use
 export vim=vim
-# the programs etc are extracted inside this directory
-export s=$t
-if [ ! -d "$s" ]
-then
-	mkdir $s
-fi
-# scripts etc. are in this directory
-export b=$d/dat/bin
-# parms: it or en, defaults to en
+export vimdiff=vimdiff
+# version of python
+export python=python3
 if [ "$1" = "it" ]
 then
 	export lang=it
-	export LANGUAGE=it_IT.UTF-8
-	export podir=it_IT.UTF-8
-	export poname=guide-it
-	export doclib=$d/cache/gawk/doc/it
-	. $b/extractit
 else
 	export lang=en
-	export LANGUAGE=C.UTF-8
-	export podir=C.UTF-8
-	export poname=guide-mellow
-	export doclib=$d/cache/gawk/doc
-	. $b/extracten
 fi
+#
+# everything happens in the directory
+# which is the one that contains
+# the scripts etc.
+# (it does not work elsewhere)
+# and remains in its place inside a gawk distribution
+# the doc distribution library is supposed to be
+# at the same level ($docen and $docit below)
+#
+export updir=`dirname $PWD`
+export docen=${updir}/doc
+export docit=${updir}/doc/it
+# echo $updir $docen $docit
+
+#
+# there must be a doc directory
+#
+if [ ! -d "$docen" ]
+then
+	echo Current directory is $PWD
+	echo This script must be executed in a gawk distribution, in the directory egtests
+	echo Nothing done
+	exit
+fi
+
+#
+# it must contain the gawktexi.in file
+#
+if [ ! -s "$docen/gawktexi.in" ]
+then
+	echo Current directory is $PWD
+	echo This script must be executed in a gawk distribution, in the directory egtests
+	echo Nothing done
+	exit
+fi
+
+# just to play it safe, let us check Italian as well
+if [ ! -d "$docit" ]
+then
+	echo Current directory is $PWD
+	echo This script must be executed in a gawk distribution, in the directory egtests
+	echo Nothing done
+	exit
+fi
+
+#
+# it must contain the gawktexi.in file
+#
+if [ ! -s "$docit/gawktexi.in" ]
+then
+	echo Current directory is $PWD
+	echo This script must be executed in a gawk distribution, in the directory egtests
+	echo Nothing done
+	exit
+fi
+
+# current directory
+export b=${PWD}
+#
+# programs etc. are in this directory
+#
+export s=${PWD}/tmp
+
+if [ ! -d "$s" ]
+then
+	mkdir $s
+else
+	rm -rf $s
+	mkdir  $s
+fi
+
+# extract both versions, so that all
+# the needed stuff is there
+. $b/extracten
+. $b/extractit
+#
+# LANGUAGE, defaults to en
+#
+if [ "$LANGUAGE" = "" ]
+then
+	export LANGUAGE=en
+fi
+#
+# for internationalization
+#
+mkdir        $s/$lang/eg/prog/$LANGUAGE
+mkdir        $s/$lang/eg/prog/$LANGUAGE/LC_MESSAGES
+export podir=$s/$lang/eg/prog/$LANGUAGE
+#
+# language: it or en, defaults to en
+#
+if [ "$lang" = "it" ]
+then
+	export poname=guide-it
+	export doclib=$docit
+else
+	export poname=guide-mellow
+	export doclib=$docen
+fi
+#
 # depending on the language...
+#
 export AWKPATH=.:$s/$lang/eg/lib:$s/$lang/eg/misc:$s/$lang/eg/prog
 export AWKLIBPATH=.:/usr/local/lib/gawk
 export datadir=$s/$lang/eg/data
 export miscdir=$s/$lang/eg/misc
+#
 # for testing po / pot -- used only for Italian
-cd $s
-cp $b/guide-it.po $lang/eg/data
-# name of directory where grcat and pwcat are
+# the English translation is available already in guide-mellow.po
+#
+cp $b/guide-it.po $s/it/eg/data
+chmod 644 $s/it/eg/data/guide-it.po
+#
+# name of a directory used as a work area
+#
 export tmplib=$s/$lang
 # name of a temporary program needed sometimes
 export testpgm=$tmplib/testpgm.awk
-# name of a temporary program needed sometimes
+# name of a temporary datafile needed sometimes
 export testdata=$tmplib/testdata.txt
-# working directory during the test
-cd $s/$lang/eg/prog
-# check that the extract.awk pgm is equal to the one from gawktexi.in
-cat extract.awk     >$testpgm
-cat ../lib/join.awk>>$testpgm
-diff $testpgm $b/extract$lang.awk
-if [ "$?" -ne 0 ]
-then
-	echo "*"
-	echo "* Beware, the extract.awk program is not the same contained in gawktexi.in"
-	echo "*"
-fi
 
 cd $s/$lang/eg
-list=`find . -type f|gawk -f $b/gawkeg.awk -v lang=$lang|sort`
+#
+# prepare the list of tests to perform
+#
+list=`find . -type f|gawk -f $b/egtest.awk -v s=$s -v lang=$lang|sort`
+#
+# working directory during the tests
+#
 cd $s/$lang/eg/prog
 
 while	[ true ]
 do
 	# the parameter for scegli is the number of columns
-	scelta=`$b/scegli $list 4`
-        sublst=`$b/extract 1 "$scelta"`
-	#echo $sublst
-        subcmd=`$b/extract 2 "$scelta"`
-	#echo $subcmd
-	# done with
+	# real output is in $s/choice
+	gawk -f $b/choose.awk -v list="$list" -v cols=4 -v s=$s
+	choice=`cat $s/choice`
+	#echo "choice=$choice"
+        gawk -f $b/picksome.awk -v s=$s -v what=f -v choice="$choice"
+	sublst=`cat $s/sublst`
+	#echo "sublst=|$sublst|"
+        gawk -f $b/picksome.awk -v s=$s -v what=c -v choice="$choice"
+	subcmd=`cat $s/subcmd`
+	#echo "subcmd=|$subcmd|"
 	if [ "$subcmd" = "q" -o "$subcmd" = "Q" -o "$subcmd" = "zz" -o "$subcmd" = "ZZ" -o "$subcmd" = "quit" -o "$subcmd" = "x" ]
 	then
-		go_away
+		rm -rf $s
+		exit
 	fi
 	# browse/edit
 	if [ "$subcmd" = "b" -o "$subcmd" = "e" ]
@@ -799,11 +922,12 @@ do
 		#echo $sublst
 		for i in $sublst
 		do
-			subrou=`echo $i|gawk -v t="true" -f ../../egidx.awk`
+			subrou=`echo $i|gawk -v t="true" -f $s/egidx.awk`
 			basename=`basename $subrou`
-			figlet $basename
+			echo $basename
 			echo "*"
 			echo "* Browsing/editing $i"
+			echo "*"
 			$vim $subrou
 			wait_go_ahead
 		done
@@ -815,12 +939,12 @@ do
 		#echo $sublst
 		for i in $sublst
 		do
-			subrou=`echo $i|gawk -v t="true" -f ../../egidx.awk`
-			figlet $subrou
+			subrou=`echo $i|gawk -v t="true" -f $s/egidx.awk`
+			echo $subrou
 			echo "*"
 			echo "* viewing differences in $i"
 			echo "*"
-			other=`echo $i|gawk -v t="alte" -f ../../egidx.awk`
+			other=`echo $i|gawk -v t="alte" -f $s/egidx.awk`
 			echo $subrou $other
 			${vim}diff -c ":color blue" $subrou $other
 			wait_go_ahead
@@ -832,9 +956,9 @@ do
 	then
 		for i in $sublst
 		do
-			echo $i is:
-			echo $i|gawk -v t="true" -f ../../egidx.awk
-			echo $i|gawk -v t="alte" -f ../../egidx.awk
+			echo "===> $i is:"
+			echo $i|gawk -v t="true" -f $s/egidx.awk
+			echo $i|gawk -v t="alte" -f $s/egidx.awk
 		done
 		wait_go_ahead
 		continue
@@ -854,11 +978,10 @@ do
 	for i in $sublst
 	do
 		subrou=`echo $i|cut -f 1 -d"."`
-		figlet $subrou
+		echo $subrou
 		echo "*"
 		echo "* Testing $i"
 		do_$subrou
 		wait_go_ahead
 	done
 done
-

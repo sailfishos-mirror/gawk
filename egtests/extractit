@@ -1,14 +1,21 @@
 :
 #set -xv
 
-echo "* extracting in $s/it from the Italian gawktexi.in"
+echo "* Extracting in $s/it from the Italian gawktexi.in"
 cd $s
-# for existing directory, just replace the programs, leave what is there already
-from=$doclib
 if [ ! -d "it" ]
 then
 	mkdir it
+else
+	rm -r it
+	mkdir it
 fi
 cd it
-cp $doclib/gawktexi.in gawktexi.in
-gawk -f $b/extractit.awk gawktexi.in
+cp $docit/gawktexi.in gawktexi.it
+gawk -f $b/extractit.awk gawktexi.it
+cat $s/it/eg/prog/extract.awk $s/it/eg/lib/join.awk >$s/extract.it
+diff    $b/extractit.awk $s/extract.it
+if [ "$?" -ne "0" ]
+then
+	echo Extractit: the extract.awk script is different from the one in the book
+fi

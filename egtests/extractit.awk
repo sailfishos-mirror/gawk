@@ -3,6 +3,7 @@
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993
 # Revised September 2000
+# Antonio Colombo, October 2020, test for Italian accented letters
 
 BEGIN    { IGNORECASE = 1 }
 
