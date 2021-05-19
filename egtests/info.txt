@@ -1,163 +1,69 @@
-Hi Arnold,
+* egtest
 
-I just pushed an update to the Italian "gawktexi.in".
-Please, "propagate" it.
+A script to test the programs/scripts included
+in the Gawk book (both in the English original
+and in the Italian translation).
+No license is imbedded in the scripts, the
+license of Gawk is implied.
 
-I have packed in a ZIP file all the scripts used
-to test all the 66 examples/files that can be
-extracted from the Gawk book.
+The script should work when executed in the
+distribution directory in which it is contained.
+The position of its input (the gawktexi.in files
+that are in the distribution doc and doc/it
+directories) is supposed to be at the same level
+of the egtests directory, i.e.:
 
-To use it you should unzip the file in a test
-"bin" directory, and change a few variables inside
-the "gawkeg" script.
+egtests
+doc
+doc/it
 
-At the beginning of the "gawkeg" script there is
-an indication of where are the variables to be
-changed, basically the name of the test "bin"
-directory where the script are ($b) the name of
-where to put the "eg" directory ($s) and the names
-of the directories where the "gawktexi.in" file
-can be found.
+The script has one possible parameter, namely "it"
+for Italian. Every other parameter (or no parameters)
+will default to "en" for English.
 
-Hopefully that should be enough.
+egtest [it]
 
-Just run:
-./gawkeg
-...which defaults to "en"
+The script extracts both the original English and
+the Italian programs/scripts from the Gawk book.
 
-or
+Only the programs/scripta in the selected language
+are tested, but it is possible to compare each of
+them with the corresponding program/script in the
+other language.
 
-./gawkeg it
+All the testing is done in a "tmp" directory
+created in egtests, which is removed at the exit
+from the egtest script.
+The script does NOT change any contents in the
+egtests directory during the test.
 
-To see all what can be done, at the "gawkeg"
-prompt just type:
+The gawkeg script needs a number of pieces of
+software, in order to test gawk extensions, etc.
+Namely:
+[to be completed]
 
-h<ENTER>
 
-...for the "d" option (differences between English
-and Italian script) to work, the "other" directory
-must exist.
+After calling egtest, the following prompt
+is visualized:
 
-I tried to run the thing on another PC (under
-WSL), from the "distribution" and changing the
-test directories, and it seems to work.
+===> Which test(s)? [1-nn,q,h,...]
 
-Better not to use it with the "root" user, some
-tests would give different results (e.g. the
-"readable" one).
+Typing h<Enter>
 
-The script uses a couple of programs, "scegli" and
-"extract", of which only the executables are in the
-ZIP file. If it is of interest, you can have the C
-source files, but they are a mess: the two
-programs have been written for a different set of
-tasks, and should be rewritten, but since they
-work...
+...a list of the available options inside egtest
+is shown:
 
-The English tests should all run fine. The Italian
-ones do run here, but only with the just updated
-Italian "gawktexi.in".
+Choose by number one or more tests to try
+e.g.: 1-5,14,26-30
+If a suffix is given, e.g.: 1e or: h
+(alone or after a list of numbers)
+h -- will just print this help text
+d -- will invoke vimdiff for a test file in both languages
+b -- will invoke vim for a test file
+e -- will invoke vim for a test file
+w -- will tell where a module is
+q,Q,quit,x,ZZ,zz -- will exit from egtest
+Everything else just has no effect
 
-Please let me know if you are able to use the
-script, and if you have remarks, questions, etc.,
-they are welcome.
-
-All the best, Antonio
-
-PS I did not bother to put licenses, but
-everything can be used/modified freely, consider
-it with the same license as gawk.
--- 
-   /||\    | Antonio Colombo
-  / || \   |  azc100@gmail.com
- /  ()  \  | antonio@geekcorp.com
-(___||___) |   azc10@yahoo.com
-
-==================
-
-Looking into the example programs, I wonder:
-
-Should gettime.awk be renamed getlocaltime.awk
-(or viceversa)? When checking alarm.awk, it
-speaks of getlocaltime, but then you have
-to use "gettime.awk" instead.
-
-A few other gawk scripts have names slightly
-different from the name in the "eg/whatever"
-directory.
-
-bits2str.awk is actually also contained in
-testbits.awk, contrary to the philosophy of
-the "modularity". testbits.awk should not
-contain it (I think). And the bits2str.awk
-instructions are contained twice in gawktexi.in,
-once for themselves, and once in testbits.awk.
-I wonder if something should be changed here.
-
-To get the test for cut.awk working, I had to
-put "-f getopt.awk" BEFORE "-f cut.awk", not really
-sure why. I wonder if it should be noted
-somewhere. It is the case also for other "users"
-of "getopt".
-
-The transfile.awk example is not extracted.
-I wonder if it should or not...
-To make the example work, I had to change in transfile.awk
-FILENAME != _oldfilename @{
-to
-FILENAME != _oldfilename && _filename_ != FILENAME @{
-..or beginfile() would be invoked more than necessary
-
-On a detail, for consistency with _filename_,
-_oldfilename should be called
-_oldfilename_
-
-histsort.awk should be changed to use the input
-records only AFTER the initial number,
-otherwise all entries are different by definition.
-I found no way to get history without the number
-of the command, so I just cut it out for the test.
-
-noassign.awk does not work (at least for me).
-ARGC and ARGV give you only the input files,
-not the real ARGC and ARGV passed by the Operating
-System to gawk.
-Variables are not seen at all, so they are always
-used inside the program (unless I missed something).
-If one acts on PROCINFO["argc"] and PROCINFO["argv"],
-one sees "everything", as evidenced modifying noassign.awk
-BEGIN {
-    if (No_command_assign) {
-        for ( j in PROCINFO["argv"] ) { print
-"#",j,PROCINFO["argv"][j],"#"; }
-        disable_assigns(ARGC, ARGV)
-    }
-}
-I suspect the real ARGC and ARGV would not be changed.
-Also, noassign.awk does not do anything about the "-v"
-before the assignment. I wonder what to do.
-
-ord.awk is ok, but it does not manage ASCII above 127
-(European accented letter, e.g.). Not sure if it should
-be modified.
-
-In pi.awk it should be noted inside the program that
-it needs intdiv0.awk (as it is noted in the text).
-
-process_array.awk is in processarray.awk:
-maybe the name should be the same.
-
-I am not sure that the output of shell_quote is OK
-(too many "'"s and """s).
-
-========================
-
-In the last update to gawktexi,in, where you explain "ls",
-an "old" file should probably be present, to show the
-difference in field 8, when the last modification
-date goes back to 6 months or more:
--rwxrwxr-x 1 azc10 azc10   1427 apr 19 16:56 gawkdiff
--rwxrwxr-x 1 azc10 azc10    381 apr 13  2020 fs_set.awk
-..."apr" is in Italian, "Jun" would be "giu"
-
-========================
+Please report bugs, problems, comments to:
+Antonio Colombo azc100(at)gmail(dot)com
