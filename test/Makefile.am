@@ -1570,22 +1570,22 @@ EXPECTED_FAIL_DJGPP = \
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
 	backbigs1 backsmalls1 clos1way6 devfd devfd1 devfd2 \
-	errno exitval2 fork fork2 fts getfile getlnhd ignrcas3 inetdayt \
-	inetecht mbfw1 mbprintf1 mbprintf4 mbstr1 mbstr2 pid pipeio2 \
-	pty1 pty2 readdir rstest4 rstest5 status-close timeout
+	errno exitval2 fmttest fork fork2 fts functab5 \
+	getfile getlnhd hsprint ignrcas3 inetdayt inetecht inf-nan-torture \
+	mbfw1 mbprintf1 mbprintf4 mbstr1 mbstr2 \
+	pid pipeio2 pty1 pty2 readdir rstest4 rstest5 status-close timeout
 
 # List of tests that fail on z/OS
 EXPECTED_FAIL_ZOS = \
 	aasort aasorti arraysort asort asorti backbigs1 backsmalls1 \
 	backsmalls2 beginfile1 beginfile2 charasbytes clos1way6 concat4 \
 	dfamb1 double1 double2 errno fmttest forcenum getlndir gsubtst5 \
-	ignrcas2 lc_num1 localenl localenl mbfw1 mbprintf1 mbprintf2 \
-	mbprintf3 mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n nlstringtest \
-	nofile nonfatal2 numrange printhuge profile5 profile5 rebt8b2 \
-	posix_compare \
-	regrange reint2 rri1 sigpipe1 sort1 sortfor sortu space sprintfc \
-	subamp subi18n symtab1 symtab11 symtab8 timeout wideidx wideidx2 \
-	widesub widesub2 widesub3 widesub4
+	ignrcas2 inf-nan-torture iolint lc_num1 localenl mbfw1 mbprintf1 \
+	mbprintf2 mbprintf3 mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n \
+	nlstringtest nofile nonfatal2 numrange posix_compare printhuge \
+	profile5 rebt8b2 regrange reint2 rri1 sigpipe1 sort1 sortfor \
+	sortu space sprintfc subamp subi18n symtab1 symtab11 symtab8 \
+	timeout wideidx wideidx2 widesub widesub2 widesub3 widesub4
 
 ZOS_FAIL = @ZOS_FAIL@
 
@@ -2279,9 +2279,9 @@ testext::
 	@echo $@
 	@$(AWK) ' /^(@load|BEGIN)/,/^}/' "$(top_srcdir)"/extension/testext.c > testext.awk
 	@$(AWK) -f ./testext.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -q -e '-M|--bignum'; \
-	then cmp "."/$@-mpfr.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; \
-	else cmp "."/$@.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; fi
+	@-if echo "$$GAWK_TEST_ARGS" | egrep -e '-M|--bignum' > /dev/null; \
+	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; \
+	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; fi
 
 getfile:
 	@echo $@
@@ -2419,9 +2419,9 @@ ignrcas3::
 arrdbg:
 	@echo $@
 	@$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@-mpfr.ok" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -q -e '-M|--bignum'; \
-	then cmp "."/$@-mpfr.ok _$@ && rm -f _$@ $@.ok $@-mpfr.ok ; \
-	else cmp "."/$@.ok _$@ && rm -f _$@ $@.ok $@-mpfr.ok ; fi
+	@-if echo "$$GAWK_TEST_ARGS" | egrep -e '-M|--bignum' > /dev/null; \
+	then $(CMP) "."/$@-mpfr.ok _$@ && rm -f _$@ $@.ok $@-mpfr.ok ; \
+	else $(CMP) "."/$@.ok _$@ && rm -f _$@ $@.ok $@-mpfr.ok ; fi
 
 sourcesplit:
 	@echo $@
@@ -2477,14 +2477,13 @@ typedregex4:
 iolint:
 	@echo $@
 	@echo hello > 'echo hello'
-	@touch 'exec cat' ; chmod 755 'exec cat'
-	@$(AWK) -f "$(srcdir)"/$@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-	@-$(RM) -f cat 'echo hello' 'exec cat' f1 f2 md5sum
+	@-$(RM) -f cat 'echo hello' f1 f2 cksum
 
 argcasfile:
 	@echo $@
-	@$(AWK) -f "$(srcdir)"/$@.awk ARGC=1 /no/such/file < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@$(AWK) -f "$(srcdir)"/$@.awk ARGC=1 ' /no/such/file' < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 # Targets generated for other tests:
@@ -2497,8 +2496,7 @@ Maketests: $(srcdir)/Makefile.am $(srcdir)/Gentests
 clean-local:
 	rm -fr _* core core.* fmtspcl.ok junk strftime.ok test1 test2 \
 	seq *~ readfile.ok fork.tmp.* testext.awk fts.ok readdir.ok \
-	readdir_test.ok readdir_retest.ok \
-	profile1.ok
+	readdir_test.ok readdir_retest.ok profile1.ok X_*
 
 # An attempt to print something that can be grepped for in build logs
 pass-fail:

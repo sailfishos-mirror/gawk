@@ -27,14 +27,18 @@ regex.h
 regex_internal.c
 regex_internal.h
 verify.h
+malloc/dynarray_at_failure.c
+malloc/dynarray_emplace_enlarge.c
+malloc/dynarray_finalize.c
 malloc/dynarray.h
-malloc/dynarray-skeleton.c
-malloc/dynarray_resize.c"
+malloc/dynarray_resize.c
+malloc/dynarray_resize_clear.c
+malloc/dynarray-skeleton.c"
 
 for i in $FILE_LIST
 do
-	if [ -f $GL/$i ] && [ -f $i ]
+	if [ -f $GL/$i ] && [ -f support/$i ]
 	then
-		cp $GL/$i $i
+		cp $GL/$i support/$i
 	fi
 done

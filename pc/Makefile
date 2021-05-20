@@ -85,6 +85,7 @@ MAK = $(MAKE) $(MAKEFILE)
 prefix = c:/gnu
 pkgdatadir = $(prefix)/lib/awk
 pkgextensiondir = $(prefix)/lib/gawk
+DEFPATH = "\".;$(pkgdatadir);c:/lib/awk;c:/gnu/lib/awk\""
 DEFLIBPATH = "\"$(pkgextensiondir)\""
 LOCALEDIR="\"$(prefix)/share/locale\""
 SHLIBEXT = "\"dll\""
@@ -101,7 +102,7 @@ DO_LNK = $($(LNK))
 DO_BIND= $($(BIND))
 #------------------------------------------------------------------------
 # To allow Make find files in the support subdirectory.
-VPATH = .;./support
+VPATH = .;./support;./support/malloc
 #========================================================================
 # End of general configuration. Some platform-specific configuration
 # notes appear below.
@@ -228,7 +229,7 @@ BIND = EMPTY
 PBIND = EMPTY
 EMPTY=
 
-CFLAGS = $(CF) -DGAWK -I. -I./support -DHAVE_CONFIG_H -DDEFLIBPATH=$(DEFLIBPATH) -DSHLIBEXT=$(SHLIBEXT) -DLOCALEDIR=$(LOCALEDIR)
+CFLAGS = $(CF) -DGAWK -I. -I./support -DHAVE_CONFIG_H -DDEFPATH=$(DEFPATH) -DDEFLIBPATH=$(DEFLIBPATH) -DSHLIBEXT=$(SHLIBEXT) -DLOCALEDIR=$(LOCALEDIR)
 
 # object files
 AWKOBJS1  = array$O builtin$O eval$O field$O floatcomp$O gawkmisc$O io$O main$O
@@ -241,7 +242,10 @@ ALLOBJS = $(AWKOBJS) awkgram$O getid$O $(OBJ)
 
 # LIBOBJS
 #       GNU and other stuff that gawk uses as library routines.
-LIBOBJS= getopt$O getopt1$O dfa$O regex$O random$O localeinfo$O
+DYNOBJS= dynarray_resize$O dynarray_emplace_enlarge$O dynarray_finalize$O \
+         dynarray_at_failure$O dynarray_resize_clear$O
+
+LIBOBJS= getopt$O getopt1$O dfa$O random$O localeinfo$O regex$O $(DYNOBJS)
 
 GAWKOBJS = $(ALLOBJS) $(LIBOBJS)
 
@@ -271,8 +275,10 @@ $(RSPFILE) : $(GAWKOBJS)
 #    and we have -I. on the compiler command line.  unistd.h is
 #    included by awk.h.
 # 2. custom.h is not mentioned because pc ports don't use it.
-$(ALLOBJS) $(LIBOBJS): \
+$(ALLOBJS) $(LIBOBJS) $(DYNOBJS): \
   awk.h regex.h config.h gettext.h mbsupport.h protos.h dfa.h getopt.h nonposix.h
+
+$(DYNOBJS) regex$O:	dynarray.h libc-config.h malloc/dynarray.h malloc/dynarray-skeleton.c
 
 builtin$O:	floatmagic.h random.h popen.h
 

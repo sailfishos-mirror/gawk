@@ -37,13 +37,6 @@ BEGIN {
 	print close("f2")	# -1 expected here
 	fflush()
 
-	# `%.*s' used for output file and output pipe"
-	print "junk" > "md5sum"
-	print "hello" | "md5sum"
-	print close("md5sum")
-	print close("md5sum")
-	fflush()
-
 	# `%.*s' used for input pipe and output file
 	"echo hello" | getline junk
 	print "hello" > "echo hello"
@@ -55,13 +48,11 @@ BEGIN {
 	# `%.*s' used for output file and two-way pipe
 	# `%.*s' used for output pipe and two-way pipe
 	# Not doing |& due to race condition and signals. sigh
-	exec_cat = "exec cat"
-	print "/bin/cat \"$@\"" > exec_cat
-	print "hello" | exec_cat
-	# print "hello" |& exec_cat
-	print close(exec_cat)
-	print close(exec_cat)
-	# print close(exec_cat)
+	cat = "cat"
+	print "hello" | "cat"
+	print "/bin/cat \"$@\"" > "cat"
+	print close("cat")
+	print close("cat")
 	fflush()
 
 	# `%.*s' used for input pipe and output pipe
@@ -69,5 +60,13 @@ BEGIN {
 	print "hello" | "echo hello"
 	print close("echo hello")
 	print close("echo hello")
+	fflush()
+
+	# `%.*s' used for output file and output pipe"
+	BINMODE = 2
+	print "junk" > "cksum"	# cksum is more portable than md5sum
+	print "hello" | "cksum"
+	print close("cksum")
+	print close("cksum")
 	fflush()
 }
