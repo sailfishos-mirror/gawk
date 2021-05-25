@@ -4815,6 +4815,7 @@ static const struct token tokentab[] = {
 {"log",		Op_builtin,	 LEX_BUILTIN,	A(1),		do_log,	MPF(log)},
 {"lshift",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(2),	do_lshift,	MPF(lshift)},
 {"match",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(2)|A(3), do_match,	0},
+{"mkbool",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(1),	do_mkbool,	0},
 {"mktime",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2), do_mktime, 0},
 {"namespace",  	Op_symbol,	 LEX_NAMESPACE,	GAWKX,		0,	0},
 {"next",	Op_K_next,	 LEX_NEXT,	0,		0,	0},

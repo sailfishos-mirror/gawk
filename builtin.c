@@ -4106,7 +4106,10 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_val:
-		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX)) {
+		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
+		case NUMBER|BOOL:
+			res = "number|bool";
+			break;
 		case NUMBER:
 			res = "number";
 			break;
@@ -4314,4 +4317,19 @@ check_symtab_functab(NODE *dest, const char *fname, const char *msg)
 		fatal(msg, fname, "SYMTAB");
 	else if (dest == func_table)
 		fatal(msg, fname, "FUNCTAB");
+}
+
+/* do_mkbool --- create boolean values */
+
+NODE *
+do_mkbool(int nargs)
+{
+	NODE *tmp;
+	bool result;
+
+	tmp = POP_SCALAR();
+	result = boolval(tmp);
+	DEREF(tmp);
+
+	return make_bool_node(result);
 }

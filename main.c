@@ -981,7 +981,6 @@ load_procinfo_argv()
 	// hook it into PROCINFO
 	sub = make_string("argv", 4);
 	assoc_set(PROCINFO_node, sub, argv_array);
-
 }
 
 /* load_procinfo --- populate the PROCINFO array */

@@ -754,6 +754,8 @@ particular records in a file and perform operations upon them.
 * Arrays Summary::                      Summary of arrays.
 * Built-in::                            Summarizes the built-in functions.
 * Calling Built-in::                    How to call built-in functions.
+* Boolean Functions::                   A function that returns Boolean
+                                        values.
 * Numeric Functions::                   Functions that work with numbers,
                                         including @code{int()}, @code{sin()}
                                         and @code{rand()}.
@@ -861,6 +863,7 @@ particular records in a file and perform operations upon them.
 * Programs Summary::                    Summary of programs.
 * Programs Exercises::                  Exercises.
 * Nondecimal Data::                     Allowing nondecimal input data.
+* Boolean Typed Values::                Values with @code{bool} type.
 * Array Sorting::                       Facilities for controlling array
                                         traversal and sorting arrays.
 * Controlling Array Traversal::         How to use PROCINFO["sorted_in"].
@@ -18307,6 +18310,7 @@ but are summarized here for your convenience.
 
 @menu
 * Calling Built-in::            How to call built-in functions.
+* Boolean Functions::           A function that returns Boolean values.
 * Numeric Functions::           Functions that work with numbers, including
                                 @code{int()}, @code{sin()} and @code{rand()}.
 * String Functions::            Functions for string manipulation, such as
@@ -18375,6 +18379,25 @@ six, and then 12, and @code{atan2()} is called with the two arguments six
 and 12.  But if the order of evaluation is right to left, @code{i}
 first becomes 10, then 11, and @code{atan2()} is called with the
 two arguments 11 and 10.
+
+
+@node Boolean Functions
+@subsection Generating Boolean Values
+@cindex boolean function
+
+This function is specific to @command{gawk}. It is not
+available in compatibility mode (@pxref{Options}):
+
+@c @asis for docbook
+@table @asis
+@item @code{mkbool(@var{expression})}
+@cindexgawkfunc{mkbool}
+Return a Boolean-typed value based on the regular Boolean value
+of @var{expression}.  Boolean ``true'' values have numeric value one.
+Boolean ``false'' values have numeric
+zero.  This is discussed in more
+detail in @ref{Boolean Typed Values}.
+@end table
 
 @node Numeric Functions
 @subsection Numeric Functions
@@ -20898,6 +20921,9 @@ Return one of the following strings, depending upon the type of @var{x}:
 @item "number"
 @var{x} is a number.
 
+@item "number|bool"
+@var{x} is a Boolean typed value (@pxref{Boolean Typed Values}).
+
 @item "string"
 @var{x} is a string.
 
@@ -21776,7 +21802,7 @@ being aware of them.
 @cindex pointers to functions
 @cindex differences in @command{awk} and @command{gawk} @subentry indirect function calls
 
-This section describes an advanced, @command{gawk}-specific extension.
+This @value{SECTION} describes an advanced, @command{gawk}-specific extension.
 
 Often, you may wish to defer the choice of function to call until runtime.
 For example, you may have different kinds of records, each of which
@@ -29385,6 +29411,7 @@ discusses the ability to dynamically add new built-in functions to
 
 @menu
 * Nondecimal Data::             Allowing nondecimal input data.
+* Boolean Typed Values::        Values with @code{number|bool} type.
 * Array Sorting::               Facilities for controlling array traversal and
                                 sorting arrays.
 * Two-way I/O::                 Two-way communications with another process.
@@ -29450,6 +29477,49 @@ leads to less surprising results.
 
 This option may disappear in a future version of @command{gawk}.
 @end quotation
+
+@node Boolean Typed Values
+@section Boolean Typed Values
+
+Scalar values in @command{awk} are either numbers or strings.
+@command{gawk} also supports values of type @code{regexp}
+(@pxref{Strong Regexp Constants}).
+
+As described in @ref{Truth Values}, Boolean values in @command{awk}
+don't have a separate type: a value counts as ``true'' if it is nonzero
+or non-null, and as ``false'' otherwise.
+
+When interchanging data with languages that do have a real Boolean type,
+using a standard format such as JSON or XML, the lack of a true Boolean
+type in @command{awk} is problematic.
+(See, for example, the @code{json} extension provided by
+@uref{https://sourceforge.net/projects/gawkextlib, the @code{gawkextlib} project}.)
+
+It's easy to import Boolean data into @command{awk}, but then the fact
+that it was originally Boolean is lost.  Exporting data is even harder;
+there's no way to indicate that a value is really Boolean.
+
+To solve this problem, @command{gawk} provides a function named @code{mkbool()}.
+It takes one argument, which is any @command{awk} expression, and it
+returns a value of Boolean type.
+
+The returned values are normal @command{awk} numeric values, with
+values of either one or zero,
+depending upon the truth
+value of the original expression passed in the call to @code{bool()}.
+
+The @code{typeof()} function (@pxref{Type Functions}) returns
+@code{"number|bool"} for these values.
+
+Thus Boolean-typed values @emph{are} numbers as far as @command{gawk}
+is concerned, except that extension code can treat them as Booleans
+if desired.
+
+While it would have been possible to add two new built-in variables
+of Boolean type named @code{TRUE} and @code{FALSE}, doing so would
+undoubtedly have broken many existing @command{awk} programs.  Instead,
+having a ``generator'' function that creates Boolean values gives
+flexibility, without breaking as much existing code.
 
 @node Array Sorting
 @section Controlling Array Traversal and Array Sorting
@@ -35586,7 +35656,8 @@ multibyte encoding.
 @itemx @ @ @ @ AWK_STRNUM,
 @itemx @ @ @ @ AWK_ARRAY,
 @itemx @ @ @ @ AWK_SCALAR,@ @ @ @ @ @ @ @ @ /* opaque access to a variable */
-@itemx @ @ @ @ AWK_VALUE_COOKIE@ @ @ @ /* for updating a previously created value */
+@itemx @ @ @ @ AWK_VALUE_COOKIE,@ @ @ /* for updating a previously created value */
+@itemx @ @ @ @ AWK_BOOL
 @itemx @} awk_valtype_t;
 This @code{enum} indicates the type of a value.
 It is used in the following @code{struct}.
@@ -35599,6 +35670,7 @@ It is used in the following @code{struct}.
 @itemx @ @ @ @ @ @ @ @ awk_array_t@ @ @ @ @ @ @ @ a;
 @itemx @ @ @ @ @ @ @ @ awk_scalar_t@ @ @ @ @ @ @ scl;
 @itemx @ @ @ @ @ @ @ @ awk_value_cookie_t@ vc;
+@itemx @ @ @ @ @ @ @ @ awk_bool_t@ @ @ @ @ @ @ @ @ b;
 @itemx @ @ @ @ @} u;
 @itemx @} awk_value_t;
 An ``@command{awk} value.''
@@ -35614,6 +35686,7 @@ The @code{val_type} member indicates what kind of value the
 @itemx #define array_cookie@ @ @ u.a
 @itemx #define scalar_cookie@ @ u.scl
 @itemx #define value_cookie@ @ @ u.vc
+@itemx #define bool_value@ @ @ @ @ u.b
 Using these macros makes accessing the fields of the @code{awk_value_t} more
 readable.
 
@@ -35940,6 +36013,11 @@ This function creates a strongly typed regexp value.  @code{string} is
 the regular expression of length @code{len}.  It expects @code{string}
 to be a @samp{char *} value pointing to data previously obtained from
 @code{gawk_malloc()}, @code{gawk_calloc()}, or @code{gawk_realloc()}.
+
+@item static inline awk_value_t *
+@itemx make_bool(awk_bool_t boolval, awk_value_t *result);
+This function creates a boolean value in the @code{awk_value_t} variable
+pointed to by @code{result}.
 
 @end table
 
@@ -36741,7 +36819,8 @@ value type, as appropriate.  This behavior is summarized in
   <colspec colname="c6"/>
   <colspec colname="c7"/>
   <colspec colname="c8"/>
-  <spanspec spanname="hspan" namest="c3" nameend="c8" align="center"/>
+  <colspec colname="c9"/>
+  <spanspec spanname="hspan" namest="c3" nameend="c9" align="center"/>
   <thead>
     <row><entry></entry><entry spanname="hspan"><para>Type of Actual Value</para></entry></row>
     <row>
@@ -36751,6 +36830,7 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Strnum</para></entry>
       <entry><para>Number</para></entry>
       <entry><para>Regex</para></entry>
+      <entry><para>Bool</para></entry>
       <entry><para>Array</para></entry>
       <entry><para>Undefined</para></entry>
     </row>
@@ -36759,6 +36839,7 @@ value type, as appropriate.  This behavior is summarized in
     <row>
       <entry></entry>
       <entry><para><emphasis role="bold">String</emphasis></para></entry>
+      <entry><para>String</para></entry>
       <entry><para>String</para></entry>
       <entry><para>String</para></entry>
       <entry><para>String</para></entry>
@@ -36775,6 +36856,7 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
     </row>
     <row>
       <entry></entry>
@@ -36783,12 +36865,14 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Number</para></entry>
       <entry><para>Number</para></entry>
       <entry><para>false</para></entry>
+      <entry><para>Number</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
     </row>
     <row>
       <entry><para><emphasis role="bold">Type</emphasis></para></entry>
       <entry><para><emphasis role="bold">Regex</emphasis></para></entry>
+      <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>Regex</para></entry>
@@ -36798,7 +36882,19 @@ value type, as appropriate.  This behavior is summarized in
     </row>
     <row>
       <entry><para><emphasis role="bold">Requested</emphasis></para></entry>
+      <entry><para><emphasis role="bold">Bool</emphasis></para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>Bool</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+    </row>
+    <row>
+      <entry><para></para></entry>
       <entry><para><emphasis role="bold">Array</emphasis></para></entry>
+      <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
@@ -36813,6 +36909,7 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Scalar</para></entry>
       <entry><para>Scalar</para></entry>
       <entry><para>Scalar</para></entry>
+      <entry><para>Scalar</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
     </row>
@@ -36823,12 +36920,14 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Strnum</para></entry>
       <entry><para>Number</para></entry>
       <entry><para>Regex</para></entry>
+      <entry><para>Bool</para></entry>
       <entry><para>Array</para></entry>
       <entry><para>Undefined</para></entry>
     </row>
     <row>
       <entry></entry>
       <entry><para><emphasis role="bold">Value cookie</emphasis></para></entry>
+      <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
@@ -36851,43 +36950,46 @@ value type, as appropriate.  This behavior is summarized in
 \vglue-1.1\baselineskip
 @end tex
 @c @multitable @columnfractions .166 .166 .198 .15 .15 .166
-@multitable {Requested} {Undefined} {Number} {Number} {Scalar} {Regex} {Array} {Undefined}
-@headitem @tab @tab String @tab Strnum @tab Number @tab Regex @tab Array @tab Undefined
-@item @tab @b{String} @tab String @tab String @tab String @tab String @tab false @tab false
-@item @tab @b{Strnum} @tab false @tab Strnum @tab Strnum @tab false @tab false @tab false
-@item @tab @b{Number} @tab Number @tab Number @tab Number @tab false @tab false @tab false
-@item @b{Type} @tab @b{Regex} @tab false @tab false @tab false @tab Regex @tab false @tab false
-@item @b{Requested} @tab @b{Array} @tab false @tab false @tab false @tab false @tab Array @tab false
-@item @tab @b{Scalar} @tab Scalar @tab Scalar @tab Scalar @tab Scalar @tab false @tab false
-@item @tab @b{Undefined} @tab String @tab Strnum @tab Number @tab Regex @tab Array @tab Undefined
-@item @tab @b{Value cookie} @tab false @tab false @tab false @tab false @tab false @tab false
+@multitable {Requested} {Undefined} {Number} {Number} {Scalar} {Regex} {Number} {Array} {Undefined}
+@headitem @tab @tab String @tab Strnum @tab Number @tab Regex @tab Bool @tab Array @tab Undefined
+@item @tab @b{String} @tab String @tab String @tab String @tab String @tab String @tab false @tab false
+@item @tab @b{Strnum} @tab false @tab Strnum @tab Strnum @tab false @tab false @tab false @tab false
+@item @tab @b{Number} @tab Number @tab Number @tab Number @tab false @tab Number @tab false @tab false
+@item @b{Type} @tab @b{Regex} @tab false @tab false @tab false @tab Regex @tab false @tab false @tab false
+@item @b{Requested} @tab @b{Bool} @tab false @tab false @tab false @tab false @tab Bool @tab false @tab false
+@item @tab @b{Array} @tab false @tab false @tab false @tab false @tab false @tab Array @tab false
+@item @tab @b{Scalar} @tab Scalar @tab Scalar @tab Scalar @tab Scalar @tab Scalar @tab false @tab false
+@item @tab @b{Undefined} @tab String @tab Strnum @tab Number @tab Regex @tab Bool @tab Array @tab Undefined
+@item @tab @b{Value cookie} @tab false @tab false @tab false @tab false @tab false @tab false @tab false
 @end multitable
 @end ifnotdocbook
 @end ifnotplaintext
 @ifplaintext
 @verbatim
-                        +-------------------------------------------------------+
-                        |                   Type of Actual Value:               |
-                        +--------+--------+--------+--------+-------+-----------+
-                        | String | Strnum | Number | Regex  | Array | Undefined |
-+-----------+-----------+--------+--------+--------+--------+-------+-----------+
-|           | String    | String | String | String | String | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Strnum    | false  | Strnum | Strnum | false  | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Number    | Number | Number | Number | false  | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Regex     | false  | false  | false  | Regex  | false | false     |
-|   Type    +-----------+--------+--------+--------+--------+-------+-----------+
-| Requested | Array     | false  | false  | false  | false  | Array | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Scalar    | Scalar | Scalar | Scalar | Scalar | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Undefined | String | Strnum | Number | Regex  | Array | Undefined |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Value     | false  | false  | false  | false  | false | false     |
-|           | Cookie    |        |        |        |        |       |           |
-+-----------+-----------+--------+--------+--------+--------+-------+-----------+
+			+----------------------------------------------------------------+
+			|                        Type of Actual Value:                   |
+			+--------+--------+--------+--------+--------+-------+-----------+
+			| String | Strnum | Number | Regex  | Bool   | Array | Undefined |
++-----------+-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | String    | String | String | String | String | String | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Strnum    | false  | Strnum | Strnum | false  | false  | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Number    | Number | Number | Number | false  | Number | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Regex     | false  | false  | false  | Regex  | false  | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|   Type    | Bool      | false  | false  | false  | false  | Bool   | false | false     |
+| Requested +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Array     | false  | false  | false  | false  | false  | Array | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Scalar    | Scalar | Scalar | Scalar | Scalar | Scalar | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Undefined | String | Strnum | Number | Regex  | Bool   | Array | Undefined |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Value     | false  | false  | false  | false  | false  | false | false     |
+|           | Cookie    |        |        |        |        |        |       |           |
++-----------+-----------+--------+--------+--------+--------+--------+-------+-----------+
 @end verbatim
 @end ifplaintext
 @end float
@@ -45202,8 +45304,8 @@ internationalized program to work in a particular language.
 
 @item Logical Expression
 An expression using the operators for logic, AND, OR, and NOT, written
-@samp{&&}, @samp{||}, and @samp{!} in @command{awk}. Often called Boolean
-expressions, after the mathematician who pioneered this kind of
+@samp{&&}, @samp{||}, and @samp{!} in @command{awk}. Often called @dfn{Boolean
+expressions}, after the mathematician who pioneered this kind of
 mathematical logic.
 
 @item Lvalue

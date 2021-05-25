@@ -299,7 +299,7 @@ typedef struct awk_two_way_processor {
 } awk_two_way_processor_t;
 
 #define gawk_api_major_version 3
-#define gawk_api_minor_version 1
+#define gawk_api_minor_version 2
 
 /* Current version of the API. */
 enum {
@@ -368,7 +368,8 @@ typedef enum {
 	AWK_STRNUM,
 	AWK_ARRAY,
 	AWK_SCALAR,		/* opaque access to a variable */
-	AWK_VALUE_COOKIE	/* for updating a previously created value */
+	AWK_VALUE_COOKIE,	/* for updating a previously created value */
+	AWK_BOOL
 } awk_valtype_t;
 
 /*
@@ -383,6 +384,7 @@ typedef struct awk_value {
 		awk_array_t	a;
 		awk_scalar_t	scl;
 		awk_value_cookie_t vc;
+		awk_bool_t      b;
 	} u;
 #define str_value	u.s
 #define strnum_value	str_value
@@ -393,6 +395,7 @@ typedef struct awk_value {
 #define array_cookie	u.a
 #define scalar_cookie	u.scl
 #define value_cookie	u.vc
+#define bool_value	u.b
 } awk_value_t;
 
 /*
@@ -568,28 +571,30 @@ typedef struct gawk_api {
 	Table entry is type returned:
 
 
-	                        +-------------------------------------------------------+
-	                        |                   Type of Actual Value:               |
-	                        +--------+--------+--------+--------+-------+-----------+
-	                        | String | Strnum | Number | Regex  | Array | Undefined |
-	+-----------+-----------+--------+--------+--------+--------+-------+-----------+
-	|           | String    | String | String | String | String | false | false     |
-	|           +-----------+--------+--------+--------+--------+-------+-----------+
-	|           | Strnum    | false  | Strnum | Strnum | false  | false | false     |
-	|           +-----------+--------+--------+--------+--------+-------+-----------+
-	|           | Number    | Number | Number | Number | false  | false | false     |
-	|           +-----------+--------+--------+--------+--------+-------+-----------+
-	|           | Regex     | false  | false  | false  | Regex  | false | false     |
-	|           +-----------+--------+--------+--------+--------+-------+-----------+
-	|   Type    | Array     | false  | false  | false  | false  | Array | false     |
-	| Requested +-----------+--------+--------+--------+--------+-------+-----------+
-	|           | Scalar    | Scalar | Scalar | Scalar | Scalar | false | false     |
-	|           +-----------+--------+--------+--------+--------+-------+-----------+
-	|           | Undefined | String | Strnum | Number | Regex  | Array | Undefined |
-	|           +-----------+--------+--------+--------+--------+-------+-----------+
-	|           | Value     | false  | false  | false  | false  | false | false     |
-	|           | Cookie    |        |        |        |        |       |           |
-	+-----------+-----------+--------+--------+--------+--------+-------+-----------+
+	                        +----------------------------------------------------------------+
+	                        |                        Type of Actual Value:                   |
+	                        +--------+--------+--------+--------+--------+-------+-----------+
+	                        | String | Strnum | Number | Regex  | Bool   | Array | Undefined |
+	+-----------+-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | String    | String | String | String | String | String | false | false     |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Strnum    | false  | Strnum | Strnum | false  | false  | false | false     |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Number    | Number | Number | Number | false  | Number | false | false     |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Regex     | false  | false  | false  | Regex  | false  | false | false     |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|   Type    | Bool      | false  | false  | false  | false  | Bool   | false | false     |
+	| Requested +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Array     | false  | false  | false  | false  | false  | Array | false     |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Scalar    | Scalar | Scalar | Scalar | Scalar | Scalar | false | false     |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Undefined | String | Strnum | Number | Regex  | Bool   | Array | Undefined |
+	|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+	|           | Value     | false  | false  | false  | false  | false  | false | false     |
+	|           | Cookie    |        |        |        |        |        |       |           |
+	+-----------+-----------+--------+--------+--------+--------+--------+-------+-----------+
 	*/
 
 	/* Functions to handle parameters passed to the extension. */
@@ -1069,6 +1074,16 @@ make_number_mpfr(void *mpfr_ptr, awk_value_t *result)
 	result->val_type = AWK_NUMBER;
 	result->num_type = AWK_NUMBER_TYPE_MPFR;
 	result->num_ptr = mpfr_ptr;
+	return result;
+}
+
+/* make_bool --- make a bool value in result */
+
+static inline awk_value_t *
+make_bool(awk_bool_t boolval, awk_value_t *result)
+{
+	result->val_type = AWK_BOOL;
+	result->bool_value = boolval;
 	return result;
 }
 

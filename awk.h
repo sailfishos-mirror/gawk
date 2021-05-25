@@ -1521,6 +1521,7 @@ extern int strncasecmpmbs(const unsigned char *,
 			  const unsigned char *, size_t);
 extern int sanitize_exit_status(int status);
 extern void check_symtab_functab(NODE *dest, const char *fname, const char *msg);
+extern NODE *do_mkbool(int nargs);
 /* debug.c */
 extern void init_debug(void);
 extern int debug_prog(INSTRUCTION *pc);
@@ -1736,6 +1737,7 @@ extern NODE *r_force_number(NODE *n);
 extern NODE *r_format_val(const char *format, int index, NODE *s);
 extern NODE *r_dupnode(NODE *n);
 extern NODE *make_str_node(const char *s, size_t len, int flags);
+extern NODE *make_bool_node(bool value);
 extern NODE *make_typed_regex(const char *re, size_t len);
 extern void *more_blocks(int id);
 extern int parse_escape(const char **string_ptr);

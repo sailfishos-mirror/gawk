@@ -24,6 +24,43 @@
 
 	* Makefile.am (EXTRA_DIST): Remove files that are now in build-aux.
 
+	Unrelated:
+
+	* builtin.c (do_sub): Remove check for BOOL as target. It's not
+	correct anymore.
+
+2021-05-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* eval.c (flags2str): Move BOOL entry into the right place in the
+	list.
+	* NEWS: Update with info on mkbool.
+
+2021-05-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (do_bool): Renamed do_mkbool.
+	* awkgram.y (tokentab): Rename bool to mkbool.
+	* builtin.c (do_bool): Renamed do_mkbool.
+
+2021-04-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (boolval): Remove check for BOOL flag. It was incorrect.
+	Thanks to Andrew Schorr for the catch.
+	For Node_val, update the comment to describe the BOOL flag, and
+	move BOOL up to be alongside the flags for Node_val.
+
+2021-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Make bools plain numbers that have bool flag instead of
+	being weird string values.
+
+	* array.c (do_sort_up_value_type): Remove special ordering
+	for booleans.
+	* awk.h (warn_bool): Remove declaration.
+	* builtin.c (warn_bool): Remove function and all calls.
+	* gawkapi.c (node_to_awk_value): Update switches to look for
+	NUMBER|BOOL.
+	* node.c (make_bool_node): Revise string values and flag bits.
+
 2021-04-16         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* main (arg_assign): For -v '@/...' make sure that there are
@@ -45,11 +82,60 @@
 	* interpret.h (r_interpret): Remove LINT_no_effect from Op_lint
 	case.
 
+2021-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* array.c (do_sort_up_value_type): Fix order with bools.
+
+2021-03-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk_api.h (gawk_api_minor_version): Increase to 2.
+	* gawk_api.c (assign_bool): New function.
+	(node_to_awk_value): Finish updating for bool types and values.
+
+2021-03-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h (make_bool): New inline function.
+	Update table of request/return types.
+	* gawkapi.c (awk_value_to_node): Add support for AWK_BOOL.
+	(node_to_awk_value): Start on same. Not yet complete.
+
 2021-03-21         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* str_array.c (fnv1a_hash_string): New function.
 	(str_array_init): Use fnv1a_hash_string if AWK_HASH env var
 	set to "fnv1a".
+
+2021-03-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* array.c (do_sort_up_value_type): Add logic for handling bools.
+
+2021-03-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (warn_bool, do_bool): Add function declarations.
+	* awkgram.y (tokentab): Add entry for "bool" builtin.
+	* builtin.c (warn_bool): New function.
+	(do_index, do_substr, do_toupper, do_tolower, do_match,
+	do_length): Call it.
+	(do_sub): If first arg to sub/gsub is bool, fatal error.
+	(do_bool): New function.
+	* field.c (do_split, do_patsplit): Call warn_bool.
+	* main.c (load_procinfo_bools): Removed function and call.
+
+2021-03-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Start on a bool type for gawk.
+
+	* awk.h (BOOL): New flag value.
+	(make_bool_node): Add declaration of new function.
+	(bool_val): Check for BOOL along with NUMBER.
+	* builtin.c (do_typeof): Add support for BOOL.
+	* eval.c (flags2str): Ditto.
+	* gawkapi.h (awk_val_type): Add AWK_BOOL.
+	(awk_value_t): Add awk_bool_t element to the union and macro for it.
+	(struct gawk_api): Update the table of request/return values.
+	* main.c (load_procinfo_bools): New function.
+	(load_procinfo): Call it.
+	* node.c (make_bool_node): New function.
 
 2021-02-13         Arnold D. Robbins     <arnold@skeeve.com>
 
