@@ -1551,20 +1551,20 @@ mpf1:
 #ifdef HAVE_MPFR
 			case MP_INT_WITH_PREC:
 				sprintf(cp, "*.*Z%c", cs1);
-				while ((size_t)(nc = mpfr_snprintf(obufout, ofre, cpbuf,
-					     (int) fw, (int) prec, zi)) >= ofre)
+				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
+					     (int) fw, (int) prec, zi)) >= (int) ofre)
 					chksize(nc)
 				break;
 			case MP_INT_WITHOUT_PREC:
 				sprintf(cp, "*Z%c", cs1);
-				while ((size_t)(nc = mpfr_snprintf(obufout, ofre, cpbuf,
-					     (int) fw, zi)) >= ofre)
+				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
+					     (int) fw, zi)) >= (int) ofre)
 					chksize(nc)
 				break;
 			case MP_FLOAT:
 				sprintf(cp, "*.*R*%c", cs1);
-				while ((size_t)(nc = mpfr_snprintf(obufout, ofre, cpbuf,
-					     (int) fw, (int) prec, ROUND_MODE, mf)) >= ofre)
+				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
+					     (int) fw, (int) prec, ROUND_MODE, mf)) >= (int) ofre)
 					chksize(nc)
 				break;
 #endif
@@ -1573,7 +1573,7 @@ mpf1:
 					sprintf(cp, "*.*%c", cs1);
 					while ((size_t)(nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw, (int) prec,
-						     (double) tmpval)) >= ofre)
+						     (double) tmpval)) >= (int) ofre)
 						chksize(nc)
 				} else {
 					// For %a and %A, use the default precision if it
@@ -1581,7 +1581,7 @@ mpf1:
 					sprintf(cp, "*%c", cs1);
 					while ((size_t)(nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw,
-						     (double) tmpval)) >= ofre)
+						     (double) tmpval)) >= (int) ofre)
 						chksize(nc)
 				}
 			}
