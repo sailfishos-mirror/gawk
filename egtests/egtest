@@ -402,6 +402,17 @@ do_inventory_shipped() {
 	echo "*"
 }
 
+do_isnumeric() {
+	echo "*"
+	echo "* input file:"
+	echo "printf \"42\na.1\n123.456,78\n123,456.78\n12345678\nstring\n11\n011\n0x11\n0011\n42e4\n42E4\n0xf\nxg\n1xg\n\" > $testdata"
+	      printf  "42\na.1\n123.456,78\n123,456.78\n12345678\nstring\n11\n011\n0x11\n0011\n42e4\n42E4\n0xf\nxg\n1xg\n"  > $testdata
+	echo "*"
+	      echo '{ a=$0; result=isnumeric(a) ; if ( result==1 ) { print "#",a,"	is numeric" } else { print "#",a,"	is not numeric"} }' > $testpgm
+	echo "gawk -f $testpgm -f isnumeric.awk $testdata"
+	      gawk -f $testpgm -f isnumeric.awk $testdata
+}
+
 do_join() {
 	echo 'BEGIN {  for ( i=1; i<=9; i++ ) a[i]=i ; for ( i in a ) print a[i] ; print "* joining only from 2 to 8"; joined=join(a,2,8,"_|_"); print joined; exit; }' > $testpgm
 	echo "*"
