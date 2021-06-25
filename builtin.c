@@ -1558,19 +1558,19 @@ mpf1:
 			case MP_INT_WITH_PREC:
 				sprintf(cp, "*.*Z%c", cs1);
 				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
-					     (int) fw, (int) prec, zi)) >= ofre)
+					     (int) fw, (int) prec, zi)) >= (int) ofre)
 					chksize(nc)
 				break;
 			case MP_INT_WITHOUT_PREC:
 				sprintf(cp, "*Z%c", cs1);
 				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
-					     (int) fw, zi)) >= ofre)
+					     (int) fw, zi)) >= (int) ofre)
 					chksize(nc)
 				break;
 			case MP_FLOAT:
 				sprintf(cp, "*.*R*%c", cs1);
 				while ((nc = mpfr_snprintf(obufout, ofre, cpbuf,
-					     (int) fw, (int) prec, ROUND_MODE, mf)) >= ofre)
+					     (int) fw, (int) prec, ROUND_MODE, mf)) >= (int) ofre)
 					chksize(nc)
 				break;
 #endif
@@ -1579,7 +1579,7 @@ mpf1:
 					sprintf(cp, "*.*%c", cs1);
 					while ((nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw, (int) prec,
-						     (double) tmpval)) >= ofre)
+						     (double) tmpval)) >= (int) ofre)
 						chksize(nc)
 				} else {
 					// For %a and %A, use the default precision if it
@@ -1587,7 +1587,7 @@ mpf1:
 					sprintf(cp, "*%c", cs1);
 					while ((nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw,
-						     (double) tmpval)) >= ofre)
+						     (double) tmpval)) >= (int) ofre)
 						chksize(nc)
 				}
 			}
@@ -4112,7 +4112,10 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_val:
-		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX)) {
+		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
+		case NUMBER|BOOL:
+			res = "number|bool";
+			break;
 		case NUMBER:
 			res = "number";
 			break;
@@ -4320,4 +4323,19 @@ check_symtab_functab(NODE *dest, const char *fname, const char *msg)
 		fatal(msg, fname, "SYMTAB");
 	else if (dest == func_table)
 		fatal(msg, fname, "FUNCTAB");
+}
+
+/* do_mkbool --- create boolean values */
+
+NODE *
+do_mkbool(int nargs)
+{
+	NODE *tmp;
+	bool result;
+
+	tmp = POP_SCALAR();
+	result = boolval(tmp);
+	DEREF(tmp);
+
+	return make_bool_node(result);
 }

@@ -436,6 +436,10 @@ typedef struct exp_node {
 		 * is a hint to indicate that an integer array optimization may be
 		 * used when this value appears as a subscript.
 		 *
+		 * The BOOL flag indicates that this number should be converted to True
+		 * or False by extensions that interchange data with other languages,
+		 * via JSON, XML or some other serialization mechanism.
+		 *
 		 * We hope that the rest of the flags are self-explanatory. :-)
 		 */
 		MALLOC	= 0x0001,       /* stptr can be free'd, i.e. not a field node pointing into a shared buffer */
@@ -445,24 +449,25 @@ typedef struct exp_node {
 		NUMBER	= 0x0010,       /* assigned as number */
 		USER_INPUT = 0x0020,    /* user input: if NUMERIC then
 					 * a NUMBER */
-		INTLSTR	= 0x0040,       /* use localized version */
-		NUMINT	= 0x0080,       /* numeric value is an integer */
-		INTIND	= 0x0100,	/* integral value is array index;
+		BOOL    = 0x0040,	/* this is a boolean value */
+		INTLSTR	= 0x0080,       /* use localized version */
+		NUMINT	= 0x0100,       /* numeric value is an integer */
+		INTIND	= 0x0200,	/* integral value is array index;
 					 * lazy conversion to string.
 					 */
-		WSTRCUR	= 0x0200,       /* wide str value is current */
-		MPFN	= 0x0400,       /* arbitrary-precision floating-point number */
-		MPZN	= 0x0800,       /* arbitrary-precision integer */
-		NO_EXT_SET = 0x1000,    /* extension cannot set a value for this variable */
-		NULL_FIELD = 0x2000,    /* this is the null field */
+		WSTRCUR	= 0x0400,	/* wide str value is current */
+		MPFN	= 0x0800,	/* arbitrary-precision floating-point number */
+		MPZN	= 0x01000,	/* arbitrary-precision integer */
+		NO_EXT_SET = 0x02000,	/* extension cannot set a value for this variable */
+		NULL_FIELD = 0x04000,	/* this is the null field */
 
 	/* type = Node_var_array */
-		ARRAYMAXED	= 0x4000,       /* array is at max size */
-		HALFHAT		= 0x8000,       /* half-capacity Hashed Array Tree;
+		ARRAYMAXED	= 0x08000,	/* array is at max size */
+		HALFHAT		= 0x010000,	/* half-capacity Hashed Array Tree;
 						 * See cint_array.c */
-		XARRAY		= 0x10000,
-		NUMCONSTSTR	= 0x20000,	/* have string value for numeric constant */
-		REGEX           = 0x40000,	/* this is a typed regex */
+		XARRAY		= 0x020000,
+		NUMCONSTSTR	= 0x040000,	/* have string value for numeric constant */
+		REGEX           = 0x080000,	/* this is a typed regex */
 	} flags;
 	long valref;
 } NODE;
@@ -1503,6 +1508,7 @@ extern int strncasecmpmbs(const unsigned char *,
 			  const unsigned char *, size_t);
 extern int sanitize_exit_status(int status);
 extern void check_symtab_functab(NODE *dest, const char *fname, const char *msg);
+extern NODE *do_mkbool(int nargs);
 /* debug.c */
 extern void init_debug(void);
 extern int debug_prog(INSTRUCTION *pc);
@@ -1714,6 +1720,7 @@ extern NODE *r_force_number(NODE *n);
 extern NODE *r_format_val(const char *format, int index, NODE *s);
 extern NODE *r_dupnode(NODE *n);
 extern NODE *make_str_node(const char *s, size_t len, int flags);
+extern NODE *make_bool_node(bool value);
 extern NODE *make_typed_regex(const char *re, size_t len);
 extern void *more_blocks(int id);
 extern int parse_escape(const char **string_ptr);

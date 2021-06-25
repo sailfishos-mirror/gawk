@@ -11,6 +11,9 @@ BEGIN {
 	split("-2.4", f)
 	dict[strnum_sub] = f[1]
 
+	bool_sub = "bool-sub"
+	dict[bool_sub] = mkbool(1)
+
 	n = asorti(dict, dictindices)
 	for (i = 1; i <= n; i++)
 		printf("dict[%s] = %s\n", dictindices[i], dict[dictindices[i]]) > "orig.out"
@@ -51,4 +54,12 @@ BEGIN {
 	if (typeof(dict[strnum_sub]) != "strnum")
 		printf("dict[\"%s\"] should be strnum, is %s\n",
 			strnum_sub, typeof(dict[strnum_sub]));
+
+	if (typeof(dict[bool_sub]) != "number|bool")
+		printf("dict[\"%s\"] should be number|bool, is %s\n",
+			bool_sub, typeof(dict[bool_sub]));
+
+	if ((dict[bool_sub] "") != "1")
+		printf("dict[\"%s\"] should be 1, is %s\n",
+			bool_sub, dict[bool_sub]);
 }

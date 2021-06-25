@@ -749,6 +749,8 @@ particular records in a file and perform operations upon them.
 * Arrays Summary::                      Summary of arrays.
 * Built-in::                            Summarizes the built-in functions.
 * Calling Built-in::                    How to call built-in functions.
+* Boolean Functions::                   A function that returns Boolean
+                                        values.
 * Numeric Functions::                   Functions that work with numbers,
                                         including @code{int()}, @code{sin()}
                                         and @code{rand()}.
@@ -803,6 +805,8 @@ particular records in a file and perform operations upon them.
                                         once.
 * Shell Quoting::                       A function to quote strings for the
                                         shell.
+* Isnumeric Function::                  A function to test whether a value
+                                        is numeric.
 * Data File Management::                Functions for managing command-line
                                         data files.
 * Filetrans Function::                  A function for handling data file
@@ -856,6 +860,7 @@ particular records in a file and perform operations upon them.
 * Programs Summary::                    Summary of programs.
 * Programs Exercises::                  Exercises.
 * Nondecimal Data::                     Allowing nondecimal input data.
+* Boolean Typed Values::                Values with @code{number|bool} type.
 * Array Sorting::                       Facilities for controlling array
                                         traversal and sorting arrays.
 * Controlling Array Traversal::         How to use PROCINFO["sorted_in"].
@@ -1023,6 +1028,7 @@ particular records in a file and perform operations upon them.
 * Unix Installation::                   Installing @command{gawk} under
                                         various versions of Unix.
 * Quick Installation::                  Compiling @command{gawk} under Unix.
+* Compiling with MPFR::                 Building with MPFR.
 * Shell Startup Files::                 Shell convenience functions.
 * Additional Configuration Options::    Other compile-time options.
 * Configuration Philosophy::            How it's all supposed to work.
@@ -1052,6 +1058,7 @@ particular records in a file and perform operations upon them.
 * Bugs::                                Reporting Problems and Bugs.
 * Bug address::                         Where to send reports to.
 * Usenet::                              Where not to send reports to.
+* Performance bugs::                    What to do if you think there is a performance issue.
 * Maintainers::                         Maintainers of non-*nix ports.
 * Other Versions::                      Other freely available @command{awk}
                                         implementations.
@@ -17448,6 +17455,7 @@ but are summarized here for your convenience.
 
 @menu
 * Calling Built-in::            How to call built-in functions.
+* Boolean Functions::           A function that returns Boolean values.
 * Numeric Functions::           Functions that work with numbers, including
                                 @code{int()}, @code{sin()} and @code{rand()}.
 * String Functions::            Functions for string manipulation, such as
@@ -17516,6 +17524,25 @@ six, and then 12, and @code{atan2()} is called with the two arguments six
 and 12.  But if the order of evaluation is right to left, @code{i}
 first becomes 10, then 11, and @code{atan2()} is called with the
 two arguments 11 and 10.
+
+
+@node Boolean Functions
+@subsection Generating Boolean Values
+@cindex boolean function
+
+This function is specific to @command{gawk}. It is not
+available in compatibility mode (@pxref{Options}):
+
+@c @asis for docbook
+@table @asis
+@item @code{mkbool(@var{expression})}
+@cindexgawkfunc{mkbool}
+Return a Boolean-typed value based on the regular Boolean value
+of @var{expression}.  Boolean ``true'' values have numeric value one.
+Boolean ``false'' values have numeric
+zero.  This is discussed in more
+detail in @ref{Boolean Typed Values}.
+@end table
 
 @node Numeric Functions
 @subsection Numeric Functions
@@ -19810,6 +19837,9 @@ Return one of the following strings, depending upon the type of @var{x}:
 @item "number"
 @var{x} is a number.
 
+@item "number|bool"
+@var{x} is a Boolean typed value (@pxref{Boolean Typed Values}).
+
 @item "string"
 @var{x} is a string.
 
@@ -20688,7 +20718,7 @@ being aware of them.
 @cindex pointers to functions
 @cindex differences in @command{awk} and @command{gawk} @subentry indirect function calls
 
-This section describes an advanced, @command{gawk}-specific extension.
+This @value{SECTION} describes an advanced, @command{gawk}-specific extension.
 
 Often, you may wish to defer the choice of function to call until runtime.
 For example, you may have different kinds of records, each of which
@@ -21377,6 +21407,7 @@ programming use.
 * Getlocaltime Function::       A function to get formatted times.
 * Readfile Function::           A function to read an entire file at once.
 * Shell Quoting::               A function to quote strings for the shell.
+* Isnumeric Function::          A function to test whether a value is numeric.
 @end menu
 
 @node Strtonum Function
@@ -22166,6 +22197,46 @@ function shell_quote(s,             # parameter
 @}
 @c endfile
 @end example
+
+@node Isnumeric Function
+@subsection Checking Whether A Value Is Numeric
+
+A frequent programming question is how to ascertain whether a value is numeric.
+This can be solved by using this example function @code{isnumeric()}, which
+employs the trick of converting a string value to user input by using the
+@code{split()} function:
+
+@cindex @code{isnumeric()} user-defined function
+@cindex user-defined @subentry function @subentry @code{isnumeric()}
+@example
+@c file eg/lib/isnumeric.awk
+# isnumeric --- check whether a value is numeric
+
+function isnumeric(x,  f)
+@{
+    switch (typeof(x)) @{
+    case "strnum":
+    case "number":
+        return 1
+    case "string":
+        return (split(x, f, " ") == 1) && (typeof(f[1]) == "strnum")
+    default:
+        return 0
+    @}
+@}
+@c endfile
+@end example
+
+Please note that leading or trailing white space is disregarded in deciding
+whether a value is numeric or not, so if it matters to you, you may want
+to add an additional check for that.
+
+Traditionally, it has been recommended to check for numeric values using the
+test @samp{x+0 == x}. This function is superior in two ways: it will not
+report that unassigned variables contain numeric values; and it recognizes
+string values with numeric contents.
+On the other hand, it uses the @code{typeof()} function
+(@pxref{Type Functions}), which is specific to @command{gawk}.
 
 @node Data File Management
 @section @value{DDF} Management
@@ -23008,8 +23079,8 @@ $ @kbd{awk -f getopt.awk -v _getopt_test=1 -- -a \}
 @print{} c = <otherd>, Optarg = <>
 @print{} c = <otherc>, Optarg = <>
 @print{} non-option arguments:
-@print{} 	ARGV[8] = <arg1>
-@print{} 	ARGV[9] = <arg2>
+@print{}        ARGV[8] = <arg1>
+@print{}        ARGV[9] = <arg2>
 @end example
 
 In all the runs, the first @option{--} terminates the arguments to
@@ -25206,7 +25277,7 @@ look nice on the page:
 @end ignore
 @c file eg/prog/split.awk
 
-function usage(		common)
+function usage(     common)
 @{
     common = "[-a suffix-len] [file [outname]]"
     printf("usage: split [-l count]  %s\n", common) > "/dev/stderr"
@@ -28267,6 +28338,7 @@ discusses the ability to dynamically add new built-in functions to
 
 @menu
 * Nondecimal Data::             Allowing nondecimal input data.
+* Boolean Typed Values::        Values with @code{number|bool} type.
 * Array Sorting::               Facilities for controlling array traversal and
                                 sorting arrays.
 * Two-way I/O::                 Two-way communications with another process.
@@ -28332,6 +28404,49 @@ leads to less surprising results.
 
 This option may disappear in a future version of @command{gawk}.
 @end quotation
+
+@node Boolean Typed Values
+@section Boolean Typed Values
+
+Scalar values in @command{awk} are either numbers or strings.
+@command{gawk} also supports values of type @code{regexp}
+(@pxref{Strong Regexp Constants}).
+
+As described in @ref{Truth Values}, Boolean values in @command{awk}
+don't have a separate type: a value counts as ``true'' if it is nonzero
+or non-null, and as ``false'' otherwise.
+
+When interchanging data with languages that do have a real Boolean type,
+using a standard format such as JSON or XML, the lack of a true Boolean
+type in @command{awk} is problematic.
+(See, for example, the @code{json} extension provided by
+@uref{https://sourceforge.net/projects/gawkextlib, the @code{gawkextlib} project}.)
+
+It's easy to import Boolean data into @command{awk}, but then the fact
+that it was originally Boolean is lost.  Exporting data is even harder;
+there's no way to indicate that a value is really Boolean.
+
+To solve this problem, @command{gawk} provides a function named @code{mkbool()}.
+It takes one argument, which is any @command{awk} expression, and it
+returns a value of Boolean type.
+
+The returned values are normal @command{awk} numeric values, with
+values of either one or zero,
+depending upon the truth
+value of the original expression passed in the call to @code{mkbool()}.
+
+The @code{typeof()} function (@pxref{Type Functions}) returns
+@code{"number|bool"} for these values.
+
+Thus Boolean-typed values @emph{are} numbers as far as @command{gawk}
+is concerned, except that extension code can treat them as Booleans
+if desired.
+
+While it would have been possible to add two new built-in variables
+of Boolean type named @code{TRUE} and @code{FALSE}, doing so would
+undoubtedly have broken many existing @command{awk} programs.  Instead,
+having a ``generator'' function that creates Boolean values gives
+flexibility, without breaking as much existing code.
 
 @node Array Sorting
 @section Controlling Array Traversal and Array Sorting
@@ -29039,7 +29154,7 @@ main(void)
         printf("%d\n", x + y); 
     return 0; 
 @} 
-$ @kbd{cc -O add.c -o add}	@ii{Compile the program}
+$ @kbd{cc -O add.c -o add}      @ii{Compile the program}
 @end example
 
 You could then write an exceedingly simple @command{gawk} program
@@ -29642,6 +29757,19 @@ they should be added to the core interpreter only as a last resort.
 
 @node Internationalization
 @chapter Internationalization with @command{gawk}
+
+@cindex Robbins @subentry Malka
+@cindex Moon, Sailor
+@cindex Sailor Moon @seeentry{Moon, Sailor}
+@quotation
+@i{Moon@dots{} Gorgeous@dots{} MEDITATION!}
+@author Pretty Guardian Sailor Moon Eternal, The Movie
+@end quotation
+
+@quotation
+@i{It probably sounded better in Japanese.}
+@author Malka Robbins
+@end quotation
 
 Once upon a time, computer makers
 wrote software that worked only in English.
@@ -34429,7 +34557,8 @@ multibyte encoding.
 @itemx @ @ @ @ AWK_STRNUM,
 @itemx @ @ @ @ AWK_ARRAY,
 @itemx @ @ @ @ AWK_SCALAR,@ @ @ @ @ @ @ @ @ /* opaque access to a variable */
-@itemx @ @ @ @ AWK_VALUE_COOKIE@ @ @ @ /* for updating a previously created value */
+@itemx @ @ @ @ AWK_VALUE_COOKIE,@ @ @ /* for updating a previously created value */
+@itemx @ @ @ @ AWK_BOOL
 @itemx @} awk_valtype_t;
 This @code{enum} indicates the type of a value.
 It is used in the following @code{struct}.
@@ -34442,6 +34571,7 @@ It is used in the following @code{struct}.
 @itemx @ @ @ @ @ @ @ @ awk_array_t@ @ @ @ @ @ @ @ a;
 @itemx @ @ @ @ @ @ @ @ awk_scalar_t@ @ @ @ @ @ @ scl;
 @itemx @ @ @ @ @ @ @ @ awk_value_cookie_t@ vc;
+@itemx @ @ @ @ @ @ @ @ awk_bool_t@ @ @ @ @ @ @ @ @ b;
 @itemx @ @ @ @ @} u;
 @itemx @} awk_value_t;
 An ``@command{awk} value.''
@@ -34457,6 +34587,7 @@ The @code{val_type} member indicates what kind of value the
 @itemx #define array_cookie@ @ @ u.a
 @itemx #define scalar_cookie@ @ u.scl
 @itemx #define value_cookie@ @ @ u.vc
+@itemx #define bool_value@ @ @ @ @ u.b
 Using these macros makes accessing the fields of the @code{awk_value_t} more
 readable.
 
@@ -34783,6 +34914,11 @@ This function creates a strongly typed regexp value.  @code{string} is
 the regular expression of length @code{len}.  It expects @code{string}
 to be a @samp{char *} value pointing to data previously obtained from
 @code{gawk_malloc()}, @code{gawk_calloc()}, or @code{gawk_realloc()}.
+
+@item static inline awk_value_t *
+@itemx make_bool(awk_bool_t boolval, awk_value_t *result);
+This function creates a boolean value in the @code{awk_value_t} variable
+pointed to by @code{result}.
 
 @end table
 
@@ -35584,7 +35720,8 @@ value type, as appropriate.  This behavior is summarized in
   <colspec colname="c6"/>
   <colspec colname="c7"/>
   <colspec colname="c8"/>
-  <spanspec spanname="hspan" namest="c3" nameend="c8" align="center"/>
+  <colspec colname="c9"/>
+  <spanspec spanname="hspan" namest="c3" nameend="c9" align="center"/>
   <thead>
     <row><entry></entry><entry spanname="hspan"><para>Type of Actual Value</para></entry></row>
     <row>
@@ -35594,6 +35731,7 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Strnum</para></entry>
       <entry><para>Number</para></entry>
       <entry><para>Regex</para></entry>
+      <entry><para>Bool</para></entry>
       <entry><para>Array</para></entry>
       <entry><para>Undefined</para></entry>
     </row>
@@ -35602,6 +35740,7 @@ value type, as appropriate.  This behavior is summarized in
     <row>
       <entry></entry>
       <entry><para><emphasis role="bold">String</emphasis></para></entry>
+      <entry><para>String</para></entry>
       <entry><para>String</para></entry>
       <entry><para>String</para></entry>
       <entry><para>String</para></entry>
@@ -35618,6 +35757,7 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
     </row>
     <row>
       <entry></entry>
@@ -35626,12 +35766,14 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Number</para></entry>
       <entry><para>Number</para></entry>
       <entry><para>false</para></entry>
+      <entry><para>Number</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
     </row>
     <row>
       <entry><para><emphasis role="bold">Type</emphasis></para></entry>
       <entry><para><emphasis role="bold">Regex</emphasis></para></entry>
+      <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>Regex</para></entry>
@@ -35641,7 +35783,19 @@ value type, as appropriate.  This behavior is summarized in
     </row>
     <row>
       <entry><para><emphasis role="bold">Requested</emphasis></para></entry>
+      <entry><para><emphasis role="bold">Bool</emphasis></para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>Bool</para></entry>
+      <entry><para>false</para></entry>
+      <entry><para>false</para></entry>
+    </row>
+    <row>
+      <entry><para></para></entry>
       <entry><para><emphasis role="bold">Array</emphasis></para></entry>
+      <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
@@ -35656,6 +35810,7 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Scalar</para></entry>
       <entry><para>Scalar</para></entry>
       <entry><para>Scalar</para></entry>
+      <entry><para>Scalar</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
     </row>
@@ -35666,12 +35821,14 @@ value type, as appropriate.  This behavior is summarized in
       <entry><para>Strnum</para></entry>
       <entry><para>Number</para></entry>
       <entry><para>Regex</para></entry>
+      <entry><para>Bool</para></entry>
       <entry><para>Array</para></entry>
       <entry><para>Undefined</para></entry>
     </row>
     <row>
       <entry></entry>
       <entry><para><emphasis role="bold">Value cookie</emphasis></para></entry>
+      <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
       <entry><para>false</para></entry>
@@ -35694,43 +35851,46 @@ value type, as appropriate.  This behavior is summarized in
 \vglue-1.1\baselineskip
 @end tex
 @c @multitable @columnfractions .166 .166 .198 .15 .15 .166
-@multitable {Requested} {Undefined} {Number} {Number} {Scalar} {Regex} {Array} {Undefined}
-@headitem @tab @tab String @tab Strnum @tab Number @tab Regex @tab Array @tab Undefined
-@item @tab @b{String} @tab String @tab String @tab String @tab String @tab false @tab false
-@item @tab @b{Strnum} @tab false @tab Strnum @tab Strnum @tab false @tab false @tab false
-@item @tab @b{Number} @tab Number @tab Number @tab Number @tab false @tab false @tab false
-@item @b{Type} @tab @b{Regex} @tab false @tab false @tab false @tab Regex @tab false @tab false
-@item @b{Requested} @tab @b{Array} @tab false @tab false @tab false @tab false @tab Array @tab false
-@item @tab @b{Scalar} @tab Scalar @tab Scalar @tab Scalar @tab Scalar @tab false @tab false
-@item @tab @b{Undefined} @tab String @tab Strnum @tab Number @tab Regex @tab Array @tab Undefined
-@item @tab @b{Value cookie} @tab false @tab false @tab false @tab false @tab false @tab false
+@multitable {Requested} {Undefined} {Number} {Number} {Scalar} {Regex} {Number} {Array} {Undefined}
+@headitem @tab @tab String @tab Strnum @tab Number @tab Regex @tab Bool @tab Array @tab Undefined
+@item @tab @b{String} @tab String @tab String @tab String @tab String @tab String @tab false @tab false
+@item @tab @b{Strnum} @tab false @tab Strnum @tab Strnum @tab false @tab false @tab false @tab false
+@item @tab @b{Number} @tab Number @tab Number @tab Number @tab false @tab Number @tab false @tab false
+@item @b{Type} @tab @b{Regex} @tab false @tab false @tab false @tab Regex @tab false @tab false @tab false
+@item @b{Requested} @tab @b{Bool} @tab false @tab false @tab false @tab false @tab Bool @tab false @tab false
+@item @tab @b{Array} @tab false @tab false @tab false @tab false @tab false @tab Array @tab false
+@item @tab @b{Scalar} @tab Scalar @tab Scalar @tab Scalar @tab Scalar @tab Scalar @tab false @tab false
+@item @tab @b{Undefined} @tab String @tab Strnum @tab Number @tab Regex @tab Bool @tab Array @tab Undefined
+@item @tab @b{Value cookie} @tab false @tab false @tab false @tab false @tab false @tab false @tab false
 @end multitable
 @end ifnotdocbook
 @end ifnotplaintext
 @ifplaintext
 @verbatim
-                        +-------------------------------------------------------+
-                        |                   Type of Actual Value:               |
-                        +--------+--------+--------+--------+-------+-----------+
-                        | String | Strnum | Number | Regex  | Array | Undefined |
-+-----------+-----------+--------+--------+--------+--------+-------+-----------+
-|           | String    | String | String | String | String | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Strnum    | false  | Strnum | Strnum | false  | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Number    | Number | Number | Number | false  | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Regex     | false  | false  | false  | Regex  | false | false     |
-|   Type    +-----------+--------+--------+--------+--------+-------+-----------+
-| Requested | Array     | false  | false  | false  | false  | Array | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Scalar    | Scalar | Scalar | Scalar | Scalar | false | false     |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Undefined | String | Strnum | Number | Regex  | Array | Undefined |
-|           +-----------+--------+--------+--------+--------+-------+-----------+
-|           | Value     | false  | false  | false  | false  | false | false     |
-|           | Cookie    |        |        |        |        |       |           |
-+-----------+-----------+--------+--------+--------+--------+-------+-----------+
+			+----------------------------------------------------------------+
+			|                        Type of Actual Value:                   |
+			+--------+--------+--------+--------+--------+-------+-----------+
+			| String | Strnum | Number | Regex  | Bool   | Array | Undefined |
++-----------+-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | String    | String | String | String | String | String | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Strnum    | false  | Strnum | Strnum | false  | false  | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Number    | Number | Number | Number | false  | Number | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Regex     | false  | false  | false  | Regex  | false  | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|   Type    | Bool      | false  | false  | false  | false  | Bool   | false | false     |
+| Requested +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Array     | false  | false  | false  | false  | false  | Array | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Scalar    | Scalar | Scalar | Scalar | Scalar | Scalar | false | false     |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Undefined | String | Strnum | Number | Regex  | Bool   | Array | Undefined |
+|           +-----------+--------+--------+--------+--------+--------+-------+-----------+
+|           | Value     | false  | false  | false  | false  | false  | false | false     |
+|           | Cookie    |        |        |        |        |        |       |           |
++-----------+-----------+--------+--------+--------+--------+--------+-------+-----------+
 @end verbatim
 @end ifplaintext
 @end float
@@ -39598,8 +39758,9 @@ for internationalization
 
 @item
 The @code{extension()} function and the ability to add
-new built-in functions dynamically
-(@pxref{Dynamic Extensions}).
+new built-in functions dynamically. This has seen removed.
+It was replaced by the new extension mechanism.
+@xref{Dynamic Extensions}.
 
 @item
 The @code{mktime()} function for creating timestamps
@@ -39699,7 +39860,7 @@ the fields, instead of matching the field separator
 (@pxref{Splitting By Content}).
 
 @item
-If @code{PROCINFO["sorted_in"]} exists, @samp{for(iggy in foo)} loops sort the
+If @code{PROCINFO["sorted_in"]} exists, @samp{for (iggy in foo)} loops sort the
 indices before looping over them.  The value of this element
 provides control over how the indices are sorted before the loop
 traversal starts
@@ -40085,6 +40246,32 @@ The index for this manual was completely reworked.
 
 @item
 Support was added for MSYS2.
+
+@item
+@code{asort()} and @code{asorti()} were changed to
+allow @code{FUNCTAB} and @code{SYMTAB} as the first argument if a
+second destination array is supplied (@pxref{String Functions}).
+
+@item
+The @option{-I}/@option{--trace} options were added to
+print a trace of the byte codes as they execute (@pxref{Options}).
+
+@item
+@code{$0} and the fields are now cleared before starting a
+@code{BEGINFILE} rule (@pxref{BEGINFILE/ENDFILE}).
+
+@item
+Several example programs in the manual were updated to their modern
+POSIX equivalents.
+
+@item
+The ``no effect'' lint warnings from @option{--lint} were fixed up
+and now behave more sanely (@pxref{Options}).
+
+@item
+Handling of Infinity and NaN values were improved.
+@xref{Math Definitions}, and also see
+@ref{POSIX Floating Point Problems}.
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -40887,6 +41074,10 @@ to configure @command{gawk} for your system yourself.
 @node Quick Installation
 @appendixsubsec Compiling @command{gawk} for Unix-Like Systems
 
+@menu
+* Compiling with MPFR::              Building with MPFR.
+@end menu
+
 The normal installation steps should work on all modern commercial
 Unix-derived systems, GNU/Linux, BSD-based systems, and the Cygwin
 environment for MS-Windows.
@@ -40959,6 +41150,24 @@ command to do so.  The command then becomes @samp{sudo make install}. It
 is likely that you will be asked for your password, and you will have
 to have been set up previously as a user who is allowed to run the
 @command{sudo} command.
+
+
+@node Compiling with MPFR
+@appendixsubsubsec Building With MPFR
+
+@cindex MPFR library, building with
+Use of the MPFR library with @command{gawk}
+is an optional feature: if you have the MPFR and GMP libraries already installed
+when you configure and build @command{gawk},
+@command{gawk} automatically will be able to use them.
+
+You can install these libraries from source code by fetching them
+from the GNU distribution site at @code{ftp.gnu.org}.
+
+Most modern systems provide package managers which save you the trouble
+of building from source. They fetch and install the library header files
+and binaries for you.  You will need to research how to do this for
+your particular system.
 
 @node Shell Startup Files
 @appendixsubsec Shell Startup Files
@@ -41756,6 +41965,7 @@ but we might well want to fix it.
 @menu
 * Bug address::                 Where to send reports to.
 * Usenet::                      Where not to send reports to.
+* Performance bugs::            What to do if you think there is a performance issue.
 * Maintainers::                 Maintainers of non-*nix ports.
 @end menu
 
@@ -41864,6 +42074,88 @@ My memory was imperfect.  Back in June 2009, I wrote:
 and run to another section of the playground.  Then, if you like mixing
 metaphors, you can throw rocks from there."
 @end ignore
+
+@node Performance bugs
+@appendixsubsec What To Do If You Think There Is A Performance Issue
+
+@cindex performance, checking issues
+@cindex profiling, compiling @command{gawk} for
+If you think that @command{gawk} is too slow at doing a particular task,
+you should investigate before sending in a bug report. Here are the steps
+to follow:
+
+@enumerate 1
+@item
+Run @command{gawk} with the @option{--profile} option (@pxref{Options})
+to see what your
+program is doing. It may be that you have written it in an inefficient manner.
+For example, you may be doing something for every record that could be done
+just once, for every file.
+(Use a @code{BEGINFILE} rule; @pxref{BEGINFILE/ENDFILE}.)
+Or you may be doing something for every file that only needs to be done
+once per run of the program.
+(Use a @code{BEGIN} rule; @pxref{BEGIN/END}.)
+
+@item
+If profiling at the @command{awk} level doesn't help, then you will
+need to compile @command{gawk} itself for profiling at the C language level.
+
+To do that, start with the latest released version of
+@command{gawk}. Unpack the source code in a new directory, and configure
+it:
+
+@example
+$ @kbd{tar -xpzvf gawk-X.Y.Z.tar.gz}
+@print{} @dots{}                                @ii{Output ommited}
+$ @kbd{cd gawk-X.Y.Z}
+$ @kbd{./configure}
+@print{} @dots{}                                @ii{Output ommited}
+@end example
+
+@item
+Edit the files @file{Makefile} and @file{support/Makefile}.
+Change every instance of @option{-O2} or @option{-O} to @option{-pg}.
+This causes @command{gawk} to be compiled for profiling.
+
+@item
+Compile the program by running the @command{make} command:
+
+@example
+@group
+$ @kbd{make}
+@print{} @dots{}                                @ii{Output ommited}
+@end group
+@end example
+
+@item
+Run the freshly compiled @command{gawk} on a @emph{real} program,
+using @emph{real} data.  Using an artificial program to try to time one
+particular feature of @command{gawk} is useless; real @command{awk} programs
+generally spend most of their time doing I/O, not computing.  If you want to prove
+that something is slow, it @emph{must} be done using a real program and real data.
+
+Use a data file that is large enough for the statistical profiling to measure
+where @command{gawk} spends its time. It should be at least 100 megabytes in size.
+
+@item
+When done, you should have a file in the current directory named @file{gmon.out}.
+Run the command @samp{gprof gawk gmon.out > gprof.out}.
+
+@item
+Submit a bug report explaining what you think is slow. Include the @file{gprof.out}
+file with it.
+
+Preferably, you should also submit the program and the data, or else indicate where to
+get the data if the file is large.
+
+@item
+If you have not submitted your program and data, be prepared to apply patches and
+rerun the profiling in order to see if the patches were effective.
+
+@end enumerate
+
+If you are incapable or unwilling to do the steps listed above, then you will
+just have to live with @command{gawk} as it is.
 
 @node Maintainers
 @appendixsubsec Reporting Problems with Non-Unix Ports
@@ -44045,8 +44337,8 @@ internationalized program to work in a particular language.
 
 @item Logical Expression
 An expression using the operators for logic, AND, OR, and NOT, written
-@samp{&&}, @samp{||}, and @samp{!} in @command{awk}. Often called Boolean
-expressions, after the mathematician who pioneered this kind of
+@samp{&&}, @samp{||}, and @samp{!} in @command{awk}. Often called @dfn{Boolean
+expressions}, after the mathematician who pioneered this kind of
 mathematical logic.
 
 @item Lvalue
