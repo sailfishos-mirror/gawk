@@ -39,6 +39,7 @@ static void (*install_func)(NODE *) = NULL;
 static NODE *make_symbol(const char *name, NODETYPE type);
 static NODE *install(const char *name, NODE *parm, NODETYPE type);
 static void free_bcpool(INSTRUCTION_POOL *pl);
+static NODE *get_name_from_awk_ns(const char *name);
 
 static AWK_CONTEXT *curr_ctxt = NULL;
 static int ctxt_level;
@@ -102,10 +103,7 @@ lookup(const char *name)
 	tables[3] = symbol_table;	/* then globals */
 	tables[4] = NULL;
 
-	if (strncmp(name, "awk::", 5) == 0)
-		tmp = make_string(name + 5, strlen(name) - 5);
-	else
-		tmp = make_string(name, strlen(name));
+	tmp = get_name_from_awk_ns(name);
 
 	n = NULL;
 	for (i = 0; tables[i] != NULL; i++) {
@@ -307,10 +305,7 @@ install(const char *name, NODE *parm, NODETYPE type)
 	NODE *n_name;
 	NODE *prev;
 
-	if (strncmp(name, "awk::", 5) == 0)
-		n_name = make_string(name + 5, strlen(name) - 5);
-	else
-		n_name = make_string(name, strlen(name));
+	n_name = get_name_from_awk_ns(name);
 
 	table = symbol_table;
 
@@ -609,7 +604,10 @@ load_symbols()
 			    || r->type == Node_var
 			    || r->type == Node_var_array
 			    || r->type == Node_var_new) {
-				tmp = make_string(r->vname, strlen(r->vname));
+				if (strncmp(r->vname, "awk::", 5) == 0)
+					tmp = make_string(r->vname + 5, strlen(r->vname) - 5);
+				else
+					tmp = make_string(r->vname, strlen(r->vname));
 				aptr = assoc_lookup(sym_array, tmp);
 				unref(tmp);
 				unref(*aptr);
@@ -646,6 +644,7 @@ load_symbols()
 	unref(scalar);
 	unref(untyped);
 	unref(array);
+	unref(built_in);
 }
 
 /* check_param_names --- make sure no parameter is the name of a function */
@@ -987,4 +986,19 @@ is_all_upper(const char *name)
 	}
 
 	return true;
+}
+
+/* get_name_from_awk_ns --- get the name after awk:: or the full name */
+
+static NODE *
+get_name_from_awk_ns(const char *name)
+{
+	NODE *tmp;
+
+	if (strncmp(name, "awk::", 5) == 0)
+		tmp = make_string(name + 5, strlen(name) - 5);
+	else
+		tmp = make_string(name, strlen(name));
+
+	return tmp;
 }

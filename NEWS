@@ -24,10 +24,26 @@ Boolean. This is mainly for use with data exchange to/from languages
 or environments that support real Boolean values. See the manual
 for details.
 
+5. As BWK awk has supported interval expressions since 2019, they are
+now enabled even if --traditional is supplied. The -r/--re-interval option
+remains, but it does nothing.
+
+6. The rwarray extension has two new functions, writeall() and readall(),
+for saving / restoring all of gawk's variables and arrays.
+
+Changes from 5.1.1 to 5.1.2
+---------------------------
+
+1. Infrastructure upgrades: Automake 1.16.5, Texinfo 6.8.
+
+2. The rwarray extension now supports writing and reading GMP and
+    MPFR values. As a result, a bug in the API code was fixed.
+
 Changes from 5.1.0 to 5.1.1
 ---------------------------
 
-1. Infrastructure upgrades: Bison 3.7.1, Gettext 0.20.2, Automake 1.16.3.
+1. Infrastructure upgrades: Bison 3.8, Gettext 0.20.2, Automake 1.16.4,
+   and (will wonders never cease) Autoconf 2.71.
 
 2. asort and asorti now allow FUNCTAB and SYMTAB as the first argument if a
    second destination array is supplied. Similarly, using either array as
@@ -62,15 +78,28 @@ Changes from 5.1.0 to 5.1.1
 10. Several example programs in the manual have been updated to their
     modern POSIX equivalents.
 
-11. Handling of Infinity and NaN values has been improved.
+11. A number of examples in doc/gawkinet.texi have been updated for
+    current times. Thanks to Juergen Kahrs for the work.
 
-12. There has been a general tightening up of the use of const and
+12. Handling of Infinity and NaN values has been improved.
+
+13. There has been a general tightening up of the use of const and
     of types.
 
-13. The "no effect" lint warnings have been fixed up and now behave
+14. The "no effect" lint warnings have been fixed up and now behave
     more sanely.
 
-14. There have been numerous minor code cleanups and bug fixes. See the
+15. The manual has been updated with much more information about what is
+    and is not a bug, and the changes in the gawk mailing lists.
+
+16. The behavior of strongly-typed regexp constants when passed as the
+    third argument to sub() or gsub() has been clarified in the code and
+    in the manual.
+
+17. Similar to item #4 above, division by zero is now fatal in MPFR
+    mode, as it is in regular mode.
+
+18. There have been numerous minor code cleanups and bug fixes. See the
     ChangeLog for details.
 
 Changes from 5.0.1 to 5.1.0

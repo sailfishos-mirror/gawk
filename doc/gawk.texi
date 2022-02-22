@@ -59,11 +59,12 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH January, 2021
+@set UPDATE-MONTH October, 2021
 @set VERSION 5.1
-@set PATCHLEVEL 0
+@set PATCHLEVEL 1
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
+@set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
 @ifset FOR_PRINT
 @set TITLE Effective awk Programming
 @end ifset
@@ -578,6 +579,7 @@ particular records in a file and perform operations upon them.
 * Fields with fixed data::              Field values with fixed-width data.
 * Splitting By Content::                Defining Fields By Content
 * More CSV::                            More on CSV files.
+* FS versus FPAT::                      A subtle difference.
 * Testing field creation::              Checking how @command{gawk} is
                                         splitting records.
 * Multiple Line::                       Reading multiline records.
@@ -810,8 +812,8 @@ particular records in a file and perform operations upon them.
                                         once.
 * Shell Quoting::                       A function to quote strings for the
                                         shell.
-* Isnumeric Function::                  A function to test whether a value
-                                        is numeric.
+* Isnumeric Function::                  A function to test whether a value is
+                                        numeric.
 * Data File Management::                Functions for managing command-line
                                         data files.
 * Filetrans Function::                  A function for handling data file
@@ -1037,6 +1039,8 @@ particular records in a file and perform operations upon them.
 * Shell Startup Files::                 Shell convenience functions.
 * Additional Configuration Options::    Other compile-time options.
 * Configuration Philosophy::            How it's all supposed to work.
+* Compiling from Git::                  Compiling from Git.
+* Building the Documentation::          Building the Documentation.
 * Non-Unix Installation::               Installation on Other Operating
                                         Systems.
 * PC Installation::                     Installing and Compiling
@@ -1058,12 +1062,13 @@ particular records in a file and perform operations upon them.
                                         VMS.
 * VMS Running::                         How to run @command{gawk} under VMS.
 * VMS GNV::                             The VMS GNV Project.
-* VMS Old Gawk::                        An old version comes with some VMS
-                                        systems.
 * Bugs::                                Reporting Problems and Bugs.
+* Bug definition::                      Defining what is and is not a bug.
 * Bug address::                         Where to send reports to.
 * Usenet::                              Where not to send reports to.
-* Performance bugs::                    What to do if you think there is a performance issue.
+* Performance bugs::                    What to do if you think there is a
+                                        performance issue.
+* Asking for help::                     Dealing with non-bug questions.
 * Maintainers::                         Maintainers of non-*nix ports.
 * Other Versions::                      Other freely available @command{awk}
                                         implementations.
@@ -3861,7 +3866,7 @@ The following list describes options mandated by the POSIX standard:
 @itemx --field-separator @var{fs}
 @cindex @option{-F} option
 @cindex @option{--field-separator} option
-@cindex @code{FS} variable @subentry @code{--field-separator} option and
+@cindex @code{FS} variable @subentry @option{--field-separator} option and
 Set the @code{FS} variable to @var{fs}
 (@pxref{Field Separators}).
 
@@ -4196,7 +4201,7 @@ if @command{gawk} is not compiled to use the GNU MPFR and MP libraries
 @cindex @option{--non-decimal-data} option
 @cindex hexadecimal values, enabling interpretation of
 @cindex octal values, enabling interpretation of
-@cindex troubleshooting @subentry @code{--non-decimal-data} option
+@cindex troubleshooting @subentry @option{--non-decimal-data} option
 Enable automatic interpretation of octal and hexadecimal
 values in input data
 (@pxref{Nondecimal Data}).
@@ -4301,8 +4306,8 @@ data (@pxref{Locales}).
 
 @c @cindex automatic warnings
 @c @cindex warnings, automatic
-@cindex @option{--traditional} option @subentry @code{--posix} option and
-@cindex @option{--posix} option @subentry @code{--traditional} option and
+@cindex @option{--traditional} option @subentry @option{--posix} option and
+@cindex @option{--posix} option @subentry @option{--traditional} option and
 If you supply both @option{--traditional} and @option{--posix} on the
 command line, @option{--posix} takes precedence. @command{gawk}
 issues a warning if both options are supplied.
@@ -4316,8 +4321,7 @@ Allow interval expressions
 (@pxref{Regexp Operators})
 in regexps.
 This is now @command{gawk}'s default behavior.
-Nevertheless, this option remains (both for backward compatibility
-and for use in combination with @option{--traditional}).
+Nevertheless, this option remains for backward compatibility.
 
 @item @option{-s}
 @itemx @option{--no-optimize}
@@ -6101,16 +6105,37 @@ regexp constants are valid and work the way you want them to, using
 any version of @command{awk}.@footnote{Use two backslashes if you're
 using a string constant with a regexp operator or function.}
 
-Finally, when @samp{@{} and @samp{@}} appear in regexp constants
+When @samp{@{} and @samp{@}} appear in regexp constants
 in a way that cannot be interpreted as an interval expression
 (such as @code{/q@{a@}/}), then they stand for themselves.
 
+@cindex BWK @command{awk} @subentry interval expressions in
 As mentioned, interval expressions were not traditionally available
 in @command{awk}. In March of 2019, BWK @command{awk} (finally) acquired them.
+Starting with @value{PVERSION} 5.2, @command{gawk}'s
+@option{--traditional} option no longer disables interval
+expressions in regular expressions.
 
-Nonetheless, because they were not available for
-so many decades, @command{gawk} continues to not supply them
-when in compatibility mode (@pxref{Options}).
+POSIX says that interval expressions containing repetition counts greater
+than 255 produce unspecified results.
+
+@cindex Eggert, Paul
+In the manual for GNU @command{grep}, Paul Eggert notes the following:
+
+@quotation
+Interval expressions may be implemented internally via repetition.
+For example, @samp{^(a|bc)@{2,4@}$} might be implemented as
+@samp{^(a|bc)(a|bc)((a|bc)(a|bc)?)?$}.  A large repetition count may
+exhaust memory or greatly slow matching.  Even small counts can cause
+problems if cascaded; for example, @samp{grep -E
+".*@{10,@}@{10,@}@{10,@}@{10,@}@{10,@}"} is likely to overflow a
+stack.  Fortunately, regular expressions like these are typically
+artificial, and cascaded repetitions do not conform to POSIX so cannot
+be used in portable programs anyway.
+@end quotation
+
+@noindent
+This same caveat applies to @command{gawk}.
 
 @node Bracket Expressions
 @section Using Bracket Expressions
@@ -6645,24 +6670,23 @@ in @ref{Regexp Operators}.
 @end ifnotdocbook
 @end ifnottex
 
-@item @code{--posix}
+@item @option{--posix}
 Match only POSIX regexps; the GNU operators are not special
 (e.g., @samp{\w} matches a literal @samp{w}).  Interval expressions
 are allowed.
 
 @cindex Brian Kernighan's @command{awk}
-@item @code{--traditional}
+@item @option{--traditional}
 Match traditional Unix @command{awk} regexps. The GNU operators
-are not special, and interval expressions are not available.
-Because BWK @command{awk} supports them,
+are not special.  Because BWK @command{awk} supports them,
 the POSIX character classes (@samp{[[:alnum:]]}, etc.) are available.
+So too, interval expressions are allowed.
 Characters described by octal and hexadecimal escape sequences are
 treated literally, even if they represent regexp metacharacters.
 
-@item @code{--re-interval}
-Allow interval expressions in regexps, if @option{--traditional}
-has been provided.
-Otherwise, interval expressions are available by default.
+@item @option{--re-interval}
+This option remains for backwards compatibility but no longer has any
+real effect.
 @end table
 
 @node Case-sensitivity
@@ -8428,6 +8452,7 @@ four, and @code{$4} has the value @code{"ddd"}.
 
 @menu
 * More CSV::                    More on CSV files.
+* FS versus FPAT::              A subtle difference.
 @end menu
 
 @c O'Reilly doesn't like it as a note the first thing in the section.
@@ -8636,6 +8661,28 @@ In general, using @code{FPAT} to do your own CSV parsing is like having
 a bed with a blanket that's not quite big enough. There's always a corner
 that isn't covered. We recommend, instead, that you use Manuel Collado's
 @uref{http://mcollado.z15.es/xgawk/, @code{CSVMODE} library for @command{gawk}}.
+
+@node FS versus FPAT
+@subsection @code{FS} Versus @code{FPAT}: A Subtle Difference
+
+As we discussed earlier, @code{FS} describes the data between fields (``what fields are not'')
+and @code{FPAT} describes the fields themselves (``what fields are'').
+This leads to a subtle difference in how fields are found when using regexps as the value
+for @code{FS} or @code{FPAT}.
+
+In order to distinguish one field from another, there must be a non-empty separator between
+each field.  This makes intuitive sense---otherwise one could not distinguish fields from
+separators.
+
+Thus, regular expression matching as done when splitting fields with @code{FS} is not
+allowed to match the null string; it must always match at least one character, in order
+to be able to proceed through the entire record.
+
+On the other hand, regular expression matching with @code{FPAT} can match the null
+string, and the non-matching intervening characters function as the separators.
+
+This same difference is reflected in how matching is done with the @code{split()}
+and @code{patsplit()} functions (@pxref{String Functions}).
 
 @node Testing field creation
 @section Checking How @command{gawk} Is Splitting Records
@@ -11982,6 +12029,17 @@ can be used with @samp{~} and @samp{!~}, passed to one of the built-in functions
 listed above, or passed as a parameter to a user-defined function.
 @end itemize
 
+You may use the @option{-v} option (@pxref{Options}) to assign a
+strongly-typed regexp constant to a variable on the command line, like so:
+
+@example
+gawk -v pattern='@@/something(interesting)+/' @dots{}
+@end example
+
+@noindent
+You may also make such assignments as regular command-line arguments
+(@pxref{Other Arguments}).
+
 You may use the @code{typeof()} built-in function
 (@pxref{Type Functions})
 to determine if a variable or function parameter is
@@ -11997,6 +12055,21 @@ and on to the built-in functions that accept regexp constants.
 When used in numeric conversions, strongly typed regexp variables convert
 to zero. When used in string conversions, they convert to the string
 value of the original regexp text.
+
+There is an additional, interesting corner case. When used as the third
+argument to @code{sub()} or @code{gsub()}, they retain their type.  Thus,
+if you have something like this:
+
+@example
+re = @@/don't panic/
+sub(/don't/, "do", re)
+print typeof(re), re
+@end example
+
+@noindent
+then @code{re} retains its type, but now attempts to match the string
+@samp{do panic}.  This provides a (very indirect) way to create regexp-typed
+variables at runtime.
 
 @node Variables
 @subsection Variables
@@ -15267,20 +15340,25 @@ awk '
 This prints the first three fields of each input record, with one
 input field per output line.
 
-It isn't possible to
-set more than one variable in the
-@var{initialization} part without using a multiple assignment statement
-such as @samp{x = y = 0}. This makes sense only if all the initial values
-are equal.  (But it is possible to initialize additional variables by writing
-their assignments as separate statements preceding the @code{for} loop.)
-
 @c @cindex comma operator, not supported
-The same is true of the @var{increment} part. Incrementing additional
-variables requires separate statements at the end of the loop.
-The C compound expression, using C's comma operator, is useful in
-this context, but it is not supported in @command{awk}.
+C and C++ programmers might expect to be able to use the comma
+operator to set more than one variable in the @var{initialization}
+part of the @code{for} loop, or to increment multiple variables in the
+@var{increment} part of the loop, like so:
 
-Most often, @var{increment} is an increment expression, as in the previous
+@example
+for (i = 0, j = length(a); i < j; i++, j--) @dots{}   @ii{C/C++, not awk!}
+@end example
+
+@noindent
+You cannot do this; the comma operator is not supported in @command{awk}.
+There are workarounds, but they are nonobvious and can lead to
+code that is difficult to read and understand. It is best, therefore,
+to simply write additional initializations as separate statements
+preceding the @code{for} loop and to place additional increment statements
+at the end of the loop's body.
+
+Most often, @var{increment} is an increment expression, as in the earlier
 example.  But this is not required; it can be any expression
 whatsoever.  For example, the following statement prints all the powers of two
 between 1 and 100:
@@ -18694,6 +18772,9 @@ You may use them as the first argument, but only if providing a second
 array to use for the actual sorting.
 @end quotation
 
+You are allowed to use the same array for both the @var{source} and @var{dest}
+arguments, but doing so only makes sense if you're also supplying the third argument.
+
 @item @code{gensub(@var{regexp}, @var{replacement}, @var{how}} [@code{, @var{target}}]@code{) #}
 @cindexgawkfunc{gensub}
 @cindex search and replace in strings
@@ -18706,6 +18787,9 @@ as a number indicating which match of @var{regexp} to replace.  Treat
 numeric values less than one as if they were one.  If no @var{target}
 is supplied, use @code{$0}.  Return the modified string as the result
 of the function. The original target string is @emph{not} changed.
+
+The returned value is @emph{always} a string, even if the original
+@var{target} was a number or a regexp value.
 
 @code{gensub()} is a general substitution function.  Its purpose is
 to provide more features than the standard @code{sub()} and @code{gsub()}
@@ -18755,7 +18839,8 @@ substitution is performed.  If @var{how} is zero, @command{gawk} issues
 a warning message.
 
 If @var{regexp} does not match @var{target}, @code{gensub()}'s return value
-is the original unchanged value of @var{target}.
+is the original unchanged value of @var{target}.  Note that, as mentioned
+above, the returned value is a string, even if @var{target} was not.
 
 @item @code{gsub(@var{regexp}, @var{replacement}} [@code{, @var{target}}]@code{)}
 @cindexawkfunc{gsub}
@@ -19329,6 +19414,16 @@ in the string replaced with its corresponding uppercase character.
 Nonalphabetic characters are left unchanged.  For example,
 @code{toupper("MiXeD cAsE 123")} returns @code{"MIXED CASE 123"}.
 @end table
+
+At first glance, the @code{split()} and @code{patsplit()} functions appear to be
+mirror images of each other. But there are differences:
+
+@itemize @bullet
+@item @code{split()} treats its third argument like @code{FS}, with all the
+special rules involved for @code{FS}.
+
+@item Matching of null strings differs. This is discussed in @ref{FS versus FPAT}.
+@end itemize
 
 @cindex sidebar @subentry Matching the Null String
 @ifdocbook
@@ -20671,7 +20766,7 @@ that illustrates the use of these functions:
 
 @cindex @code{bits2str()} user-defined function
 @cindex user-defined @subentry function @subentry @code{bits2str()}
-@cindex @code{testbits.awk} program
+@cindex @file{testbits.awk} program
 @example
 @group
 @c file eg/lib/bits2str.awk
@@ -20994,6 +21089,29 @@ Normally, passing a variable that has never been used to a built-in
 function causes it to become a scalar variable (unassigned).
 However, @code{isarray()} and @code{typeof()} are different; they do
 not change their arguments from untyped to unassigned.
+
+@cindex dark corner @subentry array elements created by reference
+By ``variable'' we mean one denoted by a simple identifier.  Array elements
+that come into existence simply by referencing them
+are different, they are automatically forced to be scalars. Consider:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} unassigned
+@end example
+
+@noindent
+@code{x["foo"]} comes into existence before it is passed to @code{typeof()};
+@code{typeof()} cannot tell that it didn't exist prior to being called.
+@value{DARKCORNER}
+
+@c FIXME: For 5.2, if this will change, update this bit of doc.
+@c This may change in a future release, whereby @command{gawk}
+@c would allow such an unassigned array element to be used for
+@c a multidimensional array, and not remain a scalar forever
+@c (or until deleted).
 
 @node I18N Functions
 @subsection String-Translation Functions
@@ -21866,8 +21984,8 @@ a closing parenthesis, with the addition of a leading @samp{@@}
 character:
 
 @example
-the_func = "sum"
-result = @@the_func()   # calls the sum() function
+the_function = "sum"
+result = @@the_function()   # calls the sum() function
 @end example
 
 Here is a full program that processes the previously shown data,
@@ -22162,16 +22280,28 @@ built-in functions indirectly, as follows.
 @itemize @value{BULLET}
 @item
 You cannot pass a regular expression constant to a built-in function
-through an indirect function call.@footnote{This may change in a future
-version; recheck the documentation that comes with your version of
-@command{gawk} to see if it has.} This applies to the @code{sub()},
+through an indirect function call.  This applies to the @code{sub()},
 @code{gsub()}, @code{gensub()}, @code{match()}, @code{split()} and
-@code{patsplit()} functions.
+@code{patsplit()} functions.  However, you can pass a strongly typed
+regexp constant (@pxref{Strong Regexp Constants}).
 
 @item
 If calling @code{sub()} or @code{gsub()}, you may only pass two arguments,
 since those functions are unusual in that they update their third argument.
 This means that @code{$0} will be updated.
+
+@item
+You cannot indirectly call built-in functions that can take @code{$0} as
+a default parameter; you must supply an argument instead.  For example,
+you must pass an argument to @code{length()} if calling it indirectly.
+
+@item
+Calling a built-in function indirectly with the wrong number of arguments
+for that function causes a fatal error. For example, calling
+@code{length()} with two arguments.  These errors are found at runtime
+instead of when @command{gawk} parses your program, since @command{gawk}
+doesn't know until runtime if you have passed the correct number of
+arguments or not.
 @end itemize
 
 @command{gawk} does its best to make indirect function calls efficient.
@@ -22179,7 +22309,7 @@ For example, in the following case:
 
 @example
 for (i = 1; i <= n; i++)
-    @@the_func()
+    @@the_function()
 @end example
 
 @noindent
@@ -23322,7 +23452,8 @@ to add an additional check for that.
 Traditionally, it has been recommended to check for numeric values using the
 test @samp{x+0 == x}. This function is superior in two ways: it will not
 report that unassigned variables contain numeric values; and it recognizes
-string values with numeric contents.
+string values with numeric contents where @code{CONVFMT} does not yield
+the original string.
 On the other hand, it uses the @code{typeof()} function
 (@pxref{Type Functions}), which is specific to @command{gawk}.
 
@@ -23597,7 +23728,7 @@ mechanism for dealing with files that can't be opened.  However, the
 code here provides a portable solution.} You can do this by prepending
 the following program to your @command{awk} program:
 
-@cindex @code{readable.awk} program
+@cindex @file{readable.awk} program
 @example
 @c file eg/lib/readable.awk
 # readable.awk --- library file to skip over unreadable files
@@ -23655,7 +23786,7 @@ in @ref{Filetrans Function}, the following library file calls a function named
 @code{zerofile()} that the user must provide.  The arguments passed are
 the @value{FN} and the position in @code{ARGV} where it was found:
 
-@cindex @code{zerofile.awk} program
+@cindex @file{zerofile.awk} program
 @example
 @c file eg/lib/zerofile.awk
 # zerofile.awk --- library file to process empty input files
@@ -23715,7 +23846,7 @@ Some users have suggested an additional command-line option for @command{gawk}
 to disable command-line assignments.  However, some simple programming with
 a library file does the trick:
 
-@cindex @code{noassign.awk} program
+@cindex @file{noassign.awk} program
 @example
 @c file eg/lib/noassign.awk
 # noassign.awk --- library file to avoid the need for a
@@ -23877,9 +24008,11 @@ As a side point, @command{gawk} actually uses the GNU @code{getopt_long()}
 function to process both normal and GNU-style long options
 (@pxref{Options}).
 
+@cindex Minshall, Greg
 The abstraction provided by @code{getopt()} is very useful and is quite
 handy in @command{awk} programs as well.  Following is an @command{awk}
 version of @code{getopt()} that accepts both short and long options.
+(Support for long options was supplied by Greg Minshall. We thank him.)
 
 This function highlights one of the
 greatest weaknesses in @command{awk}, which is that it is very poor at
@@ -25353,7 +25486,7 @@ functions needed, and a @code{usage()} function that prints out a usage
 message and exits.  @code{usage()} is called if invalid arguments are
 supplied:
 
-@cindex @code{cut.awk} program
+@cindex @file{cut.awk} program
 @example
 @c file eg/prog/cut.awk
 # cut.awk --- implement cut in awk
@@ -25708,7 +25841,7 @@ that processes the command-line arguments with @code{getopt()}.  The @option{-i}
 @code{IGNORECASE} predefined variable
 (@pxref{Built-in Variables}):
 
-@cindex @code{egrep.awk} program
+@cindex @file{egrep.awk} program
 @example
 @c file eg/prog/egrep.awk
 # egrep.awk --- simulate egrep in awk
@@ -25975,7 +26108,7 @@ The program is moderately straightforward.  All the work is done in the
 It starts with explanatory comments, a list of options,
 and then a @code{usage()} function:
 
-@cindex @code{id.awk} program
+@cindex @file{id.awk} program
 @example
 @c file eg/prog/id.awk
 # id.awk --- implement id in awk
@@ -26011,9 +26144,9 @@ function usage()
 @{
     printf("Usage:\n" \
            "\tid [user]\n" \
-           "\tid −G [−n] [user]\n" \
-           "\tid −g [−nr] [user]\n" \
-           "\tid −u [−nr] [user]\n") > "/dev/stderr"
+           "\tid -G [-n] [user]\n" \
+           "\tid -g [-nr] [user]\n" \
+           "\tid -u [-nr] [user]\n") > "/dev/stderr"
 
     exit 1
 @}
@@ -26376,7 +26509,7 @@ a @code{usage()} function describing the options. The variable
 @code{common} keeps the function's lines short so that they
 look nice on the page:
 
-@cindex @code{split.awk} program
+@cindex @file{split.awk} program
 @example
 @c file eg/prog/split.awk
 # split.awk --- do split in awk
@@ -26694,7 +26827,7 @@ If the first argument is @option{-a}, then the flag variable
 Finally, @command{awk} is forced to read the standard input by setting
 @code{ARGV[1]} to @code{"-"} and @code{ARGC} to two:
 
-@cindex @code{tee.awk} program
+@cindex @file{tee.awk} program
 @example
 @c file eg/prog/tee.awk
 # tee.awk --- tee in awk
@@ -26843,7 +26976,7 @@ and the @code{join()} library function
 The program begins with a @code{usage()} function and then a brief outline of
 the options and their meanings in comments:
 
-@cindex @code{uniq.awk} program
+@cindex @file{uniq.awk} program
 @example
 @c file eg/prog/uniq.awk
 @group
@@ -27191,7 +27324,7 @@ The @code{BEGIN} rule does the argument processing.  The variable
 @code{print_total} is true if more than one file is named on the
 command line:
 
-@cindex @code{wc.awk} program
+@cindex @file{wc.awk} program
 @example
 @c file eg/prog/wc.awk
 # wc.awk --- count lines, words, characters, bytes
@@ -27388,7 +27521,7 @@ If there are no fields left after removing all the punctuation, the
 current record is skipped.  Otherwise, the program loops through each
 word, comparing it to the previous one:
 
-@cindex @code{dupword.awk} program
+@cindex @file{dupword.awk} program
 @example
 @c file eg/prog/dupword.awk
 # dupword.awk --- find duplicate words in text
@@ -27480,7 +27613,7 @@ Just for a change, this program uses a @code{switch} statement
 @code{if}-@code{else} statements instead.
 Here is the program:
 
-@cindex @code{alarm.awk} program
+@cindex @file{alarm.awk} program
 @example
 @c file eg/prog/alarm.awk
 # alarm.awk --- set an alarm
@@ -27676,7 +27809,7 @@ as the target.  The main program sets two global variables, @code{FROM} and
 
 Finally, the processing rule simply calls @code{translate()} for each record:
 
-@cindex @code{translate.awk} program
+@cindex @file{translate.awk} program
 @example
 @c file eg/prog/translate.awk
 # translate.awk --- do tr-like stuff
@@ -27829,7 +27962,7 @@ that there are two blank lines at the top and two blank lines at the bottom.
 The @code{END} rule arranges to flush the final page of labels; there may
 not have been an even multiple of 20 labels in the data:
 
-@cindex @code{labels.awk} program
+@cindex @file{labels.awk} program
 @example
 @c file eg/prog/labels.awk
 # labels.awk --- print mailing labels
@@ -27960,7 +28093,7 @@ to remove punctuation characters.  Finally, we solve the third problem
 by using the system @command{sort} utility to process the output of the
 @command{awk} script.  Here is the new version of the program:
 
-@cindex @code{wordfreq.awk} program
+@cindex @file{wordfreq.awk} program
 @example
 @c file eg/prog/wordfreq.awk
 # wordfreq.awk --- print list of word frequencies
@@ -28052,7 +28185,7 @@ Each element of @code{lines} is a unique command, and the indices of
 The @code{END} rule simply prints out the lines, in order:
 
 @cindex Rakitzis, Byron
-@cindex @code{histsort.awk} program
+@cindex @file{histsort.awk} program
 @example
 @c file eg/prog/histsort.awk
 # histsort.awk --- compact a shell history file
@@ -28148,7 +28281,7 @@ and also available @uref{https://www.gnu.org/software/texinfo/manual/texinfo/, o
 @end ifnotinfo
 @ifinfo
 (The Texinfo language is described fully, starting with
-@inforef{Top, , Texinfo, texinfo,Texinfo---The GNU Documentation Format}.)
+@ref{Top, , Texinfo, texinfo,Texinfo---The GNU Documentation Format}.)
 @end ifinfo
 
 For our purposes, it is enough to know three things about Texinfo input
@@ -28222,7 +28355,7 @@ The first rule handles calling @code{system()}, checking that a command is
 given (@code{NF} is at least three) and also checking that the command
 exits with a zero exit status, signifying OK:
 
-@cindex @code{extract.awk} program
+@cindex @file{extract.awk} program
 @example
 @c file eg/prog/extract.awk
 # extract.awk --- extract files and run programs from Texinfo files
@@ -28964,7 +29097,7 @@ The following program uses arrays of arrays to bring together
 words with the same signature and array sorting to print the words
 in sorted order:
 
-@cindex @code{anagram.awk} program
+@cindex @file{anagram.awk} program
 @example
 @c file eg/prog/anagram.awk
 # anagram.awk --- An implementation of the anagram-finding algorithm
@@ -29248,7 +29381,7 @@ information is printed.  Modify the @command{awk} version
 same way.
 
 @item
-The @code{split.awk} program (@pxref{Split Program}) assumes
+The @file{split.awk} program (@pxref{Split Program}) assumes
 that letters are contiguous in the character set,
 which isn't true for EBCDIC systems.
 Fix this problem.
@@ -29509,9 +29642,9 @@ Because it is common to have decimal data with leading zeros, and because
 using this facility could lead to surprising results, the default is to leave it
 disabled.  If you want it, you must explicitly request it.
 
-@cindex programming conventions @subentry @code{--non-decimal-data} option
+@cindex programming conventions @subentry @option{--non-decimal-data} option
 @cindex @option{--non-decimal-data} option @subentry @code{strtonum()} function and
-@cindex @code{strtonum()} function (@command{gawk}) @subentry @code{--non-decimal-data} option and
+@cindex @code{strtonum()} function (@command{gawk}) @subentry @option{--non-decimal-data} option and
 @quotation CAUTION
 @emph{Use of this option is not recommended.}
 It can break old programs very badly.
@@ -29962,6 +30095,12 @@ there is only one copy of the original array elements' data, even though
 both arrays use the values.
 @end quotation
 
+You may use the same array for both the first and second arguments to
+@code{asort()} and @code{asorti()}.  Doing so only makes sense if you
+are also supplying the third argument, since @command{awk} doesn't
+provide a way to pass that third argument without also passing the first
+and second ones.
+
 @c Document It And Call It A Feature. Sigh.
 @cindex @command{gawk} @subentry @code{IGNORECASE} variable in
 @cindex arrays @subentry sorting @subentry @code{IGNORECASE} variable and
@@ -30408,8 +30547,7 @@ It then prints the results and closes the connection.
 Because this topic is extensive, the use of @command{gawk} for
 TCP/IP programming is documented separately.
 @ifinfo
-See
-@inforef{Top, , General Introduction, gawkinet, @value{GAWKINETTITLE}},
+@xref{Top, , General Introduction, gawkinet, @value{GAWKINETTITLE}},
 @end ifinfo
 @ifnotinfo
 See
@@ -31376,7 +31514,7 @@ the initial @file{.pot} file:
 gawk --gen-pot -f guide.awk > guide.pot
 @end example
 
-@cindex @code{xgettext} utility
+@cindex @command{xgettext} utility
 When run with @option{--gen-pot}, @command{gawk} does not execute your
 program.  Instead, it parses it as usual and prints all marked strings
 to standard output in the format of a GNU @command{gettext} Portable Object
@@ -31737,7 +31875,7 @@ using the GNU @command{gettext} package.
 (GNU @command{gettext} is described in
 complete detail in
 @ifinfo
-@inforef{Top, , GNU @command{gettext} utilities, gettext, GNU @command{gettext} utilities}.)
+@xref{Top, , GNU @command{gettext} utilities, gettext, GNU @command{gettext} utilities}.)
 @end ifinfo
 @ifnotinfo
 @uref{https://www.gnu.org/software/gettext/manual/,
@@ -35157,6 +35295,14 @@ Similarly, in POSIX mode, @command{gawk} prints the result of
 the system's C @code{printf()} function using the @code{%g} format string
 for the value, whatever that may be.
 
+@quotation NOTE
+The sign used for NaN values can vary!  The result depends upon both
+the underlying system architecture and the underlying library used to
+format NaN values. In particular, it's possible to get different results
+for the same function call depending upon whether or not @command{gawk}
+is running in MPFR mode (@option{-M}) or not. Caveat Emptor!
+@end quotation
+
 @node Floating point summary
 @section Summary
 
@@ -37136,7 +37282,7 @@ variables (such as @code{ARGC} or @code{NF}).
 @item awk_bool_t sym_update_ns(const char *name_space, const char *name, awk_value_t *value);
 This is like @code{sym_update()}, but the @code{name_space} parameter allows you
 to specify which namespace @code{name} is part of.  @code{name_space} cannot be
-@code{NULL}. If it is @code{""} or @code{"awk}, then @code{name} is searched
+@code{NULL}. If it is @code{""} or @code{"awk"}, then @code{name} is searched
 for in the default @code{awk} namespace.
 @end table
 
@@ -39602,8 +39748,9 @@ is:
 @node Extension Sample Read write array
 @subsection Dumping and Restoring an Array
 
-The @code{rwarray} extension adds two functions,
-named @code{writea()} and @code{reada()}, as follows:
+The @code{rwarray} extension adds four functions,
+named @code{writea()}, @code{reada()},
+@code{writeall()} and @code{readall()}, as follows:
 
 @table @code
 @item @@load "rwarray"
@@ -39622,6 +39769,24 @@ success, or zero upon failure.
 it reads the file named as its first argument, filling in
 the array named as the second argument. It clears the array first.
 Here too, the return value is one on success, or zero upon failure.
+
+@cindex @code{writeall()} extension function
+@item ret = writeall(file)
+This function takes a string argument, which is the name of the file
+to which to dump the state of all variables.
+Calling this function
+is completely equivalent to calling
+@code{writea(file, SYMTAB)}.
+It returns one on success, or zero upon failure
+
+@cindex @code{readall()} extension function
+@item ret = writeall(file)
+This function takes a string argument, which is the name of the
+file from which to read the contents of various global variables.
+For each variable in the file, the data is loaded unless the variable
+already exists. If the variable already exists, the data for that variable
+in the file is ignored.
+It returns one on success, or zero upon failure.
 @end table
 
 The array created by @code{reada()} is identical to that written by
@@ -39639,6 +39804,13 @@ as native binary data.  Thus, arrays containing only string data can
 theoretically be dumped on systems with one byte order and restored on
 systems with a different one, but this has not been tried.
 
+Note that the @code{writeall()} and @code{readall()} functions provide
+a mechanism for maintaining persistent state across repeated invocations of a
+program. If, for example, a program calculates some statistics based on the
+data in a series of files, it could save state using @code{writeall()} after
+processing N files, and then reload the state using @code{readall()} when
+the N+1st file arrives to update the results.
+
 Here is an example:
 
 @example
@@ -39647,6 +39819,10 @@ Here is an example:
 ret = writea("arraydump.bin", array)
 @dots{}
 ret = reada("arraydump.bin", array)
+@dots{}
+ret = writeall("globalstate.bin")
+@dots{}
+ret = readall("globalstate.bin")
 @end example
 
 @node Extension Sample Readfile
@@ -39810,7 +39986,7 @@ Next, go to @url{https://sourceforge.net/projects/gawkextlib/files} to
 download @code{gawkextlib} and any extensions that you would like to build.
 The @file{README} file at that site explains how to build the code.  If you
 installed @command{gawk} in a non-standard location, you will need to
-specify @code{./configure --with-gawk=@var{/path/to/gawk}} to find it.
+specify @samp{./configure --with-gawk=@var{/path/to/gawk}} to find it.
 You may need to use the @command{sudo} utility
 to install both @command{gawk} and @code{gawkextlib}, depending upon
 how your system works.
@@ -41965,15 +42141,15 @@ Git repository; for more information see @ref{Accessing The Source}.
 
 @node Extracting
 @appendixsubsec Extracting the Distribution
-@command{gawk} is distributed as several @code{tar} files compressed with
+@command{gawk} is distributed as several @command{tar} files compressed with
 different compression programs: @command{gzip}, @command{bzip2},
 and @command{xz}. For simplicity, the rest of these instructions assume
 you are using the one compressed with the GNU Gzip program (@command{gzip}).
 
 Once you have the distribution (e.g.,
 @file{gawk-@value{VERSION}.@value{PATCHLEVEL}.tar.gz}),
-use @code{gzip} to expand the
-file and then use @code{tar} to extract it.  You can use the following
+use @command{gzip} to expand the
+file and then use @command{tar} to extract it.  You can use the following
 pipeline to produce the @command{gawk} distribution:
 
 @example
@@ -42046,15 +42222,21 @@ A file providing an overview of the configuration and installation process.
 
 @item ChangeLog
 A detailed list of source code changes as bugs are fixed or improvements made.
+There are similar files in all of the subdirectories.
 
 @item ChangeLog.0
-An older list of source code changes.
+@itemx ChangeLog.1
+Older lists of source code changes.
+There are similar files in all of the subdirectories.
 
 @item NEWS
 A list of changes to @command{gawk} since the last release or patch.
+There may be similar files in other subdirectories.
 
 @item NEWS.0
-An older list of changes to @command{gawk}.
+@itemx NEWS.1
+Older lists of changes to @command{gawk}.
+There may be similar files in other subdirectories.
 
 @item COPYING
 The GNU General Public License.
@@ -42111,7 +42293,7 @@ The generated Info file for this @value{DOCUMENT}.
 @item doc/gawkinet.texi
 The Texinfo source file for
 @ifinfo
-@inforef{Top, , General Introduction, gawkinet, @value{GAWKINETTITLE}}.
+@ref{Top, , General Introduction, gawkinet, @value{GAWKINETTITLE}}.
 @end ifinfo
 @ifnotinfo
 @cite{@value{GAWKINETTITLE}}.
@@ -42124,6 +42306,23 @@ with @command{makeinfo} to produce an Info or HTML file.
 @item doc/gawkinet.info
 The generated Info file for
 @cite{@value{GAWKINETTITLE}}.
+
+@item doc/gawkworkflow.texi
+The Texinfo source file for
+@ifinfo
+@ref{Top, , General Introduction, gawkworkflow, @value{GAWKWORKFLOWTITLE}}.
+@end ifinfo
+@ifnotinfo
+@cite{@value{GAWKWORKFLOWTITLE}}.
+@end ifnotinfo
+It should be processed with @TeX{}
+(via @command{texi2dvi} or @command{texi2pdf})
+to produce a printed document and
+with @command{makeinfo} to produce an Info or HTML file.
+
+@item doc/gawkworkflow.info
+The generated Info file for
+@cite{@value{GAWKWORKFLOWTITLE}}.
 
 @item doc/igawk.1
 The @command{troff} source for a manual page describing the @command{igawk}
@@ -42226,13 +42425,15 @@ to configure @command{gawk} for your system yourself.
 * Shell Startup Files::              Shell convenience functions.
 * Additional Configuration Options:: Other compile-time options.
 * Configuration Philosophy::         How it's all supposed to work.
+* Compiling from Git::               Compiling from Git.
+* Building the Documentation::       Building the Documentation.
 @end menu
 
 @node Quick Installation
 @appendixsubsec Compiling @command{gawk} for Unix-Like Systems
 
 @menu
-* Compiling with MPFR::              Building with MPFR.
+* Compiling with MPFR::         Building with MPFR.
 @end menu
 
 The normal installation steps should work on all modern commercial
@@ -42254,7 +42455,7 @@ the Free Software Foundation's website}.)
 @end ifnotinfo
 @ifinfo
 (The Autoconf software is described fully starting with
-@inforef{Top, , Autoconf, autoconf,Autoconf---Generating Automatic Configuration Scripts}.)
+@ref{Top, , Autoconf, autoconf,Autoconf---Generating Automatic Configuration Scripts}.)
 @end ifinfo
 
 To configure @command{gawk}, simply run @command{configure}:
@@ -42315,8 +42516,8 @@ to have been set up previously as a user who is allowed to run the
 @cindex MPFR library, building with
 Use of the MPFR library with @command{gawk}
 is an optional feature: if you have the MPFR and GMP libraries already installed
-when you configure and build @command{gawk},
-@command{gawk} automatically will be able to use them.
+when you configure and build @command{gawk},
+@command{gawk} automatically will be able to use them.
 
 You can install these libraries from source code by fetching them
 from the GNU distribution site at @code{ftp.gnu.org}.
@@ -42381,7 +42582,7 @@ command line when compiling @command{gawk} from scratch, including:
 @table @code
 
 @cindex @option{--disable-extensions} configuration option
-@cindex configuration option @subentry @code{--disable-extensions}
+@cindex configuration option @subentry @option{--disable-extensions}
 @item --disable-extensions
 Disable the extension mechanism within @command{gawk}. With this
 option, it is not possible to use dynamic extensions.  This also
@@ -42393,7 +42594,7 @@ The default action is to dynamically check if the extensions
 can be configured and compiled.
 
 @cindex @option{--disable-lint} configuration option
-@cindex configuration option @subentry @code{--disable-lint}
+@cindex configuration option @subentry @option{--disable-lint}
 @item --disable-lint
 Disable all lint checking within @command{gawk}.  The
 @option{--lint} and @option{--lint-old} options
@@ -42416,21 +42617,21 @@ to fail.  This option may be removed at a later date.
 @end quotation
 
 @cindex @option{--disable-mpfr} configuration option
-@cindex configuration option @subentry @code{--disable-mpfr}
+@cindex configuration option @subentry @option{--disable-mpfr}
 @item --disable-mpfr
 Skip checking for the MPFR and GMP libraries. This is useful
 mainly for the developers, to make sure nothing breaks if
 MPFR support is not available.
 
 @cindex @option{--disable-nls} configuration option
-@cindex configuration option @subentry @code{--disable-nls}
+@cindex configuration option @subentry @option{--disable-nls}
 @item --disable-nls
 Disable all message-translation facilities.
 This is usually not desirable, but it may bring you some slight performance
 improvement.
 
 @cindex @option{--enable-versioned-extension-dir} configuration option
-@cindex configuration option @subentry @code{--enable-versioned-extension-dir}
+@cindex configuration option @subentry @option{--enable-versioned-extension-dir}
 @item --enable-versioned-extension-dir
 Use a versioned directory for extensions.  The directory name will
 include the major and minor API versions in it. This makes it possible
@@ -42491,6 +42692,64 @@ for information on how to report problems in configuring @command{gawk}).
 The same mechanism may be used to send in updates to @file{configure.ac}
 and/or @file{custom.h}.
 
+@node Compiling from Git
+@appendixsubsec Compiling from Git
+
+Building @command{gawk} directly from the development source control
+repository is possible, but not recommended for everyday users, as the
+code may not be as stable as released versions are.  If you really do
+want to do that, here are the steps:
+
+@example
+git clone https://git.savannah.gnu.org/r/gawk.git
+cd gawk
+./bootstrap.sh && ./configure && make && make check
+@end example
+
+@node Building the Documentation
+@appendixsubsec Building the Documentation
+
+@cindex documentation @subentry building @subentry Info files
+The generated Info documentation is included in the distribution
+@command{tar} files and in the Git source code repository; you should
+not need to rebuild it. However, if it needs to be done, simply running
+@command{make} will do it, assuming that you have a recent enough version
+of @command{makeinfo} installed.
+
+@cindex documentation @subentry building @subentry PDF
+If you wish to build the PDF version of the manuals, you will need
+to have @TeX{} installed, and possibly additional packages that
+provide the necessary fonts and tools, such as @command{dvi2pdf}
+and @command{ps2pdf}.  You will also need GNU Troff (@command{groff})
+installed in order to format the reference card and the manual page
+(@pxref{Distribution contents}).  Managing this process is beyond the
+scope of this @value{DOCUMENT}.
+
+Assuming you have all you need, then the following commands produce the
+PDF versions of the documentation:
+
+@example
+cd doc
+make pdf
+@end example
+
+@noindent
+This creates PDF versions of all three Texinfo documents included
+in the distribution, as well as of the manual page and the reference card.
+
+@cindex documentation @subentry building @subentry HTML
+Similarly, if you have a recent enough version of @command{makeinfo},
+you can make the HTML version of the manuals with:
+
+@example
+cd doc
+make html
+@end example
+
+@noindent
+This creates HTML versions of all three Texinfo documents included
+in the distribution.
+
 @node Non-Unix Installation
 @appendixsec Installation on Other Operating Systems
 
@@ -42531,6 +42790,14 @@ See also the @file{README_d/README.pc} file in the distribution.
 The only supported binary distribution for MS-Windows systems
 is that provided by Eli Zaretskii's @uref{https://sourceforge.net/projects/ezwinports/,
 ``ezwinports''} project.  Install the compiled @command{gawk} from there.
+Note that to run that port, you need to have the
+@file{libgcc_s_dw2-1.dll} file installed on your system.  This file is
+part of the GCC distribution, and should reside either in the same
+directory where you install @file{gawk.exe} or somewhere on your
+system's @env{Path}.  You can download this file from
+@uref{https://osdn.net/projects/mingw/releases, the MinGW site}; look under the
+``MinGW.org Compiler Collection (GCC)'' for the @code{LibGCC-1.DLL}
+download.
 
 @node PC Compiling
 @appendixsubsubsec Compiling @command{gawk} for PC Operating Systems
@@ -42736,7 +43003,7 @@ recipe works ``out of the box.''
 
 @cindex @command{gawk} @subentry VMS version of
 @cindex installing @command{gawk} @subentry VMS
-This @value{SUBSECTION} describes how to compile and install @command{gawk} under VMS.
+This @value{SUBSECTION} describes how to compile and install @command{gawk} under OpenVMS.
 The older designation ``VMS'' is used throughout to refer to OpenVMS.
 
 @menu
@@ -42746,7 +43013,6 @@ The older designation ``VMS'' is used throughout to refer to OpenVMS.
 * VMS Installation Details::    How to install @command{gawk} under VMS.
 * VMS Running::                 How to run @command{gawk} under VMS.
 * VMS GNV::                     The VMS GNV Project.
-* VMS Old Gawk::                An old version comes with some VMS systems.
 @end menu
 
 @node VMS Compilation
@@ -42888,7 +43154,7 @@ $ @kbd{set command gnv$gnu:[vms_bin]gawk_verb.cld}
 @end example
 
 Or the system manager can use @file{GNV$GNU:[vms_bin]gawk_verb.cld} to
-add the @command{gawk} and @command{awk} to the system-wide @samp{DCLTABLES}.
+add the @command{gawk} and @command{awk} commands to the system-wide @samp{DCLTABLES}.
 
 The DCL syntax is documented in the @file{gawk.hlp} file.
 
@@ -42982,8 +43248,6 @@ VMS reports time values in GMT unless one of the @code{SYS$TIMEZONE_RULE}
 or @code{TZ} logical names is set.  Older versions of VMS, such as VAX/VMS
 7.3, do not set these logical names.
 
-@c @cindex directory search
-@c @cindex path, search
 @cindex search paths
 @cindex search paths @subentry for source files
 The default search path, when looking for @command{awk} program files specified
@@ -43038,7 +43302,6 @@ $ define/user sys$input sys$command:
 $ sort sys$input: sys$output:
 @end example
 
-
 @node VMS GNV
 @appendixsubsubsec The VMS GNV Project
 
@@ -43053,56 +43316,6 @@ is suitable for use with GNV.
 
 The file @file{vms/gawk_build_steps.txt} in the distribution documents
 the procedure for building a VMS PCSI kit that is compatible with GNV.
-
-@ignore
-@c The VMS POSIX product, also known as POSIX for OpenVMS, is long defunct
-@c and building gawk for it has not been tested in many years, but these
-@c old instructions might still work if anyone is still using it.
-
-@node VMS POSIX
-@appendixsubsubsec Building and Using @command{gawk} on VMS POSIX
-
-Ignore the instructions above, although @file{vms/gawk.hlp} should still
-be made available in a help library.  The source tree should be unpacked
-into a container file subsystem rather than into the ordinary VMS filesystem.
-Make sure that the two scripts, @file{configure} and
-@file{vms/posix-cc.sh}, are executable; use @samp{chmod +x} on them if
-necessary.  Then execute the following two commands:
-
-@example
-psx> @kbd{CC=vms/posix-cc.sh configure}
-psx> @kbd{make CC=c89 gawk}
-@end example
-
-@noindent
-The first command constructs files @file{config.h} and @file{Makefile} out
-of templates, using a script to make the C compiler fit @command{configure}'s
-expectations.  The second command compiles and links @command{gawk} using
-the C compiler directly; ignore any warnings from @command{make} about being
-unable to redefine @code{CC}.  @command{configure} takes a very long
-time to execute, but at least it provides incremental feedback as it runs.
-
-This has been tested with VAX/VMS V6.2, VMS POSIX V2.0, and DEC C V5.2.
-
-Once built, @command{gawk} works like any other shell utility.  Unlike
-the normal VMS port of @command{gawk}, no special command-line manipulation is
-needed in the VMS POSIX environment.
-@end ignore
-
-@node VMS Old Gawk
-@appendixsubsubsec Some VMS Systems Have An Old Version of @command{gawk}
-
-@c Thanks to "gerard labadie" <gerard.labadie@gmail.com>
-
-Some versions of VMS have an old version of @command{gawk}.  To access it,
-define a symbol, as follows:
-
-@example
-$ @kbd{gawk :== $sys$common:[syshlp.examples.tcpip.snmp]gawk.exe}
-@end example
-
-This is apparently @value{PVERSION} 2.15.6, which is extremely old. We
-recommend compiling and using the current version.
 
 @node Bugs
 @appendixsec Reporting Problems and Bugs
@@ -43120,60 +43333,184 @@ report it to the developers; we cannot promise to do anything,
 but we might well want to fix it.
 
 @menu
+* Bug definition::              Defining what is and is not a bug.
 * Bug address::                 Where to send reports to.
 * Usenet::                      Where not to send reports to.
-* Performance bugs::            What to do if you think there is a performance issue.
+* Performance bugs::            What to do if you think there is a performance
+                                issue.
+* Asking for help::             Dealing with non-bug questions.
 * Maintainers::                 Maintainers of non-*nix ports.
 @end menu
+
+@node Bug definition
+@appendixsubsec Defining What Is and What Is Not A Bug
+
+Before talking about reporting bugs, let's define what is a bug,
+and what is not.
+
+A bug is:
+
+@itemize @bullet
+@item
+When @command{gawk} behaves differently from what's described
+in the POSIX standard, and that difference is not mentioned
+in this @value{DOCUMENT} as being done on purpose.
+
+@item
+When @command{gawk} behaves differently from what's described
+in this @value{DOCUMENT}.
+
+@item
+When @command{gawk} behaves differently from other @command{awk}
+implementations in particular circumstances, and that behavior cannot
+be attributed to an additional feature in @command{gawk}.
+
+@item
+Something that is obviously wrong, such as a core dump.
+
+@item
+When this @value{DOCUMENT} is unclear or ambiguous about a particular
+feature's behavior.
+@end itemize
+
+The following things are @emph{not} bugs, and should not be reported
+to the bug mailing list.  You can ask about them on the ``help'' mailing
+list (@pxref{Asking for help}), but don't be surprised if you get an
+answer of the form ``that's how @command{gawk} behaves and it isn't
+going to change.'' Here's the list:
+
+@itemize @bullet
+@item
+Missing features, for any definition of @dfn{feature}. For example,
+additional built-in arithmetic functions, or additional ways to split
+fields or records, or anything else.
+
+The number of features that @command{gawk} does @emph{not} have is
+by definition infinite.  It cannot be all things to all people.
+In short, just because @command{gawk} doesn't do what @emph{you}
+think it should, it's not necessarily a bug.
+
+@item
+Behaviors that are defined by the POSIX standard and/or for historical
+compatibility with Unix @command{awk}.  Even if you happen to dislike
+those behaviors, they're not going to change: changing them would
+break millions of existing @command{awk} programs.
+
+@item
+Behaviors that differ from how it's done in other languages. @command{awk}
+and @command{gawk} stand on their own and do not have to follow the crowd.
+This is particularly true when the requested behavior change would break
+backwards compatibility.
+
+This applies also to differences in behavior between @command{gawk}
+and other language compilers and interpreters, such as wishes for more
+detailed descriptions of what the problem is when a syntax error is
+encountered.
+
+@item
+Documentation issues of the form ``the manual doesn't tell me how to
+do XYZ.''  The manual is not a cookbook to solve every little problem
+you may have.  Its purpose is to teach you how to solve your problems
+on your own.
+
+@item
+General questions and discussion about @command{awk} programming or
+why @command{gawk} behaves the way it does. For that use the ``help''
+mailing list: see @ref{Asking for help}.
+@end itemize
+
+For more information, see @uref{http://www.skeeve.com/fork-my-code.html,
+@cite{Fork My Code, Please!---An Open Letter To Those of You Who Are Unhappy}},
+by Arnold Robbins and Chet Ramey.
 
 @node Bug address
 @appendixsubsec Submitting Bug Reports
 
 Before reporting a bug, make sure you have really found a genuine bug.
-First, verify that you have the latest version of @command{gawk}.
-Many bugs (usually subtle ones) are fixed at each release, and if yours
-is out of date, the problem may already have been solved.
 
-Second, please see if setting the environment variable @env{LC_ALL}
+Here are the steps for submitting a bug report. Following them will
+make both your life and the lives of the maintainers much easier.
+
+@enumerate 1
+@item
+Make sure that what you want to report is appropriate.
+@xref{Bug definition}.  If it's not, you are wasting your
+time and ours.
+
+@item
+Verify that you have the latest version of @command{gawk}.
+Many bugs (usually subtle ones) are fixed at each release, and if yours
+is out-of-date, the problem may already have been solved.
+
+@item
+Please see if setting the environment variable @env{LC_ALL}
 to @code{LC_ALL=C} causes things to behave as you expect. If so, it's
 a locale issue, and may or may not really be a bug.
 
-Third, carefully reread the documentation and see if it says you can do
+@item
+Carefully reread the documentation and see if it says you can do
 what you're trying to do.  If it's not clear whether you should be able
 to do something or not, report that too; it's a bug in the documentation!
 
-Finally, before reporting a bug or trying to fix it yourself, try to isolate it
+@item
+Before reporting a bug or trying to fix it yourself, try to isolate it
 to the smallest possible @command{awk} program and input @value{DF} that
-reproduce the problem.  Then send us the program and @value{DF},
-some idea of what kind of Unix system you're using,
-the compiler you used to compile @command{gawk}, and the exact results
+reproduce the problem.  Then send us:
+
+@itemize @bullet
+@item
+The program and @value{DF}.
+
+@item
+Some idea of what kind of Unix system you're using.
+
+@item
+The compiler you used to compile @command{gawk}.
+
+@item
+The exact results
 @command{gawk} gave you.  Also say what you expected to occur; this helps
 us decide whether the problem is really in the documentation.
 
-Make sure to include the version number of @command{gawk} you are using.
+@item
+The version number of @command{gawk} you are using.
 You can get this information with the command @samp{gawk --version}.
+@end itemize
 
-@cindex @code{bug-gawk@@gnu.org} bug reporting address
-@cindex email address for bug reports, @code{bug-gawk@@gnu.org}
-@cindex bug reports, email address, @code{bug-gawk@@gnu.org}
+@item
+Do @emph{not} send screenshots. Instead, use copy/paste to send text, or
+send files.
+
+@item
+Do send files as attachments, instead of inline. This avoids corruption
+by mailer programs out in the wilds of the Internet.
+
+@item
+Please be sure to send all mail in @emph{plain text},
+not (or not exclusively) in HTML.
+
+@item
+@emph{All email must be in English. This is the only language
+understood in common by all the maintainers.}
+@end enumerate
+
+@cindex @email{bug-gawk@@gnu.org} bug reporting address
+@cindex email address for bug reports, @email{bug-gawk@@gnu.org}
+@cindex bug reports, email address, @email{bug-gawk@@gnu.org}
 Once you have a precise problem description, send email to
-@EMAIL{bug-gawk@@gnu.org,bug-gawk at gnu dot org}.
+@EMAIL{bug-gawk@@gnu.org,bug dash gawk at gnu dot org}.
 
 The @command{gawk} maintainers subscribe to this address, and
 thus they will receive your bug report.
 Although you can send mail to the maintainers directly,
 the bug reporting address is preferred because the
 email list is archived at the GNU Project.
-@emph{All email must be in English. This is the only language
-understood in common by all the maintainers.}
-In addition, please be sure to send all mail in @emph{plain text},
-not (or not exclusively) in HTML.
 
 @quotation NOTE
 Many distributions of GNU/Linux and the various BSD-based operating systems
 have their own bug reporting systems.  If you report a bug using your distribution's
 bug reporting system, you should also send a copy to
-@EMAIL{bug-gawk@@gnu.org,bug-gawk at gnu dot org}.
+@EMAIL{bug-gawk@@gnu.org,bug dash gawk at gnu dot org}.
 
 This is for two reasons.  First, although some distributions forward
 bug reports ``upstream'' to the GNU mailing list, many don't, so there is a good
@@ -43181,10 +43518,6 @@ chance that the @command{gawk}  maintainers won't even see the bug report!  Seco
 mail to the GNU list is archived, and having everything at the GNU Project
 keeps things self-contained and not dependent on other organizations.
 @end quotation
-
-Non-bug suggestions are always welcome as well.  If you have questions
-about things that are unclear in the documentation or are just obscure
-features, ask on the bug list; we will try to help you out if we can.
 
 Please note: We ask that you follow the
 @uref{https://gnu.org/philosophy/kind-communication.html,
@@ -43212,6 +43545,10 @@ Usenet/Internet newsgroup @code{comp.lang.awk}.  Although some of the
 @command{gawk} developers occasionally read this news group, the primary
 @command{gawk} maintainer no longer does.  Thus it's virtually guaranteed
 that he will @emph{not} see your posting.
+
+If you really don't care about the previous paragraph and continue to
+post bug reports in @code{comp.lang.awk}, then understand that you're
+not reporting bugs, you're just whining.
 
 Similarly, posting bug reports or questions in web forums (such
 as @uref{https://stackoverflow.com/, Stack Overflow}) may get you
@@ -43263,10 +43600,10 @@ it:
 
 @example
 $ @kbd{tar -xpzvf gawk-X.Y.Z.tar.gz}
-@print{} @dots{}                                @ii{Output ommited}
+@print{} @dots{}                                @ii{Output omitted}
 $ @kbd{cd gawk-X.Y.Z}
 $ @kbd{./configure}
-@print{} @dots{}                                @ii{Output ommited}
+@print{} @dots{}                                @ii{Output omitted}
 @end example
 
 @item
@@ -43280,7 +43617,7 @@ Compile the program by running the @command{make} command:
 @example
 @group
 $ @kbd{make}
-@print{} @dots{}                                @ii{Output ommited}
+@print{} @dots{}                                @ii{Output omitted}
 @end group
 @end example
 
@@ -43293,6 +43630,10 @@ that something is slow, it @emph{must} be done using a real program and real dat
 
 Use a data file that is large enough for the statistical profiling to measure
 where @command{gawk} spends its time. It should be at least 100 megabytes in size.
+
+@example
+$ @kbd{./gawk -f realprogram.awk realdata > /dev/null}
+@end example
 
 @item
 When done, you should have a file in the current directory named @file{gmon.out}.
@@ -43313,6 +43654,65 @@ rerun the profiling in order to see if the patches were effective.
 
 If you are incapable or unwilling to do the steps listed above, then you will
 just have to live with @command{gawk} as it is.
+
+@node Asking for help
+@appendixsubsec Where To Send Non-bug Questions
+
+If you have questions related to @command{awk} programming, or why @command{gawk}
+behaves a certain way, or any other @command{awk}- or @command{gawk}-related issue,
+please @emph{do not} send it to the bug reporting address.
+
+As of July, 2021, there is a separate mailing list for this purpose:
+@EMAIL{help-gawk@@gnu.org, help dash gawk at gnu dot org}.
+Anything that is not a bug report should be sent to that list.
+
+@quotation NOTE
+If you disregard these directions and send non-bug mails to the bug list,
+you will be told to use the help list.
+After two such requests you will be silently @emph{blacklisted} from the bug list.
+@end quotation
+
+Please note: As with the bug list, we ask that you follow the
+@uref{https://gnu.org/philosophy/kind-communication.html,
+GNU Kind Communication Guidelines} in your correspondence on the help
+list (as well as off of it).
+
+@cindex Proulx, Bob
+If you wish to the subscribe to the list, in order to help out
+others, or to learn from others, here are instructions, courtesy
+of Bob Proulx:
+
+@table @emph
+@item Subscribe by email
+
+Send an email message to
+@EMAIL{help-gawk-request@@gnu.org, help dash gawk dash request at gnu dot org}
+with ``subscribe'' in
+the body of the message.  The subject does not matter and is not used.
+
+@item Subscribe by web form
+
+To use the web interface visit
+@uref{https://lists.gnu.org/mailman/listinfo/help-gawk,
+the list information page}.
+Use the
+subscribe form to fill out your email address and submit using the
+@code{Subscribe} button.
+
+@item Reply to the confirmation message
+
+In both cases then reply to the confirmation message that is sent to
+your address in reply.
+@end table
+
+Bob mentions that you may also use email for subscribing and
+unsubscribing. For example:
+
+@example
+$ @kbd{echo help | mailx -s request help-gawk-request@@gnu.org}
+$ @kbd{echo subscribe | mailx -s request help-gawk-request@@gnu.org}
+$ @kbd{echo unsubscribe | mailx -s request help-gawk-request@@gnu.org}
+@end example
 
 @node Maintainers
 @appendixsubsec Reporting Problems with Non-Unix Ports
@@ -43344,13 +43744,13 @@ The people maintaining the various @command{gawk} ports are:
 @c OS/2 is not mentioned anywhere else though.
 @item OS/2 @tab Andreas Buening, @EMAIL{andreas.buening@@nexgo.de,andreas dot buening at nexgo dot de}
 
-@item VMS @tab John Malmberg, @EMAIL{wb8tyw@@qsl.net,wb8tyw at qsl.net}
+@item VMS @tab John Malmberg, @EMAIL{wb8tyw@@qsl.net,wb8tyw at qsl dot net}
 
-@item z/OS (OS/390) @tab Daniel Richard G.@: @EMAIL{skunk@@iSKUNK.ORG,skunk at iSKUNK.ORG}
+@item z/OS (OS/390) @tab Daniel Richard G.@: @EMAIL{skunk@@iSKUNK.ORG,skunk at iSKUNK dot ORG}
 @end multitable
 
 If your bug is also reproducible under Unix, send a copy of your
-report to the @EMAIL{bug-gawk@@gnu.org,bug-gawk at gnu dot org} email list as well.
+report to the @EMAIL{bug-gawk@@gnu.org,bug dash gawk at gnu dot org} email list as well.
 
 @node Other Versions
 @appendixsec Other Freely Available @command{awk} Implementations
@@ -43464,8 +43864,7 @@ and links them with a library of functions that provide the core
 @command{awk} functionality.
 It also has a number of extensions.
 
-The @command{awk} translator is released under the GPL, and the library
-is under the LGPL.
+Both the @command{awk} translator and the library are released under the GPL.
 
 To get @command{awka}, go to @url{https://sourceforge.net/projects/awka}.
 @c You can reach Andrew Sumner at @email{andrew@@zbcom.net}.
@@ -43544,6 +43943,19 @@ Source code is available from @uref{https://github.com/benhoyt/goawk}.
 The author wrote a nice 
 @uref{https://benhoyt.com/writings/goawk/, article}
 describing the implementation.
+
+@cindex @command{AWKgo}
+@cindex @command{awk} to Go translator
+@cindex source code @subentry @command{AWKgo}
+@cindex programming languages @subentry Go
+@item @command{AWKgo}
+This is an @command{awk} to Go translator.
+It was written by the author of @command{goawk}.
+(See the previous entry in this list.) Source code is
+available from
+@uref{https://github.com/benhoyt/goawk/tree/master/awkgo}.
+The author's article about it is at
+@uref{https://benhoyt.com/writings/awkgo/}.
 
 @cindex @command{jawk}
 @cindex Java implementation of @command{awk}
@@ -43642,10 +44054,14 @@ and both Vax/VMS and OpenVMS.
 Instructions for each system are included in this @value{APPENDIX}.
 
 @item
-Bug reports should be sent via email to @email{bug-gawk@@gnu.org}.
+Bug reports should be sent via email to @EMAIL{bug-gawk@@gnu.org, bug dash gawk at gnu dot org}.
 Bug reports should be in English and should include the version of @command{gawk},
 how it was compiled, and a short program and @value{DF} that demonstrate
 the problem.
+
+@item
+Non-bug emails should be sent to @EMAIL{help-gawk@@gnu.org, help dash gawk at gnu dot org}.
+Repeatedly sending non-bug emails to the bug list will get you blacklisted from it.
 
 @item
 There are a number of other freely available @command{awk}
@@ -43800,7 +44216,7 @@ for information on getting the latest version of @command{gawk}.)
 Follow the @cite{GNU Coding Standards}.
 @end ifnotinfo
 @ifinfo
-See @inforef{Top, , Version, standards, GNU Coding Standards}.
+@xref{Top, , Version, standards, GNU Coding Standards}.
 @end ifinfo
 This document describes how GNU software should be written. If you haven't
 read it, please do so, preferably @emph{before} starting to modify @command{gawk}.
@@ -43917,7 +44333,7 @@ submit your changes.
 information.)
 
 Using this format makes it easy for me to apply your changes to the
-master version of the @command{gawk} source code (using @code{patch}).
+master version of the @command{gawk} source code (using @command{patch}).
 If I have to apply the changes manually, using a text editor, I may
 not do so, particularly if there are lots of changes.
 
@@ -43960,7 +44376,7 @@ your code in the public domain and submit a signed statement to that
 effect, or assign the copyright in your code to the FSF.
 Both of these actions are easy to do and @emph{many} people have done so
 already. If you have questions, please contact me, or
-@email{gnu@@gnu.org}.
+@EMAIL{gnu@@gnu.org, gnu at gnu dot org}.
 
 @item
 When doing a port, bear in mind that your code must coexist peacefully

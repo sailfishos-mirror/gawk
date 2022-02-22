@@ -4,6 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2018, 2019,
+ * 2021,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -75,7 +76,7 @@ static NODE **env_store(NODE *symbol, NODE *subs);
 static NODE **env_clear(NODE *symbol, NODE *subs);
 
 /* special case for ENVIRON */
-const array_funcs_t env_array_func = {
+static const array_funcs_t env_array_func = {
 	"env",
 	str_array_init,
 	(afunc_t) 0,

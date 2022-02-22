@@ -4,6 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003, 2010-2013, 2017-2019,
+ * 2021,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -78,7 +79,7 @@ err(bool isfatal, const char *s, const char *emsg, va_list argp)
 	}
 
 #ifdef HAVE_MPFR
-	if (FNR_node && is_mpg_number(FNR_node->var_value)) {
+	if (FNR_node && FNR_node->var_value && is_mpg_number(FNR_node->var_value)) {
 		NODE *val;
 		val = mpg_update_var(FNR_node);
 		assert((val->flags & MPZN) != 0);

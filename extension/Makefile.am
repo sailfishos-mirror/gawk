@@ -1,7 +1,7 @@
 #
 # extension/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1995-2006, 2012-2015, 2017, 2020,
+# Copyright (C) 1995-2006, 2012-2015, 2017, 2020, 2021,
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -32,8 +32,6 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f
-
-# Note: rwarray does not currently compile.
 
 pkgextension_LTLIBRARIES =	\
 	filefuncs.la	\
@@ -142,8 +140,7 @@ EXTRA_DIST =  \
 	ChangeLog.1 \
 	ext_custom.h \
 	fts.3 \
-	README.fts \
-	rwarray0.c
+	README.fts
 
 dist_man_MANS = \
 	filefuncs.3am fnmatch.3am fork.3am inplace.3am \

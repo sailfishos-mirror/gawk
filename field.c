@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2020 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2021 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -81,13 +81,13 @@ static awk_fieldwidth_info_t *FIELDWIDTHS = NULL;
 
 NODE **fields_arr;		/* array of pointers to the field nodes */
 bool field0_valid;		/* $(>0) has not been changed yet */
-int default_FS;			/* true when FS == " " */
-Regexp *FS_re_yes_case = NULL;
-Regexp *FS_re_no_case = NULL;
-Regexp *FS_regexp = NULL;
-Regexp *FPAT_re_yes_case = NULL;
-Regexp *FPAT_re_no_case = NULL;
-Regexp *FPAT_regexp = NULL;
+static int default_FS;		/* true when FS == " " */
+static Regexp *FS_re_yes_case = NULL;
+static Regexp *FS_re_no_case = NULL;
+static Regexp *FS_regexp = NULL;
+static Regexp *FPAT_re_yes_case = NULL;
+static Regexp *FPAT_re_no_case = NULL;
+static Regexp *FPAT_regexp = NULL;
 NODE *Null_field = NULL;
 
 #define clear_mpfr(n) ((n)->flags &= ~(MPFN | MPZN | NUMCUR))
@@ -837,7 +837,7 @@ fw_parse_field(long up_to,	/* parse only up to this field number */
 
 /* invalidate_field0 --- $0 needs reconstruction */
 
-void
+static void
 invalidate_field0()
 {
 	field0_valid = false;
@@ -979,6 +979,8 @@ do_split(int nargs)
 			 Regexp *, Setfunc, NODE *, NODE *, bool);
 	Regexp *rp = NULL;
 
+	check_args_min_max(nargs, "split", 3, 4);
+
 	if (nargs == 4) {
 		static bool warned = false;
 
@@ -1080,6 +1082,8 @@ do_patsplit(int nargs)
 	NODE *src, *arr, *sep, *fpat, *tmp, *sep_arr = NULL;
 	char *s;
 	Regexp *rp = NULL;
+
+	check_args_min_max(nargs, "patsplit", 3, 4);
 
 	if (nargs == 4) {
 		sep_arr = POP_PARAM();

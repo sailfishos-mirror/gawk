@@ -35,6 +35,7 @@
 #endif
 
 static void yyerror(const char *m, ...) ATTRIBUTE_PRINTF_1;
+#define  YYERROR_IS_DECLARED	1	/* for bison 3.8. sigh. */
 static void error_ln(int line, const char *m, ...) ATTRIBUTE_PRINTF_2;
 static void lintwarn_ln(int line, const char *m, ...) ATTRIBUTE_PRINTF_2;
 static void warning_ln(int line, const char *m, ...) ATTRIBUTE_PRINTF_2;
@@ -56,6 +57,7 @@ static void dumpintlstr2(const char *str1, size_t len1, const char *str2, size_t
 static bool include_source(INSTRUCTION *file, void **srcfile_p);
 static bool load_library(INSTRUCTION *file, void **srcfile_p);
 static void set_namespace(INSTRUCTION *ns, INSTRUCTION *comment);
+static void change_namespace(const char *new_namespace);
 static void next_sourcefile(void);
 static char *tokexpand(void);
 static NODE *set_profile_text(NODE *n, const char *str, size_t len);
@@ -111,6 +113,7 @@ static void add_sign_to_num(NODE *n, char sign);
 
 static bool at_seen = false;
 static bool want_source = false;
+static bool want_namespace = false;
 static bool want_regexp = false;	/* lexical scanning kludge */
 static enum {
 	FUNC_HEADER,
@@ -316,7 +319,20 @@ rule
 	  }
 	| '@' LEX_NAMESPACE namespace statement_term
 	  {
+		/*
+		 * 1/2022:
+		 * We have an interesting isssue here.  This production isn't
+		 * reduced until after the token following the statement_term
+		 * is seen. As a result, the change in namespace doesn't take
+		 * effect until then. That's fine if the first token is 'function'
+		 * or BEGIN or some such, but it's a disaster if it's an identifer;
+		 * that identifier will be in the previous namespace.
+		 * Therefore, the actual setting of the namespace is done immediately
+		 * down in the scanner.
+		 */
+
 		want_source = false;
+		want_namespace = false;
 		at_seen = false;
 
 		// this frees $3 storage in all cases
@@ -4078,6 +4094,9 @@ retry:
 		yylval = GET_INSTRUCTION(Op_token);
 		if (want_source) {
 			yylval->lextok = estrdup(tokstart, tok - tokstart);
+			// See the comment in the production for @namespace.
+			if (want_namespace)
+				change_namespace(yylval->lextok);
 			return lasttok = FILENAME;
 		}
 
@@ -4418,6 +4437,8 @@ retry:
 
 		switch (class) {
 		case LEX_NAMESPACE:
+			want_namespace = true;
+			// fall through
 		case LEX_INCLUDE:
 		case LEX_LOAD:
 			want_source = true;
@@ -6765,8 +6786,8 @@ check_qualified_special(char *token)
 	 * Now it's more complicated.  Here are the rules.
 	 *
 	 * 1. Namespace name cannot be a standard awk reserved word or function.
-	 * 2. Subordinate part of the name cannot be standard awk reserved word or function.
-	 * 3. If namespace part is explicitly "awk", return result of check_special().
+	 * 2. Subordinate part of the name cannot be a standard awk reserved word or function.
+	 * 3. If the namespace part is explicitly "awk", return the result of check_special().
 	 * 4. Else return -1 (gawk extensions allowed, we check standard awk in step 2).
 	 */
 
@@ -6798,12 +6819,12 @@ check_qualified_special(char *token)
 
 	// Now check the subordinate part
 	i = check_special(subname);
-	if (i >= 0 && (tokentab[i].flags & GAWKX) == 0 && strcmp(ns, "awk") != 0) {
+	if (i >= 0 && (tokentab[i].flags & GAWKX) == 0 && strcmp(ns, awk_namespace) != 0) {
 		error_ln(sourceline, _("using reserved identifier `%s' as second component of a qualified name is not allowed"), subname);
 		goto done;
 	}
 
-	if (strcmp(ns, "awk") == 0) {
+	if (strcmp(ns, awk_namespace) == 0) {
 		i = check_special(subname);
 		if (i >= 0) {
 			if ((tokentab[i].flags & GAWKX) != 0 && tokentab[i].class == LEX_BUILTIN)
@@ -6818,7 +6839,7 @@ done:
 	return i;
 }
 
-/* set_namespace --- change the current namespace */
+/* set_namespace --- update namespace data structures */
 
 static void
 set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
@@ -6849,13 +6870,9 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 		return;
 	}
 
-	if (strcmp(ns->lextok, current_namespace) == 0)
-		;	// nothing to do
-	else if (strcmp(ns->lextok, awk_namespace) == 0) {
-		set_current_namespace(awk_namespace);
-	} else {
-		set_current_namespace(estrdup(ns->lextok, strlen(ns->lextok)));
-	}
+	// Actual changing of namespace is done earlier.
+	// See comments in the production and in yylex().
+
 	efree(ns->lextok);
 
 	// save info and push on front of list of namespaces seen
@@ -6868,9 +6885,33 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 	ns->lextok = NULL;
 	bcfree(ns);
 
-	namespace_changed = true;
-
 	return;
+}
+
+/* change_namespace --- change the current namespace */
+
+static void
+change_namespace(const char *new_namespace)
+{
+	/* error messages will come from set_namespace(), above */
+
+	if (! is_valid_identifier(new_namespace))
+		return;
+
+	int mid = check_special(new_namespace);
+
+	if (mid >= 0)
+		return;
+
+	if (strcmp(new_namespace, current_namespace) == 0)
+		;	// nothing to do
+	else if (strcmp(new_namespace, awk_namespace) == 0) {
+		set_current_namespace(awk_namespace);
+	} else {
+		set_current_namespace(estrdup(new_namespace, strlen(new_namespace)));
+	}
+
+	namespace_changed = true;
 }
 
 /* qualify_name --- put name into namespace */

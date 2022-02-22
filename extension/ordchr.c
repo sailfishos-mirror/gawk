@@ -9,7 +9,7 @@
  */
 
 /*
- * Copyright (C) 2001, 2004, 2011, 2012, 2013, 2018, 2020,
+ * Copyright (C) 2001, 2004, 2011, 2012, 2013, 2018, 2020, 2021,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -67,7 +67,7 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	assert(result != NULL);
 
 	if (get_argument(0, AWK_STRING, & str)) {
-		ret = str.str_value.str[0];
+		ret = (unsigned char) str.str_value.str[0];
 	} else if (do_lint)
 		lintwarn(ext_id, _("ord: first argument is not a string"));
 

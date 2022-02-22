@@ -755,6 +755,16 @@ enum redirval {
 
 struct break_point;
 
+#if __DECC && __VAX
+typedef unsigned long exec_count_t;	// for exec_count
+#define EXEC_COUNT_FMT	"%lu"
+#define EXEC_COUNT_PROFILE_FMT	"%6lu"
+#else
+typedef unsigned long long exec_count_t;	// for exec_count
+#define EXEC_COUNT_FMT	"%llu"
+#define EXEC_COUNT_PROFILE_FMT	"%6llu"
+#endif
+
 typedef struct exp_instruction {
 	struct exp_instruction *nexti;
 	union {
@@ -765,7 +775,7 @@ typedef struct exp_instruction {
 					awk_value_t *result,
 					struct awk_ext_func *finfo);
 		long dl;
-		unsigned long long ldl;	// for exec_count
+		exec_count_t ldl;	// for exec_count
 		char *name;
 	} d;
 
@@ -1459,6 +1469,7 @@ extern bool is_identchar(int c);
 extern NODE *make_regnode(NODETYPE type, NODE *exp);
 extern bool validate_qualified_name(char *token);
 /* builtin.c */
+extern void efflush(FILE *fp, const char *from, struct redirect *rp);
 extern double double_to_int(double d);
 extern NODE *do_exp(int nargs);
 extern NODE *do_fflush(int nargs);
@@ -1509,6 +1520,8 @@ extern int strncasecmpmbs(const unsigned char *,
 extern int sanitize_exit_status(int status);
 extern void check_symtab_functab(NODE *dest, const char *fname, const char *msg);
 extern NODE *do_mkbool(int nargs);
+extern void check_exact_args(int nargs, const char *fname, int count);
+extern void check_args_min_max(int nargs, const char *fname, int min, int max);
 /* debug.c */
 extern void init_debug(void);
 extern int debug_prog(INSTRUCTION *pc);
@@ -1611,6 +1624,7 @@ extern int os_isreadable(const awk_input_buf_t *iobuf, bool *isdir);
 extern int os_is_setuid(void);
 extern int os_setbinmode(int fd, int mode);
 extern void os_restore_mode(int fd);
+extern void os_maybe_set_errno(void);
 extern size_t optimal_bufsize(int fd, struct stat *sbuf);
 extern int ispath(const char *file);
 extern int isdirpunct(int c);

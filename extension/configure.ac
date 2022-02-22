@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 2012-2020 the Free Software Foundation, Inc.
+dnl Copyright (C) 2012-2021 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -23,9 +23,9 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk Bundled Extensions],[5.1.0],[bug-gawk@gnu.org],[gawk-extensions])
+AC_INIT([GNU Awk Bundled Extensions],[5.1.1],[bug-gawk@gnu.org],[gawk-extensions])
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.71])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
@@ -94,10 +94,8 @@ AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
 		sys/statvfs.h sys/sysmacros.h sys/time.h)
 
 AC_HEADER_DIRENT
-dnl 12/2017: AC_HEADER_MAJOR no longer works on recent Fedora / GLIBC.
-dnl Instead we just check for the headers in the call above.
-dnl AC_HEADER_MAJOR
-AC_HEADER_TIME
+AC_CHECK_HEADERS_ONCE([sys/time.h])
+
 
 dnl check for mpfr support
 case `uname -m` in

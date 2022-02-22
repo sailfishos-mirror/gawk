@@ -1,10 +1,315 @@
+2022-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Enable interval expressions even for --traditional, as BWK
+	awk has supported them since 2019.
+
+	* NEWS: Updated.
+	* main.c (main): Add lint warning for --re-interval.
+	(parse_args): Add explanatory comment.
+	* re.c (resetup): Update the comment w.r.t. interval expressions.
+	Change the test for enabled them to if do_traditional.
+
+2022-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix resource links found by Coverity. Thanks to
+	Jakub Martisko <jamartis@redhat.com> for the report.
+
+	* ext.c (make_builtin): Free install_name before returning.
+	* io.c (remap_std_file): Unconditionally close newfd.
+	* symbol.c (load_symbols): Unref built_in also.
+
+2022-12-10         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* io.c (wait_any): When saving a saved exit status returned by
+	_cwait or waitpid or wait in struct redirect's status field, we
+	should actually save the valued returned by sanitize_exit_status
+	instead of the raw status. This fixes a bug whereby a saved status
+	for a previously exited process was being returned by gawk_pclose
+	without first being sanitized. Thanks to Jakub Martisko
+	<jamartis@redhat.com> for reporting the bug.
+
+2022-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (sanitize_exit_status): Fix formatting.
+
+2022-02-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Continue fixing indirect calls of builtins.
+
+	* awk.h (check_exact_args, check_args_min_max): Add declarations.
+	* builtin.c (check_exact_args, check_args_min_max): New functions.
+	(do_exp, do_fflush, do_index, do_int, do_isarray, do_length, do_log,
+	do_sqrt, do_strftime, do_systime, do_mktime, do_system, do_tolower,
+	do_toupper, do_atan2, do_sin, do_cos, do_rand, do_srand, do_match,
+	do_sub, do_lshift, do_rshift, do_compl, do_strtonum, do_dcgettext,
+	do_dcngettext, do_bindtextdomain, do_intdiv, do_typeof): Call
+	the argument checking functions.
+	(call_sub, call_match): Manually check argument count.
+	* field.c (do_split, do_patsplit): Call the argument checking
+	functions.
+	* interpret.h (r_interpret): For indirect call of extension functions,
+	pop the function name off the stack when done.
+	* mpfr.c (do_atan2, do_mpfr_func, do_mpfr_int, do_mpfr_compl,
+	do_mpfr_lshift, do_mpfr_rshift, do_mpfr_strtonum, do_mpfr_rand,
+	do_mpfr_srand, do_mpfr_intdiv): Call the argument checking functions.
+
+2022-02-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Start fixing issues with indirect calls of builtins.
+	Thanks to Denis Shirokov <cosmogen@gmail.com> for the initial report.
+	Much more remains to be done.
+
+	* builtin.c (do_length): Check number of arguments, fatal if not one.
+	If passed Node_var_new, turn it into the null string.
+	* interpret.h (r_interpret): For Op_indirect_call, pop the function
+	name off the stack.
+
+2022-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (change_namespace): New function. Extracted from
+	set_namespace.
+	(want_namespace): New variable.
+	[grammar]: Add explanatory comment about the change.
+	(yylex): Change the namespace immediately from the lexer.
+	(set_namespace): Adjust code.
+	* symbol.c (load_symbols): Strip off leading awk:: so that
+	PROCINFO["identifiers"] is like SYMTAB and FUNCTAB. This makes
+	the code match the documentation. Thanks to John Naman
+	<gawker@703n.com> for the bug report.
+
+2021-12-17         Yuri Gribov           <tetra2005@gmail.com>
+
+	Make a number of functions and variables static.
+
+	* cint_array.c (argv_array_func): Make static.
+	* debug.c (cur_rule, check_until): Ditto.
+	* field.c (default_FS, FS_re_yes_case, FS_re_no_case, FS_regexp,
+	FPAT_re_yes_case, FPAT_re_no_case, invalidate_field0: Ditto.
+	* io.c (iopflags2str): Ditto.
+	* main.c (ENVIRON_node): Ditto.
+	* re.c (reflags2str): Ditto.
+	* str_array.c (env_array_func): Ditto.
+
+2021-12-08         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* gawkapi.c (api_sym_update): Allow undefined Node_var_new variables
+	to be converted to arrays, otherwise API functions have no way
+	of creating an array that is referenced in an undefined fashion in
+	the program. This is somewhat comparable to how the set_argument
+	API allows an undefined argument variable to be converted to an array.
+
+2021-12-02         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* builtin.c (efwrite): Don't use return in call of function
+	returning void. Some compilers might not like it.
+
+2021-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (efflush): Don't use return in call of function
+	returning void. It works, but is funky, and I think some
+	compilers will complain.
+
+	Unrelated. Clean up the calls to w32_maybe_set_errno.
+
+	* awk.h (os_maybe_set_errno): Add declaration.
+	* builtin.c (wrerror): Replaced ifdef'ed code calling
+	w32_maybe_set_errno() with simple call to os_maybe_set_errno().
+	* io.c (non_fatal_flush_std_file, close_io): Ditto.
+	* main.c (usage, copyleft): Ditto.
+	* nonposix.h (w32_maybe_set_errno): Remove declaration.
+
+2021-11-30         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	Improve output redirection error handling for problems not detected
+	until the final flush or close. Thanks to Miguel Pineiro Jr.
+	<mpj@pineiro.cc> for the bug report and suggesting a fix.
+
+	* awk.h (efflush): Add declaration.
+	* builtin.c (efwrite): Break up into 3 functions by moving the
+	flushing logic into efflush and the error handling logic into
+	wrerror.
+	(wrerror): New function containing the error-handling logic extracted
+	from efwrite.
+	(efflush): New function containing the fflush logic extracted from
+	efwrite.
+	* io.c (close_redir): Call efflush prior to closing the redirection
+	to identify any problems with flushing output and to take advantage
+	of the error-handling logic used for print and printf.
+
+2021-11-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_typeof): Make Node_array_ref handling smarter.
+	See test/stupid5.awk.
+
+2021-11-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.c (awk_value_to_node): Fix handling of MPFR values
+	coming back from an extension.
+
+2021-11-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* mkinstalldirs: Removed, it wasn't used.
+	* Makefile.in: Regenerated.
+
+2021-11-03         Sam James             <sam@gentoo.org>
+
+	* configure.ac: Fix AR_FLAGS assignment typo.
+	* configure.ac: Rename AR_FLAGS to ARFLAGS.
+
+2021-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.1: Release tar ball made.
+
+2021-10-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README: Updated.
+
+2021-10-20         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* msg.c (err): Need to check that FNR_node->var_value is non-NULL
+	before testing with is_mpg_number.
+
+2021-10-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Factor duplicated code out into a separate function.
+	D.R.Y. principle.
+
+	* symbol.c (get_name_from_awk_ns): New function.
+	(lookup): Use it.
+	(install): Use it.
+
+	* awkgram.y (check_qualified_special): Use awk_namespace instead of a
+	string constant.
+	* profile.c (pprint): Ditto.
+	(adjust_namespace): Ditto. Also, fix the check for the qualified
+	name to look for the "::" in case one namespace is a prefix of
+	another.
+
+2021-10-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README: Update version, copyright year.
+	* custom.h: Update copyright year.
+
+2021-09-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_mktime): Update that ISO 8601 does not allow
+	hours > 23. Thanks to Nethox <nethox+awk@gmail.com> for the info.
+
+2021-09-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h: Some clean-up of comments in the header file.
+
+2021-09-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* interpret.h: Remove subscript_in_array variable.
+
+	Unrelated:
+
+	* builtin.c (add_thousands): Fix insertion of thousands_sep
+	string. Do it in reverse order.
+
+2021-09-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* interpret.h: For Op_subscript, don't allow references into
+	FUNCTAB and SYMTAB to create new elements.  Thanks to
+	Jason C. Kwan <jasonckwan@yahoo.com> for the bug report.
+
+	Unrelated:
+
+	* aclocal.m4: Regenerated: Automake 1.16.4.
+	* NEWS: Updated.
+
+	Unrelated:
+
+	* awkgram.y (YYERROR_IS_DECLARED): Added for Bison 3.8.
+	* command.y (YYERROR_IS_DECLARED): Ditto.
+	* NEWS: Updated.
+
+2021-09-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Move to Autoconf 2.71 (finally!)
+
+	* configure.ac: Updated.
+	* aclocal.m4, configh.in configure: Regenerated.
+	* NEWS: Updated.
+
+2021-09-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Have the ' flag work for %d in MPFR mode also. Thanks to
+	Dan Nielsen <catskill549@yahoo.com> for the report.
+
+	* builtin.c (add_thousands):  New function.
+	(reverse): New helper function.
+	(format_tree): Use add_thousands if MPFR and an integer
+	format.
+
+2021-09-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (UPDATE_YEAR): Update to 2021.
+
+2021-09-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* mpfr.c (mpg_cmp_as_numbers): Avoid compiler warning about possibly
+	used before set.  Thanks to Michal Jaegermann for the report.
+
+2021-08-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (main): Change have_srcfile from int to bool.
+
+2021-08-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Allow setting AR and ARFLAGS on the configure command line.
+	Thanks to Jacob Burkholder <jake.burkholder2@gmail.com> for
+	the report.
+
+	* configure.ac (AR_FLAGS): Provide default value.
+	(AR): Call AC_SUBST on it.
+
+2021-08-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_sub): Rationalize handling of strongly typed
+	regex as argument to sub/gsub, as well as rationalize the return
+	value from gensub to always be string. Thanks to John Naman
+	<gawker@703n.com> for the bug report.
+
+2021-08-05         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* mpfr.c (do_mpfr_func): New argument, warn_negative. If true,
+	print a warning message about a negative argument. Bring -M
+	code into line with regular code. Bug report from Neil Ormos
+	in the help-gawk list.
+
+	Unrelated:
+
+	* mpfr.c (do_mpfr_int_div, mpg_div, mpg_mod): If dividing by
+	zero, print a fatal error messages. Brings MPFR code into line
+	with the regular code. Thanks to Peng Yu for noticing the bug, in
+	the help-gawk list.
+
+2021-07-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (exec_count_t): Add typedef for Vax VMS C and everyone else.
+	(EXEC_COUNT_FMT, EXEC_COUNT_PROFILE_FMT): Corresponding format
+	strings for printf.
+	* debug.c (print_instruction): Use EXEC_COUNT_FMT.
+	* profile.c (indent): Ditto and use EXEC_COUNT_PROFILE_FMT.
+
+2021-07-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* array.c (asort_actual): Add a lint warning for passing the
+	same array as the first two arguments without a third.
+	Thanks to Peng Yu <pengyu.ut@gmail.com> for the report.
+
+2021-06-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* custom.h: Add a bunch of defines to work around the continous,
+	needless churn in support/dfa.c.
+
 2021-06-04         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* builtin.c (format_tree): In MPFR prints, cast values to
 	int for proper int vs. unsigned comparison. Fixes things
 	for HP-UX. Thanks to Daniel Richard G. for the report.
-
-2021-06-04         Arnold D. Robbins     <arnold@skeeve.com>
 
 2021-05-21         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -71,7 +376,7 @@
 
 2021-04-16         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* main (arg_assign): For -v '@/...' make sure that there are
+	* main.c (arg_assign): For -v '@/...' make sure that there are
 	at least three characters there. Thanks to Ed Morton
 	<mortoneccc@comcast.net> for the report.
 
@@ -798,7 +1103,7 @@
 	* array.c (sort_up_value_type): Handle other types of nodes,
 	in case someone applies PROCINFO["sorted_in"] to SYMTAB or
 	FUNCTAB. This threw an assertion error if assertions were
-	enabled. Thanks to John Namam <Gawer@703n.com> for the report.
+	enabled. Thanks to John Namam <gawker@703n.com> for the report.
 	(asort_actual): Disallow SYMTAB and FUNCTAB as first arguments.
 	* TODO: Note that we should should eventually allow SYMTAB/FUNCTAB
 	passed to asort/asorti if a destination array is provided. (The
@@ -1044,7 +1349,6 @@
 
 	* gawkapi.h: Update copyright year, fix some spelling errors.
 
-2019-07-08         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 2019-07-08         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
 	* gawkapi.h (gawk_api_major_version): Bump from 2 to 3 because the

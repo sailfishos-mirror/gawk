@@ -628,8 +628,8 @@ remap_std_file(int oldfd)
 	if (newfd >= 0) {
 		/* if oldfd is open, dup2() will close oldfd for us first. */
 		ret = dup2(newfd, oldfd);
-		if (ret == 0)
-			close(newfd);
+		// close unconditionally, calling code assumes it
+		close(newfd);
 	} else
 		ret = 0;
 
@@ -1375,6 +1375,9 @@ close_redir(struct redirect *rp, bool exitwarn, two_way_close_type how)
 
 	if (rp == NULL)
 		return 0;
+	if ((rp->flag & RED_WRITE) && rp->output.fp)
+		/* flush before closing to leverage special error handling */
+		efflush(rp->output.fp, "flush", rp);
 	if (rp->output.fp == stdout || rp->output.fp == stderr)
 		goto checkwarn;		/* bypass closing, remove from list */
 
@@ -1460,10 +1463,8 @@ non_fatal_flush_std_file(FILE *fp)
 		bool is_fatal = ! is_non_fatal_std(fp);
 
 		if (is_fatal) {
-#ifdef __MINGW32__
-			if (errno == 0 || errno == EINVAL)
-				w32_maybe_set_errno();
-#endif
+			os_maybe_set_errno();
+
 			if (errno == EPIPE)
 				die_via_sigpipe();
 			else
@@ -1560,10 +1561,8 @@ close_io(bool *stdio_problem, bool *got_EPIPE)
 	*stdio_problem = false;
 	/* we don't warn about stdout/stderr if EPIPE, but we do error exit */
 	if (fflush(stdout) != 0) {
-#ifdef __MINGW32__
-		if (errno == 0 || errno == EINVAL)
-			w32_maybe_set_errno();
-#endif
+		os_maybe_set_errno();
+
 		if (errno != EPIPE)
 			warning(_("error writing standard output: %s"), strerror(errno));
 		else
@@ -1573,10 +1572,8 @@ close_io(bool *stdio_problem, bool *got_EPIPE)
 		*stdio_problem = true;
 	}
 	if (fflush(stderr) != 0) {
-#ifdef __MINGW32__
-		if (errno == 0 || errno == EINVAL)
-			w32_maybe_set_errno();
-#endif
+		os_maybe_set_errno();
+
 		if (errno != EPIPE)
 			warning(_("error writing standard error: %s"), strerror(errno));
 		else
@@ -2602,7 +2599,7 @@ wait_any(int interesting)	/* pid of interest, if any */
 		for (redp = red_head; redp != NULL; redp = redp->next)
 			if (interesting == redp->pid) {
 				redp->pid = -1;
-				redp->status = status;
+				redp->status = sanitize_exit_status(status);
 				break;
 			}
 	}
@@ -2632,7 +2629,7 @@ wait_any(int interesting)	/* pid of interest, if any */
 			for (redp = red_head; redp != NULL; redp = redp->next)
 				if (pid == redp->pid) {
 					redp->pid = -1;
-					redp->status = status;
+					redp->status = sanitize_exit_status(status);
 					break;
 				}
 		}
@@ -4173,7 +4170,7 @@ pty_vs_pipe(const char *command)
 
 /* iopflags2str --- make IOP flags printable */
 
-const char *
+static const char *
 iopflags2str(int flag)
 {
 	static const struct flagtab values[] = {

@@ -67,6 +67,7 @@ r_interpret(INSTRUCTION *code)
 	Regexp *rp;
 	NODE *set_array = NULL;	/* array with a post-assignment routine */
 	NODE *set_idx = NULL;	/* the index of the array element */
+	bool in_indirect_call = false;
 
 
 /* array subscript */
@@ -265,13 +266,24 @@ uninitialized_scalar:
 			t2 = mk_sub(pc->sub_count);
 			t1 = POP_ARRAY(false);
 
-			if (do_lint && in_array(t1, t2) == NULL) {
+			if (in_array(t1, t2) == NULL) {
 				t2 = force_string(t2);
-				lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
-					array_vname(t1), (int) t2->stlen, t2->stptr);
-				if (t2->stlen == 0)
-					lintwarn(_("subscript of array `%s' is null string"), array_vname(t1));
+
+				if (t1 == func_table) {
+					fatal(_("reference to uninitialized element `%s[\"%.*s\"] is not allowed'"),
+						"FUNCTAB", (int) t2->stlen, t2->stptr);
+				} else if (t1 == symbol_table) {
+					fatal(_("reference to uninitialized element `%s[\"%.*s\"] is not allowed'"),
+						"SYMTAB", (int) t2->stlen, t2->stptr);
+				} else if (do_lint) {
+					lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
+						array_vname(t1), (int) t2->stlen, t2->stptr);
+					if (t2->stlen == 0)
+						lintwarn(_("subscript of array `%s' is null string"), array_vname(t1));
+				}
 			}
+
+			// continue the regular processing
 
 			/* for FUNCTAB, get the name as the element value */
 			if (t1 == func_table) {
@@ -1048,6 +1060,14 @@ arrayfor:
 					DEREF(t1);
 			}
 			free_api_string_copies();
+
+			if (in_indirect_call) {
+				// pop function name off the stack
+				NODE *fname = POP();
+				DEREF(fname);
+				in_indirect_call = false;
+			}
+
 			PUSH(r);
 		}
 			break;
@@ -1121,6 +1141,7 @@ match_re:
 			NODE *f = NULL;
 			int arg_count;
 			char save;
+			NODE *function_name;
 
 			arg_count = (pc + 1)->expr_count;
 			t1 = PEEK(arg_count);	/* indirect var */
@@ -1163,6 +1184,12 @@ match_re:
 					r = the_func(arg_count);
 				str_restore(t1, save);
 
+				// Normally, setup_frame() handles getting rid of the
+				// function name.  Since we have called the builtin directly,
+				// we have to manually do this here.
+				function_name = POP();
+				DEREF(function_name);
+
 				PUSH(r);
 				break;
 			} else if (f->type != Node_func) {
@@ -1184,6 +1211,7 @@ match_re:
 					npc[1] = pc[1];
 					npc[1].func_name = fname;	/* name of the builtin */
 					npc[1].c_function = bc->c_function;
+					in_indirect_call = true;
 					ni = npc;
 					JUMPTO(ni);
 				} else

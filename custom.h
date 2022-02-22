@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018, 2019, 2020,
+ * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2021,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -106,5 +106,10 @@ typedef unsigned long long uint_fast64_t;
 # define _GL_ATTRIBUTE_PURE /* empty */
 #endif
 #define FLEXIBLE_ARRAY_MEMBER	1
+#define xreallocarray xnrealloc
+#define xizalloc xzalloc
+#define xicalloc xcalloc
+#define xirealloc xrealloc
+#define ximalloc xmalloc
 
 #include "mbsupport.h" /* defines stuff for DJGPP to fake MBS */

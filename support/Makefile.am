@@ -1,7 +1,7 @@
 #
 # Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 2000-2016, 2018, 2019 the Free Software Foundation, Inc.
+# Copyright (C) 2000-2016, 2018, 2019, 2021 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -26,9 +26,12 @@
 AM_CFLAGS  = @CFLAGS@
 AM_LDFLAGS = @LDFLAGS@
 
+AR = @AR@
+
 # Stuff to include in the dist that doesn't need it's own
 # Makefile.am files
 EXTRA_DIST = \
+        ChangeLog.0 \
 	Makefile.am \
 	Makefile.in \
 	regcomp.c \

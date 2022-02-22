@@ -135,7 +135,7 @@ init_profiling_signals()
 /* indent --- print out enough tabs */
 
 static void
-indent(unsigned long long count)
+indent(exec_count_t count)
 {
 	int i;
 
@@ -143,7 +143,7 @@ indent(unsigned long long count)
 		if (count == 0)
 			fprintf(prof_fp, "\t");
 		else
-			fprintf(prof_fp, "%6llu  ", count);
+			fprintf(prof_fp, EXEC_COUNT_PROFILE_FMT "  ", count);
 	}
 
 	assert(indent_level >= 0);
@@ -297,7 +297,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 					ip2 = (pc + 1)->lasti;
 
 					if (do_profile && ip1->exec_count > 0)
-						fprintf(prof_fp, " # %llu", ip1->exec_count);
+						fprintf(prof_fp, " # " EXEC_COUNT_FMT, ip1->exec_count);
 
 					end_line(ip1);
 					skip_comment = true;
@@ -647,7 +647,7 @@ cleanup:
 		{
 			const char *fname;
 			if (pc->opcode == Op_builtin) {
-				bool prepend_awk = (current_namespace != awk_namespace && strcmp(current_namespace, "awk") != 0);
+				bool prepend_awk = (current_namespace != awk_namespace && strcmp(current_namespace, awk_namespace) != 0);
 				fname = getfname(pc->builtin, prepend_awk);
 			} else
 				fname = (pc + 1)->func_name;
@@ -1044,7 +1044,7 @@ cleanup:
 
 			ip1 = pc->branch_if;
 			if (ip1->exec_count > 0)
-				fprintf(prof_fp, " # %llu", ip1->exec_count);
+				fprintf(prof_fp, " # " EXEC_COUNT_FMT, ip1->exec_count);
 			ip1 = end_line(ip1);
 			indent_in();
 			if (pc->comment != NULL)
@@ -2098,7 +2098,7 @@ adjust_namespace(char *name, bool *malloced)
 	// unadorned name from symbol table, add awk:: if not in awk:: n.s.
 	if (strchr(name, ':') == NULL &&
 	    current_namespace != awk_namespace &&	// can be equal if namespace never changed
-	    strcmp(current_namespace, "awk") != 0 &&
+	    strcmp(current_namespace, awk_namespace) != 0 &&
 	    ! is_all_upper(name)) {
 		char *buf;
 		size_t len = 5 + strlen(name) + 1;
@@ -2113,7 +2113,8 @@ adjust_namespace(char *name, bool *malloced)
 	// qualifed name, remove <ns>:: if in that n.s.
 	size_t len = strlen(current_namespace);
 
-	if (strncmp(current_namespace, name, len) == 0) {
+	if (strncmp(current_namespace, name, len) == 0 &&
+	    name[len] == ':' && name[len+1] == ':') {
 		char *ret = name + len + 2;
 
 		return ret;

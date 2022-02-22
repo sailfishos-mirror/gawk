@@ -1,6 +1,6 @@
 /* xalloc.h -- malloc with out-of-memory checking
 
-   Copyright (C) 1990-2000, 2003-2004, 2006-2019 Free Software Foundation, Inc.
+   Copyright (C) 1990-2000, 2003-2004, 2006-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -434,6 +434,17 @@ xpalloc (void *pa, idx_t *nitems, idx_t nitems_incr_min,
   pa = xrealloc (pa, nbytes);
   *nitems = n;
   return pa;
+}
+
+/* Clone an object P of size S, with error checking.  Append
+   a terminating NUL byte.  */
+
+char *
+ximemdup0 (void const *p, idx_t s)
+{
+  char *result = malloc(s + 1);
+  result[s] = 0;
+  return memcpy (result, p, s);
 }
 
 

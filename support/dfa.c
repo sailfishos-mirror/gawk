@@ -1,10 +1,10 @@
 /* dfa.c - deterministic extended regexp routines for GNU
-   Copyright (C) 1988, 1998, 2000, 2002, 2004-2005, 2007-2021 Free Software
+   Copyright (C) 1988, 1998, 2000, 2002, 2004-2005, 2007-2022 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -26,6 +26,7 @@
 
 #include "flexmember.h"
 #include "idx.h"
+#include "verify.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -34,6 +35,13 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+
+/* Pacify gcc -Wanalyzer-null-dereference in areas where GCC
+   understandably cannot deduce that the input comes from a
+   well-formed regular expression.  There's little point to the
+   runtime overhead of 'assert' instead of 'assume_nonnull' when the
+   MMU will check anyway.  */
+#define assume_nonnull(x) assume ((x) != NULL)
 
 static bool
 streq (char const *a, char const *b)
@@ -582,7 +590,7 @@ struct dfa
 
   /* dfaexec implementation.  */
   char *(*dfaexec) (struct dfa *, char const *, char *,
-                    bool, ptrdiff_t *, bool *);
+                    bool, idx_t *, bool *);
 
   /* Other cached information derived from the locale.  */
   struct localeinfo localeinfo;
@@ -617,14 +625,14 @@ static void regexp (struct dfa *dfa);
    * PWC points to wint_t, not to wchar_t.
    * The last arg is a dfa *D instead of merely a multibyte conversion
      state D->mbs.
-   * N must be at least 1.
+   * N is idx_t not size_t, and must be at least 1.
    * S[N - 1] must be a sentinel byte.
    * Shift encodings are not supported.
    * The return value is always in the range 1..N.
    * D->mbs is always valid afterwards.
    * *PWC is always set to something.  */
 static int
-mbs_to_wchar (wint_t *pwc, char const *s, size_t n, struct dfa *d)
+mbs_to_wchar (wint_t *pwc, char const *s, idx_t n, struct dfa *d)
 {
   unsigned char uc = s[0];
   wint_t wc = d->localeinfo.sbctowc[uc];
@@ -1531,8 +1539,8 @@ addtok_mb (struct dfa *dfa, token t, char mbprop)
       dfa->tokens = xpalloc (dfa->tokens, &dfa->talloc, 1, -1,
                              sizeof *dfa->tokens);
       if (dfa->localeinfo.multibyte)
-        dfa->multibyte_prop = xnrealloc (dfa->multibyte_prop, dfa->talloc,
-                                         sizeof *dfa->multibyte_prop);
+        dfa->multibyte_prop = xreallocarray (dfa->multibyte_prop, dfa->talloc,
+                                             sizeof *dfa->multibyte_prop);
     }
   if (dfa->localeinfo.multibyte)
     dfa->multibyte_prop[dfa->tindex] = mbprop;
@@ -2165,7 +2173,7 @@ state_index (struct dfa *d, position_set const *s, int context)
 
   for (i = 0; i < s->nelem; ++i)
     {
-      size_t ind = s->elems[i].index;
+      idx_t ind = s->elems[i].index;
       hash ^= ind + s->elems[i].constraint;
     }
 
@@ -2488,7 +2496,7 @@ reorder_tokens (struct dfa *d)
 static void
 dfaoptimize (struct dfa *d)
 {
-  char *flags = xzalloc (d->tindex);
+  char *flags = xizalloc (d->tindex);
 
   for (idx_t i = 0; i < d->tindex; i++)
     {
@@ -2511,7 +2519,7 @@ dfaoptimize (struct dfa *d)
   position_set *merged = &merged0;
   alloc_position_set (merged, d->nleaves);
 
-  d->constraints = xcalloc (d->tindex, sizeof *d->constraints);
+  d->constraints = xicalloc (d->tindex, sizeof *d->constraints);
 
   for (idx_t i = 0; i < d->tindex; i++)
     if (flags[i] & OPT_QUEUED)
@@ -2614,9 +2622,9 @@ dfaanalyze (struct dfa *d, bool searchflag)
 
   d->searchflag = searchflag;
   alloc_position_set (&merged, d->nleaves);
-  d->follows = xcalloc (tindex, sizeof *d->follows);
+  d->follows = xicalloc (tindex, sizeof *d->follows);
   position_set *backward
-    = d->epsilon ? xcalloc (tindex, sizeof *backward) : NULL;
+    = d->epsilon ? xicalloc (tindex, sizeof *backward) : NULL;
 
   for (idx_t i = 0; i < tindex; i++)
     {
@@ -2799,7 +2807,7 @@ dfaanalyze (struct dfa *d, bool searchflag)
 
   append (pos, &tmp);
 
-  d->separates = xcalloc (tindex, sizeof *d->separates);
+  d->separates = xicalloc (tindex, sizeof *d->separates);
 
   for (idx_t i = 0; i < tindex; i++)
     {
@@ -2850,13 +2858,13 @@ realloc_trans_if_necessary (struct dfa *d)
       realtrans[0] = realtrans[1] = NULL;
       d->trans = realtrans + 2;
       idx_t newalloc = d->tralloc = newalloc1 - 2;
-      d->fails = xnrealloc (d->fails, newalloc, sizeof *d->fails);
-      d->success = xnrealloc (d->success, newalloc, sizeof *d->success);
-      d->newlines = xnrealloc (d->newlines, newalloc, sizeof *d->newlines);
+      d->fails = xreallocarray (d->fails, newalloc, sizeof *d->fails);
+      d->success = xreallocarray (d->success, newalloc, sizeof *d->success);
+      d->newlines = xreallocarray (d->newlines, newalloc, sizeof *d->newlines);
       if (d->localeinfo.multibyte)
         {
           realtrans = d->mb_trans ? d->mb_trans - 2 : NULL;
-          realtrans = xnrealloc (realtrans, newalloc1, sizeof *realtrans);
+          realtrans = xreallocarray (realtrans, newalloc1, sizeof *realtrans);
           if (oldalloc == 0)
             realtrans[0] = realtrans[1] = NULL;
           d->mb_trans = realtrans + 2;
@@ -3344,7 +3352,7 @@ skip_remains_mb (struct dfa *d, unsigned char const *p,
 
 static inline char *
 dfaexec_main (struct dfa *d, char const *begin, char *end, bool allow_nl,
-              ptrdiff_t *count, bool multibyte)
+              idx_t *count, bool multibyte)
 {
   if (MAX_TRCOUNT <= d->sindex)
     {
@@ -3527,14 +3535,14 @@ dfaexec_main (struct dfa *d, char const *begin, char *end, bool allow_nl,
 
 static char *
 dfaexec_mb (struct dfa *d, char const *begin, char *end,
-            bool allow_nl, ptrdiff_t *count, bool *backref)
+            bool allow_nl, idx_t *count, bool *backref)
 {
   return dfaexec_main (d, begin, end, allow_nl, count, true);
 }
 
 static char *
 dfaexec_sb (struct dfa *d, char const *begin, char *end,
-            bool allow_nl, ptrdiff_t *count, bool *backref)
+            bool allow_nl, idx_t *count, bool *backref)
 {
   return dfaexec_main (d, begin, end, allow_nl, count, false);
 }
@@ -3543,7 +3551,7 @@ dfaexec_sb (struct dfa *d, char const *begin, char *end,
    any regexp that uses a construct not supported by this code.  */
 static char *
 dfaexec_noop (struct dfa *d, char const *begin, char *end,
-              bool allow_nl, ptrdiff_t *count, bool *backref)
+              bool allow_nl, idx_t *count, bool *backref)
 {
   *backref = true;
   return (char *) begin;
@@ -3555,7 +3563,7 @@ dfaexec_noop (struct dfa *d, char const *begin, char *end,
 
 char *
 dfaexec (struct dfa *d, char const *begin, char *end,
-         bool allow_nl, ptrdiff_t *count, bool *backref)
+         bool allow_nl, idx_t *count, bool *backref)
 {
   return d->dfaexec (d, begin, end, allow_nl, count, backref);
 }
@@ -3900,7 +3908,7 @@ icatalloc (char *old, char const *new)
   if (newsize == 0)
     return old;
   idx_t oldsize = strlen (old);
-  char *result = xrealloc (old, oldsize + newsize + 1);
+  char *result = xirealloc (old, oldsize + newsize + 1);
   memcpy (result + oldsize, new, newsize + 1);
   return result;
 }
@@ -3913,10 +3921,8 @@ freelist (char **cpp)
 }
 
 static char **
-enlist (char **cpp, char *new, idx_t len)
+enlistnew (char **cpp, char *new)
 {
-  new = memcpy (xmalloc (len + 1), new, len);
-  new[len] = '\0';
   /* Is there already something in the list that's new (or longer)?  */
   idx_t i;
   for (i = 0; cpp[i] != NULL; i++)
@@ -3938,10 +3944,16 @@ enlist (char **cpp, char *new, idx_t len)
         cpp[i] = NULL;
       }
   /* Add the new string.  */
-  cpp = xnrealloc (cpp, i + 2, sizeof *cpp);
+  cpp = xreallocarray (cpp, i + 2, sizeof *cpp);
   cpp[i] = new;
   cpp[i + 1] = NULL;
   return cpp;
+}
+
+static char **
+enlist (char **cpp, char const *str, idx_t len)
+{
+  return enlistnew (cpp, ximemdup0 (str, len));
 }
 
 /* Given pointers to two strings, return a pointer to an allocated
@@ -3974,7 +3986,7 @@ static char **
 addlists (char **old, char **new)
 {
   for (; *new; new++)
-    old = enlist (old, *new, strlen (*new));
+    old = enlistnew (old, xstrdup (*new));
   return old;
 }
 
@@ -4016,9 +4028,9 @@ allocmust (must *mp, idx_t size)
 {
   must *new_mp = xmalloc (sizeof *new_mp);
   new_mp->in = xzalloc (sizeof *new_mp->in);
-  new_mp->left = xzalloc (size);
-  new_mp->right = xzalloc (size);
-  new_mp->is = xzalloc (size);
+  new_mp->left = xizalloc (size);
+  new_mp->right = xizalloc (size);
+  new_mp->is = xizalloc (size);
   new_mp->begline = false;
   new_mp->endline = false;
   new_mp->prev = mp;
@@ -4090,6 +4102,7 @@ dfamust (struct dfa const *d)
 
         case STAR:
         case QMARK:
+          assume_nonnull (mp);
           resetmust (mp);
           break;
 
@@ -4097,7 +4110,9 @@ dfamust (struct dfa const *d)
           {
             char **new;
             must *rmp = mp;
+            assume_nonnull (rmp);
             must *lmp = mp = mp->prev;
+            assume_nonnull (lmp);
             idx_t j, ln, rn, n;
 
             /* Guaranteed to be.  Unlikely, but ...  */
@@ -4138,10 +4153,12 @@ dfamust (struct dfa const *d)
           break;
 
         case PLUS:
+          assume_nonnull (mp);
           mp->is[0] = '\0';
           break;
 
         case END:
+          assume_nonnull (mp);
           assert (!mp->prev);
           for (idx_t i = 0; mp->in[i] != NULL; i++)
             if (strlen (mp->in[i]) > strlen (result))
@@ -4159,7 +4176,9 @@ dfamust (struct dfa const *d)
         case CAT:
           {
             must *rmp = mp;
+            assume_nonnull (rmp);
             must *lmp = mp = mp->prev;
+            assume_nonnull (lmp);
 
             /* In.  Everything in left, plus everything in
                right, plus concatenation of
@@ -4169,11 +4188,10 @@ dfamust (struct dfa const *d)
               {
                 idx_t lrlen = strlen (lmp->right);
                 idx_t rllen = strlen (rmp->left);
-                char *tp = xmalloc (lrlen + rllen);
+                char *tp = ximalloc (lrlen + rllen + 1);
+                memcpy (tp + lrlen, rmp->left, rllen + 1);
                 memcpy (tp, lmp->right, lrlen);
-                memcpy (tp + lrlen, rmp->left, rllen);
-                lmp->in = enlist (lmp->in, tp, lrlen + rllen);
-                free (tp);
+                lmp->in = enlistnew (lmp->in, tp);
               }
             /* Left-hand */
             if (lmp->is[0] != '\0')
