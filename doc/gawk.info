@@ -29140,8 +29140,8 @@ File: gawk.info,  Node: Extension Sample Read write array,  Next: Extension Samp
 17.7.9 Dumping and Restoring an Array
 -------------------------------------
 
-The 'rwarray' extension adds two functions, named 'writea()' and
-'reada()', as follows:
+The 'rwarray' extension adds four functions, named 'writea()',
+'reada()', 'writeall()' and 'readall()', as follows:
 
 '@load "rwarray"'
      This is how you load the extension.
@@ -29158,6 +29158,20 @@ The 'rwarray' extension adds two functions, named 'writea()' and
      argument.  It clears the array first.  Here too, the return value
      is one on success, or zero upon failure.
 
+'ret = writeall(file)'
+     This function takes a string argument, which is the name of the
+     file to which to dump the state of all variables.  Calling this
+     function is completely equivalent to calling 'writea(file,
+     SYMTAB)'.  It returns one on success, or zero upon failure
+
+'ret = writeall(file)'
+     This function takes a string argument, which is the name of the
+     file from which to read the contents of various global variables.
+     For each variable in the file, the data is loaded unless the
+     variable already exists.  If the variable already exists, the data
+     for that variable in the file is ignored.  It returns one on
+     success, or zero upon failure.
+
    The array created by 'reada()' is identical to that written by
 'writea()' in the sense that the contents are the same.  However, due to
 implementation issues, the array traversal order of the re-created array
@@ -29173,6 +29187,13 @@ written as native binary data.  Thus, arrays containing only string data
 can theoretically be dumped on systems with one byte order and restored
 on systems with a different one, but this has not been tried.
 
+   Note that the 'writeall()' and 'readall()' functions provide a
+mechanism for maintaining persistent state across repeated invocations
+of a program.  If, for example, a program calculates some statistics
+based on the data in a series of files, it could save state using
+'writeall()' after processing N files, and then reload the state using
+'readall()' when the N+1st file arrives to update the results.
+
    Here is an example:
 
      @load "rwarray"
@@ -29180,6 +29201,10 @@ on systems with a different one, but this has not been tried.
      ret = writea("arraydump.bin", array)
      ...
      ret = reada("arraydump.bin", array)
+     ...
+     ret = writeall("globalstate.bin")
+     ...
+     ret = readall("globalstate.bin")
 
 
 File: gawk.info,  Node: Extension Sample Readfile,  Next: Extension Sample Time,  Prev: Extension Sample Read write array,  Up: Extension Samples
@@ -38012,6 +38037,8 @@ Index
                                                               (line  18)
 * readable data files, checking:         File Checking.       (line   6)
 * readable.awk program:                  File Checking.       (line  11)
+* readall() extension function:          Extension Sample Read write array.
+                                                              (line  30)
 * readdir extension:                     Extension Sample Readdir.
                                                               (line   9)
 * readfile() extension function:         Extension Sample Readfile.
@@ -38725,6 +38752,8 @@ Index
 * words, usage counts, generating:       Word Sorting.        (line   6)
 * writea() extension function:           Extension Sample Read write array.
                                                               (line  12)
+* writeall() extension function:         Extension Sample Read write array.
+                                                              (line  24)
 * xgettext utility:                      String Extraction.   (line  13)
 * xor:                                   Bitwise Functions.   (line  58)
 * XOR bitwise operation:                 Bitwise Functions.   (line   6)
@@ -39259,92 +39288,92 @@ Ref: table-readdir-file-types1175318
 Node: Extension Sample Revout1176386
 Node: Extension Sample Rev2way1176975
 Node: Extension Sample Read write array1177715
-Node: Extension Sample Readfile1179657
-Node: Extension Sample Time1180752
-Node: Extension Sample API Tests1182504
-Node: gawkextlib1182996
-Node: Extension summary1185914
-Node: Extension Exercises1189616
-Node: Language History1190858
-Node: V7/SVR3.11192514
-Node: SVR41194666
-Node: POSIX1196100
-Node: BTL1197481
-Node: POSIX/GNU1198210
-Node: Feature History1203988
-Node: Common Extensions1221163
-Node: Ranges and Locales1222446
-Ref: Ranges and Locales-Footnote-11227062
-Ref: Ranges and Locales-Footnote-21227089
-Ref: Ranges and Locales-Footnote-31227324
-Node: Contributors1227547
-Node: History summary1233544
-Node: Installation1234924
-Node: Gawk Distribution1235868
-Node: Getting1236352
-Node: Extracting1237315
-Node: Distribution contents1238953
-Node: Unix Installation1246014
-Node: Quick Installation1246818
-Node: Compiling with MPFR1249238
-Node: Shell Startup Files1249928
-Node: Additional Configuration Options1251017
-Node: Configuration Philosophy1253332
-Node: Compiling from Git1255728
-Node: Building the Documentation1256283
-Node: Non-Unix Installation1257667
-Node: PC Installation1258127
-Node: PC Binary Installation1258965
-Node: PC Compiling1259838
-Node: PC Using1260955
-Node: Cygwin1264508
-Node: MSYS1265732
-Node: VMS Installation1266334
-Node: VMS Compilation1267053
-Ref: VMS Compilation-Footnote-11268282
-Node: VMS Dynamic Extensions1268340
-Node: VMS Installation Details1270025
-Node: VMS Running1272287
-Node: VMS GNV1276566
-Node: Bugs1277280
-Node: Bug definition1278192
-Node: Bug address1281128
-Node: Usenet1284516
-Node: Performance bugs1285705
-Node: Asking for help1288626
-Node: Maintainers1290593
-Node: Other Versions1291787
-Node: Installation summary1299951
-Node: Notes1301315
-Node: Compatibility Mode1302109
-Node: Additions1302891
-Node: Accessing The Source1303816
-Node: Adding Code1305253
-Node: New Ports1311445
-Node: Derived Files1315820
-Ref: Derived Files-Footnote-11321480
-Ref: Derived Files-Footnote-21321515
-Ref: Derived Files-Footnote-31322113
-Node: Future Extensions1322227
-Node: Implementation Limitations1322885
-Node: Extension Design1324095
-Node: Old Extension Problems1325239
-Ref: Old Extension Problems-Footnote-11326757
-Node: Extension New Mechanism Goals1326814
-Ref: Extension New Mechanism Goals-Footnote-11330178
-Node: Extension Other Design Decisions1330367
-Node: Extension Future Growth1332480
-Node: Notes summary1333086
-Node: Basic Concepts1334244
-Node: Basic High Level1334925
-Ref: figure-general-flow1335207
-Ref: figure-process-flow1335893
-Ref: Basic High Level-Footnote-11339195
-Node: Basic Data Typing1339380
-Node: Glossary1342708
-Node: Copying1374595
-Node: GNU Free Documentation License1412138
-Node: Index1437258
+Node: Extension Sample Readfile1180881
+Node: Extension Sample Time1181976
+Node: Extension Sample API Tests1183728
+Node: gawkextlib1184220
+Node: Extension summary1187138
+Node: Extension Exercises1190840
+Node: Language History1192082
+Node: V7/SVR3.11193738
+Node: SVR41195890
+Node: POSIX1197324
+Node: BTL1198705
+Node: POSIX/GNU1199434
+Node: Feature History1205212
+Node: Common Extensions1222387
+Node: Ranges and Locales1223670
+Ref: Ranges and Locales-Footnote-11228286
+Ref: Ranges and Locales-Footnote-21228313
+Ref: Ranges and Locales-Footnote-31228548
+Node: Contributors1228771
+Node: History summary1234768
+Node: Installation1236148
+Node: Gawk Distribution1237092
+Node: Getting1237576
+Node: Extracting1238539
+Node: Distribution contents1240177
+Node: Unix Installation1247238
+Node: Quick Installation1248042
+Node: Compiling with MPFR1250462
+Node: Shell Startup Files1251152
+Node: Additional Configuration Options1252241
+Node: Configuration Philosophy1254556
+Node: Compiling from Git1256952
+Node: Building the Documentation1257507
+Node: Non-Unix Installation1258891
+Node: PC Installation1259351
+Node: PC Binary Installation1260189
+Node: PC Compiling1261062
+Node: PC Using1262179
+Node: Cygwin1265732
+Node: MSYS1266956
+Node: VMS Installation1267558
+Node: VMS Compilation1268277
+Ref: VMS Compilation-Footnote-11269506
+Node: VMS Dynamic Extensions1269564
+Node: VMS Installation Details1271249
+Node: VMS Running1273511
+Node: VMS GNV1277790
+Node: Bugs1278504
+Node: Bug definition1279416
+Node: Bug address1282352
+Node: Usenet1285740
+Node: Performance bugs1286929
+Node: Asking for help1289850
+Node: Maintainers1291817
+Node: Other Versions1293011
+Node: Installation summary1301175
+Node: Notes1302539
+Node: Compatibility Mode1303333
+Node: Additions1304115
+Node: Accessing The Source1305040
+Node: Adding Code1306477
+Node: New Ports1312669
+Node: Derived Files1317044
+Ref: Derived Files-Footnote-11322704
+Ref: Derived Files-Footnote-21322739
+Ref: Derived Files-Footnote-31323337
+Node: Future Extensions1323451
+Node: Implementation Limitations1324109
+Node: Extension Design1325319
+Node: Old Extension Problems1326463
+Ref: Old Extension Problems-Footnote-11327981
+Node: Extension New Mechanism Goals1328038
+Ref: Extension New Mechanism Goals-Footnote-11331402
+Node: Extension Other Design Decisions1331591
+Node: Extension Future Growth1333704
+Node: Notes summary1334310
+Node: Basic Concepts1335468
+Node: Basic High Level1336149
+Ref: figure-general-flow1336431
+Ref: figure-process-flow1337117
+Ref: Basic High Level-Footnote-11340419
+Node: Basic Data Typing1340604
+Node: Glossary1343932
+Node: Copying1375819
+Node: GNU Free Documentation License1413362
+Node: Index1438482
 
 End Tag Table
 

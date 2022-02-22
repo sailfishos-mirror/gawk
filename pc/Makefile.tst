@@ -235,6 +235,7 @@ SHLIB_TESTS = \
 	getfile \
 	inplace1 inplace2 inplace2bcomp inplace3 inplace3bcomp \
 	ordchr ordchr2 \
+	readall \
 	readdir readdir_test readdir_retest readfile readfile2 revout \
 	revtwoway rwarray \
 	testext time
@@ -347,7 +348,8 @@ EXPECTED_FAIL_ZOS = \
 GENTESTS_UNUSED = Makefile.in checknegtime.awk dtdgport.awk fix-fmtspcl.awk \
 	fmtspcl-mpfr.ok fmtspcl.awk fmtspcl.tok gtlnbufv.awk hello.awk \
 	inchello.awk inclib.awk inplace.1.in inplace.2.in inplace.in \
-	printfloat.awk readdir0.awk valgrind.awk xref.awk
+	printfloat.awk readdir0.awk valgrind.awk xref.awk \
+	readall1.awk readall2.awk
 
 
 # List of tests on MinGW or DJGPP that need a different cmp program
@@ -1027,7 +1029,7 @@ inplace3bcomp::
 
 testext::
 	@echo $@
-	@-$(AWK) ' /^(@load|BEGIN)/,/^}/' "$(top_srcdir)"/extension/testext.c > testext.awk
+	@-$(AWK) ' /^(@load|BEGIN|function)/,/^}/' "$(top_srcdir)"/extension/testext.c > testext.awk
 	@-$(AWK) -f ./testext.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -e '-M|--bignum' > /dev/null; \
 	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; \
@@ -1064,6 +1066,13 @@ readdir_retest:
 	@-$(AWK) -lreaddir -F$(SLASH) -f "$(srcdir)"/$@.awk "$(top_srcdir)" > $@.ok
 	@-$(AWK) -lreaddir_test -F$(SLASH) -f "$(srcdir)"/$@.awk "$(top_srcdir)" > _$@
 	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
+
+readall:
+	@echo $@
+	@-$(AWK) -lrwarray -f "$(srcdir)"/$@1.awk -v "ofile=readall.state" > _$@
+	@-$(AWK) -lrwarray -f "$(srcdir)"/$@2.awk -v "ifile=readall.state" >> _$@
+	@-$(CMP) $@.ok _$@ && rm -f _$@
+	@-$(RM) -f readall.state
 
 fts:
 	@echo $@
@@ -3697,7 +3706,11 @@ diffout:
 		if [ "$$i" != "_*" ]; then \
 		echo ============== $$i ============= ; \
 		base=`echo $$i | sed 's/^_//'` ; \
-		if [ -r $${base}.ok ]; then \
+		if echo "$$GAWK_TEST_ARGS" | egrep -e '-M|--bignum' > /dev/null && [ -r $${base}-mpfr.ok ]; then \
+		diff -u $${base}-mpfr.ok $$i ; \
+		elif echo "$$GAWK_TEST_ARGS" | egrep -e '-M|--bignum' > /dev/null && [ -r "$(srcdir)"/$${base}-mpfr.ok ]; then \
+		diff -u "$(srcdir)"/$${base}-mpfr.ok $$i ; \
+		elif [ -r $${base}.ok ]; then \
 		diff -u $${base}.ok $$i ; \
 		else \
 		diff -u "$(srcdir)"/$${base}.ok  $$i ; \
