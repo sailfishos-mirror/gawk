@@ -1173,7 +1173,7 @@ r_get_lhs(NODE *n, bool reference)
 		break;
 
 	default:
-		cant_happen();
+		cant_happen("unexpected variable type %s", nodetype2str(n->type));
 	}
 
 	if (do_lint && reference && var_uninitialized(n))
@@ -1347,7 +1347,7 @@ setup_frame(INSTRUCTION *pc)
 			break;
 
 		default:
-			cant_happen();
+			cant_happen("unexpected parameter type %s", nodetype2str(m->type));
 		}
 		r->vname = fp[i].param;
 	}
