@@ -256,6 +256,8 @@ do_fflush(int nargs)
 	}
 
 	tmp = POP_STRING();
+	if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
+		lintwarn(_("%s: received non-string argument"), "fflush");
 	file = tmp->stptr;
 	len = tmp->stlen;
 
@@ -405,9 +407,9 @@ do_index(int nargs)
 	POP_TWO_SCALARS(s1, s2);
 
 	if (do_lint) {
-		if ((fixtype(s1)->flags & STRING) == 0)
+		if ((fixtype(s1)->flags & (STRING|USER_INPUT)) == 0)
 			lintwarn(_("%s: received non-string first argument"), "index");
-		if ((fixtype(s2)->flags & STRING) == 0)
+		if ((fixtype(s2)->flags & (STRING|USER_INPUT)) == 0)
 			lintwarn(_("%s: received non-string second argument"), "index");
 	}
 
@@ -591,7 +593,7 @@ do_length(int nargs)
 
 	assert(tmp->type == Node_val);
 
-	if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
+	if (do_lint && (fixtype(tmp)->flags & (STRING|USER_INPUT)) == 0)
 		lintwarn(_("%s: received non-string argument"), "length");
 	tmp = force_string(tmp);
 
@@ -1722,6 +1724,8 @@ printf_common(int nargs)
 	}
 
 	args_array[0] = force_string(args_array[0]);
+	if (do_lint && (fixtype(args_array[0])->flags & STRING) == 0)
+		lintwarn(_("%s: received non-string format string argument"), "printf/sprintf");
 	r = format_tree(args_array[0]->stptr, args_array[0]->stlen, args_array, nargs);
 	for (i = 0; i < nargs; i++)
 		DEREF(args_array[i]);
@@ -1852,15 +1856,21 @@ do_substr(int nargs)
 
 	if (nargs == 3) {
 		t1 = POP_NUMBER();
+		if (do_lint && (fixtype(t1)->flags & NUMBER) == 0)
+			lintwarn(_("%s: received non-numeric third argument"), "substr");
 		d_length = get_number_d(t1);
 		DEREF(t1);
 	}
 
 	t1 = POP_NUMBER();
+	if (do_lint && (fixtype(t1)->flags & NUMBER) == 0)
+		lintwarn(_("%s: received non-numeric second argument"), "substr");
 	d_index = get_number_d(t1);
 	DEREF(t1);
 
 	t1 = POP_STRING();
+	if (do_lint && (fixtype(t1)->flags & (STRING|USER_INPUT)) == 0)
+		lintwarn(_("%s: received non-string first argument"), "substr");
 
 	if (nargs == 3) {
 		if (! (d_length >= 1)) {
@@ -2022,7 +2032,7 @@ do_strftime(int nargs)
 		unref(sub);
 
 		if (val != NULL) {
-			if (do_lint && (fixtype(val)->flags & STRING) == 0)
+			if (do_lint && (fixtype(val)->flags & (STRING|USER_INPUT)) == 0)
 				lintwarn(_("strftime: format value in PROCINFO[\"strftime\"] has numeric type"));
 			val = force_string(val);
 			format = val->stptr;
@@ -2037,6 +2047,7 @@ do_strftime(int nargs)
 		if (nargs == 3) {
 			t3 = POP_SCALAR();
 			do_gmt = boolval(t3);
+			// no lint check, we allow number or string to give us a boolean value
 			DEREF(t3);
 		}
 
@@ -2748,6 +2759,8 @@ do_match(int nargs)
 	tre = POP();
 	rp = re_update(tre);
 	t1 = POP_STRING();
+	if (do_lint && (fixtype(t1)->flags & (STRING|USER_INPUT)) == 0)
+		lintwarn(_("%s: received non-string first argument"), "match");
 
 	rstart = research(rp, t1->stptr, 0, t1->stlen, RE_NEED_START);
 	if (rstart >= 0) {	/* match succeded */
@@ -3946,6 +3959,8 @@ do_dcgettext(int nargs)
 
 	if (nargs == 3) {	/* third argument */
 		tmp = POP_STRING();
+		if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string third argument"), "dcgettext");
 		lc_cat = localecategory_from_argument(tmp);
 		DEREF(tmp);
 	} else
@@ -3953,6 +3968,8 @@ do_dcgettext(int nargs)
 
 	if (nargs >= 2) {  /* second argument */
 		t2 = POP_STRING();
+		if (do_lint && (fixtype(t2)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string second argument"), "dcgettext");
 		domain = t2->stptr;
 		str_terminate(t2, save2);
 	} else
@@ -3960,15 +3977,21 @@ do_dcgettext(int nargs)
 #else
 	if (nargs == 3) {
 		tmp = POP_STRING();
+		if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string third argument"), "dcgettext");
 		DEREF(tmp);
 	}
 	if (nargs >= 2) {
 		t2 = POP_STRING();
+		if (do_lint && (fixtype(t2)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string second argument"), "dcgettext");
 		DEREF(t2);
 	}
 #endif
 
 	t1 = POP_STRING();	/* first argument */
+	if (do_lint && (fixtype(t1)->flags & STRING) == 0)
+		lintwarn(_("%s: received non-string first argument"), "dcgettext");
 	string = t1->stptr;
 
 #if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT
@@ -4009,6 +4032,8 @@ do_dcngettext(int nargs)
 
 	if (nargs == 5) {	/* fifth argument */
 		tmp = POP_STRING();
+		if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string fifth argument"), "dcngettext");
 		lc_cat = localecategory_from_argument(tmp);
 		DEREF(tmp);
 	} else
@@ -4017,6 +4042,8 @@ do_dcngettext(int nargs)
 	t3 = NULL;
 	if (nargs >= 4) {	/* fourth argument */
 		t3 = POP_STRING();
+		if (do_lint && (fixtype(t3)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string fourth argument"), "dcngettext");
 		domain = t3->stptr;
 		save = domain[t3->stlen];
 		domain[t3->stlen] = '\0';
@@ -4026,22 +4053,32 @@ do_dcngettext(int nargs)
 #else
 	if (nargs == 5) {
 		tmp = POP_STRING();
+		if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string fifth argument"), "dcngettext");
 		DEREF(tmp);
 	}
 	if (nargs >= 4) {
 		t3 = POP_STRING();
+		if (do_lint && (fixtype(t3)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string fourth argument"), "dcngettext");
 		DEREF(t3);
 	}
 #endif
 
 	t2 = POP_NUMBER();	/* third argument */
+	if (do_lint && (fixtype(t2)->flags & NUMBER) == 0)
+		lintwarn(_("%s: received non-numeric third argument"), "dcngettext");
 	d = get_number_d(t2);
 	DEREF(t2);
 
 	number = (unsigned long) double_to_int(d);
 	t2 = POP_STRING();	/* second argument */
+	if (do_lint && (fixtype(t2)->flags & STRING) == 0)
+		lintwarn(_("%s: received non-string second argument"), "dcngettext");
 	string2 = t2->stptr;
 	t1 = POP_STRING();	/* first argument */
+	if (do_lint && (fixtype(t1)->flags & STRING) == 0)
+		lintwarn(_("%s: received non-string first argument"), "dcngettext");
 	string1 = t1->stptr;
 
 #if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT
@@ -4098,6 +4135,8 @@ do_bindtextdomain(int nargs)
 
 	if (nargs == 2) {	/* second argument */
 		t2 = POP_STRING();
+		if (do_lint && (fixtype(t2)->flags & STRING) == 0)
+			lintwarn(_("%s: received non-string second argument"), "bindtextdomain");
 		domain = (const char *) t2->stptr;
 		save = t2->stptr[t2->stlen];
 		t2->stptr[t2->stlen] = '\0';
@@ -4105,6 +4144,8 @@ do_bindtextdomain(int nargs)
 
 	/* first argument */
 	t1 = POP_STRING();
+	if (do_lint && (fixtype(t1)->flags & STRING) == 0)
+		lintwarn(_("%s: received non-string first argument"), "bindtextdomain");
 	if (t1->stlen > 0) {
 		directory = (const char *) t1->stptr;
 		str_terminate(t1, save1);
