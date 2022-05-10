@@ -156,7 +156,7 @@ static void merge_comments(INSTRUCTION *c1, INSTRUCTION *c2);
 static INSTRUCTION *make_braced_statements(INSTRUCTION *lbrace, INSTRUCTION *stmts, INSTRUCTION *rbrace);
 static void add_sign_to_num(NODE *n, char sign);
 
-static bool at_seen = false;
+static int at_seen = 0;
 static bool want_source = false;
 static bool want_namespace = false;
 static bool want_regexp = false;	/* lexical scanning kludge */
@@ -2056,7 +2056,7 @@ yyreduce:
 #line 301 "awkgram.y"
           {
 		want_source = false;
-		at_seen = false;
+		at_seen--;
 		if (yyvsp[-1] != NULL && yyvsp[0] != NULL) {
 			SRCFILE *s = (SRCFILE *) yyvsp[-1];
 			s->comment = yyvsp[0];
@@ -2070,7 +2070,7 @@ yyreduce:
 #line 311 "awkgram.y"
           {
 		want_source = false;
-		at_seen = false;
+		at_seen--;
 		if (yyvsp[-1] != NULL && yyvsp[0] != NULL) {
 			SRCFILE *s = (SRCFILE *) yyvsp[-1];
 			s->comment = yyvsp[0];
@@ -2097,7 +2097,7 @@ yyreduce:
 
 		want_source = false;
 		want_namespace = false;
-		at_seen = false;
+		at_seen--;
 
 		// this frees $3 storage in all cases
 		set_namespace(yyvsp[-1], yyvsp[0]);
@@ -2328,7 +2328,7 @@ yyreduce:
 #line 505 "awkgram.y"
           {
 		yyval = yyvsp[0];
-		at_seen = false;
+		at_seen--;
 	  }
 #line 2334 "awkgram.c"
     break;
@@ -4297,7 +4297,7 @@ regular_print:
 		 */
 
 		yyval = list_prepend(yyvsp[0], t);
-		at_seen = false;
+		at_seen--;
 	  }
 #line 4303 "awkgram.c"
     break;
@@ -6299,7 +6299,7 @@ retry:
 			goto collect_regexp;
 		}
 		pushback();
-		at_seen = true;
+		at_seen++;
 		return lasttok = '@';
 
 	case '\\':
@@ -6913,7 +6913,7 @@ retry:
 				/* regular code */
 				break;
 			default:
-				cant_happen();
+				cant_happen("bad value %d for want_param_names", (int) want_param_names);
 				break;
 			}
 		}
@@ -8872,7 +8872,7 @@ list_append(INSTRUCTION *l, INSTRUCTION *x)
 {
 #ifdef GAWKDEBUG
 	if (l->opcode != Op_list)
-		cant_happen();
+		cant_happen("unexpected value %s for opcode", opcode2str(l->opcode));
 #endif
 	l->lasti->nexti = x;
 	l->lasti = x;
@@ -8884,7 +8884,7 @@ list_prepend(INSTRUCTION *l, INSTRUCTION *x)
 {
 #ifdef GAWKDEBUG
 	if (l->opcode != Op_list)
-		cant_happen();
+		cant_happen("unexpected value %s for opcode", opcode2str(l->opcode));
 #endif
 	x->nexti = l->nexti;
 	l->nexti = x;
@@ -8896,9 +8896,9 @@ list_merge(INSTRUCTION *l1, INSTRUCTION *l2)
 {
 #ifdef GAWKDEBUG
 	if (l1->opcode != Op_list)
-		cant_happen();
+		cant_happen("unexpected value %s for opcode", opcode2str(l1->opcode));
 	if (l2->opcode != Op_list)
-		cant_happen();
+		cant_happen("unexpected value %s for opcode", opcode2str(l2->opcode));
 #endif
 	l1->lasti->nexti = l2->nexti;
 	l1->lasti = l2->lasti;
@@ -9184,7 +9184,7 @@ merge_comments(INSTRUCTION *c1, INSTRUCTION *c2)
 	}
 
 	if (c2 != NULL) {
-		strcat(buffer, "\n");
+		// strcat(buffer, "\n");
 		strcat(buffer, c2->memory->stptr);
 		if (c2->comment != NULL) {
 			strcat(buffer, "\n");

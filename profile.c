@@ -373,8 +373,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 				break;
 
 			default:
-				fprintf(stderr, "Got unexpected type %s\n", nodetype2str(m->type));
-				cant_happen();
+				cant_happen("got unexpected type %s", nodetype2str(m->type));
 			}
 
 			switch (pc->opcode) {
@@ -581,7 +580,7 @@ cleanup:
 
 		case Op_K_delete_loop:
 			/* Efficency hack not in effect because of exec_count instruction */
-			cant_happen();
+			cant_happen("unexpected opcode %s", opcode2str(pc->opcode));
 			break;
 
 		case Op_in_array:
@@ -669,7 +668,7 @@ cleanup:
 		case Op_K_print_rec:
 			if (pc->opcode == Op_K_print_rec)
 				// instead of `print $0', just `print'
-				tmp = strdup("");
+				tmp = estrdup("", 0);
 			else if (pc->redir_type != 0) {
 				// Avoid turning printf("hello\n") into printf(("hello\n"))
 				NODE *n = pp_top();
@@ -679,7 +678,7 @@ cleanup:
 				    && n->pp_str[n->pp_len - 1] == ')') {
 					n = pp_pop();
 
-					tmp = strdup(n->pp_str);
+					tmp = estrdup(n->pp_str, strlen(n->pp_str));
 					pp_free(n);
 				} else
 					tmp = pp_list(pc->expr_count, "()", ", ");
@@ -999,9 +998,11 @@ cleanup:
 			fprintf(prof_fp, "%s (", op2str(pc->opcode));
 			pprint(pc->nexti, ip1->switch_start, NO_PPRINT_FLAGS);
 			t1 = pp_pop();
-			fprintf(prof_fp, "%s) {\n", t1->pp_str);
+			fprintf(prof_fp, "%s) {", t1->pp_str);
 			if (pc->comment)
 				print_comment(pc->comment, 0);
+			else
+				fprintf(prof_fp, "\n");
 			pp_free(t1);
 			pprint(ip1->switch_start, ip1->switch_end, NO_PPRINT_FLAGS);
 			indent(SPACEOVER);
@@ -1023,9 +1024,11 @@ cleanup:
 
 			indent_in();
 			if (pc->comment != NULL) {
-				if (pc->comment->memory->comment_type == EOL_COMMENT)
+				if (pc->comment->memory->comment_type == EOL_COMMENT) {
 					fprintf(prof_fp, "\t%s", pc->comment->memory->stptr);
-				else {
+					if (pc->comment->comment != NULL)
+						print_comment(pc->comment->comment, indent_level);
+				} else {
 					fprintf(prof_fp, "\n");
 					print_comment(pc->comment, indent_level);
 				}
@@ -1219,7 +1222,7 @@ cleanup:
 			break;
 
 		default:
-			cant_happen();
+			cant_happen("unexpected opcode %s", opcode2str(pc->opcode));
 		}
 
 		if (pc == endp)

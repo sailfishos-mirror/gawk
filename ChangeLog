@@ -1,3 +1,106 @@
+2022-05-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkbug.in: Add attestation for having read bug reporting
+	section in the manual. (Yes, I'm pretty paranoid.)
+
+2022-05-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (deprecate_mpfr): New function.
+	(parse_args): Call it for -M.
+
+2022-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Disallow SYMTAB["x"]["y"]. Reported by Jason C. Kwan.
+
+	* interpret.h (r_interpret): Add checks at Op_sub_array case.
+
+	Unrelated. Fix MPFR mode unary minus applied to a variable with
+	a zero MPG value. Also reported by Jason C. Kwan.
+
+	* mpfr.c (mpg_interpret): Fix Op_unary_minus to create an
+	MPFR -0 value. MPG doesn't distinguish negative zero from
+	positive zero.
+
+2022-04-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix some profiling issues related to comments in switch / case
+	statements.
+
+	* awkgram.y (merge_comments): Remove newline between comments being
+	merged.
+	* profile.c (pprint): Improve code for Op_K_switch, Op_K_case.
+
+2022-04-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkbug.in: Small changes.
+
+2022-04-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Small fix from the persistent-gawk guys.
+
+	* profile.c (pprint): Use estrdup instead of strdup.
+
+2022-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Allow nested indirect function calls. Thanks to
+	Kaz Kylheku <kaz@kylheku.com> for the report.
+
+	* awkgram.y (at_seen): Turn into an int that is incremented
+	and decremented as appropriate.
+
+2022-03-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Make lint checks for builtin functions smarter. Initial
+	report from Timothy Sample <samplet@ngyro.com>.
+
+	* builtin.c (do_fflush): Require string type.
+	(printf_common): Ditto.
+	(do_index): Allow strnum for both arguments.
+	(do_length): Ditto.
+	(do_strftime): Ditto.
+	(do_substr): Require numbers for arguments 2 and 3, string or
+	strnum for argument 1.
+	(do_match): Require string or strnum for argument 1.
+	(do_dcgettext): Require strings for all arguments.
+	(do_bindtextdomain): Ditto.
+	(do_dcngettext): Require strings for arguments 5, 4, 2, and 1, and
+	number for argument 3.
+
+2022-03-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated.
+
+2022-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (usage): Update the message for the gawkbug program.
+
+2022-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Add `gawkbug' reporting program.
+
+	* gawkbug.in: New file.
+	* Makefile.am (bin_SCRIPTS): New, for  gawkbug.
+	* configure.ac: Add gawkbug to AC_CONFIG_FILES list.
+	* NEWS: Updated.
+	* .gitignore: Updated.
+
+2022-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (cant_happen): Change to allow a format string and arguments,
+	in order to provide a clue as to what went wrong, and not just
+	print "internal error".
+	* awkgram.y, debug.c, eval.c, interpret.h, io.c, main.c, mpfr.c,
+	profile.c, re.c, symbol.c: Fix all uses of cant_happen().
+
+2022-02-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Memory issues with MPFR, fix part 2. (Part 1 is in the
+	extension directory.)
+
+	* gawkapi.c (awk_value_to_node): Clear the GMP/MPFR values
+	returned from the C extension after setting the internal
+	variable.
+	
 2022-02-22         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Enable interval expressions even for --traditional, as BWK

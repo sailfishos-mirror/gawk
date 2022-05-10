@@ -56,7 +56,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Ottobre 2021
+@set UPDATE-MONTH Aprile 2022
 @set VERSION 5.1
 @set PATCHLEVEL 1
 
@@ -316,7 +316,7 @@ Some comments on the layout for TeX.
 Tel.: +1-617-542-5942 Fax: +1-617-542-2652 Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="https://www.gnu.org">https://www.gnu.org/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2021
+<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2022
 Free Software Foundation, Inc.
 All Rights Reserved.
 </literallayout>
@@ -346,7 +346,7 @@ All Rights Reserved.
 
 @ifnotdocbook
 @iftex
-Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2021 @*
+Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2022 @*
 Free Software Foundation, Inc.
 @end iftex
 @end ifnotdocbook
@@ -431,7 +431,7 @@ URL: @uref{https://www.gnu.org/}
 @c This one is correct for gawk 3.1.0 from the FSF
 ISBN 1-882114-28-0
 @sp 0
-Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2018 @*
+Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2022 @*
 Free Software Foundation, Inc.
 @sp 1
 Traduzione e revisione:@*
@@ -2330,12 +2330,12 @@ aiuta a contenere la distribuzione @command{gawk} entro dimensioni gestibili.
 L'iniziale raccolta di materiale, cos@`{@dotless{i}} com'@`e, @`e tuttora disponibile
 su @uref{ftp://ftp.freefriends.org/arnold/Awkstuff}.
 
-Nella speranza di fare qualcosa di pi@`u generale, ho acuisito il dominio
+Nella speranza di fare qualcosa di pi@`u generale, ho acquisito il dominio
 @code{awklang.org}.  A fine anno 2017 un volontario si @`e assunto il compito
 di gestirlo.
 
-Se qualcuno ha scritto un programma @command{awk} interessante, o
-un'estensione a @command{gawk} che vuole condividere col resto del mondo,
+Se qualcuno ha scritto un programma @command{awk} interessante,
+che vuole condividere col resto del mondo,
 @`e invitato a consultare la pagina @uref{http://www.awklang.org} e a usare
 il puntatore ``Contact''.
 
@@ -3962,7 +3962,7 @@ e per ordinare dei vettori.
 
 Nel seguito della presentazione del linguaggio @command{awk}, saranno
 introdotte molte delle variabili e parecchie funzioni.  Esse sono
-descritte sistematicamente in @ref{Variabili predefinite} e in
+descritte sistematicamente nella @ref{Variabili predefinite} e nel
 @ref{Funzioni}.
 
 @node Quando
@@ -4429,7 +4429,12 @@ Analizza il programma sorgente e
 genera un file GNU @command{gettext} @dfn{portable object template} sullo
 standard output per tutte le costanti di tipo stringa che sono state marcate
 come da tradurre.
+@iftex
+@xrefil{Internazionalizzazione},
+@end iftex
+@ifnottex
 @xref{Internazionalizzazione},
+@end ifnottex
 per informazioni su quest'opzione.
 
 @item @option{-h}
@@ -4499,7 +4504,7 @@ fornito per default, perci@`o non @`e necessario specificarlo nel nome
 dell'estensione.  La routine di inizializzazione dell'estensione dovrebbe
 essere denominata @code{dl_load()}.  Un'alternativa @`e quella di usare la
 direttiva @code{@@load} all'interno del programma per caricare una libreria
-condivisa.  Questa funzionalit@`a avanzata @`e descritta in dettaglio in
+condivisa.  Questa funzionalit@`a avanzata @`e descritta in dettaglio nel
 @ref{Estensioni dinamiche}.
 
 @item @option{-L}[@var{valore}]
@@ -4549,8 +4554,21 @@ brevi, questa non @`e un'operazione gravosa.
 @cindex opzione @subentry @option{--bignum}
 Chiede il calcolo con precisione arbitraria sui numeri.  Quest'opzione non ha
 alcun effetto se @command{gawk} non @`e compilato per l'uso delle librerie GNU
-MPFR e MP
+MPFR ed MP
+@iftex
+(@pxrefil{Calcolo con precisione arbitraria}).
+@end iftex
+@ifnottex
 (@pxref{Calcolo con precisione arbitraria}).
+@end ifnottex
+
+A partire dalla @value{PVERSION} 5.2,
+le funzionalit@`a di calcolo con precisione arbitraria in @command{gawk}
+sono @emph{deprecate}.  Tali funzionalit@`a saranno rimosse da @command{gawk}
+nel 2024.
+Se si utilizza quest'opzione, @command{gawk} genera un messaggio di
+avvertimento.  Per evitare di ricevere il messaggio, si definisca la
+variabile d'ambiente @env{GAWK_NO_MPFR_WARN} con un valore qualsiasi.
 
 @item @option{-n}
 @itemx @option{--non-decimal-data}
@@ -5204,6 +5222,11 @@ in millisecondi.  Sui sistemi che non prevedono
 la chiamata di sistema @code{usleep()},
 il valore @`e arrotondato a un numero intero di secondi .
 
+@item GAWK_NO_MPFR_WARN
+Specifica che @command{gawk} non deve stampare un avviso
+di deprecazione quando viene usato specificando l'opzione
+@option{-M} o @option{--bignum}.
+
 @item GAWK_READ_TIMEOUT
 Specifica per quanto tempo, in millisecondi, @command{gawk}
 aspetta l'input prima di emettere un messaggio di errore.
@@ -5754,7 +5777,7 @@ comando  @option{-i} e @option{-f}.
 @item
 @command{gawk} consente di caricare funzioni aggiuntive scritte in C
 o C++ con la direttiva @code{@@load} e/o con l'opzione @option{-l}
-(questa funzionalit@`a avanzata @`e descritta pi@`u avanti, in
+(questa funzionalit@`a avanzata @`e descritta pi@`u avanti, nel
 @ref{Estensioni dinamiche}).
 @end itemize
 @node Espressioni regolari
@@ -6440,12 +6463,13 @@ Quando @samp{@{} e @samp{@}} appaiono in costanti @dfn{regexp}
 in un modo non interpretabile come espressione di intervallo
 (come in @code{/q@{a@}/}), allora sono prese letteralmente.
 
+@cindex Brian Kernighan @subentry @command{awk} di @subentry espressioni di intervallo in
 Come detto sopra, le espressioni di intervallo non erano tradizionalmente
-disponibili in @command{awk}.  Con la versione di Marzo 2019 di
+disponibili in @command{awk}.  Con la versione di marzo 2019 di
 BWK @command{awk} sono (finalmente) disponibili.
-Ciononostante, non essendo state disponibili per parecchi decenni,
-@command{gawk} continua a non renderle disponibili quando viene
-eseguito in modalit@`a compatibile (@pxref{Opzioni}).
+A partire dalla @value{PVERSION} 5.2 l'opzione @option{--traditional}
+di @command{gawk} non disabilita pi@`u le espressioni di intervallo
+contenute in espressioni regolari.
 
 POSIX afferma che espressioni di intervallo che contengano
 contatori di ripetizione maggiori di 255 producono risultati
@@ -7009,17 +7033,16 @@ Le espressioni di intervallo sono ammesse.
 @cindex Brian Kernighan @subentry @command{awk} di
 @item @option{--traditional}
 Le @dfn{regexp} Unix tradizionali di @command{awk} sono ammesse.  Gli
-operatori GNU non sono speciali, e le espressioni
-di intervallo non sono ammesse.
-Le classi di caratteri POSIX (@samp{[[:alnum:]]}, etc.) sono ammesse,
-poich@'e BWK @command{awk} le prevede.
+operatori GNU non sono speciali.  Poich@'e sono supportate anche da
+BWK @command{awk},
+le classi di caratteri POSIX (@samp{[[:alnum:]]}, etc.) sono disponibili.
+Quindi, anche le espressioni di intervallo sono consentite.
 I caratteri descritti usando sequenze di protezione ottali ed esadecimali sono
 trattati letteralmente, anche se rappresentano metacaratteri di @dfn{regexp}.
 
 @item @option{--re-interval}
-Sono consentite espressioni di intervallo in @dfn{regexp},
-se @option{--traditional} @`e stata specificata.
-Altrimenti, le espressioni di intervallo sono disponibili per default.
+Quest'opzione rimane specificabile per compatibilit@`a all'indietro,
+ma non ha in pratica alcun effetto.
 @end table
 
 @node Maiuscolo-Minuscolo
@@ -9947,14 +9970,16 @@ significa che non @`e possibile usarlo per ottenere input multipli,
 provenienti da due o pi@`u sorgenti.  @xref{Proseguire dopo errore in input}
 per una modalit@`a che consente di tentare ulteriori operazioni di I/O.
 
-Assegnare un valore di tempo limite previene un blocco a tempo indeterminato
-legato a operazioni di lettura.  Si tenga per@`o presente che ci sono altre
+Assegnare un valore di tempo limite previene, per le operazioni di lettura,
+un [possibile] blocco a tempo indeterminato.
+Si tenga per@`o presente che ci sono altre
 situazioni in cui @command{gawk} pu@`o restare bloccato in attesa che un
 dispositivo di input sia pronto.  Un cliente di rete a volte pu@`o impiegare
 molto tempo per stabilire una
 connessione prima di poter iniziare a leggere qualsiasi dato,
-oppure il tentativo di aprire un file speciale FIFO in lettura pu@`o bloccarsi
-indefinitamente in attesa che qualche altro processo lo apra in scrittura.
+oppure il tentativo di aprire un file speciale FIFO in lettura pu@`o rimanere
+bloccato indefinitamente in attesa che qualche altro processo lo apra in
+scrittura.
 
 @node Proseguire dopo errore in input
 @section Elaborare ulteriore input dopo certi errori di I/O
@@ -12002,7 +12027,13 @@ numero intero, una frazione decimale o un numero in notazione scientifica
 (esponenziale).@footnote{La rappresentazione interna di tutti i numeri,
 compresi gli interi, usa numeri in virgola mobile a doppia precisione.
 Sui sistemi pi@`u moderni, questi sono nel formato standard IEEE 754.
-@xref{Calcolo con precisione arbitraria}, per maggiori informazioni.}
+@iftex
+@xrefil{Calcolo con precisione arbitraria},
+@end iftex
+@ifnottex
+@xref{Calcolo con precisione arbitraria},
+@end ifnottex
+per maggiori informazioni.}
 Ecco alcuni esempi di costanti numeriche che hanno tutte lo stesso
 valore:
 
@@ -14117,7 +14148,7 @@ Una particolare posizione dove @code{/pippo/} @emph{non} @`e un'abbreviazione di
 @samp{$0 ~ /pippo/} @`e quella in cui @`e l'operando di destra di @samp{~} o
 @samp{!~}.
 @xref{Usare le costanti @dfn{regexp}},
-dove questo punto @`e trattato in maggiore dettaglio.
+dove questo punto @`e trattato in maggior dettaglio.
 
 @node Confronto POSIX di stringhe
 @subsubsection Confronto tra stringhe usando l'ordine di collazione locale
@@ -14412,7 +14443,13 @@ definire delle funzioni da usare nel proprio programma.
 @xref{Funzioni definite dall'utente}
 per istruzioni su come farlo.
 Infine, @command{gawk} permette di scrivere funzioni in C o in C++ che possono
-essere chiamate dal proprio programma (@pxref{Estensioni dinamiche}).
+essere chiamate dal proprio programma
+@iftex
+(@pxrefil{Estensioni dinamiche}).
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche}).
+@end ifnottex
 
 @cindex argomenti @subentry nelle chiamate di funzione
 Una funzione viene utilizzata invocandola tramite un'espressione di
@@ -14805,7 +14842,7 @@ Le chiamate di funzione restituiscono un valore che pu@`o essere usato come part
 di un'espressione pi@`u lunga.  Le espressioni usate per passare valori di
 parametro vengono valutate completamente prima di chiamare la funzione.
 @command{awk} fornisce funzioni predefinite e prevede quelle definite
-dall'utente; questo @`e descritto in
+dall'utente; questo @`e descritto nel
 @ref{Funzioni}.
 
 @item
@@ -16620,7 +16657,7 @@ costituito da un unico carattere.
 @cindex differenze tra @command{awk} e @command{gawk} @subentry variabile @code{LINT}
 @cindex @dfn{lint} @subentry controlli
 @cindex controllo @subentry @dfn{lint}
-@item LINT o
+@item LINT #
 Quando questa variabile @`e vera (non uguale a zero e non uguale alla stringa
 nulla), @command{gawk} si comporta come se fosse stata specificata sulla
 riga di comando l'opzione @option{--lint}
@@ -17129,7 +17166,12 @@ I seguenti elementi addizionali del vettore
 sono disponibili per fornire informazioni sulle librerie MPFR e GMP,
 se la versione in uso di @command{gawk} consente il calcolo con precisione
 arbitraria
+@iftex
+(@pxrefil{Calcolo con precisione arbitraria}):
+@end iftex
+@ifnottex
 (@pxref{Calcolo con precisione arbitraria}):
+@end ifnottex
 
 @table @code
 @item PROCINFO["gmp_version"]
@@ -18079,7 +18121,7 @@ grado di gestire numeri ripetuti, salti di riga o righe che non
 iniziano con un numero:
 
 @example
-@c file eg/misc/arraymax.awk
+@c file eg/misc/arrayorder.awk
 @{
     if ($1 > massimo)
         massimo = $1
@@ -18103,7 +18145,7 @@ Quando questo programma viene eseguito col seguente input:
 
 @example
 @group
-@c file eg/misc/arraymax.data
+@c file eg/misc/arrayorder.data
 5  Io sono l'uomo Cinque
 2  Chi sei?  Il nuovo numero due!
 4  . . . E quattro a terra
@@ -18141,6 +18183,11 @@ END @{
 @}
 @end group
 @end example
+
+Come accennato, il programma @`e piuttosto semplice.  Pu@`o facilmente
+andare in errore; per esempio, se si usano numeri di riga negativi o
+non-alfabetici.  Lo scopo del programma @`e solo quello di mostrare
+l'utilizzo di base dei vettori.
 
 @node Visitare un intero vettore
 @subsection Visitare tutti gli elementi di un vettore
@@ -18336,7 +18383,12 @@ l'ordine in cui sono presentati gli elementi @`e: dapprima le
 funzioni predefinite (@pxref{Funzioni predefinite}), poi
 le funzioni definite dall'utente (@pxref{Funzioni definite dall'utente})
 e infine le funzioni caricate da un'estensione
+@iftex
+(@pxrefil{Estensioni dinamiche}).
+@end iftex
+@ifnottex
 (@pxref{Estensioni dinamiche}).
+@end ifnottex
 
 @item "@@val_str_asc"
 Ordinare secondo il valore degli elementi in ordine crescente (invece che in
@@ -21758,7 +21810,14 @@ intervallo di valori interi; i numeri al di fuori di questo intervallo vengono
 ridotti per rientrare all'interno dell'intervallo.}
 
 Comunque, quando si usa il calcolo con precisione arbitraria con l'opzione
-@option{-M} (@pxref{Calcolo con precisione arbitraria}), il risultato pu@`o
+@option{-M}
+@iftex
+(@pxrefil{Calcolo con precisione arbitraria}),
+@end iftex
+@ifnottex
+(@pxref{Calcolo con precisione arbitraria}),
+@end ifnottex
+il risultato pu@`o
 essere diverso.  Questo @`e particolarmente evidente con la funzione @code{compl()}:
 
 @example
@@ -21778,8 +21837,9 @@ $ @kbd{gawk -M 'BEGIN @{ printf "%#x\n", compl(42) @}'}
 @print{} 0xffffffffffffffd5
 @end example
 
-Quando si usa l'opzione @option{-M}, nel dettaglio, @command{gawk} usa
-gli interi a precisione arbitraria di GNU MP che hanno almeno 64 bit di precisione.
+Quando si usa l'opzione @option{-M}, ``sotto il coperchio'', @command{gawk} usa
+gli interi a precisione arbitraria di GNU MP che hanno almeno 64 bit di
+precisione.
 Quando non si usa l'opzione @option{-M}, @command{gawk} memorizza i valori
 interi come regolari valori in virgola mobile con doppia precisione, che
 mantengono solo 53 bit di precisione.  Inoltre, la libreria GNU MP tratta
@@ -21787,8 +21847,9 @@ mantengono solo 53 bit di precisione.  Inoltre, la libreria GNU MP tratta
 cos@`{@dotless{i}} il
 risultato con @option{-M} in questo caso @`e un numero negativo.
 
-In breve, usare @command{gawk} per qualsiasi tipo di operazione "bit a bit",
-tranne le pi@`u semplici, probabilmente @`e una cattiva idea; @dfn{caveat emptor}!
+In poche parole, usare @command{gawk} per qualsiasi tipo di operazione
+"bit a bit", tranne le pi@`u semplici, probabilmente @`e una cattiva idea;
+@dfn{caveat emptor}!
 
 @end sidebar
 
@@ -21937,7 +21998,12 @@ esisteva o no prima che la funzione fosse chiamata.
 @command{awk}.
 Questi sono costituiti dalle funzioni descritte nella lista seguente.
 Le descrizioni sono volutamente concise.
+@iftex
+@xrefil{Internazionalizzazione},
+@end iftex
+@ifnottex
 @xref{Internazionalizzazione},
+@end ifnottex
 per un'esposizione completa.
 I parametri opzionali sono racchiusi tra parentesi quadre ([ ]):
 
@@ -23202,7 +23268,13 @@ A partire dalla @value{PVERSION} 4.1.2 di @command{gawk}, le chiamate
 indirette di funzione
 possono anche essere usate per chiamare funzioni predefinite e con
 funzioni di estensione
-(@pxref{Estensioni dinamiche}). Ci sono alcune limitazioni nel richiamare
+@iftex
+(@pxrefil{Estensioni dinamiche}).
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche}).
+@end ifnottex
+Ci sono alcune limitazioni nel richiamare
 in maniera indiretta delle funzioni predefinite, come qui dettagliato:
 
 @itemize @value{BULLET}
@@ -31723,6 +31795,20 @@ $ @kbd{gawk -f confronta_in_minuscolo.awk}
 @print{} n N O o p P Q q r R S s t T u U V v w W X x y Y z Z
 @end example
 
+@quotation NOTA
+``Sotto il coperchio,'' @command{gawk} usa la funzione di libreria
+C @code{qsort()} per gestire le operazioni di ordinamento.
+@code{qsort()} pu@`o anche chiamare se stesso ricorsivamente.
+Ci@`o implica che, nello scrivere una funzione di confronto, si
+dovrebbe stare attenti a evitare l'uso di variabili e di vettori
+globali; si dovrebbero usare solo variabili locali e vettori che
+sono definiti come parametri ulteriori passati alla funzione che
+effettua il confronto.  In caso contrario, @`e possibile che avvengano
+delle corruzioni inintenzionali di memoria dei vettori
+globali e anche che lo stesso programma @command{gawk} finisca con
+un errore.
+@end quotation
+
 @node I/O bidirezionale
 @section Comunicazioni bidirezionali con un altro processo
 
@@ -32526,7 +32612,13 @@ Come descritto sin qui e nei successivi @value{CHAPTERS},
 rispetto a quelle presenti nel comando @command{awk} standard.
 Queste sono state sviluppate col passare del tempo.
 Pi@`u recentemente, l'attenzione si @`e spostata sull'uso
-del meccanismo delle estensioni (@pxref{Estensioni dinamiche})
+del meccanismo delle estensioni
+@iftex
+(@pxrefil{Estensioni dinamiche})
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche})
+@end ifnottex
 per aggiungere ulteriori funzionalit@`a.
 @ifnotinfo
 Questa @value{SECTION}
@@ -35741,7 +35833,14 @@ degli spazi-dei-nomi, e il comando @code{dump} del debugger
 @cindex spazio-dei-nomi @subentry interazione con l'estensione API
 @cindex estensione API @subentry interazione con lo spazio-dei-nomi
 @cindex API (estensione) @subentry interazione con lo spazio-dei-nomi
-L'estensione API (@pxref{Estensioni dinamiche}) ha sempre previsto
+L'estensione API
+@iftex
+(@pxrefil{Estensioni dinamiche})
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche})
+@end ifnottex
+ha sempre previsto
 di avere funzioni in uno spazio-dei-nomi differente, sebbene ci@`o
 non fosse stato ancora implementato.  Tuttavia, le routine di
 ricerca e di aggiornamento dei simbolo non prevedevano l'utilizzo
@@ -35783,7 +35882,13 @@ Altre parti di @command{gawk} sono state estese come necessario per
 integrare gli spazi-dei-nomi nel loro funzionamento.
 Questo vale soprattutto per la profilazione / ``stampa-elegante''
 (@pxref{Profilare}) e per le funzionalit@`a relative alle
-estensioni (@pxref{Estensioni dinamiche}).
+estensioni
+@iftex
+(@pxrefil{Estensioni dinamiche}).
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche}).
+@end ifnottex
 
 @cindex spazio-dei-nomi @subentry compatibilit@`a all'indietro
 @item
@@ -36084,6 +36189,23 @@ implicita, il che equivale ad avere un bit in pi@`u nella mantissa.
 @node Funzionalit@`a MPFR
 @section Funzionalit@`a per il calcolo a precisione arbitraria in @command{gawk}
 
+@quotation AVVERTIMENTO
+A partire dalla @value{PVERSION} 5.2,
+l'aritmetica a precisione arbitraria in @command{gawk}
+@`e @emph{deprecata}.  Verr@`a rimossa da @command{gawk} nel 2024.
+
+Il supporto MPFR @`e deprecato perch@'e @`e stato un errore fornirlo.
+Tale supporto ha generato moltissime segnalazioni di problemi,
+la funzionalit@`a @`e stata abusata, e anche il manutentore di @command{gawk}
+ha subito pubblici abusi, senza un effettivo vantaggio per tutti.
+
+Se si usa questa funzionalit@`a, si dovrebbe iniziare a lavorare fin da ora
+per trova un differente insieme di strumenti software per raggiungere
+gli obiettivi desiderati.@footnote{Naturalmente, nulla vieta di continuare
+a usare una versione di @command{gawk} che ancora fornisce la possibilit@`a
+di usare MPFR. Semplicemente, tale versione non verr@`a pi@`u aggiornata.}
+@end quotation
+
 Per default, @command{gawk} usa i valori in virgola mobile a doppia precisione
 disponibili nell'hardware del sistema su cui viene eseguito.
 Tuttavia, se @`e stato compilato in modo da includere questa funzionalit@`a
@@ -36095,8 +36217,8 @@ Si pu@`o verificare se il supporto a MPFR @`e disponibile in questo modo:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 4.1.2, API: 1.1 (GNU MPFR 3.1.0-p3, GNU MP 5.0.2)
-@print{} Copyright (C) 1989, 1991-2015 Free Software Foundation.
+@print{} GNU Awk 5.2.0, API: 3.2 (GNU MPFR 4.0.2, GNU MP 6.2.0)
+@print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
 
@@ -38364,15 +38486,22 @@ assegnandogli dei puntatori. Per esempio:
 @example
 char *p = gawk_malloc(42);      p @ii{``possiede'' la memoria}
 char *q = p;
-p = NULL;                       @ii{ora} q @ii{la ``possiede''}
+p = NULL;                       @ii{adesso} q @ii{la ``possiede''}
 @end example
 
-Gli oggetti MPFR e GMP sono certamente allocati sullo @dfn{stack}
+Gli oggetti MPFR e GMP sono in effetti allocati sullo @dfn{stack}
 oppure dinamicamente, ma le librerie MPFR e GMP trattano questi
 oggetti come valori, allo stesso modo in cui si passa normalmente
 un valore intero (@code{int}) o uno a virgola mobile a doppia
 precisione (@code{double}) per valore.  Non c'@`e modo di
 ``trasferire il possesso'' di oggetti MPFR e GMP.
+
+Il risultato finale di un calcolo effettuato tramite MPFR o GMP
+dovrebbe essere restituito a @command{gawk} per valore, come
+si farebbe se si trattasse di una stringa o di un numero
+a virgola mobile a doppia precisione (@code{double}).
+@command{gawk} liberer@`a la memoria occupata dal numero stesso.
+
 Per questo motivo, il codice in un'estensione dovrebbe essere
 simile a questo:
 
@@ -38387,11 +38516,10 @@ mpz_add(risposta, part1, part2);
 /* di tipo (awk_value_t *). */
 make_number_mpz(risposta, & risultato); @ii{assegnare valore finale GMP}
 
-mpz_clear(part1);                    @ii{rilasciare valori intermedi}
+mpz_clear(part1);                       @ii{rilasciare valori intermedi}
 mpz_clear(part2);
-mpz_clear(risposta);
 
-return result;
+return risultato;           @ii{valore in @code{risposta} gestito da @code{gawk}}
 @end example
 
 @node Funzioni di registrazione
@@ -38514,7 +38642,13 @@ estensione va registrata con @command{gawk} usando questa funzione dell'API:
 Questa funzione restituisce il valore @dfn{true} se ha successo,
 oppure @dfn{false} in caso contrario.
 Il parametro @code{name_space} indica lo spazio-dei-nomi in cui porre
-la funzione (@pxref{Spazi-dei-nomi}).
+la funzione
+@iftex
+(@pxrefil{Spazi-dei-nomi}).
+@end iftex
+@ifnottex
+(@pxref{Spazi-dei-nomi}).
+@end ifnottex
 Si usi una stringa vuota (@code{""}) o @code{"awk"} per porre la funzione
 nello spazio-dei-nomi @code{awk}, che @`e quello di default.
 Il puntatore @code{func} @`e l'indirizzo di una struttura
@@ -42232,8 +42366,9 @@ anche in questo caso @`e:
 @node Esempio di estensione Rwarray
 @subsection Scaricare e ricaricare un vettore
 
-L'estensione @code{rwarray} aggiunge due funzioni,
-di nome @code{writea()} e @code{reada()}, come segue:
+L'estensione @code{rwarray} aggiunge quattro funzioni,
+di nome @code{writea()}, @code{reada()},
+@code{writeall()} e @code{readall()}, come segue:
 
 @table @code
 @item @@load "rwarray"
@@ -42251,11 +42386,31 @@ valore uno se completa il lavoro o zero se non va a buon fine.
 @cindex estensione @subentry @code{reada()}
 @item ret = reada(file, vettore)
 @code{reada()} @`e la funzione inversa di @code{writea()};
-legge il file il cui nome @`e fornito come primo argomento, riempiendo il
+legge il file il cui nome @`e fornito come primo argomento, caricando il
 vettore il cui nome @`e il secondo argomento. Il vettore viene preventivamente
 svuotato.
-Anche in questo caso, il valore restituito @`e uno se tutto va bene o zero se
-la funzione non va a buon fine.
+Anche in questo caso, la funzione restituisce il valore uno se completa il
+il lavoro o zero se non va a buon fine.
+
+@cindex @code{writeall()} (estensione)
+@cindex estensione @subentry @code{writeall()}
+@item ret = writeall(file)
+Questa funzione ha come argomento una stringa, che @`e il nome del file
+sul quale scaricare tutte le variabili e i rispettivi valori.
+Chiamare questa funzione @`e completamente equivalente a chiamare
+@code{writea(file, SYMTAB)}.  Restituisce il
+valore uno se completa il lavoro o zero se non va a buon fine.
+
+@cindex @code{readall()} (estensione)
+@cindex estensione @subentry @code{readall()}
+@item ret = readall(file)
+Questa funzione ha come argomento una stringa, che @`e il nome del file
+dal quale leggere i valori di molteplici variabili globali.
+Per ogni variabile contenuta nel file, il relativo valore viene
+caricato, a meno che la variabile sia gi@`a esistente.
+Se la variabile esiste gi@`a, il valore della variabile specificato
+nel file viene ignorato.  Restituisce il
+valore uno se completa il lavoro o zero se non va a buon fine.
 @end table
 
 Il vettore creato da @code{reada()} @`e identico a quello scritto da
@@ -42279,6 +42434,16 @@ stringa possono essere scaricati da un sistema con un certo ordine di byte
 e ripristinati su un sistema con un ordine di byte differente, anche se
 un test al riguardo non @`e mai stato fatto.
 
+Si noti che le funzioni @code{writeall()} e @code{readall()} forniscono
+un meccanismo che consente di ripristinare una situazione esistente
+nel caso in cui si chiami ripetutamente lo stesso programma.
+Se, per esempio, un programma calcola alcune statistiche basandosi sui
+dati contenuti in una serie di file, si potrebbe salvare lo stato delle
+variabili usando la funzione @code{writeall()} dopo aver elaborato
+N file, e in seguito ricaricare lo stato delle variabili usando la
+funzione @code{readall()} quando @`e disponibile il file N+1, cos@`{@dotless{i}}
+da poter aggiornare i risultati.
+
 Ecco un esempio:
 
 @example
@@ -42287,6 +42452,10 @@ Ecco un esempio:
 ret = writea("scaricato.bin", vettore)
 @dots{}
 ret = reada("scaricato.bin", vettore)
+@dots{}
+ret = writeall("situazione-corrente.bin")
+@dots{}
+ret = readall("situazione-corrente.bin")
 @end example
 
 @node Esempio di estensione Readfile
@@ -43227,7 +43396,12 @@ oppure no
 @item
 Le funzioni @code{bindtextdomain()}, @code{dcgettext()}
 e @code{dcngettext()} per l'internazionalizzazione
+@iftex
+(@pxrefil{I18N per programmatore})
+@end iftex
+@ifnottex
 (@pxref{I18N per programmatore})
+@end ifnottex
 
 @ifset INTDIV
 @item
@@ -43633,7 +43807,13 @@ processo in esecuzione.
 
 @item
 @code{TEXTDOMAIN}, per impostare il dominio testuale in cui internazionalizzare
-un'applicazione (@pxref{Internazionalizzazione}).
+un'applicazione
+@iftex
+(@pxrefil{Internazionalizzazione}).
+@end iftex
+@ifnottex
+(@pxref{Internazionalizzazione}).
+@end ifnottex
 @end itemize
 
 @item
@@ -43677,7 +43857,12 @@ Le funzioni @code{asort()} e @code{asorti()} per l'ordinamento di vettori
 @item
 Le funzioni @code{bindtextdomain()}, @code{dcgettext()} e @code{dcngettext()}
 per l'internationalizzazione
+@iftex
+(@pxrefil{I18N per programmatore}).
+@end iftex
+@ifnottex
 (@pxref{I18N per programmatore}).
+@end ifnottex
 
 @item
 La funzione @code{extension()} e la possibilit@`a di aggiungere
@@ -44043,7 +44228,12 @@ L'opzione @option{-R} @`e stata rimossa.
 
 @item
 Supporto per il calcolo ad alta precisione con MPFR
+@iftex
+(@pxrefil{Calcolo con precisione arbitraria}).
+@end iftex
+@ifnottex
 (@pxref{Calcolo con precisione arbitraria}).
+@end ifnottex
 
 @item
 Le funzioni @code{and()}, @code{or()} e @code{xor()} sono state modificate
@@ -44163,7 +44353,12 @@ in input sono mantenute nell'output generato.
 
 @item
 Miglioramenti all'API per l'estensione
+@iftex
+(@pxrefil{Estensioni dinamiche}):
+@end iftex
+@ifnottex
 (@pxref{Estensioni dinamiche}):
+@end ifnottex
 
 @c nested
 @itemize @value{MINUS}
@@ -45145,7 +45340,13 @@ nelle appropriate sottodirectory di @file{awklib/eg}.
 @item extension/*
 Il codice sorgente, le pagine di manuale, e i file di infrastruttura per
 gli esempi di estensione incluse con @command{gawk}.
-@xref{Estensioni dinamiche}, per ulteriori dettagli.
+@iftex
+@xrefil{Estensioni dinamiche},
+@end iftex
+@ifnottex
+@xref{Estensioni dinamiche},
+@end ifnottex
+per ulteriori dettagli.
 
 @item extras/*
 Ulteriori file, non-essenziali.  Al momento, questa directory contiene
@@ -46342,40 +46543,39 @@ fare quella particolare cosa o no, occorre segnalarlo; in questo caso si tratta
 di un bug nella documentazione!
 
 @item
-Prima di segnalare un bug o di tentare di risolverlo personalmente, si tenti
+Prima di segnalare un bug o di tentare di risolverlo da soli, si tenti
 di isolarlo preparando un programma @command{awk} il pi@`u piccolo possibile,
 con un @value{DF} in input che possa riprodurre il problema.
 
-Dopo averlo fatto, si spedisca:
+@item
+@cindex @command{gawkbug} utility
+@cindex programma di utilit@`a @subentry @command{gawkbug}
+Si usi il programma @command{gawkbug} per preparare la segnalazione
+del bug.  Questo programma prepara un modello di segnalazione
+di bug e vi permette di modificarlo nel vostro programma di edit.
+Va quindi modificato appropriatamente per includere:
 
 @itemize @bullet
 @item
 il programma e il @value{DF}.
 
 @item
-Qualche informazioni sul tipo di sistema Unix in uso.
-
-@item
-Il compilatore usato per compilare @command{gawk},
-
-@item
 I risultati esatti che @command{gawk} ha prodotto.  Inoltre andrebbe
 specificato cosa ci si aspettava che il programma facesse; questo @`e
-di aiuto per decidere se il problema @`e un problema di documentazione.
+di aiuto per decidere se il problema @`e in realt@`a un problema
+di documentazione.
 
 @item
-Il numero di versione di @command{gawk} in uso.
-Questa informazione si pu@`o ottenere con il comando @samp{gawk --version}.
+Una soluzione al problema, se ne avete una.
 @end itemize
 
 @item
 @emph{Non} inviare immagini di videate.  In alternativa, usate COPIA/INCOLLA
 per inviare testo, o per spedire file.
 
-@item
-Spedite file come allegati, invece che nel corpo del messaggio.
-Ci@`o evita la possibile corruzione del file da programmi di gestione
-della posta attraverso cui il messaggio transita in Internet.
+@c @item
+@c Do send files as attachments, instead of inline. This avoids corruption
+@c by mailer programs out in the wilds of the Internet.
 
 @item
 Accertatevi di spedire tutta la posta in formato @emph{testo},
@@ -46391,17 +46591,14 @@ lingua che tutti i manutentori comprendono.}
 @cindex indirizzo email per segnalare bug @subentry @email{bug-gawk@@gnu.org}
 @cindex bug @subentry segnalare @subentry indirizzo email, @email{bug-gawk@@gnu.org}
 @cindex segnalare bug @subentry indirizzo email @subentry @email{bug-gawk@@gnu.org}
-Una volta pronta la descrizione precisa del problema, si spedisca un messaggio
-di posta elettronica a
+Il programma @command{gawkbug} spedisce un messaggio di posta elettronica a
 @EMAIL{bug-gawk@@gnu.org,bug (trattino) gawk (chiocciola) gnu (punto) org}.
 
 I manutentori di @command{gawk} sono i destinatari, e riceveranno la
-segnalazione di errore.  Sebbene sia possibile spedire messaggi direttamente ai
-manutentori, @`e preferibile usare l'indirizzo sopra fornito perch@'e quella
-mailing list rimane in archivio presso il Progetto GNU.  @emph{Tutti i messaggi
-devono essere in inglese. @`E questo il solo linguaggio che tutti i manutentori
-conoscono.} Inoltre, occorre accertarsi di spedire tutti i messaggi in formato
-@emph{testo}, e non (o non soltanto) in formato HTML.
+segnalazione di errore.
+@emph{Non} spedite messaggi di posta elettronica direttamente ai manutentori;
+@`e preferibile usare l'indirizzo sopra fornito perch@'e quella
+mailing list rimane in archivio presso il Progetto GNU.
 
 @quotation NOTA
 Molte distribuzioni di GNU/Linux e i vari sistemi operativi basati su
@@ -47203,9 +47400,24 @@ rendere possibile la loro inclusione:
 
 @enumerate 1
 @item
+Esporre al manutentore di @command{gawk} la nuova funzionalit@`a che
+si vuole introdurre.
+La lista per segnalare i bug pu@`o essere usata per fare questo.
+Anche se non si ritiene opportuno aggiungere la funzionalit@`a
+proposta, si @`e comunque sempre liberi di aggiungerla e di
+distribuire una versione alternativa, che sia un ``fork'' di
+@command{gawk}.
+
+@item
 Prima di inserire la nuova funzionalit@`a all'interno di @command{gawk},
 prendere in considerazione la possibilit@`a di scriverla sotto forma di
-estensione  (@pxref{Estensioni dinamiche}).
+estensione
+@iftex
+(@pxrefil{Estensioni dinamiche}).
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche}).
+@end ifnottex
 Se ci@`o non @`e possibile, continuare con i passi rimanenti descritti in questa
 lista.
 
@@ -47271,8 +47483,10 @@ della funzione.
 
 @item
 Mettere degli spazi attorno alle parentesi usate nelle strutture di controllo
-(@code{if}, @code{while}, @code{for}, @code{do}, @code{switch}
-e @code{return}).
+(@code{if}, @code{while}, @code{for}, @code{do} e, @code{switch}.
+
+@item
+Non mettere tra parentesi l'espressione usata con l'istruzione @code{return}.
 
 @item
 Non mettere spazi davanti alle parentesi usate nelle chiamate di funzione.
@@ -47298,6 +47512,13 @@ Usare confronti con @code{NULL} e @code{'\0'} per le condizioni
 contenute nelle istruzioni @code{if}, @code{while} e @code{for}, e anche
 nelle varie clausole @code{case} delle istruzioni @code{switch}, invece
 del semplice puntatore o il semplice valore del carattere.
+
+@item
+Non usare, @emph{MAI}, lo stile di confronto tra espressioni
+@samp{-1 == pippo} o @samp{0 >= paperino}.  Sono decenni che @`e in uso,
+e capisco perch@'e possa piacere a qualcuno.  Nonostante questo,
+@`e uno stile assolutamente deprecabile, e del codice che ne faccia uso
+non sar@`a mai accettato.
 
 @item
 Usare i valori @code{true} e @code{false} per le variabili @code{booleane},

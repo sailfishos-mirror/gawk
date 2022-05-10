@@ -59,7 +59,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH October, 2021
+@set UPDATE-MONTH April, 2022
 @set VERSION 5.1
 @set PATCHLEVEL 1
 
@@ -926,6 +926,8 @@ particular records in a file and perform operations upon them.
 * Computer Arithmetic::                 A quick intro to computer math.
 * Math Definitions::                    Defining terms used.
 * MPFR features::                       The MPFR features in @command{gawk}.
+* MPFR Deprecated::                     MPFR features are deprecated!
+* MPFR Intro::                          MPFR General introduction.
 * FP Math Caution::                     Things to know.
 * Inexactness of computations::         Floating point math is not exact.
 * Inexact representation::              Numbers are not exactly represented.
@@ -2122,11 +2124,11 @@ helps keep the @command{gawk} distribution down to manageable size.
 The initial collection of material, such as it is, is still available
 at @uref{ftp://ftp.freefriends.org/arnold/Awkstuff}.
 
-In the hopes of doing something more broad, I acquired the
+In the hopes of doing something broader, I acquired the
 @code{awklang.org} domain.  Late in 2017, a volunteer took on the task
 of managing it.
 
-If you have written an interesting @command{awk} program, that
+If you have written an interesting @command{awk} program that
 you would like to share with the rest of the world, please see
 @uref{http://www.awklang.org} and use the ``Contact'' link.
 
@@ -4195,6 +4197,13 @@ Select arbitrary-precision arithmetic on numbers. This option has no effect
 if @command{gawk} is not compiled to use the GNU MPFR and MP libraries
 (@pxref{Arbitrary Precision Arithmetic}).
 
+As of @value{PVERSION} 5.2,
+the arbitrary precision arithmetic features in @command{gawk}
+are @emph{deprecated}.  They will be removed from @command{gawk} in 2024.
+If you use this option, @command{gawk} generates a warning message.
+Create the environment variable @env{GAWK_NO_MPFR_WARN} with an arbitrary
+value in order to silence the warning.
+
 @item @option{-n}
 @itemx @option{--non-decimal-data}
 @cindex @option{-n} option
@@ -4821,6 +4830,10 @@ in milliseconds. On systems that do not support
 the @code{usleep()} system call,
 the value is rounded up to an integral number of seconds.
 
+@item GAWK_NO_MPFR_WARN
+Specifies that @command{gawk} should not print a deprecation
+warning when used with the @option{-M}/@option{--bignum} options.
+
 @item GAWK_READ_TIMEOUT
 Specifies the time, in milliseconds, for @command{gawk} to
 wait for input before returning with an error.
@@ -5116,19 +5129,26 @@ It also describes the @code{ordchr} extension.
 This @value{SECTION} describes features and/or command-line options from
 previous releases of @command{gawk} that either are not available in the
 current version or are still supported but deprecated (meaning that
-they will @emph{not} be in the next release).
+they will @emph{not} be in a future release).
 
+@ignore
+@c This happened long enough ago that we can remove it.
 The process-related special files @file{/dev/pid}, @file{/dev/ppid},
 @file{/dev/pgrpid}, and @file{/dev/user} were deprecated in @command{gawk}
 3.1, but still worked.  As of @value{PVERSION} 4.0, they are no longer
 interpreted specially by @command{gawk}.  (Use @code{PROCINFO} instead;
 see @ref{Auto-set}.)
+@end ignore
 
 @ignore
 This @value{SECTION}
 is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
+
+The multiprecision arithmetic feature is deprecated as of @command{gawk} @value{PVERSION} 5.2.
+Use of @option{-M}/@option{--bignum} produces a warning message.  The feature
+will be removed in the release of 2024.
 
 @node Undocumented
 @section Undocumented Options and Features
@@ -5547,7 +5567,7 @@ between @samp{0} and @samp{7}.  For example, the code for the ASCII ESC
 @item \x@var{hh}@dots{}
 The hexadecimal value @var{hh}, where @var{hh} stands for a sequence
 of hexadecimal digits (@samp{0}--@samp{9}, and either @samp{A}--@samp{F}
-or @samp{a}--@samp{f}).  A maximum of two digts are allowed after
+or @samp{a}--@samp{f}).  A maximum of two digits are allowed after
 the @samp{\x}. Any further hexadecimal digits are treated as simple
 letters or numbers.  @value{COMMONEXT}
 (The @samp{\x} escape sequence is not allowed in POSIX awk.)
@@ -9625,12 +9645,12 @@ means that you cannot use this to multiplex input from
 two or more sources.  @xref{Retrying Input} for a way to enable 
 later I/O attempts to succeed.
 
-Assigning a timeout value prevents read operations from
-blocking indefinitely. But bear in mind that there are other ways
+Assigning a timeout value prevents read operations from being
+blocked indefinitely. But bear in mind that there are other ways
 @command{gawk} can stall waiting for an input device to be ready.
 A network client can sometimes take a long time to establish
 a connection before it can start reading any data,
-or the attempt to open a FIFO special file for reading can block
+or the attempt to open a FIFO special file for reading can be blocked
 indefinitely until some other process opens it for writing.
 
 @node Retrying Input
@@ -17368,7 +17388,7 @@ confused upon encountering repeated numbers, gaps, or lines that don't
 begin with a number:
 
 @example
-@c file eg/misc/arraymax.awk
+@c file eg/misc/arrayorder.awk
 @{
     if ($1 > max)
         max = $1
@@ -17391,7 +17411,7 @@ When this program is run with the following input:
 
 @example
 @group
-@c file eg/misc/arraymax.data
+@c file eg/misc/arrayorder.data
 5  I am the Five man
 2  Who are you?  The new number two!
 4  . . . And four on the floor
@@ -17428,6 +17448,10 @@ END @{
 @}
 @end group
 @end example
+
+As mentioned, the program is simplistic. It can be easily
+confused; for example, by using negative or nonalphabetic line numbers.
+The point here is merely to demonstrate basic array usage.
 
 @node Scanning an Array
 @subsection Scanning All Elements of an Array
@@ -30167,6 +30191,17 @@ $ @kbd{gawk -f case_fold_compare.awk}
 @print{} n N O o p P Q q r R S s t T u U V v w W X x y Y z Z
 @end example
 
+@quotation NOTE
+``Under the hood,'' @command{gawk} uses the C library @code{qsort()}
+function to manage the sorting. @code{qsort()} can call itself
+recursively.  This means that when you write a comparison function,
+you should be careful to avoid the use of global variables and arrays;
+use only local variables and arrays that you declare as additional
+parameters to the comparison function.  Otherwise, you are likely to
+cause unintentional memory corruption in your global arrays and possibly
+cause @command{gawk} itself to fail.
+@end quotation
+
 @node Two-way I/O
 @section Two-Way Communications with Another Process
 
@@ -34136,6 +34171,38 @@ one extra bit of significand.
 @node MPFR features
 @section Arbitrary-Precision Arithmetic Features in @command{gawk}
 
+This @value{SECTION} briefly describes arbitrary-precision
+arithmetic in @command{gawk}.
+
+@menu
+* MPFR Deprecated::             MPFR features are deprecated!
+* MPFR Intro::                  MPFR General introduction.
+@end menu
+
+@node MPFR Deprecated
+@subsection Arbitrary Precision Arithmetic is Deprecated!
+
+As of @value{PVERSION} 5.2,
+arbitrary precision arithmetic in @command{gawk}
+is @emph{deprecated}.  It will be removed from @command{gawk} in 2024.
+
+This feature is deprecated because its inclusion was a mistake. It has
+led to endless bug reports, misuse of the feature and public abuse of the
+maintainer, for no real increased value.
+
+If you use this feature, you should start working now to find a different
+toolset with which to accomplish your goals.@footnote{Of course, you can
+always continue to use a version of @command{gawk} that still supports
+arbitrary precison arithmetic. It simply will be unmaintained.}
+
+If the feature is very important to you, then consider if you are willing
+to volunteer to maintain it, so that it can continue to be included
+in @command{gawk}. If that is the case, contact the maintainer to discuss it
+with him.  You may do so by submitting a bug report.
+
+@node MPFR Intro
+@subsection Arbitrary Precsioon Introduction
+
 By default, @command{gawk} uses the double-precision floating-point values
 supplied by the hardware of the system it runs on.  However, if it was
 compiled to do so, and the @option{-M} command-line option is supplied,
@@ -34146,8 +34213,8 @@ is available like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 4.1.2, API: 1.1 (GNU MPFR 3.1.0-p3, GNU MP 5.0.2)
-@print{} Copyright (C) 1989, 1991-2015 Free Software Foundation.
+@print{} GNU Awk 5.2.0, API: 3.2 (GNU MPFR 4.0.2, GNU MP 6.2.0)
+@print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
 
@@ -36243,8 +36310,13 @@ p = NULL;                       @ii{now} q @ii{``owns'' it}
 MPFR and GMP objects are indeed allocated on the stack or dynamically,
 but the MPFR and GMP libraries treat these objects as values, the same way that
 you would pass an @code{int} or a @code{double} by value.  There is no
-way to ``transfer ownership'' of MPFR and GMP objects.  Thus, code in
-an extension should look like this:
+way to ``transfer ownership'' of MPFR and GMP objects.
+
+The final results of an MPFR or GMP calculation should be passed back
+to @command{gawk}, by value, as you would a string or a @code{double}.
+@command{gawk} will take care of freeing the storage.
+
+Thus, code in an extension should look like this:
 
 @example
 mpz_t part1, part2, answer;             @ii{declare local values}
@@ -36258,9 +36330,8 @@ make_number_mpz(answer, & result);      @ii{set it with final GMP value}
 
 mpz_clear(part1);                       @ii{release intermediate values}
 mpz_clear(part2);
-mpz_clear(answer);
 
-return result;
+return result;                          @ii{value in @code{answer} managed by @code{gawk}}
 @end example
 
 @node Registration Functions
@@ -39780,7 +39851,7 @@ is completely equivalent to calling
 It returns one on success, or zero upon failure
 
 @cindex @code{readall()} extension function
-@item ret = writeall(file)
+@item ret = readall(file)
 This function takes a string argument, which is the name of the
 file from which to read the contents of various global variables.
 For each variable in the file, the data is loaded unless the variable
@@ -43455,17 +43526,17 @@ to do something or not, report that too; it's a bug in the documentation!
 @item
 Before reporting a bug or trying to fix it yourself, try to isolate it
 to the smallest possible @command{awk} program and input @value{DF} that
-reproduce the problem.  Then send us:
+reproduce the problem.
+
+@item
+@cindex @command{gawkbug} utility
+Use the @command{gawkbug} program to submit the bug report. This
+program sets up a bug report template and opens it in your editor.
+You then need to edit it appropriately to include:
 
 @itemize @bullet
 @item
 The program and @value{DF}.
-
-@item
-Some idea of what kind of Unix system you're using.
-
-@item
-The compiler you used to compile @command{gawk}.
 
 @item
 The exact results
@@ -43473,17 +43544,16 @@ The exact results
 us decide whether the problem is really in the documentation.
 
 @item
-The version number of @command{gawk} you are using.
-You can get this information with the command @samp{gawk --version}.
+A fix if you have one.
 @end itemize
 
 @item
 Do @emph{not} send screenshots. Instead, use copy/paste to send text, or
 send files.
 
-@item
-Do send files as attachments, instead of inline. This avoids corruption
-by mailer programs out in the wilds of the Internet.
+@c @item
+@c Do send files as attachments, instead of inline. This avoids corruption
+@c by mailer programs out in the wilds of the Internet.
 
 @item
 Please be sure to send all mail in @emph{plain text},
@@ -43497,12 +43567,12 @@ understood in common by all the maintainers.}
 @cindex @email{bug-gawk@@gnu.org} bug reporting address
 @cindex email address for bug reports, @email{bug-gawk@@gnu.org}
 @cindex bug reports, email address, @email{bug-gawk@@gnu.org}
-Once you have a precise problem description, send email to
+The @command{gawkbug} program sends email to
 @EMAIL{bug-gawk@@gnu.org,bug dash gawk at gnu dot org}.
 
 The @command{gawk} maintainers subscribe to this address, and
 thus they will receive your bug report.
-Although you can send mail to the maintainers directly,
+Do @emph{not} send mail to the maintainers directly;
 the bug reporting address is preferred because the
 email list is archived at the GNU Project.
 
@@ -44187,6 +44257,12 @@ make it possible to include them:
 
 @enumerate 1
 @item
+Discuss the proposed new feature with the @command{gawk} maintainer.
+The bug list may be used for this.  Even if I don't
+wish to include your feature, be aware that you are still free to
+add it and distribute your own ``fork'' of @command{gawk}.
+
+@item
 Before building the new feature into @command{gawk} itself,
 consider writing it as an extension
 (@pxref{Dynamic Extensions}).
@@ -44250,8 +44326,10 @@ line above the line with the name and arguments of the function.
 
 @item
 Put spaces around parentheses used in control structures
-(@code{if}, @code{while}, @code{for}, @code{do}, @code{switch},
-and @code{return}).
+(@code{if}, @code{while}, @code{for}, @code{do}, and @code{switch}).
+
+@item
+Do not parenthesize the expression used with @code{return}.
 
 @item
 Do not put spaces in front of parentheses used in function calls.
@@ -44274,6 +44352,12 @@ Use comparisons against @code{NULL} and @code{'\0'} in the conditions of
 @code{if}, @code{while}, and @code{for} statements, as well as in the @code{case}s
 of @code{switch} statements, instead of just the
 plain pointer or character value.
+
+@item
+Do not, @emph{under any circumstances}, use the @samp{-1 == foo} or
+@samp{0 >= bar} style of comparison expressions.  I have known about
+it for decades, and I understand why some people like it.  Nonetheless,
+I abhor it with a passion, and code that uses it will never be accepted.
 
 @item
 Use @code{true} and @code{false} for @code{bool} values,

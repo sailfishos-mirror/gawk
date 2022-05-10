@@ -575,6 +575,8 @@ EXTRA_DIST = \
 	indirectbuiltin2.ok \
 	indirectcall2.awk \
 	indirectcall2.ok \
+	indirectcall3.awk \
+	indirectcall3.ok \
 	indirectcall.awk \
 	indirectcall.in \
 	indirectcall.ok \
@@ -746,6 +748,8 @@ EXTRA_DIST = \
 	mpfrmemok1.ok \
 	mpfrnegzero.awk \
 	mpfrnegzero.ok \
+	mpfrnegzero2.awk \
+	mpfrnegzero2.ok \
 	mpfrnonum.awk \
 	mpfrnonum.in \
 	mpfrnonum.ok \
@@ -1019,6 +1023,8 @@ EXTRA_DIST = \
 	profile15.ok \
 	profile16.awk \
 	profile16.ok \
+	profile17.awk \
+	profile17.ok \
 	prt1eval.awk \
 	prt1eval.ok \
 	prtoeval.awk \
@@ -1066,6 +1072,8 @@ EXTRA_DIST = \
 	regeq.awk \
 	regeq.in \
 	regeq.ok \
+	regex3minus.awk \
+	regex3minus.ok \
 	regexpbrack.awk \
 	regexpbrack.in \
 	regexpbrack.ok \
@@ -1299,6 +1307,8 @@ EXTRA_DIST = \
 	symtab10.ok \
 	symtab11.awk \
 	symtab11.ok \
+	symtab12.awk \
+	symtab12.ok \
 	synerr1.awk \
 	synerr1.ok \
 	synerr2.awk \
@@ -1431,6 +1441,7 @@ BASIC_TESTS = \
 	posix2008sub prdupval prec printf0 printf1 printfchar prmarscl \
 	prmreuse prt1eval prtoeval rand randtest range1 range2 readbuf \
 	rebrackloc rebt8b1 rebuild redfilnm regeq regexpbrack regexpbrack2 \
+	regex3minus \
 	regexprange regrange reindops reparse resplit rri1 rs rscompat \
 	rsnul1nl rsnulbig rsnulbig2 rsnullre rsnulw rstest1 rstest2 \
 	rstest3 rstest4 rstest5 rswhite scalar sclforin sclifin setrec0 \
@@ -1460,7 +1471,7 @@ GAWK_EXT_TESTS = \
 	icasefs icasers id igncdym igncfs ignrcas2 ignrcas4 ignrcase \
 	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
 	include include2 indirectbuiltin indirectcall indirectcall2 \
-	indirectbuiltin2 \
+	indirectcall3 indirectbuiltin2 \
 	inf-nan-torture intarray iolint isarrayunset lint lintexp \
 	lintindex lintint lintlength lintold lintplus lintset lintwarn \
 	manyfiles match1 match2 match3 mbstr1 mbstr2 mixed1 mktime \
@@ -1472,12 +1483,14 @@ GAWK_EXT_TESTS = \
 	profile1 profile10 profile11 profile12 profile13 profile14 \
 	profile15 profile16 profile2 profile3 profile4 profile5 profile6 \
 	profile7 profile8 profile9 pty1 pty2 rebuf regexsub reginttrad \
+	profile17 \
 	regnul1 regnul2 regx8bit reint reint2 rsgetline rsglstdin rsstart1 \
 	rsstart2 rsstart3 rstest6 sandbox1 shadow shadowbuiltin sortfor \
 	sortfor2 sortu sourcesplit split_after_fpat splitarg4 strftfld \
 	strftime strtonum strtonum1 stupid1 stupid2 stupid3 stupid4 stupid5 \
 	switch2 symtab1 symtab10 symtab11 symtab2 symtab3 symtab4 symtab5 \
 	symtab6 symtab7 symtab8 symtab9 timeout typedregex1 typedregex2 \
+	symtab12 \
 	typedregex3 typedregex4 typedregex5 typedregex6 typeof1 typeof2 \
 	typeof3 typeof4 typeof5 typeof6 watchpoint1
 
@@ -1523,7 +1536,7 @@ NEED_MPFR = \
 	mpfrbigint mpfrbigint2 mpfrcase mpfrcase2 mpfrexprange mpfrfield \
 	mpfrieee mpfrmemok1 mpfrnegzero mpfrnonum mpfrnr mpfrrem mpfrrnd \
 	mpfrrndeval mpfrsort mpfrsqrt mpfrstrtonum mpgforcenum mpfruplus \
-	mpfranswer42
+	mpfranswer42 mpfrnegzero2
 
 # List of tests that need --non-decimal-data
 NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
@@ -1534,7 +1547,7 @@ NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 muldimpo
 # List of tests that need --pretty-print
 NEED_PRETTY = nsprof1 nsprof2 \
 	profile4 profile5 profile8 profile9 profile10 profile11 profile13 \
-	profile14 profile15 profile16
+	profile14 profile15 profile16 profile17
 
 # List of tests that need --re-interval
 NEED_RE_INTERVAL = gsubtst3 reint reint2
@@ -1633,7 +1646,7 @@ VALGRIND =
 #
 # And we set AWKLIBPATH to find the extension libraries we built.
 LOCALES = LANGUAGE= LC_ALL=$${GAWKLOCALE:-C} LANG=$${GAWKLOCALE:-C}
-AWK = $(LOCALES) AWKLIBPATH=../extension/.libs $(VALGRIND) $(AWKPROG) $(GAWK_TEST_ARGS)
+AWK = $(LOCALES) AWKLIBPATH=../extension/.libs GAWK_NO_MPFR_WARN=1 $(VALGRIND) $(AWKPROG) $(GAWK_TEST_ARGS)
 
 # Message stuff is to make it a little easier to follow.
 # Make the pass-fail last and dependent on others to avoid
