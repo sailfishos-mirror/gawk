@@ -155,7 +155,7 @@ BASIC_TESTS = \
 	fldchgnf fldterm fnamedat fnarray fnarray2 fnaryscl fnasgnm \
 	fnmisc fordel forref forsimp fsbs fscaret fsnul1 fsrs fsspcoln \
 	fstabplus funsemnl funsmnam funstack getline getline2 getline3 \
-	getline4 getline5 getlnbuf getnr2tb getnr2tm gsubasgn gsubtest \
+	getline4 getline5 getlnbuf getlnfa getnr2tb getnr2tm gsubasgn gsubtest \
 	gsubtst2 gsubtst3 gsubtst4 gsubtst5 gsubtst6 gsubtst7 gsubtst8 \
 	hex hex2 hsprint inpref inputred intest intprec iobug1 leaddig \
 	leadnl litoct longsub longwrds manglprm math membug1 memleak \
@@ -1693,6 +1693,11 @@ getline4:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 getline5:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+getlnfa:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
