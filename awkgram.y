@@ -5399,6 +5399,10 @@ make_assignable(INSTRUCTION *ip)
 	case Op_subscript:
 		ip->opcode = Op_subscript_lhs;
 		return ip;
+	case Op_field_assign:
+		// no need to change the opcode, but do need to return
+		// a non-NULL pointer.
+		return ip;
 	default:
 		break;	/* keeps gcc -Wall happy */
 	}
