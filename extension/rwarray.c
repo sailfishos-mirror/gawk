@@ -78,10 +78,14 @@ static awk_bool_t write_elem(FILE *fp, awk_element_t *element);
 static awk_bool_t write_value(FILE *fp, awk_value_t *val);
 static awk_bool_t write_number(FILE *fp, awk_value_t *val);
 
+#ifdef HAVE_MPFR
 typedef union {
 	mpz_t mpz_val;
 	mpfr_t mpfr_val;
 } value_storage;
+#else
+typedef int value_storage;	// should not be used
+#endif /* HAVE_MPFR */
 
 typedef awk_array_t (*array_handle_t)(awk_value_t *);
 static awk_bool_t read_array(FILE *fp, awk_array_t array);
@@ -421,12 +425,14 @@ free_value(awk_value_t *v)
 		case AWK_NUMBER_TYPE_DOUBLE:
 			/* no memory allocated */
 			break;
+#ifdef HAVE_MPFR
 		case AWK_NUMBER_TYPE_MPZ:
 			mpz_clear(v->num_ptr);
 			break;
 		case AWK_NUMBER_TYPE_MPFR:
 			mpfr_clear(v->num_ptr);
 			break;
+#endif /* HAVE_MPFR */
 		default:
 			warning(ext_id, _("cannot free number with unknown type %d"), v->num_type);
 			break;
