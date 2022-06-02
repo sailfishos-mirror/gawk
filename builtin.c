@@ -3319,11 +3319,13 @@ done:
 		if ((target->flags & REGEX) != 0) {
 			is_regex = true;
 
-			// free old regex registers
-			refree(target->typed_re->re_reg[0]);
-			if (target->typed_re->re_reg[1] != NULL)
-				refree(target->typed_re->re_reg[1]);
-			freenode(target->typed_re);
+			if (target->valref == 1) {
+				// free old regex registers
+				refree(target->typed_re->re_reg[0]);
+				if (target->typed_re->re_reg[1] != NULL)
+					refree(target->typed_re->re_reg[1]);
+				freenode(target->typed_re);
+			}
 		}
 		unref(*lhs);		// nuke original value
 		if (is_regex)
