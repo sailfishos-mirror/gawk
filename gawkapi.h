@@ -849,6 +849,9 @@ typedef struct gawk_api {
 			 */
 			const awk_input_buf_t **ibufp,
 			const awk_output_buf_t **obufp);
+
+	/* Destroy an array. */
+	awk_bool_t (*api_destroy_array)(awk_ext_id_t id, awk_array_t a_cookie);
 } gawk_api_t;
 
 #ifndef GAWK	/* these are not for the gawk code itself! */
@@ -918,6 +921,8 @@ typedef struct gawk_api {
 	(api->api_get_element_count(ext_id, array, count_p))
 
 #define create_array()		(api->api_create_array(ext_id))
+
+#define destroy_array(array)	(api->api_destroy_array(ext_id, array))
 
 #define clear_array(array)	(api->api_clear_array(ext_id, array))
 

@@ -409,7 +409,7 @@ free_value(awk_value_t *v)
 {
 	switch (v->val_type) {
 	case AWK_ARRAY:
-		clear_array(v->array_cookie);
+		destroy_array(v->array_cookie);
 		break;
 	case AWK_STRING:
 	case AWK_REGEX:
