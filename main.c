@@ -923,6 +923,10 @@ load_environ()
 	been_here = true;
 
 	ENVIRON_node = install_symbol(estrdup("ENVIRON", 7), Node_var_array);
+
+	/* set up array functions */
+	init_env_array(ENVIRON_node);
+
 	for (i = 0; environ[i] != NULL; i++) {
 		static char nullstr[] = "";
 
@@ -952,9 +956,6 @@ load_environ()
 	 */
 	path_environ("AWKPATH", defpath);
 	path_environ("AWKLIBPATH", deflibpath);
-
-	/* set up array functions */
-	init_env_array(ENVIRON_node);
 
 	return ENVIRON_node;
 }
