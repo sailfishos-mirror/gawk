@@ -1,3 +1,34 @@
+2022-06-15         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* main.c (load_environ): Init ENVIRON_node before filling
+	it. Fixes a crash if something like "0=foo" is the first thing
+	in the environment. Thanks to David Arroyo <david@aqwari.net>
+	for the report.
+
+2022-06-06         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* gawkapi.h (gawk_api_t): Add new api_destroy_array hook to clear
+	and free an array.
+	(destroy_array): New macro wrapper for api_destroy_array.
+	* gawkapi.c (api_destroy_array): Add new function to clear and free
+	an array.
+	(api_impl): Add hook for api_destroy_array.
+
+2022-06-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_sub): Fix memory corruption when substituting
+	into a value that is a typed regex. Thanks to valgrind.
+
+2022-05-24         Adam Van Scyoc        <avanscy@g.clemson.edu>
+
+	* awkgram.y (make_assignable): Handle Op_field_assign.
+	Avoids a core dump upon a certain kind of syntax error;
+	see test/getlnfa.awk.
+
+2022-05-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* profile.c (pp_list): Typo fix in a comment.
+
 2022-05-10         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawkbug.in: Add attestation for having read bug reporting

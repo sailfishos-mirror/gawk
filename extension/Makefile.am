@@ -98,9 +98,10 @@ revtwoway_la_SOURCES  = revtwoway.c
 revtwoway_la_LDFLAGS  = $(MY_MODULE_FLAGS)
 revtwoway_la_LIBADD   = $(MY_LIBS)
 
+# On Cygwin, rwarray has to be linked with the MPFR and GMP libraries.
 rwarray_la_SOURCES    = rwarray.c
 rwarray_la_LDFLAGS    = $(MY_MODULE_FLAGS)
-rwarray_la_LIBADD     = $(MY_LIBS)
+rwarray_la_LIBADD     = $(MY_LIBS) $(LIBMPFR)
 
 time_la_SOURCES       = time.c
 time_la_LDFLAGS       = $(MY_MODULE_FLAGS)
@@ -109,9 +110,10 @@ time_la_LIBADD        = $(MY_LIBS)
 # N.B. Becaues we are not installing testext, we must specify -rpath in
 # LDFLAGS to get automake to build a shared library, since it needs
 # an installation path.
+# On Cygwin, testext has to be linked with the MPFR and GMP libraries.
 testext_la_SOURCES    = testext.c
 testext_la_LDFLAGS    = $(MY_MODULE_FLAGS) -rpath /foo
-testext_la_LIBADD     = $(MY_LIBS)
+testext_la_LIBADD     = $(MY_LIBS) $(LIBMPFR)
 
 # N.B. Because we are not installing readdir_test, we must specify -rpath in
 # LDFLAGS to get automake to build a shared library, since it needs
