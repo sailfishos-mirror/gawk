@@ -244,13 +244,13 @@ revtwoway_la_OBJECTS = $(am_revtwoway_la_OBJECTS)
 revtwoway_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(revtwoway_la_LDFLAGS) $(LDFLAGS) -o $@
-rwarray_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+rwarray_la_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 am_rwarray_la_OBJECTS = rwarray.lo
 rwarray_la_OBJECTS = $(am_rwarray_la_OBJECTS)
 rwarray_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(rwarray_la_LDFLAGS) $(LDFLAGS) -o $@
-testext_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+testext_la_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 am_testext_la_OBJECTS = testext.lo
 testext_la_OBJECTS = $(am_testext_la_OBJECTS)
 testext_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -624,9 +624,11 @@ revoutput_la_LIBADD = $(MY_LIBS)
 revtwoway_la_SOURCES = revtwoway.c
 revtwoway_la_LDFLAGS = $(MY_MODULE_FLAGS)
 revtwoway_la_LIBADD = $(MY_LIBS)
+
+# On Cygwin, rwarray has to be linked with the MPFR and GMP libraries.
 rwarray_la_SOURCES = rwarray.c
 rwarray_la_LDFLAGS = $(MY_MODULE_FLAGS)
-rwarray_la_LIBADD = $(MY_LIBS)
+rwarray_la_LIBADD = $(MY_LIBS) $(LIBMPFR)
 time_la_SOURCES = time.c
 time_la_LDFLAGS = $(MY_MODULE_FLAGS)
 time_la_LIBADD = $(MY_LIBS)
@@ -634,9 +636,10 @@ time_la_LIBADD = $(MY_LIBS)
 # N.B. Becaues we are not installing testext, we must specify -rpath in
 # LDFLAGS to get automake to build a shared library, since it needs
 # an installation path.
+# On Cygwin, testext has to be linked with the MPFR and GMP libraries.
 testext_la_SOURCES = testext.c
 testext_la_LDFLAGS = $(MY_MODULE_FLAGS) -rpath /foo
-testext_la_LIBADD = $(MY_LIBS)
+testext_la_LIBADD = $(MY_LIBS) $(LIBMPFR)
 
 # N.B. Because we are not installing readdir_test, we must specify -rpath in
 # LDFLAGS to get automake to build a shared library, since it needs
