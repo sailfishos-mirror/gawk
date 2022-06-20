@@ -66,7 +66,9 @@ static void catchstackoverflow(int emergency, stackoverflow_context_t scp);
 #endif
 static void nostalgia(void) ATTRIBUTE_NORETURN;
 static void version(void) ATTRIBUTE_NORETURN;
+#if 0
 static void deprecate_mpfr(void);
+#endif
 static void init_fds(void);
 static void init_groupset(void);
 static void save_argv(int, char **);
@@ -1689,7 +1691,7 @@ parse_args(int argc, char **argv)
 #else
 			warning(_("-M ignored: MPFR/GMP support not compiled in"));
 #endif
-			deprecate_mpfr();
+			// deprecate_mpfr();
 			break;
 
 		case 'P':
@@ -1858,6 +1860,7 @@ set_current_namespace(const char *new_namespace)
 	current_namespace = new_namespace;
 }
 
+#if 0
 /* deprecate_mpfr --- print long info about MPFR being deprecated */
 
 static void
@@ -1876,3 +1879,4 @@ deprecate_mpfr(void)
 		warning(_("Use `export GAWK_NO_MPFR_WARN=1' to disable this warning."));
 	}
 }
+#endif
