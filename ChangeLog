@@ -4,12 +4,56 @@
 	* main.c (deprecate_mpfr): ifdef'ed out.
 	(parse_args): Comment out call to deprecate_mpfr().
 
+2022-06-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (optab): Add --persist.
+	(parse_args): For --persist, fatal message to use the
+	environment variable. Thanks to Terence Kelly for suggesting
+	the option, since it's mentioned in his paper.
+
+2022-06-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Typo fix.
+	* main.c (main): Correct the return value check in the call
+	to pma_init(). Thanks to Terence Kelly for the report.
+
 2022-06-15         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
 	* main.c (load_environ): Init ENVIRON_node before filling
 	it. Fixes a crash if something like "0=foo" is the first thing
 	in the environment. Thanks to David Arroyo <david@aqwari.net>
 	for the report.
+
+2022-06-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (main): Set gawk_name first thing, in case we fatal out
+	on pma_init.
+	* configure.ac: Add --disable-pma option.
+
+2022-06-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (main): If persistent memory not available and
+	GAWK_PERSIST_FILE supplied, issue a warnning. Similarly, don't
+	do mtrace if using persistent malloc.
+	(version): Include PMA version in the output.
+
+2022-06-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (using_persistent_malloc): Declare new variable
+	* main.c (main): Check for error from pma_init. Set
+	using_persistent_malloc.
+	* symbol.c (init_symbol_table): Check using_persistent_malloc
+	appropriately. Adjust the flow for it.
+	* NEWS: Updated.
+	* Makefile.am (LDADD): Add $(LDFLAGS).
+	* custom.h (pma_init): Define to 0.
+
+2022-06-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* custom.h: Deal with use/non-use of persistent malloc.
+	* main.c (main): Bracket mtrace call in #ifndef. Call pma_init()
+	first thing.
+	* configure.ac (GAWK_USE_PERSISTENT_MALLOC): Add call.
 
 2022-06-06         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 

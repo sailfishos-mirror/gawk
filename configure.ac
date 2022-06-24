@@ -74,6 +74,15 @@ AC_ARG_ENABLE([mpfr],
 	fi
 )
 
+SKIP_PERSIST_MALLOC=no
+AC_ARG_ENABLE([pma],
+	[AS_HELP_STRING([--disable-pma],[do not build gawk with the persistent memory allocator])],
+	if test "$enableval" = no
+	then
+		SKIP_PERSIST_MALLOC=yes
+	fi
+)
+
 EXTENSIONDIR=
 AC_ARG_ENABLE([versioned-extension-dir],
 	[AS_HELP_STRING([--enable-versioned-extension-dir], [use a versioned directory for extensions])],
@@ -316,6 +325,9 @@ AC_CHECK_FUNCS(__etoa_l atexit btowc fmod gai_strerror \
 	wcscoll wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
 AC_FUNC_MBRTOWC
+
+dnl check if we can use the persistent memory allocator
+GAWK_USE_PERSISTENT_MALLOC
 
 dnl check for dynamic linking
 dnl This is known to be very primitive
