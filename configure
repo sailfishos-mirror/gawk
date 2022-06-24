@@ -661,6 +661,8 @@ LIBREADLINE
 SOCKET_LIBS
 ENABLE_EXTENSIONS_FALSE
 ENABLE_EXTENSIONS_TRUE
+USE_PERSISTENT_MALLOC_FALSE
+USE_PERSISTENT_MALLOC_TRUE
 LIBSIGSEGV_PREFIX
 LTLIBSIGSEGV
 LIBSIGSEGV
@@ -799,6 +801,7 @@ enable_silent_rules
 enable_lint
 enable_builtin_intdiv0
 enable_mpfr
+enable_pma
 enable_versioned_extension_dir
 enable_dependency_tracking
 enable_largefile
@@ -1456,6 +1459,8 @@ Optional Features:
   --enable-builtin-intdiv0
                           enable built-in intdiv0 function
   --disable-mpfr          do not check for MPFR
+  --disable-pma           do not build gawk with the persistent memory
+                          allocator
   --enable-versioned-extension-dir
                           use a versioned directory for extensions
   --enable-dependency-tracking
@@ -3656,6 +3661,18 @@ then :
   enableval=$enable_mpfr; if test "$enableval" = no
 	then
 		SKIP_MPFR=yes
+	fi
+
+fi
+
+
+SKIP_PERSIST_MALLOC=no
+# Check whether --enable-pma was given.
+if test ${enable_pma+y}
+then :
+  enableval=$enable_pma; if test "$enableval" = no
+	then
+		SKIP_PERSIST_MALLOC=yes
 	fi
 
 fi
@@ -12518,6 +12535,69 @@ printf "%s\n" "#define HAVE_MBRTOWC 1" >>confdefs.h
   fi
 
 
+
+use_persistent_malloc=no
+if test "$SKIP_PERSIST_MALLOC" = no
+then
+	ac_fn_c_check_func "$LINENO" "mmap" "ac_cv_func_mmap"
+if test "x$ac_cv_func_mmap" = xyes
+then :
+
+fi
+
+	ac_fn_c_check_func "$LINENO" "munmap" "ac_cv_func_munmap"
+if test "x$ac_cv_func_munmap" = xyes
+then :
+
+fi
+
+	if test $ac_cv_func_mmap = yes && test $ac_cv_func_munmap = yes
+	then
+
+printf "%s\n" "#define USE_PERSISTENT_MALLOC 1" >>confdefs.h
+
+		use_persistent_malloc=yes
+		case $host_os in
+		linux-*)
+			case $CC in
+			gcc | clang)
+				LDFLAGS="${LDFLAGS} -no-pie"
+				export LDFLAGS
+				;;
+			*)
+				# tinycc and pcc don't support -no-pie flag
+				# their executables are non-PIE automatically
+				# so no need to do anything
+				;;
+			esac
+			;;
+		*darwin*)
+			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
+			export LDFLAGS
+			;;
+		*cygwin* | *CYGWIN*)
+			true	# nothing do, Cygwin exes are not PIE
+			;;
+		# Other OS's go here...
+		*)
+			# For now, play it safe
+			use_persistent_malloc=no
+			;;
+		esac
+	else
+		use_persistent_malloc=no
+	fi
+fi
+ if test "$use_persistent_malloc" = "yes"; then
+  USE_PERSISTENT_MALLOC_TRUE=
+  USE_PERSISTENT_MALLOC_FALSE='#'
+else
+  USE_PERSISTENT_MALLOC_TRUE='#'
+  USE_PERSISTENT_MALLOC_FALSE=
+fi
+
+
+
 # Check whether --enable-extensions was given.
 if test ${enable_extensions+y}
 then :
@@ -13830,6 +13910,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${TEST_CROSS_COMPILE_TRUE}" && test -z "${TEST_CROSS_COMPILE_FALSE}"; then
   as_fn_error $? "conditional \"TEST_CROSS_COMPILE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_PERSISTENT_MALLOC_TRUE}" && test -z "${USE_PERSISTENT_MALLOC_FALSE}"; then
+  as_fn_error $? "conditional \"USE_PERSISTENT_MALLOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_EXTENSIONS_TRUE}" && test -z "${ENABLE_EXTENSIONS_FALSE}"; then

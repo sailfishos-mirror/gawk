@@ -150,6 +150,7 @@ static void parse_args(int argc, char **argv);
 static void set_locale_stuff(void);
 static bool stopped_early = false;
 
+bool using_persistent_malloc = false;
 int do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
@@ -205,6 +206,7 @@ static const struct option optab[] = {
 #if defined(YYDEBUG) || defined(GAWKDEBUG)
 	{ "parsedebug",		no_argument,		NULL,	'Y' },
 #endif
+	{ "persist",		required_argument,	NULL,	'T' },
 	{ "posix",		no_argument,		NULL,	'P' },
 	{ "pretty-print",	optional_argument,	NULL,	'o' },
 	{ "profile",		optional_argument,	NULL,	'p' },
@@ -228,8 +230,22 @@ main(int argc, char **argv)
 	bool have_srcfile = false;
 	SRCFILE *s;
 	char *cp;
+	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file 
+for PMA */
 #if defined(LOCALEDEBUG)
 	const char *initial_locale;
+#endif
+
+	myname = gawk_name(argv[0]);
+
+	if (pma_init(1, persist_file) != 0) {
+		fatal(_("persistent memory allocator failed to initialize"));
+	}
+
+	using_persistent_malloc = (persist_file != NULL);
+#ifndef USE_PERSISTENT_MALLOC
+	if (using_persistent_malloc)
+		warning(_("persistent memory is not supported"));
 #endif
 
 	/* do these checks early */
@@ -238,12 +254,10 @@ main(int argc, char **argv)
 
 #ifdef HAVE_MCHECK_H
 #ifdef HAVE_MTRACE
-	if (do_tidy_mem)
+	if (! using_persistent_malloc && do_tidy_mem)
 		mtrace();
 #endif /* HAVE_MTRACE */
 #endif /* HAVE_MCHECK_H */
-
-	myname = gawk_name(argv[0]);
 	os_arg_fixup(&argc, &argv); /* emulate redirection, expand wildcards */
 
 	if (argc < 2)
@@ -1357,8 +1371,11 @@ version()
 #ifdef DYNAMIC
 	printf(", API: %d.%d", GAWK_API_MAJOR_VERSION, GAWK_API_MINOR_VERSION);
 #endif
+#ifdef USE_PERSISTENT_MALLOC
+	printf(", PMA: %s", pma_version);
+#endif
 #ifdef HAVE_MPFR
-	printf(" (GNU MPFR %s, GNU MP %s)", mpfr_get_version(), gmp_version);
+	printf(", (GNU MPFR %s, GNU MP %s)", mpfr_get_version(), gmp_version);
 #endif
 	printf("\n");
 	print_ext_versions();
@@ -1710,6 +1727,14 @@ parse_args(int argc, char **argv)
 
 		case 'S':
 			do_flags |= DO_SANDBOX;
+			break;
+
+		case 'T':	// --persist=file
+#ifdef USE_PERSISTENT_MALLOC
+			fatal(_("Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."), optarg);
+#else
+			warning(_("Persistent memory is not supported."));
+#endif /* USE_PERSISTENT_MALLOC */
 			break;
 
 		case 'V':

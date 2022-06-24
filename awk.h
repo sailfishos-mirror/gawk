@@ -1216,6 +1216,7 @@ extern int do_flags;
 extern bool do_optimize;
 extern int use_lc_numeric;
 extern int exit_val;
+extern bool using_persistent_malloc;
 
 #ifdef NO_LINT
 #define do_lint 0

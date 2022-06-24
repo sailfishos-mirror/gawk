@@ -34,6 +34,8 @@ EXTRA_DIST = \
         ChangeLog.0 \
 	Makefile.am \
 	Makefile.in \
+	pma.h \
+	pma.c \
 	regcomp.c \
 	regex_internal.c \
 	regex_internal.h \
@@ -70,6 +72,10 @@ libsupport_a_SOURCES = \
 	malloc/dynarray_finalize.c \
 	malloc/dynarray_resize.c \
 	malloc/dynarray_resize_clear.c
+
+if USE_PERSISTENT_MALLOC
+libsupport_a_SOURCES += pma.c pma.h
+endif
 
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f

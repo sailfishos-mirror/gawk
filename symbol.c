@@ -55,9 +55,20 @@ static bool installing_specials = false;
 void
 init_symbol_table()
 {
-	getnode(global_table);
-	memset(global_table, '\0', sizeof(NODE));
-	null_array(global_table);
+	NODE *pma_root_node = NULL;
+
+	if (using_persistent_malloc) {
+		pma_root_node = (NODE *) pma_get_root();
+		if (pma_root_node != NULL) {
+			global_table = pma_root_node;
+		}
+	}
+
+	if (global_table == NULL) {
+		getnode(global_table);
+		memset(global_table, '\0', sizeof(NODE));
+		null_array(global_table);
+	}
 
 	getnode(param_table);
 	memset(param_table, '\0', sizeof(NODE));
@@ -66,8 +77,15 @@ init_symbol_table()
 	installing_specials = true;
 	func_table = install_symbol(estrdup("FUNCTAB", 7), Node_var_array);
 
-	symbol_table = install_symbol(estrdup("SYMTAB", 6), Node_var_array);
+	if (using_persistent_malloc && pma_root_node != NULL)
+		symbol_table = lookup("SYMTAB");
+	else
+		symbol_table = install_symbol(estrdup("SYMTAB", 6), Node_var_array);
+
 	installing_specials = false;
+
+	if (using_persistent_malloc && pma_root_node == 0)
+		pma_set_root(global_table);
 }
 
 /*
