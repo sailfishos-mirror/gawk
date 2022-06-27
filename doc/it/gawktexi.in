@@ -1020,6 +1020,8 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         programmazione di rete.
 * Profilare::                           Profilare i propri programmi
                                         @command{awk}.
+* Memoria persistente::                 Preservare dati fra successive
+					esecuzioni di @command{gawk}.
 * Filosofia delle estensioni::          Cosa dovrebbe essere incluso e cosa no.
 * Sommario funzionalit@`a avanzate::    Sommario funzionalit@`a avanzate.
 * I18N e L10N::                         Internazionalizzazione e localiz.
@@ -31154,9 +31156,14 @@ Poi vengono illustrate delle funzionalit@`a speciali di @command{gawk} per
 l'ordinamento di vettori.  Quindi viene trattato dettagliatamente l'I/O
 bidirezionale, di cui si @`e fatto cenno in precedenti parti di questo
 @value{DOCUMENT}, assieme ai fondamenti sulle reti TCP/IP.
-Infine, vediamo come @command{gawk}
+Vediamo poi come @command{gawk}
 pu@`o tracciare il @dfn{profilo} di un programma @command{awk}, cos@`{@dotless{i}} che si
 possa ritoccarlo per migliorarne le prestazioni.
+In seguito, viene presentata una funzionalit@`a sperimentale che consente di
+preservare il valori di variabili e di vettori @command{awk} per poterle
+poi usare in usccessive esecuzione di @command{gawk}.
+Viene infine trattata la filosofia che sta dietro al meccanismo dell
+estensione di @command{gawk}.
 
 @c FULLXREF ON
 Altre funzionalit@`a avanzate vengono trattate separatamente dedicando un
@@ -31205,6 +31212,8 @@ tratta della capacit@`a di aggiungere dinamicamente nuove funzioni predefinite a
                                 processo.
 * Reti TCP/IP::                 Usare @command{gawk} per programmazione di rete.
 * Profilare::                   Profilare i propri programmi @command{awk}.
+* Memoria persistente::         Preservare dati fra successive esecuzioni di
+				@command{gawk}.
 * Filosofia delle estensioni::  Cosa dovrebbe essere incluso e cosa no.
 * Sommario funzionalit@`a avanzate:: Sommario delle funzionalit@`a avanzate.
 @end menu
@@ -32621,6 +32630,205 @@ delle costanti numeriche; se sono stati usati dei valori ottali o esadecimali
 nel codice sorgente, questi compariranno nell'output nello stesso
 formato con cui sono stati inseriti.
 
+@node memoria persistente
+@section Preservare dati fra successive esecuzioni di @command{gawk}
+
+A partire dalle versione @value{PVERSION} 5.2, @command{gawk} supporta
+la @dfn{memoria persistente} [@dfn{persistent memory}].
+
+Questa funzionalit@`a sperimentale preserva
+i valori di tutte le variabili e di tutti i vettori di @command{gawk}
+immagazzinandoli in un "deposito" che risiede in un file del
+filesystem.  Quando la memoria persistente non viene utilizzata
+(@`e questo il caso normale), tali dati del programma @command{gawk}
+risiedono nella memoria del computer (e vanno persi alla fine
+dell'esecuzione di @command{gawk}).
+
+La funzionalit@`a della memoria persistente @`e disponibile solo nei
+sistemi che prevedono le chiamate a sistema @code{mmap()} e
+@code{munmap()}.  L'eseguibile di @command{gawk} dev'essere stato compilato
+in modalit@`a non-PIE (Position Independent Executable ==
+programma che funziona a prescindere da dove si trova nel computer),
+poich@'e i dati immagazzinati contengono puntatori a funzioni che si
+trovano all'interno del programma @command{gawk}.  Ci@`o implica
+anche che, per fare uso della memoria persistente, si deve fare uso
+del medesimo eseguibile di @command{gawk}, nelle successive chiamate
+al programma.
+
+Finora la memoria persistente @`e stata testata solo nel sistema operativo
+GNU/Linux e in quello Mac OS.  In altri sistemi operativi, la situazione
+pu@`o essere diversa, e potrebbe essere necessario fare ulteriori indagini
+prima di utilizzare questa funzionalit@`a.
+
+Per usare la memoria persistente, seguire questa procedura:
+
+@enumerate 1
+@item
+Creare un file sparso, nuovo e vuoto, delle dimensioni desiderate.
+Per esempio 4 gigabyte.  In ambiente Linux si pu@`o usare il comando
+@command{truncate}:
+
+@example
+$ @kbd{truncate -s 4G dati.pma}
+@end example
+
+@item
+Assegnare il percorso del file dei dati alla variabile d'ambiente
+@env{GAWK_PERSIST_FILE}.  @`E consigliabile farlo specificando il
+valore della variabile di ambiente quando si chiama il programma
+@command{gawk}, in questo modo:
+
+@example
+$ @kbd{GAWK_PERSIST_FILE=dati.pma ./gawk 'BEGIN @{ print ++i @}'}
+1
+@end example
+
+@item
+Usare lo stesso file di dati nelle successive esecuzioni del
+programma, per utilizzare i dati preservati:
+
+@example
+$ @kbd{GAWK_PERSIST_FILE=dati.pma ./gawk 'BEGIN @{ print ++i @}'}
+2
+$ @kbd{GAWK_PERSIST_FILE=dati.pma ./gawk 'BEGIN @{ print ++i @}'}
+3
+@end example
+
+@noindent
+Come si pu@`o vedere dall'esempio, nelle successive esecuzioni che usano
+il medesimo file di dati, il valore della variabile di @command{gawk}
+@`e stato conservato.
+
+@end enumerate
+
+@`E interessante notare che il programma @command{gawk} che viene
+eseguito non @`e necessariamente lo stesso da un'esecuzione alla
+successiva; i dati persistenti sono solo i valori delle variabili e
+dei vettori, non l'intera situazione interna del programma @command{gawk}.
+Ci@`o consente di condividere dei dati fra programmi indipendenti l'uno
+dall'altro, eliminando la necessit@`a dei diversi programmi di comunicare
+fra loro utilizzando dei file di testo.
+
+@cindex Kelly, Terence
+Terence Kelly, l'autore dell'allocatore di memoria persistente usato da
+@command{gawk}, consiglia quanto segue riguardo al file dati usato per
+la memoria persistente:
+
+@quotation
+Riguardo alla dimensione del file, la mia raccomandazione @`e di definirlo
+molto pi@`u grande del volume massimo di dati che si prevede debba
+contenere, a condizione che il filesystem supporti i file sparsi.
+[I file sparsi hanno una dimensione massima predefinita, ma usano
+su disco solo lo spazio fisico necessario a contenere i dati che vengono
+effettivamente immessi.]
+
+L'aspetto ``paghi solo quello che usi'', che @`e proprio dei file
+sparsi assicura che lo spazio effettivamente usato dal file di
+dati sia sufficiente a contenere tutti i dati del programma,
+ma avr@`a la dimensione minima richiesta per farlo.
+Se il filesystem @emph{non} supporta i file sparsi, occorre
+scegliere fra i due corni di un dilemma: definire un file dati
+troppo grande @`e uno spreco di spazio, ma definirlo troppo piccolo
+rischia di esaurire lo spazio disponibile, e in tal caso la chiamata
+alla funzione @code{pma_malloc()} restituisce il puntatore @code{NULL}
+[ossia che non @`e possibile allocare spazio per ulteriori variabili].
+In ogni caso, la funzionalit@`a di memoria persistente di @command{gawk}
+dovrebbe funzionare anche senza la disponibilit@`a di file sparsi.
+@ignore
+Note also that if the
+file system is encrypted, sparsity is no longer meaningful,
+even if the file system would otherwise support sparse files.
+At least this is true for some combinations of FS and FS
+encryption.  Not sure if we need to say that here.
+@end ignore
+@end quotation
+
+Si pu@`o inibire l'utilizzo dell'allocatore di memoria persistente
+in @command{gawk}, specificando l'opzione @option{--disable-pma}
+al comando @command{configure}, in fase di compilazione di
+@command{gawk} (@pxref{Installazione Unix}).
+
+La lista che segue contiene articoli e link a siti Internet
+[in inglese], che contengono ulteriori informazioni sulla
+memoria persistente e sul perch@'e pu@`o tornare utile in un
+linguaggio interptetato come @command{gawk}.
+
+@cindex Kelly, Terence
+@table @asis
+@item @uref{https://web.eecs.umich.edu/~tpkelly/pma/}
+Questa @`e la distribuzione ufficiale del 
+@dfn{Persistent Memory Allocator} (PMA)
+di Terence Kelly.
+Kelly pu@`o essere contattato direttamente a uno dei seguenti
+indirizzi email:
+@EMAIL{tpkelly@@acm.org, tpkelly (chiocciola) acm.org},
+@EMAIL{tpkelly@@cs.princeton.edu, tpkelly (chiocciola) cs.princeton.edu}, o
+@EMAIL{tpkelly@@eecs.umich.edu, tpkelly (chiocciola) eecs.umich.edu}.
+
+@item @cite{Persistent Memory Allocation}
+Terence Kelly, Zi Fan Tan, Jianan Li e Haris Volos,
+ACM @cite{Queue} magazine, Vol. 20 No. 2 (Marzo/Aprile 2022),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3534855, PDF},
+@uref{https://queue.acm.org/detail.cfm?id=3534855, HTML}.
+Questo saggio spiega il design del PMA
+usato per la memoria persistente in @command{gawk}.  
+  
+@item @cite{Persistent Scripting}
+Zi Fan Tan, Jianan Li, Haris Volos e Terence Kelly,
+Non-Volatile Memory Workshop (NVMW) 2022,
+@uref{http://nvmw.ucsd.edu/program/}.
+Questo saggio spiega le motivazioni che hanno portato a
+preparare un prototipo di ricerca di memoria persistente
+per @command{gawk}, ne descrive il comportamento e presenta
+stime di performance usando la memoria non-volatile
+Intel Optane; si noti che l'interfaccia @`e lievemente diversa.
+
+@item @cite{Persistent Memory Programming on Conventional Hardware}
+Terence Kelly,
+ACM @cite{Queue} magazine Vol. 17 No. 4 (Luglio/Agosto 2019),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3358955.3358957, PDF}, 
+@uref{https://queue.acm.org/detail.cfm?id=3358957, HTML}.
+Questo saggio descrive semplici tecniche per utilizzare la memoria
+persistente nei linguaggi C/C++, su computer convenzionali che
+non dispongono della funzionalit@`a hardware della memoria non-volatile.
+
+@item @cite{Is Persistent Memory Persistent?}
+Terence Kelly,
+ACM @cite{Queue} magazine Vol. 18 No. 2 (Marzo/Aprile 2020),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3400899.3400902, PDF},
+@uref{https://queue.acm.org/detail.cfm?id=3400902, HTML}.
+Questo saggio descrive un semplice e robusto ambiente di sviluppo
+per testare del software in grado di sopravvivere ad autentiche
+interruzioni di corrente elettrica.
+
+@item @cite{Crashproofing the Original NoSQL Key/Value Store}
+Terence Kelly,
+ACM @cite{Queue} magazine Vol. 19 No. 4 (Luglio/Agosto 2021),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3487019.3487353, PDF},
+@uref{https://queue.acm.org/detail.cfm?id=3487353, HTML}.
+Questo saggio descrive una funzionalit@`a di resistenza a
+interruzioni di programma aggiunta al database DBM GNU
+(@code{gdbm}).
+@end table
+
+Quando Terence Kelly ha pubblicato i suoi saggi, i suoi collaboratori
+hanno sviluppato il prototipo di un'integrazione fra PMA e @command{gawk}.
+Quella versione aggiungeva un'opzione (obbligatoria!)
+@option{--persist=@var{file}} per specificare in quale file andavano
+immagazzinati i dati persistenti.  Se si specifica tale opzione a
+@command{gawk}, si ottiene un messaggio di errore che spiega
+all'utente di usare in alternativa la variabile
+@env{GAWK_PERSIST_FILE}.  Tranne che in questo paragrafo, tale opzione
+@`e assolutamente non documentata.
+
+Come notato pi@`u sopra, il supporto per la memoria persistente
+@`e @emph{sperimentale}.
+Se diventa troppo impegnativo,@footnote{Nel senso di generare troppe
+segnalazioni di errore o troppe differenze marcate nel comportamento
+rispetto a quando @command{gawk} @`e eseguito normalmente.} allora il
+supporto per la funzionalit@`a verr@`a rimossso.
+
+
 @node Filosofia delle estensioni
 @section Funzionalit@`a incluse @dfn{versus} estensioni
 
@@ -32735,6 +32943,11 @@ profilazione @command{gawk} scrive il profilo, includendo lo
 
 @item
 Si pu@`o anche fare solo una ``stampa-elegante'' del programma.
+
+@item
+La funzionalit@`a ``memoria persistente'' consente di preservare i valori
+di variabili e vettori fra un'esecuzione e l'altra di @command{gawk}.
+Questa funzionalit@`a @`e al momento sperimentale.
 
 @item
 Nuove funzionalit@`a dovrebbero essere sviluppate usando, se possibile,
