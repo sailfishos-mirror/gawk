@@ -113,3 +113,16 @@ typedef unsigned long long uint_fast64_t;
 #define ximalloc xmalloc
 
 #include "mbsupport.h" /* defines stuff for DJGPP to fake MBS */
+
+#ifdef USE_PERSISTENT_MALLOC
+#include <stdlib.h>
+#include "pma.h"
+#define malloc	pma_malloc
+#define calloc	pma_calloc
+#define realloc	pma_realloc
+#define free	pma_free
+#else /* ! USE_PERSISTENT_MALLOC */
+#define pma_init(verbose, file)	0
+#define pma_get_root()	NULL
+#define pma_set_root(rootptr)	/* nothing */
+#endif /* ! USE_PERSISTENT_MALLOC */
