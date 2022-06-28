@@ -265,6 +265,7 @@ typedef enum nodevals {
 	Node_var,		/* scalar variable, lnode is value */
 	Node_var_array,		/* array is ptr to elements, table_size num of eles */
 	Node_var_new,		/* newly created variable, may become an array */
+	Node_elem_new,		/* newly created array element, may become a subarray */
 	Node_param_list,	/* lnode is a variable, rnode is more list */
 	Node_func,		/* lnode is param. list, rnode is body */
 	Node_ext_func,		/* extension function, code_ptr is builtin code */
@@ -1464,6 +1465,7 @@ extern NODE *do_asorti(int nargs);
 extern unsigned long (*hash)(const char *s, size_t len, unsigned long hsize, size_t *code);
 extern void init_env_array(NODE *env_node);
 extern void init_argv_array(NODE *argv_node, NODE *shadow_node);
+extern NODE *new_array_element(void);
 /* awkgram.c */
 extern NODE *variable(int location, char *name, NODETYPE type);
 extern int parse_program(INSTRUCTION **pcode, bool from_eval);
@@ -1578,6 +1580,7 @@ extern STACK_ITEM *grow_stack(void);
 extern void dump_fcall_stack(FILE *fp);
 extern int register_exec_hook(Func_pre_exec preh, Func_post_exec posth);
 extern NODE **r_get_field(NODE *n, Func_ptr *assign, bool reference);
+extern NODE *elem_new_to_scalar(NODE *n);
 /* ext.c */
 extern NODE *do_ext(int nargs);
 void load_ext(const char *lib_name);	/* temporary */
@@ -1872,7 +1875,8 @@ POP_ARRAY(bool check_for_untyped)
 	NODE *t = POP();
 	static bool warned = false;
 
-	if (do_lint && ! warned && check_for_untyped && t->type == Node_var_new) {
+	if (do_lint && ! warned && check_for_untyped
+	    && (t->type == Node_var_new || t->type == Node_elem_new)) {
 		warned = true;
 		lintwarn(_("behavior of `for' loop on untyped variable is not defined by POSIX"));
 	}
@@ -1965,6 +1969,13 @@ dupnode(NODE *n)
 static inline NODE *
 force_string_fmt(NODE *s, const char *fmtstr, int fmtidx)
 {
+	if (s->type == Node_elem_new) {
+		s->type = Node_val;
+		s->flags &= ~NUMBER;
+
+		return s;
+	}
+
 	if ((s->flags & STRCUR) != 0
 		&& (s->stfmt == STFMT_UNUSED || (s->stfmt == fmtidx
 #ifdef HAVE_MPFR

@@ -968,6 +968,9 @@ print_symbol(NODE *r, bool isparam)
 	case Node_var_new:
 		fprintf(out_fp, "untyped variable\n");
 		break;
+	case Node_elem_new:
+		fprintf(out_fp, "untyped element\n");
+		break;
 	case Node_var:
 		if (! isparam && r->var_update)
 			r->var_update();
@@ -1241,6 +1244,7 @@ do_set_var(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 
 		switch (r->type) {
 		case Node_var_new:
+		case Node_elem_new:
 			r->type = Node_var;
 			r->var_value = dupnode(Nnull_string);
 			/* fall through */
@@ -1730,6 +1734,7 @@ watchpoint_triggered(struct list_item *w)
 			t2 = symbol;
 			break;
 		case Node_var_new:
+		case Node_elem_new:
 			break;
 		default:
 			cant_happen("unexpected symbol type %s", nodetype2str(symbol->type));
@@ -1806,7 +1811,7 @@ initialize_watch_item(struct list_item *w)
 		r = *get_field(field_num, NULL);
 		w->cur_value = dupnode(r);
 	} else {
-		if (symbol->type == Node_var_new)
+		if (symbol->type == Node_var_new || symbol->type == Node_elem_new)
 			w->cur_value = (NODE *) 0;
 		else if (symbol->type == Node_var) {
 			r = symbol->var_value;
@@ -3753,6 +3758,10 @@ print_memory(NODE *m, NODE *func, Func_print print_func, FILE *fp)
 		print_func(fp, "%s", m->vname);
 		break;
 
+	case Node_elem_new:
+		print_func(fp, "element - %p", m);
+		break;
+
 	default:
 		print_func(fp, "?");  /* can't happen */
 	}
@@ -5109,7 +5118,7 @@ do_print_f(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 			r = find_symbol(name, NULL);
 			if (r == NULL)
 				goto done;
-			if (r->type == Node_var_new)
+			if (r->type == Node_var_new || r->type == Node_elem_new)
 				tmp[i] = Nnull_string;
 			else if (r->type != Node_var) {
 				d_error(_("`%s' is not a scalar variable"), name);
