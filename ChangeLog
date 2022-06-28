@@ -64,16 +64,45 @@
 	an array.
 	(api_impl): Add hook for api_destroy_array.
 
+2022-06-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (elem_new_to_scalar): Add declaration.
+	* eval.c (elem_new_to_scalar): No longer static. Make it handle
+	things when valref is > 1. Returns a NODE * instead of being void.
+	(cmp_scalars): Change usage of elem_new_to_scalar().
+	* interpret.h (r_interpret): Op_push*: Make Node_elem_new into
+	a separate case, using elem_new_to_scalar().
+	* array.c (force_array): For Node_elem_new, clear symbol->stptr.
+	* eval.r (r_get_lhs): Use efree() intstead of free() in Node_elem_new
+	case.
+
 2022-06-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* builtin.c (do_sub): Fix memory corruption when substituting
 	into a value that is a typed regex. Thanks to valgrind.
+
+2022-06-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix a nasty memory corruption problem. Thanks to
+	Andrew Schorr for the report.
+
+	* eval.c (r_get_lhs): Handle Node_elem_new separately
+	to free the string value. This was not the problem.
+	* interpret.h (r_interpret): For Op_assign, when turning
+	Node_elem_new into the null string, DEREF the old value
+	and dupnode the new one. THIS was the problem.
 
 2022-05-24         Adam Van Scyoc        <avanscy@g.clemson.edu>
 
 	* awkgram.y (make_assignable): Handle Op_field_assign.
 	Avoids a core dump upon a certain kind of syntax error;
 	see test/getlnfa.awk.
+
+2022-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* array.c (force_array): When converting Node_elem_new to an array,
+	release the string storage. Thanks to valgrind, by way of Andrew
+	Schorr, for the report.
 
 2022-05-11         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -111,15 +140,85 @@
 	merged.
 	* profile.c (pprint): Improve code for Op_K_switch, Op_K_case.
 
+2022-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* mpfr.c (mpg_force_number): Small whitespace fix.
+	* node.c (r_force_number): Ditto.
+
 2022-04-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawkbug.in: Small changes.
+
+2022-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Further cleanups.
+
+	* array.c (new_array_element): Set s->stfmt to STFMT_UNUSED.
+	* awk.h (force_string_fmt): No need to set s->stfmt anymore.
+	* builtin.c (do_typeof): Collapse Node_var_new and Node_elem_new
+	cases.
+	* symbol.c (print_vars): Node_elem_new can't be in a top level
+	variable. Remove check and add a call to cant_happen if some
+	other node type is received.
+	* NEWS: Updated.
 
 2022-04-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Small fix from the persistent-gawk guys.
 
 	* profile.c (pprint): Use estrdup instead of strdup.
+
+2022-03-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* array.c (new_array_element): Make a full null string instead of
+	an empty node; it can be more easily converted to scalar that way.
+	* awk.h (force_string_fmt): Change the node type, remove NUMBER flag,
+	set STFMT_UNUSED.
+	* cint_array.c (lear_clear): Remove check for not equal Node_elem_new.
+	* int_array.c (int_clear): Ditto.
+	* str_array.c (str_clear): Ditto.
+	* eval.c (elem_new_to_scalar): Now only needs to change the node type.
+	* interpret.h (r_interpret): Treat Node_elem_new like Node_val, and
+	UPREF it when pushed. Remove test before DEREFing when popping.
+	* mpfr.c (mpg_force_number): Simplify converting Node_elem_new to
+	Node_val. Fix the string value.
+	* node.c (r_force_number): Ditto.
+
+2022-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Allow unreferenced array elements to turn into subarrays.
+
+	* awk.h (Node_elem_new): New node type.
+	(new_array_element): Add declaration.
+	(POP_ARRAY): Handle Node_elem_new.
+	(force_string_fmt): Ditto. Make sure valref has the right value.
+	* array.c (force_array): Handle Node_elem_new.
+	(do_sort_up_value_type): Ditto.
+	(new_array_element): New function, creates Node_elem_new node.
+	* builtin.c (do_length): Handle Node_elem_new.
+	(do_typeof): Ditto.
+	* cint_array.c (leaf_lookup): Use new_array_element() when creating
+	a new element.
+	(left_clear): Don't unref Node_elem_new.
+	* debug.c (print_symbol, do_set_var,watchpont_triggered,
+	initialize_watch_item, print_memory, do_print_f): Handle Node_elem_new.
+	* eval.c (nodetypes): Add Node_elem_new.
+	(r_get_lhs, setup_frame): Handle Node_elem_new.
+	(elem_new_to_scalar): New function.
+	(cmp_scalars): Use elem_new_to_scalar.
+	* ext.c (get_actual_argument): Handle Node_elem_new.
+	* gawkapi.c (api_get_argument, api_set_argument, node_to_awk_value,
+	api_sym_update): Handle Node_elem_new.
+	* int_array.c (int_clear): Don't unref Node_elem_new.
+	(int_insert): Use new_array_element() when creating a new element.
+	* interpret.h (r_interpret): Handle Node_elem_new as appropriate.
+	* mpfr.c (mpg_force_number): Handle Node_elem_new.Make sure valref has
+	the right value.
+	* node.c (r_force_number): Ditto.
+	* str_array.c (str_lookup): Use new_array_element() when creating a
+	new element.
+	(str_clear): Don't unref Node_elem_new.
+	* symbol.c (print_vars): Handle Node_elem_new.
 
 2022-03-27         Arnold D. Robbins     <arnold@skeeve.com>
 
