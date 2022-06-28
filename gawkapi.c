@@ -1204,6 +1204,17 @@ api_clear_array(awk_ext_id_t id, awk_array_t a_cookie)
 	return awk_true;
 }
 
+/* api_destroy_array --- destroy an array */
+
+static awk_bool_t
+api_destroy_array(awk_ext_id_t id, awk_array_t a_cookie)
+{
+	if (! api_clear_array(id, a_cookie))
+		return awk_false;
+	freenode((NODE *) a_cookie);
+	return awk_true;
+}
+
 /* api_flatten_array_typed --- flatten out an array so that it can be looped over easily. */
 
 static awk_bool_t
@@ -1561,6 +1572,9 @@ gawk_api_t api_impl = {
 
 	/* Find/open a file */
 	api_get_file,
+
+	/* Additional array hook to destroy an array */
+	api_destroy_array,
 };
 
 /* init_ext_api --- init the extension API */

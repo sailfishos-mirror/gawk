@@ -59,7 +59,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH April, 2022
+@set UPDATE-MONTH June, 2022
 @set VERSION 5.1
 @set PATCHLEVEL 1
 
@@ -286,13 +286,13 @@ Fax: +1-617-542-2652
 Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="https://www.gnu.org">https://www.gnu.org/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2021
+<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2022
 Free Software Foundation, Inc.
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2021 @*
+Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2022 @*
 Free Software Foundation, Inc.
 @end ifnotdocbook
 @sp 2
@@ -878,6 +878,7 @@ particular records in a file and perform operations upon them.
 * TCP/IP Networking::                   Using @command{gawk} for network
                                         programming.
 * Profiling::                           Profiling your @command{awk} programs.
+* Persistent Memory::                   Preserving data between runs.
 * Extension Philosophy::                What should be built-in and what
                                         should not.
 * Advanced Features Summary::           Summary of advanced features.
@@ -926,7 +927,7 @@ particular records in a file and perform operations upon them.
 * Computer Arithmetic::                 A quick intro to computer math.
 * Math Definitions::                    Defining terms used.
 * MPFR features::                       The MPFR features in @command{gawk}.
-* MPFR Deprecated::                     MPFR features are deprecated!
+* MPFR On Parole::                      MPFR features are on parole!
 * MPFR Intro::                          MPFR General introduction.
 * FP Math Caution::                     Things to know.
 * Inexactness of computations::         Floating point math is not exact.
@@ -4199,10 +4200,16 @@ if @command{gawk} is not compiled to use the GNU MPFR and MP libraries
 
 As of @value{PVERSION} 5.2,
 the arbitrary precision arithmetic features in @command{gawk}
-are @emph{deprecated}.  They will be removed from @command{gawk} in 2024.
+are ``on parole.''
+The primary maintainer is no longer willing to support this feature,
+but another member of the development team has stepped up to take it over.
+As long as this situation reamins stable, MPFR will be supported. If it
+changes, the MPFR support will be removed from @command{gawk}.
+@ignore
 If you use this option, @command{gawk} generates a warning message.
 Create the environment variable @env{GAWK_NO_MPFR_WARN} with an arbitrary
 value in order to silence the warning.
+@end ignore
 
 @item @option{-n}
 @itemx @option{--non-decimal-data}
@@ -4830,9 +4837,11 @@ in milliseconds. On systems that do not support
 the @code{usleep()} system call,
 the value is rounded up to an integral number of seconds.
 
+@ignore
 @item GAWK_NO_MPFR_WARN
 Specifies that @command{gawk} should not print a deprecation
 warning when used with the @option{-M}/@option{--bignum} options.
+@end ignore
 
 @item GAWK_READ_TIMEOUT
 Specifies the time, in milliseconds, for @command{gawk} to
@@ -29583,9 +29592,13 @@ programs.
 Then, @command{gawk}'s special features for sorting arrays are presented.
 Next, two-way I/O, discussed briefly in earlier parts of this
 @value{DOCUMENT}, is described in full detail, along with the basics
-of TCP/IP networking.  Finally, we see how @command{gawk}
+of TCP/IP networking.  We then see how @command{gawk}
 can @dfn{profile} an @command{awk} program, making it possible to tune
 it for performance.
+Next, we present an experimental feature that allows you to preserve
+the values of @command{awk} variables and arrays between runs of @command{gawk}.
+Finally, we discuss the philosophy behind @command{gawk}'s extension
+mechanism.
 
 @c FULLXREF ON
 Additional advanced features are discussed in separate @value{CHAPTER}s of their
@@ -29620,6 +29633,7 @@ discusses the ability to dynamically add new built-in functions to
 * Two-way I/O::                 Two-way communications with another process.
 * TCP/IP Networking::           Using @command{gawk} for network programming.
 * Profiling::                   Profiling your @command{awk} programs.
+* Persistent Memory::           Preserving data between runs.
 * Extension Philosophy::        What should be built-in and what should not.
 * Advanced Features Summary::   Summary of advanced features.
 @end menu
@@ -30954,6 +30968,169 @@ Profiling and pretty-printing also preserve the original format of numeric
 constants; if you used an octal or hexadecimal value in your source
 code, it will appear that way in the output.
 
+@node Persistent Memory
+@section Preserving Data Between Runs
+
+Starting with @value{PVERSION} 5.2, @command{gawk} supports
+@dfn{persistent memory}.  This experimental feature stores the values of
+all of @command{gawk}'s variables and arrays in a persistent heap,
+which resides in a file in
+the filesystem.  When persistent memory is not in use (the normal case),
+@command{gawk}'s data resides in ephemeral system memory.
+
+Persistent memory is enabled on systems supporting the @code{mmap()}
+and @code{munmap()} system calls.  @command{gawk} must be compiled as a
+non-PIE (Position Independent Executable) binary, since the persistent
+store ends up holding pointers to functions held within the @command{gawk}
+executable.  This also means that to use the persistent memory, you must
+use the same @command{gawk} executable from run to run.
+
+As of this writing, persistent memory has only been tested on GNU/Linux
+and Mac OS systems. On others, your mileage may vary, and/or you may
+need to investigate how to make it work for you.
+
+To use persistent memory, follow these steps:
+
+@enumerate 1
+@item
+Create a new, empty sparse file of the desired size. For example, four
+gigabytes.  On a GNU/Linux system, you can use the @command{truncate}
+command:
+
+@example
+$ @kbd{truncate -s 4G data.pma}
+@end example
+
+@item
+Provide the path to the data file in the @env{GAWK_PERSIST_FILE}
+environment variable.  This is best done by placing the value in the
+environment just for the run of @command{gawk}, like so:
+
+@example
+$ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
+1
+@end example
+
+@item
+Use the same data file in subsequent runs to use the preserved data values:
+
+@example
+$ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
+2
+$ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
+3
+@end example
+
+@noindent
+As shown, in subsequent runs using the same data file, the values of
+@command{gawk}'s variables are preserved.
+
+@end enumerate
+
+Interestingly, the program that you execute need not be the same from
+run to run; the persistent store only maintains the values of variables
+and arrays, not the totality of @command{gawk}'s internal state.
+This lets you share data between unrelated programs, eliminating
+the need for scripts to communicate via text files.
+
+Terence Kelly, the author of the persistent memory allocator
+@command{gawk} uses, provides the following advice about the backing file:
+
+@quotation
+Regarding backing file size, I recommend making it far larger  
+than all of the data that will ever reside in it, assuming
+that the file system supports sparse files.  The ``pay only
+for what you use'' aspect of sparse files ensures that the
+actual storage resource footprint of the backing file will
+meet the application's needs but will be as small as
+possible.  If the file system does @emph{not} support sparse
+files, there's a dilemma:  Making the backing file too large
+is wasteful, but making it too small risks memory exhaustion,
+i.e., @code{pma_malloc()} returns @code{NULL}.
+But persistent @command{gawk} should
+still work even without sparse files.
+@ignore
+Note also that if the
+file system is encrypted, sparsity is no longer meaningful,
+even if the file system would otherwise support sparse files.
+At least this is true for some combinations of FS and FS
+encryption.  Not sure if we need to say that here.
+@end ignore
+@end quotation
+
+You can disable the use of the persistent memory allocator in
+@command{gawk} with the @option{--disable-pma} option to the @command{configure}
+command at the time that you build @command{gawk} (@pxref{Unix
+Installation}).
+
+Here are articles and web links that provide more information about
+persistent memory and why it's useful in a scripting language like
+@command{gawk}.
+
+@table @asis
+@item @uref{https://web.eecs.umich.edu/~tpkelly/pma/}
+This is the canonical source for Terence Kelly's Persistent Memory
+Allocator (PMA).  Kelly may be reached directly at any of the following
+email addresses:
+@EMAIL{tpkelly@@acm.org, tpkelly AT acm.org},
+@EMAIL{tpkelly@@cs.princeton.edu, tpkelly AT cs.princeton.edu}, or
+@EMAIL{tpkelly@@eecs.umich.edu, tpkelly AT eecs.umich.edu}.
+
+@item @cite{Persistent Memory Allocation}
+Terence Kelly, Zi Fan Tan, Jianan Li, and Haris Volos,
+ACM @cite{Queue} magazine, Vol. 20 No. 2 (March/April 2022),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3534855, PDF},
+@uref{https://queue.acm.org/detail.cfm?id=3534855, HTML}.
+This paper explains the design of the PMA
+allocator used in persistent @command{gawk}.  
+  
+@item @cite{Persistent Scripting}
+Zi Fan Tan, Jianan Li, Haris Volos, and Terence Kelly,
+Non-Volatile Memory Workshop (NVMW) 2022,
+@uref{http://nvmw.ucsd.edu/program/}.
+This paper motivates and describes a research prototype of persistent
+@command{gawk} and presents performance evaluations on Intel Optane
+non-volatile memory; note that the interface differs slightly.
+
+@item @cite{Persistent Memory Programming on Conventional Hardware}
+Terence Kelly,
+ACM @cite{Queue} magazine Vol. 17 No. 4 (July/Aug 2019),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3358955.3358957, PDF}, 
+@uref{https://queue.acm.org/detail.cfm?id=3358957, HTML}.
+This paper describes simple techniques for persistent memory for C/C++
+code on conventional computers that lack non-volatile memory hardware.
+
+@item @cite{Is Persistent Memory Persistent?}
+Terence Kelly,
+ACM @cite{Queue} magazine Vol. 18 No. 2 (March/April 2020),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3400899.3400902, PDF},
+@uref{https://queue.acm.org/detail.cfm?id=3400902, HTML}.
+This paper describes a simple and robust testbed for testing software  
+against real power failures.  
+
+@item @cite{Crashproofing the Original NoSQL Key/Value Store}
+Terence Kelly,
+ACM @cite{Queue} magazine Vol. 19 No. 4 (July/Aug 2021),
+@uref{https://dl.acm.org/doi/pdf/10.1145/3487019.3487353, PDF},
+@uref{https://queue.acm.org/detail.cfm?id=3487353, HTML}.
+This paper describes a crash-tolerance feature added to GNU DBM'
+(@code{gdbm}).
+@end table
+
+When Terence Kelly published his papers, his collaborators produced
+a prototype integration of PMA with @command{gawk}.  That version used
+a (mandatory!) option @option{--persist=@var{file}} to specify the file
+for storing the persistent heap. If this option is given to @command{gawk},
+it produces a fatal error message instructing the user to use the
+@env{GAWK_PERSIST_FILE} environment variable instead. Except for this
+paragraph, that option is otherwise undocumented.
+
+As noted earlier, support for persistent memory is @emph{experimental}.
+If it becomes burdensome,@footnote{Meaning, there are too many
+bug reports, or too many strange differences in behavior from when
+@command{gawk} is run normally.} then the feature will be removed.
+
+
 @node Extension Philosophy
 @section Builtin Features versus Extensions
 
@@ -31040,6 +31217,10 @@ you tune them more easily.  Sending the @code{USR1} signal while profiling cause
 
 @item
 You can also just ``pretty-print'' the program.
+
+@item
+Persistent memory allows you to preserve the values of variables and arrays
+between runs of @command{gawk}.  This feature is currently experimental.
 
 @item
 New features should be developed using the extension mechanism if possible;
@@ -34176,21 +34357,24 @@ This @value{SECTION} briefly describes arbitrary-precision
 arithmetic in @command{gawk}.
 
 @menu
-* MPFR Deprecated::             MPFR features are deprecated!
+* MPFR On Parole::              MPFR features are on parole!
 * MPFR Intro::                  MPFR General introduction.
 @end menu
 
-@node MPFR Deprecated
-@subsection Arbitrary Precision Arithmetic is Deprecated!
+@node MPFR On Parole
+@subsection Arbitrary Precision Arithmetic is On Parole!
 
 As of @value{PVERSION} 5.2,
 arbitrary precision arithmetic in @command{gawk}
-is @emph{deprecated}.  It will be removed from @command{gawk} in 2024.
+is ``on parole.''  The primary @command{gawk} maintainer is no
+longer maintaining it. Fortunately, a volunteer from the development
+team has agreed to take it over.
 
-This feature is deprecated because its inclusion was a mistake. It has
+This feature is on parole because its inclusion was a mistake. It has
 led to endless bug reports, misuse of the feature and public abuse of the
 maintainer, for no real increased value.
 
+@ignore
 If you use this feature, you should start working now to find a different
 toolset with which to accomplish your goals.@footnote{Of course, you can
 always continue to use a version of @command{gawk} that still supports
@@ -34200,6 +34384,15 @@ If the feature is very important to you, then consider if you are willing
 to volunteer to maintain it, so that it can continue to be included
 in @command{gawk}. If that is the case, contact the maintainer to discuss it
 with him.  You may do so by submitting a bug report.
+@end ignore
+
+If the situation with support changes, the feature will be removed
+from @command{gawk}.
+
+If you use this feature, you should consider finding a different
+toolset with which to accomplish your goals.@footnote{Of course, you can
+always continue to use a version of @command{gawk} that still supports
+arbitrary precision arithmetic. It simply will be unmaintained.}
 
 @node MPFR Intro
 @subsection Arbitrary Precision Introduction
@@ -37741,6 +37934,12 @@ Return false if there was some kind of problem, true otherwise.
 The array remains an array, but after calling this function, it
 has no elements. This is equivalent to using the @code{delete}
 statement (@pxref{Delete}).
+
+@item awk_bool_t destroy_array(awk_array_t a_cookie);
+Clear the array represented by @code{a_cookie} and release the array
+allocated by @code{create_array}.
+Return false if there was some kind of problem, true otherwise.
+The array will no longer exist and cannot be used again.
 
 @item awk_bool_t flatten_array_typed(awk_array_t a_cookie,
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_flat_array_t **data,
