@@ -7,8 +7,9 @@ dnl Decide whether or not to use the persistent memory allocator
 
 AC_DEFUN([GAWK_USE_PERSISTENT_MALLOC],
 [
+AC_CHECK_SIZEOF([void *])
 use_persistent_malloc=no
-if test "$SKIP_PERSIST_MALLOC" = no
+if test "$SKIP_PERSIST_MALLOC" = no && test $ac_cv_sizeof_void_p -eq 8
 then
 	AC_CHECK_FUNC([mmap])
 	AC_CHECK_FUNC([munmap])
