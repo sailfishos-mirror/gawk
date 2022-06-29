@@ -217,7 +217,7 @@ str_lookup(NODE *symbol, NODE *subs)
 	b->ahname = subs;
 	b->ahname_str = subs->stptr;
 	b->ahname_len = subs->stlen;
-	b->ahvalue = new_array_element();
+	b->ahvalue = dupnode(Nnull_string);
 	b->ahcode = code1;
 	return & (b->ahvalue);
 }
