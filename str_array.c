@@ -4,7 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2018, 2019,
- * 2021,
+ * 2021, 2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -217,7 +217,7 @@ str_lookup(NODE *symbol, NODE *subs)
 	b->ahname = subs;
 	b->ahname_str = subs->stptr;
 	b->ahname_len = subs->stlen;
-	b->ahvalue = new_array_element();
+	b->ahvalue = dupnode(Nnull_string);
 	b->ahcode = code1;
 	return & (b->ahvalue);
 }

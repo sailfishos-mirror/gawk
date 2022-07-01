@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003-2015, 2017-2019, 2021,
+ * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003-2015, 2017-2019, 2021, 2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -60,15 +60,6 @@ r_force_number(NODE *n)
 	char *cpend;
 	char save;
 	char *ptr;
-
-	if (n->type == Node_elem_new) {
-		n->type = Node_val;
-		n->flags &= ~STRING;
-		n->stptr[0] = '0';	// STRCUR is still set
-		n->stlen = 1;
-
-		return n;
-	}
 
 	if ((n->flags & NUMCUR) != 0)
 		return n;

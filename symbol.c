@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2015, 2017-2020,
+ * Copyright (C) 1986, 1988, 1989, 1991-2015, 2017-2020, 2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -497,8 +497,6 @@ print_vars(NODE **table, int (*print_func)(FILE *, const char *, ...), FILE *fp)
 			print_func(fp, "untyped variable\n");
 		else if (r->type == Node_var)
 			valinfo(r->var_value, print_func, fp);
-		else
-			cant_happen("unexpected node type: %s", nodetype2str(r->type));
 	}
 }
 

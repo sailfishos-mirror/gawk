@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012-2019, 2021, the Free Software Foundation, Inc.
+ * Copyright (C) 2012-2019, 2021, 2022, the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -69,7 +69,7 @@ api_get_argument(awk_ext_id_t id, size_t count,
 		return awk_false;
 
 	/* if type is undefined */
-	if (arg->type == Node_var_new || arg->type == Node_elem_new) {
+	if (arg->type == Node_var_new) {
 		if (wanted == AWK_UNDEFINED)
 			return awk_true;
 		else if (wanted == AWK_ARRAY) {
@@ -124,7 +124,7 @@ api_set_argument(awk_ext_id_t id,
 		return awk_false;
 
 	if (   (arg = get_argument(count)) == NULL
-	    || (arg->type != Node_var_new && arg->type != Node_elem_new))
+	    || arg->type != Node_var_new)
 		return awk_false;
 
 	arg = get_array_argument(arg, count);
@@ -564,7 +564,6 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 
 	switch (node->type) {
 	case Node_var_new:	/* undefined variable */
-	case Node_elem_new:	/* undefined element */
 		val->val_type = AWK_UNDEFINED;
 		if (wanted == AWK_UNDEFINED) {
 			ret = awk_true;
@@ -897,13 +896,10 @@ api_sym_update(awk_ext_id_t id,
 
 	efree((void *) full_name);
 
-	if ((node->type == Node_var && value->val_type != AWK_ARRAY)
-	    || node->type == Node_var_new
-	    || node->type == Node_elem_new) {
+	if ((node->type == Node_var && value->val_type != AWK_ARRAY) || node->type == Node_var_new) {
 		unref(node->var_value);
 		node->var_value = awk_value_to_node(value);
-		if ((node->type == Node_var_new || node->type == Node_elem_new)
-		    && value->val_type != AWK_UNDEFINED)
+		if (node->type == Node_var_new && value->val_type != AWK_UNDEFINED)
 			node->type = Node_var;
 
 		return awk_true;

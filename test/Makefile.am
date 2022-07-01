@@ -1,7 +1,7 @@
 #
 # test/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1988-2021 the Free Software Foundation, Inc.
+# Copyright (C) 1988-2022 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -678,12 +678,6 @@ EXTRA_DIST = \
 	manglprm.ok \
 	manyfiles.awk \
 	manyfiles.ok \
-	mdim1.awk \
-	mdim1.ok \
-	mdim2.awk \
-	mdim2.ok \
-	mdim3.awk \
-	mdim3.ok \
 	modifiers.sh \
 	modifiers.ok \
 	muldimposix.awk \
@@ -1482,7 +1476,6 @@ GAWK_EXT_TESTS = \
 	indirectcall3 indirectbuiltin2 \
 	inf-nan-torture intarray iolint isarrayunset lint lintexp \
 	lintindex lintint lintlength lintold lintplus lintset lintwarn \
-	mdim1 mdim2 mdim3 \
 	manyfiles match1 match2 match3 mbstr1 mbstr2 mixed1 mktime \
 	modifiers muldimposix nastyparm negtime next nondec nondec2 \
 	nonfatal1 nonfatal2 nonfatal3 nsawk1a nsawk1b nsawk1c nsawk2a \

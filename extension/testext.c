@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012, 2013, 2014, 2015, 2017, 2018, 2021
+ * Copyright (C) 2012, 2013, 2014, 2015, 2017, 2018, 2021, 2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the

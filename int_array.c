@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019, 2020,
+ * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019, 2020, 2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -794,7 +794,7 @@ int_insert(NODE *symbol, long k, uint32_t hash1)
 	}
 
 	b->ainum[i] = k;
-	b->aivalue[i] = new_array_element();
+	b->aivalue[i] = dupnode(Nnull_string);
 	b->aicount++;
 	return & b->aivalue[i];
 }

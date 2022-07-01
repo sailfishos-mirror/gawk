@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019, 2020, 2021,
+ * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019-2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -1070,7 +1070,7 @@ leaf_lookup(NODE *symbol, NODE *array, long k, long size, long base)
 	lhs = array->nodes + (k - base); /* leaf element */
 	if (*lhs == NULL) {
 		array->table_size++;	/* one more element in leaf array */
-		*lhs = new_array_element();
+		*lhs = dupnode(Nnull_string);
 	}
 	return lhs;
 }

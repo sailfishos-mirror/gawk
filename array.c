@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2014, 2016, 2018-2021,
+ * Copyright (C) 1986, 1988, 1989, 1991-2014, 2016, 2018-2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -315,7 +315,7 @@ array_vname(const NODE *symbol)
 
 /*
  *  force_array --- proceed to the actual Node_var_array,
- *	change Node_var_new or Node_elem_new to an array.
+ *	change Node_var_new to an array.
  *	If canfatal and type isn't good, die fatally,
  *	otherwise return the final actual value.
  */
@@ -334,11 +334,6 @@ force_array(NODE *symbol, bool canfatal)
 	}
 
 	switch (symbol->type) {
-	case Node_elem_new:
-		efree(symbol->stptr);
-		symbol->stptr = NULL;
-		symbol->stlen = 0;
-		/* fall through */
 	case Node_var_new:
 		symbol->xarray = NULL;	/* make sure union is as it should be */
 		null_array(symbol);
@@ -1171,7 +1166,6 @@ do_sort_up_value_type(const void *p1, const void *p2)
 		Node_func,
 		Node_ext_func,
 		Node_var_new,
-		Node_elem_new,
 		Node_var,
 		Node_var_array,
 		Node_val,
@@ -1433,27 +1427,4 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 	}
 
 	return list;
-}
-
-/* new_array_element --- return a new empty element node */
-
-NODE *
-new_array_element(void)
-{
-	NODE *n = make_number(0.0);
-	char *sp;
-
-	emalloc(sp, char *, 2, "new_array_element");
-	sp[0] = sp[1] = '\0';
-
-	n->stptr = sp;
-	n->stlen = 0;
-	n->stfmt = STFMT_UNUSED;
-
-	n->flags |= (MALLOC|STRING|STRCUR);
-
-	n->type = Node_elem_new;
-	n->valref = 1;
-
-	return n;
 }
