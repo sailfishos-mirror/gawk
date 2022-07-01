@@ -9,7 +9,8 @@
  */
 
 /*
- * Copyright (C) 2009-2014, 2017, 2018, 2020, 2021 the Free Software Foundation, Inc.
+ * Copyright (C) 2009-2014, 2017, 2018, 2020-2022
+ * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.

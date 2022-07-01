@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2021,
+ * Copyright (C) 1986, 1988, 1989, 1991-2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -25,7 +25,7 @@
  */
 
 /* FIX THIS BEFORE EVERY RELEASE: */
-#define UPDATE_YEAR	2021
+#define UPDATE_YEAR	2022
 
 #include "awk.h"
 #include "getopt.h"
