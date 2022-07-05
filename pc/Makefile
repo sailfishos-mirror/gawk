@@ -1,7 +1,6 @@
 # Makefile for gawk (GNU awk)                                      Dec 2010
 #
 # - for GNU C (djgpp)         [32bit protected-mode executable for DOS]
-# - for GNU C (emx)           [32bit executable for OS/2 or DOS or Windows32]
 # - for GNU C (mingw32)	      [Windows32 executable for Windows 9x/NT/2K/XP/7]
 
 # Tested with GNU make on Windows, OS/2 and DOS.
@@ -26,9 +25,6 @@ default:
 	@echo "  djgpp-readline . Like djgpp, but with readline        "
 	@echo "   [You will need to have GNU readline library installed.] "
 	@echo "  djgpp-readline-mpfr . djgpp with readline and MPFR    "
-	@echo "  emx ..... OS/2 32-bit exe [emx/gcc; uses emxlibc.dll] "
-	@echo "  emxnt ... NT exe [emx/gcc with RSXNT]                 "
-	@echo "  emxbnd .. OS/2 and DOS 32-bit exe [emx/gcc]           "
 	@echo "  mingw32 . Windows32 exe [Mingw32 GNU C]               "
 	@echo "  mingw32-readline . Like mingw32, but with readline    "
 	@echo "   [You will need to have GNU readline library installed.] "
@@ -65,7 +61,7 @@ RSPFILE = gawk.rsp
 #LDRSP = $(GAWKOBJS)
 #LNKRSP = $(LDRSP)
 #
-# else use brain-dead approach (emxbnd will need 'tr').
+# else use brain-dead approach
 RSP = $(RSPFILE)
 LDRSP = @$(RSP)
 LNKRSP = $(LDRSP)
@@ -148,46 +144,6 @@ djgpp-readline-mpfr:
 	CC=gcc O=.o CF='-O2 -DHAVE_LIBREADLINE -DHAVE_MPFR' \
 	LNK=LDJG LF=-s LF2="-lreadline -lmpfr -lgmp -lm" \
 	BIND=BDJG
-
-#========================================================================
-#========================== EMX =========================================
-#========================================================================
-
-# Link command for OS/2 versions.
-LEMX = $(CC) $(LF) -o $@ $(GAWKOBJS) gawk.def -lbsd $(LF2)
-
-# Link and bind for DOS and OS/2 versions.
-# emx-09 needs '-p' emx option here or in EMXOPT environ var.
-# The following works with 0.9a or newer
-LEMXBND = $(CC) $(LF) -o gawk $(LDRSP) gawk.def -lbsd $(LF2)
-BEMX = emxbind -bs gawk  -p
-# The following works with 0.9c or newer
-#LEMXBND = $(CC) $(LF) -o a.out $(LDRSP) gawk.def -lbsd $(LF2)
-#BEMX = emxbind -bs -o $@ a.out -p
-#BEMX = emxbind -bs /emx/bin/emx.exe a.out $@ -p
-BEMXD = emxbind -b -o $@ a.out -p
-
-emx:
-	$(MAK) all \
-	"CC=gcc -Zomf" O=.obj "CF=-O -DOS2" \
-	LNK=LEMX "LF=-s -Zcrtdll -Zstack 512" RSP=
-
-emxnt:
-	$(MAK) all \
-	"CC=gcc -Zwin32 -Zcrtdll=rsxntcs" O=.o "CF=-O -DOS2" \
-	LNK=LEMX "LF=-s -Zstack 512" RSP=
-
-emxbnd:
-	$(MAK) all \
-	CC=gcc O=.o "CF=-O -DOS2 -DMSDOS" OBJ=popen.o \
-	LNK=LEMXBND \
-	BIND=BEMX "P=|tr \" \" \"\n\""
-
-emxbnd-debug:
-	$(MAK) all \
-	CC=gcc O=.o "CF=-g -DOS2 -DMSDOS" OBJ=popen.o \
-	LNK=LEMXBND \
-	BIND=BEMXD "P=|tr \" \" \"\n\""
 
 #========================================================================
 #========================== MINGW32 =====================================

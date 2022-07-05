@@ -183,9 +183,6 @@ s/^#undef HAVE_STRINGS_H *$/#define HAVE_STRINGS_H 1/
 s/^#undef HAVE_STRING_H *$/#define HAVE_STRING_H 1/
 /^#undef HAVE_STRNCASECMP *$/c\
 #define HAVE_STRNCASECMP 1\
-#ifdef __EMX__\
-#define strncasecmp strnicmp\
-#endif
 s/^#undef HAVE_STRTOD *$/#define HAVE_STRTOD 1/
 /^#undef HAVE_STRTOUL *$/c\
 #if defined(__MINGW32__) || defined(__DJGPP__)\
@@ -326,9 +323,4 @@ extern bool is_valid_identifier(const char *name);\
 \
 #ifndef __DJGPP__\
 #define HAVE_POPEN_H 1\
-#endif\
-\
-#if defined(__EMX__)\
-#define strcasecmp stricmp\
-#define strncasecmp strnicmp\
 #endif

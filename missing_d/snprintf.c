@@ -87,9 +87,9 @@ safe_tmpfile (void)
 		return NULL;
 
 #if ! defined(__DJGPP__) && ! defined(MSDOS) && ! defined(_MSC_VER) \
-	&& ! defined(_WIN32) && ! defined(__CRTRSXNT__) && ! defined(__EMX__) \
+	&& ! defined(_WIN32) && ! defined(__CRTRSXNT__) \
 	&& ! defined(__MINGW32__) && ! defined(__WIN32__)
-	/* If not MS or OS/2, unlink after opening. */
+	/* If not MS unlink after opening. */
 	unlink (tmpfilename);
 	free(tmpfilename);
 	tmpfilename = NULL;
