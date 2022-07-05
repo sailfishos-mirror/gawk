@@ -32,7 +32,7 @@
 
 /* some old compilers don't grok #elif. sigh */
 
-#if defined(__EMX__) || defined(__DJGPP__) || defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #include "pc/gawkmisc.pc"
 #else /* not __DJGPP__, not __MINGW32__ */
 #if defined(VMS)

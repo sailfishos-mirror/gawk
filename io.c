@@ -113,18 +113,6 @@
 #include "popen.h"
 #endif
 
-#ifdef __EMX__
-#include <process.h>
-
-#if !defined(_S_IFDIR) && defined(S_IFDIR)
-#define _S_IFDIR	S_IFDIR
-#endif
-
-#if !defined(_S_IRWXU) && defined(S_IRWXU)
-#define _S_IRWXU	S_IRWXU
-#endif
-#endif
-
 #ifndef ENFILE
 #define ENFILE EMFILE
 #endif
@@ -361,7 +349,7 @@ init_io()
 }
 
 
-#if defined(__DJGPP__) || defined(__MINGW32__) || defined(__EMX__) || defined(__CYGWIN__)
+#if defined(__DJGPP__) || defined(__MINGW32__) || defined(__CYGWIN__)
 /* binmode --- convert BINMODE to string for fopen */
 
 static const char *
@@ -1953,7 +1941,7 @@ strictopen:
 		if (openfd == INVALID_HANDLE && errno == ENOENT && save_errno)
 			errno = save_errno;
 	}
-#if defined(__EMX__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 	if (openfd == INVALID_HANDLE && errno == EACCES) {
 		/* On OS/2 and Windows directory access via open() is
 		   not permitted.  */
@@ -2369,11 +2357,9 @@ use_pipes:
 	int ptoc[2], ctop[2];
 	int pid;
 	int save_errno;
-#if defined(__EMX__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 	int save_stdout, save_stdin;
-#ifdef __MINGW32__
 	char *qcmd = NULL;
-#endif
 #endif
 
 	if (pipe(ptoc) < 0)
@@ -2387,7 +2373,7 @@ use_pipes:
 		return false;
 	}
 
-#if defined(__EMX__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 	save_stdin = dup(0);	/* duplicate stdin */
 	save_stdout = dup(1);	/* duplicate stdout */
 
@@ -2430,13 +2416,9 @@ use_pipes:
 	os_close_on_exec(save_stdout, str, "pipe", "from"); /* saved stdout of the parent process */
 
 	/* stderr does NOT get dup'ed onto child's stdout */
-#ifdef __EMX__
-	pid = spawnl(P_NOWAIT, "/bin/sh", "sh", "-c", str, NULL);
-#else  /* __MINGW32__ */
 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
 		     qcmd = quote_cmd(str), NULL);
 	efree(qcmd);
-#endif
 
 	/* restore stdin and stdout */
 	close(1);
@@ -2464,7 +2446,7 @@ use_pipes:
 		return false;
 	}
 
-#else /* NOT __EMX__, NOT __MINGW32__ */
+#else /* NOT __MINGW32__ */
 	if ((pid = fork()) < 0) {
 		save_errno = errno;
 		close(ptoc[0]); close(ptoc[1]);
@@ -2492,7 +2474,7 @@ use_pipes:
 		execl("/bin/sh", "sh", "-c", str, NULL);
 		_exit(errno == ENOENT ? 127 : 126);
 	}
-#endif /* NOT __EMX__, NOT __MINGW32__ */
+#endif /* NOT __MINGW32__ */
 
 	/* parent */
 	if ((BINMODE & BINMODE_INPUT) != 0)
@@ -2532,7 +2514,7 @@ use_pipes:
 	else
 		find_output_wrapper(& rp->output);
 
-#if !defined(__EMX__) && !defined(__MINGW32__)
+#if !defined(__MINGW32__)
 	os_close_on_exec(ctop[0], str, "pipe", "from");
 	os_close_on_exec(ptoc[1], str, "pipe", "from");
 
@@ -2659,11 +2641,9 @@ gawk_popen(const char *cmd, struct redirect *rp)
 {
 	int p[2];
 	int pid;
-#if defined(__EMX__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 	int save_stdout;
-#ifdef __MINGW32__
 	char *qcmd = NULL;
-#endif
 #endif
 
 	/*
@@ -2677,7 +2657,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	if (pipe(p) < 0)
 		fatal(_("cannot open pipe `%s': %s"), cmd, strerror(errno));
 
-#if defined(__EMX__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 	rp->iop = NULL;
 	save_stdout = dup(1); /* save stdout */
 	if (save_stdout == -1) {
@@ -2700,13 +2680,9 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	os_close_on_exec(p[0], cmd, "pipe", "from"); /* pipe output: input of the parent process */
 	os_close_on_exec(save_stdout, cmd, "pipe", "from"); /* saved stdout of the parent process */
 
-#ifdef __EMX__
-	pid = spawnl(P_NOWAIT, "/bin/sh", "sh", "-c", cmd, NULL);
-#else  /* __MINGW32__ */
 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
 		     qcmd = quote_cmd(cmd), NULL);
 	efree(qcmd);
-#endif
 
 	/* restore stdout */
 	close(1);
@@ -2716,7 +2692,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	}
 	close(save_stdout);
 
-#else /* NOT __EMX__, NOT __MINGW32__ */
+#else /* NOT __MINGW32__ */
 	if ((pid = fork()) == 0) {
 		if (close(1) == -1)
 			fatal(_("close of stdout in child failed: %s"),
@@ -2729,14 +2705,14 @@ gawk_popen(const char *cmd, struct redirect *rp)
 		execl("/bin/sh", "sh", "-c", cmd, NULL);
 		_exit(errno == ENOENT ? 127 : 126);
 	}
-#endif /* NOT __EMX__, NOT __MINGW32__ */
+#endif /* NOT __MINGW32__ */
 
 	if (pid == -1) {
 		close(p[0]); close(p[1]);
 		fatal(_("cannot create child process for `%s' (fork: %s)"), cmd, strerror(errno));
 	}
 	rp->pid = pid;
-#if !defined(__EMX__) && !defined(__MINGW32__)
+#if !defined(__MINGW32__)
 	if (close(p[1]) == -1) {
 		close(p[0]);
 		fatal(_("close of pipe failed: %s"), strerror(errno));
@@ -3093,12 +3069,6 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 	*errcode = 0;
 	if (src == NULL || *src == '\0')
 		return NULL;
-#ifdef __EMX__
-	char os2_src[strlen(src) + 1];
-
-	if (is_extlib)
-		src = os2_fixdllname(os2_src, src, sizeof(os2_src));
-#endif /* __EMX__ */
 	path = do_find_source(src, stb, errcode, pi);
 
 	if (path == NULL && is_extlib) {
@@ -3414,7 +3384,7 @@ iop_alloc(int fd, const char *name, int errno_val)
 
 	if (fd != INVALID_HANDLE)
 		fstat(fd, & iop->public_.sbuf);
-#if defined(__EMX__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 	else if (errno_val == EISDIR) {
 		iop->public_.sbuf.st_mode = (_S_IFDIR | _S_IRWXU);
 		iop->public_.fd = FAKE_FD_VALUE;

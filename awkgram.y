@@ -3612,17 +3612,6 @@ yylex(void)
 		return lasttok = NEWLINE_EOF;
 	pushback();
 
-#if defined __EMX__
-	/*
-	 * added for OS/2's extproc feature of cmd.exe
-	 * (like #! in BSD sh)
-	 */
-	if (strncasecmp(lexptr, "extproc ", 8) == 0) {
-		while (*lexptr && *lexptr != '\n')
-			lexptr++;
-	}
-#endif
-
 	lexeme = lexptr;
 	thisline = NULL;
 

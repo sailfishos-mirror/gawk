@@ -1865,8 +1865,6 @@ platform_name()
 	return "mingw";
 #elif defined(__DJGPP__)
 	return "djgpp";
-#elif defined(__EMX__)
-	return "os2";
 #elif defined(USE_EBCDIC)
 	return "os390";
 #else
