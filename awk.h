@@ -169,9 +169,9 @@ extern void *memset_ulong(void *dest, int val, unsigned long l);
 #define fwrite	fwrite_unlocked
 #endif /* HAVE_FWRITE_UNLOCKED */
 
-#if defined(__DJGPP__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 #include "nonposix.h"
-#endif /* defined(__DJGPP__) || defined(__MINGW32__) */
+#endif /* defined(__MINGW32__) */
 
 /* use this as lintwarn("...")
    this is a hack but it gives us the right semantics */

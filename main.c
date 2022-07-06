@@ -1862,8 +1862,6 @@ platform_name()
 	return "vms";
 #elif defined(__MINGW32__)
 	return "mingw";
-#elif defined(__DJGPP__)
-	return "djgpp";
 #elif defined(USE_EBCDIC)
 	return "os390";
 #else

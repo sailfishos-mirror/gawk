@@ -1,6 +1,5 @@
 # Makefile for gawk (GNU awk)                                      Dec 2010
 #
-# - for GNU C (djgpp)         [32bit protected-mode executable for DOS]
 # - for GNU C (mingw32)	      [Windows32 executable for Windows 9x/NT/2K/XP/7]
 
 # Tested with GNU make on Windows, OS/2 and DOS.
@@ -19,12 +18,6 @@
 default:
 	@echo "Enter $(MAK) target "
 	@echo " where 'target' is chosen from                          "
-	@echo "  djgpp ... DOS 32-bit exe [GNU C, Delorie, v2]         "
-	@echo "  djgpp-mpfr . Like djgpp, but with MPFR                "
-	@echo "   [You will need to have GNU MPFR library installed.]  "
-	@echo "  djgpp-readline . Like djgpp, but with readline        "
-	@echo "   [You will need to have GNU readline library installed.] "
-	@echo "  djgpp-readline-mpfr . djgpp with readline and MPFR    "
 	@echo "  mingw32 . Windows32 exe [Mingw32 GNU C]               "
 	@echo "  mingw32-readline . Like mingw32, but with readline    "
 	@echo "   [You will need to have GNU readline library installed.] "
@@ -37,11 +30,9 @@ default:
 	@echo "  doc ..... Create documentation                        "
 
 # Support dropped in 4.0
-# - for DJGPP v1.x            [DOS 32bit protected-mode executable]
 # - for MS-Visual C/C++ 4.x   [Windows32 executable for Windows 9x/NT]
 # - for Microsoft C 7         [16bit ececutable for DOS]
 # - for Microsoft C 6.00A     [16bit executable for OS/2 or DOS]
-#	@echo "  djgppv1 . DOS 32-bit exe [GNU C, Delorie, v1]         "
 #	@echo "  msc ..... DOS exe [Microsoft C 7 & 8 (AKA 1.52)]      "
 #	@echo "  msc6 .... DOS exe [Microsoft C 6.00a]                 "
 #	@echo "  msc6os2 . OS/2 exe [Microsoft C 6.00a]                "
@@ -102,48 +93,6 @@ VPATH = .;./support;./support/malloc
 #========================================================================
 # End of general configuration. Some platform-specific configuration
 # notes appear below.
-
-#========================================================================
-#========================== DJGPP =======================================
-#========================================================================
-
-ifneq ($(DJGPP),)
-prefix = /dev/env/DJDIR
-pkgdatadir = $(prefix)/share/awk
-SHLIBEXT = "\"dxe\""
-endif
-LDJG = $(CC) $(LF) -o gawk.exe $(LDRSP) $(LF2)
-BDJG = stubify -g awk.exe | stubedit awk.exe runfile=gawk
-
-djgpp:
-	$(MAK) all \
-	CC=gcc O=.o CF=-O2 \
-	LNK=LDJG LF=-s LF2=-lm \
-	BIND=BDJG
-
-djgpp-debug:
-	$(MAK) all \
-	CC=gcc O=.o CF='-O2 -g' \
-	LNK=LDJG LF2=-lm \
-	BIND=BDJG
-
-djgpp-mpfr:
-	$(MAK) all \
-	CC=gcc O=.o CF='-O2 -DHAVE_MPFR' \
-	LNK=LDJG LF=-s LF2="-lmpfr -lgmp -lm" \
-	BIND=BDJG
-
-djgpp-readline:
-	$(MAK) all \
-	CC=gcc O=.o CF='-O2 -DHAVE_LIBREADLINE' \
-	LNK=LDJG LF=-s LF2="-lreadline -lm" \
-	BIND=BDJG
-
-djgpp-readline-mpfr:
-	$(MAK) all \
-	CC=gcc O=.o CF='-O2 -DHAVE_LIBREADLINE -DHAVE_MPFR' \
-	LNK=LDJG LF=-s LF2="-lreadline -lmpfr -lgmp -lm" \
-	BIND=BDJG
 
 #========================================================================
 #========================== MINGW32 =====================================

@@ -67,17 +67,10 @@ char *w32_setlocale (int, const char *);
 
 #endif	/* __MINGW32__ */
 
-#if defined(VMS) || defined(__DJGPP__) || defined(__MINGW32__)
+#if defined(VMS) || defined(__MINGW32__)
 int getpgrp(void);
 #endif
 
-#if defined(__DJGPP__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 int getppid(void);
-#endif
-
-#ifdef __DJGPP__
-/* Prototypes of for Posix functions for which we define replacements
-   in pc/ files.  */
-wint_t btowc (int c);
-wint_t putwc (wchar_t wc, FILE *stream);
 #endif

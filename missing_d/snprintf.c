@@ -86,7 +86,7 @@ safe_tmpfile (void)
 	if ((fd = mkstemp (tmpfilename)) < 0)
 		return NULL;
 
-#if ! defined(__DJGPP__) && ! defined(MSDOS) && ! defined(_MSC_VER) \
+#if ! defined(MSDOS) && ! defined(_MSC_VER) \
 	&& ! defined(_WIN32) && ! defined(__CRTRSXNT__) \
 	&& ! defined(__MINGW32__) && ! defined(__WIN32__)
 	/* If not MS unlink after opening. */
