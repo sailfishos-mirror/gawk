@@ -388,7 +388,7 @@ void
 dfaerror(const char *s)
 {
 	fatal("%s", s);
-	exit(EXIT_FATAL);	/* for DJGPP */
+	exit(EXIT_FATAL);
 }
 
 /* re_cache_get --- populate regexp cache if empty */

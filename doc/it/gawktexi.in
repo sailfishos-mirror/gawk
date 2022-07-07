@@ -1085,7 +1085,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         esattamente.
 * Confronti tra valori in VM::          Come confrontare valori in virgola mobile.
 * Gli errori si sommano::               Gli errori diventano sempre maggiori.
-* Valori strani::                       Un cenno riguardo ai valori infiniti e a NaN [Non un Numero].
+* Valori strani::                       Un cenno riguardo ai valori infiniti e a NaN [Not a Number].
 * Ottenere la precisione::              Ottenere la precisione voluta.
 * Tentare di arrotondare::              Tentare di aggiungere bit di precisione e
                                         arrotondare.
@@ -10760,7 +10760,7 @@ stampare valori non validi, o comportarsi in modo completamente differente.
 @quotation NOTA
 Lo standard IEEE 754 per l'aritmetica in virgola mobile consente di
 avere valori speciali per rappresentare ``infinito'' (sia positivo che
-negativo) e valori che sono ``non numerici'' (NaN - [Non un Numero]).
+negativo) e valori che sono ``non numerici'' (NaN - [Not a Number]).
 
 L'input e l'output di tali valori avviene sotto forma di stringhe di
 testo.  Ci@`o pone dei problemi nel linguaggio @command{awk}, che
@@ -19422,7 +19422,7 @@ modalit@`a compatibile (@pxref{Opzioni}).
 @cindexawkfunc{log}
 @cindex logaritmo
 Restituisce il logaritmo naturale di @var{x}, se @var{x} @`e positivo;
-altrimenti, restituisce NaN (``not a number'',[Non un Numero])
+altrimenti, restituisce NaN (``Not a Number'',[Non un Numero])
 sui sistemi che implementano lo standard IEEE 754.
 Inoltre, @command{gawk} stampa un messaggio di avvertimento qualora @code{x}
 sia negativo.
@@ -32630,7 +32630,7 @@ delle costanti numeriche; se sono stati usati dei valori ottali o esadecimali
 nel codice sorgente, questi compariranno nell'output nello stesso
 formato con cui sono stati inseriti.
 
-@node memoria persistente
+@node Memoria persistente
 @section Preservare dati fra successive esecuzioni di @command{gawk}
 
 A partire dalle versione @value{PVERSION} 5.2, @command{gawk} supporta
@@ -36732,8 +36732,8 @@ per questa descrizione, che abbiamo parafrasato, e per gli esempi.}
 
 Questo @`e un valore speciale che risulta da un calcolo che non ha come
 risposta un numero reale.  In tal caso, i programmi possono o ricevere
-un’eccezione di virgola mobile, o restituire NaN [Non un Numero] come risultato.
-Lo standard IEEE 754 consiglia che i sistemi restituiscano NaN [Non un Numero].
+un’eccezione di virgola mobile, o restituire NaN [Not a Number] come risultato.
+Lo standard IEEE 754 consiglia che i sistemi restituiscano NaN [Not a Number].
 Alcuni esempi:
 
 @table @code
@@ -36756,11 +36756,11 @@ per cui il risultato @`e @code{NaN}.
 I valori Nan sono strani.  In particolare, non possono essere confrontati
 con altri numeri in virgola mobile; ogni confronto di questo tipo, eccetto
 quello ``non uguale a'', restituisce il valore ``falso''.
-I valori NaN [Non un Numero] sono talmente differenti da altri valori che perfino il
+I valori NaN [Not a Number] sono talmente differenti da altri valori che perfino il
 confronto di due valori NaN identici fra loro con @code{!=} restituisce
 il valore ``vero''!
 
-I valori NaN [Non un Numero] possono anche avere un segno (positivo o negativo),
+I valori NaN [Not a Number] possono anche avere un segno (positivo o negativo),
 anche se dipende dall'implementazione quale segno viene restituito
 da qualsiasi operazione il cui risultato sia un valore NaN.
 Per esempio, su alcuni sistemi la funzione @code{sqrt(-1)}
@@ -37574,7 +37574,7 @@ esadecimale (p.es., @code{0xDEADBEEF}). (Da notare: valore dei dati letti,
 
 @item
 Supporto per i valori in virgola mobile speciali IEEE 754 ``not a number''
-(NaN) [Non un Numero], pi@`u infinito (``inf'') e meno infinito (``@minus{}inf'').
+(NaN) [Not a Number], pi@`u infinito (``inf'') e meno infinito (``@minus{}inf'').
 In particolare, il formato per questi valori @`e quello specificato dallo
 standard C ISO 1999, che non distingue maiuscole/minuscole e pu@`o consentire
 caratteri aggiuntivi dipendenti dall'implementazione dopo il @samp{nan}, e
@@ -37662,7 +37662,7 @@ speciali. Cos@`{@dotless{i}}, @samp{+nan} e @samp{+NaN} sono la stessa cosa.
 
 @cindex POSIX @subentry modalit@`a
 Oltre a gestire l'input, @command{gawk} deve anche stampare valori
-``corretti'' in output, quando un valore sia NaN [Non un Numero]
+``corretti'' in output, quando un valore sia NaN [Not a Number]
 o Infinity [Infinito].
 A partire dalla @value{PVERSION} 4.2.2, per tali valori
 @command{gawk} stampa una delle quattro stringhe sopra descritte:
@@ -43833,9 +43833,22 @@ MirBSD
 GNU/Linux su Alpha
 @end itemize
 
+@item
+Il supporto per i seguenti sistemi è stato rimosso dal
+codice sorgente @command{gawk} a partire dalla @value{PVERSION} 5.2:
+
+
+@c nested table
+@itemize @value{MINUS}
+@item
+OS/2
+
+@c add more removed systems here
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
+@end itemize
 
 
 @c This does not need to be in the formal book.
@@ -44719,10 +44732,36 @@ e ora sono pi@`u ragionevoli.
 (@pxref{Opzioni}).
 
 @item
-La gestione dei valori Infinity [Infinito] e NaN [Non un Numero]
+La gestione dei valori Infinity [Infinito] e NaN [Not a Number]
 @`e stata migliorata.
 @xref{Definizioni matematiche} e vedere anche
 @ref{Problemi virgola mobile POSIX}.
+@end itemize
+
+La Versione 5.2 ha aggiunto le seguenti funzionalità:
+
+@itemize
+@item
+La funzione predefinita @code{mkbool()}
+(@pxref{Funzioni booleane}).
+
+@item
+Le espressioni di intervallo sono consentite
+per default nelle espressioni regolari
+(@pxref{Espressioni di intervallo}).
+
+@item
+Lo script @command{gawkbug} per la segnalazione di bug
+(@pxref{Indirizzo bug}).
+
+@cindex Kelly, Terence
+@item
+L'allocatore di memoria persistente di Terence Kelly (PMA) è stato
+integrato, consentendo l'uso di dati persistenti
+[fra successive chiamate di @command{gawk}] su alcuni
+sistemi
+(@pxref{Memoria persistente}).
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -46826,7 +46865,7 @@ con un @value{DF} in input che possa riprodurre il problema.
 @item
 @cindex @command{gawkbug} utility
 @cindex programma di utilit@`a @subentry @command{gawkbug}
-Si usi il programma @command{gawkbug} per preparare la segnalazione
+Si usi lo script @command{gawkbug} per preparare la segnalazione
 del bug.  Questo programma prepara un modello di segnalazione
 di bug e vi permette di modificarlo nel vostro programma di edit.
 Va quindi modificato appropriatamente per includere:
@@ -46867,7 +46906,7 @@ lingua che tutti i manutentori comprendono.}
 @cindex indirizzo email per segnalare bug @subentry @email{bug-gawk@@gnu.org}
 @cindex bug @subentry segnalare @subentry indirizzo email, @email{bug-gawk@@gnu.org}
 @cindex segnalare bug @subentry indirizzo email @subentry @email{bug-gawk@@gnu.org}
-Il programma @command{gawkbug} spedisce un messaggio di posta elettronica a
+Lo script @command{gawkbug} spedisce un messaggio di posta elettronica a
 @EMAIL{bug-gawk@@gnu.org,bug (trattino) gawk (chiocciola) gnu (punto) org}.
 
 I manutentori di @command{gawk} sono i destinatari, e riceveranno la
@@ -47148,10 +47187,6 @@ Le persone che si occupano delle varie versioni di @command{gawk} sono:
 @item MS-DOS with DJGPP @tab Juan Manuel Guerrero, @EMAIL{juan.guerrero@@gmx.de, juan (punto) guerrero (chiocciola) gmx (punto) de}
 
 @item MS-Windows con MinGW @tab Eli Zaretskii, @EMAIL{eliz@@gnu.org,eliz (chiocciola) gnu (punto) org}
-
-@c Leave this in the document on purpose.
-@c OS/2 is not mentioned anywhere else though.
-@item OS/2 @tab Andreas Buening, @EMAIL{andreas.buening@@nexgo.de,andreas (punto) buening (chiocciola) nexgo (punto) de}
 
 @item VMS @tab John Malmberg, @EMAIL{wb8tyw@@qsl.net,wb8tyw (chiocciola) qsl (punto) net}
 
@@ -47512,7 +47547,6 @@ per poter scaricare il file.
 @command{gawk} pu@`o essere installato anche su sistemi non-POSIX.  I sistemi
 correntemente supportati sono MS-Windows, usando
 MSYS, MSYS2, DJGPP, MinGW e Cygwin,
-@c OS/2,
 e sia Vax/VMS che OpenVMS.  Le istruzioni per ognuno di questi sistemi sono
 incluse in
 @ifnotinfo

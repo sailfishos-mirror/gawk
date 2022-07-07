@@ -50,9 +50,9 @@ int getpgrp(void)
   return (0);
 }
 
-#if defined(__DJGPP__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 int getppid(void)
 {
   return (0);
 }
-#endif	/* __DJGPP__ || __MINGW32__ */
+#endif	/* __MINGW32__ */

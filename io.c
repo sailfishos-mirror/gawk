@@ -117,10 +117,6 @@
 #define ENFILE EMFILE
 #endif
 
-#if defined(__DJGPP__)
-#define closemaybesocket(fd)	close(fd)
-#endif
-
 #if defined(VMS)
 #include <ssdef.h>
 #ifndef SS$_EXBYTLM
@@ -181,10 +177,6 @@
 
 #if defined(_AIX)
 #undef TANDEM	/* AIX defines this in one of its header files */
-#endif
-
-#ifdef __DJGPP__
-#define PIPES_SIMULATED
 #endif
 
 #ifdef __MINGW32__
@@ -349,7 +341,7 @@ init_io()
 }
 
 
-#if defined(__DJGPP__) || defined(__MINGW32__) || defined(__CYGWIN__)
+#if defined(__MINGW32__) || defined(__CYGWIN__)
 /* binmode --- convert BINMODE to string for fopen */
 
 static const char *

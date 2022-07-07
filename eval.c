@@ -545,7 +545,6 @@ posix_compare(NODE *s1, NODE *s2)
 		s1->stptr[s1->stlen] = save1;
 		s2->stptr[s2->stlen] = save2;
 	}
-#if ! defined(__DJGPP__)
 	else {
 		/* Similar logic, using wide characters */
 		const wchar_t *p1, *p2;
@@ -578,7 +577,6 @@ posix_compare(NODE *s1, NODE *s2)
 			}
 		}
 	}
-#endif
 
 	return ret;
 }

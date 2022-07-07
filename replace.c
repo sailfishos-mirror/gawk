@@ -114,7 +114,3 @@
 #ifndef HAVE_STRCOLL
 #include "missing_d/strcoll.c"
 #endif
-
-#if defined(__DJGPP__)
-#include "missing_d/wcmisc.c"
-#endif

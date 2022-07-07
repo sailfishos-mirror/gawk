@@ -112,8 +112,6 @@ typedef unsigned long long uint_fast64_t;
 #define xirealloc xrealloc
 #define ximalloc xmalloc
 
-#include "mbsupport.h" /* defines stuff for DJGPP to fake MBS */
-
 #ifdef USE_PERSISTENT_MALLOC
 #include <stdlib.h>
 #include "pma.h"

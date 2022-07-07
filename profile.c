@@ -119,17 +119,12 @@ set_prof_file(const char *file)
 void
 init_profiling_signals()
 {
-#ifdef __DJGPP__
-	signal(SIGINT, dump_and_exit);
-	signal(SIGQUIT, just_dump);
-#else  /* !__DJGPP__ */
 #ifdef SIGHUP
 	signal(SIGHUP, dump_and_exit);
 #endif
 #ifdef SIGUSR1
 	signal(SIGUSR1, just_dump);
 #endif
-#endif /* !__DJGPP__ */
 }
 
 /* indent --- print out enough tabs */

@@ -12,16 +12,6 @@
 
 # Process the bits in Makefile.in we need to generate the tests properly
 
-# Tests that fail on DJGPP
-/^EXPECTED_FAIL_DJGPP *=/,/[^\\]$/ {
-	print
-	gsub(/(^EXPECTED_FAIL_DJGPP *=|\\$)/,"")
-	for (i = 1; i <= NF; i++)
-		djgpp[$i]
-
-	next
-}
-
 # Tests that fail on MinGW
 /^EXPECTED_FAIL_MINGW *=/,/[^\\]$/ {
 	print
@@ -116,11 +106,7 @@ function print_recipe(		i, start)
 		start = 2
 
 	# print the right warning
-	if (name in djgpp && name in mingw) {
-		print "\t@echo Expect $@ to fail with DJGPP and MinGW."
-	} else if (name in djgpp) {
-		print "\t@echo Expect $@ to fail with DJGPP."
-	} else if (name in mingw) {
+	if (name in mingw) {
 		print "\t@echo Expect $@ to fail with MinGW."
 	}
 
