@@ -28,10 +28,10 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH June, 2020
+@set UPDATE-MONTH July, 2022
 
 @set TITLE Participating in @command{gawk} Development
-@set EDITION 0.73
+@set EDITION 0.74
 
 @iftex
 @set DOCUMENT booklet
@@ -144,13 +144,13 @@ Fax: +1-617-542-2652
 Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="http://www.gnu.org">http://www.gnu.org/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2017, 2018, 2019, 2020
+<literallayout class="normal">Copyright &copy; 2017, 2018, 2019, 2020, 2022
 Free Software Foundation, Inc.
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2017, 2018, 2019, 2020
+Copyright @copyright{} 2017, 2018, 2019, 2020, 2022
 Free Software Foundation, Inc.
 @end ifnotdocbook
 @sp 2
@@ -192,7 +192,7 @@ copy and modify this GNU manual.''
 @title @value{TITLE}
 @subtitle Edition @value{EDITION}
 @subtitle @value{UPDATE-MONTH}
-@author Arnold D. Robbins
+@author Arnold D.@: Robbins
 
 @ifnotdocbook
 @c Include the Distribution inside the titlepage environment so
@@ -307,22 +307,33 @@ This @value{DOCUMENT} describes how to participate in development
 of GNU Awk (@command{gawk}).  GNU Awk is a Free Software project
 belonging to the Free Software Foundation's GNU project.
 
-@cindex Git Project
-The @value{DOCUMENT} focuses on participation in the project (that is,
-how to work most effectively if you wish to contribute to it) and
-also describes how to make use of the @uref{http://git-scm.org, Git}
-distributed source code management system for @command{gawk} development.
-
-You should be comfortable working with traditional UNIX-style
-tools and with the C language and standard library facilities.
-
 @menu
+* Intended Audience::           Who should read this manual.
 * This Manual::                 How to use this manual.
 * Conventions::                 Typographical Conventions.
 * Acknowledgments::             Acknowledgments.
 * Reviewers::                   A note to reviewers.
 @end menu
 
+@node Intended Audience
+@unnumberedsec Intended Audience
+
+This @value{DOCUMENT} is aimed at software developers who wish
+to participate in @command{gawk} development.
+
+You should be comfortable working with traditional Unix-style
+command-line tools, and with the C language and standard library facilities.
+
+You should also have some prior experience using distributed
+source code control systems, such as the Concurrent Versions
+System (CVS) or Subversion (SVN).  Experience with a more modern
+system such as Mercurial or Git will be even more helpful.
+
+@cindex Git Project
+The @value{DOCUMENT} focuses on participation in the project (that is,
+how to work most effectively if you wish to contribute to it) and
+also describes how to make use of the @uref{http://git-scm.org, Git}
+distributed source code management system for @command{gawk} development.
 
 @node This Manual
 @unnumberedsec Using This Book
@@ -359,7 +370,7 @@ practices used by the @command{gawk} development team.
 
 @item
 @ref{Repo Maintenance} presents several different things
-you need to know about to keep your repo in good shape.
+you need to know about to keep your repository in good shape.
 
 @item
 @ref{Development Stuff} describes some important points you
@@ -410,7 +421,7 @@ $ @kbd{echo hello on stderr 1>&2}
 @ifnotinfo
 In the text, almost anything related to programming, such as command
 names, variable and function names, and string, numeric and regexp
-constants appear in @code{this font}. Code fragments appear in the same
+constants appear in @code{this font}.  Code fragments appear in the same
 font and quoted, @samp{like this}.  Things that are replaced by the
 user or programmer appear in @var{this font}.  Options look like this:
 @option{-f}.  File names are indicated like this: @file{/path/to/ourfile}.
@@ -461,21 +472,21 @@ Spelling errors and typo fixes welcome, but not as important.
 @node Contributing
 @chapter How to Start Contributing
 
-@command{gawk} development is distributed. It's done using electronic
-mail (email) and via branches in the Git repo@footnote{Short for
-``repository''.} on @uref{http://savannah.gnu.org, Savannah}, the GNU
+@command{gawk} development is distributed.  It's done using electronic
+mail (@dfn{email}) and via branches in the Git repository (or @dfn{repo})
+on @uref{http://savannah.gnu.org, Savannah}, the GNU
 project's source code management site.
 
-In this @value{CHAPTER} we use some Git terminology. If you're not at
+In this @value{CHAPTER} we use some Git terminology.  If you're not at
 all familiar with Git, then skim this @value{CHAPTER} and come back
 after reading the rest of the @value{DOCUMENT}.
 
-@command{gawk} is similar to many other Free Software projects. To begin
+@command{gawk} is similar to many other Free Software projects.  To begin
 contributing, simply start!  Take a look at the @file{TODO} file in the
 distribution, see if there is something of interest to you, and ask on
 the @email{bug-gawk@@gnu.org} mailing list if anyone else is working
-on it. If not, then go for it!  (@xref{Development Stuff} for a discussion of some
-of the technical things you'll need to do. Here we describe the process
+on it.  If not, then go for it!  (@xref{Development Stuff} for a discussion of some
+of the technical things you'll need to do.  Here we describe the process
 in general.)
 
 Your contribution can be almost anything that is relevant for
@@ -484,9 +495,9 @@ features.
 
 @quotation NOTE
 If possible, new features should be done using @command{gawk}'s extension
-mechanism. If you want to add a user-visible language change to the
+mechanism.  If you want to add a user-visible language change to the
 @command{gawk} core, you're going to have to convince the maintainer
-and other developers that it's really worthwhile to do so.
+and the other developers that it's really worthwhile to do so.
 
 Changes that improve performance or portability, or that fix bugs,
 or that enable more things in extensions,
@@ -511,7 +522,7 @@ mailing list.
 Once you have commit access, if you want to make a major change or add a
 major feature, where the patch(es) would be very large, it has become the
 practice to create a separate branch, based off of @code{master}, to host
-the feature. This way the maintainer can review it, and you can continue
+the feature.  This way the maintainer can review it, and you can continue
 to improve it, until it's ready for integration into @code{master}.
 
 @cindex GitHub
@@ -520,10 +531,11 @@ Because of the GNU project's requirements for signed paperwork for
 contributions, the @command{gawk} project will @strong{not} work
 with pull requests from @uref{http://github.com, GitHub} or any other
 Git-based software hosting service.  You must submit patches to the
-mailing list, and be willing to sign paperwork for large patches.
+mailing list, and be willing to sign paperwork for large patches
+(@pxref{Doing paperwork}).
 @end quotation
 
-The @email{bug-gawk@@gnu.org} mailing list is not private. Anyone may
+The @email{bug-gawk@@gnu.org} mailing list is not private.  Anyone may
 send mail to it, and anyone may subscribe to it.  To subscribe,
 go to the list's @uref{https://lists.gnu.org/mailman/listinfo/bug-gawk,
 web page} and follow the instructions there.  If you plan to be involved
@@ -533,7 +545,7 @@ subscribe to the list.
 @node Using Git
 @chapter Using Git
 
-This chapter provides an introduction to using Git. Our point is
+This chapter provides an introduction to using Git.  Our point is
 @emph{not} to rave about how wonderful Git is, nor to go into painful
 detail about how it works.  Rather we want to give you enough background
 to understand how to use Git effectively for bug fix and feature
@@ -562,8 +574,11 @@ The central idea can be termed ``push/pull.'' You @emph{pull} updates down from
 the central repository to your local copy, and if you have commit rights,
 you @emph{push} your changes or updates up to the central repository.
 
+Other developers work this way; pushing their changes up to the central
+repository and pulling your changes down into theirs.
+
 Where Git does stand out is in its management of multiple branches of
-development. Git makes it very easy to set up a separate branch for
+development.  Git makes it very easy to set up a separate branch for
 use in fixing a bug or developing a feature.  You can then easily keep
 that branch up to date with respect to the main development branch(es),
 and eventually merge the changes from your branch into the main branch.
@@ -579,9 +594,9 @@ in more detail later (@pxref{Merge Conflicts}).
 So how does Git work?@footnote{The following description is greatly
 simplified.}
 
-A repository consists of a collection of @dfn{branches}. Each branch
+A repository consists of a collection of @dfn{branches}.  Each branch
 represents the history of a collection of files and directories (a file
-@dfn{tree}). Each combined set of changes to this collection (files and
+@dfn{tree}).  Each combined set of changes to this collection (files and
 directories added or deleted, and/or file contents changed) is termed
 a @dfn{commit}.
 
@@ -590,7 +605,7 @@ the repo''), Git copies all of the original repository's branches to
 your local system.  The original remote repository is referred to as
 being @dfn{upstream}, and your local repo is @dfn{downstream} from it.
 Git distinguishes branches from the upstream repo by prefixing their
-names with @samp{origin/}.  Let's draw some pictures. @ref{savannah-repo}
+names with @samp{origin/}.  Let's draw some pictures.  @ref{savannah-repo}
 represents the state of the repo on Savannah:
 
 @page
@@ -656,16 +671,16 @@ the @samp{T} column for the moment):
 @cindex branches @subentry @code{origin/}
 Note that what is simply @code{gawk-4.1-stable} in the upstream repo
 is now referred to as @code{origin/gawk-4.1-stable}.  The @samp{origin/}
-branches are a snapshot of the state of the upstream repo. This is
+branches are a snapshot of the state of the upstream repo.  This is
 how Git allows you to see what changes you've made with respect to the
 upstream repo, without having to actually communicate with the upstream
 repo over the Internet.  (When files are identical, Git is smart enough
 to not have two separate physical copies on your local disk.)
 
 If you're working on a simple bug fix or change, you can do so directly
-in your local @code{master} branch. You can then commit your changes,
+in your local @code{master} branch.  You can then commit your changes,
 and if you have access rights, push them upstream to the Savannah repo.
-(However, there is a process to follow. Please read the rest of
+(However, there is a process to follow.  Please read the rest of
 this @value{DOCUMENT}.)
 
 @node Local Branches
@@ -684,8 +699,8 @@ branches:
 @cindex @command{git} command @subentry @code{git checkout}
 Tracking branches track branches from the upstream repository.  You first
 create a tracking branch simply by checking out a branch from the
-upstream. You use the branch name without the leading @samp{origin/}
-prefix. For example, @samp{git checkout gawk-4.1-stable}.
+upstream.  You use the branch name without the leading @samp{origin/}
+prefix.  For example, @samp{git checkout gawk-4.1-stable}.
 
 @cindex @command{git} command @subentry @code{git push}
 You can then work on this branch, making commits to it as you wish.
@@ -694,7 +709,7 @@ and your changes will be pushed up to the main repo.@footnote{Assuming
 you have permission to do so, of course.}
 
 You should @strong{never} checkout a branch using the @samp{origin/}
-prefix.  Things will get very confused. Always work on local tracking
+prefix.  Things will get very confused.  Always work on local tracking
 branches.
 
 @item Purely Local Branches
@@ -707,12 +722,12 @@ periodically synchronize it with @code{master} (or whichever upstream
 branch you started from).
 @end table
 
-This may seem somewhat abstract so far. We demonstrate with commands
+This may seem somewhat abstract so far.  We demonstrate with commands
 and branches in @ref{Development without commit access},
 later in this @value{DOCUMENT}.
 
 Let's say you have checked out a copy of @code{gawk-4.1-stable} and
-have created a purely local branch named @code{better-random}. Then
+have created a purely local branch named @code{better-random}.  Then
 our picture now looks like @ref{your-repo-2}, where the @samp{T} column
 indicates a tracking branch.
 
@@ -740,7 +755,7 @@ indicates a tracking branch.
 @node Branches are state
 @section Branches Represent Development State
 
-Branches represent development state. At any given time, when you
+Branches represent development state.  At any given time, when you
 checkout a particular branch (or create a new one), you have a copy
 of the @command{gawk} source tree that you should be able to build
 and test.
@@ -766,7 +781,7 @@ There are several kinds of branches in the Savannah repository.
 @item Dead Branches
 Branches with the prefix @samp{dead-branches/} (such as
 @code{dead-branches/const}) hold code that was never merged into the
-main code base. For example, a feature which was started, but later
+main code base.  For example, a feature which was started, but later
 deemed to be unwise to add.  These branches keep the code available,
 but they are not updated.
 
@@ -780,7 +795,7 @@ they would be used only for bug fixes.
 
 These branches have names like @code{gawk-4.1-stable},
 @code{gawk-4.0-stable}, and so on.  Once a release has been made from
-@code{master}, the previous stable branch is not updated. For example,
+@code{master}, the previous stable branch is not updated.  For example,
 once @command{gawk} 4.1.0 was released, no more work was done on
 @code{gawk-4.0-stable}.
 
@@ -820,7 +835,7 @@ merging commits from one branch to another.
 @cindex purely local branches
 Purely local branches are where you do your own development.
 You may use purely local branches because you don't have commit rights
-to the Savannah repo. You may also use them if you are doing some work
+to the Savannah repo.  You may also use them if you are doing some work
 that isn't ready for sharing with the rest of the team, or cannot be
 committed for some other reason.
 
@@ -889,13 +904,13 @@ The first things to set are your email address and your real name:
 @cindex configuration setting @subentry @code{user.name}
 @cindex configuration setting @subentry @code{user.email}
 @example
-$ @kbd{git config --global user.name "J.P. Developer"}     @ii{Set full name}
+$ @kbd{git config --global user.name "J. P. Developer"}    @ii{Set full name}
 $ @kbd{git config --global user.email jpdev@@example.com}   @ii{Set email address}
 @end example
 
 Setting these two items are an absolute requirement.
-@strong{Note}: No aliases are allowed. If you can't supply your
-real name, you cannot contribute to the project. Other options that
+@strong{Note}: No aliases are allowed.  If you can't supply your
+real name, you cannot contribute to the project.  Other options that
 the @command{gawk} maintainer recommends that you use are:
 
 @cindex @code{push.default} configuration setting
@@ -903,17 +918,17 @@ the @command{gawk} maintainer recommends that you use are:
 @cindex configuration setting @subentry @code{push.default}
 @cindex configuration setting @subentry @code{pager.status}
 @example
-$ @kbd{git config --global push.default simple}    @ii{Only push current branch}
+$ @kbd{git config --global push.default simple}    @ii{Only push the current branch}
 $ @kbd{git config --global pager.status true}      @ii{Use pager for output of} git status
 @end example
 
 @cindex @file{.gitconfig} file
 The global settings are stored in the @file{.gitconfig} file in your
-home directory. The file looks like this:
+home directory.  The file looks like this:
 
 @example
 [user]
-        name = J.P. Developer
+        name = J. P. Developer
         email = jpdev@@example.com
 [push]
         default = simple
@@ -923,7 +938,7 @@ home directory. The file looks like this:
 
 The @code{push.default=simple} setting ensures that older
 versions of Git only push the current branch up to the Savannah
-repo. This is the safest way to operate, and is the default
+repo.  This is the safest way to operate, and is the default
 in current Git versions.
 
 There may be other settings in your configuration file as well.
@@ -931,7 +946,7 @@ Use @samp{git config} to see your settings:
 
 @example
 $ @kbd{git config --list}
-@print{} user.name=J.P. Developer
+@print{} user.name=J. P. Developer
 @print{} user.email=jpdev@@example.com
 @print{} push.default=simple
 @end example
@@ -967,6 +982,7 @@ to the Git repo, and so you cannot push your changes directly.
 * Switching Branches::          Moving from one branch to another.
 * Starting A New Branch::       Starting a new branch for development.
 * Undoing a change::            Throwing away changes.
+* Saving Without Committing::   Moving changes aside.
 * Updating::                    Keeping in sync with the upstream repo.
 * Submitting Changes::          How to submit your changes.
 * Removing Branches::           Getting rid of unneeded branches.
@@ -977,41 +993,23 @@ to the Git repo, and so you cannot push your changes directly.
 @section Cloning The Repo
 
 @cindex @command{git} command @subentry @code{git clone}
-Clone the Savannah repo using @samp{git clone}. You may do so using
-either the native Git protocol, or using HTTP if you must go through a
-gateway or firewall that won't pass the Git protocol.
+Clone the Savannah repo using @samp{git clone}.  You should do so using
+using the HTTPS protcol; HTTPS is considered to be more secure than the
+native Git protocol and is preferred.@footnote{The native Git protocol
+is supported, but not recommended.}
 
 @cindex URL @subentry for cloning repositories
 To choose which method, you supply a @dfn{URL} for the repo when you
 clone it, as follows.
 
-@cindex URL @subentry for @command{gawk} repository
-@cindex Repository, @command{gawk}, URL for
-@itemize @bullet
-@item
-Clone via the Git native protocol:
-
 @example
-$ @kbd{git clone git://git.savannah.gnu.org/gawk.git}     @ii{Clone the repo}
+$ @kbd{git clone https://git.savannah.gnu.org/r/gawk.git} @ii{Clone the repo}
 @print{} ...
 $ @kbd{cd gawk}                                           @ii{Start working}
 @end example
-
-This will be faster, but not all firewalls pass the Git protocol
-on through.
-
-@item
-Clone via the HTTP protocol:
-
-@example
-$ @kbd{git clone http://git.savannah.gnu.org/r/gawk.git}  @ii{Clone the repo}
-@print{} ...
-$ @kbd{cd gawk}                                           @ii{Start working}
-@end example
-@end itemize
 
 @emph{You only need to clone the repo once.} From then on, you update its
-contents using other Git commands. For example, after coming back from
+contents using other Git commands.  For example, after coming back from
 your vacation in the Bahamas:
 
 @cindex @command{git} command @subentry @code{git pull}
@@ -1032,9 +1030,9 @@ $ @kbd{./bootstrap.sh && ./configure && make -j && make check}
 @quotation NOTE
 Unless you have installed all the tools described in @ref{GNU Tools},
 you @emph{must} run @command{./bootstrap.sh} every time you clone a repo,
-do a @samp{git pull} or checkout a different branch. (In the latter case,
+do a @samp{git pull} or checkout a different branch.  (In the latter case,
 do @samp{make distclean} first.)  Otherwise things will get messy very
-quickly. The @command{bootstrap.sh} script ensures that all of the file
+quickly.  The @command{bootstrap.sh} script ensures that all of the file
 time stamps are up to date so that it's not necessary to run the various
 configuration tools.
 @end quotation
@@ -1060,7 +1058,7 @@ $ @kbd{./bootstrap.sh && ./configure &&}        @ii{Start working}
 @node Starting A New Branch
 @section Starting A New Branch
 
-Let's say you want to work on a new feature. For example,
+Let's say you want to work on a new feature.  For example,
 you might decide to add Python syntax support.@footnote{Just joking.
 Please don't attempt this for real.} You should create a
 new branch on which to work.  First, switch back to @code{master}:
@@ -1071,7 +1069,7 @@ $ @kbd{make distclean}
 $ @kbd{git checkout master}
 @end example
 
-Now, create a new branch. The easiest way to do that is
+Now, create a new branch.  The easiest way to do that is
 with the @option{-b} option to @samp{git checkout}:
 
 @example
@@ -1087,7 +1085,7 @@ file with your changes before @dfn{committing} them to the repo.
 
 @cindex @command{git} command @subentry @code{git status}
 Let's say you've added a new file @file{python.c} and updated several
-others. Use @samp{git status} to see what's changed:
+others.  Use @samp{git status} to see what's changed:
 
 @example
 $ @kbd{git status}
@@ -1098,12 +1096,12 @@ $ @kbd{git status}
 @cindex @command{git} command @subentry @code{git difftool}
 @cindex @command{meld} utility
 Before committing the current set of changes, you can use @samp{git diff}
-to view the changes. You may also use @samp{git difftool}@footnote{Don't
+to view the changes.  You may also use @samp{git difftool}@footnote{Don't
 run @samp{git difftool} in the background; it works interactively.} to run an
 external @command{diff} command, such as @command{meld} on GNU/Linux:
 
 @example
-$ @kbd{git diff}                           @ii{Regular built-in tool}
+$ @kbd{git diff}                           @ii{Regular built-in tool for standard diffs}
 $ @kbd{git difftool --tool=meld}           @ii{GUI diff tool}
 @end example
 
@@ -1135,8 +1133,8 @@ $ @kbd{git commit}
 @cindex @command{git} command @subentry @code{git log}
 Running @samp{git commit} causes Git to invoke an editor
 (typically from the @env{$EDITOR} environment variable)
-in which you can compose a commit message. Please supply a
-short message summarizing the commit. This message will be
+in which you can compose a commit message.  Please supply a
+short message summarizing the commit.  This message will be
 visible via @samp{git log}.
 
 @node Undoing a change
@@ -1148,13 +1146,47 @@ per-file basis by simply checking out the file again:
 
 @cindex @command{git} command @subentry @code{git checkout}
 @example
-git checkout awkgram.y      @ii{Undo changes to} awkgram.y@ii{. There is no output}
+$ @kbd{git checkout awkgram.y}     @ii{Undo changes to} awkgram.y@ii{.  There is no output}
 @end example
 
 @cindex @command{git} command @subentry @code{git reset}
 To start over completely, use @samp{git reset --hard}.
 Note that this will @emph{throw away} all your changes, with no
 chance for recovery, so be sure you really want to do it.
+
+@node Saving Without Committing
+@section Moving Changes Aside
+
+Sometimes, you may be in the middle of a set of changes that are
+not yet completed, when you need to stop what you're doing and work
+on something else.  For example, you might be updating the documentation
+when a bug report comes in and you want to work on the bug.  But you
+can't just switch branches, since you haven't finished your
+current changes.
+
+@cindex @command{git} command @subentry @code{git stash}
+@cindex @command{git} command @subentry @code{git stash pop}
+@cindex @command{git} command @subentry @code{git stash list}
+The way to work around this problem is with @samp{git stash}.  This
+command saves your changes in a special place within Git from which
+they may be restored later.  After executing @samp{git stash},
+your current branch is restored to its original, pristine state.
+
+The workflow might go something like this:
+
+@example
+$ @kbd{git checkout my-local-branch}                @ii{Checkout a work branch}
+...                                           @ii{Do some work}
+$ @kbd{git stash}                                   @ii{Save the work aside}
+$ @kbd{git checkout gawk-4.1-stable}                @ii{Work on a bug fix}
+...                                           @ii{Now we're done}
+$ @kbd{git checkout my-local-branch}                @ii{Go back to our local work}
+$ @kbd{git stash pop}                               @ii{Restore the earlier changes}
+@end example
+
+The stash is maintained as a stack.  Sets of changes are pushed onto the
+stack by @samp{git stash} and popped off of it with @samp{git stash pop}.
+You may use @samp{git stash list} to see the list of saved changes.
 
 @node Updating
 @section Updating and Merging
@@ -1201,7 +1233,7 @@ sets of changes, and Git could not do the merge for you.
 In this case, the conflicted area will be delimited by the traditional
 conflict markers, @samp{<<<}, @samp{===} and @samp{>>>}.
 
-Your mission is then to edit the file and @dfn{resolve} the conflict
+Your mission then is to edit the file and @dfn{resolve} the conflict
 by fixing the order of additions (such as in a @file{ChangeLog} file),
 or fixing the code to take new changes into account.
 
@@ -1211,7 +1243,21 @@ Once you have done so, you tell Git that everything is OK using
 @example
 $ @kbd{git checkout feature/python}        @ii{Move back to new, purely local branch}
 $ @kbd{git rebase master}                  @ii{``Start over'' from current} master
-@print{} ... Kaboom! Conflict. FIXME: Show real output here
+@print{} First, rewinding head to replay your work on top of it...
+@print{} Applying: Demo change.
+@print{} Using index info to reconstruct a base tree...
+@print{} M	main.c
+@print{} Falling back to patching base and 3-way merge...
+@print{} Auto-merging main.c
+@print{} CONFLICT (content): Merge conflict in main.c
+@print{} error: Failed to merge in the changes.
+@print{} Patch failed at 0001 Demo change.
+@print{} Use 'git am --show-current-patch' to see the failed patch
+@print{} 
+@print{} Resolve all conflicts manually, mark them as resolved with
+@print{} "git add/rm <conflicted_files>", then run "git rebase --continue".
+@print{} You can instead skip this commit: run "git rebase --skip".
+@print{} To abort and get back to the state before "git rebase", run "git rebase --abort".
 $ @kbd{gvim main.c}                        @ii{Edit the file and fix the problem}
 $ @kbd{git add main.c}                     @ii{Tell Git everything is OK now @dots{}}
 $ @kbd{git commit}                         @ii{@dots{} and it's settled}
@@ -1226,11 +1272,11 @@ It's not necessary if you are  using @samp{git merge}
 @node Submitting Changes
 @section Submitting Your Changes
 
-So now your feature is complete. You've added test cases for it to
+So now your feature is complete.  You've added test cases for it to
 the test suite@footnote{You did do this, didn't you?}, you have
 @file{ChangeLog} entries that describe all the changes@footnote{You remembered this, right?},
 you have documented the new feature@footnote{You wouldn't neglect this, would you?},
-and everything works great. You're ready
+and everything works great.  You're ready
 to submit the changes for review, and with any luck, inclusion into
 @command{gawk}.
 
@@ -1282,7 +1328,7 @@ approves your changes, he will apply the patch(es) and commit the changes.
 Which list should you send mail to?  If you are just starting to
 contribute, use @email{bug-gawk@@gnu.org}.  After making enough
 contributions, you may be invited to join the private @command{gawk}
-developers' mailing list. If you do so, then submit your changes to
+developers' mailing list.  If you do so, then submit your changes to
 that list.
 
 If you make any substantial changes, you will need to assign copyright
@@ -1318,7 +1364,7 @@ Always do a @samp{make distclean} before switching between branches.
 Things will get really confused if you don't.
 
 @item
-For upstream branches, @emph{always} work with tracking branches. @emph{Never}
+For upstream branches, @emph{always} work with tracking branches.  @emph{Never}
 use @samp{git checkout origin/@var{whatever}}.  Git will happily let
 you do something like that, but it's just plain asking for trouble.
 
@@ -1395,7 +1441,7 @@ and to accept having commit access to the repo.
 @cindex account, Savannah, creation of
 @cindex @code{ssh} key
 The first thing to do is to create an account on Savannah, choosing a
-unique user name. To do so, go to the @uref{http://savannah.gnu.org,
+unique user name.  To do so, go to the @uref{http://savannah.gnu.org,
 Savannah home page} and click on the ``New User'' link.  The setup
 will include uploading of your @command{ssh} key, as per the instructions
 on the Savannah web page.
@@ -1410,7 +1456,7 @@ commit access to the repo.
 In order to be able to commit changes to the repo, you must
 clone it using an @samp{ssh://} URL.
 Cloning the repo with @command{ssh} is similar to cloning
-with the Git protocol or with HTTP, but the URL is different:
+with HTTPS, but the URL is different:
 
 @cindex @command{git} command @subentry @code{git clone}
 @cindex URL @subentry for @command{gawk} repository
@@ -1468,7 +1514,7 @@ Here's how to commit your changes:
 $ @kbd{git diff}            @ii{Review the patch one more time}
 $ @kbd{git add @dots{}}         @ii{Add any files for committing}
 $ @kbd{git commit}          @ii{Commit the files, with a commit message}
-$ @kbd{git push}            @ii{Push the files up to the repo. Ta da!}
+$ @kbd{git push}            @ii{Push the files up to the repo.  Ta da!}
 @end example
 
 The first three steps are the same described earlier
@@ -1496,8 +1542,8 @@ $ @kbd{git checkout -b feature/python}          @ii{Create and switch to a new b
 Now, you can develop as normal, adding new files if necessary (such as new tests),
 modifying code, updating the @file{ChangeLog} and documentation, and so on.
 
-You can share changes with the mailing list as diffs, as usual. However, especially
-for a large feature, it would be better to push your branch up to Savannah. Then,
+You can share changes with the mailing list as diffs, as usual.  However, especially
+for a large feature, it would be better to push your branch up to Savannah.  Then,
 everyone else can simply pull it down to their local systems and review your
 changes at their leisure.
 
@@ -1515,7 +1561,7 @@ $ @kbd{git push -u origin feature/python}       @ii{Push the branch up to the re
 @end example
 
 When you use @samp{push -u origin}, Git helpfully converts
-your purely local branch into a tracking branch. It becomes
+your purely local branch into a tracking branch.  It becomes
 as if the branch had originated from the upstream repo
 and you checked it out locally.
 
@@ -1583,7 +1629,7 @@ Usually, bug fixes should be made on the current ``stable'' branch.
 Once a fix has been reviewed and approved, you can commit it and
 push it yourself.
 Typically, the maintainer then takes care to merge the fix to @code{master}
-and from there to any other branches. However, you are welcome to
+and from there to any other branches.  However, you are welcome to
 save him the time and do this yourself.
 
 @cindex directory ownership
@@ -1605,7 +1651,7 @@ review, even if the feature is not yet totally ``ready for prime time.''
 
 During development of a new feature, you will most likely wish to keep your
 feature branch up to date with respect to ongoing improvements in @code{master}.
-This is generally easy to do. There are two different mechanisms, and which
+This is generally easy to do.  There are two different mechanisms, and which
 one you use depends upon the nature of your new feature branch.
 
 @table @dfn
@@ -1626,7 +1672,7 @@ $ @kbd{git rebase master}               @ii{Rebase from} master
 @noindent
 The rebasing operation may require that you resolve conflicts
 (@pxref{Merge Conflicts}).
-Edit any conflicted files and resolve the problem(s). Compile and
+Edit any conflicted files and resolve the problem(s).  Compile and
 test your changes, then use @samp{git add}
 and @samp{git commit} to indicate resolution, and then use
 @samp{git rebase --continue} to continue the rebasing.
@@ -1652,8 +1698,10 @@ Here too, you may have to resolve any merge conflicts
 (@pxref{Merge Conflicts}).
 Once that's done, you can push the changes up to Savannah.
 
+@end table
+
 When the changes on your branch are complete, usually the
-maintainer merges the branch to @code{master}. But
+maintainer merges the branch to @code{master}.  But
 there's really no magic involved, the merge is simply
 done in the other direction:
 
@@ -1704,8 +1752,6 @@ To update the other remaining development branches
 with the latest changes on @code{master}, use the
 @samp{helpers/update-branches.sh} script in the repo.
 
-@end table
-
 @node Repo Maintenance
 @chapter Keeping Your Repo Organized
 
@@ -1723,7 +1769,7 @@ get merged into @code{master}.  Then the branches on Savannah are
 deleted (as shown in @ref{General practices}).
 
 However, your local copies of those branches (labelled with the
-@samp{origin/} prefix) remain in your local repo. If you don't
+@samp{origin/} prefix) remain in your local repo.  If you don't
 need them, then you can clean up your repo as follows.
 
 First, remove any related tracking branch you may have:
@@ -1748,7 +1794,7 @@ $ @kbd{git fetch --prune}                       @ii{Remove unneeded branches}
 As Git works, occasional ``cruft'' collects in the repository.
 Git does occasionally clean this out on its own, but if you're
 concerned about disk usage, you can do so yourself
-using @samp{git gc} (short for ``garbage collect''). For
+using @samp{git gc} (short for ``garbage collect'').  For
 example:
 
 @cindex @command{git} command @subentry @code{git gc}
@@ -1769,7 +1815,7 @@ $ @kbd{du -s .}                               @ii{Check disk usage again}
 @cindex branches @subentry renaming
 @item Renaming branches
 Occasionally you may want to rename a branch.@footnote{This discussion
-adopted from
+is adopted from
 @uref{https://multiplestates.wordpress.com/2015/02/05/rename-a-local-and-remote-branch-in-git, here}.}
 If your branch is local and you are on it, use:
 
@@ -1786,7 +1832,7 @@ $ @kbd{git branch -m feature/@var{old-name} feature/@var{new-name}}
 
 You then need to fix the upstream repo.  This command does so,
 using an older syntax to simultaneously delete the old name and
-push the new name. You should be on the new branch:
+push the new name.  You should be on the new branch:
 
 @example
 $ @kbd{git push origin :feature/@var{old-name} feature/@var{new-name}}
@@ -1794,7 +1840,7 @@ $ @kbd{git push origin :feature/@var{old-name} feature/@var{new-name}}
 
 @quotation NOTE
 It is the leading @samp{:} in the first branch name that causes
-Git to delete the old name in the upstream repo. Don't omit it!
+Git to delete the old name in the upstream repo.  Don't omit it!
 @end quotation
 
 Finally, reset the upstream branch for the local branch
@@ -1803,6 +1849,9 @@ with the new name:
 @example
 $ @kbd{git push -u origin feature/@var{new-name}}
 @end example
+
+You should also update the mailing list to let the other
+developers know what's happening.
 
 @end table
 
@@ -1830,7 +1879,7 @@ documentation.
 for a discussion of the general procedure.  In particular, pay attention to the
 coding style guidelines in 
 @ref{Adding Code, Adding Code, Adding New Features, gawk, GAWK: Effective awk Programming}.@footnote{Changes that don't follow the coding
-style guidelines won't be accepted. Period.}
+style guidelines won't be accepted.  Period.}
 These two sections may also be found online, at
 @uref{https://www.gnu.org/software/gawk/manual/html_node/Additions.html#Additions}, and
 @uref{https://www.gnu.org/software/gawk/manual/html_node/Adding-Code.html#Adding-Code},
@@ -1854,11 +1903,11 @@ For any change of more than just a few lines, you will need to assign
 copyright in (that is, ownership of) those changes to the Free Software
 Foundation.
 
-This is generally an easy thing to do. In particular, you can choose to
+This is generally an easy thing to do.  In particular, you can choose to
 use a version of the copyright assignment which assigns all your current
 @emph{and future} changes to @command{gawk} to the FSF.  This means
 that you only need to do the paperwork once, and from then on all your
-changes will automatically belong to the FSF. The maintainer recommends
+changes will automatically belong to the FSF.  The maintainer recommends
 doing this.
 
 The maintainer will help you with this process once you have a
@@ -1870,7 +1919,7 @@ contribution that warrants it.
 @cindex software tools
 This @value{SECTION} discusses additional tools that you may need to
 install on your system in order to be in sync with what the @command{gawk}
-maintainer uses. It also discusses different C compiler options for use
+maintainer uses.  It also discusses different C compiler options for use
 during code development, and how to compile @command{gawk} for debugging.
 
 @menu
@@ -1885,8 +1934,8 @@ during code development, and how to compile @command{gawk} for debugging.
 @cindex autotools
 If you expect to work with the configuration files and/or the
 @file{Makefile} files, you will need to install a number of other GNU
-tools. In general, you should be using the latest versions of the tools,
-or least the same ones that the maintainer himself uses. This helps
+tools.  In general, you should be using the latest versions of the tools,
+or least the same ones that the maintainer himself uses.  This helps
 minimize the differences that the maintainer has to resolve when merging
 changes, and in general avoids confusion and hassle.
 Similarly, you should install the latest GNU documentation tools as well.
@@ -1899,7 +1948,7 @@ The tools are described in the following list:
 @item autoconf
 GNU Autoconf processes the @file{configure.ac} files in order to
 generate the @file{configure} shell script and @file{config.h.in}
-input file. See @uref{https://www.gnu.org/software/autoconf/autoconf.html,
+input file.  See @uref{https://www.gnu.org/software/autoconf/autoconf.html,
 the Autoconf home page} for more information.
 
 @cindex @command{automake}
@@ -1907,7 +1956,7 @@ the Autoconf home page} for more information.
 @cindex @file{Makefile.am} file
 @item automake
 GNU Automake processes the @file{configure.ac} and @file{Makefile.am}
-files to produce @file{Makefile.in} files. See @uref{https://www.gnu.org/software/automake,
+files to produce @file{Makefile.in} files.  See @uref{https://www.gnu.org/software/automake,
 the Automake home page} for more information.
 
 @cindex @command{gettext}
@@ -1915,9 +1964,9 @@ the Automake home page} for more information.
 @cindex @file{gawk.pot} file
 @item gettext
 GNU Gettext processes the @command{gawk} source code to produce the
-original @file{po/gawk.pot} message template file. Normally you
+original @file{po/gawk.pot} message template file.  Normally you
 should not need need to do this; the maintainer usually
-manages this task. See @uref{https://www.gnu.org/software/gettext,
+manages this task.  See @uref{https://www.gnu.org/software/gettext,
 the Gettext home page} for more information.
 
 @cindex @command{libtool}
@@ -1925,7 +1974,7 @@ the Gettext home page} for more information.
 @cindex extensions, @command{gawk}
 @item libtool
 GNU Libtool works with Autoconf and Automake to produce portable
-shared libraries. It is used for the extensions that ship with @command{gawk},
+shared libraries.  It is used for the extensions that ship with @command{gawk},
 whose code is in the @file{extensions} directory.
 See @uref{https://www.gnu.org/software/libtool, the Libtool home page}
 for more information.
@@ -1936,10 +1985,10 @@ for more information.
 @cindex GNU Texinfo
 @item makeinfo
 The @command{makeinfo} command is used to build the Info versions of
-the documentation. You need to have the same version as the maintainer
+the documentation.  You need to have the same version as the maintainer
 uses, so that when you make a change to the documentation, the corresponding
-change to the generated Info file will be minimal. @command{makeinfo} is
-part of GNU Texinfo. See @uref{https://www.gnu.org/software/texinfo,
+change to the generated Info file will be minimal.  @command{makeinfo} is
+part of GNU Texinfo.  See @uref{https://www.gnu.org/software/texinfo,
 the Texinfo home page} for more information.
 
 @end table
@@ -1976,14 +2025,14 @@ It is capable of compiling @command{gawk}, and it does so well enough
 that @samp{make check} runs without errors.
 
 However, in the past the quality has varied, and the maintainer has
-had problems with it. He recommends using it for regular development,
+had problems with it.  He recommends using it for regular development,
 where fast compiles are important, but rebuilding with GCC before doing
 any commits, in case @command{tcc} has missed something.@footnote{This
 bit the maintainer once.}
 
 See @uref{http://www.tinycc.org, the project's home page} for
-some information. More information can be found in the project's
-@uref{http://repo.or.cz/tinycc.git, Git repository}. The maintainer builds
+some information.  More information can be found in the project's
+@uref{http://repo.or.cz/tinycc.git, Git repository}.  The maintainer builds
 from the @code{mob} branch for his work, but after updating it you should
 check that this branch still works to compile @command{gawk} before
 installing it.
@@ -1993,11 +2042,11 @@ installing it.
 @item The (Revived) Portable C Compiler
 This is an updated version of the venerable Unix Portable C Compiler,
 PCC.  It accepts ANSI C syntax and supports both older and modern
-architectures. It produces better code than @command{tcc} but is slower,
+architectures.  It produces better code than @command{tcc} but is slower,
 although still much faster than GCC and @command{clang}.
 
 See @uref{http://pcc.ludd.ltu.se, the project's home page} for more
-information. See @uref{http://pcc.ludd.ltu.se/supported-platforms}
+information.  See @uref{http://pcc.ludd.ltu.se/supported-platforms}
 for instructions about obtaining the code using CVS and building it.
 
 @cindex @command{pcc} compiler @subentry Git mirror
@@ -2016,7 +2065,8 @@ Git mirror.
 If you wish to compile for debugging, you should use GCC.  After
 running @command{configure} but before running @command{make}, edit the
 @file{Makefile} and remove the @option{-O2} flag from the definition of
-@code{CFLAGS}.  Optionally, do the same for @file{extensions/Makefile}.
+@code{CFLAGS}.  Optionally, do the same for @file{support/Makefile} and/or
+@file{extensions/Makefile}.
 Then run @command{make}.
 
 @cindex @file{.developing} file
@@ -2047,15 +2097,15 @@ Add a file to the list of files to be committed.
 
 @item git branch
 View existing branches, or delete a branch.
-Most useful options: @option{-a} and @option{-d}.
+The most useful options are @option{-a} and @option{-d}.
 
 @item git checkout
 Checkout an existing branch, create a new branch, or checkout a file to
-reset it. Use the @option{-b} option to create and checkout a
+reset it.  Use the @option{-b} option to create and checkout a
 new branch in one operation.
 
 @item git clone
-Clone (make a new copy of) an existing repository. You generally
+Clone (make a new copy of) an existing repository.  You generally
 only need to do this once.
 
 @item git commit
@@ -2077,8 +2127,8 @@ Use a ``tool'' (usually a GUI-based program) to view differences,
 instead of the standard textual diff as you'd get from @samp{git diff}.
 
 @item git fetch
-Update your local copy of the upstream's branches. That is,
-update the various @samp{origin/} branches. This leaves your
+Update your local copy of the upstream's branches.  That is,
+update the various @samp{origin/} branches.  This leaves your
 local tracking branches unchanged.
 With the @option{--prune} option, this removes any copies
 of stale @samp{origin/} branches.
@@ -2089,14 +2139,14 @@ original branch from which you started.
 
 @item git gc
 Run a ``garbage collection'' pass in the current repository.
-This can often reduce the space used in a large repo. For
+This can often reduce the space used in a large repo.  For
 @command{gawk} it does not make that much difference.
 
 @item git help
 Print a man-page--style usage summary for a command.
 
 @item git log
-Show the current branch's commit log. This includes who
+Show the current branch's commit log.  This includes who
 made the commit, the date, and the commit message.
 Commits are shown from newest to oldest.
 
@@ -2111,8 +2161,8 @@ into @code{@var{xxx}}.
 @item git push
 Push commits from your local tracking branch @code{@var{xxx}}
 through @code{origin/@var{xxx}} and on to branch @code{@var{xxx}}
-in the upstream repo. Use @samp{git push -u origin --delete @var{xxx}} to delete
-an upstream branch. (Do so carefully!)
+in the upstream repo.  Use @samp{git push -u origin --delete @var{xxx}} to delete
+an upstream branch.  (Do so carefully!)
 
 @item git rebase
 Rebase the changes in the current purely local branch to
@@ -2125,6 +2175,12 @@ with respect to the original branch from which they were started.
 @cindex @command{git} command @subentry @code{git reset} @subentry @option{--hard} option
 Restore the original state of the repo, especially with the
 @option{--hard} option.  Read up on this command, and use it carefully.
+
+@item git stash
+@cindex @command{git} command @subentry @code{git stash}
+Save your current changes in a special place within Git.  They can
+be restored with @samp{git stash pop}, even on a different branch.
+Use @samp{git stash list} to see the list of stashed changes.
 
 @item git status
 Show the status of files that are scheduled to be committed,
