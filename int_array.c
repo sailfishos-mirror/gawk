@@ -792,7 +792,7 @@ int_insert(NODE *symbol, long k, uint32_t hash1)
 	}
 
 	b->ainum[i] = k;
-	b->aivalue[i] = dupnode(Nnull_string);
+	b->aivalue[i] = new_array_element();
 	b->aicount++;
 	return & b->aivalue[i];
 }

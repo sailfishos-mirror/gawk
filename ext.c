@@ -200,7 +200,7 @@ get_actual_argument(NODE *t, int i, bool want_array)
 	pc = TOP()->code_ptr;	/* Op_ext_builtin instruction */
 	fname = (pc + 1)->func_name;
 
-	if (t->type == Node_var_new) {
+	if (t->type == Node_var_new || t->type == Node_elem_new) {
 		if (want_array)
 			return force_array(t, false);
 		else {

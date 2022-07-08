@@ -15,5 +15,5 @@ BEGIN {
 BEGIN {
 	print typeof(x)
 	print typeof(a[1])
-	a[1][2]	# fatals on this
+	a[1][2]	# this used to fatal, it no longer does
 }

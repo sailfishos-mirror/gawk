@@ -591,7 +591,7 @@ do_length(int nargs)
 
 		size = assoc_length(tmp);
 		return make_number(size);
-	} else if (tmp->type == Node_var_new) {
+	} else if (tmp->type == Node_var_new || tmp->type == Node_elem_new) {
 		// this can happen from an indirect call
 		DEREF(tmp);
 		tmp = dupnode(Nnull_string);
@@ -4342,6 +4342,7 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_var_new:
+	case Node_elem_new:
 		res = "untyped";
 		deref = false;
 		break;

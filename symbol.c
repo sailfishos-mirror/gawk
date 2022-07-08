@@ -497,6 +497,8 @@ print_vars(NODE **table, int (*print_func)(FILE *, const char *, ...), FILE *fp)
 			print_func(fp, "untyped variable\n");
 		else if (r->type == Node_var)
 			valinfo(r->var_value, print_func, fp);
+		else
+			cant_happen("unexpected node type: %s", nodetype2str(r->type));
 	}
 }
 
