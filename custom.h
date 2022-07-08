@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2021,
+ * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -111,8 +111,6 @@ typedef unsigned long long uint_fast64_t;
 #define xicalloc xcalloc
 #define xirealloc xrealloc
 #define ximalloc xmalloc
-
-#include "mbsupport.h" /* defines stuff for DJGPP to fake MBS */
 
 #ifdef USE_PERSISTENT_MALLOC
 #include <stdlib.h>

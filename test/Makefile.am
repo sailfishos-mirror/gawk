@@ -1,7 +1,7 @@
 #
 # test/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1988-2021 the Free Software Foundation, Inc.
+# Copyright (C) 1988-2022 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -678,6 +678,15 @@ EXTRA_DIST = \
 	manglprm.ok \
 	manyfiles.awk \
 	manyfiles.ok \
+	mdim1.awk \
+	mdim1.ok \
+	mdim2.awk \
+	mdim2.ok \
+	mdim3.awk \
+	mdim3.ok \
+	mdim4.awk \
+	mdim4.in \
+	mdim4.ok \
 	modifiers.sh \
 	modifiers.ok \
 	muldimposix.awk \
@@ -1476,6 +1485,7 @@ GAWK_EXT_TESTS = \
 	indirectcall3 indirectbuiltin2 \
 	inf-nan-torture intarray iolint isarrayunset lint lintexp \
 	lintindex lintint lintlength lintold lintplus lintset lintwarn \
+	mdim1 mdim2 mdim3 mdim4 \
 	manyfiles match1 match2 match3 mbstr1 mbstr2 mixed1 mktime \
 	modifiers muldimposix nastyparm negtime next nondec nondec2 \
 	nonfatal1 nonfatal2 nonfatal3 nsawk1a nsawk1b nsawk1c nsawk2a \
@@ -1589,15 +1599,6 @@ NEED_LOCALE_JP = mbprintf2
 
 NEED_LOCALE_RU = mtchi18n
 
-# List of tests that fail on DJGPP
-EXPECTED_FAIL_DJGPP = \
-	backbigs1 backsmalls1 backw beginfile1 clos1way clos1way2 \
-	clos1way3 clos1way4 clos1way5 clos1way6 errno getlndir \
-	getlnhd gnuops3 gnureops id ignrcas3 inetdayt inetdayu \
-	inetecht inetechu inftest jarebug mbfw1 mbprintf1 mbprintf4 \
-	mbstr1 mbstr2 mpfrsqrt nonfatal1 nonfatal2 nonfatal3 pid pty1 pty2 \
-	randtest regx8bit strtod sigpipe1 symtab6 timeout
-
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
 	backbigs1 backsmalls1 clos1way6 devfd devfd1 devfd2 \
@@ -1627,7 +1628,7 @@ GENTESTS_UNUSED = Makefile.in checknegtime.awk dtdgport.awk fix-fmtspcl.awk \
 	printfloat.awk readdir0.awk valgrind.awk xref.awk \
 	readall1.awk readall2.awk
 
-# List of tests on MinGW or DJGPP that need a different cmp program
+# List of tests on MinGW that need a different cmp program
 NEED_TESTOUTCMP = \
 	beginfile2 double2 exit fmttest hsprint posix profile5 space
 
