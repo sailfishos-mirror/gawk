@@ -224,6 +224,20 @@ uninitialized_scalar:
 								save_symbol->vname);
 				if (op != Op_push_arg_untyped)
 					m = dupnode(Nnull_string);
+				UPREF(m);
+				PUSH(m);
+				break;
+
+			case Node_elem_new:
+				if (op != Op_push_arg_untyped) {
+					/* convert untyped to scalar */
+					m = elem_new_to_scalar(m);
+				}
+				if (do_lint)
+					lintwarn(isparam ?
+						_("reference to uninitialized argument `%s'") :
+						_("reference to uninitialized variable `%s'"),
+								save_symbol->vname);
 				PUSH(m);
 				break;
 
@@ -320,7 +334,7 @@ uninitialized_scalar:
 				}
 			}
 
-			if (r->type == Node_val)
+			if (r->type == Node_val || r->type == Node_elem_new)
 				UPREF(r);
 			PUSH(r);
 			break;
@@ -353,6 +367,11 @@ uninitialized_scalar:
 				t2 = force_string(t2);
 				r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
 				assoc_set(t1, t2, r);
+			} else if (r->type == Node_elem_new) {
+				r = force_array(r, false);
+				r->parent_array = t1;
+				t2 = force_string(t2);
+				r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
 			} else if (r->type != Node_var_array) {
 				t2 = force_string(t2);
 				fatal(_("attempt to use scalar `%s[\"%.*s\"]' as an array"),
@@ -389,7 +408,7 @@ uninitialized_scalar:
 			 * be stored in SYMTAB:
 			 * 	1. Variables that don"t yet have a value (Node_var_new)
 			 * 	2. Variables that have a value (Node_var)
-			 * 	3. Values that awk code stuck into SYMTAB not related to variables (Node_value)
+			 * 	3. Values that awk code stuck into SYMTAB not related to variables (Node_val)
 			 * For 1, since we are giving it a value, we have to change the type to Node_var.
 			 * For 1 and 2, we have to step through the Node_var to get to the value.
 			 * For 3, we fatal out. This avoids confusion on things like
@@ -713,7 +732,7 @@ mod:
 			 * SYMTAB is a little more messy.  Three possibilities for SYMTAB:
 			 * 	1. Variables that don"t yet have a value (Node_var_new)
 			 * 	2. Variables that have a value (Node_var)
-			 * 	3. Values that awk code stuck into SYMTAB not related to variables (Node_value)
+			 * 	3. Values that awk code stuck into SYMTAB not related to variables (Node_val)
 			 * For 1, since we are giving it a value, we have to change the type to Node_var.
 			 * For 1 and 2, we have to step through the Node_var to get to the value.
 			 * For 3, we fatal out. This avoids confusion on things like
@@ -844,6 +863,10 @@ mod:
 			lhs = POP_ADDRESS();
 			r = TOP_SCALAR();
 			unref(*lhs);
+			if (r->type == Node_elem_new) {
+				DEREF(r);
+				r = dupnode(Nnull_string);
+			}
 			UPREF(r);
 			UNFIELD(*lhs, r);
 			REPLACE(r);
@@ -1074,7 +1097,7 @@ arrayfor:
 			(void) POP_CODE();
 			while (arg_count-- > 0) {
 				t1 = POP();
-				if (t1->type == Node_val)
+				if (t1->type == Node_val || t1->type == Node_elem_new)
 					DEREF(t1);
 			}
 			free_api_string_copies();

@@ -1070,7 +1070,7 @@ leaf_lookup(NODE *symbol, NODE *array, long k, long size, long base)
 	lhs = array->nodes + (k - base); /* leaf element */
 	if (*lhs == NULL) {
 		array->table_size++;	/* one more element in leaf array */
-		*lhs = dupnode(Nnull_string);
+		*lhs = new_array_element();
 	}
 	return lhs;
 }
