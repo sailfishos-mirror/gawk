@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2021 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2022 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -3611,17 +3611,6 @@ yylex(void)
 	if (c == END_FILE)
 		return lasttok = NEWLINE_EOF;
 	pushback();
-
-#if defined __EMX__
-	/*
-	 * added for OS/2's extproc feature of cmd.exe
-	 * (like #! in BSD sh)
-	 */
-	if (strncasecmp(lexptr, "extproc ", 8) == 0) {
-		while (*lexptr && *lexptr != '\n')
-			lexptr++;
-	}
-#endif
 
 	lexeme = lexptr;
 	thisline = NULL;

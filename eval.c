@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2019, 2021,
+ * Copyright (C) 1986, 1988, 1989, 1991-2019, 2021, 2022,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -238,6 +238,7 @@ static const char *const nodetypes[] = {
 	"Node_var",
 	"Node_var_array",
 	"Node_var_new",
+	"Node_elem_new",
 	"Node_param_list",
 	"Node_func",
 	"Node_ext_func",
@@ -543,7 +544,6 @@ posix_compare(NODE *s1, NODE *s2)
 		s1->stptr[s1->stlen] = save1;
 		s2->stptr[s2->stlen] = save2;
 	}
-#if ! defined(__DJGPP__)
 	else {
 		/* Similar logic, using wide characters */
 		const wchar_t *p1, *p2;
@@ -576,7 +576,6 @@ posix_compare(NODE *s1, NODE *s2)
 			}
 		}
 	}
-#endif
 
 	return ret;
 }
@@ -1167,6 +1166,14 @@ r_get_lhs(NODE *n, bool reference)
 		n->var_value = dupnode(Nnull_string);
 		break;
 
+	case Node_elem_new:
+		efree(n->stptr);
+		n->stptr = NULL;
+		n->stlen = 0;
+		n->type = Node_var;
+		n->var_value = dupnode(Nnull_string);
+		break;
+
 	case Node_var:
 		break;
 
@@ -1313,6 +1320,7 @@ setup_frame(INSTRUCTION *pc)
 		switch (m->type) {
 		case Node_var_new:
 		case Node_var_array:
+		case Node_elem_new:
 			r->type = Node_array_ref;
 			r->orig_array = r->prev_array = m;
 			break;
@@ -1534,6 +1542,10 @@ cmp_scalars(scalar_cmp_t comparison_type)
 
 	t2 = POP_SCALAR();
 	t1 = TOP();
+
+	t1 = elem_new_to_scalar(t1);
+	t2 = elem_new_to_scalar(t2);
+
 	if (t1->type == Node_var_array) {
 		DEREF(t2);
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t1));
@@ -1872,3 +1884,20 @@ init_interpret()
 		interpret = r_interpret;
 }
 
+/* elem_new_to_scalar --- convert Node_elem_new to untyped scalar */
+
+NODE *
+elem_new_to_scalar(NODE *n)
+{
+	if (n->type != Node_elem_new)
+		return n;
+
+	if (n->valref > 1) {
+		unref(n);
+		return dupnode(Nnull_string);
+	}
+
+	n->type = Node_val;
+
+	return n;
+}

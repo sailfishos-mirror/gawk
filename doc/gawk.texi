@@ -4203,7 +4203,7 @@ the arbitrary precision arithmetic features in @command{gawk}
 are ``on parole.''
 The primary maintainer is no longer willing to support this feature,
 but another member of the development team has stepped up to take it over.
-As long as this situation reamins stable, MPFR will be supported. If it
+As long as this situation remains stable, MPFR will be supported. If it
 changes, the MPFR support will be removed from @command{gawk}.
 @ignore
 If you use this option, @command{gawk} generates a warning message.
@@ -16422,12 +16422,8 @@ This element gives a string indicating the platform for which
 
 @c nested table
 @table @code
-@item "djgpp"
-@itemx "mingw"
-Microsoft Windows, using either DJGPP or MinGW, respectively.
-
-@item "os2"
-OS/2.
+@item "mingw"
+Microsoft Windows, using MinGW.
 
 @item "os390"
 OS/390.
@@ -30978,7 +30974,7 @@ which resides in a file in
 the filesystem.  When persistent memory is not in use (the normal case),
 @command{gawk}'s data resides in ephemeral system memory.
 
-Persistent memory is enabled on systems supporting the @code{mmap()}
+Persistent memory is enabled on 64-bit systems supporting the @code{mmap()}
 and @code{munmap()} system calls.  @command{gawk} must be compiled as a
 non-PIE (Position Independent Executable) binary, since the persistent
 store ends up holding pointers to functions held within the @command{gawk}
@@ -31033,6 +31029,7 @@ and arrays, not the totality of @command{gawk}'s internal state.
 This lets you share data between unrelated programs, eliminating
 the need for scripts to communicate via text files.
 
+@cindex Kelly, Terence
 Terence Kelly, the author of the persistent memory allocator
 @command{gawk} uses, provides the following advice about the backing file:
 
@@ -31067,6 +31064,7 @@ Here are articles and web links that provide more information about
 persistent memory and why it's useful in a scripting language like
 @command{gawk}.
 
+@cindex Kelly, Terence
 @table @asis
 @item @uref{https://web.eecs.umich.edu/~tpkelly/pma/}
 This is the canonical source for Terence Kelly's Persistent Memory
@@ -41083,9 +41081,23 @@ MirBSD
 GNU/Linux on Alpha
 @end itemize
 
+@item
+Support for the following systems was removed from the code
+for @command{gawk} @value{PVERSION} 5.2:
+
+
+@c nested table
+@itemize @value{MINUS}
+@item
+OS/2
+
+@item
+DJGPP
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
+@end itemize
 
 
 @c This does not need to be in the formal book.
@@ -41876,6 +41888,29 @@ and now behave more sanely (@pxref{Options}).
 Handling of Infinity and NaN values were improved.
 @xref{Math Definitions}, and also see
 @ref{POSIX Floating Point Problems}.
+@end itemize
+
+Version 5.2 added the following features:
+
+@itemize
+@item
+The @code{mkbool()} built-in function
+(@pxref{Boolean Functions}).
+
+@item
+Interval expressions in regular expressions are
+enabled by default (@pxref{Interval Expressions}).
+
+@item
+The @command{gawkbug} script for reporting bugs
+(@pxref{Bug address}).
+
+@cindex Kelly, Terence
+@item
+Terence Kelly's persistent memory allocator (PMA) was
+added, allowing the use of persistent data on certain systems
+(@pxref{Persistent Memory}).
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -43098,14 +43133,13 @@ type @samp{make mingw32}.
 @cindex operating systems @subentry PC, @command{gawk} on
 @cindex PC operating systems, @command{gawk} on
 
-Information in this section applies to the MinGW and
-DJGPP ports of @command{gawk}. @xref{Cygwin} for information
+Information in this section applies to the MinGW
+port of @command{gawk}. @xref{Cygwin} for information
 about the Cygwin port.
 
 Under MS-Windows, the MinGW environment supports
 both the @samp{|&} operator and TCP/IP networking
 (@pxref{TCP/IP Networking}).
-The DJGPP environment does not support @samp{|&}.
 
 @cindex search paths
 @cindex search paths @subentry for source files
@@ -44002,17 +44036,10 @@ The people maintaining the various @command{gawk} ports are:
 @cindex G., Daniel Richard
 @cindex Robbins @subentry Arnold
 @cindex Zaretskii, Eli
-@cindex Guerrero, Juan Manuel
 @multitable {MS-Windows with MinGW} {123456789012345678901234567890123456789001234567890}
 @item Unix and POSIX systems @tab Arnold Robbins, @EMAIL{arnold@@skeeve.com,arnold at skeeve dot com}
 
-@item MS-DOS with DJGPP @tab Juan Manuel Guerrero, @EMAIL{juan.guerrero@@gmx.de, juan dot guerrero at gmx dot de}
-
 @item MS-Windows with MinGW @tab Eli Zaretskii, @EMAIL{eliz@@gnu.org,eliz at gnu dot org}
-
-@c Leave this in the document on purpose.
-@c OS/2 is not mentioned anywhere else though.
-@item OS/2 @tab Andreas Buening, @EMAIL{andreas.buening@@nexgo.de,andreas dot buening at nexgo dot de}
 
 @item VMS @tab John Malmberg, @EMAIL{wb8tyw@@qsl.net,wb8tyw at qsl dot net}
 
@@ -44321,8 +44348,7 @@ the file.
 @item
 @command{gawk} may be built on non-POSIX systems as well. The currently
 supported systems are MS-Windows using
-MSYS, MSYS2, DJGPP, MinGW, and Cygwin,
-@c OS/2,
+MSYS, MSYS2, MinGW, and Cygwin,
 and both Vax/VMS and OpenVMS.
 Instructions for each system are included in this @value{APPENDIX}.
 
