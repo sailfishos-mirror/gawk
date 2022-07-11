@@ -59,9 +59,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH June, 2022
-@set VERSION 5.1
-@set PATCHLEVEL 1
+@set UPDATE-MONTH July, 2022
+@set VERSION 5.2
+@set PATCHLEVEL 0
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
 @set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
@@ -72,7 +72,7 @@
 @set TITLE GAWK: Effective AWK Programming
 @end ifclear
 @set SUBTITLE A User's Guide for GNU Awk
-@set EDITION 5.1
+@set EDITION 5.2
 
 @iftex
 @set DOCUMENT book
@@ -21120,28 +21120,27 @@ function causes it to become a scalar variable (unassigned).
 However, @code{isarray()} and @code{typeof()} are different; they do
 not change their arguments from untyped to unassigned.
 
-@cindex dark corner @subentry array elements created by reference
-By ``variable'' we mean one denoted by a simple identifier.  Array elements
-that come into existence simply by referencing them
-are different, they are automatically forced to be scalars. Consider:
+This applies to both variables denoted by simple identifiers
+and array elements that come into existence simply by referencing them.
+Consider:
 
 @example
 $ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
 @print{} untyped
 $ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
-@print{} unassigned
+@print{} untyped
 @end example
 
-@noindent
-@code{x["foo"]} comes into existence before it is passed to @code{typeof()};
-@code{typeof()} cannot tell that it didn't exist prior to being called.
-@value{DARKCORNER}
+Note that prior to @value{PVERSION} 5.2, array elements
+that come into existence simply by referencing them
+were different, they were automatically forced to be scalars:
 
-@c FIXME: For 5.2, if this will change, update this bit of doc.
-@c This may change in a future release, whereby @command{gawk}
-@c would allow such an unassigned array element to be used for
-@c a multidimensional array, and not remain a scalar forever
-@c (or until deleted).
+@example
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} unassigned
+@end example
 
 @node I18N Functions
 @subsection String-Translation Functions
@@ -30974,14 +30973,14 @@ which resides in a file in
 the filesystem.  When persistent memory is not in use (the normal case),
 @command{gawk}'s data resides in ephemeral system memory.
 
-Persistent memory is enabled on 64-bit systems supporting the @code{mmap()}
+Persistent memory is enabled on certain 64-bit systems supporting the @code{mmap()}
 and @code{munmap()} system calls.  @command{gawk} must be compiled as a
 non-PIE (Position Independent Executable) binary, since the persistent
 store ends up holding pointers to functions held within the @command{gawk}
 executable.  This also means that to use the persistent memory, you must
 use the same @command{gawk} executable from run to run.
 
-As of this writing, persistent memory has only been tested on GNU/Linux
+As of this writing, persistent memory has only been tested on GNU/Linux, Cygwin,
 and Mac OS systems. On others, your mileage may vary, and/or you may
 need to investigate how to make it work for you.
 
@@ -30991,7 +30990,7 @@ To use persistent memory, follow these steps:
 @item
 Create a new, empty sparse file of the desired size. For example, four
 gigabytes.  On a GNU/Linux system, you can use the @command{truncate}
-command:
+utility:
 
 @example
 $ @kbd{truncate -s 4G data.pma}
@@ -31003,7 +31002,7 @@ environment variable.  This is best done by placing the value in the
 environment just for the run of @command{gawk}, like so:
 
 @example
-$ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
+$ @kbd{GAWK_PERSIST_FILE=data.pma gawk 'BEGIN @{ print ++i @}'}
 1
 @end example
 
@@ -31011,9 +31010,9 @@ $ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
 Use the same data file in subsequent runs to use the preserved data values:
 
 @example
-$ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
+$ @kbd{GAWK_PERSIST_FILE=data.pma gawk 'BEGIN @{ print ++i @}'}
 2
-$ @kbd{GAWK_PERSIST_FILE=data.pma ./gawk 'BEGIN @{ print ++i @}'}
+$ @kbd{GAWK_PERSIST_FILE=data.pma gawk 'BEGIN @{ print ++i @}'}
 3
 @end example
 
@@ -31127,7 +31126,6 @@ As noted earlier, support for persistent memory is @emph{experimental}.
 If it becomes burdensome,@footnote{Meaning, there are too many
 bug reports, or too many strange differences in behavior from when
 @command{gawk} is run normally.} then the feature will be removed.
-
 
 @node Extension Philosophy
 @section Builtin Features versus Extensions
@@ -41902,6 +41900,10 @@ Interval expressions in regular expressions are
 enabled by default (@pxref{Interval Expressions}).
 
 @item
+Support for the FNV1-A hash algorithm for its hash function
+(@pxref{Other Environment Variables}).
+
+@item
 The @command{gawkbug} script for reporting bugs
 (@pxref{Bug address}).
 
@@ -43768,6 +43770,7 @@ Use the @command{gawkbug} program to submit the bug report. This
 program sets up a bug report template and opens it in your editor.
 You then need to edit it appropriately to include:
 
+@c nested list
 @itemize @bullet
 @item
 The program and @value{DF}.
@@ -43818,7 +43821,7 @@ bug reporting system, you should also send a copy to
 
 This is for two reasons.  First, although some distributions forward
 bug reports ``upstream'' to the GNU mailing list, many don't, so there is a good
-chance that the @command{gawk}  maintainers won't even see the bug report!  Second,
+chance that the @command{gawk} maintainers won't even see the bug report!  Second,
 mail to the GNU list is archived, and having everything at the GNU Project
 keeps things self-contained and not dependent on other organizations.
 @end quotation
