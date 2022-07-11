@@ -2348,9 +2348,9 @@ readdir_retest:
 
 readall:
 	@echo $@
-	@-$(AWK) -lrwarray -f "$(srcdir)"/$@1.awk -v "ofile=readall.state" > _$@
-	@-$(AWK) -lrwarray -f "$(srcdir)"/$@2.awk -v "ifile=readall.state" >> _$@
-	@-$(CMP) $@.ok _$@ && rm -f _$@
+	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@1.awk -v "ofile=readall.state" > _$@
+	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@2.awk -v "ifile=readall.state" >> _$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(RM) -f readall.state
 
 fts:
@@ -2529,7 +2529,7 @@ argcasfile:
 indirectbuiltin2:
 	@echo $@
 	@-for test in 0 1 2 3 4 5 ; do \
-	$(AWK) -v test=$$test -f "$(srcdir)"/$@.awk ; \
+	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 

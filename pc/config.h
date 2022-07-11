@@ -172,6 +172,9 @@
 #define HAVE_MEMMOVE 1
 #endif
 
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
@@ -180,6 +183,9 @@
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
+
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
 
 /* we have the mktime function */
 #define HAVE_MKTIME 1
@@ -253,8 +259,14 @@
 #define HAVE_STDLIB_H 1
 #endif
 
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
+
+/* Define to 1 if you have the `strcoll' function. */
+#undef HAVE_STRCOLL
 
 /* Define to 1 if you have the `strerror' function. */
 #define HAVE_STRERROR 1
@@ -278,12 +290,13 @@
 
 /* Define to 1 if you have the `strncasecmp' function. */
 #define HAVE_STRNCASECMP 1
+s/^#undef HAVE_STRTOD *$/#define HAVE_STRTOD 1/
 
 /* Define to 1 if you have the <stropts.h> header file. */
 #undef HAVE_STROPTS_H
 
 /* Define to 1 if you have the `strtod' function. */
-#define HAVE_STRTOD 1
+#undef HAVE_STRTOD
 
 /* Define to 1 if you have the `strtoul' function. */
 #if defined(__MINGW32__)
@@ -306,6 +319,9 @@
 
 /* Define to 1 if you have the `system' function. */
 #define HAVE_SYSTEM 1
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #if defined(__MINGW32__)
@@ -331,11 +347,17 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
+#undef HAVE_SYS_WAIT_H
+
 /* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
 
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
+
+/* Define to 1 if you have the `tmpfile' function. */
+#undef HAVE_TMPFILE
 
 /* Define to 1 if your `struct tm' has `tm_zone'. Deprecated, use
    `HAVE_STRUCT_TM_TM_ZONE' instead. */
@@ -414,6 +436,9 @@
 #define HAVE_WINT_T 1
 #endif
 
+/* Define to 1 if the system has the type `_Bool'. */
+#undef HAVE__BOOL
+
 /* Define to 1 if you have the `__etoa_l' function. */
 #undef HAVE___ETOA_L
 
@@ -430,7 +455,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.1.1"
+#define PACKAGE_STRING "GNU Awk 5.1.61"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -439,16 +464,22 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.1.1"
+#define PACKAGE_VERSION "5.1.61"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
+
+/* Define to 1 if *printf supports %F format */
+#undef PRINTF_HAS_F_FORMAT
 
 /* The size of `unsigned int', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_INT 4
 
 /* The size of `unsigned long', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_LONG 4
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
@@ -466,6 +497,9 @@
 
 /* Define to 1 if the character set is EBCDIC */
 #undef USE_EBCDIC
+
+/* Define to 1 if we can use the pma allocator */
+#undef USE_PERSISTENT_MALLOC
 
 /* This is required to compile Gnulib regex code.  */
 #if defined(__MINGW32__)
@@ -560,7 +594,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.1.1"
+#define VERSION "5.1.61"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
@@ -644,5 +678,4 @@
 #undef uintmax_t
 
 #include "custom.h"
-
 #define HAVE_POPEN_H 1
