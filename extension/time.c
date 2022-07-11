@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <unistd.h>
 
 #include <sys/types.h>
@@ -80,8 +81,9 @@ vms_fake_nanosleep(struct timespec *rqdly, struct timespec *rmdly)
 
 static const gawk_api_t *api;	/* for convenience macros to work */
 static awk_ext_id_t ext_id;
-static const char *ext_version = "time extension: version 1.0";
-static awk_bool_t (*init_func)(void) = NULL;
+static const char *ext_version = "time extension: version 1.1";
+static awk_bool_t issue_warning(void);
+static awk_bool_t (*init_func)(void) = issue_warning;
 
 int plugin_is_GPL_compatible;
 
@@ -96,6 +98,16 @@ int plugin_is_GPL_compatible;
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+
+/* issue_warning --- issue a warning that this extension is obsolete */
+
+static awk_bool_t
+issue_warning(void)
+{
+	warning(ext_id, _("The time extension is obsolete. Use the timex extension from gawkextlib instead."));
+
+	return awk_true;
+}
 
 /*
  * Returns time since 1/1/1970 UTC as a floating point value; should
