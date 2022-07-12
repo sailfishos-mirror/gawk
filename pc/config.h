@@ -88,17 +88,17 @@
 #undef HAVE_ICONV
 
 /* Define to 1 if the system has the type `intmax_t'. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_INTMAX_T 1
 #endif
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_INTTYPES_H 1
 #endif
 
 /* Define to 1 if you have the `isascii' function. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_ISASCII 1
 #endif
 
@@ -121,7 +121,7 @@
 #endif
 
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
-#if defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #define HAVE_LANGINFO_CODESET 1
 #endif
 
@@ -138,7 +138,7 @@
 #undef HAVE_LIBSIGSEGV
 
 /* Define to 1 if you have the <locale.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_LOCALE_H 1
 #endif
 
@@ -168,8 +168,13 @@
 #undef HAVE_MEMCPY_ULONG
 
 /* Define to 1 if you have the `memmove' function. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_MEMMOVE 1
+#endif
+
+/* Define to 1 if you have the <memory.h> header file. */
+#ifdef __DJGPP__
+#define HAVE_MEMORY_H 1
 #endif
 
 /* Define to 1 if you have the `memset' function. */
@@ -180,6 +185,11 @@
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
+
+/* Define to 1 if you have the `mkstemp' function. */
+#ifdef __DJGPP__
+#define HAVE_MKSTEMP 1
+#endif
 
 /* we have the mktime function */
 #define HAVE_MKTIME 1
@@ -200,12 +210,12 @@
 #undef HAVE_POSIX_OPENPT
 
 /* Define to 1 if you have the `setenv' function. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_SETENV 1
 #endif
 
 /* Define to 1 if you have the `setlocale' function. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_SETLOCALE 1
 #endif
 
@@ -216,7 +226,7 @@
 #undef HAVE_SIGPROCMASK
 
 /* Define to 1 if you have the `snprintf' function. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_SNPRINTF 1
 #endif
 
@@ -231,7 +241,7 @@
 #endif
 
 /* Define to 1 if stdbool.h conforms to C99. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_STDBOOL_H 1
 #endif
 
@@ -241,7 +251,7 @@
 #endif
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_STDINT_H 1
 #endif
 
@@ -249,12 +259,22 @@
 #undef HAVE_STDIO_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_STDLIB_H 1
+#endif
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#ifdef __DJGPP__
+#define HAVE_STRCASECMP 1
 #endif
 
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
+
+/* Define to 1 if you have the `strcoll' function. */
+#ifdef __DJGPP__
+#define HAVE_STRCOLL 1
+#endif
 
 /* Define to 1 if you have the `strerror' function. */
 #define HAVE_STRERROR 1
@@ -278,6 +298,9 @@
 
 /* Define to 1 if you have the `strncasecmp' function. */
 #define HAVE_STRNCASECMP 1
+#ifdef __EMX__
+#define strncasecmp strnicmp
+#endif
 
 /* Define to 1 if you have the <stropts.h> header file. */
 #undef HAVE_STROPTS_H
@@ -286,7 +309,7 @@
 #define HAVE_STRTOD 1
 
 /* Define to 1 if you have the `strtoul' function. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_STRTOUL 1
 #endif
 
@@ -297,7 +320,7 @@
 #undef HAVE_STRUCT_PASSWD_PW_PASSWD
 
 /* Define to 1 if `st_blksize' is a member of `struct stat'. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 #endif
 
@@ -307,8 +330,13 @@
 /* Define to 1 if you have the `system' function. */
 #define HAVE_SYSTEM 1
 
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#ifdef __DJGPP__
+#define HAVE_SYS_IOCTL_H 1
+#endif
+
 /* Define to 1 if you have the <sys/param.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_SYS_PARAM_H 1
 #endif
 
@@ -319,23 +347,33 @@
 #undef HAVE_SYS_SOCKET_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || defined(__DJGPP__)
 #define HAVE_SYS_STAT_H 1
 #endif
 
 /* Define to 1 if you have the <sys/time.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #define HAVE_SYS_TIME_H 1
 #endif
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
+#ifdef __DJGPP__
+#define HAVE_SYS_WAIT_H 1
+#endif
+
 /* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
 
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
+
+/* Define to 1 if you have the `tmpfile' function. */
+#ifdef __DJGPP__
+#define HAVE_TMPFILE 1
+#endif
 
 /* Define to 1 if your `struct tm' has `tm_zone'. Deprecated, use
    `HAVE_STRUCT_TM_TM_ZONE' instead. */
@@ -359,12 +397,12 @@
 #define HAVE_TZSET 1
 
 /* Define to 1 if the system has the type `uintmax_t'. */
-#if defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #define HAVE_UINTMAX_T 1
 #endif
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#if defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #define HAVE_UNISTD_H 1
 #endif
 
@@ -372,7 +410,7 @@
 #undef HAVE_UNSIGNED_LONG_LONG_INT
 
 /* Define to 1 if you have the `usleep' function. */
-#if defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #define HAVE_USLEEP 1
 #endif
 
@@ -414,6 +452,11 @@
 #define HAVE_WINT_T 1
 #endif
 
+/* Define to 1 if the system has the type `_Bool'. */
+#ifdef __DJGPP__
+#define HAVE__BOOL 1
+#endif
+
 /* Define to 1 if you have the `__etoa_l' function. */
 #undef HAVE___ETOA_L
 
@@ -444,6 +487,11 @@
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
 
+/* Define to 1 if *printf supports %F format */
+#ifdef __DJGPP__
+#define PRINTF_HAS_F_FORMAT 1
+#endif
+
 /* The size of `unsigned int', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_INT 4
 
@@ -468,7 +516,7 @@
 #undef USE_EBCDIC
 
 /* This is required to compile Gnulib regex code.  */
-#if defined(__MINGW32__)
+#if defined(__DJGPP__) || defined(__MINGW32__)
 #define _GNU_SOURCE 1
 #endif
 /* Enable extensions on AIX 3, Interix.  */
@@ -644,5 +692,27 @@
 #undef uintmax_t
 
 #include "custom.h"
+#ifdef __DJGPP__
+/* gcc no longer includes this by default */
+# include <sys/version.h>
 
+/* Library search path */
+# if (__DJGPP__ > 2 || __DJGPP_MINOR__ >= 3)
+#  define DEFPATH  ".;/dev/env/DJDIR/share/awk"
+# else
+#  define DEFPATH  ".;c:/lib/awk;c:/gnu/lib/awk"
+# endif
+
+/* Function prototype.  */
+#include <stdbool.h>
+extern bool is_valid_identifier(const char *name);
+#endif
+
+#ifndef __DJGPP__
 #define HAVE_POPEN_H 1
+#endif
+
+#if defined(__EMX__)
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#endif

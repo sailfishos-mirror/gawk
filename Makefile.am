@@ -97,7 +97,6 @@ base_sources = \
 	int_array.c \
 	interpret.h \
 	io.c \
-	mbsupport.h \
 	main.c \
 	mpfr.c \
 	msg.c \
