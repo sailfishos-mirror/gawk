@@ -216,7 +216,7 @@ static int integrity_check(int line) {  // can be slow; intended for debugging s
     tpiu += getbit(a, PIU);  // total number of aos with previous-ao-is-in-use bit set
   }
   assert(tpiu == tiu || 1 + tpiu == tiu);
-  FYI("anext list length: %d  tiu %d  tpiu %d  nallocs %lu  nfrees %lu\n",
+  FYI("anext list length: %d  tiu %d  tpiu %d  nallocs %llu  nfrees %llu\n",
                           nadd,   tiu,     tpiu,       h->nallocs, h->nfrees);
   assert(h->nallocs >= h->nfrees);
   assert(h->nallocs - h->nfrees == (uint64_t)tiu);
@@ -341,7 +341,7 @@ static void flr(ao_t *p) {  // remove ao from free list
 #define MUNMAP(A, N) do { if (0 != munmap((A), (N))) ERR("mmap()" ERN); } while (0)
 static void * addrgap(off_t n) {  // find big gap in address space to map n bytes
   void *A, *Amax = NULL;  size_t L = 0, U, Max = 0, N = (size_t)n;  char *r;
-  FYI("addrgap(%ld)\n", n);
+  FYI("addrgap(%lld)\n", n);
   if (N % (size_t)PGSZ) { ERR("file size %lu not multiple of PGSZ\n", N); SERN; }
   if (N < sizeof(pma_hdr_t) + 10 * PGSZ) { ERR("file size %lu too small\n", N); SERN; }
   for (U = 1; ; U *= 2)  // double upper bound until failure
