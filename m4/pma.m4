@@ -35,8 +35,8 @@ then
 			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
 			export LDFLAGS
 			;;
-		*cygwin* | *CYGWIN*)
-			true	# nothing do, Cygwin exes are not PIE
+		*cygwin* | *CYGWIN* | *solaris2.11* )
+			true	# nothing do, Cygwin and Solaris exes are not PIE
 			;;
 		# Other OS's go here...
 		*)
