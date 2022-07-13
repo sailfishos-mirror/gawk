@@ -56,9 +56,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Giugno 2022
-@set VERSION 5.1
-@set PATCHLEVEL 1
+@set UPDATE-MONTH Luglio 2022
+@set VERSION 5.2
+@set PATCHLEVEL 0
 
 @c added Italian hyphenation stuff
 @hyphenation{ven-go-no o-met-te-re o-met-ten-do}
@@ -72,7 +72,7 @@
 @set TITLE GAWK: Programmare efficacemente in AWK
 @end ifclear
 @set SUBTITLE Una Guida Utente per GNU Awk
-@set EDITION 5.1
+@set EDITION 5.2
 
 @iftex
 @set DOCUMENT libro
@@ -21976,30 +21976,28 @@ Tuttavia, se si chiama @code{isarray()} e @code{typeof()} queste
 funzioni non cambiano gli argomenti che vengono passati loro da
 non ancora tipizzati (untyped) a non ancora assegnati (unassigned).
 
-@cindex angolo buio @subentry elementi di un vettore creati per riferimento
-Per ``variabile'' intendiamo quelle descritte da un identificativo semplice.
-Elementi di un vettore che vengono creati semplicemente facendo un
-riferimento agli stessi sono differenti, e sono automaticamente forzati
-a essere delle variabili scalari.  Si consideri:
+Ci@`o vale sia per variabili scalari che per
+elementi di vettore generati semplicemente facendo
+un riferimento agli stessi.
+Si consideri:
 
 @example
 $ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
 @print{} untyped
 $ @kbd{gawk 'BEGIN @{ print typeof(x["pippo"]) @}'}
-@print{} unassigned
+@print{} untyped
 @end example
 
-@noindent
-@code{x["pippo"]} viene creato prima di essere passato alla funzione
-@code{typeof()}; @code{typeof()} non @`e in grado di determinare se
-esisteva o no prima che la funzione fosse chiamata.
-@value{DARKCORNER}
-
-@c FIXME: For 5.2, if this will change, update this bit of doc.
-@c This may change in a future release, whereby @command{gawk}
-@c would allow such an unassigned array element to be used for
-@c a multidimensional array, and not remain a scalar forever
-@c (or until deleted).
+Notare che prima della @value{PVERSION} 5.2, gli elementi di
+vettore generati facendo un riferimento agli stessi
+venivano automaticamente definiti come scalari:
+  
+@example
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["pippo"]) @}'}
+@print{} unassigned
+@end example
 
 @node Funzioni di internazionalizzazione
 @subsection Funzioni per tradurre stringhe
@@ -24890,7 +24888,6 @@ BEGIN @{
 @end example
 
 @cindex risoluzione di problemi @subentry funzione @code{getline}
-@cindex comando @subentry @code{getline} @subentry risoluzione di problemi
 @cindex @code{getline} (comando) @subentry risoluzione di problemi
 Questo codice funziona, perch@'e l'errore di @code{getline} non @`e fatale.
 Rimuovendo l'elemento da @code{ARGV} con @code{delete}
@@ -25808,7 +25805,6 @@ viene chiamata solo una volta.
 @cindex @code{PROCINFO} (vettore) @subentry verificare la divisione in campi
 @cindex vettore @subentry @code{PROCINFO} @subentry verificare la divisione in campi
 @cindex @code{getline} (comando) @subentry funzione definita dall'utente, @code{_pw_init()}
-@cindex comando @subentry @code{getline} @subentry funzione definita dall'utente, @code{_pw_init()}
 Poich@'e questa funzione usa @code{getline} per leggere informazioni da
 @command{pwcat}, dapprima salva i valori di @code{FS}, @code{RS} e @code{$0}.
 Annota nella variabile @code{using_fw} se la suddivisione in campi
@@ -26114,7 +26110,6 @@ gruppi.  Ce ne sono diverse, costruite sul modello delle omonime funzioni della
 libreria C:
 
 @cindex @code{getline} (comando) @subentry funzione definita dall'utente, @code{_gr_init()}
-@cindex comando @subentry @code{getline} @subentry funzione definita dall'utente, @code{_gr_init()}
 @cindex @code{_gr_init()} @subentry funzione definita dall'utente
 @cindex funzione definita dall'utente @subentry @code{_gr_init()}
 @example
@@ -31902,7 +31897,7 @@ temporanei rimangono pi@`u difficili da usare delle @dfn{pipe} bidirezionali.} @
 @cindex @code{|} (barra verticale) @subentry operatore @code{|&} (I/O)
 @cindex barra verticale (@code{|}) @subentry operatore @code{|&} (I/O)
 @cindex @command{csh} (comando di utilit@`a) @subentry operatore @code{|&}, confronto con
-@cindex comando @subentry @command{csh} @subentry operatore @code{|&}, confronto con
+@cindex comando di utilit@`a @subentry @command{csh} @subentry operatore @code{|&}, confronto con
 Comunque, con @command{gawk}, @`e possibile aprire una @dfn{pipe}
 @emph{bidirezionale}
 verso un altro processo.  Il secondo processo @`e chiamato @dfn{coprocesso},
@@ -32528,8 +32523,8 @@ $ @kbd{gawk --profile -f mioprog &}
 [1] 13992
 @end example
 
-@cindex @command{kill} (comando) @subentry profilazione dinamica e
-@cindex comando @subentry @command{kill} @subentry profilazione dinamica e
+@cindex @command{kill} (comando di utilit@`a) @subentry profilazione dinamica e
+@cindex comando di utilit@`a @subentry @command{kill} @subentry profilazione dinamica e
 @cindex @code{USR1} (segnale) @subentry per profilazione dinamica
 @cindex @code{SIGUSR1} (segnale) (per profilazione dinamica)
 @cindex segnali @subentry @code{USR1}/@code{SIGUSR1} (per profilazione)
@@ -32652,9 +32647,9 @@ del medesimo eseguibile di @command{gawk}, nelle successive chiamate
 al programma.
 
 Finora la memoria persistente @`e stata testata solo nel sistema operativo
-GNU/Linux e in quello Mac OS.  In altri sistemi operativi, la situazione
-pu@`o essere diversa, e potrebbe essere necessario fare ulteriori indagini
-prima di utilizzare questa funzionalit@`a.
+GNU/Linux, Cygwin e in quello Mac OS.  In altri sistemi operativi, la
+situazione pu@`o essere diversa, e potrebbe essere necessario fare ulteriori
+indagini prima di utilizzare questa funzionalit@`a.
 
 Per usare la memoria persistente, seguire questa procedura:
 
@@ -32662,7 +32657,7 @@ Per usare la memoria persistente, seguire questa procedura:
 @item
 Creare un file sparso, nuovo e vuoto, delle dimensioni desiderate.
 Per esempio 4 gigabyte.  In ambiente Linux si pu@`o usare il comando
-@command{truncate}:
+di utilit@`a @command{truncate}:
 
 @example
 $ @kbd{truncate -s 4G dati.pma}
@@ -32675,7 +32670,7 @@ valore della variabile di ambiente quando si chiama il programma
 @command{gawk}, in questo modo:
 
 @example
-$ @kbd{GAWK_PERSIST_FILE=dati.pma ./gawk 'BEGIN @{ print ++i @}'}
+$ @kbd{GAWK_PERSIST_FILE=dati.pma gawk 'BEGIN @{ print ++i @}'}
 1
 @end example
 
@@ -32684,9 +32679,9 @@ Usare lo stesso file di dati nelle successive esecuzioni del
 programma, per utilizzare i dati preservati:
 
 @example
-$ @kbd{GAWK_PERSIST_FILE=dati.pma ./gawk 'BEGIN @{ print ++i @}'}
+$ @kbd{GAWK_PERSIST_FILE=dati.pma gawk 'BEGIN @{ print ++i @}'}
 2
-$ @kbd{GAWK_PERSIST_FILE=dati.pma ./gawk 'BEGIN @{ print ++i @}'}
+$ @kbd{GAWK_PERSIST_FILE=dati.pma gawk 'BEGIN @{ print ++i @}'}
 3
 @end example
 
@@ -32823,7 +32818,6 @@ Se diventa troppo impegnativo,@footnote{Nel senso di generare troppe
 segnalazioni di errore o troppe differenze marcate nel comportamento
 rispetto a quando @command{gawk} @`e eseguito normalmente.} allora il
 supporto per la funzionalit@`a verr@`a rimossso.
-
 
 @node Filosofia delle estensioni
 @section Funzionalit@`a incluse @dfn{versus} estensioni
@@ -44748,6 +44742,11 @@ per default nelle espressioni regolari
 (@pxref{Espressioni di intervallo}).
 
 @item
+Supporto per l'algoritmo di generazione di numeri casuali FNV1-A
+da usare in alternativa all'algoritmo normale
+(@pxref{Altre variabili d'ambiente}).
+
+@item
 Lo script @command{gawkbug} per la segnalazione di bug
 (@pxref{Indirizzo bug}).
 
@@ -46863,13 +46862,14 @@ di isolarlo preparando un programma @command{awk} il pi@`u piccolo possibile,
 con un @value{DF} in input che possa riprodurre il problema.
 
 @item
-@cindex @command{gawkbug} utility
-@cindex programma di utilit@`a @subentry @command{gawkbug}
+@cindex @command{gawkbug} (comando di utilit@`a)
+@cindex comando di utilit@`a @subentry @command{gawkbug}
 Si usi lo script @command{gawkbug} per preparare la segnalazione
 del bug.  Questo programma prepara un modello di segnalazione
 di bug e vi permette di modificarlo nel vostro programma di edit.
 Va quindi modificato appropriatamente per includere:
 
+@c nested list
 @itemize @bullet
 @item
 il programma e il @value{DF}.
