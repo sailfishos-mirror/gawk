@@ -473,7 +473,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.1.1"
+#define PACKAGE_STRING "GNU Awk 5.1.61"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -482,7 +482,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.1.1"
+#define PACKAGE_VERSION "5.1.61"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -497,6 +497,9 @@
 
 /* The size of `unsigned long', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_LONG 4
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
@@ -514,6 +517,9 @@
 
 /* Define to 1 if the character set is EBCDIC */
 #undef USE_EBCDIC
+
+/* Define to 1 if we can use the pma allocator */
+#undef USE_PERSISTENT_MALLOC
 
 /* This is required to compile Gnulib regex code.  */
 #if defined(__DJGPP__) || defined(__MINGW32__)
@@ -608,7 +614,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.1.1"
+#define VERSION "5.1.61"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
