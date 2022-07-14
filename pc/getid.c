@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, the Free Software Foundation, Inc.
+ * Copyright (C) 2010, 2022, the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
