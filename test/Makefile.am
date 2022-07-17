@@ -1654,7 +1654,8 @@ AWK = $(LOCALES) AWKLIBPATH=../extension/.libs GAWK_NO_MPFR_WARN=1 $(VALGRIND) $
 # Message stuff is to make it a little easier to follow.
 # Make the pass-fail last and dependent on others to avoid
 # spurious errors if `make -j' in effect.
-check:	msg \
+check:	env-check \
+	msg \
 	printlang \
 	basic-msg-start  basic           basic-msg-end \
 	unix-msg-start   unix-tests      unix-msg-end \
@@ -1719,6 +1720,16 @@ shlib-tests:
 	fi
 
 shlib-real-tests: $(SHLIB_TESTS)
+
+env-check:
+	@if [ "$$GAWK_PERSIST_FILE" != "" ]; then \
+	echo ; \
+	echo '**********************************************************************************' ; \
+	echo '* Please remove GAWK_PERSIST_FILE from the environment before running the tests. *' ; \
+	echo '**********************************************************************************' ; \
+	echo ; \
+	exit 1; \
+	fi
 
 msg::
 	@echo ''
