@@ -206,7 +206,7 @@ static const struct option optab[] = {
 #if defined(YYDEBUG) || defined(GAWKDEBUG)
 	{ "parsedebug",		no_argument,		NULL,	'Y' },
 #endif
-	{ "persist",		required_argument,	NULL,	'T' },
+	{ "persist",		optional_argument,	NULL,	'T' },
 	{ "posix",		no_argument,		NULL,	'P' },
 	{ "pretty-print",	optional_argument,	NULL,	'o' },
 	{ "profile",		optional_argument,	NULL,	'p' },
@@ -1729,8 +1729,10 @@ parse_args(int argc, char **argv)
 			do_flags |= DO_SANDBOX;
 			break;
 
-		case 'T':	// --persist=file
+		case 'T':	// --persist[=file]
 #ifdef USE_PERSISTENT_MALLOC
+			if (optarg == NULL)
+				optarg = "/some/file";
 			fatal(_("Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."), optarg);
 #else
 			warning(_("Persistent memory is not supported."));
