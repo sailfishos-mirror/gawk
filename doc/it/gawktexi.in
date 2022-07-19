@@ -4499,6 +4499,8 @@ nell'output.
 @cindex opzione @subentry @option{--load}
 @cindex caricare estensioni
 @cindex estensioni @subentry caricare
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 Carica un'estensione dinamica denominata @var{ext}.  Le estensioni sono
 memorizzate come librerie condivise di sistema.
 Quest'opzione ricerca la libreria usando la variabile d'ambiente
@@ -4565,6 +4567,10 @@ MPFR ed MP
 (@pxref{Calcolo con precisione arbitraria}).
 @end ifnottex
 
+@ignore
+@cindex @env{GAWK_NO_MPFR_WARN} (variabile d'ambiente)
+@cindex variabili d'ambiente @env{GAWK_NO_MPFR_WARN}
+@end ignore
 A partire dalla @value{PVERSION} 5.2,
 le funzionalit@`a di calcolo con precisione arbitraria in @command{gawk}
 sono ``in libert@`a vigilata''.
@@ -4673,7 +4679,7 @@ sinistro e il conteggio delle chiamate di funzione per ogni funzione.
 @cindex @option{--posix} (opzione)
 @cindex opzione @subentry @option{--posix}
 @cindex POSIX @subentry modalit@`a
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 @cindex @command{gawk} @subentry estensioni, disabilitare
 Opera in modalit@`a POSIX rigorosa.  Disabilita tutte le estensioni di
 @command{gawk} (proprio come @option{--traditional}) e
@@ -4853,7 +4859,7 @@ alla ricerca di ulteriori opzioni.
 @cindex @dfn{lint} @subentry controlli @env{POSIXLY_CORRECT} (variabile d'ambiente)
 @cindex controllo @subentry @dfn{lint} @subentry @env{POSIXLY_CORRECT} (variabile d'ambiente)
 @cindex POSIX @subentry modalit@`a
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 Se la variabile d'ambiente @env{POSIXLY_CORRECT} esiste,
 @command{gawk} si comporta in modalit@`a POSIX rigorosa, esattamente come se
 fosse stata fornita l'opzione @option{--posix}.
@@ -5226,22 +5232,37 @@ sono quelle pi@`u utili agli utenti normali:
 
 @table @env
 @item GAWK_MSEC_SLEEP
+@cindex @env{GAWK_MSEC_SLEEP} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_MSEC_SLEEP}
 Specifica l'intervallo tra due tentativi di riconnessione,
 in millisecondi.  Sui sistemi che non prevedono
 la chiamata di sistema @code{usleep()},
 il valore @`e arrotondato a un numero intero di secondi .
 
 @ignore
+@cindex @env{GAWK_NO_MPFR_WARN} (variabile d'ambiente)
+@cindex variabili d'ambiente @env{GAWK_NO_MPFR_WARN}
 @item GAWK_NO_MPFR_WARN
 Specifica che @command{gawk} non deve stampare un avviso
 di deprecazione quando viene usato specificando l'opzione
 @option{-M} o @option{--bignum}.
 @end ignore
 
+@cindex @env{GAWK_PERSIST_FILE} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_PERSIST_FILE}
+@item GAWK_PERSIST_FILE
+Specifica il file da utilizzare per immagazzinare le variabili
+e i vettori di @command{gawk} per la funzionalità ``memoria persistente''
+@xref{Memoria persistente}.
+
+@cindex @env{GAWK_READ_TIMEOUT} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_READ_TIMEOUT}
 @item GAWK_READ_TIMEOUT
 Specifica per quanto tempo, in millisecondi, @command{gawk}
 aspetta l'input prima di emettere un messaggio di errore.
 
+@cindex @env{GAWK_SOCK_RETRIES} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_SOCK_RETRIES}
 @item GAWK_SOCK_RETRIES
 Controlla il numero di volte che @command{gawk} cerca di
 ristabilire una connessione bidirezionale TCP/IP (@dfn{socket}) prima di
@@ -5251,6 +5272,14 @@ Si noti che quando @`e attiva l'opzione di continuazione dopo errori di I/O
 (@pxref{Continuazione dopo errori}),
 @command{gawk} tenta di aprire un @dfn{socket} TCP/IP soltanto una volta.
 
+@cindex @env{PMA_VERBOSITY} (variabile d'ambiente)
+@cindex variabile d'ambiente @subentry @env{PMA_VERBOSITY}
+@item PMA_VERBOSITY
+Controlla la verbosità dell'allocatore di memoria persistente.
+@xref{Memoria persistente}.
+
+@cindex @env{POSIXLY_CORRECT} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{POSIXLY_CORRECT}
 @item POSIXLY_CORRECT
 Provoca il passaggio di @command{gawk} alla modalit@`a di compatibilit@`a POSIX,
 disabilitando tutte le estensioni tradizionali e GNU.
@@ -5262,6 +5291,8 @@ soprattutto agli sviluppatori di @command{gawk} per il collaudo e la messa
 a punto del programma.  Sono soggette a cambiamenti.  Le variabili sono:
 
 @table @env
+@cindex @env{AWKBUFSIZE} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKBUFSIZE}
 @item AWKBUFSIZE
 Questa variabile riguarda solo @command{gawk} installato su sistemi
 conformi a POSIX.
@@ -5273,6 +5304,8 @@ dimensione del buffer da allocare.  (Quando questa variabile non @`e impostata,
 del blocco di ``default'', che normalmente @`e la dimensione del blocco I/O
 del filesystem).
 
+@cindex @env{AWK_HASH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWK_HASH}
 @item AWK_HASH
 Se questa variabile @`e impostata con un valore di @samp{gst}, @command{gawk}
 usa la funzione hash di GNU Smalltalk per gestire i vettori.
@@ -5281,12 +5314,16 @@ Se invece ha per valore @samp{fnv1a}, @command{gawk} usa la funzione hash
 FNV1-A}.
 Queste funzioni possono essere leggermente pi@`u veloci della funzione standard.
 
+@cindex @env{AWKREADFUNC} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKREADFUNC}
 @item AWKREADFUNC
 Se questa variabile esiste, @command{gawk} legge i file sorgenti una riga per
 volta, anzich@'e a blocchi.  Questa variabile @`e presente
 per problemi di debug su filesystem di sistemi operativi non POSIX,
 dove l'I/O @`e elaborato a record, non a blocchi.
 
+@cindex @env{GAWK_MSG_SRC} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_MSG_SRC}
 @item GAWK_MSG_SRC
 Se questa variabile esiste, @command{gawk} include il @value{FN} e il
 numero di riga all'interno del codice sorgente @command{gawk}
@@ -5295,11 +5332,15 @@ i messaggi di errore grave.  Il suo intento @`e quello di aiutare a isolare
 l'origine di un messaggio, poich@'e ci possono essere pi@`u righe di codice che
 producono lo stesso messaggio di avvertimento o di errore.
 
+@cindex @env{GAWK_LOCALE_DIR} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_LOCALE_DIR}
 @item GAWK_LOCALE_DIR
 Specifica la posizione dei file oggetto compilati contenenti la traduzione dei
 messaggi emessi da @command{gawk} stesso. Questa variabile @`e passata alla
 funzione @code{bindtextdomain()} nella fase di partenza di @command{gawk}.
 
+@cindex @env{GAWK_NO_DFA} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_NO_DFA}
 @item GAWK_NO_DFA
 Se questa variabile esiste, @command{gawk} non usa il riconoscitore di
 espressioni regolari ASFD [automa a stati finiti deterministico] per i tipi di
@@ -5309,22 +5350,32 @@ riconoscitori di espressioni regolari che @command{gawk} usa internamente (non
 dovrebbero esserci differenze, ma a volte la teoria non coincide con la
 pratica).
 
+@cindex @env{GAWK_STACKSIZE} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_STACKSIZE}
 @item GAWK_STACKSIZE
 Specifica di quanto @command{gawk} dovrebbe accrescere il suo @dfn{stack} di
 valutazione interno, all'occorrenza.
 
+@cindex @env{INT_CHAIN_MAX} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{INT_CHAIN_MAX}
 @item INT_CHAIN_MAX
 Specifica il numero massimo previsto di elementi che @command{gawk} mantiene
 su una catena hash per gestire i vettori indicizzati da numeri interi.
 
+@cindex @env{STR_CHAIN_MAX} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{STR_CHAIN_MAX}
 @item STR_CHAIN_MAX
 Specifica il numero massimo previsto di elementi che @command{gawk} mantiene
 su una catena hash per gestire i vettori indicizzati da stringhe.
 
+@cindex @env{TIDYMEM} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{TIDYMEM}
 @item TIDYMEM
 Se questa variabile esiste, @command{gawk} usa le chiamate di libreria
 @code{mtrace()} della @dfn{GNU C library} per aiutare a scoprire
 possibili sprechi di memoria.
+Questa funzionalità non è disponibile se si usa l'allocatore di
+memoria persistente.
 @end table
 
 @node Codice di ritorno
@@ -5369,6 +5420,8 @@ Questo
 @cindex caricare estensioni @subentry @code{@@load} (direttiva)
 @cindex estensioni @subentry caricare @subentry @code{@@load} (direttiva)
 @cindex includere file @subentry direttiva @code{@@include}
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 La direttiva @code{@@include} pu@`o essere usata per leggere file sorgenti
 di @command{awk} esterni.  Questo d@`a la possibilit@`a di suddividere file
 sorgenti di @command{awk} di grandi dimensioni in porzioni pi@`u piccole e pi@`u
@@ -5511,6 +5564,8 @@ Questo
 @cindex chiocciola (@code{@@}) @subentry @code{@@load} (direttiva)
 @cindex caricare estensioni @subentry direttiva @code{@@load}
 @cindex estensioni @subentry caricare @subentry direttiva @code{@@load}
+@cindex @env{AWKLIBPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKLIBPATH}
 La direttiva @code{@@load} pu@`o essere usata per leggere estensioni di
 @command{awk} esterne (memorizzate come librerie condivise di sistema).
 Questo consente di collegare del codice compilato che pu@`o offrire prestazioni
@@ -5779,6 +5834,12 @@ input sulla riga di comando.  @command{gawk} consente anche di usare il
 @value{FN} speciale @file{/dev/stdin}.
 
 @item
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
+@cindex @env{AWKLIBPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKLIBPATH}
+@cindex @env{POSIXLY_CORRECT} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{POSIXLY_CORRECT}
 @command{gawk} tiene conto di diverse variabili d'ambiente;
 @env{AWKPATH}, @env{AWKLIBPATH} e @env{POSIXLY_CORRECT} sono le
 pi@`u importanti.
@@ -6259,7 +6320,7 @@ Usando la concatenazione, si pu@`o formare un'espressione regolare come
 @samp{U} e finisce con @samp{A}.
 
 @cindex POSIX @subentry modalit@`a
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 @cindex POSIX @command{awk} @subentry uso del punto (@code{.})
 In modalit@`a POSIX stretta (@pxref{Opzioni}),
 @samp{.} non individua il carattere @sc{nul},
@@ -8059,7 +8120,7 @@ si possano manipolare con un programma @command{awk} separato.)
 @cindex separatore di campo @subentry spazi vuoti come
 @cindex spazi vuoti @subentry come separatore di campo
 @cindex separatore di campo @subentry @code{FS} (variabile) come
-@cindex @code{FS} (variabile) @subentry come separatore di campo 
+@cindex @code{FS} (variabile) @subentry come separatore di campo
 I campi sono separati normalmente da spazi vuoti
 (spazi, tabulazioni e ritorni a capo), non solo da spazi singoli.  Due spazi
 in una riga non delimitano un campo vuoto. Il valore di default del separatore
@@ -8972,7 +9033,7 @@ $ @kbd{gawk -v fpat=2 -f test-csv.awk sample.csv}
 @cindex valori separati da virgole (CSV) come dati @subentry analizzare con libreria @code{CSVMODE}
 In generale, usare @code{FPAT} per effettuare l'analisi di dati in formato CSV
 @`e come utilizzare un lenzuolo troppo corto.  Rimane sempre un angolo che non
-@`e coperto.  Si raccomanda, in alternativa, di usare la libreria @code{CSVMODE} 
+@`e coperto.  Si raccomanda, in alternativa, di usare la libreria @code{CSVMODE}
 messa a disposizione da Manuel Collado.  Vedere:
 @uref{http://mcollado.z15.es/xgawk/, @code{CSVMODE} libreria per @command{gawk}}.
 
@@ -9331,7 +9392,7 @@ Per esempio:
 @{
     while ((inizio = index($0, "/*")) != 0) @{
         prima = substr($0, 1, inizio - 1)  # parte iniziale della stringa
-        dopo = substr($0, inizio + 2)    # ... */ ...    
+        dopo = substr($0, inizio + 2)    # ... */ ...
         while ((fine = index(dopo, "*/")) == 0) @{  # */ @`e nella parte finale?
             # passa ai record seguenti
             if (getline <= 0) @{
@@ -10142,7 +10203,7 @@ o da un coprocesso.
 tempo limite alle operazioni di lettura da @var{file}.
 
 @cindex POSIX @subentry modalit@`a
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 @item
 Le directory sulla riga di comando generano un errore fatale per
 @command{awk} standard;
@@ -11522,7 +11583,7 @@ Sono qui elencate alcune cose da tener presente usando i
 @itemize @value{BULLET}
 @cindex modalit@`a compatibile di (@command{gawk}) @subentry nomi di file
 @cindex nomi @subentry di file @subentry nella modalit@`a compatibile di @command{gawk}
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 @item
 Il riconoscimento dei @value{FNS} per i tre file standard pre-aperti
 @`e disabilitato solo in modalit@`a POSIX.
@@ -11786,7 +11847,7 @@ Questo valore @`e zero se la chiusura riesce, o @minus{}1 se non riesce.
 @end float
 
 @cindex POSIX @subentry modalit@`a
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 Lo standard POSIX @`e molto generico; dice che @code{close()}
 restituisce zero se @`e terminata correttamente, e un valore diverso da zero
 nell'altro caso.  In generale,
@@ -12139,7 +12200,7 @@ $ @kbd{gawk 'BEGIN @{ print "ciao, \}
 @print{} ciao, mondo
 @end example
 
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 In modalit@`a POSIX (@pxref{Opzioni}), @command{gawk} non consente
 caratteri protetti di avanzamento riga.  Altrimenti, il
 comportamento @`e quello descritto sopra.
@@ -12876,7 +12937,9 @@ normale, @command{gawk} tratta @samp{4,321} come 4, mentre nella localizzazione
 danese @`e trattato come numero completo comprendente la parte frazionaria,
 4.321.
 
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
+@cindex @env{POSIXLY_CORRECT} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{POSIXLY_CORRECT}
 Alcune delle prime versioni di @command{gawk} si conformavano completamente con
 quest'aspetto dello standard.  Tuttavia, molti utenti di localizzazioni non
 inglesi si lamentavano di questo comportamento, perch@'e i loro dati usavano il
@@ -14181,7 +14244,7 @@ diverso dal risultato ottenuto quando si esegue un confronto rigorosamente
 dovrebbe funzionare come se le stringhe fossero confrontate usando la
 funzione @code{strcoll()} di C.}
 
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 Poich@'e questo comportamento differisce sensibilmente dalla pratica corrente,
 @command{gawk} lo implementava solo quando eseguito in modalit@`a POSIX
 (@pxref{Opzioni}).
@@ -14216,7 +14279,7 @@ a <= b && a >= b
 @end example
 @end quotation
 
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 A partire dalla @value{PVERSION} 4.2, @command{gawk} continua a usare
 l'ordine di collazione locale per @code{<}, @code{<=}, @code{>}
 e @code{>=} solo se eseguito nella modalit@`a POSIX.
@@ -15948,7 +16011,7 @@ comprendere.  @`E quindi meglio scrivere le istruzioni di
 inizializzazione come istruzioni a parte, prima del ciclo
 @code{for}, e inserire ulteriori istruzioni di incremento variabili
 alla fine del codice all'interno del ciclo stesso.
-  
+
 Molto spesso, @var{incremento} @`e un'espressione di incremento, come
 nell'esempio precedente.  Ma questo non @`e obbligatorio; pu@`o trattarsi di
 un'espressione qualsiasi.  Per esempio,
@@ -16908,6 +16971,8 @@ Un'attenzione speciale dovrebbe essere prestata alla modifica di
 @code{ENVIRON["PATH"]}, che @`e il percorso di ricerca usato per trovare
 i programmi eseguibili.
 
+@cindex @env{TZ} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{TZ}
 Queste modifiche possono anche influire sul programma @command{gawk}, poich@'e
 alcune funzioni predefinite possono tener conto di certe
 variabili d'ambiente.
@@ -20147,7 +20212,7 @@ non @`e la stringa nulla),
 @var{vettore} ha solo un elemento. Il valore di quell'elemento @`e la
 @var{stringa} originale.
 
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 In modalit@`a POSIX (@pxref{Opzioni}), il quarto argomento non @`e consentito.
 
 @item @code{sprintf(@var{formato}, @var{espressione1}, @dots{})}
@@ -21991,7 +22056,7 @@ $ @kbd{gawk 'BEGIN @{ print typeof(x["pippo"]) @}'}
 Notare che prima della @value{PVERSION} 5.2, gli elementi di
 vettore generati facendo un riferimento agli stessi
 venivano automaticamente definiti come scalari:
-  
+
 @example
 $ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
 @print{} untyped
@@ -27734,7 +27799,7 @@ a uscire dal programma se l'utente in questione non esiste:
 
 @example
 @c file eg/prog/id.awk
-function scrivi_info_utente(user,   
+function scrivi_info_utente(user,
                             pwent, fields, groupnames, grent, groups, i)
 @{
     pwent = getpwnam(user)
@@ -27824,6 +27889,8 @@ Altrimenti viene letto lo standard input.
 Se specificato, @var{nome-output-file} @`e il prefisso da anteporre
 ai nomi dei file in output, invece di usare @samp{x}.
 
+@cindex @env{LC_ALL} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{LC_ALL}
 Per utilizzare l'opzione @option{-b} di @command{split},
 @command{gawk} dovrebbe essere chiamato specificando anche
 per @command{gawk} l'opzione @option{-b} (@pxref{Opzioni}),
@@ -27989,7 +28056,7 @@ la funzione @code{substr()}.
 
 @item
 Preparare le strutture di dati per la prossima volta in cui
-@code{calcola_suffisso()} sar@`a chiamato.  Per fare ci@`o, 
+@code{calcola_suffisso()} sar@`a chiamato.  Per fare ci@`o,
 si esegue un ciclo sui valori di @code{Indice_suff}, procedendo
 @emph{all'indietro}.
 Se l'elemento corrente @`e minore di 26, @`e incrementato, e il ciclo
@@ -30149,6 +30216,8 @@ evidenzia l'utilit@`a di rendere l'inclusione di
 file disponibile per @command{awk} standard, e mostra come farlo utilizzando
 una combinazione di programmazione di shell e di @command{awk}.
 
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 Usare funzioni di libreria in @command{awk} pu@`o presentare molti vantaggi.
 Incoraggia il riutilizzo di codice e la scrittura di funzioni di tipo
 generale.  I programmi sono pi@`u snelli e quindi pi@`u comprensibili.
@@ -30405,6 +30474,8 @@ la pila viene ``disfatta'', e il precedente file in input diventa nuovamente il
 file in input corrente.  Il processo viene iniziato ponendo il file originale
 come primo file sulla pila.
 
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 La funzione @code{percorso()} trova qual @`e il percorso completo di un file.
 Simula il comportamento di @command{gawk} quando utilizza la variabile
 d'ambiente @env{AWKPATH}
@@ -31608,7 +31679,7 @@ produzione dovrebbe usare la funzione @code{isarray()}
 (@pxref{Funzioni per i tipi})
 per controllare ci@`o, e scegliere un ordinamento preciso per i sottovettori.
 
-@cindex modalit@`a POSIX 
+@cindex modalit@`a POSIX
 Tutti gli ordinamenti basati su @code{PROCINFO["sorted_in"]}
 sono disabilitati in modalit@`a POSIX,
 perch@'e il vettore @code{PROCINFO} in questo caso non @`e speciale.
@@ -32664,6 +32735,9 @@ di utilit@`a @command{truncate}:
 $ @kbd{truncate -s 4G dati.pma}
 @end example
 
+
+@cindex @env{GAWK_PERSIST_FILE} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_PERSIST_FILE}
 @item
 Assegnare il percorso del file dei dati alla variabile d'ambiente
 @env{GAWK_PERSIST_FILE}.  @`E consigliabile farlo specificando il
@@ -32740,15 +32814,25 @@ in @command{gawk}, specificando l'opzione @option{--disable-pma}
 al comando @command{configure}, in fase di compilazione di
 @command{gawk} (@pxref{Installazione Unix}).
 
-La lista che segue contiene articoli e link a siti Internet
+@cindex @env{PMA_VERBOSITY} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{PMA_VERBOSITY}
+Si può impostare la variabile d'ambiente @env{PMA_VERBOSITY} a un
+valore compreso fra zero e tre, per controllare quante informazioni
+di debug e segnalazioni di errore verranno stampate dall'allocatore
+di memoria persistente.
+@command{gawk} imposta il valore di default a uno.  Vedere il
+codice sorgente @file{support/pma.c} per comprendere il comportamento
+dei vari livelli di verbosità.
+
+La lista che segue punta ad articoli e link a siti Internet
 [in inglese], che contengono ulteriori informazioni sulla
 memoria persistente e sul perch@'e pu@`o tornare utile in un
-linguaggio interptetato come @command{gawk}.
+linguaggio interpretato come @command{gawk}.
 
 @cindex Kelly, Terence
 @table @asis
 @item @uref{https://web.eecs.umich.edu/~tpkelly/pma/}
-Questa @`e la distribuzione ufficiale del 
+Questa @`e la distribuzione ufficiale del
 @dfn{Persistent Memory Allocator} (PMA)
 di Terence Kelly.
 Kelly pu@`o essere contattato direttamente a uno dei seguenti
@@ -32763,8 +32847,8 @@ ACM @cite{Queue} magazine, Vol. 20 No. 2 (Marzo/Aprile 2022),
 @uref{https://dl.acm.org/doi/pdf/10.1145/3534855, PDF},
 @uref{https://queue.acm.org/detail.cfm?id=3534855, HTML}.
 Questo saggio spiega il design del PMA
-usato per la memoria persistente in @command{gawk}.  
-  
+usato per la memoria persistente in @command{gawk}.
+
 @item @cite{Persistent Scripting}
 Zi Fan Tan, Jianan Li, Haris Volos e Terence Kelly,
 Non-Volatile Memory Workshop (NVMW) 2022,
@@ -32778,7 +32862,7 @@ Intel Optane; si noti che l'interfaccia @`e lievemente diversa.
 @item @cite{Persistent Memory Programming on Conventional Hardware}
 Terence Kelly,
 ACM @cite{Queue} magazine Vol. 17 No. 4 (Luglio/Agosto 2019),
-@uref{https://dl.acm.org/doi/pdf/10.1145/3358955.3358957, PDF}, 
+@uref{https://dl.acm.org/doi/pdf/10.1145/3358955.3358957, PDF},
 @uref{https://queue.acm.org/detail.cfm?id=3358957, HTML}.
 Questo saggio descrive semplici tecniche per utilizzare la memoria
 persistente nei linguaggi C/C++, su computer convenzionali che
@@ -34178,6 +34262,8 @@ Nel nostro caso, il debugger verr@`a invocato in questo modo:
 $ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -1 file_di_input}
 @end example
 
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 @noindent
 dove entrambi i file @file{getopt.awk} e @file{uniq.awk} sono in @env{$AWKPATH}.
 (Gli utenti esperti di GDB o debugger simili dovrebbero tener presente che
@@ -36760,7 +36846,7 @@ restituisce un NaN negativo.  Su altri sistemi il NaN restituito
 
 Quando tali valori vengono generati, @command{gawk} li stampa
 come @samp{-nan} o @samp{+nan}, rispettivamente.  Anche per
-questi valori, @command{gawk} accetta queste stringhe come 
+questi valori, @command{gawk} accetta queste stringhe come
 dati in input e le converte internamente ai valori loro
 assegnati come numeri in virgola mobile.
 
@@ -38157,7 +38243,7 @@ e sono gestite da @command{gawk} da quel punto in avanti.
 
 La memoria che contiene valori MPFR/GMP provenienti da @command{gawk}
 dovrebbe anche essere trattata come in sola lettura.
-Inoltre, a differenza di quel che succede per le stringhe, 
+Inoltre, a differenza di quel che succede per le stringhe,
 la memoria che contiene valori MPFR/GMP allocati da un'estensione
 e passati in seguito a @command{gawk} @`e @emph{copiata} da @command{gawk};
 @`e quindi l'estensione che dovrebbe liberare quelle aree di memoria,
@@ -40808,6 +40894,8 @@ BEGIN @{
 @}
 @end example
 
+@cindex @env{AWKLIBPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKLIBPATH}
 Ecco il risultato dell'esecuzione dello @dfn{script}:
 
 @example
@@ -41932,6 +42020,8 @@ BEGIN @{
 @}
 @end example
 
+@cindex @env{AWKLIBPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKLIBPATH}
 La variabile d'ambiente @env{AWKLIBPATH} dice a
 @command{gawk} dove @`e possibile trovare le estensioni (@pxref{Trovare le estensioni}).
 La variabile viene impostata alla directory corrente, e quindi viene eseguito
@@ -43682,6 +43772,8 @@ ottenere il resto della divisione
 Modifiche e/o aggiunte alle opzioni della riga di comando:
 
 @itemize @value{MINUS}
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 @item
 La variabile d'ambiente @env{AWKPATH} per specificare un percorso di ricerca
 per l'opzione @option{-f} della riga di comando
@@ -43883,6 +43975,8 @@ nell'ordine in cui sono state rese disponibili in @command{gawk}.
 La versione 2.10 di @command{gawk} ha introdotto le seguenti funzionalit@`a:
 
 @itemize @value{BULLET}
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 @item
 La variabile d'ambiente @env{AWKPATH} per specificare un percorso di ricerca
 per l'opzione @option{-f} della riga di comando
@@ -45660,6 +45754,10 @@ gli esempi di estensione incluse con @command{gawk}.
 @end ifnottex
 per ulteriori dettagli.
 
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
+@cindex @env{AWKLIBPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKLIBPATH}
 @item extras/*
 Ulteriori file, non-essenziali.  Al momento, questa directory contiene
 alcuni file da eseguire al momento di iniziare una sessione,
@@ -45826,6 +45924,10 @@ di ogni particolare sistema.
 @node File da usare a inizio sessione
 @appendixsubsec File di inizializzazione della shell
 
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
+@cindex @env{AWKLIBPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKLIBPATH}
 La distribuzione contiene i file da usare a inizio sessione
 @file{gawk.sh} e
 @file{gawk.csh}, che contengono funzioni che possono essere di aiuto
@@ -46135,6 +46237,8 @@ Si veda anche il file @file{README_d/README.pc} nella distribuzione.
 @appendixsubsubsec Installare una distribuzione predisposta per sistemi MS-Windows
 @cindex installare @command{gawk} @subentry su MS-Windows
 
+@cindex @env{Path} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{Path}
 La sola distribuzione binaria predisposta supportata per i sistem MS-Windows
 @`e quella messa a disposizione da Eli Zaretskii
 @uref{https://sourceforge.net/projects/ezwinports/, progetto ``ezwinports''}.
@@ -46640,7 +46744,10 @@ VMS restituisce data e ora in formato GMT, a meno che non siano stati impostati
 i nomi logici @code{SYS$TIMEZONE_RULE} o @code{TZ}.  Precedenti versioni di
 VMS, come VAX/VMS 7.3, non impostano questi nomi logici.
 
+@cindex percorso di ricerca
 @cindex percorso di ricerca @subentry per file sorgente
+@cindex @env{AWKPATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{AWKPATH}
 Il percorso di ricerca di default, nella ricerca dei file di programma per
 @command{awk} specificati dall'opzione @option{-f}, @`e
 @code{"SYS$DISK:[],AWK_LIBRARY:"}.  Il nome logico @env{AWKPATH} pu@`o essere
@@ -46844,8 +46951,10 @@ Molti bug (di solito difficili da scoprire) sono corretti in ogni nuova
 versione, e se la versione che state usando non @`e aggiornata,
 il problema pu@`o essere stato risolto nel frattempo.
 
+@cindex @env{LC_ALL} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{LC_ALL}
 @item
-Per piacere, controllate se, l'impostazione della variabile
+Si prega di controllare se l'impostazione della variabile
 @env{LC_ALL} come @code{LC_ALL=C} produce il funzionamento atteso da parte
 del programma.  Se @`e questo il caso, il problema dipende dalla
 localizzazione, e pu@`o non essere veramente un bug.
@@ -46958,7 +47067,7 @@ pi@`u intelligenti per aver lasciato perdere.
 @cindex @code{comp.lang.awk} gruppo di discussione
 @cindex newsgroup @code{comp.lang.awk}
 @cindex gruppo di discussione @code{comp.lang.awk}
-Siete pregati di @emph{non} provare a notificare bug di @command{gawk}
+Si prega di @emph{non} provare a notificare bug di @command{gawk}
 scrivendo al gruppo di discussione Usenet/Internet @code{comp.lang.awk}.
 Sebbene alcuni degli sviluppatori di @command{gawk} leggano talora i
 messaggi di questo gruppo di discussione, il manutentore principale di
@@ -47096,7 +47205,7 @@ ci si deve rassegnare a vivere con il @command{gawk} disponibile.
 Se avete domande relative alla programmazione @command{awk}, o sul perch@'e
 @command{gawk} si comporta in un certo modo, o per qualsiasi altra domanda
 relativa ad @command{awk} o a @command{gawk},
-siete pregati di @emph{non} inviarle all'indirizzo che si usa per
+si prega di @emph{non} inviarle all'indirizzo che si usa per
 segnalare bug.
 
 A far data dal 21 luglio 2021, esiste una mailing list a parte
@@ -47113,7 +47222,7 @@ Dopo la seconda richiesta di queto tipo, sarete esclusi senza preavviso
 (@emph{blacklisted}) dalla lista di segnalazione dei bug.
 @end quotation
 
-Per piacere, tenete presente: Come per la mailing list dedicata
+Si prega di tenere presente: Come per la mailing list dedicata
 alla segnalazione di bug, siete invitati a seguire le
 @uref{https://gnu.org/philosophy/kind-communication.html,
 -- Linee guida GNU per una comunicazione gentile}
@@ -48171,6 +48280,8 @@ dorking with the configuration machinery.
 
 @c @enumerate A
 @c @item
+@cindex @env{PATH} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{PATH}
 Installare a partire dal sorgente @`e abbastanza facile.  @`E il modo con cui il
 manutentore ha lavorato per anni (e ancora lavora).
 Egli aveva @file{/usr/local/bin} all'inizio del suo @env{PATH} e dava i
@@ -49876,6 +49987,8 @@ Si veda anche ``Epoca'' e ``GMT''.
 Un nome per designare un valore. In @command{awk}, le variabili possono
 essere degli scalari o dei vettori.
 
+@cindex ambiente, definizione di
+@cindex variabili d'ambiente @substring definizione di
 @item Variabili d'ambiente
 Una collezione di stringhe, in formato @samp{@var{nome}=@var{valore}}, che
 ogni programma ha a disposizione.  Gli utenti in generale assegnano valori
