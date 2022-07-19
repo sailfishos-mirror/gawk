@@ -4057,6 +4057,8 @@ sign in the output.
 @cindex @option{-l} option
 @cindex @option{--load} option
 @cindex loading extensions
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 Load a dynamic extension named @var{ext}. Extensions
 are stored as system shared libraries.
 This option searches for the library using the @env{AWKLIBPATH}
@@ -4108,6 +4110,10 @@ Select arbitrary-precision arithmetic on numbers. This option has no effect
 if @command{gawk} is not compiled to use the GNU MPFR and MP libraries
 (@pxref{Arbitrary Precision Arithmetic}).
 
+@ignore
+@cindex @env{GAWK_NO_MPFR_WARN} environment variable
+@cindex environment variables @subentry @env{GAWK_NO_MPFR_WARN}
+@end ignore
 As of @value{PVERSION} 5.2,
 the arbitrary precision arithmetic features in @command{gawk}
 are ``on parole.''
@@ -4697,6 +4703,8 @@ behavior, but they are more specialized. Those in the following
 list are meant to be used by regular users:
 
 @table @env
+@cindex @env{GAWK_MSEC_SLEEP} environment variable
+@cindex environment variables @subentry @env{GAWK_MSEC_SLEEP}
 @item GAWK_MSEC_SLEEP
 Specifies the interval between connection retries,
 in milliseconds. On systems that do not support
@@ -4704,16 +4712,29 @@ the @code{usleep()} system call,
 the value is rounded up to an integral number of seconds.
 
 @ignore
+@cindex @env{GAWK_NO_MPFR_WARN} environment variable
+@cindex environment variables @subentry @env{GAWK_NO_MPFR_WARN}
 @item GAWK_NO_MPFR_WARN
 Specifies that @command{gawk} should not print a deprecation
 warning when used with the @option{-M}/@option{--bignum} options.
 @end ignore
 
+@cindex @env{GAWK_PERSIST_FILE} environment variable
+@cindex environment variables @subentry @env{GAWK_PERSIST_FILE}
+@item GAWK_PERSIST_FILE
+Specifies the backing file to use for persistent storage
+of @command{gawk}'s variables and arrays.
+@xref{Persistent Memory}.
+
+@cindex @env{GAWK_READ_TIMEOUT} environment variable
+@cindex environment variables @subentry @env{GAWK_READ_TIMEOUT}
 @item GAWK_READ_TIMEOUT
 Specifies the time, in milliseconds, for @command{gawk} to
 wait for input before returning with an error.
 @xref{Read Timeout}.
 
+@cindex @env{GAWK_SOCK_RETRIES} environment variable
+@cindex environment variables @subentry @env{GAWK_SOCK_RETRIES}
 @item GAWK_SOCK_RETRIES
 Controls the number of times @command{gawk} attempts to
 retry a two-way TCP/IP (socket) connection before giving up.
@@ -4721,6 +4742,14 @@ retry a two-way TCP/IP (socket) connection before giving up.
 Note that when nonfatal I/O is enabled (@pxref{Nonfatal}),
 @command{gawk} only tries to open a TCP/IP socket once.
 
+@cindex @env{PMA_VERBOSITY} environment variable
+@cindex environment variables @subentry @env{PMA_VERBOSITY}
+@item PMA_VERBOSITY
+Controls the verbosity of the persistent memory allocator.
+@xref{Persistent Memory}.
+
+@cindex @env{POSIXLY_CORRECT} environment variable
+@cindex environment variables @subentry @env{POSIXLY_CORRECT}
 @item POSIXLY_CORRECT
 Causes @command{gawk} to switch to POSIX-compatibility
 mode, disabling all traditional and GNU extensions.
@@ -4732,6 +4761,8 @@ for use by the @command{gawk} developers for testing and tuning.
 They are subject to change. The variables are:
 
 @table @env
+@cindex @env{AWKBUFSIZE} environment variable
+@cindex environment variables @subentry @env{AWKBUFSIZE}
 @item AWKBUFSIZE
 This variable only affects @command{gawk} on POSIX-compliant systems.
 With a value of @samp{exact}, @command{gawk} uses the size of each input
@@ -4741,6 +4772,8 @@ the size of the buffer to allocate.  (When this variable is not set,
 @command{gawk} uses the smaller of the file's size and the ``default''
 blocksize, which is usually the filesystem's I/O blocksize.)
 
+@cindex @env{AWK_HASH} environment variable
+@cindex environment variables @subentry @env{AWK_HASH}
 @item AWK_HASH
 If this variable exists with a value of @samp{gst}, @command{gawk}
 switches to using the hash function from GNU Smalltalk for
@@ -4750,12 +4783,16 @@ With a value of @samp{fnv1a}, @command{gawk} uses the
 FNV1-A hash function}.
 These functions may be marginally faster than the standard function.
 
+@cindex @env{AWKREADFUNC} environment variable
+@cindex environment variables @subentry @env{AWKREADFUNC}
 @item AWKREADFUNC
 If this variable exists, @command{gawk} switches to reading source
 files one line at a time, instead of reading in blocks. This exists
 for debugging problems on filesystems on non-POSIX operating systems
 where I/O is performed in records, not in blocks.
 
+@cindex @env{GAWK_MSG_SRC} environment variable
+@cindex environment variables @subentry @env{GAWK_MSG_SRC}
 @item GAWK_MSG_SRC
 If this variable exists, @command{gawk} includes the @value{FN}
 and line number within the @command{gawk} source code
@@ -4764,11 +4801,15 @@ are generated.  Its purpose is to help isolate the source of a
 message, as there are multiple places that produce the
 same warning or error message.
 
+@cindex @env{GAWK_LOCALE_DIR} environment variable
+@cindex environment variables @subentry @env{GAWK_LOCALE_DIR}
 @item GAWK_LOCALE_DIR
 Specifies the location of compiled message object files
 for @command{gawk} itself. This is passed to the @code{bindtextdomain()}
 function when @command{gawk} starts up.
 
+@cindex @env{GAWK_NO_DFA} environment variable
+@cindex environment variables @subentry @env{GAWK_NO_DFA}
 @item GAWK_NO_DFA
 If this variable exists, @command{gawk} does not use the DFA regexp matcher
 for ``does it match'' kinds of tests. This can cause @command{gawk}
@@ -4777,21 +4818,30 @@ two regexp matchers that @command{gawk} uses internally. (There aren't
 supposed to be differences, but occasionally theory and practice don't
 coordinate with each other.)
 
+@cindex @env{GAWK_STACKSIZE} environment variable
+@cindex environment variables @subentry @env{GAWK_STACKSIZE}
 @item GAWK_STACKSIZE
 This specifies the amount by which @command{gawk} should grow its
 internal evaluation stack, when needed.
 
+@cindex @env{INT_CHAIN_MAX} environment variable
+@cindex environment variables @subentry @env{INT_CHAIN_MAX}
 @item INT_CHAIN_MAX
 This specifies intended maximum number of items @command{gawk} will maintain on a
 hash chain for managing arrays indexed by integers.
 
+@cindex @env{STR_CHAIN_MAX} environment variable
+@cindex environment variables @subentry @env{STR_CHAIN_MAX}
 @item STR_CHAIN_MAX
 This specifies intended maximum number of items @command{gawk} will maintain on a
 hash chain for managing arrays indexed by strings.
 
+@cindex @env{TIDYMEM} environment variable
+@cindex environment variables @subentry @env{TIDYMEM}
 @item TIDYMEM
 If this variable exists, @command{gawk} uses the @code{mtrace()} library
 calls from the GNU C library to help track down possible memory leaks.
+This cannot be used together with the persistent memory allocator.
 @end table
 
 @node Exit Status
@@ -4826,6 +4876,8 @@ This @value{SECTION} describes a feature that is specific to @command{gawk}.
 @cindex file inclusion, @code{@@include} directive
 @cindex including files, @code{@@include} directive
 @cindex @code{@@include} directive @sortas{include directive}
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 The @code{@@include} keyword can be used to read external @command{awk} source
 files.  This gives you the ability to split large @command{awk} source files
 into smaller, more manageable pieces, and also lets you reuse common @command{awk}
@@ -4956,6 +5008,8 @@ This @value{SECTION} describes a feature that is specific to @command{gawk}.
 @cindex loading extensions @subentry @code{@@load} directive
 @cindex extensions @subentry loadable @subentry loading, @code{@@load} directive
 @cindex @code{@@load} directive @sortas{load directive}
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 The @code{@@load} keyword can be used to read external @command{awk} extensions
 (stored as system shared libraries).
 This allows you to link in compiled code that may offer superior
@@ -5193,6 +5247,12 @@ on the command line. @command{gawk} also lets you use the special
 @value{FN} @file{/dev/stdin}.
 
 @item
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
+@cindex @env{POSIXLY_CORRECT} environment variable
+@cindex environment variables @subentry @env{POSIXLY_CORRECT}
 @command{gawk} pays attention to a number of environment variables.
 @env{AWKPATH}, @env{AWKLIBPATH}, and @env{POSIXLY_CORRECT} are the
 most important ones.
@@ -11710,6 +11770,8 @@ treats @samp{4,321} as 4, while in the Danish locale, it's treated
 as the full number including the fractional part, 4.321.
 
 @cindex POSIX mode
+@cindex @env{POSIXLY_CORRECT} environment variable
+@cindex environment variables @subentry @env{POSIXLY_CORRECT}
 Some earlier versions of @command{gawk} fully complied with this aspect
 of the standard.  However, many users in non-English locales complained
 about this behavior, because their data used a period as the decimal
@@ -15415,6 +15477,8 @@ that it creates.  You should therefore be especially careful if you
 modify @code{ENVIRON["PATH"]}, which is the search path for finding
 executable programs.
 
+@cindex @env{TZ} environment variable
+@cindex environment variables @subentry @env{TZ}
 This can also affect the running @command{gawk} program, since some of the
 built-in functions may pay attention to certain environment variables.
 The most notable instance of this is @code{mktime()} (@pxref{Time
@@ -25405,6 +25469,8 @@ If supplied, @var{file} is the input file to read. Otherwise standard
 input is processed.  If supplied, @var{outname} is the leading prefix
 to use for @value{FN}s, instead of @samp{x}.
 
+@cindex @env{LC_ALL} environment variable
+@cindex environment variables @subentry @env{LC_ALL}
 In order to use the @option{-b} option, @command{gawk} should be invoked
 with its @option{-b} option (@pxref{Options}), or with the environment
 variable @env{LC_ALL} set to @samp{C}, so that each input byte is treated
@@ -27547,6 +27613,8 @@ This @value{SECTION} provides the motivation for making file inclusion
 available for standard @command{awk}, and shows how to do it using a
 combination of shell and @command{awk} programming.
 
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 Using library functions in @command{awk} can be very beneficial. It
 encourages code reuse and the writing of general functions. Programs are
 smaller and therefore clearer.
@@ -27782,6 +27850,8 @@ the stack is ``popped,'' and the previous input file becomes the current
 input file again.  The process is started by making the original file
 the first one on the stack.
 
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 The @code{pathto()} function does the work of finding the full path to
 a file.  It simulates @command{gawk}'s behavior when searching the
 @env{AWKPATH} environment variable
@@ -29878,6 +29948,9 @@ utility:
 $ @kbd{truncate -s 4G data.pma}
 @end example
 
+
+@cindex @env{GAWK_PERSIST_FILE} environment variable
+@cindex environment variables @subentry @env{GAWK_PERSIST_FILE}
 @item
 Provide the path to the data file in the @env{GAWK_PERSIST_FILE}
 environment variable.  This is best done by placing the value in the
@@ -29940,6 +30013,14 @@ You can disable the use of the persistent memory allocator in
 @command{gawk} with the @option{--disable-pma} option to the @command{configure}
 command at the time that you build @command{gawk} (@pxref{Unix
 Installation}).
+
+@cindex @env{PMA_VERBOSITY} environment variable
+@cindex environment variables @subentry @env{PMA_VERBOSITY}
+You can set the @env{PMA_VERBOSITY} environment variable to a
+value between zero and three to control how much debugging
+and error information the persistent memory allocator will print.
+@command{gawk} sets the default to one. See the @file{support/pma.c}
+source code to understand what the different verbosity levels are.
 
 Here are articles and web links that provide more information about
 persistent memory and why it's useful in a scripting language like
@@ -31211,6 +31292,8 @@ In our case, we invoke the debugger like this:
 $ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -1 inputfile}
 @end example
 
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 @noindent
 where both @file{getopt.awk} and @file{uniq.awk} are in @env{$AWKPATH}.
 (Experienced users of GDB or similar debuggers should note that
@@ -37204,6 +37287,8 @@ BEGIN @{
 @}
 @end example
 
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 Here is the result of running the script:
 
 @example
@@ -38234,6 +38319,8 @@ BEGIN @{
 @}
 @end example
 
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 The @env{AWKLIBPATH} environment variable tells
 @command{gawk} where to find extensions (@pxref{Finding Extensions}).
 We set it to the current directory and run the program:
@@ -39781,11 +39868,15 @@ division and remainder
 Changes and/or additions in the command-line options:
 
 @itemize @value{MINUS}
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 @item
 The @env{AWKPATH} environment variable for specifying a path search for
 the @option{-f} command-line option
 (@pxref{Options})
 
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 @item
 The @env{AWKLIBPATH} environment variable for specifying a path search for
 the @option{-l} command-line option
@@ -39975,6 +40066,8 @@ in the order they were added to @command{gawk}.
 Version 2.10 of @command{gawk} introduced the following features:
 
 @itemize @value{BULLET}
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 @item
 The @env{AWKPATH} environment variable for specifying a path search for
 the @option{-f} command-line option
@@ -41539,6 +41632,10 @@ The source code, manual pages, and infrastructure files for
 the sample extensions included with @command{gawk}.
 @xref{Dynamic Extensions}, for more information.
 
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 @item extras/*
 Additional non-essential files.  Currently, this directory contains some shell
 startup files to be installed in @file{/etc/profile.d} to aid in manipulating
@@ -41681,6 +41778,10 @@ your particular system.
 @node Shell Startup Files
 @appendixsubsec Shell Startup Files
 
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
+@cindex @env{AWKLIBPATH} environment variable
+@cindex environment variables @subentry @env{AWKLIBPATH}
 The distribution contains shell startup files @file{gawk.sh} and
 @file{gawk.csh}, containing functions to aid in manipulating
 the @env{AWKPATH} and @env{AWKLIBPATH} environment variables.
@@ -41938,6 +42039,8 @@ See also the @file{README_d/README.pc} file in the distribution.
 @appendixsubsubsec Installing a Prepared Distribution for MS-Windows Systems
 @cindex installing @command{gawk} @subentry MS-Windows
 
+@cindex @env{Path} environment variable
+@cindex environment variables @subentry @env{Path}
 The only supported binary distribution for MS-Windows systems
 is that provided by Eli Zaretskii's @uref{https://sourceforge.net/projects/ezwinports/,
 ``ezwinports''} project.  Install the compiled @command{gawk} from there.
@@ -42400,6 +42503,8 @@ or @code{TZ} logical names is set.  Older versions of VMS, such as VAX/VMS
 
 @cindex search paths
 @cindex search paths @subentry for source files
+@cindex @env{AWKPATH} environment variable
+@cindex environment variables @subentry @env{AWKPATH}
 The default search path, when looking for @command{awk} program files specified
 by the @option{-f} option, is @code{"SYS$DISK:[],AWK_LIBRARY:"}.  The logical
 name @env{AWKPATH} can be used to override this default.  The format
@@ -42592,6 +42697,8 @@ Verify that you have the latest version of @command{gawk}.
 Many bugs (usually subtle ones) are fixed at each release, and if yours
 is out-of-date, the problem may already have been solved.
 
+@cindex @env{LC_ALL} environment variable
+@cindex environment variables @subentry @env{LC_ALL}
 @item
 Please see if setting the environment variable @env{LC_ALL}
 to @code{LC_ALL=C} causes things to behave as you expect. If so, it's
@@ -43753,6 +43860,8 @@ dorking with the configuration machinery.
 
 @c @enumerate A
 @c @item
+@cindex @env{PATH} environment variable
+@cindex environment variables @subentry @env{PATH}
 Installing from source is quite easy. It's how the maintainer worked for years
 (and still works).
 He had @file{/usr/local/bin} at the front of his @env{PATH} and just did:
@@ -44821,6 +44930,7 @@ ordinary expression.  It could be a string constant, such as
 @item Empty String
 See ``Null String.''
 
+@cindex environment, definition of
 @item Environment
 A collection of strings, of the form @samp{@var{name}=@var{val}}, that each
 program has available to it. Users generally place values into the
