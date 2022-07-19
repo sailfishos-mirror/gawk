@@ -1317,7 +1317,7 @@ catchsig(int sig)
 		fflush(NULL);
 		abort();
 	} else
-		cant_happen("unexpected signal, number %s", strsignal(sig));
+		cant_happen("unexpected signal, number %d (%s)", sig, strsignal(sig));
 	/* NOTREACHED */
 }
 
