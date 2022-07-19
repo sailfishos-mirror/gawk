@@ -123,4 +123,5 @@ typedef unsigned long long uint_fast64_t;
 #define pma_init(verbose, file)	0
 #define pma_get_root()	NULL
 #define pma_set_root(rootptr)	/* nothing */
+#define pma_errno 0
 #endif /* ! USE_PERSISTENT_MALLOC */

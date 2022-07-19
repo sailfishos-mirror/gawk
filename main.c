@@ -238,8 +238,13 @@ for PMA */
 
 	myname = gawk_name(argv[0]);
 
-	if (pma_init(1, persist_file) != 0) {
-		fatal(_("persistent memory allocator failed to initialize"));
+	int pma_result = pma_init(1, persist_file);
+	if (pma_result != 0) {
+		// don't use 'fatal' routine, it seems to need to
+		// allocate memory
+		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
+				myname, pma_result, pma_errno);
+		exit(EXIT_FATAL);
 	}
 
 	using_persistent_malloc = (persist_file != NULL);
