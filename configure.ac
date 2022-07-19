@@ -312,17 +312,13 @@ osf1)	: ;;
 esac
 
 # Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
-AC_CHECK_FUNCS(__etoa_l atexit btowc fmod gai_strerror \
-	getgrent getgroups grantpt \
-	fwrite_unlocked \
-	isascii isblank iswctype iswlower iswupper mbrlen \
-	memcmp memcpy memcpy_ulong memmove memset \
-	memset_ulong mkstemp mtrace \
-	posix_openpt setenv setlocale setsid sigprocmask \
-	snprintf strchr \
-	strerror strftime strcasecmp strncasecmp strcoll strtod strtoul \
-	system timegm tmpfile towlower towupper tzset usleep waitpid wcrtomb \
-	wcscoll wctype)
+AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
+	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper \
+	mbrlen memcmp memcpy memcpy_ulong memmove memset memset_ulong \
+	mkstemp mtrace posix_openpt setenv setlocale setsid sigprocmask \
+	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
+	strsignal strtod strtoul system timegm tmpfile towlower towupper \
+	tzset usleep waitpid wcrtomb wcscoll wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
 AC_FUNC_MBRTOWC
 

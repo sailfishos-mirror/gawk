@@ -114,3 +114,7 @@
 #ifndef HAVE_STRCOLL
 #include "missing_d/strcoll.c"
 #endif
+
+#ifndef HAVE_STRSIGNAL
+#include "missing_d/strsignal.c"
+#endif
