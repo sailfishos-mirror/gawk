@@ -232,6 +232,7 @@ SHLIB_TESTS = \
 	apiterm \
 	filefuncs fnmatch fork fork2 fts functab4 functab5 \
 	getfile \
+	indirectbuiltin2 \
 	inplace1 inplace2 inplace2bcomp inplace3 inplace3bcomp \
 	ordchr ordchr2 \
 	readall \
