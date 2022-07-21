@@ -1,6 +1,9 @@
 /* "pma", a persistent memory allocator (interface)
    Copyright (C) 2022  Terence Kelly
    Contact:  tpkelly @ { acm.org, cs.princeton.edu, eecs.umich.edu }
+   Home:     http://web.eecs.umich.edu/~tpkelly/pma/  [or "https"]
+   Design:   HTML:  https://queue.acm.org/detail.cfm?id=3534855
+             PDF:   https://dl.acm.org/doi/pdf/10.1145/3534855
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +23,7 @@
 #define PMA_H_INCLUDED
 
 // version strings of interface and implementation should match
-#define PMA_H_VERSION "2022.05May.01 (Avon 5) + gawk"
+#define PMA_H_VERSION "2022.07Jul.19.1658299753 (Avon 6)"
 extern const char pma_version[];
 
 /* May contain line number in pma.c where something went wrong if one
@@ -31,17 +34,28 @@ extern int pma_errno;
    called, otherwise behavior is undefined.  Available verbosity
    levels are: 0 => no diagnostic printouts, 1 => errors only printed
    to stderr, 2 => also warnings, 3 => also very verbose "FYI"
-   messages.  Use verbosity level 2 by default.  File argument
-   specifies backing file containing persistent heap, initially an
-   empty sparse file whose size is a multiple of the system page
-   size.  If file argument is NULL, fall back on standard memory
+   messages.  Verbosity level 2 is recommended.  Verbosity may be
+   over-ridden via environment variable PMA_VERBOSITY.  File argument
+   specifies backing file containing persistent heap, which must
+   initially be an empty (logically all zeros) file, and ideally also
+   a sparse file.  Backing file size must be a multiple of the system
+   page size on first use; ideally the backing file should also be a
+   multiple of the address alignment enforced in the implementation.
+   The backing file does not grow so it must be large enough to hold
+   the largest persistent heap that the application might need (if
+   the file is sparse, its storage resource footprint is "pay as you
+   go," so there's no downside to making it generously large).  If
+   file argument is NULL, pma will fall back on standard memory
    allocator: pma_malloc passes the buck to ordinary malloc, pma_free
    calls ordinary free, etc.  In fallback-to-standard-malloc mode,
    only pma_malloc/calloc/realloc/free may be used; other functions
    such as pma_get/set_root must not be used.  The implementation may
    store a copy of the file argument, i.e., the pointer, so both this
-   pointer and the memory to which it points (*file) must not
-   change. */
+   pointer and the memory to which it points (*file) must not change.
+   Initialization may perform an integrity check on the heap; this
+   check may be slow depending on the complexity of the heap.  Any
+   non-zero return value indicates trouble; inspect both the value
+   returned and also pma_errno. */
 extern int pma_init(int verbose, const char *file);
 
 /* The following four functions may be used like their standard

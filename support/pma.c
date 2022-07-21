@@ -1,6 +1,9 @@
 /* "pma", a persistent memory allocator (implementation)
    Copyright (C) 2019, 2022  Terence Kelly
    Contact:  tpkelly @ { acm.org, cs.princeton.edu, eecs.umich.edu }
+   Home:     http://web.eecs.umich.edu/~tpkelly/pma/  [or "https"]
+   Design:   HTML:  https://queue.acm.org/detail.cfm?id=3534855
+             PDF:   https://dl.acm.org/doi/pdf/10.1145/3534855
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +44,7 @@
 #include "pma.h"
 
 // Software version; not the same as backing file format version.
-const char pma_version[] = "2022.05May.01 (Avon 5) + gawk";
+const char pma_version[] = "2022.07Jul.19.1658299753 (Avon 6)";
 
 #define S(s) #s
 #define S2(s) S(s)
@@ -62,10 +65,9 @@ int        pma_errno;
 enum {
   VERS = 2,     // backing file format version number
   WDSZ = 8,     // word size (bytes)
-  NFL  = 422    // number of free lists / size classes
+  NFL  = 422,   // number of free lists / size classes
+  ALGN = 1024 * 1024 * 1024  // alignment of in-memory image of heap file
 };
-
-static int PGSZ;	// can vary per system and even dynamically
 
 typedef struct ao {  // alloc object
   struct ao *anext,          // header; singly linked list of all aos in addr order
@@ -77,13 +79,8 @@ typedef struct ao {  // alloc object
 // bit 1:  is the previous ao on the state.anext list in use?
 // bit 2:  has this ao ever grown via realloc?
 
-// Some older compilers gratuitously reject the himask definition on
-// the first line below despite it being perfectly legal C99.  The
-// workaround on the second line below appears correct by inspection
-// but it has not yet been subjected to the same extensive tests as
-// the original.
-// static const uintptr_t lomask = 0x7, himask = ~lomask;  // requires recent compiler
-static const uintptr_t lomask = 0x7, himask = ~ ( (uintptr_t) 0x7 );  // not extensively tested as of Fri 27 May 2022
+static const uintptr_t lomask = 0x7,  // we should really say "himask = ~lomask", but...
+                       himask = ~ ((uintptr_t) 0x7);  // for obsolete compillers
 
 // extract bits from header
 #define HIBH(ao_t_ptr) ((ao_t *)((uintptr_t)(ao_t_ptr) & himask))
@@ -134,7 +131,9 @@ static struct {
   pma_hdr_t * hdr;    // addr where backing file is mapped
 } state;
 
-#define ASI assert(1 == state.init || 2 == state.init)
+// #define ASI assert(1 == state.init || 2 == state.init)  // assert state initialization
+#define ASI(...) \
+  do { if (! (1 == state.init || 2 == state.init)) { ERR("not initialized\n"); SE; assert(0); return __VA_ARGS__ ; } } while(0)
 
 enum { IU = 0, PIU = 1, GROWN = 2 };
 
@@ -147,6 +146,7 @@ static int getbit(ao_t *p, int bit) {
     case  GROWN:  return   grown;
     default:
       ERR("bad bit: %d\n", bit);
+      SE;
       assert(0);
       return INT_MIN;
   }
@@ -155,6 +155,8 @@ static int getbit(ao_t *p, int bit) {
 #define DP(...) (void)fprintf(stderr, __VA_ARGS__)
 #define VS      (void *)
 
+// valid ao ptr:
+#define VAO(p)  (VS state.hdr->afirst <= VS (p) && VS state.hdr->abound > VS (p))
 #ifndef NDEBUG
 static int valid_footer(ao_t *p) {
   if (!getbit(p, IU)) {
@@ -164,8 +166,6 @@ static int valid_footer(ao_t *p) {
   else
     return 1;
 }
-// valid ao ptr:
-#define VAO(p)  (VS state.hdr->afirst <= VS (p) && VS state.hdr->abound > VS (p))
 #define VAF(p)  (VAO(p) && valid_footer(p))
 #endif // NDEBUG
 
@@ -216,8 +216,8 @@ static int integrity_check(int line) {  // can be slow; intended for debugging s
     tpiu += getbit(a, PIU);  // total number of aos with previous-ao-is-in-use bit set
   }
   assert(tpiu == tiu || 1 + tpiu == tiu);
-  FYI("anext list length: %d  tiu %d  tpiu %d  nallocs %llu  nfrees %llu\n",
-                          nadd,   tiu,     tpiu,       h->nallocs, h->nfrees);
+  FYI("anext list length: %d  tiu %d  tpiu %d  nallocs %" PRIu64 "  nfrees %" PRIu64 "\n",
+                          nadd,   tiu,     tpiu,       h->nallocs,         h->nfrees);
   assert(h->nallocs >= h->nfrees);
   assert(h->nallocs - h->nfrees == (uint64_t)tiu);
   // check free lists
@@ -251,9 +251,9 @@ static int integrity_check(int line) {  // can be slow; intended for debugging s
 
 void pma_check_and_dump(void) {
   pma_hdr_t *h = state.hdr;
-  ASI;
-  if (2 == state.init) { ERR("check_and_dump" NM); assert(0); SE; return; }
-  if (IC) ERR("integrity check failed\n");
+  ASI();
+  if (2 == state.init) { ERR("check_and_dump" NM); SE; assert(0); return; }
+  if (IC) ERR("integrity check failed\n");  // proceed with dump anyway (?)
   DP(COORDS "check data structures and dump\n");
   DP("header version:    %s\n", PMA_H_VERSION);
   DP("software version:  %s\n", pma_version);
@@ -338,12 +338,11 @@ static void flr(ao_t *p) {  // remove ao from free list
 }
 
 #define MMAP(N) mmap(NULL, (N), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0)
-#define MUNMAP(A, N) do { if (0 != munmap((A), (N))) ERR("mmap()" ERN); } while (0)
+#define MUNMAP(A, N) do { if (0 != munmap((A), (N))) { ERR("munmap()" ERN); SERN; } } while (0)
 static void * addrgap(off_t n) {  // find big gap in address space to map n bytes
   void *A, *Amax = NULL;  size_t L = 0, U, Max = 0, N = (size_t)n;  char *r;
-  FYI("addrgap(%lld)\n", n);
-  if (N % (size_t)PGSZ) { ERR("file size %lu not multiple of PGSZ\n", N); SERN; }
-  if (N < sizeof(pma_hdr_t) + 10 * PGSZ) { ERR("file size %lu too small\n", N); SERN; }
+  FYI("addrgap(%jd)\n", (intmax_t)n);  // TODO: better way to handle off_t
+  if (N < sizeof(pma_hdr_t) + 40960) { ERR("file size %zu too small\n", N); SERN; }
   for (U = 1; ; U *= 2)  // double upper bound until failure
     if (MAP_FAILED == (A = MMAP(U))) break;
     else                   MUNMAP(A, U);
@@ -352,14 +351,15 @@ static void * addrgap(off_t n) {  // find big gap in address space to map n byte
     if (MAP_FAILED == (A = MMAP(M))) {      U = M; }
     else { Amax = A; Max = M; MUNMAP(A, M); L = M; }
   }
-  FYI("max gap: %lu bytes at %p\n", Max, Amax);
-  if (Max < N + (size_t)PGSZ * 2) {  // safety margin
-    ERR("max gap %lu too small for required %lu\n", Max, N);
+  FYI("max gap: %zu bytes at %p\n", Max, Amax);
+  if (Max < N + (size_t)ALGN * 2) {  // safety margin
+    ERR("max gap %zu too small for required %zu\n", Max, N);
     SERN;
   }
   r = (char *)Amax + (Max - N)/2;
-  while ((uintptr_t)r % PGSZ)  // page align
-    r++;
+  if ((uintptr_t)r % ALGN)  // align on conservative boundary
+    r += (uintptr_t)ALGN - ((uintptr_t)r % ALGN);
+  assert(0 == (uintptr_t)r % ALGN);
   FYI("addrgap returns %p == %lu\n", VS r, (uintptr_t)r);
   return r;
 }
@@ -368,22 +368,32 @@ static void * addrgap(off_t n) {  // find big gap in address space to map n byte
 
 #define MM(a,s,f) mmap((a), (size_t)(s), PROT_READ | PROT_WRITE, MAP_SHARED, (f), 0)
 int pma_init(int verbose, const char *file) {
-  int fd;  void *a1, *a2;  size_t as = sizeof(a1);  struct stat s;
+  int fd, pwr2flag = 0;  long ps, pwr2;  void *a1, *a2;  char *ev;
+  size_t as = sizeof(a1);  struct stat s;
   pma_hdr_t *h;
-  assert(0 <= verbose && 3 >= verbose);
+  if (! (0 <= verbose && 3 >= verbose)) { SE; assert(0); RL; }  // ERR macro wouldn't work here
   state.vrb = verbose;
-  if (state.init) { ERR("already initialized\n"); assert(0); SERL; }
-  FYI("pma software version \"%s\" header version \"%s\", expects backing file format version %d\n",
-      pma_version, PMA_H_VERSION, VERS);
-  assert(0 == strcmp(pma_version, PMA_H_VERSION));
   FYI("pma_init(%d,\"%s\")\n", verbose, file);
+  if (NULL != (ev = getenv("PMA_VERBOSITY"))) {
+    int newvrb;
+    if (1 != sscanf(ev, "%1d", &newvrb)) { ERR("parsing envar verbosity \"%s\"\n", ev); SERL; }
+    if (! (0 <= newvrb && 3 >= newvrb))  { ERR("bad envar verbosity %d\n", newvrb);     SERL; }
+    state.vrb = newvrb;
+    WRN("envar verbosity over-ride %d -> %d\n", verbose, newvrb);
+  }
+  if (state.init) { ERR("already initialized\n"); SE; assert(0); RL; }
+  FYI("software version '%s' expects backing file format version %d\n",
+      pma_version, VERS);
+  if (strcmp(pma_version, PMA_H_VERSION)) {
+    ERR("software version mismatch: '%s' / '%s'\n", pma_version, PMA_H_VERSION);
+    SE; assert(0); RL; }
   // check assumptions
-  assert(WDSZ == sizeof(void *));  // in C11 we'd static_assert()
-  assert(WDSZ == sizeof(size_t));
-  assert(WDSZ == sizeof(unsigned long));
+  assert((himask & lomask) ==   (uintptr_t)0 );
+  assert((himask | lomask) == ~((uintptr_t)0));
+  if (! (WDSZ == sizeof(void *) && // in C11 we'd static_assert()
+         WDSZ == sizeof(size_t) &&
+         WDSZ == sizeof(unsigned long))) { ERR("word size not 64 bits\n"); SERL; }
   assert(0 == sizeof(pma_hdr_t) % WDSZ);
-
-  PGSZ = sysconf(_SC_PAGESIZE);
   if (NULL == file) {
     WRN("no backing file provided; falling back on standard malloc\n");
     state.init = 2;
@@ -391,10 +401,16 @@ int pma_init(int verbose, const char *file) {
     state.hdr  = NULL;
     return 0;
   }
+  if (4096 > (ps = sysconf(_SC_PAGESIZE))) {
+    ERR("bad page size %ld, errno '%s'\n", ps, strerror(errno)); SERL; }
+  for (pwr2 = 4096; pwr2 <= ALGN; pwr2 *= 2)
+    if (pwr2 == ps) { pwr2flag = 1; break; }
+  if (0 == pwr2flag) {
+    ERR("page size %ld not a reasonable power of two\n", ps); SERL; }
   // map backing file containing persistent heap
   if (0 > (fd = open(file, O_RDWR)))      { ERR("open()"    ERN); SERL; }
   if (0 != fstat(fd, &s))                 { ERR("fstat()"   ERN); SERL; }
-  if (!S_ISREG(s.st_mode))                { ERR("not reg\n"    ); SERL; }
+  if (!S_ISREG(s.st_mode))  { ERR("%s not regular file\n", file); SERL; }
   if ((ssize_t)as != read(fd, &a1, as))   { ERR("read()"    ERN); SERL; }
   if (NULL == a1) a1 = addrgap(s.st_size);
   if (NULL == a1)                         { ERR("addrgap()" ERN);   RL; }
@@ -408,6 +424,10 @@ int pma_init(int verbose, const char *file) {
     int i;
     ao_t *w, **ftr;  // initial "wilderness", footer
     FYI("initializing persistent heap\n");
+    if (s.st_size % ps) {
+      ERR("backing file size %jd not multiple of page size %ld\n", (intmax_t)s.st_size, ps);
+      SERL;
+    }
     assert(      0 == h->bf_vers
            &&    0 == h->nallocs
            &&    0 == h->nfrees
@@ -441,13 +461,18 @@ int pma_init(int verbose, const char *file) {
   }
   else {
     FYI("persistent heap already initialized\n");
+    // Page size may change during life of heap.  We insist that
+    // backing file is multiple of page size at time of birth, but
+    // for already-initialized heaps we issue warning only.
+    if (s.st_size % ps)
+      WRN("backing file size %jd not multiple of page size %ld\n", (intmax_t)s.st_size, ps);
     if (VERS != h->bf_vers) {
       ERR("backing file version mismatch: %d vs. %" PRIu64 "\n", VERS, h->bf_vers);
       SERL;
     }
     (void)sc(1);  // to populate UB[]
   }
-  if (IC) { ERR("integrity check failed\n"); SERL; }
+  if (IC) { ERR("integrity check failed\n"); SERL; }  // integrity check may be slow
   return 0;
 }
 #undef MM
@@ -462,7 +487,7 @@ static ao_t * split_ao(ao_t *p, size_t s) {
   assert(NULL == LOBH(p));  // lo bits of header (p->anext) might be set, but not lo bits of p
   assert(NULL == p->fprev && NULL == p->fnext);  // *p should already be spliced out of free lists
   assert(c >= s && 0 == c % WDSZ);
-  FYI("split_ao(%p,%lu) AOCAP %lu words req %lu words cap %lu\n", VS p, s, c, Sw, Cw);
+  FYI("split_ao(%p,%zu) AOCAP %zu words req %zu words cap %zu\n", VS p, s, c, Sw, Cw);
   globh(p, &iu, &piu, &grown);
   if (4 <= Cw - Sw) {  // split ao if remainder is large enough to be allocatable
     ao_t  *rem = (ao_t *)(&(p->fprev) + Sw),   // remainder
@@ -485,19 +510,21 @@ static ao_t * split_ao(ao_t *p, size_t s) {
   return p;
 }
 
+// TODO:  add FYIs to consistently report return values of malloc, realloc, calloc
+
 void * pma_malloc(size_t size) {
   ao_t *r = NULL;
-  FYI("malloc(%lu)\n", size);
-  ASI;
+  FYI("malloc(%zu)\n", size);
+  ASI(NULL);
   if (2 == state.init) return malloc(size);
   assert(!IC);
   if (0 >= size) {
-    WRN("malloc(%lu) argument <= zero\n", size);  SERN;  }
+    WRN("malloc(%zu) argument <= zero\n", size);  SERN;  }
   for (int c = sc(size); c < NFL; c++) {
     ao_t *h = &(state.hdr->free[c]);
-    // FYI("check size class %d UB %lu\n", c, UB[c]);
+    // FYI("check size class %d UB %zu\n", c, UB[c]);
     for (ao_t *f = h->fnext; f != h; f = f->fnext) {
-      // FYI("free list contains ao with capacity %lu\n", AOCAP(f));
+      // FYI("free list contains ao with capacity %zu\n", AOCAP(f));
       if (AOCAP(f) >= size) {
         r = f;
         goto end;
@@ -514,21 +541,21 @@ void * pma_malloc(size_t size) {
     return &(r->fprev);
   }
   else {
-    WRN("malloc(%lu) cannot satisfy request at this time\n", size);
+    WRN("malloc(%zu) cannot satisfy request at this time\n", size);
     SERN;  // conflates ENOMEM / EAGAIN (request might succeed after frees)
   }
 }
 
 void * pma_calloc(size_t nmemb, size_t size) {
   void *p;
-  FYI("calloc(%lu,%lu)\n", nmemb, size);
-  ASI;
+  FYI("calloc(%zu,%zu)\n", nmemb, size);
+  ASI(NULL);
   if (2 == state.init) return calloc(nmemb, size);
   if (0 >= nmemb || 0 >= size) {
-    WRN("calloc(%lu,%lu) argument <= zero\n", nmemb, size);  SERN;  }
+    WRN("calloc(%zu,%zu) argument <= zero\n", nmemb, size);  SERN;  }
   // SSIZE_MAX exists but SIZE_MAX apparently doesn't; sheesh
   if (nmemb > UINT64_MAX / size) {
-    WRN("calloc(%lu,%lu) arguments overflow\n", nmemb, size);  SERN;  }
+    WRN("calloc(%zu,%zu) arguments overflow\n", nmemb, size);  SERN;  }
   if (NULL != (p = pma_malloc(nmemb * size)))
     (void)memset(p, 0, nmemb * size);
   return p;
@@ -536,8 +563,8 @@ void * pma_calloc(size_t nmemb, size_t size) {
 
 void * pma_realloc(void *ptr, size_t size) {
   ao_t *p;  void *nu;  // "new" is a C++ keyword
-  FYI("realloc(%p,%lu)\n", ptr, size);
-  ASI;
+  FYI("realloc(%p,%zu)\n", ptr, size);
+  ASI(NULL);
   if (2 == state.init) return realloc(ptr, size);
   if (NULL == ptr) return pma_malloc(size);
   if (0 >= size) { pma_free(ptr); RN; }
@@ -576,15 +603,15 @@ static int coalesce(ao_t *p, int flr_lo_hi) {
 void pma_free(void *ptr) {
   ao_t *p, *n, **ftr;  int r;
   FYI("free(%p)\n", ptr);
-  ASI;
+  ASI();
   if (2 == state.init) { free(ptr); return; }
   assert(!IC);
   if (NULL == ptr) return;  // allowed by C & POSIX
   if (! (VS state.hdr->afirst <= ptr && VS state.hdr->abound > ptr)) {  // e.g., p=strdup("foo") ... pma_free(p);
     ERR("freed ptr %p outside allocatable area bounds %p %p\n",
         ptr, VS state.hdr->afirst, VS state.hdr->abound);
-    assert(0);
     SE;
+    assert(0);
     return;
   }
   assert(0 == (uintptr_t)ptr % WDSZ);
@@ -621,19 +648,21 @@ void pma_free(void *ptr) {
   assert(!IC);
  }
 
-void pma_set_root(void *p) {
+void pma_set_root(void *p) {  // TODO:  return success/fail indicator?
   FYI("set_root(%p)\n", p);
-  ASI;
-  if (2 == state.init) { ERR("set_root" NM); assert(0); SE; return; }
-  assert(NULL == p || VAO(p));  // could also check that p "looks like" pointer returned by malloc,
-  state.hdr->root = p;          // e.g., header's in-use bit should be set and HIBH should be reasonable
+  ASI();
+  if (2 == state.init)         { ERR("set_root" NM);      SE; assert(0); return; }
+  if (! (NULL == p || VAO(p))) { ERR("bad root %p\n", p); SE; assert(0); return; }
+  // could also check that p "looks like" pointer returned by pma_malloc,
+  // e.g., header's in-use bit should be set and HIBH should be reasonable
+  state.hdr->root = p;
 }
 
 void * pma_get_root(void) {
   void *p;
   FYI("get_root()\n");
-  ASI;
-  if (2 == state.init) { ERR("get_root" NM); assert(0); SERN; }
+  ASI(NULL);
+  if (2 == state.init) { ERR("get_root" NM); SE; assert(0); RN; }
   p = state.hdr->root;
   assert(NULL == p || VAO(p));
   return p;
@@ -642,8 +671,8 @@ void * pma_get_root(void) {
 typedef unsigned long ul_t;
 void pma_set_avail_mem(const ul_t v) {
   FYI("set_avail_mem(0x%lx)\n", v);
-  ASI;
-  if (2 == state.init) { ERR("set_avail_mem" NM); assert(0); SE; return; }
+  ASI();
+  if (2 == state.init) { ERR("set_avail_mem" NM); SE; assert(0); return; }
   assert(!IC);
   for (int i = 0; i < NFL; i++) {
     ao_t *p, *f = &(state.hdr->free[i]);
