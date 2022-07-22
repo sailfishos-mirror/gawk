@@ -1,6 +1,6 @@
 /* strsignal --- replacement version for systems that don't have it */
 
-const char*
+char *
 strsignal(int signal)
 {
 	static char buffer[100];
