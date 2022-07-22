@@ -1746,7 +1746,7 @@ GAWK_EXT_TESTS = \
 	getlndir gnuops2 gnuops3 gnureops gsubind icasefs icasers id \
 	igncdym igncfs ignrcas2 ignrcas4 ignrcase incdupe incdupe2 \
 	incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 include include2 \
-	indirectbuiltin indirectbuiltin2 indirectcall indirectcall2 \
+	indirectbuiltin indirectcall indirectcall2 \
 	indirectcall3 inf-nan-torture intarray iolint isarrayunset lint \
 	lintexp lintindex lintint lintlength lintold lintplus lintset \
 	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 \
@@ -2620,13 +2620,22 @@ mpfruplus:
 
 mpfranswer42:
 	@echo $@
-	@-$(AWK) -M -f "$(srcdir)"/mpfranswer42.awk > _$@ 2>&1 || echo EXIT CODE: $$? >> _$@
+	@-$(AWK) -M -f "$(srcdir)"/$@.awk > _$@ 2>&1 || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 mpfrmemok1:
 	@echo $@
 	@-$(AWK) -p- -M -f "$(srcdir)"/$@.awk 2>&1 | sed 1d > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mpfrsqrt:
+	@if $(AWK) --version | $(AWK) ' /API/ { exit 1 }' ; then \
+	true ; \
+	else \
+	echo $@ ; \
+	$(AWK) -M -f "$(srcdir)"/$@.awk > _$@ 2>&1 || echo EXIT CODE: $$? >> _$@ ; \
+	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
+	fi
 
 jarebug::
 	@echo $@
@@ -5407,11 +5416,6 @@ mpfrrem:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 mpfrrndeval:
-	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  -M >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-mpfrsqrt:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  -M >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
