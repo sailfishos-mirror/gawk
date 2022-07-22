@@ -305,6 +305,9 @@
 /* Define to 1 if you have the <stropts.h> header file. */
 #undef HAVE_STROPTS_H
 
+/* Define to 1 if you have the `strsignal' function. */
+#undef HAVE_STRSIGNAL
+
 /* Define to 1 if you have the `strtod' function. */
 #define HAVE_STRTOD 1
 
@@ -473,7 +476,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.1.61"
+#define PACKAGE_STRING "GNU Awk 5.1.62"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -482,7 +485,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.1.61"
+#define PACKAGE_VERSION "5.1.62"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -614,7 +617,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.1.61"
+#define VERSION "5.1.62"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
