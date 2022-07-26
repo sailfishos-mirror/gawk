@@ -2833,7 +2833,7 @@ debug_prog(INSTRUCTION *pc)
 		unserialize_list(HISTORY);
 		unserialize_list(OPTION);
 		unsetenv("DGAWK_RESTART");
-		fprintf(out_fp, "Restarting ...\n");
+		fprintf(out_fp, _("Restarting ...\n"));
 		if (strcasecmp(run, "true") == 0)
 			(void) do_run(NULL, 0);
 
