@@ -1665,7 +1665,7 @@ check:	env-check \
 	charset-tests-all \
 	shlib-msg-start  shlib-tests     shlib-msg-end \
 	mpfr-msg-start   mpfr-tests      mpfr-msg-end \
-	pma-msg-start    pma-tests       pma-msg-end \
+	pma-msg-start    pma-tests       pma-msg-end
 	@$(MAKE) pass-fail || { $(MAKE) diffout; exit 1; }
 
 basic:	$(BASIC_TESTS)
@@ -1752,6 +1752,7 @@ makepmafile: makepmafile.c
 	$(CC) $< -o $@
 
 pma:
+	@echo $@
 	@GAWK_PERSIST_FILE=test.pma $(AWK) 'BEGIN { print ++i }' > _$@ 2>&1
 	@GAWK_PERSIST_FILE=test.pma $(AWK) 'BEGIN { print ++i }' >> _$@ 2>&1
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
