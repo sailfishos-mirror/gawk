@@ -21469,11 +21469,6 @@ Use @samp{| "cat 1>&2"} instead of @samp{> "/dev/stderr"} if your system
 does not have a @file{/dev/stderr}, or if you cannot use @command{gawk}.
 
 @item
-A number of programs use @code{nextfile}
-(@pxref{Nextfile Statement})
-to skip any remaining input in the input file.
-
-@item
 @c 12/2000: Thanks to Nelson Beebe for pointing out the output issue.
 @cindex case sensitivity @subentry example programs
 @cindex @code{IGNORECASE} variable @subentry in example programs
@@ -30034,6 +30029,13 @@ value between zero and three to control how much debugging
 and error information the persistent memory allocator will print.
 @command{gawk} sets the default to one. See the @file{support/pma.c}
 source code to understand what the different verbosity levels are.
+
+@quotation NOTE
+Persistent memory and the use of MPFR (the @option{-M} option)
+don't mix! If you use @option{-M} then you will get a core dump on the
+second @command{gawk} run.  This may eventually be fixed. But then again,
+it may not.
+@end quotation
 
 Here are articles and web links that provide more information about
 persistent memory and why it's useful in a scripting language like
