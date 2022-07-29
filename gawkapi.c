@@ -148,7 +148,9 @@ awk_value_to_node(const awk_value_t *retval)
 {
 	NODE *ext_ret_val = NULL;
 	NODE *v;
+#ifdef HAVE_MPFR
 	int tval = 0;
+#endif
 
 	if (retval == NULL)
 		fatal(_("awk_value_to_node: received null retval"));

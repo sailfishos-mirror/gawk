@@ -30,6 +30,7 @@ EXTRA_DIST = \
 	ChangeLog.1 \
 	Gentests \
 	Maketests \
+	makepmafile.c \
 	README \
 	aadelete1.awk \
 	aadelete1.ok \
@@ -963,6 +964,7 @@ EXTRA_DIST = \
 	pipeio2.awk \
 	pipeio2.in \
 	pipeio2.ok \
+	pma.ok \
 	posix2008sub.awk \
 	posix2008sub.ok \
 	posix_compare.awk \
@@ -1566,6 +1568,9 @@ NEED_SANDBOX = sandbox1
 # List of tests that need --traditional
 NEED_TRADITIONAL = litoct tradanch rscompat
 
+# Lists of tests that need the PMA allocator and a backing file
+NEED_PMA = pma
+
 # Lists of tests that run a shell script
 RUN_SHELL = exit fflush localenl modifiers next randtest rtlen rtlen01
 
@@ -1659,7 +1664,8 @@ check:	env-check \
 	machine-msg-start machine-tests machine-msg-end \
 	charset-tests-all \
 	shlib-msg-start  shlib-tests     shlib-msg-end \
-	mpfr-msg-start   mpfr-tests      mpfr-msg-end
+	mpfr-msg-start   mpfr-tests      mpfr-msg-end \
+	pma-msg-start    pma-tests       pma-msg-end
 	@$(MAKE) pass-fail || { $(MAKE) diffout; exit 1; }
 
 basic:	$(BASIC_TESTS)
@@ -1726,6 +1732,32 @@ env-check:
 	echo ; \
 	exit 1; \
 	fi
+
+pma-msg-start:
+	@echo "======== Starting PMA tests ========"
+
+pma-msg-end:
+	@echo "======== Done with PMA tests ========"
+
+pma-tests:
+	@if $(AWK) --version | $(AWK) ' /PMA/ { exit 1 }' ; then \
+	echo PMA tests not supported on this system ; \
+	else \
+	$(MAKE) makepmafile ; \
+	./makepmafile ; \
+	$(MAKE) $(NEED_PMA) ; \
+	fi
+
+makepmafile: makepmafile.c
+	$(CC) $< -o $@
+
+pma:
+	@echo $@
+	@GAWK_PERSIST_FILE=test.pma $(AWK) 'BEGIN { print ++i }' > _$@ 2>&1
+	@GAWK_PERSIST_FILE=test.pma $(AWK) 'BEGIN { print ++i }' >> _$@ 2>&1
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(RM) -f test.pma
+
 
 msg::
 	@echo ''
@@ -2559,7 +2591,7 @@ Maketests: $(srcdir)/Makefile.am $(srcdir)/Gentests
 clean-local:
 	rm -fr _* core core.* fmtspcl.ok junk strftime.ok test1 test2 \
 	seq *~ readfile.ok fork.tmp.* testext.awk fts.ok readdir.ok \
-	readdir_test.ok readdir_retest.ok profile1.ok X_*
+	readdir_test.ok readdir_retest.ok profile1.ok X_* makepmafile
 
 # An attempt to print something that can be grepped for in build logs
 pass-fail:
