@@ -4416,7 +4416,7 @@ read_with_timeout(int fd, void *buf, size_t size)
 
 /* gawk_fwrite --- like fwrite */
 
-static size_t
+size_t
 gawk_fwrite(const void *buf, size_t size, size_t count, FILE *fp, void *opaque)
 {
 	(void) opaque;

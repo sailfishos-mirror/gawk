@@ -161,11 +161,27 @@ efwrite(const void *ptr,
 {
 	errno = 0;
 	if (rp != NULL) {
-		if (rp->output.gawk_fwrite(ptr, size, count, fp, rp->output.opaque) != count) {
+		/*
+		 * 7/2022: We need to also check ferror(); there can be times when write(2) fails but
+		 * fwrite succeeds!  To do that, we make sure that rp->output.gawk_fwrite is not
+		 * taken over by an extension before checking ferror().  From the bug report
+		 * (https://lists.gnu.org/archive/html/bug-gawk/2022-07/msg00000.html):
+		 *
+		 * Minimal working example:
+		 * yes | stdbuf -oL gawk '{print}' | head -n1 # Prints but hangs
+		 * yes | stdbuf -o0 gawk '{print}' | head -n1 # OK
+		 * yes | gawk '{print; fflush()}'  | head -n1 # OK
+		 *
+		 * After this change, all three work.
+		 */
+		bool err_on_write = (rp->output.gawk_fwrite(ptr, size, count, fp, rp->output.opaque) != count);
+		bool err_on_fp = (rp->output.gawk_fwrite == gawk_fwrite && ferror(fp));
+
+		if (err_on_write || err_on_fp) {
 			wrerror(fp, from, rp);
 			return;
 		}
-	} else if (fwrite(ptr, size, count, fp) != count) {
+	} else if (fwrite(ptr, size, count, fp) != count || ferror(fp)) {
 		wrerror(fp, from, rp);
 		return;
 	}

@@ -1684,6 +1684,7 @@ extern bool is_non_fatal_redirect(const char *str, size_t len);
 extern void ignore_sigpipe(void);
 extern void set_sigpipe_to_default(void);
 extern bool non_fatal_flush_std_file(FILE *fp);
+extern size_t gawk_fwrite(const void *buf, size_t size, size_t count, FILE *fp, void *opaque);
 
 /* main.c */
 extern int arg_assign(char *arg, bool initing);
