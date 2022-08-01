@@ -5252,7 +5252,7 @@ di deprecazione quando viene usato specificando l'opzione
 @cindex variabili d'ambiente @subentry @env{GAWK_PERSIST_FILE}
 @item GAWK_PERSIST_FILE
 Specifica il file da utilizzare per immagazzinare le variabili
-e i vettori di @command{gawk} per la funzionalità ``memoria persistente''
+e i vettori di @command{gawk} per la funzionalit@`a ``memoria persistente''
 @xref{Memoria persistente}.
 
 @cindex @env{GAWK_READ_TIMEOUT} (variabile d'ambiente)
@@ -5275,7 +5275,7 @@ Si noti che quando @`e attiva l'opzione di continuazione dopo errori di I/O
 @cindex @env{PMA_VERBOSITY} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{PMA_VERBOSITY}
 @item PMA_VERBOSITY
-Controlla la verbosità dell'allocatore di memoria persistente.
+Controlla la verbosit@`a dell'allocatore di memoria persistente.
 @xref{Memoria persistente}.
 
 @cindex @env{POSIXLY_CORRECT} (variabile d'ambiente)
@@ -5374,7 +5374,7 @@ su una catena hash per gestire i vettori indicizzati da stringhe.
 Se questa variabile esiste, @command{gawk} usa le chiamate di libreria
 @code{mtrace()} della @dfn{GNU C library} per aiutare a scoprire
 possibili sprechi di memoria.
-Questa funzionalità non è disponibile se si usa l'allocatore di
+Questa funzionalit@`a non @`e disponibile se si usa l'allocatore di
 memoria persistente.
 @end table
 
@@ -23573,11 +23573,6 @@ in uso non ha un @file{/dev/stderr}, o se non @`e possibile usare
 @command{gawk}.
 
 @item
-Alcuni programmi usano @code{nextfile}
-(@pxref{Istruzione nextfile})
-per evitare di leggere gli input ancora non letti dal file in input corrente.
-
-@item
 @c 12/2000: Thanks to Nelson Beebe for pointing out the output issue.
 @cindex distinzione maiuscolo/minuscolo @subentry programmi di esempio
 @cindex @code{IGNORECASE} (variabile) @subentry programmi di esempio
@@ -32717,6 +32712,20 @@ anche che, per fare uso della memoria persistente, si deve fare uso
 del medesimo eseguibile di @command{gawk}, nelle successive chiamate
 al programma.
 
+Si pu@`o verificare se il supporto della memoria persistente @`e disponibile
+in @command{gawk} in questo modo:
+
+@example
+$ @kbd{gawk --version}
+@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.07Jul.19.1658299753 (Avon 6), (GNU MPFR 4.0.2, GNU MP 6.2.0)
+@print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
+@dots{}
+@end example
+
+@noindent
+Se @`e presente la stringa @samp{PMA} con un indicatore di versione, allora
+la memoria persistente @`e supportata.
+
 Finora la memoria persistente @`e stata testata solo nei sistemi operativi
 GNU/Linux, Cygwin, Solaris 2.11 e in Mac OS.
 In altri sistemi operativi, la situazione pu@`o essere diversa, e potrebbero
@@ -32816,15 +32825,23 @@ al comando @command{configure}, in fase di compilazione di
 
 @cindex @env{PMA_VERBOSITY} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{PMA_VERBOSITY}
-Si può impostare la variabile d'ambiente @env{PMA_VERBOSITY} a un
+Si pu@`o impostare la variabile d'ambiente @env{PMA_VERBOSITY} a un
 valore compreso fra zero e tre, per controllare quante informazioni
 di debug e segnalazioni di errore verranno stampate dall'allocatore
 di memoria persistente.
 @command{gawk} imposta il valore di default a uno.  Vedere il
 codice sorgente @file{support/pma.c} per comprendere il comportamento
-dei vari livelli di verbosità.
+dei vari livelli di verbosit@`a.
 
-La lista che segue punta ad articoli e link a siti Internet
+@quotation NOTA
+La memoria persistente e il calcolo con precisione arbitraria (MPFR, 
+ottenibile specificando l'opzione @option{-M}) non sono compatibili fra
+loro! Usando l'opzione @option{-M} si otterr@`a un errore fatale
+(dfn{core dump}) alla seconda esecuzione di @command{gawk}.  Il problema
+potrebbe essere risolto in futuro, ma la cosa @`e tutt'altro che certa.
+@end quotation
+
+La lista che segue punta ad articoli e link a siti Interne
 [in inglese], che contengono ulteriori informazioni sulla
 memoria persistente e sul perch@'e pu@`o tornare utile in un
 linguaggio interpretato come @command{gawk}.
@@ -36563,7 +36580,7 @@ Si pu@`o verificare se il supporto a MPFR @`e disponibile in questo modo:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API: 3.2 (GNU MPFR 4.0.2, GNU MP 6.2.0)
+@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.07Jul.19.1658299753 (Avon 6), (GNU MPFR 4.0.2, GNU MP 6.2.0)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
