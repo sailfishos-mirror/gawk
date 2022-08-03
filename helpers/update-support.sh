@@ -42,3 +42,8 @@ do
 		cp $GL/$i support/$i
 	fi
 done
+
+cd support
+rm -f pma.c pma.h
+wget http://web.eecs.umich.edu/~tpkelly/pma/latest/pma.h
+wget http://web.eecs.umich.edu/~tpkelly/pma/latest/pma.c
