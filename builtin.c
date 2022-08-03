@@ -1024,7 +1024,10 @@ check_pos:
 					s1++;
 					n0--;
 				}
-				if (val >= num_args) {
+				// val could be less than zero if someone provides a field width
+				// so large that it causes integer overflow. Mainly fuzzers do this,
+				// but let's try to be good anyway.
+				if (val < 0 || val >= num_args) {
 					toofew = true;
 					break;
 				}

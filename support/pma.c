@@ -44,7 +44,7 @@
 #include "pma.h"
 
 // Software version; not the same as backing file format version.
-const char pma_version[] = "2022.07Jul.19.1658299753 (Avon 6)";
+const char pma_version[] = "2022.08Aug.03.1659520468 (Avon 7)";
 
 #define S(s) #s
 #define S2(s) S(s)
@@ -80,7 +80,7 @@ typedef struct ao {  // alloc object
 // bit 2:  has this ao ever grown via realloc?
 
 static const uintptr_t lomask = 0x7,  // we should really say "himask = ~lomask", but...
-                       himask = ~ ((uintptr_t) 0x7);  // for obsolete compillers
+                       himask = ~ ((uintptr_t) 0x7);  // for obsolete compilers
 
 // extract bits from header
 #define HIBH(ao_t_ptr) ((ao_t *)((uintptr_t)(ao_t_ptr) & himask))
@@ -203,7 +203,7 @@ static int integrity_check(int line) {  // can be slow; intended for debugging s
   for (ao_t *next, *a = h->afirst; a < h->abound; a = next) {
     next = HIBH(a->anext);
     assert(VAF(a));
-    assert(32 <= AOSZ(a));
+    assert(32 <= AOSZ(a));  // TODO: magic number here
     assert(next > a && next <= h->abound);
     if (1000000 < ++nadd) {
       WRN("integrity check discontinued; anext list too long (call at line %d)\n", line);
@@ -472,7 +472,7 @@ int pma_init(int verbose, const char *file) {
     }
     (void)sc(1);  // to populate UB[]
   }
-  if (IC) { ERR("integrity check failed\n"); SERL; }  // integrity check may be slow
+  assert(!IC);
   return 0;
 }
 #undef MM
