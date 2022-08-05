@@ -31055,7 +31055,8 @@ memory like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.08Aug.03.1659520468 (Avon 7), (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.08Aug.03.1659520468 (Avon 7),
+   (GNU MPFR 4.0.1, GNU MP 6.1.2)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
@@ -31156,10 +31157,15 @@ and error information the persistent memory allocator will print.
 source code to understand what the different verbosity levels are.
 
 @quotation NOTE
-Persistent memory and the use of MPFR (the @option{-M} option)
-don't mix! If you use @option{-M} then you will get a core dump on the
-second @command{gawk} run.  This may eventually be fixed. But then again,
-it may not.
+If you use MPFR mode (the @option{-M} option) on the first run
+of a program using persistent memory, you @emph{must} continue
+to use it on all subsequent runs.  Similarly, if you don't use @option{-M}
+on the first run, do not use it on any subsequent runs.
+
+Mixing and matching MPFR mode and regular mode with the same
+backing file will lead to strange results and/or core dumps.
+@command{gawk} does not currently detect such a situation and
+may not do so in the future either.
 @end quotation
 
 Here are articles and web links that provide more information about
@@ -34508,7 +34514,8 @@ is available like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.08Aug.03.1659520468 (Avon 7), (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.08Aug.03.1659520468 (Avon 7),
+   (GNU MPFR 4.0.1, GNU MP 6.1.2)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example

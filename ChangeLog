@@ -1,5 +1,15 @@
 2022-08-03         Arnold D. Robbins     <arnold@skeeve.com>
 
+	* mpfr.c (mpfr_mem_alloc, mpfr_mem_realloc, mpfr_mem_free):
+	New functions that just call malloc/realloc/free. Those are
+	redefined to the pma_* functions if using pma.
+	* awk.h (mpfr_mem_alloc, mpfr_mem_realloc, mpfr_mem_free):
+	Add declarations.
+	* main.c (main): Call mp_set_memory_functions with the new
+	functions as arguments.
+
+2022-08-03         Arnold D. Robbins     <arnold@skeeve.com>
+
 	* builtin.c (format_tree): When collecting positional field widths or
 	precisions, check for wrap around to negative values. Thanks to
 	YU Jiongchi <jcyu.2022@phdcs.smu.edu.sg> for the report.

@@ -1728,6 +1728,9 @@ extern NODE *mpg_node(unsigned int);
 extern const char *mpg_fmt(const char *, ...);
 extern int mpg_strtoui(mpz_ptr, char *, size_t, char **, int);
 extern void mpg_zero(NODE *n);
+extern void *mpfr_mem_alloc(size_t alloc_size);
+extern void *mpfr_mem_realloc(void *ptr, size_t old_size, size_t new_size);
+extern void mpfr_mem_free(void *ptr, size_t size);
 #endif
 /* msg.c */
 extern void gawk_exit(int status);

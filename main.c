@@ -252,6 +252,9 @@ for PMA */
 	if (using_persistent_malloc)
 		warning(_("persistent memory is not supported"));
 #endif
+#ifdef HAVE_MPFR
+	mp_set_memory_functions(mpfr_mem_alloc, mpfr_mem_realloc, mpfr_mem_free);
+#endif
 
 	/* do these checks early */
 	if (getenv("TIDYMEM") != NULL)

@@ -1963,6 +1963,38 @@ mpfr_unset(NODE *n)
 		mpz_clear(n->mpg_i);
 }
 
+/*
+ * Custom memory allocation functions for GMP / MPFR. We need these so that the
+ * persistent memory feature will also work with the -M option.
+ *
+ * These just call malloc/realloc/free; if we are using PMA then those are
+ * redefined as macros to point at the pma functions, so all should "just work."
+ */
+
+/* mpfr_mem_alloc --- allocate memory */
+
+void *
+mpfr_mem_alloc(size_t alloc_size)
+{
+	return malloc(alloc_size);
+}
+
+/* mpfr_mem_realloc --- reallocate memory */
+
+void *
+mpfr_mem_realloc(void *ptr, size_t old_size, size_t new_size)
+{
+	return realloc(ptr, new_size);
+}
+
+/* mpfr_mem_free --- free memory */
+
+void
+mpfr_mem_free(void *ptr, size_t size)
+{
+	free(ptr);
+}
+
 #else
 
 void
