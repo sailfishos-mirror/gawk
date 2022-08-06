@@ -60,14 +60,18 @@
 #define ULLONG_MAX __UINT64_MAX
 #endif /* ULLONG_MAX */
 #endif /* __VAX */
+#ifndef HAVE_STDINT_H
 typedef char int_least8_t;
 typedef unsigned char uint_least8_t;
 typedef short int_least16_t;
 typedef unsigned short uint_least16_t;
+typedef unsigned long uint_fast32_t;
+typedef long int_fast32_t;
 #ifndef __VAX
 typedef long long int_fast64_t;
 typedef unsigned long long uint_fast64_t;
 #endif /* __VAX */
+#endif
 #endif /* __VMS */
 
 
@@ -125,3 +129,7 @@ typedef unsigned long long uint_fast64_t;
 #define pma_set_root(rootptr)	/* nothing */
 #define pma_errno 0
 #endif /* ! USE_PERSISTENT_MALLOC */
+
+#ifndef HAVE_STRSIGNAL
+char * strsignal(int signal);
+#endif /* ! HAVE_STRSIGNAL */
