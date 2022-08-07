@@ -229,8 +229,7 @@ main(int argc, char **argv)
 	bool have_srcfile = false;
 	SRCFILE *s;
 	char *cp;
-	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file 
-for PMA */
+	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 #if defined(LOCALEDEBUG)
 	const char *initial_locale;
 #endif
@@ -1369,6 +1368,39 @@ nostalgia()
 	abort();
 }
 
+/* get_pma_version --- get a usable version string out of PMA */
+
+#ifdef USE_PERSISTENT_MALLOC
+const char *
+get_pma_version()
+{
+	static char buf[200];
+	const char *open, *close;
+	char *out;
+	const char *in;
+
+	/*
+	 * The default version string looks like this:
+	 * 2022.08Aug.03.1659520468 (Avon 7)
+	 * Yucko. Just pull out the bits between the parens.
+	 */
+
+	open = strchr(pma_version, '(');
+	if (open == NULL)
+		return pma_version;	// sigh.
+
+	open++;
+	close = strchr(open, ')');
+
+	for (out = buf, in = open; in < close;)
+		*out++ = *in++;
+
+	*out++ = '\0';
+
+	return buf;
+}
+#endif
+
 /* version --- print version message */
 
 static void
@@ -1376,10 +1408,10 @@ version()
 {
 	printf("%s", version_string);
 #ifdef DYNAMIC
-	printf(", API: %d.%d", GAWK_API_MAJOR_VERSION, GAWK_API_MINOR_VERSION);
+	printf(", API %d.%d", GAWK_API_MAJOR_VERSION, GAWK_API_MINOR_VERSION);
 #endif
 #ifdef USE_PERSISTENT_MALLOC
-	printf(", PMA: %s", pma_version);
+	printf(", PMA %s", get_pma_version());
 #endif
 #ifdef HAVE_MPFR
 	printf(", (GNU MPFR %s, GNU MP %s)", mpfr_get_version(), gmp_version);
