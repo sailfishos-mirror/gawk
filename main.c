@@ -946,8 +946,10 @@ load_environ()
 
 	ENVIRON_node = install_symbol(estrdup("ENVIRON", 7), Node_var_array);
 
-	/* set up array functions */
-	init_env_array(ENVIRON_node);
+	// Force string functions; if the first element in environ[]
+	// looks like "0=foo" we end up with the cint_funcs and that's
+	// not what we want, we just get core dumps.
+	ENVIRON_node->array_funcs = & str_array_func;
 
 	for (i = 0; environ[i] != NULL; i++) {
 		static char nullstr[] = "";
@@ -978,6 +980,9 @@ load_environ()
 	 */
 	path_environ("AWKPATH", defpath);
 	path_environ("AWKLIBPATH", deflibpath);
+
+	/* set up array functions */
+	init_env_array(ENVIRON_node);
 
 	return ENVIRON_node;
 }
