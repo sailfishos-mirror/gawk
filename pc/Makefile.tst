@@ -1083,8 +1083,8 @@ readdir:
 	echo If it does, try rerunning on an ext'[234]' filesystem. ; \
 	fi
 	@-$(AWK) -f "$(srcdir)"/readdir.awk "$(top_srcdir)" > _$@ || echo EXIT CODE: $$? >> _$@
-	@-ls -afi "$(top_srcdir)" > _dirlist
-	@-ls -lna "$(top_srcdir)" | sed 1d > _longlist
+	@-$(LS) -afi "$(top_srcdir)" > _dirlist
+	@-$(LS) -lna "$(top_srcdir)" | sed 1d > _longlist
 	@-$(AWK) -f "$(srcdir)"/readdir0.awk -v extout=_$@  \
 		-v dirlist=_dirlist -v longlist=_longlist > $@.ok
 	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@ _dirlist _longlist
