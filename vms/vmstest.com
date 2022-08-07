@@ -1747,8 +1747,10 @@ $!
 $symtab10:	echo "''test'"
 $   test_class = "gawk_ext"
 $   set noOn
-$   gawk "-D" -f 'test'.awk < 'test'.in > _'test'.tmp 2>&1
-$   if .not. $status then call exit_code '$status' _'test'.tmp
+$   define/user sys$error _'test'.tmp
+$   gawk -f 'test'.awk > _'test'.tmp2
+$   if .not. $status then call exit_code '$status' _'test'.tmp2
+$   append _'test'.tmp2 _'test'.tmp
 $   cmp 'test'.ok sys$disk:[]_'test'.tmp
 $   if $status
 $   then
