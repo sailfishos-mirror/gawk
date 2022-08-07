@@ -76,7 +76,7 @@ function substitutions(test, string)
 	gsub(/ru_RU.UTF-8/, "RUS_RUS.1251", string)
 
 	# command for `ls'
-	gsub(/@ls/, "@$(LS)", string)
+	gsub(/@-ls/, "@-$(LS)", string)
 
 	# MSYS needs "/" to be doubled
 	gsub(/-F\//, "-F$(SLASH)", string)

@@ -358,6 +358,7 @@ $	endif
 $!
 $	if key2 .eqs. "intmax_t"
 $	then
+$           write tf "#ifndef HAVE_INTMAX_T"
 $	    write tf "#ifndef ''key2'"
 $	    write tf "#ifdef __VAX"
 $	    write tf "#define ''key2' long"
@@ -365,11 +366,13 @@ $	    write tf "#else"
 $	    write tf "#define ''key2' long long"
 $	    write tf "#endif"
 $	    write tf "#endif"
+$           write tf "#endif"
 $	    goto cfgh_in_loop1
 $	endif
 $!
 $	if key2 .eqs. "uintmax_t"
 $	then
+$           write tf "#ifndef HAVE_UINTMAX_T
 $	    write tf "#ifndef ''key2'"
 $	    write tf "#ifdef __VAX"
 $	    write tf "#define ''key2' unsigned long"
@@ -377,14 +380,17 @@ $	    write tf "#else"
 $	    write tf "#define ''key2' unsigned long long"
 $	    write tf "#endif"
 $	    write tf "#endif"
+$           write tf "#endif"
 $	    goto cfgh_in_loop1
 $	endif
 $!
 $	if key2 .eqs. "socklen_t"
 $	then
+$           write tf "#if (__CRTL_VER < 80500000)"
 $	    write tf "#ifndef ''key2'"
 $	    write tf "#define ''key2' int"
 $	    write tf "#endif"
+$           write tf "#endif"
 $	    goto cfgh_in_loop1
 $	endif
 $!

@@ -26,6 +26,7 @@
 
 #include "awk.h"
 #include <math.h>
+#include "floatmagic.h"
 
 #include <math.h>
 

@@ -230,8 +230,7 @@ main(int argc, char **argv)
 	bool have_srcfile = false;
 	SRCFILE *s;
 	char *cp;
-	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file 
-for PMA */
+	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 #if defined(LOCALEDEBUG)
 	const char *initial_locale;
 #endif
@@ -948,8 +947,10 @@ load_environ()
 
 	ENVIRON_node = install_symbol(estrdup("ENVIRON", 7), Node_var_array);
 
-	/* set up array functions */
-	init_env_array(ENVIRON_node);
+	// Force string functions; if the first element in environ[]
+	// looks like "0=foo" we end up with the cint_funcs and that's
+	// not what we want, we just get core dumps.
+	ENVIRON_node->array_funcs = & str_array_func;
 
 	for (i = 0; environ[i] != NULL; i++) {
 		static char nullstr[] = "";
@@ -980,6 +981,9 @@ load_environ()
 	 */
 	path_environ("AWKPATH", defpath);
 	path_environ("AWKLIBPATH", deflibpath);
+
+	/* set up array functions */
+	init_env_array(ENVIRON_node);
 
 	return ENVIRON_node;
 }
@@ -1370,6 +1374,39 @@ nostalgia()
 	abort();
 }
 
+/* get_pma_version --- get a usable version string out of PMA */
+
+#ifdef USE_PERSISTENT_MALLOC
+const char *
+get_pma_version()
+{
+	static char buf[200];
+	const char *open, *close;
+	char *out;
+	const char *in;
+
+	/*
+	 * The default version string looks like this:
+	 * 2022.08Aug.03.1659520468 (Avon 7)
+	 * Yucko. Just pull out the bits between the parens.
+	 */
+
+	open = strchr(pma_version, '(');
+	if (open == NULL)
+		return pma_version;	// sigh.
+
+	open++;
+	close = strchr(open, ')');
+
+	for (out = buf, in = open; in < close;)
+		*out++ = *in++;
+
+	*out++ = '\0';
+
+	return buf;
+}
+#endif
+
 /* version --- print version message */
 
 static void
@@ -1377,10 +1414,10 @@ version()
 {
 	printf("%s", version_string);
 #ifdef DYNAMIC
-	printf(", API: %d.%d", GAWK_API_MAJOR_VERSION, GAWK_API_MINOR_VERSION);
+	printf(", API %d.%d", GAWK_API_MAJOR_VERSION, GAWK_API_MINOR_VERSION);
 #endif
 #ifdef USE_PERSISTENT_MALLOC
-	printf(", PMA: %s", pma_version);
+	printf(", PMA %s", get_pma_version());
 #endif
 #ifdef HAVE_MPFR
 	printf(", (GNU MPFR %s, GNU MP %s)", mpfr_get_version(), gmp_version);

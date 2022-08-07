@@ -165,7 +165,7 @@ gawk.opt : $(MAKEFILE) config.h         # create linker options file
       $ @$(VMSDIR)gawk_ident.com
 
 $(VMSCODE)	: awk.h config.h $(VMSDIR)redirect.h $(VMSDIR)vms.h
-$(AWKOBJS)	: awk.h gettext.h mbsupport.h $(SUPPORT)regex.h \
+$(AWKOBJS)	: awk.h gettext.h $(SUPPORT)regex.h \
 		  $(SUPPORT)dfa.h config.h $(VMSDIR)redirect.h
 $(GAWKOBJ)	: awk.h config.h $(VMSDIR)redirect.h
 
