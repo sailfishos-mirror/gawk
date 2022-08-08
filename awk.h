@@ -404,7 +404,7 @@ enum flagvals {
 	NUMBER	= 0x0010,       /* assigned as number */
 	USER_INPUT = 0x0020,    /* user input: if NUMERIC then
 				 * a NUMBER */
-	BOOL    = 0x0040,	/* this is a boolean value */
+	BOOLVAL = 0x0040,	/* this is a boolean value */
 	INTLSTR	= 0x0080,       /* use localized version */
 	NUMINT	= 0x0100,       /* numeric value is an integer */
 	INTIND	= 0x0200,	/* integral value is array index;

@@ -113,6 +113,7 @@ DATE = gdate
 
 # Set sort command
 SORT = sort
+SORT2 = sort
 
 # MS-DOS and OS/2 use ; as a PATH delimiter
 PATH_SEPARATOR = ;
@@ -317,10 +318,10 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	backbigs1 backsmalls1 clos1way6 devfd devfd1 devfd2 \
+	backbigs1 backsmalls1 clos1way6 close_status devfd devfd1 devfd2 \
 	errno exitval2 fork fork2 fts functab5 \
 	getfile getlnhd ignrcas3 inetdayt inetecht inf-nan-torture \
-	mbfw1 mbprintf1 mbprintf4 mbstr1 mbstr2 \
+	iolint mbfw1 mbprintf1 mbprintf4 mbstr1 mbstr2 \
 	pid pipeio2 pty1 pty2 readdir rstest4 rstest5 status-close timeout
 
 
@@ -1258,6 +1259,11 @@ longwrds:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk -v SORT="$(SORT)" < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+nsidentifier:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk -v SORT="$(SORT2)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 spacere:
 	@echo $@
 	@-LC_ALL=C AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -1270,6 +1276,7 @@ typedregex4:
 
 iolint:
 	@echo $@ $(ZOS_FAIL)
+	@echo Expect $@ to fail with MinGW.
 	@echo hello > 'echo hello'
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -1475,6 +1482,7 @@ closebad:
 
 close_status:
 	@echo $@
+	@echo Expect $@ to fail with MinGW.
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
@@ -3128,11 +3136,6 @@ nsforloop:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 nsfuncrecurse:
-	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-nsidentifier:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@

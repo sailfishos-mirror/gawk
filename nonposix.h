@@ -65,6 +65,8 @@ char *w32_setlocale (int, const char *);
 #endif
 #define setlocale(c,v) w32_setlocale(c,v)
 
+char *strsignal (int);
+
 #endif	/* __MINGW32__ */
 
 #if defined(VMS) || defined(__MINGW32__)

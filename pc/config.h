@@ -245,7 +245,7 @@
 #undef HAVE_STROPTS_H
 
 /* Define to 1 if you have the `strsignal' function. */
-#undef HAVE_STRSIGNAL
+#define HAVE_STRSIGNAL 1
 
 /* Define to 1 if you have the `strtod' function. */
 #define HAVE_STRTOD 1

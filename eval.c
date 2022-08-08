@@ -446,7 +446,7 @@ flags2str(int flagval)
 		{ NUMCUR, "NUMCUR" },
 		{ NUMBER, "NUMBER" },
 		{ USER_INPUT, "USER_INPUT" },
-		{ BOOL, "BOOL" },
+		{ BOOLVAL, "BOOL" },
 		{ INTLSTR, "INTLSTR" },
 		{ NUMINT, "NUMINT" },
 		{ INTIND, "INTIND" },

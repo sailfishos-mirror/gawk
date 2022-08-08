@@ -109,6 +109,7 @@ s/^#undef HAVE_STRINGS_H *$/#define HAVE_STRINGS_H 1/
 s/^#undef HAVE_STRING_H *$/#define HAVE_STRING_H 1/
 /^#undef HAVE_STRNCASECMP *$/c\
 #define HAVE_STRNCASECMP 1
+s/^#undef HAVE_STRSIGNAL *$/#define HAVE_STRSIGNAL 1/
 s/^#undef HAVE_STRTOD *$/#define HAVE_STRTOD 1/
 /^#undef HAVE_STRTOUL *$/c\
 #define HAVE_STRTOUL 1

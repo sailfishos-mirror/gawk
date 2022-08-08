@@ -4320,8 +4320,8 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_val:
-		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
-		case NUMBER|BOOL:
+		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOLVAL)) {
+		case NUMBER|BOOLVAL:
 			res = "number|bool";
 			break;
 		case NUMBER:
