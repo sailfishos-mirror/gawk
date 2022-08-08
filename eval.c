@@ -26,7 +26,6 @@
 
 #include "awk.h"
 #include <math.h>
-#include "floatmagic.h"
 
 NODE **fcall_list = NULL;
 long fcall_count = 0;
