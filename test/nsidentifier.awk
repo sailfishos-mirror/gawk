@@ -1,3 +1,8 @@
+# Invoker can customize sort command if necessary.
+BEGIN {
+	if (!SORT) SORT = "LC_ALL=C sort"
+}
+
 # Overdocumented Test Case for FUNCTAB
 
 @namespace "ns"
@@ -29,8 +34,8 @@ BEGIN {
 	}
 	print "------------------------------"
 	for (i in PROCINFO["identifiers"])
-		print i | "LC_ALL=C sort"
-	close("LC_ALL=C sort")
+		print i | awk::SORT
+	close(awk::SORT)
 
 	exit 0
 }
