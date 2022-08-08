@@ -1107,7 +1107,7 @@ make_bool_node(bool value)
 	val = make_number(nval);
 	val->stptr = estrdup(sval, strlen(sval));
 	val->stlen = strlen(sval);
-	val->flags |= NUMCUR|STRCUR|BOOL;
+	val->flags |= NUMCUR|STRCUR|BOOLVAL;
 	val->stfmt = STFMT_UNUSED;
 
 	return val;

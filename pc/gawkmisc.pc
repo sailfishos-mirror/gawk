@@ -34,6 +34,7 @@ const char *defpath = ".;c:\\lib\\awk;c:\\gnu\\lib\\awk";
 const char *deflibpath = DEFLIBPATH;
 
 #ifdef __MINGW32__
+
 #ifdef HAVE_SOCKETS
 #include <socket.h>
 
@@ -49,7 +50,6 @@ const char *deflibpath = DEFLIBPATH;
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#endif
 
 /* gawk_name --- pull out the "gawk" part from how the OS called us */
 
@@ -70,41 +70,6 @@ const char *filespec;
 	if ((q = strchr(p, '.')) != NULL)
 		*q = '\0';
 	return strlwr(p);
-}
-
-
-/*
- * memcpy_long() & memset_ulong() are 32-bit replacements for MSC which
- * has a 16-bit size_t.
- */
-char *
-memcpy_ulong (dest, src, l)
-register char *dest;
-register const char *src;
-register unsigned long l;
-{
-	register char *ret = dest;
-
-	while (l--)
-		*dest++ = *src++;
-
-	return ret;
-}
-
-
-void *
-memset_ulong(dest, val, l)
-void *dest;
-register int val;
-register unsigned long l;
-{
-	register char *ret = dest;
-	register char *d = dest;
-
-	while (l--)
-		*d++ = val;
-
-	return ((void *) ret);
 }
 
 
@@ -193,20 +158,10 @@ os_close_on_exec(fd, name, what, dir)
 int fd;
 const char *name, *what, *dir;
 {
-#if __DJGPP__ > 2 || __DJGPP_MINOR__ >= 4
-	if (fd <= 2)	/* sanity */
-		return;
-
-	if (fcntl(fd, F_SETFD, 1) < 0)
-		warning("%s %s `%s': could not set close-on-exec: %s",
-			what, dir, name, strerror(errno));
-#endif
-#ifdef __MINGW32__
 	HANDLE fh = (HANDLE)_get_osfhandle(fd);
 
 	if (fh && fh != INVALID_HANDLE_VALUE)
 		SetHandleInformation(fh, HANDLE_FLAG_INHERIT, 0);
-#endif
 }
 
 /* os_isdir --- is this an fd on a directory? */
@@ -289,11 +244,7 @@ int fd;
 int
 os_isatty(int fd)
 {
-#if defined(__MINGW32__) || defined(_MSC_VER)
 	return (isatty(fd) && lseek(fd, SEEK_CUR, 0) == -1);
-#else
-	return isatty(fd);
-#endif
 }
  
 /* files_are_same --- return true if files are identical */
@@ -331,10 +282,13 @@ files_are_same(char *path, SRCFILE *src)
 	return 0;
 }
 
-#ifdef __MINGW32__
-
 extern void *xmalloc (size_t);
 
+/* Emulate setenv and unsetenv.
+
+   Note: this is only actually used in MinGW64 builds, since
+   mingw.org's MinGW has these functions as inlines in stdlib.h since
+   mingwrt-5.0.  */
 int
 setenv (const char *name, const char *value, int rewrite)
 {
@@ -800,6 +754,31 @@ w32_status_to_termsig (unsigned status)
   return SIGTERM;
 }
 
+/* Emulate the missing strsignal.  */
+char *
+strsignal (int signo)
+{
+  switch (signo)
+    {
+      case SIGINT:
+	return "SIGINT";
+      case SIGILL:
+	return "SIGILL";
+      case SIGFPE:
+	return "SIGFPE";
+      case SIGSEGV:
+	return "SIGSEGV";
+      case SIGTERM:
+	return "SIGTERM";
+      case SIGBREAK:
+	return "SIGBREAK";
+      case SIGABRT:
+	return "SIGABRT";
+      default:
+	return "Unknown signal";
+    }
+}
+
 void
 os_maybe_set_errno (void)
 {
@@ -823,10 +802,6 @@ os_maybe_set_errno (void)
       }
   }
 }
-
-#endif	/* __MINGW32__ */
-
-#if defined(__MINGW32__)
 
 void
 init_sockets(void)

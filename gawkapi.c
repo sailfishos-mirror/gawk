@@ -546,7 +546,7 @@ assign_regex(NODE *node, awk_value_t *val)
 static inline void
 assign_bool(NODE *node, awk_value_t *val)
 {
-	assert((node->flags & BOOL) != 0);
+	assert((node->flags & BOOLVAL) != 0);
 	val->val_type = AWK_BOOL;
 	val->bool_value = get_number_si(node) != 0 ? awk_true : awk_false;
 }
@@ -588,7 +588,7 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 		/* a scalar value */
 		switch (wanted) {
 		case AWK_BOOL:
-			if ((node->flags & BOOL) != 0) {
+			if ((node->flags & BOOLVAL) != 0) {
 				assign_bool(node, val);
 				ret = awk_true;
 			} else
@@ -606,8 +606,8 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 			break;
 
 		case AWK_STRNUM:
-			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
-			case NUMBER|BOOL:
+			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOLVAL)) {
+			case NUMBER|BOOLVAL:
 				val->val_type = AWK_BOOL;
 				break;
 			case STRING:
@@ -643,11 +643,11 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 			break;
 
 		case AWK_REGEX:
-			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
+			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOLVAL)) {
 			case STRING:
 				val->val_type = AWK_STRING;
 				break;
-			case NUMBER|BOOL:
+			case NUMBER|BOOLVAL:
 				val->val_type = AWK_BOOL;
 				break;
 			case NUMBER:
@@ -674,8 +674,8 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 			break;
 
 		case AWK_SCALAR:
-			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
-			case NUMBER|BOOL:
+			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOLVAL)) {
+			case NUMBER|BOOLVAL:
 				val->val_type = AWK_BOOL;
 				break;
 			case STRING:
@@ -705,8 +705,8 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 
 		case AWK_UNDEFINED:
 			/* return true and actual type for request of undefined */
-			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOL)) {
-			case NUMBER|BOOL:
+			switch (fixtype(node)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOLVAL)) {
+			case NUMBER|BOOLVAL:
 				assign_bool(node, val);
 				ret = awk_true;
 				break;
