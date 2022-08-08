@@ -1270,6 +1270,7 @@ typedregex4:
 
 iolint:
 	@echo $@ $(ZOS_FAIL)
+	@echo Expect $@ to fail with MinGW.
 	@echo hello > 'echo hello'
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -1475,6 +1476,7 @@ closebad:
 
 close_status:
 	@echo $@
+	@echo Expect $@ to fail with MinGW.
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
@@ -3134,6 +3136,7 @@ nsfuncrecurse:
 
 nsidentifier:
 	@echo $@
+	@echo Expect $@ to fail with MinGW.
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 

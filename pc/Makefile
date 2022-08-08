@@ -181,7 +181,7 @@ $(RSPFILE) : $(GAWKOBJS)
 #    included by awk.h.
 # 2. custom.h is not mentioned because pc ports don't use it.
 $(ALLOBJS) $(LIBOBJS) $(DYNOBJS): \
-  awk.h regex.h config.h gettext.h mbsupport.h protos.h dfa.h getopt.h nonposix.h
+  awk.h regex.h config.h gettext.h protos.h dfa.h getopt.h nonposix.h
 
 $(DYNOBJS) regex$O:	dynarray.h libc-config.h malloc/dynarray.h malloc/dynarray-skeleton.c
 
