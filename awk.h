@@ -220,6 +220,8 @@ typedef struct Regexp {
 
 #include "gawkapi.h"
 
+#include "floatmagic.h"
+
 /* Stuff for losing systems. */
 #if !defined(HAVE_STRTOD)
 extern double gawk_strtod();

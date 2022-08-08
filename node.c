@@ -25,7 +25,6 @@
  */
 
 #include "awk.h"
-#include "floatmagic.h"	/* definition of isnan */
 
 static NODE *r_make_number(double x);
 static AWKNUM get_ieee_magic_val(char *val);
