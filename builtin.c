@@ -30,7 +30,6 @@
 #include <fcntl.h>
 #endif
 #include "random.h"
-#include "floatmagic.h"
 
 #if defined(HAVE_POPEN_H)
 #include "popen.h"
