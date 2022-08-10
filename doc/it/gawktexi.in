@@ -32723,7 +32723,7 @@ in @command{gawk} in questo modo:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.08Aug.03.1659520468 (Avon 7), (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.0, API 3.2, PMA Avon 7, (GNU MPFR 4.0.1, GNU MP 6.1.2)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
@@ -32843,14 +32843,20 @@ codice sorgente @file{support/pma.c} per comprendere il comportamento
 dei vari livelli di verbosit@`a.
 
 @quotation NOTA
-La memoria persistente e il calcolo con precisione arbitraria (MPFR, 
-ottenibile specificando l'opzione @option{-M}) non sono compatibili fra
-loro! Usando l'opzione @option{-M} si otterr@`a un errore fatale
-(dfn{core dump}) alla seconda esecuzione di @command{gawk}.  Il problema
-potrebbe essere risolto in futuro, ma la cosa @`e tutt'altro che certa.
+Se si usa la libreria MPFR (opzione @option{-M}) nella prima esecuzione
+di un programma che fa uso della memoria persistente si @emph{deve}
+usarla in tutte le esecuzioni successive.
+Analogamente, se non si usa l'opzione @option{-M} nella prima esecuzione
+non va usata in alcuna esecuzione successiva.
+
+Mischiare esecuzioni che usano la libreria MPFR con esecuzioni che non
+la usano, utilizzando lo stesso file di memoria persistente produrr@`a
+risultati inattesi e/o errori fatali.
+@command{gawk} non rileva una tale situazione, e non @`e detto che lo
+far@`a in qualche versione futura.
 @end quotation
 
-La lista che segue punta ad articoli e link a siti Interne
+La lista che segue punta ad articoli e link a siti Internet
 [in inglese], che contengono ulteriori informazioni sulla
 memoria persistente e sul perch@'e pu@`o tornare utile in un
 linguaggio interpretato come @command{gawk}.
@@ -36589,7 +36595,7 @@ Si pu@`o verificare se il supporto a MPFR @`e disponibile in questo modo:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API: 3.2, PMA: 2022.08Aug.03.1659520468 (Avon 7), (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.0, API 3.2, PMA Avon 7, (GNU MPFR 4.0.1, GNU MP 6.1.2)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example

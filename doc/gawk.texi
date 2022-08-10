@@ -31038,8 +31038,8 @@ code, it will appear that way in the output.
 
 Starting with @value{PVERSION} 5.2, @command{gawk} supports
 @dfn{persistent memory}.  This experimental feature stores the values of
-all of @command{gawk}'s variables and arrays in a persistent heap,
-which resides in a file in
+all of @command{gawk}'s variables, arrays and user-defined functions
+in a persistent heap, which resides in a file in
 the filesystem.  When persistent memory is not in use (the normal case),
 @command{gawk}'s data resides in ephemeral system memory.
 
@@ -31079,7 +31079,6 @@ utility:
 $ @kbd{truncate -s 4G data.pma}
 @end example
 
-
 @cindex @env{GAWK_PERSIST_FILE} environment variable
 @cindex environment variables @subentry @env{GAWK_PERSIST_FILE}
 @item
@@ -31112,7 +31111,7 @@ Only the variables defined by the program are preserved across runs.
 
 Interestingly, the program that you execute need not be the same from
 run to run; the persistent store only maintains the values of variables
-and arrays, not the totality of @command{gawk}'s internal state.
+arrays and user-defined functions, not the totality of @command{gawk}'s internal state.
 This lets you share data between unrelated programs, eliminating
 the need for scripts to communicate via text files.
 
@@ -31229,6 +31228,9 @@ for storing the persistent heap. If this option is given to @command{gawk},
 it produces a fatal error message instructing the user to use the
 @env{GAWK_PERSIST_FILE} environment variable instead. Except for this
 paragraph, that option is otherwise undocumented.
+
+The prototype only supported persistent data; it did not
+support persistent functions.
 
 As noted earlier, support for persistent memory is @emph{experimental}.
 If it becomes burdensome,@footnote{Meaning, there are too many
