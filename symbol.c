@@ -50,25 +50,14 @@ NODE *symbol_table, *func_table;
 /* Use a flag to avoid a strcmp() call inside install() */
 static bool installing_specials = false;
 
-/* init_symbol_table --- make sure the symbol tables are initialized */
+/* init_the_tables --- deal with the tables for in memory use */
 
-void
-init_symbol_table()
+static void
+init_the_tables(void)
 {
-	NODE *pma_root_node = NULL;
-
-	if (using_persistent_malloc) {
-		pma_root_node = (NODE *) pma_get_root();
-		if (pma_root_node != NULL) {
-			global_table = pma_root_node;
-		}
-	}
-
-	if (global_table == NULL) {
-		getnode(global_table);
-		memset(global_table, '\0', sizeof(NODE));
-		null_array(global_table);
-	}
+	getnode(global_table);
+	memset(global_table, '\0', sizeof(NODE));
+	null_array(global_table);
 
 	getnode(param_table);
 	memset(param_table, '\0', sizeof(NODE));
@@ -76,16 +65,55 @@ init_symbol_table()
 
 	installing_specials = true;
 	func_table = install_symbol(estrdup("FUNCTAB", 7), Node_var_array);
-
-	if (using_persistent_malloc && pma_root_node != NULL)
-		symbol_table = lookup("SYMTAB");
-	else
-		symbol_table = install_symbol(estrdup("SYMTAB", 6), Node_var_array);
-
+	symbol_table = install_symbol(estrdup("SYMTAB", 6), Node_var_array);
 	installing_specials = false;
+}
 
-	if (using_persistent_malloc && pma_root_node == 0)
-		pma_set_root(global_table);
+/* init_symbol_table --- make sure the symbol tables are initialized */
+
+void
+init_symbol_table()
+{
+	if (! using_persistent_malloc) {
+		// normal case, initialize regularly, return
+		init_the_tables();
+		return;
+	}
+
+	// using persistent memory, get the root pointer
+	// which holds this struct:
+	struct root_pointers {
+		NODE *global_table;
+		NODE *func_table;
+	} *root_pointers = NULL;
+
+	root_pointers = (struct root_pointers *) pma_get_root();
+
+	if (root_pointers == NULL) {
+		// very first time!
+
+		// set up the tables
+		init_the_tables();
+
+		// save the pointers for the next time.
+		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers), "init_symbol_table");
+		root_pointers->global_table = global_table;
+		root_pointers->func_table = func_table;
+		pma_set_root(root_pointers);
+	} else {
+		// this is the next time, get the saved pointers and put them back in place
+		global_table = root_pointers->global_table;
+		func_table = root_pointers->func_table;
+
+		// still need to set this one up as usual
+		getnode(param_table);
+		memset(param_table, '\0', sizeof(NODE));
+		null_array(param_table);
+
+		// set the global variables
+		symbol_table = lookup("SYMTAB");
+		func_table = lookup("FUNCTAB");
+	}
 }
 
 /*
