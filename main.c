@@ -1374,9 +1374,9 @@ nostalgia()
 	abort();
 }
 
+#ifdef USE_PERSISTENT_MALLOC
 /* get_pma_version --- get a usable version string out of PMA */
 
-#ifdef USE_PERSISTENT_MALLOC
 const char *
 get_pma_version()
 {
@@ -1397,7 +1397,10 @@ get_pma_version()
 
 	open++;
 	close = strchr(open, ')');
+	if (close == NULL)
+		return pma_version;	// sigh, again.
 
+	// copy over the short name
 	for (out = buf, in = open; in < close;)
 		*out++ = *in++;
 
