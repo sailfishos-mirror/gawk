@@ -15,7 +15,6 @@ then
 	AC_CHECK_FUNC([munmap])
 	if test $ac_cv_func_mmap = yes && test $ac_cv_func_munmap = yes
 	then
-		AC_DEFINE(USE_PERSISTENT_MALLOC, 1, [Define to 1 if we can use the pma allocator])
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
@@ -50,3 +49,7 @@ then
 fi
 AM_CONDITIONAL([USE_PERSISTENT_MALLOC], [test "$use_persistent_malloc" = "yes"])
 ])
+if test "$use_persistent_malloc" = "yes"
+then
+	AC_DEFINE(USE_PERSISTENT_MALLOC, 1, [Define to 1 if we can use the pma allocator])
+fi
