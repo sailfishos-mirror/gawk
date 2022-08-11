@@ -47,9 +47,11 @@ then
 		use_persistent_malloc=no
 	fi
 fi
+
 AM_CONDITIONAL([USE_PERSISTENT_MALLOC], [test "$use_persistent_malloc" = "yes"])
-])
+
 if test "$use_persistent_malloc" = "yes"
 then
 	AC_DEFINE(USE_PERSISTENT_MALLOC, 1, [Define to 1 if we can use the pma allocator])
 fi
+])
