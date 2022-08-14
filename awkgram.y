@@ -5533,9 +5533,21 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 				op->opcode = Op_times_i;
 				break;
 			case Op_quotient:
+				if (ip2->memory->numbr == 0.0) {
+					/* don't fatalize, allow parsing rest of the input */
+					error_ln(op->source_line, _("division by zero attempted"));
+					goto regular;
+				}
+
 				op->opcode = Op_quotient_i;
 				break;
 			case Op_mod:
+				if (ip2->memory->numbr == 0.0) {
+					/* don't fatalize, allow parsing rest of the input */
+					error_ln(op->source_line, _("division by zero attempted in `%%'"));
+					goto regular;
+				}
+
 				op->opcode = Op_mod_i;
 				break;
 			case Op_plus:
