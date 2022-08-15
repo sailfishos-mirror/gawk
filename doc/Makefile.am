@@ -25,7 +25,7 @@
 
 ## process this file with automake to produce Makefile.in
 
-info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi
+info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi
 
 man_MANS = gawk.1 gawkbug.1 pm-gawk.1
 
@@ -54,7 +54,7 @@ EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	bc_notes
 
 # Get rid of generated files when cleaning
-CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf
+CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf
 
 MAKEINFO = @MAKEINFO@ --no-split --force
 
@@ -80,9 +80,9 @@ AWKCARD = awkcard.ps
 gawk.texi: $(srcdir)/gawktexi.in $(srcdir)/sidebar.awk
 	awk -f $(srcdir)/sidebar.awk < $(srcdir)/gawktexi.in > gawk.texi
 
-postscript: gawk.ps gawkinet.ps gawkworkflow.ps gawk.1.ps gawkbug.1.ps pm-gawk.1.ps $(AWKCARD)
+postscript: gawk.ps gawkinet.ps gawkworkflow.ps pm-gawk.ps gawk.1.ps gawkbug.1.ps pm-gawk.1.ps $(AWKCARD)
 
-pdf-local: postscript gawk.pdf gawkinet.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf
+pdf-local: postscript gawk.pdf gawkinet.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf
 
 gawk.ps: gawk.dvi
 	TEXINPUTS=$(srcdir): dvips -o gawk.ps gawk.dvi
@@ -92,6 +92,9 @@ gawkinet.ps: gawkinet.dvi
 
 gawkworkflow.ps: gawkworkflow.dvi
 	TEXINPUTS=$(srcdir): dvips -o gawkworkflow.ps gawkworkflow.dvi
+
+pm-gawk.ps: pm-gawk.dvi
+	TEXINPUTS=$(srcdir): dvips -o pm-gawk.ps pm-gawk.dvi
 
 gawk.1.ps: gawk.1
 	-groff -man $(srcdir)/gawk.1 > gawk.1.ps

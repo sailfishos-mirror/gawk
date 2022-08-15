@@ -60,6 +60,7 @@
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
 @set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
+@set PMGAWKTITLE Persistent-Memory @command{gawk} User Manual
 @ifset FOR_PRINT
 @set TITLE Effective awk Programming
 @end ifset
@@ -30048,7 +30049,14 @@ backing file will lead to strange results and/or core dumps.
 may not do so in the future either.
 @end quotation
 
-Here are articles and web links that provide more information about
+Terence Kelly has provided a separate @cite{@value{PMGAWKTITLE}}
+document, which is included in the @command{gawk}
+distribution.  It is worth reading.
+@ifinfo
+@xref{Top, , General Introduction, pm-gawk, @value{PMGAWKTITLE}}.
+@end ifinfo
+
+Here are additional articles and web links that provide more information about
 persistent memory and why it's useful in a scripting language like
 @command{gawk}.
 
@@ -30057,7 +30065,7 @@ persistent memory and why it's useful in a scripting language like
 @item @uref{https://web.eecs.umich.edu/~tpkelly/pma/}
 This is the canonical source for Terence Kelly's Persistent Memory
 Allocator (PMA).  The latest source code and user manual
-will alway be available at this location.
+will always be available at this location.
 Kelly may be reached directly at any of the following
 email addresses:
 @EMAIL{tpkelly@@acm.org, tpkelly AT acm.org},
@@ -41599,6 +41607,27 @@ with @command{makeinfo} to produce an Info or HTML file.
 The generated Info file for
 @cite{@value{GAWKWORKFLOWTITLE}}.
 
+@item doc/pm-gawk.texi
+The Texinfo source file for
+@ifinfo
+@ref{Top, , General Introduction, pm-gawk, @value{PMGAWKTITLE}}.
+@end ifinfo
+@ifnotinfo
+@cite{@value{PMGAWKTITLE}}.
+@end ifnotinfo
+It should be processed with @TeX{}
+(via @command{texi2dvi} or @command{texi2pdf})
+to produce a printed document and
+with @command{makeinfo} to produce an Info or HTML file.
+
+@item doc/pm-gawk.info
+The generated Info file for
+@cite{@value{PMGAWKTITLE}}.
+
+@item doc/pm-gawk.1
+The @command{troff} source for a manual page describing the
+the persistent memory features presented in @ref{Persistent Memory}.
+
 @item doc/igawk.1
 The @command{troff} source for a manual page describing the @command{igawk}
 program presented in
@@ -41622,16 +41651,12 @@ the @file{Makefile.in} files used by Autoconf and
 
 @item Makefile.in
 @itemx aclocal.m4
-@itemx bisonfix.awk
-@itemx config.guess
+@itemx build-aux/*
 @itemx configh.in
 @itemx configure.ac
 @itemx configure
 @itemx custom.h
-@itemx depcomp
-@itemx install-sh
 @itemx missing_d/*
-@itemx mkinstalldirs
 @itemx m4/*
 These files and subdirectories are used when configuring and compiling
 @command{gawk} for various Unix systems.  Most of them are explained
