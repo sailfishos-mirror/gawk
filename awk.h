@@ -156,15 +156,6 @@ typedef int off_t;
 #define setlocale(locale, val)	/* nothing */
 #endif /* HAVE_SETLOCALE */
 
-#if HAVE_MEMCPY_ULONG
-extern char *memcpy_ulong(char *dest, const char *src, unsigned long l);
-#define memcpy memcpy_ulong
-#endif
-#if HAVE_MEMSET_ULONG
-extern void *memset_ulong(void *dest, int val, unsigned long l);
-#define memset memset_ulong
-#endif
-
 #ifdef HAVE_FWRITE_UNLOCKED
 #define fwrite	fwrite_unlocked
 #endif /* HAVE_FWRITE_UNLOCKED */
