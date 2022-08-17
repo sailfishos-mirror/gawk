@@ -66,9 +66,6 @@ static void catchstackoverflow(int emergency, stackoverflow_context_t scp);
 #endif
 static void nostalgia(void) ATTRIBUTE_NORETURN;
 static void version(void) ATTRIBUTE_NORETURN;
-#if 0
-static void deprecate_mpfr(void);
-#endif
 static void init_fds(void);
 static void init_groupset(void);
 static void save_argv(int, char **);
@@ -1755,7 +1752,6 @@ parse_args(int argc, char **argv)
 #else
 			warning(_("-M ignored: MPFR/GMP support not compiled in"));
 #endif
-			// deprecate_mpfr();
 			break;
 
 		case 'P':
