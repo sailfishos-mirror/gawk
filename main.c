@@ -1929,24 +1929,3 @@ set_current_namespace(const char *new_namespace)
 
 	current_namespace = new_namespace;
 }
-
-#if 0
-/* deprecate_mpfr --- print long info about MPFR being deprecated */
-
-static void
-deprecate_mpfr(void)
-{
-	static bool first = true;
-
-	if (first) {
-		first = false;
-		if (getenv("GAWK_NO_MPFR_WARN") != NULL)
-			return;
-
-		warning(_("MPFR mode is deprecated!"));
-		warning(_("It will be removed in the gawk release of 2024."));
-		warning(_("For more information, see https://......."));
-		warning(_("Use `export GAWK_NO_MPFR_WARN=1' to disable this warning."));
-	}
-}
-#endif
