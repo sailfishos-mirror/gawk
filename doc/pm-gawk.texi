@@ -65,7 +65,7 @@ A copy of the license is available at @*
 @titlepage
 @title @value{TYTL}
 @c UPDATE date below
-@subtitle 15 August 2022
+@subtitle 16 August 2022
 @subtitle @gwk{} version 5.2
 @subtitle @pmg{} version 2022.08Aug.03.1659520468 (Avon 7)
 @author Terence Kelly
@@ -118,39 +118,39 @@ persistent-memory @gwk{}.
 @sp 1
 
 @c UPDATE below after official release
-GNU AWK (@gwk{}) 5.2, expected in August 2022, introduces a new
+GNU AWK (@gwk{}) 5.2, expected in September 2022, introduces a new
 @emph{persistent memory} feature that makes AWK scripting easier and
 sometimes improves performance.  The new feature, called ``@pmg{},''
 can ``remember'' script-defined variables and functions across
 executions and can pass variables and functions between unrelated
 scripts without serializing/parsing text files---all with near-zero
 fuss.  @pmg{} does @emph{not} require non-volatile memory hardware nor
-any other exotic infrastructure; @pmg{} runs on the ordinary
-conventional computers and operating systems that most of us have been
-using for decades.
+any other exotic infrastructure; it runs on the ordinary conventional
+computers and operating systems that most of us have been using for
+decades.
 
 @sp 1
 
 @c TODO:  ADR:  hyperlinks to info page below
 
 @noindent
-The main @gwk{}
-documentation@footnote{@url{https://www.gnu.org/software/gawk/manual/}
-@w{ } and @w{ } @code{man gawk} @w{ } and @w{ } @code{info gawk}}
-covers the basics of the new persistence feature.  This supplementary
-manual provides additional detail, tutorial examples, and a peek under
-the hood of @pmg{}.  If you're familiar with @gwk{} and Unix-like
-environments, dive straight in: @*
+The main @gwk{} documentation@footnote{See
+@url{https://www.gnu.org/software/gawk/manual/} @w{ } and @w{ }
+@code{man gawk} @w{ } and @w{ } @code{info gawk}.}  covers the basics
+of the new persistence feature.  This supplementary manual provides
+additional detail, tutorial examples, and a peek under the hood of
+@pmg{}.  If you're familiar with @gwk{} and Unix-like environments,
+dive straight in: @*
 
 @itemize @c @w{}
-@item @ref{Quick Start} hits the ground running with a few keystrokes
-@item @ref{Examples} shows how @pmg{} streamlines typical AWK scripting
-@item @ref{Performance} covers asymptotic efficiency, OS tuning, and more
-@item @ref{Data Integrity} explains how to protect data from mishaps
-@item @ref{Acknowledgments} thanks those who made @pmg{} happen
-@item @ref{Installation} shows where obtain @pmg{}
-@item @ref{Debugging} explains how to handle suspected bugs
-@item @ref{History} traces @pmg{}'s persistence technology
+@item @ref{Quick Start} hits the ground running with a few keystrokes.
+@item @ref{Examples} shows how @pmg{} streamlines typical AWK scripting.
+@item @ref{Performance} covers asymptotic efficiency, OS tuning, and more.
+@item @ref{Data Integrity} explains how to protect data from mishaps.
+@item @ref{Acknowledgments} thanks those who made @pmg{} happen.
+@item @ref{Installation} shows where obtain @pmg{}.
+@item @ref{Debugging} explains how to handle suspected bugs.
+@item @ref{History} traces @pmg{}'s persistence technology.
 @end itemize
 
 @c UPDATE:  revise above when content finalized
@@ -168,10 +168,11 @@ allocator used in @pmg{}: @*
 @noindent
 Two publications describe the persistent memory allocator and early
 experiences with a @pmg{} prototype based on a fork of the official
-@gwk{} sources: @*
-@url{https://queue.acm.org/detail.cfm?id=3534855} @*
-@url{http://nvmw.ucsd.edu/nvmw2022-program/nvmw2022-data/nvmw2022-paper35-final_version_your_extended_abstract.pdf}
-
+@gwk{} sources:
+@itemize
+@item @url{https://queue.acm.org/detail.cfm?id=3534855}
+@item @url{http://nvmw.ucsd.edu/nvmw2022-program/nvmw2022-data/nvmw2022-paper35-final_version_your_extended_abstract.pdf}
+@end itemize
 
 @sp 1
 
@@ -241,7 +242,7 @@ The first @gwk{} invocation sees the special envar prepended on the
 command line, so it activates @pmg{}.  The second @gwk{} invocation,
 however, does @emph{not} see the envar and therefore does not access
 the script variable stored in the heap file.  The third @gwk{}
-invocation sees the special envar and therefore uses the script
+invocation does see the special envar and therefore uses the script
 variable from the heap file.
 
 While sometimes less error prone than ambient envars, per-command
@@ -293,8 +294,8 @@ happily ever after''):
 @noindent
 The @command{truncate} command above creates a heap file large enough
 to store all of the data it must eventually contain, with plenty of
-room to spare (as we'll see in @ref{Sparse Heap Files}, this isn't
-wasteful).  The @command{export} command ensures that subsequent
+room to spare.  (As we'll see in @ref{Sparse Heap Files}, this isn't
+wasteful.)  The @command{export} command ensures that subsequent
 @gwk{} invocations activate @pmg{}.  The first @pmg{} command stores
 @cite{Tom Sawyer}'s word frequencies in associative array @code{ts[]}.
 Because this array is persistent, subsequent @pmg{} commands can
@@ -381,7 +382,7 @@ and @code{max} are initialized exactly once, when the heap file is
 first used, and @emph{not} every time the script runs.  Furthermore,
 whereas script-defined variables such as @code{min} retain their
 values across @pmg{} executions, built-in AWK variables such as
-@code{NR} are re-set to zero every time @pmg{} runs, so we can't use
+@code{NR} are reset to zero every time @pmg{} runs, so we can't use
 them in the same way.  Here's a modified script for @pmg{}:
 @verbatim
         $ cat summary_persistent.awk
@@ -426,6 +427,19 @@ Our third and final set of examples shows that @pmg{} allows us to
 bundle both script-defined data and also user-defined @emph{functions}
 in a persistent heap that may be passed freely between unrelated AWK
 scripts.
+
+@c ADR doesn't like return in count() below
+@c TK:  it was put there for a reason:
+@c $ truncate -s 10M funcs.pma
+@c $ export GAWK_PERSIST_FILE=funcs.pma
+@c $ gawk 'function count(A,t) {for(i in A)t++; return t}'
+@c $ gawk 'BEGIN { a["x"] = 4; a["y"] = 5; a["z"] = 6 }'
+@c $ gawk 'BEGIN { print count(a) }'
+@c 3
+@c $ gawk 'BEGIN { delete a }'
+@c $ gawk 'BEGIN { print count(a) }'
+@c [!!blank line, not zero!!]
+@c $
 
 The following shell transcript repeatedly invokes @pmg{} to create and
 then employ a user-defined function.  These separate invocations
@@ -506,7 +520,7 @@ This chapter explains several performance advantages that result from
 the implementation of persistent memory in @pmg{}, shows how tuning
 the underlying operating system sometimes improves performance, and
 presents experimental performance measurements.  To make the
-discussion concrete, we use examples from a ``GNU/Linux'' system---GNU
+discussion concrete, we use examples from a GNU/Linux system---GNU
 utilities atop the Linux OS---but the principles apply to other modern
 operating systems.
 
@@ -620,6 +634,28 @@ excessive paging and dramatic slowdown.  Unfortunately, the hash
 tables beneath AWK's signature associative arrays inherently require
 random memory accesses, so large associative arrays can be
 problematic.
+
+@c ADR comments regarding below, "SSDs alleviate much of the
+@c performance problem of hard disks vs. RAM disks."
+@c
+@c TK replies:  When a significant amount of paging to *any*
+@c conventional block storage device starts, speed plummets by orders
+@c of magnitude.  I'd wager that the difference between paging vs. not
+@c is larger than the difference between paging to SSD vs. HDD.  So
+@c while SSDs are faster than HDDs, when paging begins they won't
+@c usually make the difference between acceptable vs. unacceptable
+@c performance.
+@c
+@c If you decide to try to find out for yourself, note that on many
+@c Linux systems the notorious OOM killer terminates a process well
+@c before its anonymous-memory footprint reaches the capacity of DRAM,
+@c so it's difficult even to provoke the phenomenon of interest.  And
+@c paging anonymous memory to swap can be managed differently than
+@c paging involving a file-backed memory mapping.
+@c
+@c Bottom line:  For the large majority of purposes, gawk users
+@c would be wise to avoid paging entirely, regardless of whether
+@c the pm-gawk feature is used.
 
 Persistence changes the rules in our favor: The OS pages data to
 @pmg{}'s @emph{heap file} instead of the swap area.  This won't help
@@ -751,7 +787,7 @@ surprising ways.  Certain well-known textbook algorithms continue to
 grind away fruitlessly long after having computed all of their
 output. @*
 @c
-@url{https://queue.acm.org/detail.cfm?id=3424304}}
+See @url{https://queue.acm.org/detail.cfm?id=3424304}.}
 @c
 To apply this maxim to @pmg{} we must distinguish two concepts that
 are frequently conflated: persistence and durability.@footnote{In
@@ -760,8 +796,8 @@ denote novel byte-addressable non-volatile memory hardware---an
 unfortunate practice that contradicts sensible long-standing
 convention and causes needless confusion.  NVM provides durability.
 Persistent memory is a software abstraction that doesn't require NVM.
-@url{https://queue.acm.org/detail.cfm?id=3358957}} (A third logically
-distinct concept is the subject of @ref{Data Integrity}.)
+See @url{https://queue.acm.org/detail.cfm?id=3358957}.} (A third
+logically distinct concept is the subject of @ref{Data Integrity}.)
 
 @dfn{Persistent} data outlive the processes that access them, but
 don't necessarily last forever.  For example, as explained in
@@ -825,20 +861,21 @@ from cache.  Read about @command{sync} and
 @node    Experiments
 @section Experiments
 
-The C-shell (@command{csh}) script listed below illustrates concepts and
-implements tips presented in this chapter.  It produced the results
-discussed in @ref{Results} in roughly 20 minutes on an aging laptop.
-You should be able to cut and paste the code listing below into a file
-and get it running without excessive fuss; write to me if you have
-difficulty.
+The C-shell (@command{csh}) script listed below illustrates concepts
+and implements tips presented in this chapter.  It produced the
+results discussed in @ref{Results} in roughly 20 minutes on an aging
+laptop.  You can cut and paste the code listing below into a file, or
+download it from @url{http://web.eecs.umich.edu/~tpkelly/pma/}.
+
+@c TODO: post script to Web site when finalized  
 
 The script measures the performance of four different ways to support
-word frequency queries over a text corpus: The naive approach of
-reading the corpus into an associative array for every query; manually
-dumping a text representation of the word-frequency table and manually
-loading it prior to a query; using @gwk{}'s @code{rwarray} extension
-to dump and load an associative array; and using @pmg{} to maintain a
-persistent associative array.
+word frequency queries over a text corpus: The na@"{@dotless{i}}ve
+approach of reading the corpus into an associative array for every
+query; manually dumping a text representation of the word-frequency
+table and manually loading it prior to a query; using @gwk{}'s
+@code{rwarray} extension to dump and load an associative array; and
+using @pmg{} to maintain a persistent associative array.
 
 Comments at the top explain prerequisites.  Lines 8--10 set input
 parameters: the directory where tests are run and where files
@@ -864,11 +901,16 @@ Lines 71--100 run the four different AWK approaches on the same random
 input, reporting separately the time to build and to query the
 associative array containing word frequencies.
 
+@c ADR suggests making shell script available on web site
+@c TK will do eventually
+
 @sp 1
+
+@c first line of C-shell script can't contain line-number comment
 
 @smallformat
 @verbatim
-#!/bin/csh -f                                                                       #   1
+#!/bin/csh -f
 # Set PMG envar to path of pm-gawk executable and AWKLIBPATH                        #   2
 #    to find rwarray.so                                                             #   3
 # Requires "sudo" to work; consider this for /etc/sudoers file:                     #   4
@@ -1103,7 +1145,7 @@ copies as sparse as the original.  If reflink copying is not
 available, @command{--sparse=always} should be used.}  Fortunately you
 can install, say, an XFS file system @emph{inside an ordinary file} on
 some other file system, such as @code{ext4}.@footnote{See
-@url{https://www.usenix.org/system/files/login/articles/login_winter19_08_kelly.pdf}}
+@url{https://www.usenix.org/system/files/login/articles/login_winter19_08_kelly.pdf}.}
 
 @c The @command{filefrag} utility reveals how the storage allocated to
 @c the two files changes if they diverge.
@@ -1157,8 +1199,7 @@ provided useful feedback.  Bentley suggested the min/max/mean example
 in @ref{Examples}, and also the exercise of making Kernighan & Pike's
 ``Markov'' script persistent.  Volos provided and tested the advice on
 tuning OS parameters in @ref{Virtual Memory and Big Data}.  Stan Park
-answered several questions about virtual memory, file systems, and
-utilities.
+provided insights about virtual memory, file systems, and utilities.
 
 @c ==================================================================
 @c ==================================================================
@@ -1170,17 +1211,28 @@ utilities.
 @c UPDATE below or remove this section if it's obsolete
 
 @gwk{} 5.2 featuring persistent memory is expected to be released in
-August 2022; look for it at @url{http://ftp.gnu.org/gnu/gawk/}.  If
+September 2022; look for it at @url{http://ftp.gnu.org/gnu/gawk/}.  If
 5.2 is not released yet, the master git branch is available at
 @c
 @url{http://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-master.tar.gz}.
 @c
-Unpack the tarball, run @command{./configure}, @command{make}, and
-@command{make check}, then try some of the examples presented earlier.
-In the normal course of events, 5.2 and later @gwk{} releases
-featuring @pmg{} will appear in the software package management
-systems of major GNU/Linux distros.  Eventually @pmg{} will be
-available in the default @gwk{} on such systems.
+Unpack the tarball, run @command{./bootstrap.sh},
+@command{./configure}, @command{make}, and @command{make check}, then
+try some of the examples presented earlier.  In the normal course of
+events, 5.2 and later @gwk{} releases featuring @pmg{} will appear in
+the software package management systems of major GNU/Linux distros.
+Eventually @pmg{} will be available in the default @gwk{} on such
+systems.
+
+@c ADR comments on above, "run ./bootstrap.sh, ./configure ..."
+@c TK replies: I haven't been doing this.  Neither the README nor the
+@c    INSTALL in the gawk tarball mention bootstrap.sh.  If it's
+@c    important, shouldn't they?  The top of bootstrap.sh says its
+@c    purpose is "to avoid out-of-date issues in Git sandboxes."
+@c    When a neurodivergent source code control system requires us to
+@c    write shell scripts to work around the problems that it creates
+@c    gratuitously, the universe is trying to tell us something about
+@c    it.
 
 @c official gawk:
 @c http://ftp.gnu.org/gnu/gawk/                                               [where to look for 5.2 after release]
@@ -1203,7 +1255,7 @@ using the heap file that you intend; using the wrong heap file is a
 common mistake.  Other fertile sources of bugs for newcomers are the
 fact that a @code{BEGIN} block is executed every time @pmg{} runs,
 which isn't always what you really want, and the fact that built-in
-AWK variables such as @code{NR} are always re-set to zero every time
+AWK variables such as @code{NR} are always reset to zero every time
 the interpreter runs.  See the discussion of initialization
 surrounding the min/max/mean script in @ref{Examples}.
 
@@ -1339,14 +1391,6 @@ creativity in early adopters, who have devised uses that @pmg{}'s
 designers never anticipated.  I'm curious to see what new purposes
 you find for it.
 
-@c TODO:  future enhancements:
-@c        pma version string consisting entirely of emojis
-@c           benefits:  compact, recognizable, lively
-@c           problem:  representing dates/numbers
-@c              solution(?): emojis can probably encode Mayan dates (need to investigate)
-@c           problem:  do Bayonne, Camden, ..., Newark, etc. have their own emojis?
-@c              solution(?): there are many different kinds of p**p emojis
-
 @c ==================================================================
 @c ==================================================================
 @c ==================================================================
@@ -1356,146 +1400,4 @@ you find for it.
 @c ==================================================================
 @c ==================================================================
 @c ==================================================================
-
-@c Arnold Robbins recommendations, distilled from 547 line diff
-@c
-@c    @emph -> @dfn for definitions of terms  [done]
-@c                Use the @dfn command to identify the introductory or
-@c                defining use of a technical term. Use the command
-@c                only in passages whose purpose is to introduce a
-@c                term which will be used again or which the reader
-@c                ought to know. Mere passing mention of a term for
-@c                the first time does not deserve @dfn.
-@c          -> @cite for book titles  [done]
-@c                Use the @cite command for the name of a book that
-@c                lacks a companion Info file. The command produces
-@c                italics in the printed manual, and quotation marks
-@c                in the Info file.  If a book is written in Texinfo,
-@c                it is better to use a cross-reference command since
-@c                a reader can easily follow such a reference in
-@c                Info. See Section 5.4 [@xref], page 44.
-@c
-@c    @code -> @command  [merely to encourage carpal tunnel syndrome?]
-@c                Use the @command command to indicate command names,
-@c                such as ls or cc
-@c          -> @samp for, um, things like "$" prompt of bash and "unset envar"
-@c                Use the @samp command to indicate text that is a
-@c                literal example or ‘sample’ of a sequence of
-@c                characters in a file, string, pattern, etc.  ....
-@c                Basically, @samp is a catchall for whatever is not
-@c                covered by @code, @kbd, @key, @command, etc.
-@c          -> @file for /proc/meminfo  and  pma.c
-@c                Use the @file command to indicate text that is the
-@c                name of a file, buffer, or directory, or is the name
-@c                of a node in Info. You can also use the command for
-@c                file name suffixes. Do not use @file for symbols in
-@c                a programming language; use @code.
-@c          -> @env for envars
-@c                Use the @env command to indicate environment
-@c                variables, as used by many operating systems,
-@c                including GNU. Do not use it for metasyntactic
-@c                variables; use @var for those (see the previous
-@c                section).
-@c
-@c    stuff that is done or otherwise addressed:
-@c
-@c    [done, with tweaks]
-@c    > @tex
-@c    > \gdef\linkcolor{0.5 0.09 0.12} % Dark Red
-@c    > \gdef\urlcolor{0.5 0.09 0.12} % Also
-@c    > \global\urefurlonlylinktrue
-@c    > @end tex
-@c
-@c    < easier, improves performance, and enables @code{gawk} to handle larger
-@c    ---
-@c    > improves performance for certain kinds of I/O-bound workloads,  [no, I/O is orthogonal to asymptotic efficiency]
-@c    > and enables @command{gawk} to handle larger
-@c
-@c    @verbatim -> @kbd and @print  [bad idea, extremely error prone]
-@c
-@c    "Linux" -> "GNU/Linux"  [in some places but not all; done with nuance]
-@c
-@c    re-set -> reset  [no, i like the former]
-@c
-@c    > @c ADR: Define median and mode. Not everyone remembers what they are.  [done]
-@c
-@c    remove "like the gawk of yesteryear"  [done]
-@c
-@c    550c561  [it's not clear what the runtime overhead would be; it might well be negligible]
-@c    < ordinary file} on some other file system; for details see my article
-@c    ---
-@c    > ordinary file} on some other file system (with some runtime overhead); for details see my article
-@c
-@c    This expedient makes reflink copying available on popular file systems
-@c    such as the @code{ext} family.
-@c    @c ADR: You should also mention @samp{cp --sparse} here.   [added TODO comment]
-@c
-@c    572,574c584,588   [done]
-@c    < Arnold Robbins got @value{ACRO} started by encouraging and supporting
-@c    < Haris Volos, Zi Fan Tan, and Jianan Li as they developed a prototype
-@c    < based on a fork of the @code{gawk} source.  Robbins moreover
-@c    ---
-@c    > Haris Volos, Zi Fan Tan, and Jianan Li developed a prototype
-@c    > based on a fork of the @command{gawk} source. Advice from Arnold Robbins
-@c    > (the @command{gawk} maintainer)
-@c    > to me, which I forwarded to them, proved very helpful.
-@c    > Robbins moreover
-@c
-@c    579c593  [done]
-@c    < improvements to @code{pma}.  Nelson Beebe provided access to Solaris
-@c    ---
-@c    > improvements to @code{pma}.  Nelson H.@: F.@: Beebe provided access to Solaris
-@c
-@c    582c596  [done]
-@c    < Jon Bentley suggested the min/max/mean example in this manual and also
-@c    ---
-@c    > Jon Bentley suggested the min/max/mean example in @ref{Examples}, and also
-@c
-@c    585,586c599,600  [done]
-@c    < provided and tested the advice on tuning OS paging parameters in this
-@c    < manual.
-@c    ---
-@c    > provided and tested the advice on tuning OS paging parameters in
-@c    > @ref{System Configuration}.
-@c
-@c    650,651c664,665    [done]
-@c    < runs, which isn't always what the programmer really wants, and the
-@c    < fact that built-in AWK variables such as @code{NR} are always re-set  [I like ``re-set'']
-@c    ---
-@c    > runs, which isn't always what you really want, and the
-@c    > fact that built-in AWK variables such as @code{NR} are always reset
-@c
-@c    678c692,694 [done]
-@c    < The new @value{ACRO} persistence feature is based on a new persistent
-@c    ---
-@c    > @c ADR: Remove "new"; it won't be new for very long, and this
-@c    > @c document will be around for a long time.
-@c    > The @value{ACRO} persistence feature is based on a persistent
-@c
-@c    @code{gdbm} -> GDBM  [done, my way]
-@c
-@c    744,747c760,763  [done]
-@c    < persistence for @code{gawk} in late 2021.  While I was writing
-@c    < @code{pma} in early 2022 the others, with advice and encouragement
-@c    < from @code{gawk} maintainer Arnold Robbins, prototyped @value{ACRO} in
-@c    < a fork of the @code{gawk} source.  Experience with the prototype
-@c    ---
-@c    > persistence for @command{gawk} in late 2021.  While I was writing
-@c    > @code{pma} in early 2022 the others,
-@c    > prototyped @value{ACRO} in
-@c    > a fork of the @command{gawk} source.  Experience with the prototype
-@c    749,751c765,767
-@c    < @value{ACRO}, and by spring 2022 Robbins was implementing persistence
-@c    < in the official version of @code{gawk}.  The persistence feature in
-@c    < official @code{gawk} differs slightly from the prototype: The former
-@c    ---
-@c    > @value{ACRO}, and by spring 2022 Arnold Robbins was implementing persistence
-@c    > in the official version of @command{gawk}.  The persistence feature in
-@c    > official @command{gawk} differs slightly from the prototype: The former
-@c
-@c    753c769  [done]
-@c    < interpreter whereas the latter uses a command-line option.  In many
-@c    ---
-@c    > interpreter whereas the latter uses a mandatory command-line option.  In many
-@c
 

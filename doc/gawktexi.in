@@ -40065,6 +40065,9 @@ OS/2
 @item
 DJGPP
 
+@item
+VAX/VMS
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -42333,6 +42336,9 @@ that issues all the necessary @code{CC} and @code{LINK} commands. There is
 also a @file{Makefile} for use with the @code{MMS} and @code{MMK} utilities.
 From the source directory, use either:
 
+The vmsbuild.com method of building is no longer being maintained and is
+planned to be removed in the future.
+
 @example
 $ @kbd{@@[.vms]vmsbuild.com}
 @end example
@@ -42358,11 +42364,20 @@ can better handle ODS-5 volumes with upper- and lowercase @value{FN}s.
 With ODS-5 volumes and extended parsing enabled, the case of the target
 parameter may need to be exact.
 
-@command{gawk} has been tested under VAX/VMS 7.3 and Alpha/VMS 7.3-1
-using Compaq C V6.4, and under Alpha/VMS 7.3, Alpha/VMS 7.3-2, and IA64/VMS 8.3.
-The most recent builds used HP C V7.3 on Alpha VMS 8.3 and both
-Alpha and IA64 VMS 8.4 used HP C 7.3.@footnote{The IA64 architecture
+@command{gawk} has been tested using these VMS Software, Inc.@:
+Community editions.
+
+@itemize @bullet
+@item
+HP C V7.3-010 on OpenVMS Alpha V8.4-2L1.
+
+@item
+HP C V7.3-020 on OpenVMS IA64 V8.4-2L3.@footnote{The IA64 architecture
 is also known as ``Itanium.''}
+@end itemize
+
+Due to HPE cancelling the Hobbyist licensing program, no more testing is
+being done on older releases of VAX/VMS and OpenVMS.
 
 @xref{VMS GNV} for information on building
 @command{gawk} as a PCSI kit that is compatible with the GNV product.
@@ -42401,7 +42416,8 @@ For Alpha and Itanium:
 /float=ieee/ieee_mode=denorm_results
 @end example
 
-For VAX:
+For VAX@footnote{Dynamic extensions do not currently work on VAX,
+this is here for reference only.}:
 
 @example
 /name=(as_is,short)
@@ -42569,7 +42585,6 @@ When defining it, the value should be quoted so that it retains a single
 translation and not a multitranslation @code{RMS} searchlist.
 
 @cindex redirection @subentry on VMS
-
 This restriction also applies to running @command{gawk} under GNV,
 as redirection is always to a DCL command.
 
