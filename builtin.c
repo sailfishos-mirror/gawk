@@ -3400,7 +3400,7 @@ call_sub(const char *name, int nargs)
 	} else {
 		/* gensub */
 		if (nargs < 3 || nargs > 4)
-			fatal(_("indirect call to gensub requires three to four arguments"));
+			fatal(_("indirect call to gensub requires three or four arguments"));
 
 		if (nargs == 4)
 			rhs = POP();
