@@ -1,7 +1,8 @@
 .ds EP \fIGAWK: Programmare efficacemente in AWK\fP
 .\"Traduzione per la versione gawk-5.2.0 di A.G. Colombo - 12 Agosto 2022
+.\"Aggiornamento per la versione gawk-5.2.0 di A.G. Colombo - 14 Agosto 2022
 .ds PM \fIManuale utente funzionalità Memoria Persistente in gawk\fP
-.TH PM-GAWK 1 "12 agosto 2022" "Free Software Foundation" "Comandi di utilità"
+.TH PM-GAWK 1 "14 agosto 2022" "Free Software Foundation" "Comandi di utilità"
 .SH NOME
 gawk con memoria persistente \- dati e funzioni persistenti
 .SH SINTASSI
@@ -68,11 +69,11 @@ Dimostrazione della persistenza di variabili:
 .ft CW
 $ \f(CBtruncate -s 1G deposito.pma\fP            # creazione file-deposito
 $ \f(CBexport GAWK_PERSIST_FILE=deposito.pma\fP  # definizione variabile d'ambiente
-$ \f(CBgawk 'BEGIN{print ++i}'\fP
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
 1
-$ \f(CBgawk 'BEGIN{print ++i}'\fP
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
 2
-$ \f(CBgawk 'BEGIN{print ++i}'\fP
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
 3
 .ft R
 .fi
@@ -84,11 +85,11 @@ Per passare la variabile d'ambiente a livello di singolo comando:
 .nf
 .ft CW
 $ \f(CBunset GAWK_PERSIST_FILE\fP
-$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{print ++i}'\fP
+$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{ print ++i }'\fP
 4
-$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{print ++i}'\fP
+$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{ print ++i }'\fP
 5
-$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{print ++i}'\fP
+$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{ print ++i }'\fP
 6
 .ft R
 .fi
@@ -101,9 +102,9 @@ a livello di ogni singolo comando si può definire un alias:
 .nf
 .ft CW
 $ \f(CBalias pm='GAWK_PERSIST_FILE=deposito.pma'\fP
-$ \f(CBpm gawk 'BEGIN{print ++i}'\fP
+$ \f(CBpm gawk 'BEGIN{ print ++i }'\fP
 7
-$ \f(CBpm gawk 'BEGIN{print ++i}'\fP
+$ \f(CBpm gawk 'BEGIN{ print ++i }'\fP
 8
 .ft R
 .fi
@@ -115,9 +116,9 @@ Per evitare di attivare la persistenza:
 .nf
 .ft CW
 $ \f(CBunset GAWK_PERSIST_FILE\fP
-$ \f(CBgawk 'BEGIN{print ++i}'\fP
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
 1
-$ \f(CBgawk 'BEGIN{print ++i}'\fP
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
 1
 .ft R
 .fi
@@ -176,6 +177,16 @@ Terence Kelly a uno o più dei seguenti indirizzi:
 \f(CWtpkelly@eecs.umich.edu\fP,
 o
 \f(CWtpkelly@cs.princeton.edu\fP.
+.SH VEDERE ANCHE
+.IR gawk (1),
+\*(EP,
+e
+\*(PM.
+I due manuali dovrebbero essere disponibili in formato Info,
+se il comando Info è installato nel vostro sistema.
+.PP
+Vedere \f(CWhttps://web.eecs.umich.edu/~tpkelly/pma/\fP per
+l'ultima versione del codice sorgente e del manuale.
 .SH PERMESSI DI COPIA
 Copyright \(co 2022
 Terence Kelly.
