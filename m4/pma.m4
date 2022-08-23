@@ -7,6 +7,7 @@ dnl Decide whether or not to use the persistent memory allocator
 
 AC_DEFUN([GAWK_USE_PERSISTENT_MALLOC],
 [
+AC_REQUIRE([AX_CHECK_COMPILE_FLAG])
 AC_CHECK_SIZEOF([void *])
 use_persistent_malloc=no
 if test "$SKIP_PERSIST_MALLOC" = no && test $ac_cv_sizeof_void_p -eq 8
@@ -18,17 +19,9 @@ then
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			case $CC in
-			gcc | clang)
-				LDFLAGS="${LDFLAGS} -no-pie"
-				export LDFLAGS
-				;;
-			*)
-				# tinycc and pcc don't support -no-pie flag
-				# their executables are non-PIE automatically
-				# so no need to do anything
-				;;
-			esac
+			AX_CHECK_COMPILE_FLAG([-no-pie],
+				[LDFLAGS="${LDFLAGS} -no-pie"
+				export LDFLAGS])
 			;;
 		*darwin*)
 			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"

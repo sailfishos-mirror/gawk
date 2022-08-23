@@ -12588,6 +12588,45 @@ printf "%s\n" "#define HAVE_MBRTOWC 1" >>confdefs.h
   fi
 
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts " >&5
+printf %s "checking whether C compiler accepts ... " >&6; }
+if test ${ax_cv_check_cflags__+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  "
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ax_cv_check_cflags__=yes
+else $as_nop
+  ax_cv_check_cflags__=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__" >&5
+printf "%s\n" "$ax_cv_check_cflags__" >&6; }
+if test "x$ax_cv_check_cflags__" = xyes
+then :
+  :
+else $as_nop
+  :
+fi
+
+
 
 # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
@@ -12642,17 +12681,45 @@ fi
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			case $CC in
-			gcc | clang)
-				LDFLAGS="${LDFLAGS} -no-pie"
+			{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -no-pie" >&5
+printf %s "checking whether C compiler accepts -no-pie... " >&6; }
+if test ${ax_cv_check_cflags___no_pie+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  -no-pie"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ax_cv_check_cflags___no_pie=yes
+else $as_nop
+  ax_cv_check_cflags___no_pie=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___no_pie" >&5
+printf "%s\n" "$ax_cv_check_cflags___no_pie" >&6; }
+if test "x$ax_cv_check_cflags___no_pie" = xyes
+then :
+  LDFLAGS="${LDFLAGS} -no-pie"
 				export LDFLAGS
-				;;
-			*)
-				# tinycc and pcc don't support -no-pie flag
-				# their executables are non-PIE automatically
-				# so no need to do anything
-				;;
-			esac
+else $as_nop
+  :
+fi
+
 			;;
 		*darwin*)
 			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
