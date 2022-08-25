@@ -5130,6 +5130,8 @@ yyerror(const char *m, ...)
 	err(false, "", buf, args);
 	va_end(args);
 	efree(buf);
+	/* we don't use fatal(), that changes the exit status to 2 */
+	exit(EXIT_FAILURE);
 }
 
 /* mk_program --- create a single list of instructions */
