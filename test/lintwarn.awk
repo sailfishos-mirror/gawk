@@ -23,7 +23,7 @@ BEGIN {
 	break
 	continue
 	next
-	a[]
+	a
 	f(/pqr/)
 	//
 	/* */
