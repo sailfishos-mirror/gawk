@@ -813,6 +813,15 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 		while (*scan != comma && scan < end) {
 			if (*scan == '"') {
 				for (scan++; scan < end;) {
+					// grow buffer if needed
+					if (new_end >= newfield + buflen) {
+						size_t offset = buflen;
+
+						buflen *= 2;
+						erealloc(newfield, char *, buflen, "comma_parse_field");
+						new_end = newfield + offset;
+					}
+
 					if (*scan == '"' && scan[1] == '"') {	// "" -> "
 						*new_end++ = '"';
 						scan += 2;
@@ -821,7 +830,6 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 						scan++;
 						break;
 					} else {
-						// grow buffer if needed
 						*new_end++ = *scan++;
 					}
 				}
@@ -829,6 +837,13 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 				// unquoted field
 				while (*scan != comma && scan < end) {
 					// grow buffer if needed
+					if (new_end >= newfield + buflen) {
+						size_t offset = buflen;
+
+						buflen *= 2;
+						erealloc(newfield, char *, buflen, "comma_parse_field");
+						new_end = newfield + offset;
+					}
 					*new_end++ = *scan++;
 				}
 			}
