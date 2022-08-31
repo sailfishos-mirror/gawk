@@ -4,9 +4,13 @@ del libro di Arnold GAWK: Programmare efficacemente in AWK,
 SE (e solo se) il software necessario è disponibile nel
 computer in cui si scarica la distribuzione di gawk.
 
-Se la sola cosa che interessa è avere un copia del libro
-in formato PDF, questa può semplicemente essere scaricata
-dal sito:
+È inoltre possibile generare la versione PDF del Manuale
+utente della funzionalità di Memoria Persistente (pm-gawk),
+disponibile a partire dalle versione 5.2 di Gawk.
+
+Se la sola cosa che interessa è avere una copia del libro
+GAWK e/o del manuale pm-gawk in formato PDF,
+queste possono semplicemente essere scaricate dal sito:
 
 https://sites.google.com/view/gawkdoc-it/home-page
 
@@ -24,10 +28,15 @@ Un terzo script:
 
 genera_formati.sh
 
-genera il manuale in vari formati, fra cui i formati
+genera il libro in vari formati, fra cui i formati
 testo, html e info.
 
+Per generare il Manuale Utente per la Memoria Persistente
+in gawk, è disponibile lo script:
+
+compila_pma.sh
+
 Per eventuali problemi con la traduzione italiana del
-libro Gawk, fare riferimento agli indirizzi email
-dei traduttori, inseriti all'inizio della versione PDF del
-libro stesso.
+libro Gawk e/o del Manuale pm-gawk, fare riferimento
+agli indirizzi email dei traduttori, inseriti all'inizio
+della versione PDF del libro Gawk.
