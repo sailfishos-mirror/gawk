@@ -1184,7 +1184,7 @@ do_split(int nargs)
 		} else if (fs->stlen == 1 && (sep->re_flags & CONSTANT) == 0) {
 			if (fs->stptr[0] == ' ') {
 				parseit = def_parse_field;
-			} else if (fs->stptr[0] == ',') {
+			} else if (fs->stptr[0] == ',' && ! do_posix) {
 				static bool warned = false;
 
 				parseit = comma_parse_field;
