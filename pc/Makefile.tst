@@ -198,7 +198,7 @@ GAWK_EXT_TESTS = \
 	igncdym igncfs ignrcas2 ignrcas4 ignrcase incdupe incdupe2 \
 	incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 include include2 \
 	indirectbuiltin indirectcall indirectcall2 \
-	indirectcall3 inf-nan-torture intarray iolint isarrayunset lint \
+	indirectcall3 intarray iolint isarrayunset lint \
 	lintexp lintindex lintint lintlength lintold lintplus lintset \
 	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 \
 	mdim3 mdim4 mixed1 mktime modifiers muldimposix nastyparm negtime \
@@ -222,7 +222,7 @@ GAWK_EXT_TESTS = \
 ARRAYDEBUG_TESTS = arrdbg
 EXTRA_TESTS = inftest regtest ignrcas3 
 INET_TESTS = inetdayu inetdayt inetechu inetecht
-MACHINE_TESTS = double1 double2 intformat
+MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 \
 	fmttest fnarydel fnparydl jarebug lc_num1 mbfw1 \
@@ -361,11 +361,11 @@ check:	env-check \
 	basic-msg-start  basic           basic-msg-end \
 	unix-msg-start   unix-tests      unix-msg-end \
 	extend-msg-start gawk-extensions arraydebug-tests extend-msg-end \
-	machine-msg-start machine-tests machine-msg-end \
 	charset-tests-all \
 	shlib-msg-start  shlib-tests     shlib-msg-end \
 	mpfr-msg-start   mpfr-tests      mpfr-msg-end \
-	pma-msg-start    pma-tests       pma-msg-end
+	pma-msg-start    pma-tests       pma-msg-end \
+	machine-msg-start machine-tests machine-msg-end
 	@-$(MAKE) pass-fail || { $(MAKE) diffout; exit 1; }
 
 basic:	$(BASIC_TESTS)
@@ -487,7 +487,8 @@ extend-msg-end:
 	@-echo "======== Done with gawk extension tests ========"
 
 machine-msg-start:
-	@-echo "======== Starting machine-specific tests ========"
+	@echo "======== Starting machine-specific tests ========"
+	@-echo "If any of these tests fail, don't worry too much."
 
 machine-msg-end:
 	@-echo "======== Done with machine-specific tests ========"
@@ -2975,12 +2976,6 @@ indirectcall3:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
-inf-nan-torture:
-	@echo $@ $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
 intarray:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --non-decimal-data >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -3517,6 +3512,12 @@ double2:
 	@echo $@ $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+inf-nan-torture:
+	@echo $@ $(ZOS_FAIL)
+	@echo Expect $@ to fail with MinGW.
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 intformat:
 	@echo $@
