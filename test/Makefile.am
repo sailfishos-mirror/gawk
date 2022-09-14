@@ -282,6 +282,12 @@ EXTRA_DIST = \
 	dumpvars.ok \
 	dynlj.awk \
 	dynlj.ok \
+	elemnew1.awk \
+	elemnew1.ok \
+	elemnew2.awk \
+	elemnew2.ok \
+	elemnew3.awk \
+	elemnew3.ok \
 	escapebrace.awk \
 	escapebrace.in \
 	escapebrace.ok \
@@ -1480,7 +1486,8 @@ GAWK_EXT_TESTS = \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
 	clos1way5 clos1way6 colonwarn commas crlf dbugeval dbugeval2 \
 	dbugeval3 dbugtypedre1 dbugtypedre2 delsub devfd devfd1 devfd2 \
-	dfacheck1 dumpvars errno exit fieldwdth forcenum fpat1 fpat2 \
+	dfacheck1 dumpvars elemnew1 elemnew2 elemnew3 \
+	errno exit fieldwdth forcenum fpat1 fpat2 \
 	fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 fpat9 fpatnull fsfwfs functab1 \
 	functab2 functab3 functab6 funlen fwtest fwtest2 fwtest3 fwtest4 \
 	fwtest5 fwtest6 fwtest7 fwtest8 genpot gensub gensub2 gensub3 \
@@ -1488,7 +1495,7 @@ GAWK_EXT_TESTS = \
 	igncdym igncfs ignrcas2 ignrcas4 ignrcase incdupe incdupe2 \
 	incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 include include2 \
 	indirectbuiltin indirectcall indirectcall2 \
-	indirectcall3 inf-nan-torture intarray iolint isarrayunset lint \
+	indirectcall3 intarray iolint isarrayunset lint \
 	lintexp lintindex lintint lintlength lintold lintplus lintset \
 	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 \
 	mdim3 mdim4 mixed1 mktime modifiers muldimposix nastyparm negtime \
@@ -1515,7 +1522,7 @@ EXTRA_TESTS = inftest regtest ignrcas3
 
 INET_TESTS = inetdayu inetdayt inetechu inetecht
 
-MACHINE_TESTS = double1 double2 intformat
+MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 
 LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 \
@@ -1668,11 +1675,11 @@ check:	env-check \
 	basic-msg-start  basic           basic-msg-end \
 	unix-msg-start   unix-tests      unix-msg-end \
 	extend-msg-start gawk-extensions arraydebug-tests extend-msg-end \
-	machine-msg-start machine-tests machine-msg-end \
 	charset-tests-all \
 	shlib-msg-start  shlib-tests     shlib-msg-end \
 	mpfr-msg-start   mpfr-tests      mpfr-msg-end \
-	pma-msg-start    pma-tests       pma-msg-end
+	pma-msg-start    pma-tests       pma-msg-end \
+	machine-msg-start machine-tests machine-msg-end
 	@$(MAKE) pass-fail || { $(MAKE) diffout; exit 1; }
 
 basic:	$(BASIC_TESTS)
@@ -1796,6 +1803,7 @@ extend-msg-end:
 
 machine-msg-start:
 	@echo "======== Starting machine-specific tests ========"
+	@echo "If any of these tests fail, don't worry too much."
 
 machine-msg-end:
 	@echo "======== Done with machine-specific tests ========"
