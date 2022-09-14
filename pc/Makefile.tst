@@ -190,7 +190,8 @@ GAWK_EXT_TESTS = \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
 	clos1way5 clos1way6 colonwarn commas crlf dbugeval dbugeval2 \
 	dbugeval3 dbugtypedre1 dbugtypedre2 delsub devfd devfd1 devfd2 \
-	dfacheck1 dumpvars errno exit fieldwdth forcenum fpat1 fpat2 \
+	dfacheck1 dumpvars elemnew1 elemnew2 elemnew3 \
+	errno exit fieldwdth forcenum fpat1 fpat2 \
 	fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 fpat9 fpatnull fsfwfs functab1 \
 	functab2 functab3 functab6 funlen fwtest fwtest2 fwtest3 fwtest4 \
 	fwtest5 fwtest6 fwtest7 fwtest8 genpot gensub gensub2 gensub3 \
@@ -2733,6 +2734,21 @@ delsub:
 dfacheck1:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+elemnew1:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+elemnew2:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+elemnew3:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 exit:
