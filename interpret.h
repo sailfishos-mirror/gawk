@@ -238,6 +238,7 @@ uninitialized_scalar:
 						_("reference to uninitialized argument `%s'") :
 						_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
+				UPREF(m);
 				PUSH(m);
 				break;
 
