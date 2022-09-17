@@ -6377,6 +6377,8 @@ Matches the empty string that occurs between two
 word-constituent characters. For example,
 @code{/\Brat\B/} matches @samp{crate}, but it does not match @samp{dirty rat}.
 @samp{\B} is essentially the opposite of @samp{\y}.
+Another way to think of this is that @samp{\B} matches the empty string
+provided it's not at the edge of a word.
 @end table
 
 @cindex buffers @subentry operators for
@@ -39020,7 +39022,8 @@ It returns one on success, or zero upon failure
 This function takes a string argument, which is the name of the
 file from which to read the contents of various global variables.
 For each variable in the file, the data is loaded unless the variable
-already exists. If the variable already exists, the data for that variable
+has already been assigned a value or used as an array.
+In that case, the data for that variable
 in the file is ignored.
 It returns one on success, or zero upon failure.
 @end table

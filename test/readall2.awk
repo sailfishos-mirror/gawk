@@ -10,6 +10,7 @@ function printarray(n, x,   i) {
 BEGIN {
 	print readall(ifile)
 	print x, y, z
+	print guide::answer
 	#print zebra[0], zebra[3]["foo"], zebra[3]["bar"]
 	printarray("zebra", zebra)
 }
