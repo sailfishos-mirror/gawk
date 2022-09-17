@@ -5582,8 +5582,22 @@ execute_code(volatile INSTRUCTION *code)
 	if (setjmp(fatal_tag) == 0) {
 		(void) interpret((INSTRUCTION *) code);
 		r = POP_SCALAR();
-	} else	/* fatal error */
-		(void) unwind_stack(save_stack_size);
+	} else {	/* fatal error */
+		/*
+		 * 9/2022:
+		 * Initially, the code did this:
+		 *
+		 * (void) unwind_stack(save_stack_size);
+		 *
+		 * to attempt to recover and keep going. But a fatal error
+		 * can corrupt memory. Instead of trying to recover, just
+		 * start over.
+		 */
+		// Let the user know, but DON'T use the fatal() function!
+		fprintf(stderr, _("fatal error during eval, need to restart.\n"));
+		// Go back to debugger
+		restart(false);		// does not return
+	}
 
 	POP_BINDING(fatal_tag_stack, fatal_tag, fatal_tag_valid);
 	do_flags = save_flags;

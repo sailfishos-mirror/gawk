@@ -237,6 +237,9 @@ EXTRA_DIST = \
 	dbugeval3.awk \
 	dbugeval3.in \
 	dbugeval3.ok \
+	dbugeval4.awk \
+	dbugeval4.in \
+	dbugeval4.ok \
 	dbugtypedre1.awk \
 	dbugtypedre1.in \
 	dbugtypedre1.ok \
@@ -1488,7 +1491,8 @@ GAWK_EXT_TESTS = \
 	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
 	clos1way5 clos1way6 colonwarn commas crlf csv1 dbugeval dbugeval2 \
-	dbugeval3 dbugtypedre1 dbugtypedre2 delsub devfd devfd1 devfd2 \
+	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
+	devfd devfd1 devfd2 \
 	dfacheck1 dumpvars elemnew1 elemnew2 elemnew3 \
 	errno exit fieldwdth forcenum fpat1 fpat2 \
 	fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 fpat9 fpatnull fsfwfs functab1 \
@@ -1546,7 +1550,7 @@ SHLIB_TESTS = \
 	testext time
 
 # List of the tests which should be run with --debug option:
-NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3
+NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \

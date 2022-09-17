@@ -454,15 +454,34 @@ do_poke(awk_element_t *e)
 
 	if (e->index.val_type != AWK_STRING)
 		return awk_false;
-	/* So this is a bit tricky. If the program refers to the variable,
+	/*
+	 * So this is a bit tricky. If the program refers to the variable,
 	 * then it will already exist in an undefined state after parsing.
 	 * If the program never refers to it, then the lookup fails.
 	 * We still need to create it in case the program accesses it via
-	 * indirection through the SYMTAB table. */
-	if (sym_lookup(e->index.str_value.str, AWK_UNDEFINED, &t) && (t.val_type != AWK_UNDEFINED))
+	 * indirection through the SYMTAB table.
+	 */
+	// it's even trickier, we need to handle foo::bar as well
+	char *p = strstr(e->index.str_value.str, "::");
+	char *ns, *ident;
+	if (p != NULL) {
+		ns = e->index.str_value.str;
+		ident = p + 2;
+		*p = '\0';
+	} else {
+		ns = "";
+		ident = e->index.str_value.str;
+	}
+
+	if (sym_lookup_ns(ns, ident, AWK_UNDEFINED, & t)
+	    && (t.val_type != AWK_UNDEFINED))
 		return awk_false;
-	if (! sym_update(e->index.str_value.str, & e->value)) {
-		warning(ext_id, _("readall: unable to set %s"), e->index.str_value.str);
+
+	if (! sym_update_ns(ns, ident, & e->value)) {
+		if (ns[0])
+			warning(ext_id, _("readall: unable to set %s::%s"), ns, ident);
+		else
+			warning(ext_id, _("readall: unable to set %s"), ident);
 		return awk_false;
 	}
 	return awk_true;
