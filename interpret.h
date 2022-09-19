@@ -583,6 +583,7 @@ uninitialized_scalar:
 plus:
 			t1 = TOP_NUMBER();
 			r = make_number(t1->numbr + x2);
+			r->numbr = fix_nan_sign(t1->numbr, x2, r->numbr);
 			DEREF(t1);
 			REPLACE(r);
 			break;
@@ -597,6 +598,7 @@ plus:
 minus:
 			t1 = TOP_NUMBER();
 			r = make_number(t1->numbr - x2);
+			r->numbr = fix_nan_sign(t1->numbr, x2, r->numbr);
 			DEREF(t1);
 			REPLACE(r);
 			break;

@@ -41,6 +41,8 @@ static int num_exec_hook = 0;
 static Func_pre_exec pre_execute[MAX_EXEC_HOOKS];
 static Func_post_exec post_execute = NULL;
 
+static double fix_nan_sign(double left, double right, double result);
+
 extern void frame_popped();
 
 int OFSlen;
@@ -1902,4 +1904,21 @@ elem_new_to_scalar(NODE *n)
 	n->type = Node_val;
 
 	return n;
+}
+
+/* fix_nan_sign --- fix NaN sign on RiscV */
+
+// See the thread starting at
+// https://lists.gnu.org/archive/html/bug-gawk/2022-09/msg00005.html
+// for why we need this function.
+
+static double
+fix_nan_sign(double left, double right, double result)
+{
+	if (isnan(left) && signbit(left))
+		return copysign(result, -1.0);
+	else if (isnan(right) && signbit(right))
+		return copysign(result, -1.0);
+	else
+		return result;
 }
