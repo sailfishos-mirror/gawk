@@ -27,13 +27,19 @@ then
 			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
 			export LDFLAGS
 			;;
-		*cygwin* | *CYGWIN* | *solaris2.11* )
-			true	# nothing do, Cygwin and Solaris exes are not PIE
+		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
+			true	# nothing do, exes on these systems are not PIE
 			;;
 		# Other OS's go here...
 		*)
 			# For now, play it safe
 			use_persistent_malloc=no
+
+			# Allow override for testing on new systems
+			if test "$REALLY_USE_PERSIST_MALLOC" != ""
+			then
+				use_persistent_malloc=yes
+			fi
 			;;
 		esac
 	else
