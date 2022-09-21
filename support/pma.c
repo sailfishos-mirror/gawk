@@ -43,8 +43,12 @@
 
 #include "pma.h"
 
+#ifndef MAP_NORESERVE
+#define MAP_NORESERVE 0
+#endif /* MAP_NORESERVE */
+
 // Software version; not the same as backing file format version.
-const char pma_version[] = "2022.08Aug.03.1659520468 (Avon 7)";
+const char pma_version[] = "2022.08Aug.03.1659520468 (Avon 7-g1)";
 
 #define S(s) #s
 #define S2(s) S(s)
