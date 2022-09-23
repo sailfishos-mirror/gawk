@@ -242,7 +242,7 @@ uninitialized_scalar:
 								save_symbol->vname);
 				// set up local param by value
 				if (op != Op_push_arg_untyped) {
-					m = elem_new_to_scalar(m);
+					m = dupnode(Nnull_string);
 				}
 
 				PUSH(m);
