@@ -190,8 +190,7 @@ GAWK_EXT_TESTS = \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
 	clos1way5 clos1way6 colonwarn commas crlf dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
-	devfd devfd1 devfd2 \
-	dfacheck1 dumpvars elemnew1 elemnew2 elemnew3 elemnew4 \
+	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	errno exit fieldwdth forcenum fpat1 fpat2 \
 	fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 fpat9 fpatnull fsfwfs functab1 \
 	functab2 functab3 functab6 funlen fwtest fwtest2 fwtest3 fwtest4 \
@@ -202,8 +201,9 @@ GAWK_EXT_TESTS = \
 	indirectbuiltin indirectcall indirectcall2 \
 	indirectcall3 intarray iolint isarrayunset lint \
 	lintexp lintindex lintint lintlength lintold lintplus lintset \
-	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 \
-	mdim3 mdim4 mixed1 mktime modifiers muldimposix nastyparm negtime \
+	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 \
+	mdim1 mdim2 mdim3 mdim4 mdim5 mdim6 mdim7 mdim8 \
+	mixed1 mktime modifiers muldimposix nastyparm negtime \
 	next nondec nondec2 nonfatal1 nonfatal2 nonfatal3 nsawk1a nsawk1b \
 	nsawk1c nsawk2a nsawk2b nsbad nsbad2 nsbad3 nsbad_cmd nsforloop \
 	nsfuncrecurse nsidentifier nsindirect1 nsindirect2 nsprof1 nsprof2 \
@@ -2742,26 +2742,6 @@ dfacheck1:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
-elemnew1:
-	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-elemnew2:
-	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-elemnew3:
-	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-elemnew4:
-	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
 exit:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -3103,6 +3083,26 @@ mdim3:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 mdim4:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mdim5:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mdim6:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mdim7:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mdim8:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
