@@ -217,6 +217,7 @@ uninitialized_scalar:
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
 				}
+
 				if (do_lint)
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
@@ -235,6 +236,7 @@ uninitialized_scalar:
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
 				}
+
 				if (do_lint)
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
@@ -242,6 +244,7 @@ uninitialized_scalar:
 								save_symbol->vname);
 				// set up local param by value
 				if (op != Op_push_arg_untyped) {
+					DEREF(m);
 					m = dupnode(Nnull_string);
 				}
 
