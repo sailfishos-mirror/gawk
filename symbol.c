@@ -467,7 +467,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 
 		list = assoc_list(the_table, "@unsorted", ASORTI);
 		/* add three: one for FUNCTAB, one for SYMTAB, and one for a final NULL */
-		emalloc(table, NODE **, (var_count + 1 + 1 + 1) * sizeof(NODE *), "get_symbols");
+		emalloc(table, NODE **, (the_table->table_size + 1 + 1 + 1) * sizeof(NODE *), "get_symbols");
 
 		for (i = count = 0; i < max; i += 2) {
 			r = list[i+1];
