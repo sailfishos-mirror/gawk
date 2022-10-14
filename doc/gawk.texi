@@ -3645,6 +3645,12 @@ next line. However, the backslash-newline combination is never even
 noticed because it is ``hidden'' inside the comment. Thus, the
 @code{BEGIN} is noted as a syntax error.
 
+If you're interested, see
+@uref{https://lists.gnu.org/archive/html/bug-gawk/2022-10/msg00025.html}
+for a source code patch that allows lines to be continued when inside
+parentheses. This patch was not added to @command{gawk} since it would
+quietly decrease the portability of @command{awk} programs.
+
 @cindex statements @subentry multiple
 @cindex @code{;} (semicolon) @subentry separating statements in actions
 @cindex semicolon (@code{;}) @subentry separating statements in actions
@@ -31069,7 +31075,11 @@ If you see the @samp{PMA} with a version indicator, then it's supported.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} environment variable
 @cindex environment variables @subentry @env{REALLY_USE_PERSIST_MALLOC}
 As of this writing, persistent memory has only been tested on GNU/Linux,
-Cygwin, Solaris 2.11, macOS, FreeBSD 13.1 and OpenBSD 7.1.
+Cygwin, Solaris 2.11, Intel-based macOS systems,@footnote{As of this writing,
+the PMA allocator does not work on Apple M1 systems, and therefore its
+use is disabled by @command{configure}. We hope that this will
+eventually be fixed.}
+FreeBSD 13.1 and OpenBSD 7.1.
 On all others, persistent memory is disabled by default. You can force
 it to be enabled by exporting the shell variable
 @env{REALLY_USE_PERSIST_MALLOC} with a nonempty value before
