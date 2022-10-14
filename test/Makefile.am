@@ -2418,8 +2418,8 @@ readdir_retest:
 
 readall:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@1.awk -v "ofile=readall.state" > _$@
-	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@2.awk -v "ifile=readall.state" >> _$@
+	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@1.awk -v "ofile=readall.state" > _$@ 2>&1
+	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@2.awk -v "ifile=readall.state" >> _$@ 2>&1
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(RM) -f readall.state
 

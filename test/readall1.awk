@@ -7,5 +7,9 @@ BEGIN {
 	zebra["archie"] = "banana"
 	zebra[3]["foo"] = "bar"
 	zebra[3]["bar"] = "foo"
+	f[1] = "alpha"
+	g[1] = "beta"
+	m["a"] = 1
+	m["b"] = 3
 	print writeall(ofile)
 }
