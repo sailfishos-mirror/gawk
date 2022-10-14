@@ -4,7 +4,8 @@
 	the_table->table_size for the count, not var_count. Bug
 	was tickled when using --dump-var together with persistent
 	memory. (Why didn't valgrind catch this?)  Thanks to Hermann
-	Peifer (peifer@gmx.eu) for the report.
+	Peifer for the report. Thanks to Terence Kelly for detective work
+	that helped pinpoint the search area for the bug.
 
 2022-09-30         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -284,8 +285,8 @@
 
 2022-06-13         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* main.c (main): If persistent memory not available and
-	GAWK_PERSIST_FILE supplied, issue a warnning. Similarly, don't
+	* main.c (main): If persistent memory is not available and
+	GAWK_PERSIST_FILE is supplied, issue a warnning. Similarly, don't
 	do mtrace if using persistent malloc.
 	(version): Include PMA version in the output.
 
