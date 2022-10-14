@@ -31,9 +31,6 @@ extern INSTRUCTION *rule_list;
 
 #define HASHSIZE	1021
 
-static int func_count;	/* total number of functions */
-static int var_count;	/* total number of global variables and functions */
-
 static NODE *symbol_list;
 static void (*install_func)(NODE *) = NULL;
 static NODE *make_symbol(const char *name, NODETYPE type);
@@ -85,6 +82,7 @@ init_symbol_table()
 	struct root_pointers {
 		NODE *global_table;
 		NODE *func_table;
+		NODE *symbol_table;
 	} *root_pointers = NULL;
 
 	root_pointers = (struct root_pointers *) pma_get_root();
@@ -99,20 +97,18 @@ init_symbol_table()
 		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers), "init_symbol_table");
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
+		root_pointers->symbol_table = symbol_table;
 		pma_set_root(root_pointers);
 	} else {
 		// this is the next time, get the saved pointers and put them back in place
 		global_table = root_pointers->global_table;
 		func_table = root_pointers->func_table;
+		symbol_table = root_pointers->symbol_table;
 
 		// still need to set this one up as usual
 		getnode(param_table);
 		memset(param_table, '\0', sizeof(NODE));
 		null_array(param_table);
-
-		// set the global variables
-		symbol_table = lookup("SYMTAB");
-		func_table = lookup("FUNCTAB");
 	}
 }
 
@@ -370,10 +366,6 @@ install(const char *name, NODE *parm, NODETYPE type)
 	else {
 		/* global symbol */
 		r = make_symbol(name, type);
-		if (type == Node_func)
-			func_count++;
-		if (type != Node_ext_func && type != Node_builtin_func && table != global_table)
-			var_count++;	/* total, includes Node_func */
 	}
 
 	if (type == Node_param_list) {
@@ -450,7 +442,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		max = the_table->table_size * 2;
 
 		list = assoc_list(the_table, "@unsorted", ASORTI);
-		emalloc(table, NODE **, (func_count + 1) * sizeof(NODE *), "get_symbols");
+		emalloc(table, NODE **, (the_table->table_size + 1) * sizeof(NODE *), "get_symbols");
 
 		for (i = count = 0; i < max; i += 2) {
 			r = list[i+1];
