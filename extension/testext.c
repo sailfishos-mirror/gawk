@@ -673,13 +673,16 @@ out:
 
 /*
 function tfunc(f) {
-	if (isarray(f))
+	if (isarray(f)) {
 		print "good: we have an array"
+		print "hello element value inside function is", f["hello"]
+	}
 }
 
 BEGIN {
 	printf "test_array_create returned %d\n", test_array_create("testarr")
 	tfunc(testarr)
+	print "hello element global scope is", testarr["hello"]
 }
 */
 

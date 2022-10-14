@@ -899,9 +899,20 @@ api_sym_update(awk_ext_id_t id,
 
 	efree((void *) full_name);
 
-	if ((node->type == Node_var && value->val_type != AWK_ARRAY)
-	    || node->type == Node_var_new
-	    || node->type == Node_elem_new) {
+	if (value->val_type == AWK_ARRAY) {
+		if (node->type == Node_var_new) {
+			/* special gymnastics to convert untyped to an array */
+			array_node = awk_value_to_node(value);
+			array_node->vname = node->vname;
+			unref(node->var_value);
+			*node = *array_node;
+			freenode(array_node);
+			value->array_cookie = node;	/* pass new cookie back to extension */
+			return awk_true;
+		}
+	} else if (node->type == Node_var
+		   || node->type == Node_var_new
+		   || node->type == Node_elem_new) {
 		unref(node->var_value);
 		node->var_value = awk_value_to_node(value);
 		if ((node->type == Node_var_new || node->type == Node_elem_new)

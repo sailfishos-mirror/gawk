@@ -8,9 +8,17 @@ function printarray(n, x,   i) {
 }
 
 BEGIN {
+	split("", f)
+	split("a b c", g)
 	print readall(ifile)
 	print x, y, z
 	print guide::answer
-	#print zebra[0], zebra[3]["foo"], zebra[3]["bar"]
+	print f[1]
+	print g[1]
+	print zebra[0]
 	printarray("zebra", zebra)
+	print typeof(m)
+	printarray("m", m)
+	for (i in m)
+		print i, m[i]
 }
