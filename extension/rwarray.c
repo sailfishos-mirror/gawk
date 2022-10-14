@@ -88,10 +88,9 @@ typedef union {
 typedef int value_storage;	// should not be used
 #endif /* HAVE_MPFR */
 
-typedef awk_array_t (*array_handle_t)(awk_value_t *);
 static awk_bool_t read_array(FILE *fp, awk_array_t array);
-static awk_bool_t read_elem(FILE *fp, awk_element_t *element, array_handle_t, value_storage *);
-static awk_bool_t read_value(FILE *fp, awk_value_t *value, array_handle_t, awk_value_t *idx, value_storage *vs);
+static awk_bool_t read_elem(FILE *fp, awk_element_t *element, value_storage *);
+static awk_bool_t read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs);
 static awk_bool_t read_number(FILE *fp, awk_value_t *value, uint32_t code, value_storage *);
 
 /*
@@ -487,27 +486,6 @@ do_poke(awk_element_t *e)
 	return awk_true;
 }
 
-/* regular_array_handle --- array creation hook for normal reada */
-
-static awk_array_t
-regular_array_handle(awk_value_t *unused)
-{
-	return create_array();
-}
-
-/* global_array_handle --- array creation hook for readall */
-
-static awk_array_t
-global_array_handle(awk_value_t *n)
-{
-	awk_value_t t;
-	size_t count;
-
-	/* The array may exist already because it was instantiated during
-	 * program parsing, so we use the existing array if it is empty. */
-	return ((n->val_type == AWK_STRING) && sym_lookup(n->str_value.str, AWK_UNDEFINED, &t) && (t.val_type == AWK_ARRAY) && get_element_count(t.array_cookie, & count) && ! count) ? t.array_cookie : create_array();
-}
-
 /* read_global --- read top-level variables dumped from SYMTAB */
 
 static awk_bool_t
@@ -524,7 +502,7 @@ read_global(FILE *fp, awk_array_t unused)
 	count = ntohl(count);
 
 	for (i = 0; i < count; i++) {
-		if (read_elem(fp, & new_elem, global_array_handle, &vs)) {
+		if (read_elem(fp, & new_elem, &vs)) {
 			if (! do_poke(& new_elem))
 				free_value(& new_elem.value);
 			if (new_elem.index.str_value.len)
@@ -664,7 +642,7 @@ read_array(FILE *fp, awk_array_t array)
 	count = ntohl(count);
 
 	for (i = 0; i < count; i++) {
-		if (read_elem(fp, & new_elem, regular_array_handle, &vs)) {
+		if (read_elem(fp, & new_elem, &vs)) {
 			/* add to array */
 			if (! set_array_element_by_elem(array, & new_elem)) {
 				warning(ext_id, _("read_array: set_array_element failed"));
@@ -683,7 +661,7 @@ read_array(FILE *fp, awk_array_t array)
 /* read_elem --- read in a single element */
 
 static awk_bool_t
-read_elem(FILE *fp, awk_element_t *element, array_handle_t array_handle, value_storage *vs)
+read_elem(FILE *fp, awk_element_t *element, value_storage *vs)
 {
 	uint32_t index_len;
 	static char *buffer;
@@ -721,7 +699,7 @@ read_elem(FILE *fp, awk_element_t *element, array_handle_t array_handle, value_s
 		make_null_string(& element->index);
 	}
 
-	if (! read_value(fp, & element->value, array_handle, & element->index, vs))
+	if (! read_value(fp, & element->value, & element->index, vs))
 		return awk_false;
 
 	return awk_true;
@@ -730,7 +708,7 @@ read_elem(FILE *fp, awk_element_t *element, array_handle_t array_handle, value_s
 /* read_value --- read a number or a string */
 
 static awk_bool_t
-read_value(FILE *fp, awk_value_t *value, array_handle_t array_handle, awk_value_t *idx, value_storage *vs)
+read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs)
 {
 	uint32_t code, len;
 
@@ -740,7 +718,7 @@ read_value(FILE *fp, awk_value_t *value, array_handle_t array_handle, awk_value_
 	code = ntohl(code);
 
 	if (code == VT_ARRAY) {
-		awk_array_t array = (*array_handle)(idx);
+		awk_array_t array = create_array();
 
 		if (! read_array(fp, array))
 			return awk_false;
