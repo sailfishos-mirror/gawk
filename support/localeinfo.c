@@ -124,7 +124,7 @@ static short const lonesome_lower[] =
 /* Verify that the worst case fits.  This is 1 for towupper, 1 for
    towlower, and 1 for each entry in LONESOME_LOWER.  */
 verify (1 + 1 + sizeof lonesome_lower / sizeof *lonesome_lower
-        <= CASE_FOLDED_BUFSIZE);
+               <= CASE_FOLDED_BUFSIZE);
 
 /* Find the characters equal to C after case-folding, other than C
    itself, and store them into FOLDED.  Return the number of characters
