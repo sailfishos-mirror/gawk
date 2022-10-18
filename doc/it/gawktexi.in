@@ -3954,6 +3954,13 @@ successiva.  Invece, la combinazione barra inversa-ritorno a capo non viene
 per nulla notata, in quanto ``nascosta'' all'interno del commento.  Quindi,
 il @code{BEGIN} @`e marcato come errore di sintassi.
 
+Chi @`e interessato pu@`o vedere
+@uref{https://lists.gnu.org/archive/html/bug-gawk/2022-10/msg00025.html}
+per una modifica al codice sorgente che consente la continuazione di
+righe se sono racchiuse fra parentesi.  Questa @dfn{patch} non @`e stata
+inclusa nella distribuzione di @command{gawk} perch@'e implicitamente
+diminuisce la portabilit@`a dei programmi @command{awk}.
+
 @cindex istruzioni @subentry multiple
 @cindex @code{;} (punto e virgola) @subentry separare istruzioni nelle azioni
 @cindex punto e virgola (@code{;}) @subentry separare istruzioni nelle azioni
@@ -33158,8 +33165,11 @@ la memoria persistente @`e supportata.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{REALLY_USE_PERSIST_MALLOC}
 Finora la memoria persistente @`e stata testata solo nei sistemi operativi
-GNU/Linux, Cygwin, Solaris 2.11, macOS, FreeBSD 13.1 e OpenBSD 7.1.
-
+GNU/Linux, Cygwin, Solaris 2.11, sistemi macOS su hardware
+Intel,@footnote{Al momento l'allocatore PMA non funziona sui sistemi
+Apple M1, e quindi il suo uso @`e disabilitato dal comando
+@command{configure}.  Si spera che il problema verr@`a risolto in futuro.}
+FreeBSD 13.1 e OpenBSD 7.1.
 Su tutti gli altri sistemi, la memoria persistente @`e disabilitata
 per default.  Si pu@`o chiedere di abilitarla esportando la
 variabile d'ambiente @env{REALLY_USE_PERSIST_MALLOC} con un
