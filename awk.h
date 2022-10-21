@@ -71,7 +71,6 @@
 #endif
 
 #include <stdarg.h>
-#include <stdbool.h>
 #include <signal.h>
 #include <time.h>
 #include <errno.h>

@@ -184,7 +184,7 @@ AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
 	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
 	termios.h stropts.h wchar.h wctype.h)
 
-AC_HEADER_STDBOOL
+gl_C_BOOL
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS_ONCE([sys/time.h])
 
