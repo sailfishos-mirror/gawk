@@ -24,18 +24,14 @@ then
 				export LDFLAGS])
 			;;
 		*darwin*)
-			# 30 September 2022: PMA works on Intel but not
-			# on M1, disable it, until it gets fixed
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# aarch64-*
-				use_persistent_malloc=no
-				;;
-			esac
+			# 23 October 2022: See README_d/README.macosx for
+			# the details on what's happening here. See also
+			# the manual.
+
+			# Compile as Intel binary all the time, even on M1.
+			CFLAGS="${CFLAGS} -arch x86_64"
+			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
+			export CFLAGS LDFLAGS
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
 			true	# nothing do, exes on these systems are not PIE

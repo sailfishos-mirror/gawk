@@ -32,6 +32,15 @@ AC_CONFIG_AUX_DIR([../build-aux])
 
 AM_INIT_AUTOMAKE([1.16 -Wall -Werror])
 
+SKIP_PERSIST_MALLOC=no
+AC_ARG_ENABLE([pma],
+	[AS_HELP_STRING([--disable-pma],[do not build gawk with the persistent memory allocator])],
+	if test "$enableval" = no
+	then
+		SKIP_PERSIST_MALLOC=yes
+	fi
+)
+
 GAWK_CANONICAL_HOST
 AC_USE_SYSTEM_EXTENSIONS
 AC_ZOS_USS
@@ -64,6 +73,7 @@ AC_CHECK_MEMBERS([struct stat.st_blksize])
 
 AM_PROG_AR
 AC_SYS_LARGEFILE
+GAWK_USE_PERSISTENT_MALLOC
 LT_INIT([win32-dll disable-static])
 dnl AC_PROG_INSTALL
 
