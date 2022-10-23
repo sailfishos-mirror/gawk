@@ -2818,6 +2818,7 @@ as_fn_append ac_header_c_list " unistd.h unistd_h HAVE_UNISTD_H"
 as_fn_append ac_header_c_list " wchar.h wchar_h HAVE_WCHAR_H"
 as_fn_append ac_header_c_list " minix/config.h minix_config_h HAVE_MINIX_CONFIG_H"
 gt_needs="$gt_needs "
+as_fn_append ac_header_c_list " stdbool.h stdbool_h HAVE_STDBOOL_H"
 as_fn_append ac_header_c_list " sys/time.h sys_time_h HAVE_SYS_TIME_H"
 as_fn_append ac_func_c_list " alarm HAVE_ALARM"
 
@@ -7088,6 +7089,7 @@ ARFLAGS=cru		# set default
 
 # This is mainly for my use during testing and development.
 # Yes, it's a bit of a hack.
+# Keep in sync with same code in extension/configure.ac
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for special development options" >&5
 printf %s "checking for special development options... " >&6; }
 if test -f $srcdir/.developing
@@ -7099,7 +7101,7 @@ then
 	# enable debugging using macros also
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -g3 -ggdb3"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
 	fi
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
@@ -10369,147 +10371,42 @@ then :
 fi
 
 
-ac_fn_c_check_type "$LINENO" "_Bool" "ac_cv_type__Bool" "$ac_includes_default"
-if test "x$ac_cv_type__Bool" = xyes
-then :
-
-printf "%s\n" "#define HAVE__BOOL 1" >>confdefs.h
 
 
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
-printf %s "checking for stdbool.h that conforms to C99... " >&6; }
-if test ${ac_cv_header_stdbool_h+y}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for bool, true, false" >&5
+printf %s "checking for bool, true, false... " >&6; }
+if test ${gl_cv_c_bool+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <stdbool.h>
 
-             #ifndef __bool_true_false_are_defined
-               #error "__bool_true_false_are_defined is not defined"
-             #endif
-             char a[__bool_true_false_are_defined == 1 ? 1 : -1];
-
-             /* Regardless of whether this is C++ or "_Bool" is a
-                valid type name, "true" and "false" should be usable
-                in #if expressions and integer constant expressions,
-                and "bool" should be a valid type name.  */
-
-             #if !true
-               #error "'true' is not true"
-             #endif
-             #if true != 1
-               #error "'true' is not equal to 1"
-             #endif
-             char b[true == 1 ? 1 : -1];
-             char c[true];
-
-             #if false
-               #error "'false' is not false"
-             #endif
-             #if false != 0
-               #error "'false' is not equal to 0"
-             #endif
-             char d[false == 0 ? 1 : -1];
-
-             enum { e = false, f = true, g = false * true, h = true * 256 };
-
-             char i[(bool) 0.5 == true ? 1 : -1];
-             char j[(bool) 0.0 == false ? 1 : -1];
-             char k[sizeof (bool) > 0 ? 1 : -1];
-
-             struct sb { bool s: 1; bool t; } s;
-             char l[sizeof s.t > 0 ? 1 : -1];
-
-             /* The following fails for
-                HP aC++/ANSI C B3910B A.05.55 [Dec 04 2003]. */
-             bool m[h];
-             char n[sizeof m == h * sizeof m[0] ? 1 : -1];
-             char o[-1 - (bool) 0 < 0 ? 1 : -1];
-             /* Catch a bug in an HP-UX C compiler.  See
-         https://gcc.gnu.org/ml/gcc-patches/2003-12/msg02303.html
-         https://lists.gnu.org/archive/html/bug-coreutils/2005-11/msg00161.html
-              */
-             bool p = true;
-             bool *pp = &p;
-
-             /* C 1999 specifies that bool, true, and false are to be
-                macros, but C++ 2011 and later overrule this.  */
-             #if __cplusplus < 201103
-              #ifndef bool
-               #error "bool is not defined"
-              #endif
-              #ifndef false
-               #error "false is not defined"
-              #endif
-              #ifndef true
-               #error "true is not defined"
-              #endif
-             #endif
-
-             /* If _Bool is available, repeat with it all the tests
-                above that used bool.  */
-             #ifdef HAVE__BOOL
-               struct sB { _Bool s: 1; _Bool t; } t;
-
-               char q[(_Bool) 0.5 == true ? 1 : -1];
-               char r[(_Bool) 0.0 == false ? 1 : -1];
-               char u[sizeof (_Bool) > 0 ? 1 : -1];
-               char v[sizeof t.t > 0 ? 1 : -1];
-
-               _Bool w[h];
-               char x[sizeof m == h * sizeof m[0] ? 1 : -1];
-               char y[-1 - (_Bool) 0 < 0 ? 1 : -1];
-               _Bool z = true;
-               _Bool *pz = &p;
-             #endif
-
-int
-main (void)
-{
-
-             bool ps = &s;
-             *pp |= p;
-             *pp |= ! p;
-
-             #ifdef HAVE__BOOL
-               _Bool pt = &t;
-               *pz |= z;
-               *pz |= ! z;
-             #endif
-
-             /* Refer to every declared value, so they cannot be
-                discarded as unused.  */
-             return (!a + !b + !c + !d + !e + !f + !g + !h + !i + !j + !k
-                     + !l + !m + !n + !o + !p + !pp + !ps
-             #ifdef HAVE__BOOL
-                     + !q + !r + !u + !v + !w + !x + !y + !z + !pt
-             #endif
-                    );
-
-  ;
-  return 0;
-}
+          #if true == false
+           #error "true == false"
+          #endif
+          extern bool b;
+          bool b = true == false;
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"
 then :
-  ac_cv_header_stdbool_h=yes
+  gl_cv_c_bool=yes
 else $as_nop
-  ac_cv_header_stdbool_h=no
+  gl_cv_c_bool=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_header_stdbool_h" >&5
-printf "%s\n" "$ac_cv_header_stdbool_h" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gl_cv_c_bool" >&5
+printf "%s\n" "$gl_cv_c_bool" >&6; }
+  if test "$gl_cv_c_bool" = yes; then
 
-if test $ac_cv_header_stdbool_h = yes; then
+printf "%s\n" "#define HAVE_C_BOOL 1" >>confdefs.h
 
-printf "%s\n" "#define HAVE_STDBOOL_H 1" >>confdefs.h
+  fi
 
-fi
+
+
+
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sys/wait.h that is POSIX.1 compatible" >&5
 printf %s "checking for sys/wait.h that is POSIX.1 compatible... " >&6; }
@@ -12722,18 +12619,14 @@ fi
 
 			;;
 		*darwin*)
-			# 30 September 2022: PMA works on Intel but not
-			# on M1, disable it, until it gets fixed
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# aarch64-*
-				use_persistent_malloc=no
-				;;
-			esac
+			# 23 October 2022: See README_d/README.macosx for
+			# the details on what's happening here. See also
+			# the manual.
+
+			# Compile as Intel binary all the time, even on M1.
+			CFLAGS="${CFLAGS} -arch x86_64"
+			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
+			export CFLAGS LDFLAGS
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
 			true	# nothing do, exes on these systems are not PIE
@@ -15688,7 +15581,7 @@ if test "$GCC" = yes &&
    test -f $srcdir/.developing &&
    grep -i debug $srcdir/.developing > /dev/null
 then
-	for i in . support extension
+	for i in . support
 	do
 		sed '/-O2/s///' $i/Makefile > foo
 		mv foo $i/Makefile
