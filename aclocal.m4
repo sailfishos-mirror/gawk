@@ -1210,6 +1210,7 @@ AC_SUBST([am__untar])
 
 m4_include([m4/arch.m4])
 m4_include([m4/ax_check_compile_flag.m4])
+m4_include([m4/c-bool.m4])
 m4_include([m4/codeset.m4])
 m4_include([m4/gettext.m4])
 m4_include([m4/host-cpu-c-abi.m4])

@@ -32,6 +32,15 @@ AC_CONFIG_AUX_DIR([../build-aux])
 
 AM_INIT_AUTOMAKE([1.16 -Wall -Werror])
 
+SKIP_PERSIST_MALLOC=no
+AC_ARG_ENABLE([pma],
+	[AS_HELP_STRING([--disable-pma],[do not build gawk with the persistent memory allocator])],
+	if test "$enableval" = no
+	then
+		SKIP_PERSIST_MALLOC=yes
+	fi
+)
+
 GAWK_CANONICAL_HOST
 AC_USE_SYSTEM_EXTENSIONS
 AC_ZOS_USS
@@ -64,6 +73,7 @@ AC_CHECK_MEMBERS([struct stat.st_blksize])
 
 AM_PROG_AR
 AC_SYS_LARGEFILE
+GAWK_USE_PERSISTENT_MALLOC
 LT_INIT([win32-dll disable-static])
 dnl AC_PROG_INSTALL
 
@@ -83,11 +93,12 @@ if test -f $srcdir/../.developing
 then
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -g3 -gdwarf-2"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
 	fi
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
+	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
 AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
@@ -125,3 +136,10 @@ AH_BOTTOM([#include "ext_custom.h"])
 
 AC_CONFIG_FILES(Makefile po/Makefile.in)
 AC_OUTPUT
+if test "$GCC" = yes &&
+   test -f $srcdir/../.developing &&
+   grep -i debug $srcdir/../.developing > /dev/null
+then
+	sed '/-O2/s///' Makefile > foo
+	mv foo Makefile
+fi

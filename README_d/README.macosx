@@ -1,3 +1,19 @@
+Sun 23 Oct 2022 14:24:37 IDT
+============================
+
+In order to use the new persistent memory feature, it's (currently) necessary
+to build gawk as a non-PIE (Position Independent Executable) binary. That
+is possible on Intel macOS systems, but not on Apple M1 systems. Such
+binaries are simply disallowed.
+
+*However*, M1 systems have x86_64 emulation capability, in order to be
+able to run old macOS binaries.  Thus, an Intel non-PIE executable works
+just fine on M1 systems. For that reason, on M1, we actually build an
+Intel binary, and everything "just works"! Woo hoo!
+
+This is a true hack. At some point it will probably stop working, but
+I'll worry about that when it happens.
+
 Fri Feb 23 10:38:05 IST 2018
 ============================
 

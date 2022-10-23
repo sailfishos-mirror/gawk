@@ -5567,7 +5567,7 @@ execute_code(volatile INSTRUCTION *code)
 {
 	volatile NODE *r = NULL;
 	volatile jmp_buf fatal_tag_stack;
-	long save_stack_size;
+	// long save_stack_size;	// see comment below
 	int save_flags = do_flags;
 
 	/* We use one global stack for all contexts.
@@ -5575,7 +5575,7 @@ execute_code(volatile INSTRUCTION *code)
 	 * a fatal error, pop stack until it has that many items.
 	 */
 
-	save_stack_size = (stack_ptr  - stack_bottom) + 1;
+	// save_stack_size = (stack_ptr  - stack_bottom) + 1;	// see comment below
 	do_flags = false;
 
 	PUSH_BINDING(fatal_tag_stack, fatal_tag, fatal_tag_valid);

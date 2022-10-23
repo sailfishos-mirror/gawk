@@ -125,6 +125,7 @@ AC_SUBST(AR)
 
 # This is mainly for my use during testing and development.
 # Yes, it's a bit of a hack.
+# Keep in sync with same code in extension/configure.ac
 AC_MSG_CHECKING([for special development options])
 if test -f $srcdir/.developing
 then
@@ -135,7 +136,7 @@ then
 	# enable debugging using macros also
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -g3 -ggdb3"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
 	fi
 	AC_MSG_RESULT([yes])
 else
@@ -184,7 +185,7 @@ AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
 	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
 	termios.h stropts.h wchar.h wctype.h)
 
-AC_HEADER_STDBOOL
+gl_C_BOOL
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS_ONCE([sys/time.h])
 
@@ -501,7 +502,7 @@ if test "$GCC" = yes &&
    test -f $srcdir/.developing &&
    grep -i debug $srcdir/.developing > /dev/null
 then
-	for i in . support extension
+	for i in . support
 	do
 		sed '/-O2/s///' $i/Makefile > foo
 		mv foo $i/Makefile
