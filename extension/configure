@@ -684,6 +684,8 @@ LIBTOOL
 OBJDUMP
 DLLTOOL
 AS
+USE_PERSISTENT_MALLOC_FALSE
+USE_PERSISTENT_MALLOC_TRUE
 ac_ct_AR
 AR
 POSUB
@@ -805,6 +807,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_silent_rules
+enable_pma
 enable_dependency_tracking
 enable_mpfr
 enable_nls
@@ -1461,6 +1464,8 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
+  --disable-pma           do not build gawk with the persistent memory
+                          allocator
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -1847,6 +1852,195 @@ printf "%s\n" "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_member
+
+# ac_fn_c_compute_int LINENO EXPR VAR INCLUDES
+# --------------------------------------------
+# Tries to find the compile-time value of EXPR in a program that includes
+# INCLUDES, setting VAR accordingly. Returns whether the value could be
+# computed
+ac_fn_c_compute_int ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if test "$cross_compiling" = yes; then
+    # Depending upon the size, compute the lo and hi bounds.
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+static int test_array [1 - 2 * !(($2) >= 0)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_lo=0 ac_mid=0
+  while :; do
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+static int test_array [1 - 2 * !(($2) <= $ac_mid)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_hi=$ac_mid; break
+else $as_nop
+  as_fn_arith $ac_mid + 1 && ac_lo=$as_val
+			if test $ac_lo -le $ac_mid; then
+			  ac_lo= ac_hi=
+			  break
+			fi
+			as_fn_arith 2 '*' $ac_mid + 1 && ac_mid=$as_val
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  done
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+static int test_array [1 - 2 * !(($2) < 0)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_hi=-1 ac_mid=-1
+  while :; do
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+static int test_array [1 - 2 * !(($2) >= $ac_mid)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_lo=$ac_mid; break
+else $as_nop
+  as_fn_arith '(' $ac_mid ')' - 1 && ac_hi=$as_val
+			if test $ac_mid -le $ac_hi; then
+			  ac_lo= ac_hi=
+			  break
+			fi
+			as_fn_arith 2 '*' $ac_mid && ac_mid=$as_val
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  done
+else $as_nop
+  ac_lo= ac_hi=
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+# Binary search between lo and hi bounds.
+while test "x$ac_lo" != "x$ac_hi"; do
+  as_fn_arith '(' $ac_hi - $ac_lo ')' / 2 + $ac_lo && ac_mid=$as_val
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main (void)
+{
+static int test_array [1 - 2 * !(($2) <= $ac_mid)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_hi=$ac_mid
+else $as_nop
+  as_fn_arith '(' $ac_mid ')' + 1 && ac_lo=$as_val
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+done
+case $ac_lo in #((
+?*) eval "$3=\$ac_lo"; ac_retval=0 ;;
+'') ac_retval=1 ;;
+esac
+  else
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+static long int longval (void) { return $2; }
+static unsigned long int ulongval (void) { return $2; }
+#include <stdio.h>
+#include <stdlib.h>
+int
+main (void)
+{
+
+  FILE *f = fopen ("conftest.val", "w");
+  if (! f)
+    return 1;
+  if (($2) < 0)
+    {
+      long int i = longval ();
+      if (i != ($2))
+	return 1;
+      fprintf (f, "%ld", i);
+    }
+  else
+    {
+      unsigned long int i = ulongval ();
+      if (i != ($2))
+	return 1;
+      fprintf (f, "%lu", i);
+    }
+  /* Do not output a trailing newline, as this causes \r\n confusion
+     on some platforms.  */
+  return ferror (f) || fclose (f) != 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"
+then :
+  echo >>conftest.val; read $3 <conftest.val; ac_retval=0
+else $as_nop
+  ac_retval=1
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+rm -f conftest.val
+
+  fi
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_compute_int
 
 # ac_fn_c_check_func LINENO FUNC VAR
 # ----------------------------------
@@ -3365,6 +3559,18 @@ to "yes", and re-run configure.
 END
     as_fn_error $? "Your 'rm' program is bad, sorry." "$LINENO" 5
   fi
+fi
+
+
+SKIP_PERSIST_MALLOC=no
+# Check whether --enable-pma was given.
+if test ${enable_pma+y}
+then :
+  enableval=$enable_pma; if test "$enableval" = no
+	then
+		SKIP_PERSIST_MALLOC=yes
+	fi
+
 fi
 
 
@@ -8491,6 +8697,185 @@ printf "%s\n" "#define _LARGE_FILES $ac_cv_sys_large_files" >>confdefs.h
 esac
 rm -rf conftest*
   fi
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts " >&5
+printf %s "checking whether C compiler accepts ... " >&6; }
+if test ${ax_cv_check_cflags__+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  "
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ax_cv_check_cflags__=yes
+else $as_nop
+  ax_cv_check_cflags__=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__" >&5
+printf "%s\n" "$ax_cv_check_cflags__" >&6; }
+if test "x$ax_cv_check_cflags__" = xyes
+then :
+  :
+else $as_nop
+  :
+fi
+
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking size of void *" >&5
+printf %s "checking size of void *... " >&6; }
+if test ${ac_cv_sizeof_void_p+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (void *))" "ac_cv_sizeof_void_p"        "$ac_includes_default"
+then :
+
+else $as_nop
+  if test "$ac_cv_type_void_p" = yes; then
+     { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error 77 "cannot compute sizeof (void *)
+See \`config.log' for more details" "$LINENO" 5; }
+   else
+     ac_cv_sizeof_void_p=0
+   fi
+fi
+
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_void_p" >&5
+printf "%s\n" "$ac_cv_sizeof_void_p" >&6; }
+
+
+
+printf "%s\n" "#define SIZEOF_VOID_P $ac_cv_sizeof_void_p" >>confdefs.h
+
+
+use_persistent_malloc=no
+if test "$SKIP_PERSIST_MALLOC" = no && test $ac_cv_sizeof_void_p -eq 8
+then
+	ac_fn_c_check_func "$LINENO" "mmap" "ac_cv_func_mmap"
+if test "x$ac_cv_func_mmap" = xyes
+then :
+
+fi
+
+	ac_fn_c_check_func "$LINENO" "munmap" "ac_cv_func_munmap"
+if test "x$ac_cv_func_munmap" = xyes
+then :
+
+fi
+
+	if test $ac_cv_func_mmap = yes && test $ac_cv_func_munmap = yes
+	then
+		use_persistent_malloc=yes
+		case $host_os in
+		linux-*)
+			{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -no-pie" >&5
+printf %s "checking whether C compiler accepts -no-pie... " >&6; }
+if test ${ax_cv_check_cflags___no_pie+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  -no-pie"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ax_cv_check_cflags___no_pie=yes
+else $as_nop
+  ax_cv_check_cflags___no_pie=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___no_pie" >&5
+printf "%s\n" "$ax_cv_check_cflags___no_pie" >&6; }
+if test "x$ax_cv_check_cflags___no_pie" = xyes
+then :
+  LDFLAGS="${LDFLAGS} -no-pie"
+				export LDFLAGS
+else $as_nop
+  :
+fi
+
+			;;
+		*darwin*)
+			# 23 October 2022: See README_d/README.macosx for
+			# the details on what's happening here. See also
+			# the manual.
+
+			# Compile as Intel binary all the time, even on M1.
+			CFLAGS="${CFLAGS} -arch x86_64"
+			LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
+			export CFLAGS LDFLAGS
+			;;
+		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
+			true	# nothing do, exes on these systems are not PIE
+			;;
+		# Other OS's go here...
+		*)
+			# For now, play it safe
+			use_persistent_malloc=no
+
+			# Allow override for testing on new systems
+			if test "$REALLY_USE_PERSIST_MALLOC" != ""
+			then
+				use_persistent_malloc=yes
+			fi
+			;;
+		esac
+	else
+		use_persistent_malloc=no
+	fi
+fi
+
+ if test "$use_persistent_malloc" = "yes"; then
+  USE_PERSISTENT_MALLOC_TRUE=
+  USE_PERSISTENT_MALLOC_FALSE='#'
+else
+  USE_PERSISTENT_MALLOC_TRUE='#'
+  USE_PERSISTENT_MALLOC_FALSE=
+fi
+
+
+if test "$use_persistent_malloc" = "yes"
+then
+
+printf "%s\n" "#define USE_PERSISTENT_MALLOC 1" >>confdefs.h
+
 fi
 
 case `pwd` in
@@ -16747,13 +17132,14 @@ if test -f $srcdir/../.developing
 then
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -g3 -gdwarf-2"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
 	fi
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 else
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
+	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
 ac_fn_c_check_header_compile "$LINENO" "fnmatch.h" "ac_cv_header_fnmatch_h" "$ac_includes_default"
@@ -17552,6 +17938,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_PERSISTENT_MALLOC_TRUE}" && test -z "${USE_PERSISTENT_MALLOC_FALSE}"; then
+  as_fn_error $? "conditional \"USE_PERSISTENT_MALLOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -19835,4 +20225,11 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 printf "%s\n" "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
+if test "$GCC" = yes &&
+   test -f $srcdir/../.developing &&
+   grep -i debug $srcdir/../.developing > /dev/null
+then
+	sed '/-O2/s///' Makefile > foo
+	mv foo Makefile
+fi
 

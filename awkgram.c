@@ -7985,7 +7985,7 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 				res *= n2->numbr;
 				break;
 			case Op_quotient:
-				if (n2->numbr == 0.0) {
+				if ((n2->flags & NUMBER) != 0 && n2->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
 					error_ln(op->source_line, _("division by zero attempted"));
 					goto regular;
@@ -7994,7 +7994,7 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 				res /= n2->numbr;
 				break;
 			case Op_mod:
-				if (n2->numbr == 0.0) {
+				if ((n2->flags & NUMBER) != 0 && n2->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
 					error_ln(op->source_line, _("division by zero attempted in `%%'"));
 					goto regular;
@@ -8038,7 +8038,7 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 				op->opcode = Op_times_i;
 				break;
 			case Op_quotient:
-				if (ip2->memory->numbr == 0.0) {
+				if ((ip2->memory->flags & NUMBER) != 0 && ip2->memory->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
 					error_ln(op->source_line, _("division by zero attempted"));
 					goto regular;
@@ -8047,7 +8047,7 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 				op->opcode = Op_quotient_i;
 				break;
 			case Op_mod:
-				if (ip2->memory->numbr == 0.0) {
+				if ((ip2->memory->flags & NUMBER) != 0 && ip2->memory->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
 					error_ln(op->source_line, _("division by zero attempted in `%%'"));
 					goto regular;

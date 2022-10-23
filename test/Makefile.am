@@ -276,6 +276,8 @@ EXTRA_DIST = \
 	dfastress.ok \
 	divzero.awk \
 	divzero.ok \
+	divzero2.awk \
+	divzero2.ok \
 	double1.awk \
 	double1.ok \
 	double2.awk \
@@ -1452,7 +1454,8 @@ BASIC_TESTS = \
 	back89 backgsub badassign1 badbuild callparam childin clobber \
 	closebad close_status clsflnam compare compare2 concat1 concat2 \
 	concat3 concat4 concat5 convfmt datanonl defref delargv delarpm2 \
-	delarprm delfunc dfacheck2 dfamb1 dfastress divzero dynlj eofsplit \
+	delarprm delfunc dfacheck2 dfamb1 dfastress divzero divzero2 \
+	dynlj eofsplit \
 	eofsrc1 escapebrace exit2 exitval1 exitval2 exitval3 fcall_exit \
 	fcall_exit2 fldchg fldchgnf fldterm fnamedat fnarray fnarray2 \
 	fnaryscl fnasgnm fnmisc fordel forref forsimp fsbs fscaret fsnul1 \

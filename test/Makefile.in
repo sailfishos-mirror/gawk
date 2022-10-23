@@ -114,16 +114,16 @@ subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/arch.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
-	$(top_srcdir)/m4/codeset.m4 $(top_srcdir)/m4/gettext.m4 \
-	$(top_srcdir)/m4/host-cpu-c-abi.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lcmessage.m4 \
-	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
-	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libsigsegv.m4 \
-	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/mpfr.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/noreturn.m4 \
-	$(top_srcdir)/m4/pma.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/readline.m4 \
-	$(top_srcdir)/m4/socket.m4 \
+	$(top_srcdir)/m4/c-bool.m4 $(top_srcdir)/m4/codeset.m4 \
+	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/host-cpu-c-abi.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lcmessage.m4 $(top_srcdir)/m4/lib-ld.m4 \
+	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
+	$(top_srcdir)/m4/libsigsegv.m4 $(top_srcdir)/m4/longlong.m4 \
+	$(top_srcdir)/m4/mpfr.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/noreturn.m4 $(top_srcdir)/m4/pma.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/readline.m4 $(top_srcdir)/m4/socket.m4 \
 	$(top_srcdir)/m4/triplet-transformation.m4 \
 	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -544,6 +544,8 @@ EXTRA_DIST = \
 	dfastress.ok \
 	divzero.awk \
 	divzero.ok \
+	divzero2.awk \
+	divzero2.ok \
 	double1.awk \
 	double1.ok \
 	double2.awk \
@@ -1720,7 +1722,8 @@ BASIC_TESTS = \
 	back89 backgsub badassign1 badbuild callparam childin clobber \
 	closebad close_status clsflnam compare compare2 concat1 concat2 \
 	concat3 concat4 concat5 convfmt datanonl defref delargv delarpm2 \
-	delarprm delfunc dfacheck2 dfamb1 dfastress divzero dynlj eofsplit \
+	delarprm delfunc dfacheck2 dfamb1 dfastress divzero divzero2 \
+	dynlj eofsplit \
 	eofsrc1 escapebrace exit2 exitval1 exitval2 exitval3 fcall_exit \
 	fcall_exit2 fldchg fldchgnf fldterm fnamedat fnarray fnarray2 \
 	fnaryscl fnasgnm fnmisc fordel forref forsimp fsbs fscaret fsnul1 \
@@ -2872,8 +2875,8 @@ readdir_retest:
 
 readall:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@1.awk -v "ofile=readall.state" > _$@
-	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@2.awk -v "ifile=readall.state" >> _$@
+	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@1.awk -v "ofile=readall.state" > _$@ 2>&1
+	@-AWKPATH="$(srcdir)" $(AWK) -lrwarray -f $@2.awk -v "ifile=readall.state" >> _$@ 2>&1
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(RM) -f readall.state
 
@@ -3336,6 +3339,11 @@ dfastress:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 divzero:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+divzero2:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@

@@ -34,6 +34,9 @@
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
 
+/* Define to 1 if bool, true and false work as per C2023. */
+#undef HAVE_C_BOOL
+
 /* Define to 1 if C supports variable-length arrays. */
 #undef HAVE_C_VARARRAYS
 
@@ -189,7 +192,7 @@
 /* we have sockets on this system */
 #undef HAVE_SOCKETS
 
-/* Define to 1 if stdbool.h conforms to C99. */
+/* Define to 1 if you have the <stdbool.h> header file. */
 #undef HAVE_STDBOOL_H
 
 /* Define to 1 if you have the <stddef.h> header file. */
@@ -343,9 +346,6 @@
 
 /* systems should define this type here */
 #undef HAVE_WINT_T
-
-/* Define to 1 if the system has the type `_Bool'. */
-#undef HAVE__BOOL
 
 /* Define to 1 if you have the `__etoa_l' function. */
 #undef HAVE___ETOA_L
@@ -578,5 +578,22 @@
 /* Define to the widest unsigned integer type if <stdint.h> and <inttypes.h>
    do not define. */
 #undef uintmax_t
+
+#ifndef HAVE_C_BOOL
+# if !defined __cplusplus && !defined __bool_true_false_are_defined
+#  if HAVE_STDBOOL_H
+#   include <stdbool.h>
+#  else
+#   if defined __SUNPRO_C
+#    error "<stdbool.h> is not usable with this configuration. To make it usable, add -D_STDC_C99= to $CC."
+#   else
+#    error "<stdbool.h> does not exist on this platform. Use gnulib module 'stdbool-c99' instead of gnulib module 'stdbool'."
+#   endif
+#  endif
+# endif
+# if !true
+#  define true (!false)
+# endif
+#endif
 
 #include "custom.h"
