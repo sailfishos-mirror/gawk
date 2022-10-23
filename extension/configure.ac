@@ -93,11 +93,12 @@ if test -f $srcdir/../.developing
 then
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -g3 -gdwarf-2"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
 	fi
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
+	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
 AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
@@ -135,3 +136,10 @@ AH_BOTTOM([#include "ext_custom.h"])
 
 AC_CONFIG_FILES(Makefile po/Makefile.in)
 AC_OUTPUT
+if test "$GCC" = yes &&
+   test -f $srcdir/../.developing &&
+   grep -i debug $srcdir/../.developing > /dev/null
+then
+	sed '/-O2/s///' Makefile > foo
+	mv foo Makefile
+fi

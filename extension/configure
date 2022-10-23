@@ -17132,13 +17132,14 @@ if test -f $srcdir/../.developing
 then
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -g3 -gdwarf-2"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
 	fi
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 else
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
+	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
 ac_fn_c_check_header_compile "$LINENO" "fnmatch.h" "ac_cv_header_fnmatch_h" "$ac_includes_default"
@@ -20224,4 +20225,11 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 printf "%s\n" "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
+if test "$GCC" = yes &&
+   test -f $srcdir/../.developing &&
+   grep -i debug $srcdir/../.developing > /dev/null
+then
+	sed '/-O2/s///' Makefile > foo
+	mv foo Makefile
+fi
 
