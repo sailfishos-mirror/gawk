@@ -212,38 +212,38 @@ top:
 
 			case Node_var_new:
 uninitialized_scalar:
-				if (op != Op_push_arg_untyped) {
-					/* convert very original untyped to scalar */
-					m->type = Node_var;
-					m->var_value = dupnode(Nnull_string);
-				}
-
 				if (do_lint)
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
 						_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
-				// set up local param by value
-				if (op != Op_push_arg_untyped)
+
+				if (op != Op_push_arg_untyped) {
+					// convert very original untyped to scalar
+					m->type = Node_var;
+					m->var_value = dupnode(Nnull_string);
+
+					// set up local param by value
 					m = dupnode(Nnull_string);
+				}
+
 				UPREF(m);
 				PUSH(m);
 				break;
 
 			case Node_elem_new:
-				if (op != Op_push_arg_untyped) {
-					/* convert very original untyped to scalar */
-					m->type = Node_var;
-					m->var_value = dupnode(Nnull_string);
-				}
-
 				if (do_lint)
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
 						_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
-				// set up local param by value
+
 				if (op != Op_push_arg_untyped) {
+					// convert very original untyped to scalar
+					m->type = Node_var;
+					m->var_value = dupnode(Nnull_string);
+
+					// set up local param by value
 					DEREF(m);
 					m = dupnode(Nnull_string);
 				}
