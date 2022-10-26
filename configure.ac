@@ -136,7 +136,7 @@ then
 	# enable debugging using macros also
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
+		CFLAGS="$CFLAGS -Wall -fno-builtin -gdwarf-4 -g3"
 	fi
 	AC_MSG_RESULT([yes])
 else
