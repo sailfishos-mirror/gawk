@@ -152,5 +152,8 @@ dist_man_MANS = \
 # gettext requires this
 SUBDIRS = po
 
+# For debugging
+DEBUG = -gdwarf-4 -g3
+
 distclean-local:
 	rm -fr .deps
