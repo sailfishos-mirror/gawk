@@ -93,7 +93,7 @@ if test -f $srcdir/../.developing
 then
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
+		CFLAGS="$CFLAGS -Wall -fno-builtin"
 	fi
 	AC_MSG_RESULT([yes])
 else
@@ -140,6 +140,6 @@ if test "$GCC" = yes &&
    test -f $srcdir/../.developing &&
    grep -i debug $srcdir/../.developing > /dev/null
 then
-	sed '/-O2/s///' Makefile > foo
+	sed -e '/-O2/s///' -e '/^CFLAGS = /s//&${DEBUG} /' Makefile > foo
 	mv foo Makefile
 fi

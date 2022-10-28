@@ -136,7 +136,7 @@ then
 	# enable debugging using macros also
 	if test "$GCC" = yes
 	then
-		CFLAGS="$CFLAGS -Wall -fno-builtin -ggdb3 -gdwarf-4"
+		CFLAGS="$CFLAGS -Wall -fno-builtin"
 	fi
 	AC_MSG_RESULT([yes])
 else
@@ -502,9 +502,19 @@ if test "$GCC" = yes &&
    test -f $srcdir/.developing &&
    grep -i debug $srcdir/.developing > /dev/null
 then
+	for i in awkgram command
+	do
+		rm -f $i.c
+		ed - $i.y << \EOF
+/^%}/a
+%no-lines
+.
+w
+EOF
+	done
 	for i in . support
 	do
-		sed '/-O2/s///' $i/Makefile > foo
+		sed -e '/-O2/s///' -e '/^CFLAGS = /s//&${DEBUG} /' $i/Makefile > foo
 		mv foo $i/Makefile
 	done
 fi

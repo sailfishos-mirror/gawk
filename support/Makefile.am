@@ -81,6 +81,9 @@ endif
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f
 
+# For debugging
+DEBUG = -gdwarf-4 -g3
+
 DEFS = -DGAWK -DHAVE_CONFIG_H -I"$(srcdir)/.."
 
 distclean-local:

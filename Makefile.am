@@ -141,6 +141,9 @@ CP= cp
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f
 
+# For debugging
+DEBUG = -gdwarf-4 -g3
+
 # First, add a link from gawk to gawk-X.Y.Z.
 #
 # For GNU systems where gawk is awk, add a link to awk.
