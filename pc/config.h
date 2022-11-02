@@ -35,6 +35,9 @@
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
 
+/* Define to 1 if bool, true and false work as per C2023. */
+#undef HAVE_C_BOOL
+
 /* Define to 1 if C supports variable-length arrays. */
 #undef HAVE_C_VARARRAYS
 
@@ -190,7 +193,7 @@
 /* we have sockets on this system */
 #define HAVE_SOCKETS 1
 
-/* Define to 1 if stdbool.h conforms to C99. */
+/* Define to 1 if you have the <stdbool.h> header file. */
 #define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stddef.h> header file. */
@@ -348,9 +351,6 @@
 /* systems should define this type here */
 #define HAVE_WINT_T 1
 
-/* Define to 1 if the system has the type `_Bool'. */
-#undef HAVE__BOOL
-
 /* Define to 1 if you have the `__etoa_l' function. */
 #undef HAVE___ETOA_L
 
@@ -367,7 +367,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.2.0"
+#define PACKAGE_STRING "GNU Awk 5.2.0a"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -376,7 +376,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.2.0"
+#define PACKAGE_VERSION "5.2.0a"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -504,7 +504,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.2.0"
+#define VERSION "5.2.0a"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
@@ -586,6 +586,23 @@
 /* Define to the widest unsigned integer type if <stdint.h> and <inttypes.h>
    do not define. */
 #undef uintmax_t
+
+#ifndef HAVE_C_BOOL
+# if !defined __cplusplus && !defined __bool_true_false_are_defined
+#  if HAVE_STDBOOL_H
+#   include <stdbool.h>
+#  else
+#   if defined __SUNPRO_C
+#    error "<stdbool.h> is not usable with this configuration. To make it usable, add -D_STDC_C99= to $CC."
+#   else
+#    error "<stdbool.h> does not exist on this platform. Use gnulib module 'stdbool-c99' instead of gnulib module 'stdbool'."
+#   endif
+#  endif
+# endif
+# if !true
+#  define true (!false)
+# endif
+#endif
 
 #include "custom.h"
 
