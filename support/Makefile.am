@@ -58,6 +58,7 @@ libsupport_a_SOURCES = \
 	getopt_int.h \
 	idx.h \
 	intprops.h \
+	intprops-internal.h \
 	libc-config.h \
 	localeinfo.c \
 	localeinfo.h \
