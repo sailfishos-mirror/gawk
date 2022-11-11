@@ -189,7 +189,7 @@ GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
-	clos1way5 clos1way6 colonwarn commas crlf dbugeval dbugeval2 \
+	clos1way5 clos1way6 colonwarn commas crlf csv1 dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	errno exit fieldwdth forcenum fpat1 fpat2 \
@@ -2711,6 +2711,11 @@ commas:
 crlf:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+csv1:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 dbugeval2:

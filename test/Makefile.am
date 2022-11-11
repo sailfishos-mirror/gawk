@@ -223,6 +223,9 @@ EXTRA_DIST = \
 	convfmt.ok \
 	crlf.awk \
 	crlf.ok \
+	csv1.awk \
+	csv1.in \
+	csv1.ok \
 	datanonl.awk \
 	datanonl.in \
 	datanonl.ok \
@@ -1493,7 +1496,7 @@ GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
-	clos1way5 clos1way6 colonwarn commas crlf dbugeval dbugeval2 \
+	clos1way5 clos1way6 colonwarn commas crlf csv1 dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	errno exit fieldwdth forcenum fpat1 fpat2 \

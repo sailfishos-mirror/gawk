@@ -563,6 +563,7 @@ particular records in a file and perform operations upon them.
 * Regexp Field Splitting::              Using regexps as the field separator.
 * Single Character Fields::             Making each character a separate
                                         field.
+* Comma Separated Fields::              Working with CSV files.
 * Command Line Field Separator::        Setting @code{FS} from the command
                                         line.
 * Full Line Fields::                    Making the full line be a single
@@ -7331,6 +7332,7 @@ with a statement such as @samp{$1 = $1}, as described earlier.
 * Default Field Splitting::      How fields are normally separated.
 * Regexp Field Splitting::       Using regexps as the field separator.
 * Single Character Fields::      Making each character a separate field.
+* Comma Separated Fields::       Working with CSV files.
 * Command Line Field Separator:: Setting @code{FS} from the command line.
 * Full Line Fields::             Making the full line be a single field.
 * Field Splitting Summary::      Some final points and a summary table.
@@ -7587,6 +7589,45 @@ In compatibility mode
 if @code{FS} is the null string, then @command{gawk} also
 behaves this way.
 
+@node Comma Separated Fields
+@subsection Working With Comma Separated Value Files
+
+Many commonly-used tools use a comma to separate fields, instead of whitespace.
+This is particularly true of popular spreadsheet programs.  There is no
+universally accepted standard for the format of these files, although
+@uref{http://www.ietf.org/rfc/rfc4180.txt, RFC 4180} lists the common
+practices.
+
+For decades, anyone wishing to work with CSV files and @command{awk}
+had to ``roll their own'' solution. (For example, @pxref{Splitting By Content}).
+In 2023, Brian Kernighan decided to add basic CSV support to his version of
+@command{awk}.  In order to keep up, @command{gawk} too provides the same
+support as his version.
+To use CSV data, set @code{FS} equal to a string with a single comma, like so: @samp{FS = ","}.
+
+Fields in CSV files are separated by commas.  In order to allow a comma
+to appear inside a field (i.e., as data), the field may be quoted
+by beginning and ending it with double quotes.  In order to allow a double
+quote inside a double-quoted field, two double quotes are used.
+@ref{table-csv-examples} shows some examples.
+
+@float Table,table-csv-examples
+@caption{Examples of CSV data}
+@multitable @columnfractions .3 .3
+@headitem Input @tab Field Contents
+@item @code{abc def} @tab @code{abc def}
+@item @code{"quoted data"} @tab @code{quoted data}
+@item @code{"quoted, data"} @tab @code{quoted, data}
+@item @code{"She said ""Stop!""."} @tab @code{She said "Stop!".}
+@item @code{She said "Stop!".} @tab @code{She said "Stop!".}
+@end multitable
+@end float
+
+The double-quote that starts a quoted field must be the first
+character after the comma.
+
+This featue is disabled in POSIX mode.
+
 @node Command Line Field Separator
 @subsection Setting @code{FS} from the Command Line
 @cindex @option{-F} option @subentry command-line
@@ -7772,6 +7813,10 @@ of @code{FS} (@samp{==} means ``is equal to''):
 @item FS == " "
 Fields are separated by runs of whitespace.  Leading and trailing
 whitespace are ignored.  This is the default.
+
+@item FS == ","
+Fields are separated by commas, with quoting of fields
+and special rules involved.
 
 @item FS == @var{any other single character}
 Fields are separated by each occurrence of the character.  Multiple
@@ -18372,6 +18417,11 @@ any trailing
 whitespace goes into @code{@var{seps}[@var{n}]}, where @var{n} is the
 return value of
 @code{split()} (i.e., the number of elements in @var{array}).
+If @var{fieldsep} is a comma, and @command{gawk} is not in POSIX mode,
+then the string is split using the CSV parsing rules, as for @code{FS}
+(@pxref{Comma Separated Fields}). In this case, the @var{seps}
+array is not filled in, since each element would simply consist of
+a string containing a comma.
 
 The @code{split()} function splits strings into pieces in the same way
 that input lines are split into fields.  For example:
