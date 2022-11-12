@@ -7801,6 +7801,7 @@ Shell programmers take note:  @command{awk} does @emph{not} use the
 name @code{IFS} that is used by the POSIX-compliant shells (such as
 the Unix Bourne shell, @command{sh}, or Bash).
 
+@c FIXME: This needs reworking now that we have CSV
 @cindex @code{FS} variable @subentry changing value of
 The value of @code{FS} can be changed in the @command{awk} program with the
 assignment operator, @samp{=} (@pxref{Assignment Ops}).
@@ -8027,6 +8028,8 @@ behaves this way.
 @node Comma Separated Fields
 @subsection Working With Comma Separated Value Files
 
+@cindex comma separated values (CSV) data @subentry parsing with @code{FS}
+@cindex CSV (comma separated values) data @subentry parsing with @code{FS}
 Many commonly-used tools use a comma to separate fields, instead of whitespace.
 This is particularly true of popular spreadsheet programs.  There is no
 universally accepted standard for the format of these files, although
@@ -8061,7 +8064,15 @@ quote inside a double-quoted field, two double quotes are used.
 The double-quote that starts a quoted field must be the first
 character after the comma.
 
-This featue is disabled in POSIX mode.
+Some programs that support CSV-formatted data even allow fields to
+include embedded newlines (such as a postal address, for example).
+This is @emph{not} supported in either BWK @command{awk} or in
+@command{gawk}. This cannot be done using only facilities in the
+@command{awk} language, since @command{awk} first splits the input
+into records, and the default record separator is a newline.
+Thus any newline embedded in a field simply terminates the record.
+
+CSV input parsing is disabled in POSIX mode.
 
 @node Command Line Field Separator
 @subsection Setting @code{FS} from the Command Line
@@ -8732,6 +8743,13 @@ with @code{FS} and with @code{FIELDWIDTHS}.
 
 Finally, the @code{patsplit()} function makes the same functionality
 available for splitting regular strings (@pxref{String Functions}).
+
+@quotation NOTE
+Given that @command{gawk} now has built-in CSV parsing
+(@pxref{Comma Separated Fields}), the examples presented here are obsolete.
+Nonetheless, it remains useful as an example of what @code{FPAT}-based
+field parsing can do.
+@end quotation
 
 @node More CSV
 @subsection More on CSV Files
