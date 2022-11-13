@@ -15737,6 +15737,10 @@ The values indicate what @command{gawk} knows about the identifiers
 after it has finished parsing the program; they are @emph{not} updated
 while the program runs.
 
+@item PROCINFO["mb_cur_max"]
+The maximum number of bytes that can be used to encode a single
+character in the current character set.
+
 @item PROCINFO["platform"]
 @cindex platform running on
 @cindex @code{PROCINFO} array @subentry platform running on
@@ -15777,6 +15781,10 @@ Assigning a new value to this element changes the default.
 
 @item PROCINFO["uid"]
 The value of the @code{getuid()} system call.
+
+@item PROCINFO["utf8"]
+This will be @code{"true"} if the current character set encoding
+is UTF-8, @code{"false"} otherwise.
 
 @item PROCINFO["version"]
 @cindex version of @subentry @command{gawk}
@@ -40976,6 +40984,19 @@ The @command{gawkbug} script for reporting bugs
 Terence Kelly's persistent memory allocator (PMA) was
 added, allowing the use of persistent data on certain systems
 (@pxref{Persistent Memory}).
+
+@end itemize
+
+Version 5.3 added the following features:
+
+@itemize
+@item
+Comma separated value (CSV) field splitting
+(@pxref{Comma Separated Fields}).
+
+@item
+The @code{"mb_cur_max"} and @code{"utf8"} elements in the
+@code{PROCINFO} array (@pxref{Auto-set}).
 
 @end itemize
 

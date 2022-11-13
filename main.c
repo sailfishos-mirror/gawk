@@ -1097,6 +1097,10 @@ load_procinfo()
 		groupset = NULL;
 	}
 #endif
+
+	update_PROCINFO_num("mb_cur_max", gawk_mb_cur_max);
+	update_PROCINFO_str("utf8", using_utf8() ? "true" : "false");
+
 	load_procinfo_argv();
 	return PROCINFO_node;
 }
