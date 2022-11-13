@@ -693,7 +693,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Campi con dati a larghezza fissa::    Valore di campi con dati a larghezza
                                         fissa.
 * Separazione in base al contenuto::    Definire campi dal loro contenuto.
-* Ancora CSV::                            Ancora sui file CSV.
+* Ancora CSV::                          Ancora sui file CSV.
 * FS rispetto a FPAT::                  Una differenza sottile.
 * Controllare la creazione di campi::   Controllare come @command{gawk} sta
                                         suddividendo i record.
@@ -9017,7 +9017,7 @@ per un esempio di tale funzione).
 @section Definire i campi in base al contenuto
 
 @menu
-* Ancora CSV::                    Ancora sui file CSV.
+* Ancora CSV::                  Ancora sui file CSV.
 * FS rispetto a FPAT::          Una differenza sottile.
 @end menu
 
@@ -17518,6 +17518,10 @@ I valori riportano ci@`o che @command{gawk} sa sugli identificativi
 dopo aver finito l'analisi iniziale del programma; questi valori @emph{non}
 vengono pi@`u aggiornati durante l'esecuzione del programma.
 
+@item PROCINFO["mb_cur_max"]
+Il massimo numero di byte che possono essere usati per rappresentare
+un singolo carattere, nella codifica correntemente utilizzata.
+
 @item PROCINFO["platform"]
 @cindex piattaforma di esecuzione
 @cindex @code{PROCINFO} (vettore) @subentry ambiente di compilazione
@@ -17559,6 +17563,10 @@ Assegnando un nuovo valore a questo elemento si cambia quello di default.
 
 @item PROCINFO["uid"]
 Il valore restituito dalla chiamata di sistema @code{getuid()}.
+
+@item PROCINFO["utf8"]
+Il valore di questa variabile sar@`a @code{"true"} [vero] se la codifica di
+carattere in uso @`e UTF-8, e sar@`a @code{"false"} [falso] in tutti gli altri casi.
 
 @item PROCINFO["version"]
 @cindex versione @subentry di @command{gawk}
@@ -45554,6 +45562,20 @@ sistemi
 
 @end itemize
 
+La Versione 5.3 ha aggiunto le seguenti funzionalit@`a:
+
+@itemize
+@item
+Divisione di campi per i file CSV
+[Campi Separati da Virgola]
+(@pxref{Campi separati da virgola}).
+
+@item
+Gli elementi @code{"mb_cur_max"} e @code{"utf8"} nel vettore
+@code{PROCINFO} (@pxref{Variabili auto-assegnate}).
+
+@end itemize
+
 @c XXX ADD MORE STUFF HERE
 @end ifclear
 
@@ -48337,6 +48359,21 @@ Questo @`e un modulo Python che intende introdurre funzionalit@`a di tipo
 @command{awk} in Python.  Si veda @uref{https://github.com/alecthomas/pawk} per
 ulteriori informazioni.  (Questo programma non @`e correlato con la versione
 modificata da Nelson Beebe di BWK @command{awk}, descritta prima.)
+
+@cindex Ramming, J.@: Christopher
+@cindex @command{awkcc}, @subentry traduttore da @command{awk} a C
+@cindex compilatore per @command{awk} @subentry @command{awkcc}
+@cindex sorgente @subentry codice @subentry @command{awkcc}
+@cindex codice sorgente @subentry @command{awkcc}
+@item @command{awkcc}
+Questo @`e un adattamento di una versione Unix di @command{awk}
+che traduce script @command{awk} in programmi C.
+@`E stato scritto da J.@: Christopher Ramming nei Bell Labs,
+attorno al 1988.
+@`E disponibile in @uref{https://github.com/nokia/awkcc}.
+Aggiornare questo programma per renderlo applicabile
+alle versioni pi@`u recenti di @command{gawk} sarebbe
+un interessante esercizio di ingegneria del software.
 
 @item @w{QSE @command{awk}}
 @cindex QSE @command{awk}
