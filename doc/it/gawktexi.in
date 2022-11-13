@@ -693,7 +693,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Campi con dati a larghezza fissa::    Valore di campi con dati a larghezza
                                         fissa.
 * Separazione in base al contenuto::    Definire campi dal loro contenuto.
-* File CSV::                            Ancora sui file CSV.
+* Ancora CSV::                            Ancora sui file CSV.
 * FS rispetto a FPAT::                  Una differenza sottile.
 * Controllare la creazione di campi::   Controllare come @command{gawk} sta
                                         suddividendo i record.
@@ -8208,6 +8208,7 @@ I programmatori di shell notino:  @command{awk} @emph{non} usa il
 nome @code{IFS} che @`e usato dalle shell conformi a POSIX (come
 la Unix Bourne shell, @command{sh}, o Bash).
 
+@c FIXME: This needs reworking now that we have CSV
 @cindex @code{FS} (variabile) @subentry cambiare il valore della
 @cindex cambiare @subentry il valore di @code{FS} (variabile)
 Il valore di @code{FS} si pu@`o cambiare nel programma @command{awk} con
@@ -8264,8 +8265,6 @@ si possano manipolare con un programma @command{awk} separato.)
 
 @cindex separatore di campo @subentry spazi vuoti come
 @cindex spazi vuoti @subentry come separatore di campo
-@cindex separatore di campo @subentry @code{FS} (variabile) come
-@cindex @code{FS} (variabile) @subentry come separatore di campo
 I campi sono separati normalmente da spazi vuoti
 (spazi, tabulazioni e ritorni a capo), non solo da spazi singoli.  Due spazi
 in una riga non delimitano un campo vuoto. Il valore di default del separatore
@@ -8451,9 +8450,18 @@ si comporta in questo modo.
 @node Campi separati da virgola
 @subsection Lavorare con file CSV
 
+@cindex dati CSV (campi separati da virgola) @subentry analizzare con @code{FS} = ","
+@cindex CSV (campi separati da virgola) come dati @subentry analizzare con @code{FS} = ","
+@cindex Comma Separated Values (CSV) come dati @subentry analizzare con @code{FS} = ","
+@cindex campi separati da virgola (CSV) come dati @subentry analizzare con @code{FS} = ","
+@cindex @code{FS} (variabile) @subentry carattere "," come
+@cindex variabile @subentry @code{FS} @subentry carattere "," come
+@cindex @code{FS} (variabile) @subentry per analizzare file CSV
+@cindex variabile @subentry @code{FS} @subentry per analizzare file CSV
 Molti programmi di uso frequente si servono della virgola come separatore
-di campo, invece di usare lo spazio. [Normalmente hanno come suffisso
-"csv", Comma Separated Value, ovvero Campi Separati da Virgola.]
+di campo, invece di usare lo spazio. [Normalmente i file in input
+a @command{gawk} hanno in questo caso come suffisso "csv",
+Comma Separated Value, ovvero Campi Separati da Virgola.]
 Questo @`e il caso in particolare per popolari fogli di calcolo.
 Non c'@`e uno standard accettato da tutti che regoli il formato di tali
 file, sebbene il documento
@@ -8463,7 +8471,7 @@ elenchi le pratiche normalmente seguite.
 Per decenni, chi voleva lavorare con file CSV in @command{awk}
 ha dovuto ``trovare da solo'' una soluzione. (Per esempio,
 @pxref{Separazione in base al contenuto}).
-Nel 2013, Brian Kernighan decise di aggiungere un supporto
+Nel 2023, Brian Kernighan ha deciso di aggiungere un supporto
 iniziale per i file CSV alla sua versione di @command{awk}.
 Per restare allo stesso livello, anche @command{gawk} rende
 disponibile lo stesso supporto presente nella versione di Brian.
@@ -8493,6 +8501,18 @@ La tabella
 
 Il doppio apice che inizia un campo fra doppi apici
 dev'essere il primo carattere dopo la virgola.
+
+Alcuni programmi che supportano dati in formato CSV consentono
+perfino di avere dei campi che includono dei caratteri a-capo
+(per esempio se un campo @`e un indirizzo postale).
+Questo @emph{non} @`e supportato n@'e in BWK @command{awk}, n@'e
+in @command{gawk}.  Non @`e possibile gestire simili situazioni
+usando solo le funzionalit@`a del linguaggio @command{awk},
+poich@'e @command{awk} divide preliminarmente l'input in
+record, e il separatore di record di default @`e il carattere
+a-capo.
+Quindi, ogni carattere a-capo presente in un campo segna
+semplicemente la fine del record.
 
 Questa funzionalit@`a @`e disabilitata in modalit@`a POSIX.
 
@@ -8692,7 +8712,7 @@ I campi sono separati da uno o pi@`u spazi vuoti.  Gli spazi vuoti iniziali
 e finali sono ignorati.  Questo @`e il comportamento di default.
 
 @item FS == ","
-I campi sono separati da virgole, con regole speciali per inserire in un
+I campi sono separati da virgola, con regole speciali per inserire in un
 campo virgole e/o doppi apici.
 
 @item FS == @var{qualsiasi altro carattere singolo}
@@ -8997,7 +9017,7 @@ per un esempio di tale funzione).
 @section Definire i campi in base al contenuto
 
 @menu
-* File CSV::                    Ancora sui file CSV.
+* Ancora CSV::                    Ancora sui file CSV.
 * FS rispetto a FPAT::          Una differenza sottile.
 @end menu
 
@@ -9021,10 +9041,10 @@ parole, @code{FS} definisce cosa un campo @emph{non @`e}, invece di cosa
 Tuttavia, ci sono casi in cui effettivamente si ha bisogno di definire i campi
 in base a cosa essi sono, e non in base a cosa non sono.
 
-@cindex dati CSV (campi separati da virgole) @subentry analizzare con @code{FPAT}
-@cindex CSV (campi separati da virgole) come dati @subentry analizzare con @code{FPAT}
+@cindex dati CSV (campi separati da virgola) @subentry analizzare con @code{FPAT}
+@cindex CSV (campi separati da virgola) come dati @subentry analizzare con @code{FPAT}
 @cindex Comma Separated Values (CSV) come dati @subentry analizzare con @code{FPAT}
-@cindex campi separati da virgole (CSV) come dati @subentry analizzare con @code{FPAT}
+@cindex campi separati da virgola (CSV) come dati @subentry analizzare con @code{FPAT}
 Il caso pi@`u emblematico @`e quello dei dati cosiddetti @dfn{comma-separated
 value} (CSV).  Molti fogli elettronici, per esempio, possono esportare i dati
 in file di testo, dove ogni record termina con un ritorno a capo e i campi
@@ -9156,7 +9176,16 @@ effettuata utilizzando @code{FS} o @code{FIELDWIDTHS}.
 Infine, la funzione @code{patsplit()} rende la stessa funzionalit@`a disponibile
 per suddividere normali stringhe (@pxref{Funzioni per stringhe}).
 
-@node File CSV
+@quotation NOTA
+Poich@'e @command{gawk} consente ora un trattamento diretto dei
+file di tipo CSV (@pxref{Campi separati da virgola}), gli esempi
+presentati qui sono obsoleti.
+Nonostante ci@`o, rimangono utili come esempio di ci@`o che
+un'analisi dei campi utilizzando la variabile @code{FPAT}
+permette di fare.
+@end quotation
+
+@node Ancora CSV
 @subsection Ancora sui file CSV
 
 @cindex Collado, Manuel
@@ -9225,9 +9254,9 @@ $ @kbd{gawk -v fpat=2 -f test-csv.awk sample.csv}
 @cindex Collado, Manuel
 @cindex @code{CSVMODE}, libreria per @command{gawk}
 @cindex libreria @subentry @code{CSVMODE} per @command{gawk}
-@cindex dati CSV (campi separati da virgole) @subentry analizzare con libreria @code{CSVMODE}
-@cindex CSV (campi separati da virgole) come dati @subentry analizzare con libreria @code{CSVMODE}
-@cindex campi separati da virgole (CSV) come dati @subentry analizzare con libreria @code{CSVMODE}
+@cindex dati CSV (campi separati da virgola) @subentry analizzare con libreria @code{CSVMODE}
+@cindex CSV (campi separati da virgola) come dati @subentry analizzare con libreria @code{CSVMODE}
+@cindex campi separati da virgola (CSV) come dati @subentry analizzare con libreria @code{CSVMODE}
 In generale, usare @code{FPAT} per effettuare l'analisi di dati in formato CSV
 @`e come utilizzare un lenzuolo troppo corto.  Rimane sempre un angolo che non
 @`e coperto.  Si raccomanda, in alternativa, di usare la libreria @code{CSVMODE}
@@ -20458,15 +20487,15 @@ Se @var{separacampo} @`e omesso, si usa il valore di @code{FS}.
 @code{@var{vettore}[@var{i}+1]}.
 Se @var{separacampo} @`e uno spazio bianco, ogni eventuale spazio bianco
 a inizio stringa viene messo in @code{@var{separatori}[0]} e ogni
-eventuale spazio bianco a fine stringa  viene messo in
+eventuale spazio bianco a fine stringa viene messo in
 @code{@var{separatori}[@var{n}]}, dove @var{n} @`e il valore restituito da
 @code{split()} (cio@`e il numero di elementi in @var{vettore}).
-Se la variabile @var{fieldsep} @`e una virgola, e @command{gawk} non @`e
+Se la variabile @var{separacampo} @`e una virgola, e @command{gawk} non @`e
 in modalit@`a POSIX, la stringa viene suddivisa usando le regole di
 analisi dei file CSV, come richiesto dal separatore @code{FS}
 (@pxref{Campi separati da virgola}).  In questo caso il vettore @var{separatori}
-non viene riempito, perch@'e consisterebbe solo di elementi contenenti
-solo una virgola.
+non viene popolato, perch@'e consisterebbe solo di elementi contenenti
+ciascuno una virgola.
 
 La funzione @code{split()} divide le stringhe in pezzi nello stesso
 modo in cui le righe in input sono divise in campi.  Per esempio:
