@@ -43,7 +43,6 @@
 
 #include "pma.h"
 
-
 // Software version; not the same as backing file format version.
 const char pma_version[] = "2022.10Oct.30.1667172241 (Avon 8-g1)";
 
