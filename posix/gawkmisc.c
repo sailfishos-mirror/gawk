@@ -18,6 +18,11 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifdef __CYGWIN__
+#ifdef __MSYS__
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <sys/cygwin.h>
+#endif
 #include <io.h>		/* for declaration of setmode(). */
 #endif
 
