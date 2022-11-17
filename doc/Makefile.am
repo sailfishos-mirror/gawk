@@ -50,7 +50,7 @@ EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	lflashlight-small.xpic lflashlight.eps lflashlight.pdf \
 	rflashlight-small.xpic rflashlight.eps rflashlight.pdf \
 	statist.jpg statist.eps statist.pdf statist.txt \
-	wordlist wordlist2 wordlist3 wordlist4 \
+	wordlist wordlist2 wordlist3 wordlist4 wordlist5 wordlist6 \
 	bc_notes
 
 # Get rid of generated files when cleaning
