@@ -4,7 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003, 2010-2013, 2017-2019,
- * 2021,
+ * 2021, 2022
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -12,7 +12,7 @@
  *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
  *
  * GAWK is distributed in the hope that it will be useful,

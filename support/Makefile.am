@@ -77,6 +77,8 @@ libsupport_a_SOURCES = \
 
 if USE_PERSISTENT_MALLOC
 libsupport_a_SOURCES += pma.c pma.h
+CFLAGS += -DNDEBUG
+AM_CFLAGS += -DNDEBUG
 endif
 
 # For some make's, e.g. OpenBSD, that don't define this
