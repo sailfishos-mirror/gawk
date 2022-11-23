@@ -154,7 +154,9 @@ DEBUG = -gdwarf-4 -g3
 install-exec-hook:
 	(cd $(DESTDIR)$(bindir); \
 	name=`echo gawk | sed '$(transform)'` ; \
-	$(LN) $${name}$(EXEEXT) gawk-$(VERSION)$(EXEEXT) 2>/dev/null ; \
+	if [ ! -f gawk-$(VERSION)$(EXEEXT) ]; \
+	then	$(LN) $${name}$(EXEEXT) gawk-$(VERSION)$(EXEEXT) 2>/dev/null ; \
+	fi; \
 	if [ ! -f awk$(EXEEXT) ]; \
 	then	$(LN_S) $${name}$(EXEEXT) awk$(EXEEXT); \
 	fi; exit 0)
