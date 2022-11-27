@@ -784,7 +784,6 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 	char *scan = *buf;
 	static const char comma = ',';
 	long nf = parse_high_water;
-	char *field;
 	char *end = scan + len;
 
 	static char *newfield = NULL;
