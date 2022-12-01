@@ -66,6 +66,16 @@ init_the_tables(void)
 	installing_specials = false;
 }
 
+// using persistent memory, manage the root pointer
+// which holds this struct:
+struct root_pointers {
+	NODE *global_table;
+	NODE *func_table;
+	NODE *symbol_table;
+	bool first;
+	int mpfr;
+} *root_pointers = NULL;
+
 /* init_symbol_table --- make sure the symbol tables are initialized */
 
 void
@@ -76,14 +86,6 @@ init_symbol_table()
 		init_the_tables();
 		return;
 	}
-
-	// using persistent memory, get the root pointer
-	// which holds this struct:
-	struct root_pointers {
-		NODE *global_table;
-		NODE *func_table;
-		NODE *symbol_table;
-	} *root_pointers = NULL;
 
 	root_pointers = (struct root_pointers *) pma_get_root();
 
@@ -98,6 +100,8 @@ init_symbol_table()
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
 		root_pointers->symbol_table = symbol_table;
+		root_pointers->first = true;
+		root_pointers->mpfr = 0;
 		pma_set_root(root_pointers);
 	} else {
 		// this is the next time, get the saved pointers and put them back in place
@@ -110,6 +114,22 @@ init_symbol_table()
 		memset(param_table, '\0', sizeof(NODE));
 		null_array(param_table);
 	}
+}
+
+/* pma_mpfr_check --- check that -M is same between invocations */
+
+void
+pma_mpfr_check(void)
+{
+	if (root_pointers->first) {
+		root_pointers->first = false;
+		root_pointers->mpfr = do_mpfr;
+		pma_set_root(root_pointers);
+		return;
+	}
+
+	if (root_pointers->mpfr != do_mpfr)
+		fatal(_("current setting of -M/--bignum does not match saved setting in PMA backing file"));
 }
 
 /*

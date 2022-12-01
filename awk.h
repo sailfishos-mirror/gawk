@@ -1817,6 +1817,7 @@ extern NODE **function_list(bool sort);
 extern void print_vars(NODE **table, Func_print print_func, FILE *fp);
 extern bool check_param_names(void);
 extern bool is_all_upper(const char *name);
+extern void pma_mpfr_check(void);
 
 /* floatcomp.c */
 #ifdef HAVE_UINTMAX_T

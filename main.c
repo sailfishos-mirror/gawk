@@ -1809,6 +1809,9 @@ parse_args(int argc, char **argv)
 out:
 	do_optimize = (do_optimize && ! do_pretty_print);
 
+	if (using_persistent_malloc)
+		pma_mpfr_check();
+
 	return;
 }
 

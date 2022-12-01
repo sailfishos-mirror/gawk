@@ -30036,9 +30036,7 @@ If you see the @samp{PMA} with a version indicator, then it's supported.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} environment variable
 @cindex environment variables @subentry @env{REALLY_USE_PERSIST_MALLOC}
 As of this writing, persistent memory has only been tested on GNU/Linux,
-Cygwin, Solaris 2.11, macOS systems,@footnote{For reasons explained in
-@file{README_d/README.macosx}, @command{gawk} is always built as an Intel
-architecture executable, even on M1 systems.}
+Cygwin, Solaris 2.11, Intel architecture macOS systems,
 FreeBSD 13.1 and OpenBSD 7.1.
 On all others, persistent memory is disabled by default. You can force
 it to be enabled by exporting the shell variable
@@ -30139,10 +30137,9 @@ of a program using persistent memory, you @emph{must} continue
 to use it on all subsequent runs.  Similarly, if you don't use @option{-M}
 on the first run, do not use it on any subsequent runs.
 
-Mixing and matching MPFR mode and regular mode with the same
-backing file will lead to strange results and/or core dumps.
-@command{gawk} does not currently detect such a situation and
-may not do so in the future either.
+Mixing and matching MPFR mode and regular mode with the same backing
+file is not allowed.  @command{gawk} detects such a situation and issues
+a fatal error message.
 
 Additionally, the GNU/Linux CIFS filesystem is known to not
 work well with the PMA allocator.
