@@ -34,16 +34,6 @@
 #include <mcheck.h>
 #endif
 
-#ifdef HAVE_LIBSIGSEGV
-#include <sigsegv.h>
-#else
-typedef void *stackoverflow_context_t;
-/* the argument to this macro is purposely not used */
-#define sigsegv_install_handler(catchsegv) signal(SIGSEGV, catchsig)
-/* define as 0 rather than empty so that (void) cast on it works */
-#define stackoverflow_install_handler(catchstackoverflow, extra_stack, STACK_SIZE) 0
-#endif
-
 #define DEFAULT_PROFILE		"awkprof.out"	/* where to put profile */
 #define DEFAULT_VARFILE		"awkvars.out"	/* where to put vars */
 #define DEFAULT_PREC		53
@@ -60,10 +50,6 @@ static void init_vars(void);
 static NODE *load_environ(void);
 static NODE *load_procinfo(void);
 static void catchsig(int sig);
-#ifdef HAVE_LIBSIGSEGV
-static int catchsegv(void *fault_address, int serious);
-static void catchstackoverflow(int emergency, stackoverflow_context_t scp);
-#endif
 static void nostalgia(void) ATTRIBUTE_NORETURN;
 static void version(void) ATTRIBUTE_NORETURN;
 static void init_fds(void);
@@ -286,6 +272,7 @@ main(int argc, char **argv)
 #endif
 	set_locale_stuff();
 
+	(void) signal(SIGSEGV, catchsig);
 	(void) signal(SIGFPE, catchsig);
 #ifdef SIGBUS
 	(void) signal(SIGBUS, catchsig);
@@ -305,12 +292,6 @@ main(int argc, char **argv)
 	 * it did not do so in the past and people would complain.
 	 */
 	ignore_sigpipe();
-
-	(void) sigsegv_install_handler(catchsegv);
-#define STACK_SIZE (16*1024)
-	emalloc(extra_stack, char *, STACK_SIZE, "main");
-	(void) stackoverflow_install_handler(catchstackoverflow, extra_stack, STACK_SIZE);
-#undef STACK_SIZE
 
 	/* initialize the null string */
 	Nnull_string = make_string("", 0);
@@ -1329,37 +1310,6 @@ catchsig(int sig)
 		cant_happen("unexpected signal, number %d (%s)", sig, strsignal(sig));
 	/* NOTREACHED */
 }
-
-#ifdef HAVE_LIBSIGSEGV
-/* catchsegv --- for use with libsigsegv */
-
-static int
-catchsegv(void *fault_address, int serious)
-{
-	if (errcount > 0)	// assume a syntax error corrupted our data structures
-		exit(EXIT_FATAL);
-
-	set_loc(__FILE__, __LINE__);
-	msg(_("fatal error: internal error: segfault"));
-	fflush(NULL);
-	abort();
-	/*NOTREACHED*/
-	return 0;
-}
-
-/* catchstackoverflow --- for use with libsigsegv */
-
-static void
-catchstackoverflow(int emergency, stackoverflow_context_t scp)
-{
-	set_loc(__FILE__, __LINE__);
-	msg(_("fatal error: internal error: stack overflow"));
-	fflush(NULL);
-	abort();
-	/*NOTREACHED*/
-	return;
-}
-#endif /* HAVE_LIBSIGSEGV */
 
 /* nostalgia --- print the famous error message and die */
 

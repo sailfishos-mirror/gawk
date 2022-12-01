@@ -305,13 +305,6 @@ AC_SEARCH_LIBS(fmod, m)
 AC_SEARCH_LIBS(isinf, m)
 AC_SEARCH_LIBS(ismod, m)
 AC_SEARCH_LIBS(isnan, m)
-dnl Don't look for libsigsegv on OSF/1, gives us severe headaches
-case $host_os in
-osf1)	: ;;
-*)
-	gl_LIBSIGSEGV
-	;;
-esac
 
 # Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
 AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
