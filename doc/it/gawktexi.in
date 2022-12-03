@@ -56,9 +56,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Agosto 2022
+@set UPDATE-MONTH Novembre 2022
 @set VERSION 5.2
-@set PATCHLEVEL 0
+@set PATCHLEVEL 1
 
 @c added Italian hyphenation stuff
 @hyphenation{ven-go-no o-met-te-re o-met-ten-do}
@@ -1223,7 +1223,8 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         di @command{gawk} su OpenVMS.
 * Dettagli installazione su OpenVMS::   Come installare @command{gawk} su
                                         OpenVMS.
-* Esecuzione su OpenVMS::               Come eseguire @command{gawk} su OpenVMS.
+* Esecuzione su OpenVMS::               Come eseguire @command{gawk} su
+                                        OpenVMS.
 * GNV su OpenVMS::                      Il progetto GNV su OpenVMS.
 * Bug::                                 Notificare problemi e bug.
 * Definizione di bug::                  Definire cos'@`e e cosa non @`e un bug.
@@ -33263,11 +33264,7 @@ la memoria persistente @`e supportata.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{REALLY_USE_PERSIST_MALLOC}
 Finora la memoria persistente @`e stata testata solo nei sistemi operativi
-GNU/Linux, Cygwin, Solaris 2.11, sistemi macOS su hardware
-Intel,@footnote{Per ragioni spiegate nel file
-@file{README_d/README.macosx}, @command{gawk} @`e sempre generato come
-un eseguibile in architettura Intel, anche sui sistemi con architettura
-M1.}
+GNU/Linux, Cygwin, Solaris 2.11, sistemi macOS su hardware Intel,
 FreeBSD 13.1 e OpenBSD 7.1.
 Su tutti gli altri sistemi, la memoria persistente @`e disabilitata
 per default.  Si pu@`o chiedere di abilitarla esportando la
@@ -33390,11 +33387,9 @@ usarla in tutte le esecuzioni successive.
 Analogamente, se non si usa l'opzione @option{-M} nella prima esecuzione
 non va usata in alcuna esecuzione successiva.
 
-Mischiare esecuzioni che usano la libreria MPFR con esecuzioni che non
-la usano, utilizzando lo stesso file di memoria persistente produrr@`a
-risultati inattesi e/o errori fatali.
-@command{gawk} non rileva una tale situazione, e non @`e detto che lo
-far@`a in qualche versione futura.
+Non @`e consentito alternare esecuzioni che usano la libreria MPFR con
+esecuzioni che non la usano.  Se @command{gawk} rileva questa
+situazione, termina l'esecuzione con un errore fatale.
 
 Inoltre, il filesystem CIFS in ambiente GNU/Linux risulta non
 funzionare bene con l'allocatore PMA.
@@ -45578,6 +45573,12 @@ Divisione di campi per i file CSV
 @item
 Gli elementi @code{"mb_cur_max"} e @code{"utf8"} nel vettore
 @code{PROCINFO} (@pxref{Variabili auto-assegnate}).
+
+@item
+La necessit@`a di utilizzare la libreria GNU @code{libsigsegv}
+@`e stata rimossa da @command{gawk}.
+Il valore aggiunto non @`e mai stato grande, e il suo utilizzo
+creava problemi in alcuni sistemi operativi.
 
 @end itemize
 
