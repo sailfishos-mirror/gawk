@@ -1,3 +1,17 @@
+2022-12-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated.
+	* awk.h (nextfree): Include dimension so we know how big it is.
+	(pma_save_free_lists): Declare new function.
+	* main.c (main): Call pma_save_free_lists() via atexit() upon exit.
+	(parse_args): Call pma_mpfr_check() unconditionally.
+	* symbol.c (struct root pointer): Add copy of nextfree[] array.
+	(init_symbol_table): On first alloc, zero out the root_pointers
+	struct. On subsequent uses, copy saved nextfree into real nextfree.
+	(pma_mpfr_check): Check using_persistent_malloc and return early if
+	not using it.
+	(pma_save_free_lists): New function to save nextfree.
+
 2022-12-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Disallow using / not using -M across invocations of gawk with

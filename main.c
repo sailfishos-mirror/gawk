@@ -443,6 +443,9 @@ main(int argc, char **argv)
 	if (os_isatty(fileno(stdout)))
 		output_is_tty = true;
 
+	/* arrange to save free lists if using PMA */
+	atexit(pma_save_free_lists);
+
 	/* initialize API before loading extension libraries */
 	init_ext_api();
 
@@ -1809,8 +1812,7 @@ parse_args(int argc, char **argv)
 out:
 	do_optimize = (do_optimize && ! do_pretty_print);
 
-	if (using_persistent_malloc)
-		pma_mpfr_check();
+	pma_mpfr_check();
 
 	return;
 }

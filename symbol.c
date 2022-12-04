@@ -47,6 +47,17 @@ NODE *symbol_table, *func_table;
 /* Use a flag to avoid a strcmp() call inside install() */
 static bool installing_specials = false;
 
+// Using persistent memory, manage the root pointer
+// which holds this struct:
+struct root_pointers {
+	NODE *global_table;
+	NODE *func_table;
+	NODE *symbol_table;
+	struct block_header nextfree[BLOCK_MAX];
+	int mpfr;
+	bool first;
+} *root_pointers = NULL;
+
 /* init_the_tables --- deal with the tables for in memory use */
 
 static void
@@ -65,16 +76,6 @@ init_the_tables(void)
 	symbol_table = install_symbol(estrdup("SYMTAB", 6), Node_var_array);
 	installing_specials = false;
 }
-
-// using persistent memory, manage the root pointer
-// which holds this struct:
-struct root_pointers {
-	NODE *global_table;
-	NODE *func_table;
-	NODE *symbol_table;
-	bool first;
-	int mpfr;
-} *root_pointers = NULL;
 
 /* init_symbol_table --- make sure the symbol tables are initialized */
 
@@ -97,6 +98,7 @@ init_symbol_table()
 
 		// save the pointers for the next time.
 		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers), "init_symbol_table");
+		memset(root_pointers, 0, sizeof(struct root_pointers));
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
 		root_pointers->symbol_table = symbol_table;
@@ -108,6 +110,7 @@ init_symbol_table()
 		global_table = root_pointers->global_table;
 		func_table = root_pointers->func_table;
 		symbol_table = root_pointers->symbol_table;
+		memcpy(nextfree, root_pointers->nextfree, sizeof(nextfree));
 
 		// still need to set this one up as usual
 		getnode(param_table);
@@ -121,15 +124,30 @@ init_symbol_table()
 void
 pma_mpfr_check(void)
 {
+	if (! using_persistent_malloc)
+		return;
+
 	if (root_pointers->first) {
 		root_pointers->first = false;
 		root_pointers->mpfr = do_mpfr;
-		pma_set_root(root_pointers);
 		return;
 	}
 
 	if (root_pointers->mpfr != do_mpfr)
 		fatal(_("current setting of -M/--bignum does not match saved setting in PMA backing file"));
+}
+
+/* pma_save_free_lists --- save the free lists in the root pointer */
+
+void
+pma_save_free_lists(void)
+{
+	if (! using_persistent_malloc)
+		return;
+
+	assert(! root_pointers->first);
+
+	memcpy(root_pointers->nextfree, nextfree, sizeof(nextfree));
 }
 
 /*

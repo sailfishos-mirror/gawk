@@ -1165,7 +1165,7 @@ extern const array_funcs_t int_array_func;
 /* special node used to indicate success in array routines (not NULL) */
 extern NODE *success_node;
 
-extern struct block_header nextfree[];
+extern struct block_header nextfree[BLOCK_MAX];
 extern bool field0_valid;
 
 extern bool do_itrace;	/* separate so can poke from a debugger */
@@ -1818,6 +1818,7 @@ extern void print_vars(NODE **table, Func_print print_func, FILE *fp);
 extern bool check_param_names(void);
 extern bool is_all_upper(const char *name);
 extern void pma_mpfr_check(void);
+extern void pma_save_free_lists(void);
 
 /* floatcomp.c */
 #ifdef HAVE_UINTMAX_T

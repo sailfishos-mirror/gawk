@@ -4,7 +4,7 @@
    are permitted in any medium without royalty provided the copyright
    notice and this notice are preserved.
 
-Changes from 5.2.1 to 5.3.0
+Changes from 5.2.2 to 5.3.0
 ---------------------------
 
 1. Infrastructure changes: Removed the use of libsigsegv. The
@@ -18,6 +18,19 @@ Changes from 5.2.1 to 5.3.0
 
 3. PROCINFO gained two new elements: PROCINFO["mb_cur_max"] and
    PROCINFO["utf8"]. See the manual for details.
+
+Changes from 5.2.1 to 5.2.2
+---------------------------
+
+1. Gawk no longer builds an x86_64 executable on M1 macOS systems.
+   This means that PMA is unavailable on those systems.
+
+2. Gawk will now diagnose if a heap file was created with a different
+   setting of -M/--bignum than in the current invocation and exit with
+   a fatal message if so.
+
+3. Gawk no longer "leaks" its free list of NODEs in the heap file, resulting
+   in much more efficient usage of persistent storage.
 
 Changes from 5.2.0 to 5.2.1
 ---------------------------
@@ -36,7 +49,7 @@ Changes from 5.2.0 to 5.2.1
 5. The rwarray extension's readall() function has had some bugs fixed.
 
 6. The PMA allocator is now supported on FreeBSD, OpenBSD and Linux on S/390x.
-   Is is now supported also on both Intel and M1 macOS systems.
+   It is now supported also on both Intel and M1 macOS systems.
 
 7. There have been several minor code cleanups and bug fixes. See the
    ChangeLog for details.
