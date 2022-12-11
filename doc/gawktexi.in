@@ -54,9 +54,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH November, 2022
+@set UPDATE-MONTH December, 2022
 @set VERSION 5.2
-@set PATCHLEVEL 1
+@set PATCHLEVEL 2
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
 @set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
@@ -15740,10 +15740,6 @@ The values indicate what @command{gawk} knows about the identifiers
 after it has finished parsing the program; they are @emph{not} updated
 while the program runs.
 
-@item PROCINFO["mb_cur_max"]
-The maximum number of bytes that can be used to encode a single
-character in the current character set.
-
 @item PROCINFO["platform"]
 @cindex platform running on
 @cindex @code{PROCINFO} array @subentry platform running on
@@ -15773,6 +15769,13 @@ The process group ID of the current process.
 @cindex process ID of @command{gawk} process
 The process ID of the current process.
 
+@item PROCINFO["pma"]
+@cindex persistent memory @subentry compiled into @command{gawk}
+@cindex PMA memory allocator
+The version of the PMA memory allocator compiled into @command{gawk}.
+This element will not be present if the PMA allocator is not available
+for use. @xref{Persistent Memory}.
+
 @item PROCINFO["ppid"]
 @cindex parent process ID of @command{gawk} process
 The parent process ID of the current process.
@@ -15784,10 +15787,6 @@ Assigning a new value to this element changes the default.
 
 @item PROCINFO["uid"]
 The value of the @code{getuid()} system call.
-
-@item PROCINFO["utf8"]
-This will be @code{"true"} if the current character set encoding
-is UTF-8, @code{"false"} otherwise.
 
 @item PROCINFO["version"]
 @cindex version of @subentry @command{gawk}
@@ -30006,6 +30005,8 @@ code, it will appear that way in the output.
 @node Persistent Memory
 @section Preserving Data Between Runs
 
+@cindex persistent memory
+@cindex PMA memory allocator
 Starting with @value{PVERSION} 5.2, @command{gawk} supports
 @dfn{persistent memory}.  This experimental feature stores the values of
 all of @command{gawk}'s variables, arrays and user-defined functions
@@ -30025,7 +30026,7 @@ memory like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
@@ -33504,7 +33505,7 @@ is available like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API 3.2, PMA Avon 7, (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
@@ -40989,6 +40990,10 @@ Terence Kelly's persistent memory allocator (PMA) was
 added, allowing the use of persistent data on certain systems
 (@pxref{Persistent Memory}).
 
+@item
+@code{PROCINFO["pma"]} exists if the PMA allocator is compiled
+in (@pxref{Auto-set}).
+
 @end itemize
 
 Version 5.3 added the following features:
@@ -40997,10 +41002,6 @@ Version 5.3 added the following features:
 @item
 Comma separated value (CSV) field splitting
 (@pxref{Comma Separated Fields}).
-
-@item
-The @code{"mb_cur_max"} and @code{"utf8"} elements in the
-@code{PROCINFO} array (@pxref{Auto-set}).
 
 @item
 The need for GNU @code{libsigsegv} was removed from @command{gawk}.
