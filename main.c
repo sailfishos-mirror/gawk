@@ -1084,10 +1084,6 @@ load_procinfo()
 	}
 #endif
 
-
-	update_PROCINFO_num("mb_cur_max", gawk_mb_cur_max);
-	update_PROCINFO_str("utf8", using_utf8() ? "true" : "false");
-
 #ifdef USE_PERSISTENT_MALLOC
 	update_PROCINFO_str("pma", get_pma_version());
 #endif /* USE_PERSISTENT_MALLOC */
