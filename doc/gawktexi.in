@@ -54,9 +54,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH November, 2022
+@set UPDATE-MONTH December, 2022
 @set VERSION 5.2
-@set PATCHLEVEL 1
+@set PATCHLEVEL 2
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
 @set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
@@ -15704,6 +15704,13 @@ The process group ID of the current process.
 @cindex process ID of @command{gawk} process
 The process ID of the current process.
 
+@item PROCINFO["pma"]
+@cindex persistent memory @subentry compiled into @command{gawk}
+@cindex PMA memory allocator
+The version of the PMA memory allocator compiled into @command{gawk}.
+This element will not be present if the PMA allocator is not available
+for use. @xref{Persistent Memory}.
+
 @item PROCINFO["ppid"]
 @cindex parent process ID of @command{gawk} process
 The parent process ID of the current process.
@@ -29928,6 +29935,8 @@ code, it will appear that way in the output.
 @node Persistent Memory
 @section Preserving Data Between Runs
 
+@cindex persistent memory
+@cindex PMA memory allocator
 Starting with @value{PVERSION} 5.2, @command{gawk} supports
 @dfn{persistent memory}.  This experimental feature stores the values of
 all of @command{gawk}'s variables, arrays and user-defined functions
@@ -29947,7 +29956,7 @@ memory like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
@@ -33426,7 +33435,7 @@ is available like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.0, API 3.2, PMA Avon 7, (GNU MPFR 4.0.1, GNU MP 6.1.2)
+@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
 @print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
 @dots{}
 @end example
@@ -40910,6 +40919,10 @@ The @command{gawkbug} script for reporting bugs
 Terence Kelly's persistent memory allocator (PMA) was
 added, allowing the use of persistent data on certain systems
 (@pxref{Persistent Memory}).
+
+@item
+@code{PROCINFO["pma"} exists if the PMA allocator is compiled
+in (@pxref{Auto-set}).
 
 @end itemize
 
