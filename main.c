@@ -141,6 +141,9 @@ static int do_binary = false;		/* hands off my data! */
 static int do_version = false;		/* print version info */
 static const char *locale = "";		/* default value to setlocale */
 static const char *locale_dir = LOCALEDIR;	/* default locale dir */
+#ifdef USE_PERSISTENT_MALLOC
+const char *get_pma_version(void);
+#endif
 
 int use_lc_numeric = false;	/* obey locale for decimal point */
 
@@ -1081,8 +1084,13 @@ load_procinfo()
 	}
 #endif
 
+
 	update_PROCINFO_num("mb_cur_max", gawk_mb_cur_max);
 	update_PROCINFO_str("utf8", using_utf8() ? "true" : "false");
+
+#ifdef USE_PERSISTENT_MALLOC
+	update_PROCINFO_str("pma", get_pma_version());
+#endif /* USE_PERSISTENT_MALLOC */
 
 	load_procinfo_argv();
 	return PROCINFO_node;
@@ -1331,7 +1339,7 @@ nostalgia()
 /* get_pma_version --- get a usable version string out of PMA */
 
 const char *
-get_pma_version()
+get_pma_version(void)
 {
 	static char buf[200];
 	const char *open, *close;
