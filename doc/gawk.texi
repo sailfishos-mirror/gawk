@@ -85,6 +85,16 @@
 @set COMMONEXT (c.e.)
 @set PAGE page
 @end iftex
+@iflatex
+@set DOCUMENT book
+@set CHAPTER chapter
+@set APPENDIX appendix
+@set SECTION section
+@set SUBSECTION subsection
+@set DARKCORNER (d.c.)
+@set COMMONEXT (c.e.)
+@set PAGE page
+@end iflatex
 @ifinfo
 @set DOCUMENT Info file
 @set CHAPTER major node
@@ -156,6 +166,10 @@
 @set LEQ @math{@leq}
 @set PI @math{@pi}
 @end iftex
+@iflatex
+@set LEQ <=
+@set PI @i{pi}
+@end iflatex
 @ifdocbook
 @set LEQ @inlineraw{docbook, &le;}
 @set PI @inlineraw{docbook, &pgr;}
@@ -247,6 +261,10 @@ Some comments on the layout for TeX.
 @syncodeindex fn cp
 @syncodeindex vr cp
 @end iftex
+@iflatex
+@syncodeindex fn cp
+@syncodeindex vr cp
+@end iflatex
 @ifxml
 @syncodeindex fn cp
 @syncodeindex vr cp
@@ -264,6 +282,9 @@ Some comments on the layout for TeX.
 @iftex
 @finalout
 @end iftex
+@iflatex
+@finalout
+@end iflatex
 
 @c Enabled '-quotes in PDF files so that cut/paste works in
 @c more places.
@@ -634,6 +655,8 @@ particular records in a file and perform operations upon them.
 * Special Caveats::                     Things to watch out for.
 * Close Files And Pipes::               Closing Input and Output Files and
                                         Pipes.
+* Close Return Value::                  Using the return value from
+                                        @code{close()}.
 * Nonfatal::                            Enabling Nonfatal Output.
 * Output Summary::                      Output summary.
 * Output Exercises::                    Exercises.
@@ -11254,6 +11277,10 @@ Doing so results in unpredictable behavior.
 @cindex coprocesses @subentry closing
 @cindex @code{getline} command @subentry coprocesses, using from
 
+@menu
+* Close Return Value::          Using the return value from @code{close()}.
+@end menu
+
 If the same @value{FN} or the same shell command is used with @code{getline}
 more than once during the execution of an @command{awk} program
 (@pxref{Getline}),
@@ -11419,12 +11446,8 @@ delayed until
 @ref{Two-way I/O},
 which describes it in more detail and gives an example.
 
-@cindex sidebar @subentry Using @code{close()}'s Return Value
-@ifdocbook
-@docbook
-<sidebar><title>Using @code{close()}'s Return Value</title>
-@end docbook
-
+@node Close Return Value
+@subsection Using @code{close()}'s Return Value
 @cindex dark corner @subentry @code{close()} function
 @cindex @code{close()} function @subentry return value
 @cindex return value, @code{close()} function
@@ -11461,6 +11484,8 @@ call.} Otherwise, it is the return value from the system's @code{close()}
 or @code{fclose()} C functions when closing input or output files,
 respectively.  This value is zero if the close succeeds, or @minus{}1
 if it fails.
+Recent versions of BWK @command{awk} also return the same values
+from @command{close()}.
 
 @float Table,table-close-pipe-return-values
 @caption{Return values from @code{close()} of a pipe}
@@ -11481,75 +11506,6 @@ pipes; thus, the return value cannot be used portably.
 @value{DARKCORNER}
 In POSIX mode (@pxref{Options}), @command{gawk} just returns zero
 when closing a pipe.
-
-@docbook
-</sidebar>
-@end docbook
-@end ifdocbook
-
-@ifnotdocbook
-@cartouche
-@center @b{Using @code{close()}'s Return Value}
-
-
-@cindex dark corner @subentry @code{close()} function
-@cindex @code{close()} function @subentry return value
-@cindex return value, @code{close()} function
-@cindex differences in @command{awk} and @command{gawk} @subentry @code{close()} function
-@cindex Unix @command{awk} @subentry @code{close()} function and
-
-In many older versions of Unix @command{awk}, the @code{close()} function
-is actually a statement.
-@value{DARKCORNER}
-It is a syntax error to try and use the return
-value from @code{close()}:
-
-@example
-command = "@dots{}"
-command | getline info
-retval = close(command)  # syntax error in many Unix awks
-@end example
-
-@cindex @command{gawk} @subentry @code{ERRNO} variable in
-@cindex @code{ERRNO} variable @subentry with @command{close()} function
-@command{gawk} treats @code{close()} as a function.
-The return value is @minus{}1 if the argument names something
-that was never opened with a redirection, or if there is
-a system problem closing the file or process.
-In these cases, @command{gawk} sets the predefined variable
-@code{ERRNO} to a string describing the problem.
-
-In @command{gawk}, starting with @value{PVERSION} 4.2, when closing a pipe or
-coprocess (input or output), the return value is the exit status of the
-command, as described in @ref{table-close-pipe-return-values}.@footnote{Prior
-to @value{PVERSION} 4.2, the return value from closing a pipe or co-process
-was the full 16-bit exit value as defined by the @code{wait()} system
-call.} Otherwise, it is the return value from the system's @code{close()}
-or @code{fclose()} C functions when closing input or output files,
-respectively.  This value is zero if the close succeeds, or @minus{}1
-if it fails.
-
-@float Table,table-close-pipe-return-values
-@caption{Return values from @code{close()} of a pipe}
-@multitable @columnfractions .50 .50
-@headitem Situation @tab Return value from @code{close()}
-@item Normal exit of command @tab Command's exit status
-@item Death by signal of command @tab 256 + number of murderous signal
-@item Death by signal of command with core dump @tab 512 + number of murderous signal
-@item Some kind of error @tab @minus{}1
-@end multitable
-@end float
-
-@cindex POSIX mode
-The POSIX standard is very vague; it says that @code{close()}
-returns zero on success and a nonzero value otherwise.  In general,
-different implementations vary in what they report when closing
-pipes; thus, the return value cannot be used portably.
-@value{DARKCORNER}
-In POSIX mode (@pxref{Options}), @command{gawk} just returns zero
-when closing a pipe.
-@end cartouche
-@end ifnotdocbook
 
 @node Nonfatal
 @section Enabling Nonfatal Output
@@ -15026,12 +14982,17 @@ you ``hooks'' into @command{gawk}'s command-line file processing loop.
 As with the @code{BEGIN} and @code{END} rules
 @ifnottex
 @ifnotdocbook
+@ifnotlatex
 (@pxref{BEGIN/END}),
+@end ifnotlatex
 @end ifnotdocbook
 @end ifnottex
 @iftex
 (see the previous @value{SECTION}),
 @end iftex
+@iflatex
+(see the previous @value{SECTION}),
+@end iflatex
 @ifdocbook
 (see the previous @value{SECTION}),
 @end ifdocbook
@@ -27670,7 +27631,7 @@ We hope you find them both interesting and enjoyable.
 A common error when writing large amounts of prose is to accidentally
 duplicate words.  Typically you will see this in text as something like ``the
 the program does the following@dots{}''  When the text is online, often
-the duplicated words occur at the end of one line and the
+the duplicated words occur at the end of one line and at the
 @iftex
 the
 @end iftex
@@ -32544,7 +32505,7 @@ to debug command-line programs, only programs contained in files.)
 In our case, we invoke the debugger like this:
 
 @example
-$ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -1 inputfile}
+$ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -- -1 inputfile}
 @end example
 
 @cindex @env{AWKPATH} environment variable
@@ -32556,6 +32517,9 @@ this syntax is slightly different from what you are used to.
 With the @command{gawk} debugger, you give the arguments for running the program
 in the command line to the debugger rather than as part of the @code{run}
 command at the debugger prompt.)
+The @option{--} ends @command{gawk}'s command line options. It's not
+strictly necessary here, but it is needed if an option to the @command{awk}
+program conflicts with a @command{gawk} option.
 The @option{-1} is an option to @file{uniq.awk}.
 
 @cindex debugger @subentry prompt
@@ -42903,7 +42867,7 @@ The generated Info file for
 
 @item doc/pm-gawk.1
 The @command{troff} source for a manual page describing the
-the persistent memory features presented in @ref{Persistent Memory}.
+persistent memory features presented in @ref{Persistent Memory}.
 
 @item doc/igawk.1
 The @command{troff} source for a manual page describing the @command{igawk}
@@ -43592,12 +43556,12 @@ recipe works ``out of the box.''
 This @value{SUBSECTION} describes how to compile and install @command{gawk} under OpenVMS.
 
 @menu
-* OpenVMS Compilation::           How to compile @command{gawk} under OpenVMS.
+* OpenVMS Compilation::          How to compile @command{gawk} under OpenVMS.
 * OpenVMS Dynamic Extensions::   Compiling @command{gawk} dynamic extensions
                                  on OpenVMS.
-* OpenVMS Installation Details::  How to install @command{gawk} under OpenVMS.
-* OpenVMS Running::               How to run @command{gawk} under OpenVMS.
-* OpenVMS GNV::                   The OpenVMS GNV Project.
+* OpenVMS Installation Details:: How to install @command{gawk} under OpenVMS.
+* OpenVMS Running::              How to run @command{gawk} under OpenVMS.
+* OpenVMS GNV::                  The OpenVMS GNV Project.
 @end menu
 
 @node OpenVMS Compilation
