@@ -2,13 +2,13 @@
 # gendocs.sh -- generate a GNU manual in many formats.  This script is
 #   mentioned in maintain.texi.  See the help message below for usage details.
 
-scriptversion=2021-01-01.00
+scriptversion=2022-10-25.23
 
-# Copyright 2003-2021 Free Software Foundation, Inc.
+# Copyright 2003-2022 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -40,15 +40,15 @@ srcdir=`pwd`
 scripturl="https://git.savannah.gnu.org/cgit/gnulib.git/plain/build-aux/gendocs.sh"
 templateurl="https://git.savannah.gnu.org/cgit/gnulib.git/plain/doc/gendocs_template"
 
-: ${SETLANG="env LANG= LC_MESSAGES= LC_ALL= LANGUAGE="}
-: ${MAKEINFO="makeinfo"}
-: ${TEXI2DVI="texi2dvi"}
-: ${DOCBOOK2HTML="docbook2html"}
-: ${DOCBOOK2PDF="docbook2pdf"}
-: ${DOCBOOK2TXT="docbook2txt"}
-: ${GENDOCS_TEMPLATE_DIR="."}
-: ${PERL='perl'}
-: ${TEXI2HTML="texi2html"}
+: "${SETLANG="env LANG= LC_TIME= LC_MESSAGES= LC_ALL= LANGUAGE="}"
+: "${MAKEINFO="makeinfo"}"
+: "${TEXI2DVI="texi2dvi"}"
+: "${DOCBOOK2HTML="docbook2html"}"
+: "${DOCBOOK2PDF="docbook2pdf"}"
+: "${DOCBOOK2TXT="docbook2txt"}"
+: "${GENDOCS_TEMPLATE_DIR="."}"
+: "${PERL="perl"}"
+: "${TEXI2HTML="texi2html"}"
 unset CDPATH
 unset use_texi2html
 
@@ -58,7 +58,7 @@ EMAIL=webmasters@gnu.org  # please override with --email
 commonarg= # passed to all makeinfo/texi2html invcations.
 dirargs=   # passed to all tools (-I dir).
 dirs=      # -I directories.
-htmlarg="--css-ref=/software/gnulib/manual.css -c TOP_NODE_UP_URL=/manual"
+htmlarg="--css-ref=https://www.gnu.org/software/gnulib/manual.css -c TOP_NODE_UP_URL=/manual"
 default_htmlarg=true
 infoarg=--no-split
 generate_ascii=true
@@ -72,22 +72,18 @@ srcfile=
 texarg="-t @finalout"
 
 version="gendocs.sh $scriptversion
-
-Copyright 2021 Free Software Foundation, Inc.
+Copyright 2022 Free Software Foundation, Inc.
 There is NO warranty.  You may redistribute this software
 under the terms of the GNU General Public License.
 For more information about these matters, see the files named COPYING."
 
 usage="Usage: $prog [OPTION]... PACKAGE MANUAL-TITLE
-
 Generate output in various formats from PACKAGE.texinfo (or .texi or
 .txi) source.  See the GNU Maintainers document for a more extensive
 discussion:
   https://www.gnu.org/prep/maintain_toc.html
-
 Options:
   --email ADR use ADR as contact in generated web pages; always give this.
-
   -s SRCFILE   read Texinfo from SRCFILE, instead of PACKAGE.{texinfo|texi|txi}
   -o OUTDIR    write files into OUTDIR, instead of manual/.
   -I DIR       append DIR to the Texinfo search path.
@@ -102,57 +98,44 @@ Options:
   --source ARG include ARG in tar archive of sources.
   --split HOW  make split HTML by node, section, chapter; default node.
   --tex ARG    pass ARG to texi2dvi for DVI and PDF, instead of -t @finalout.
-
   --texi2html  use texi2html to make HTML target, with all split versions.
   --docbook    convert through DocBook too (xml, txt, html, pdf).
-
   --help       display this help and exit successfully.
   --version    display version information and exit successfully.
-
 Simple example: $prog --email bug-gnu-emacs@gnu.org emacs \"GNU Emacs Manual\"
-
 Typical sequence:
   cd PACKAGESOURCE/doc
   wget \"$scripturl\"
   wget \"$templateurl\"
   $prog --email BUGLIST MANUAL \"GNU MANUAL - One-line description\"
-
 Output will be in a new subdirectory \"manual\" (by default;
 use -o OUTDIR to override).  Move all the new files into your web CVS
 tree, as explained in the Web Pages node of maintain.texi.
-
 Please use the --email ADDRESS option so your own bug-reporting
 address will be used in the generated HTML pages.
-
 MANUAL-TITLE is included as part of the HTML <title> of the overall
 manual/index.html file.  It should include the name of the package being
 documented.  manual/index.html is created by substitution from the file
 $GENDOCS_TEMPLATE_DIR/gendocs_template.  (Feel free to modify the
 generic template for your own purposes.)
-
 If you have several manuals, you'll need to run this script several
 times with different MANUAL values, specifying a different output
 directory with -o each time.  Then write (by hand) an overall index.html
 with links to them all.
-
 If a manual's Texinfo sources are spread across several directories,
 first copy or symlink all Texinfo sources into a single directory.
 (Part of the script's work is to make a tar.gz of the sources.)
-
 As implied above, by default monolithic Info files are generated.
 If you want split Info, or other Info options, use --info to override.
-
 You can set the environment variables MAKEINFO, TEXI2DVI, TEXI2HTML,
 and PERL to control the programs that get executed, and
 GENDOCS_TEMPLATE_DIR to control where the gendocs_template file is
 looked for.  With --docbook, the environment variables DOCBOOK2HTML,
 DOCBOOK2PDF, and DOCBOOK2TXT are also consulted.
-
 By default, makeinfo and texi2dvi are run in the default (English)
 locale, since that's the language of most Texinfo manuals.  If you
 happen to have a non-English manual and non-English web site, see the
 SETLANG setting in the source.
-
 Email bug reports or enhancement requests to bug-gnulib@gnu.org.
 "
 
@@ -202,7 +185,7 @@ base=$PACKAGE
 
 if $default_htmlarg && test -n "$use_texi2html"; then
   # The legacy texi2html doesn't support TOP_NODE_UP_URL
-  htmlarg="--css-ref=/software/gnulib/manual.css"
+  htmlarg="--css-ref=https://www.gnu.org/software/gnulib/manual.css"
 fi
 
 if test -n "$srcfile"; then
@@ -254,7 +237,6 @@ BEGIN {
 }
 " -e '
 /<img src="(.*?)"/g && ++$need{$1};
-
 END {
   #print "$me: @{[keys %need]}\n";  # for debugging, show images found.
   FILE: for my $f (keys %need) {
@@ -288,7 +270,7 @@ echo "Making output for $srcfile"
 echo " in `pwd`"
 mkdir -p "$outdir/"
 
-# 
+# ␌
 if $generate_info; then
   cmd="$SETLANG $MAKEINFO -o $PACKAGE.info $commonarg $infoarg \"$srcfile\""
   echo "Generating info... ($cmd)"
@@ -301,10 +283,10 @@ if $generate_info; then
   # separately on the web.
 fi  # end info
 
-# 
+# ␌
 if $generate_tex; then
   cmd="$SETLANG $TEXI2DVI $dirargs $texarg \"$srcfile\""
-  printf "\nGenerating dvi... ($cmd)\n"
+  printf "\nGenerating dvi... (%s)\n" "$cmd"
   eval "$cmd"
   # compress/finish dvi:
   gzip -f -9 $PACKAGE.dvi
@@ -313,18 +295,18 @@ if $generate_tex; then
   ls -l "$outdir/$PACKAGE.dvi.gz"
 
   cmd="$SETLANG $TEXI2DVI --pdf $dirargs $texarg \"$srcfile\""
-  printf "\nGenerating pdf... ($cmd)\n"
+  printf "\nGenerating pdf... (%s)\n" "$cmd"
   eval "$cmd"
   pdf_size=`calcsize $PACKAGE.pdf`
   mv $PACKAGE.pdf "$outdir/"
   ls -l "$outdir/$PACKAGE.pdf"
 fi # end tex (dvi + pdf)
 
-# 
+# ␌
 if $generate_ascii; then
   opt="-o $PACKAGE.txt --no-split --no-headers $commonarg"
   cmd="$SETLANG $MAKEINFO $opt \"$srcfile\""
-  printf "\nGenerating ascii... ($cmd)\n"
+  printf "\nGenerating ascii... (%s)\n" "$cmd"
   eval "$cmd"
   ascii_size=`calcsize $PACKAGE.txt`
   gzip -f -9 -c $PACKAGE.txt >"$outdir/$PACKAGE.txt.gz"
@@ -333,7 +315,7 @@ if $generate_ascii; then
   ls -l "$outdir/$PACKAGE.txt" "$outdir/$PACKAGE.txt.gz"
 fi
 
-# 
+# ␌
 
 if $generate_html; then
 # Split HTML at level $1.  Used for texi2html.
@@ -341,7 +323,7 @@ html_split()
 {
   opt="--split=$1 --node-files $commonarg $htmlarg"
   cmd="$SETLANG $TEXI2HTML --output $PACKAGE.html $opt \"$srcfile\""
-  printf "\nGenerating html by $1... ($cmd)\n"
+  printf "\nGenerating html by %s... (%s)\n" "$1" "$cmd"
   eval "$cmd"
   split_html_dir=$PACKAGE.html
   (
@@ -359,7 +341,7 @@ html_split()
 if test -z "$use_texi2html"; then
   opt="--no-split --html -o $PACKAGE.html $commonarg $htmlarg"
   cmd="$SETLANG $MAKEINFO $opt \"$srcfile\""
-  printf "\nGenerating monolithic html... ($cmd)\n"
+  printf "\nGenerating monolithic html... (%s)\n" "$cmd"
   rm -rf $PACKAGE.html  # in case a directory is left over
   eval "$cmd"
   html_mono_size=`calcsize $PACKAGE.html`
@@ -380,7 +362,7 @@ if test -z "$use_texi2html"; then
   #
   opt="--html -o $PACKAGE.html $split_arg $commonarg $htmlarg"
   cmd="$SETLANG $MAKEINFO $opt \"$srcfile\""
-  printf "\nGenerating html by $split... ($cmd)\n"
+  printf "\nGenerating html by %s... (%s)\n" "$split" "$cmd"
   eval "$cmd"
   split_html_dir=$PACKAGE.html
   copy_images $split_html_dir/ $split_html_dir/*.html
@@ -398,7 +380,7 @@ if test -z "$use_texi2html"; then
 else # use texi2html:
   opt="--output $PACKAGE.html $commonarg $htmlarg"
   cmd="$SETLANG $TEXI2HTML $opt \"$srcfile\""
-  printf "\nGenerating monolithic html with texi2html... ($cmd)\n"
+  printf "\nGenerating monolithic html with texi2html... (%s)\n" "$cmd"
   rm -rf $PACKAGE.html  # in case a directory is left over
   eval "$cmd"
   html_mono_size=`calcsize $PACKAGE.html`
@@ -412,7 +394,7 @@ else # use texi2html:
 fi
 fi # end html
 
-# 
+# ␌
 printf "\nMaking .tar.gz for sources...\n"
 d=`dirname $srcfile`
 (
@@ -423,12 +405,12 @@ d=`dirname $srcfile`
 )
 texi_tgz_size=`calcsize "$outdir/$PACKAGE.texi.tar.gz"`
 
-# 
+# ␌
 # Do everything again through docbook.
 if test -n "$docbook"; then
   opt="-o - --docbook $commonarg"
   cmd="$SETLANG $MAKEINFO $opt \"$srcfile\" >${srcdir}/$PACKAGE-db.xml"
-  printf "\nGenerating docbook XML... ($cmd)\n"
+  printf "\nGenerating docbook XML... (%s)\n" "$cmd"
   eval "$cmd"
   docbook_xml_size=`calcsize $PACKAGE-db.xml`
   gzip -f -9 -c $PACKAGE-db.xml >"$outdir/$PACKAGE-db.xml.gz"
@@ -438,7 +420,7 @@ if test -n "$docbook"; then
   split_html_db_dir=html_node_db
   opt="$commonarg -o $split_html_db_dir"
   cmd="$DOCBOOK2HTML $opt \"${outdir}/$PACKAGE-db.xml\""
-  printf "\nGenerating docbook HTML... ($cmd)\n"
+  printf "\nGenerating docbook HTML... (%s)\n" "$cmd"
   eval "$cmd"
   (
     cd ${split_html_db_dir} || exit 1
@@ -451,20 +433,20 @@ if test -n "$docbook"; then
   rmdir ${split_html_db_dir}
 
   cmd="$DOCBOOK2TXT \"${outdir}/$PACKAGE-db.xml\""
-  printf "\nGenerating docbook ASCII... ($cmd)\n"
+  printf "\nGenerating docbook ASCII... (%s)\n" "$cmd"
   eval "$cmd"
   docbook_ascii_size=`calcsize $PACKAGE-db.txt`
   mv $PACKAGE-db.txt "$outdir/"
 
   cmd="$DOCBOOK2PDF \"${outdir}/$PACKAGE-db.xml\""
-  printf "\nGenerating docbook PDF... ($cmd)\n"
+  printf "\nGenerating docbook PDF... (%s)\n" "$cmd"
   eval "$cmd"
   docbook_pdf_size=`calcsize $PACKAGE-db.pdf`
   mv $PACKAGE-db.pdf "$outdir/"
 fi
 
-# 
-printf "\nMaking index.html for $PACKAGE...\n"
+# ␌
+printf "\nMaking index.html for %s...\n" "$PACKAGE"
 if test -z "$use_texi2html"; then
   CONDS="/%%IF  *HTML_SECTION%%/,/%%ENDIF  *HTML_SECTION%%/d;\
          /%%IF  *HTML_CHAPTER%%/,/%%ENDIF  *HTML_CHAPTER%%/d"
