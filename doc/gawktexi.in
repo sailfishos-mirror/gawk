@@ -649,6 +649,8 @@ particular records in a file and perform operations upon them.
 * Special Caveats::                     Things to watch out for.
 * Close Files And Pipes::               Closing Input and Output Files and
                                         Pipes.
+* Close Return Value::                  Using the return value from
+                                        @code{close()}.
 * Nonfatal::                            Enabling Nonfatal Output.
 * Output Summary::                      Output summary.
 * Output Exercises::                    Exercises.
@@ -10638,6 +10640,10 @@ Doing so results in unpredictable behavior.
 @cindex coprocesses @subentry closing
 @cindex @code{getline} command @subentry coprocesses, using from
 
+@menu
+* Close Return Value::          Using the return value from @code{close()}.
+@end menu
+
 If the same @value{FN} or the same shell command is used with @code{getline}
 more than once during the execution of an @command{awk} program
 (@pxref{Getline}),
@@ -10803,7 +10809,8 @@ delayed until
 @ref{Two-way I/O},
 which describes it in more detail and gives an example.
 
-@sidebar Using @code{close()}'s Return Value
+@node Close Return Value
+@subsection Using @code{close()}'s Return Value
 @cindex dark corner @subentry @code{close()} function
 @cindex @code{close()} function @subentry return value
 @cindex return value, @code{close()} function
@@ -10840,6 +10847,8 @@ call.} Otherwise, it is the return value from the system's @code{close()}
 or @code{fclose()} C functions when closing input or output files,
 respectively.  This value is zero if the close succeeds, or @minus{}1
 if it fails.
+Recent versions of BWK @command{awk} also return the same values
+from @command{close()}.
 
 @float Table,table-close-pipe-return-values
 @caption{Return values from @code{close()} of a pipe}
@@ -10860,7 +10869,6 @@ pipes; thus, the return value cannot be used portably.
 @value{DARKCORNER}
 In POSIX mode (@pxref{Options}), @command{gawk} just returns zero
 when closing a pipe.
-@end sidebar
 
 @node Nonfatal
 @section Enabling Nonfatal Output
@@ -26508,13 +26516,10 @@ We hope you find them both interesting and enjoyable.
 A common error when writing large amounts of prose is to accidentally
 duplicate words.  Typically you will see this in text as something like ``the
 the program does the following@dots{}''  When the text is online, often
-the duplicated words occur at the end of one line and the
+the duplicated words occur at the end of one line and at the
 @iftex
 the
 @end iftex
-@iflatex
-the
-@end iflatex
 beginning of
 another, making them very difficult to spot.
 @c as here!
@@ -41694,7 +41699,7 @@ The generated Info file for
 
 @item doc/pm-gawk.1
 The @command{troff} source for a manual page describing the
-the persistent memory features presented in @ref{Persistent Memory}.
+persistent memory features presented in @ref{Persistent Memory}.
 
 @item doc/igawk.1
 The @command{troff} source for a manual page describing the @command{igawk}
@@ -42383,12 +42388,12 @@ recipe works ``out of the box.''
 This @value{SUBSECTION} describes how to compile and install @command{gawk} under OpenVMS.
 
 @menu
-* OpenVMS Compilation::           How to compile @command{gawk} under OpenVMS.
+* OpenVMS Compilation::          How to compile @command{gawk} under OpenVMS.
 * OpenVMS Dynamic Extensions::   Compiling @command{gawk} dynamic extensions
                                  on OpenVMS.
-* OpenVMS Installation Details::  How to install @command{gawk} under OpenVMS.
-* OpenVMS Running::               How to run @command{gawk} under OpenVMS.
-* OpenVMS GNV::                   The OpenVMS GNV Project.
+* OpenVMS Installation Details:: How to install @command{gawk} under OpenVMS.
+* OpenVMS Running::              How to run @command{gawk} under OpenVMS.
+* OpenVMS GNV::                  The OpenVMS GNV Project.
 @end menu
 
 @node OpenVMS Compilation
