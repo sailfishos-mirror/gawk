@@ -56,9 +56,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Novembre 2022
+@set UPDATE-MONTH Dicembre 2022
 @set VERSION 5.2
-@set PATCHLEVEL 1
+@set PATCHLEVEL 2
 
 @c added Italian hyphenation stuff
 @hyphenation{ven-go-no o-met-te-re o-met-ten-do}
@@ -93,6 +93,16 @@
 @set COMMONEXT (e.c.)
 @set PAGE pagina
 @end iftex
+@iflatex
+@set DOCUMENT libro
+@set CHAPTER capitolo
+@set APPENDIX appendice
+@set SECTION sezione
+@set SUBSECTION sottosezione
+@set DARKCORNER (a.b.)
+@set COMMONEXT (e.c.)
+@set PAGE pagina
+@end iflatex
 @ifinfo
 @set DOCUMENT File Info
 @set CHAPTER nodo principale
@@ -179,6 +189,10 @@
 @set LEQ @math{@leq}
 @set PI @math{@pi}
 @end iftex
+@iflatex
+@set LEQ <=
+@set PI @i{pi}
+@end iflatex
 @ifdocbook
 @set LEQ @inlineraw{docbook, &le;}
 @set PI @inlineraw{docbook, &pgr;}
@@ -276,6 +290,10 @@ Some comments on the layout for TeX.
 @syncodeindex fn cp
 @syncodeindex vr cp
 @end iftex
+@iflatex
+@syncodeindex fn cp
+@syncodeindex vr cp
+@end iflatex
 @ifxml
 @syncodeindex fn cp
 @syncodeindex vr cp
@@ -293,6 +311,9 @@ Some comments on the layout for TeX.
 @iftex
 @finalout
 @end iftex
+@iflatex
+@finalout
+@end iflatex
 
 @c Enabled '-quotes in PDF files so that cut/paste works in
 @c more places.
@@ -747,6 +768,8 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Avvertimenti speciali::               Cose a cui prestare attenzione.
 * Chiusura file e @dfn{pipe}::          Chiudere file in input e di output e
                                         @dfn{pipe}.
+* Valore restituito da @code{close}::   Usare il valore di ritorno restituito da
+                                        @code{close()}.
 * Continuazione dopo errori::           Abilitare continuazione dopo errori
                                         in output.
 * Sommario di Output::                  Sommario di Output.
@@ -4458,7 +4481,7 @@ Le variabili da riga di comando della forma
 @end itemize
 
 Quest'opzione @`e particolarmente necessaria per le applicazioni World Wide Web
-CGI che passano argomenti attraverso le URL; l'uso di quest'opzione impedisce
+CGI che passano argomenti attraverso gli URL; l'uso di quest'opzione impedisce
 a un utente malintenzionato (o ad altri) di passare opzioni, assegnamenti o
 codice sorgente @command{awk} (con @option{-e}) all'applicazione
 CGI.@footnote{Per maggiori dettagli,
@@ -11854,6 +11877,11 @@ Se lo si fa, il comportamente risultante @`e imprevedibile.
 @cindex coprocessi @subentry chiusura
 @cindex @code{getline} (comando) @subentry coprocessi, usare da
 
+@menu
+* Valore restituito da @code{close}::   Usare il valore di ritorno restituito da
+                                        @code{close()}.
+@end menu
+
 Se lo stesso @value{FN} o lo stesso comando di shell @`e usato con @code{getline}
 pi@`u di una volta durante l'esecuzione di un programma @command{awk}
 (@pxref{Getline}),
@@ -12034,7 +12062,9 @@ rinviata alla
 @ref{I/O bidirezionale},
 che ne parla pi@`u dettagliatamente e fornisce un esempio.
 
-@sidebar Usare il codice di ritorno di @code{close()}
+@node Valore restituito da @code{close}
+@subsection Usare il valore di ritorno restituito da @code{close()}
+@node Usare il valore di ritorno di @code{close()}
 @cindex angolo buio @subentry funzione @subentry @code{close()}
 @cindex funzione @subentry @code{close()} @subentry codice di ritorno
 @cindex @code{close()} (funzione) @subentry codice di ritorno
@@ -12066,7 +12096,7 @@ In tal caso, @command{gawk} imposta la variabile predefinita
 
 In @command{gawk}, a partire dalla @value{PVERSION} 4.2,
 quando si chiude una @dfn{pipe} o un coprocesso (in input o in output),
-il codice di ritorno @`e quello restituito dal comando,
+il valore di ritorno @`e quello restituito dal comando,
 come descritto
 @iftex
 nella
@@ -12082,6 +12112,8 @@ Altrimenti, @`e il codice di ritorno dalla chiamata alle funzione
 di sistema @code{close()} o alla funzione C @code{fclose()}
 se si sta chiudendo un file in input o in output, rispettivamente.
 Questo valore @`e zero se la chiusura riesce, o @minus{}1 se non riesce.
+Anche le versioni pi@`u recenti di BWK @command{awk} restituiscono gli stessi
+valori per la funzione @command{close()}.
 
 @float Tabella,table-close-pipe-return-values
 @caption{Codici di ritorno dalla @code{close()} di una @dfn{pipe}}
@@ -12105,7 +12137,6 @@ portabile.
 @value{DARKCORNER}
 In modalit@`a POSIX (@pxref{Opzioni}), @command{gawk} restituisce solo zero
 quando chiude una @dfn{pipe}.
-@end sidebar
 
 @node Continuazione dopo errori
 @section Abilitare continuazione dopo errori in output
@@ -15771,12 +15802,17 @@ specificati sulla riga di comando di @command{gawk}.
 Come con le regole @code{BEGIN} ed @code{END}
 @ifnottex
 @ifnotdocbook
+@ifnotlatex
 (@pxref{BEGIN/END}),
+@end ifnotlatex
 @end ifnotdocbook
 @end ifnottex
 @iftex
 (si veda la @value{SECTION} precedente),
 @end iftex
+@iflatex
+(si veda la @value{SECTION} precedente),
+@end iflatex
 @ifdocbook
 (si veda la @value{SECTION} precedente),
 @end ifdocbook
@@ -17519,10 +17555,6 @@ I valori riportano ci@`o che @command{gawk} sa sugli identificativi
 dopo aver finito l'analisi iniziale del programma; questi valori @emph{non}
 vengono pi@`u aggiornati durante l'esecuzione del programma.
 
-@item PROCINFO["mb_cur_max"]
-Il massimo numero di byte che possono essere usati per rappresentare
-un singolo carattere, nella codifica correntemente utilizzata.
-
 @item PROCINFO["platform"]
 @cindex piattaforma di esecuzione
 @cindex @code{PROCINFO} (vettore) @subentry ambiente di compilazione
@@ -17553,6 +17585,17 @@ Il @dfn{ID di gruppo del processo} del programma corrente.
 @cindex @dfn{process ID} del programma @command{gawk}
 Il @dfn{process ID} del programma corrente.
 
+@item PROCINFO["pma"]
+@cindex memoria persistente @subentry disponibile in @command{gawk}
+@cindex PMA (allocatore di memoria persistente) @subentry disponibile in @command{gawk}
+@cindex allocatore di memoria persistente (PMA) @subentry disponibile in @command{gawk}
+@cindex memoria persistente (PMA) @subentry disponibile in @command{gawk}
+La versione dell'allocatore di memoria persistente (PMA)
+disponibile in @command{gawk}.
+Questo elemento non sar@`a presente se l'allocatore di memoria
+persistente non @`e disponibile.
+@xref{Memoria persistente}.
+
 @item PROCINFO["ppid"]
 @cindex @dfn{parent process ID} del programma @command{gawk}
 Il @dfn{ID di processo del padre} del programma corrente.
@@ -17564,10 +17607,6 @@ Assegnando un nuovo valore a questo elemento si cambia quello di default.
 
 @item PROCINFO["uid"]
 Il valore restituito dalla chiamata di sistema @code{getuid()}.
-
-@item PROCINFO["utf8"]
-Il valore di questa variabile sar@`a @code{"true"} [vero] se la codifica di
-carattere in uso @`e UTF-8, e sar@`a @code{"false"} [falso] in tutti gli altri casi.
 
 @item PROCINFO["version"]
 @cindex versione @subentry di @command{gawk}
@@ -29470,8 +29509,11 @@ Si spera che siano interessanti e divertenti.
 Un errore comune quando si scrive un testo lungo @`e quello di ripetere
 accidentalmente delle parole.  Tipicamente lo si pu@`o vedere in testi del tipo
 ``questo programma fa quanto segue segue@dots{}''  Quando il testo @`e pubblicato in rete, spesso
-le parole duplicate sono poste tra il termine di
-una riga e l'inizio di un'altra, il che rende difficile scoprirle.
+le parole duplicate sono poste tra il termine di una
+@iftex
+una
+@end iftex
+riga e l'inizio di un'altra, il che rende difficile scoprirle.
 @c as here!
 
 Questo programma, @file{dupword.awk}, legge un file una riga alla volta
@@ -33225,6 +33267,10 @@ formato con cui sono stati inseriti.
 @node Memoria persistente
 @section Preservare dati fra successive esecuzioni di @command{gawk}
 
+@cindex PMA (allocatore di memoria persistente)
+@cindex allocatore di memoria persistente (PMA)
+@cindex memoria persistente (PMA)
+
 A partire dalle versione @value{PVERSION} 5.2, @command{gawk} supporta
 la @dfn{memoria persistente} [@dfn{persistent memory}].
 
@@ -34851,7 +34897,7 @@ quello di programmi che risiedono su file.)
 Nel nostro caso, il debugger verr@`a invocato in questo modo:
 
 @example
-$ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -1 file_di_input}
+$ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -- -1 file_di_input}
 @end example
 
 @cindex @env{AWKPATH} (variabile d'ambiente)
@@ -34863,6 +34909,10 @@ questa sintassi @`e leggermente differente da quello che sono abituati a usare.
 Col debugger di @command{gawk}, si danno gli argomenti per eseguire il
 programma nella riga di comando al debugger piuttosto che come parte del
 comando @code{run} al prompt del debugger.)
+Il doppio trattino @option{--} termina le opzioni specificate a @command{gawk}
+sulla riga di comando.  Non @`e strettamente necessaria in questo caso,
+ma lo diviente se un'opzione destinata al programma @command{awk}
+@`e in conflitto con qualche opzione di @command{gawk}.
 L'opzione @option{-1} @`e un'opzione per @file{uniq.awk}.
 
 @cindex debugger @subentry prompt
@@ -45560,6 +45610,11 @@ integrato, consentendo l'uso di dati persistenti
 sistemi
 (@pxref{Memoria persistente}).
 
+@item
+L'elemento @code{PROCINFO["pma"]} esiste se l'allocatore di memoria
+persistente (PMA) @`e disponibile.
+@pxref{Variabili auto-assegnate}.)
+
 @end itemize
 
 La Versione 5.3 ha aggiunto le seguenti funzionalit@`a:
@@ -45569,10 +45624,6 @@ La Versione 5.3 ha aggiunto le seguenti funzionalit@`a:
 Divisione di campi per i file CSV
 [Campi Separati da Virgola]
 (@pxref{Campi separati da virgola}).
-
-@item
-Gli elementi @code{"mb_cur_max"} e @code{"utf8"} nel vettore
-@code{PROCINFO} (@pxref{Variabili auto-assegnate}).
 
 @item
 La necessit@`a di utilizzare la libreria GNU @code{libsigsegv}
@@ -46029,10 +46080,6 @@ resto del team di sviluppo.
 John Malmberg ha apportato miglioramenti significativi alla versione
 OpenVMS e alla relativa documentazione.
 
-@item
-@cindex Colombo, Antonio
-Antonio Giovanni Colombo ha riscritto diversi esempi, che non erano pi@`u
-attuali, contenuti nei primi capitoli, e gliene sono estremamente grato.
 Ha inoltre preparato con Marco Curreli e mantiene la traduzione in
 italiano di questo libro.
 
@@ -48138,7 +48185,7 @@ Brian Kernighan, uno degli sviluppatori originali di Unix @command{awk},
 ha reso disponibile liberamente la sua implementazione di @command{awk}.
 Pu@`o essere scaricata da GitHub:
 @example
-git clone git://github.com/onetrueawk/awk bwkawk
+git clone https://github.com/onetrueawk/awk bwkawk
 @end example
 
 @noindent
@@ -48161,7 +48208,7 @@ POSIX @command{awk}.
 
 Incidentalmente, Dan Bornstein ha creato un deposito Git che contiene tutte le
 versioni di BWK @command{awk} che @`e riuscito a trovare.  @`E disponibile in
-@uref{git://github.com/danfuzz/one-true-awk}.
+@uref{https://github.com/danfuzz/one-true-awk}.
 
 @cindex Brennan, Michael
 @cindex @command{mawk} (programma di utilit@`a)
@@ -48587,7 +48634,10 @@ ugualmente al deposito usando il comando:
 git clone http://git.savannah.gnu.org/r/gawk.git
 @end example
 
-Una volta modificato il sorgente, @`e posibile usare @samp{git diff} per
+@noindent
+(Utilizzare un URL di tipo @code{https} @`e ritenuto pi@`u sicuro.)
+
+Una volta modificato il sorgente, @`e possibile usare @samp{git diff} per
 produrre una @dfn{patch}, e spedirla al manutentore di @command{gawk}; si veda
 @ref{Bug}, per come farlo.
 
