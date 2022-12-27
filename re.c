@@ -118,6 +118,8 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 		   character.  */
 		if ((gawk_mb_cur_max == 1 || ! is_multibyte) &&
 		    (*src == '\\')) {
+			bool unicode;
+
 			c = *++src;
 			switch (c) {
 			case '\0':	/* \\ before \0, either dynamic data or real end of string */
@@ -134,6 +136,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 			case 't':
 			case 'v':
 			case 'x':
+			case 'u':
 			case '0':
 			case '1':
 			case '2':
@@ -142,7 +145,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 			case '5':
 			case '6':
 			case '7':
-				c2 = parse_escape(&src);
+				c2 = parse_escape(&src, &unicode);
 				if (c2 < 0)
 					cant_happen("received bad result %d from parse_escape()", c2);
 				/*
@@ -155,7 +158,23 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 				    && (isdigit(c) || c == 'x')
 				    && strchr("()|*+?.^$\\[]", c2) != NULL)
 					*dest++ = '\\';
-				*dest++ = (char) c2;
+				if (unicode) {
+					char buf[20];
+					size_t n;
+					mbstate_t mbs;
+					int i;
+
+					memset(& mbs, 0, sizeof(mbs));
+
+					n = wcrtomb(buf, c, & mbs);
+					if (n == (size_t) -1)	// bad value
+						*dest++ = '?';
+					else {
+						for (i = 0; i < n; i++)
+							*dest++ = buf[i];
+					}
+				} else
+					*dest++ = (char) c2;
 				if (do_lint
 				    && ! nul_warned
 				    && c2 == '\0') {
