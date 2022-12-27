@@ -212,7 +212,6 @@ int
 main(int argc, char **argv)
 {
 	int i;
-	char *extra_stack;
 	bool have_srcfile = false;
 	SRCFILE *s;
 	char *cp;
@@ -555,10 +554,6 @@ main(int argc, char **argv)
 
 	if (do_tidy_mem)
 		release_all_vars();
-
-	/* keep valgrind happier */
-	if (extra_stack)
-		efree(extra_stack);
 
 	final_exit(exit_val);
 	return exit_val;	/* to suppress warnings */
