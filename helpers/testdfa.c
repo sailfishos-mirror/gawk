@@ -1,7 +1,7 @@
 /*
  * testdfa.c --- abstracted from gawk.
  *
- * gcc -I.. -I../support testdfa.c ../support/libsupport.a -o testdfa
+ * gcc -I.. -I../support testdfa.c ../support/libsupport.a -lm -o testdfa
  */
 
 /*
@@ -92,6 +92,8 @@ int main(int argc, char **argv)
 	char *place;
 	bool not_bol = false;
 	struct localeinfo localeinfo;
+
+	pma_init(1, NULL);
 
 	if (argc < 2)
 		usage(argv[0]);
