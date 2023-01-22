@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2022,
+ * Copyright (C) 2022, 2023,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -38,7 +38,7 @@ main(int argc, char **argv)
 {
 	size_t four_meg = 1024 * 1024 * 4;
 	char c = 0;
-	int fd = creat("test.pma", 0666);
+	int fd = creat("test.pma", 0600);
 
 	if (fd < 0) {
 		fprintf(stderr, "%s: could not create test.pma: %s\n",

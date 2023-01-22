@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2022,
+ * Copyright (C) 1986, 1988, 1989, 1991-2023,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -25,7 +25,7 @@
  */
 
 /* FIX THIS BEFORE EVERY RELEASE: */
-#define UPDATE_YEAR	2022
+#define UPDATE_YEAR	2023
 
 #include "awk.h"
 #include "getopt.h"
@@ -56,6 +56,7 @@ static void init_fds(void);
 static void init_groupset(void);
 static void save_argv(int, char **);
 static const char *platform_name();
+static void check_pma_security(const char *pma_file);
 
 /* These nodes store all the special variables AWK uses */
 NODE *ARGC_node, *ARGIND_node, *ARGV_node, *BINMODE_node, *CONVFMT_node;
@@ -222,10 +223,11 @@ main(int argc, char **argv)
 
 	myname = gawk_name(argv[0]);
 
+	check_pma_security(persist_file);
+
 	int pma_result = pma_init(1, persist_file);
 	if (pma_result != 0) {
-		// don't use 'fatal' routine, it seems to need to
-		// allocate memory
+		// don't use 'fatal' routine, memory can't be allocated
 		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
 				myname, pma_result, pma_errno);
 		exit(EXIT_FATAL);
@@ -250,6 +252,7 @@ main(int argc, char **argv)
 		mtrace();
 #endif /* HAVE_MTRACE */
 #endif /* HAVE_MCHECK_H */
+
 	os_arg_fixup(&argc, &argv); /* emulate redirection, expand wildcards */
 
 	if (argc < 2)
@@ -1883,4 +1886,32 @@ set_current_namespace(const char *new_namespace)
 		efree((void *) current_namespace);
 
 	current_namespace = new_namespace;
+}
+
+/* check_pma_security --- make some minimal security checks */
+
+static void
+check_pma_security(const char *pma_file)
+{
+#ifdef USE_PERSISTENT_MALLOC
+	struct stat sbuf;
+	int euid = geteuid();
+
+	// don't use 'fatal' routine, it seems to need to allocate memory
+	// and we haven't initialized PMA yet.
+
+	if (pma_file == NULL)
+		return;
+	else if (stat(pma_file, & sbuf) < 0) {
+		fprintf(stderr, _("%s: fatal: cannot stat %s: %s\n"),
+				myname, pma_file, strerror(errno));
+		exit(EXIT_FATAL);
+	} else if (euid == 0) {
+		fprintf(stderr, _("%s: fatal: using persistent memory is not allowed when running as root.\n"), myname);
+		exit(EXIT_FATAL);
+	} else if (sbuf.st_uid != euid) {
+		fprintf(stderr, _("%s: warning: %s is not owned by euid %d.\n"),
+				myname, pma_file, euid);
+	}
+#endif /* USE_PERSISTENT_MALLOC */
 }
