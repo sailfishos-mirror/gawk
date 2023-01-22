@@ -303,13 +303,13 @@ Fax: +1-617-542-2652
 Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="https://www.gnu.org">https://www.gnu.org/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2022
+<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2023
 Free Software Foundation, Inc.
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2022 @*
+Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2023 @*
 Free Software Foundation, Inc.
 @end ifnotdocbook
 @sp 2
@@ -30091,6 +30091,14 @@ utility:
 $ @kbd{truncate -s 4G data.pma}
 @end example
 
+@item
+It is recommended (but not required) to change the permissions on the
+file so that only the owner can read and write it:
+
+@example
+$ @kbd{chmod 0600 data.pma}
+@end example
+
 @cindex @env{GAWK_PERSIST_FILE} environment variable
 @cindex environment variables @subentry @env{GAWK_PERSIST_FILE}
 @item
@@ -30166,7 +30174,10 @@ and error information the persistent memory allocator will print.
 @command{gawk} sets the default to one. See the @file{support/pma.c}
 source code to understand what the different verbosity levels are.
 
-@quotation NOTE
+There are a few constraints on the use of persistent memory:
+
+@itemize @bullet
+@item
 If you use MPFR mode (the @option{-M} option) on the first run
 of a program using persistent memory, you @emph{must} continue
 to use it on all subsequent runs.  Similarly, if you don't use @option{-M}
@@ -30176,10 +30187,17 @@ Mixing and matching MPFR mode and regular mode with the same backing
 file is not allowed.  @command{gawk} detects such a situation and issues
 a fatal error message.
 
-Additionally, the GNU/Linux CIFS filesystem is known to not
+@item
+The GNU/Linux CIFS filesystem is known to not
 work well with the PMA allocator.
 Don't use a backing file on a CIFS filesystem.
-@end quotation
+
+@item
+If @command{gawk} is run by the @command{root} user, then
+persistent memory is not allowed. This is to avoid the possibility
+of private data ``leaking'' into the backing file and being
+recovered later by an attacker.
+@end itemize
 
 Terence Kelly has provided a separate @cite{@value{PMGAWKTITLE}}
 document, which is included in the @command{gawk}
@@ -39235,18 +39253,8 @@ if (contents == "" && ERRNO != "") @{
 @node Extension Sample Time
 @subsection Extension Time Functions
 
-@quotation CAUTION
-As @command{gawk} @value{PVERSION} 5.1.0, this extension is considered to be obsolete.
-It is replaced by the @code{timex} extension in @code{gawkextlib}
-(@pxref{gawkextlib}).
-
-For @value{PVERSION} 5.1, no warning will be issued if this extension is used.
-For the next major release, a warning will be issued. In the release after that
-this extension will be removed from the distribution.
-@end quotation
-
-The @code{time} extension adds two functions, named @code{gettimeofday()}
-and @code{sleep()}, as follows:
+The @code{time} extension adds three functions, named @code{gettimeofday()}
+@code{sleep()}, and @code{strptime()}, as follows:
 
 @table @code
 @item @@load "time"
@@ -39270,6 +39278,27 @@ Otherwise, return zero after sleeping for the indicated amount of time.
 Note that @var{seconds} may be a floating-point (nonintegral) value.
 Implementation details: depending on platform availability, this function
 tries to use @code{nanosleep()} or @code{select()} to implement the delay.
+
+@cindex @code{strptime()} extension function
+@item timeval = strptime(@var{string}, @var{format})
+This function takes two arguments, a string representing a date and
+time, and a format string describing the data in the string. It
+calls the C library @code{strptime()} function with the given values.
+If the parsing succeeds, the results are passed to the C library
+@code{mktime()} function, and its result is returned, expressing
+the time in seconds since the epoch in the current local timezone,
+regardless of any timezone specified in the string arguments.  (This
+is the same as @command{gawk}'s built-in @code{systime()} function.)
+Otherwise it returns @minus{}1 upon error. In the latter case,
+
+Note that the underlying @code{strptime()} C library routine apparently
+ignores any time zone indication in the date string, producing values
+relative to the current time zone.
+@ignore
+It might be better to have this
+routine return a string similar to what @command{gawk}'s @code{mktime()}
+function expects, but we ran out of energy.
+@end ignore
 @end table
 
 @node Extension Sample API Tests
