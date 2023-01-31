@@ -3,7 +3,7 @@
  */
 
 /* 
- * Copyright (C) 1986, 1988, 1989, 1991-2022,
+ * Copyright (C) 1986, 1988, 1989, 1991-2023,
  * the Free Software Foundation, Inc.
  * 
  * This file is part of GAWK, the GNU implementation of the
@@ -344,7 +344,9 @@ uninitialized_scalar:
 				}
 			}
 
-			if (r->type == Node_val || r->type == Node_elem_new)
+			if (r->type == Node_val
+			    || r->type == Node_var
+			    || r->type == Node_elem_new)
 				UPREF(r);
 			PUSH(r);
 			break;
