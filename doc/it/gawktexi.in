@@ -339,7 +339,7 @@ Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="https://www.gnu.org">https://www.gnu.org/</ulink>
 </literallayout>
 
-<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2022
+<literallayout class="normal">Copyright &copy; 1989, 1991, 1992, 1993, 1996&ndash;2005, 2007, 2009&ndash;2023
 Free Software Foundation, Inc.
 All Rights Reserved.
 </literallayout>
@@ -362,7 +362,7 @@ Italian Linux Documentation Project (ILDP)
 Email: <emailildp@@pluto.it
 URL: <ulink url="http://www.pluto.it/ildp">http://www.pluto.it/ildp/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2016&ndash;2022
+<literallayout class="normal">Copyright &copy; 2016&ndash;2023
 Free Software Foundation, Inc.
 All Rights Reserved.
 </literallayout>
@@ -370,7 +370,7 @@ All Rights Reserved.
 
 @ifnotdocbook
 @iftex
-Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2022 @*
+Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2023 @*
 Free Software Foundation, Inc.
 @end iftex
 @end ifnotdocbook
@@ -457,7 +457,7 @@ URL: @uref{https://www.gnu.org/}@*
 @c This one is correct for gawk 3.1.0 from the FSF
 @c ISBN 1-882114-28-0
 @sp 0
-Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2022@*
+Copyright @copyright{} 1989, 1991, 1992, 1993, 1996--2005, 2007, 2009--2023@*
 Free Software Foundation, Inc.
 @sp 1
 Traduzione e revisione:@*
@@ -33299,7 +33299,7 @@ in @command{gawk} in questo modo:
 @example
 $ @kbd{gawk --version}
 @print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
-@print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
+@print{} Copyright (C) 1989, 1991-2023 Free Software Foundation.
 @dots{}
 @end example
 
@@ -33333,6 +33333,14 @@ di utilit@`a @command{truncate}:
 $ @kbd{truncate -s 4G dati.pma}
 @end example
 
+@item
+Si raccomanda (ma non è obbligatorio farlo) di modificare i permessi
+di accesso al file in modo che solo il proprietario possa leggere e
+aggiornare il file:
+
+@example
+$ @kbd{chmod 0600 dati.pma}
+@end example
 
 @cindex @env{GAWK_PERSIST_FILE} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{GAWK_PERSIST_FILE}
@@ -33426,7 +33434,10 @@ di memoria persistente.
 codice sorgente @file{support/pma.c} per comprendere il comportamento
 dei vari livelli di verbosit@`a.
 
-@quotation NOTA
+Ci sono alcune limitazioni all'uso della memoria persistente:
+
+@itemize @bullet
+@item
 Se si usa la libreria MPFR (opzione @option{-M}) nella prima esecuzione
 di un programma che fa uso della memoria persistente si @emph{deve}
 usarla in tutte le esecuzioni successive.
@@ -33437,11 +33448,20 @@ Non @`e consentito alternare esecuzioni che usano la libreria MPFR con
 esecuzioni che non la usano.  Se @command{gawk} rileva questa
 situazione, termina l'esecuzione con un errore fatale.
 
-Inoltre, il filesystem CIFS in ambiente GNU/Linux risulta non
+@item
+Il filesystem CIFS in ambiente GNU/Linux risulta non
 funzionare bene con l'allocatore PMA.
 Quindi, non va usato un file di appoggio per la memoria persistente
 residente su un filesystem CIFS.
-@end quotation
+
+@item
+Se @command{gawk} è eseguito dall'utente @command{root}, l'uso
+della memoria persistente non è consentito.
+Ciò al fine di evitare la possibilità che dati "privati"
+siano salvati nel file di appoggio e vengano successivamente
+acceduti da un altro utente o hacker (che a sua volta sia divenuto
+@command{root}.
+@end itemize
 
 Terence Kelly ha preparato un documento a parte, dedicato alla
 memoria persistente @cite{@value{PMGAWKTITLE}},
@@ -37237,7 +37257,7 @@ Si pu@`o verificare se il supporto a MPFR @`e disponibile in questo modo:
 @example
 $ @kbd{gawk --version}
 @print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
-@print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
+@print{} Copyright (C) 1989, 1991-2023 Free Software Foundation.
 @dots{}
 @end example
 
@@ -43609,18 +43629,6 @@ if (contents == "" && ERRNO != "") @{
 @node Esempio di estensione Time
 @subsection Funzioni dell'estensione time
 
-@quotation ATTENZIONE
-A partire da @command{gawk} @value{PVERSION} 5.1.0, quest'estensione @`e
-da considerarsi obsoleta.  @`E sostituita dall'estensione
-@code{timex} in @code{gawkextlib} (@pxref{gawkextlib}).
-
-Nella @value{PVERSION} 5.1, non viene emesso alcun messaggio di avviso
-se si usa quest'estensione.
-A partire dalla prossima versione principale, verr@`a emesso un messaggio
-di avviso.  Nella versione successiva a quella, quest'estensione sar@`a
-rimossa dalla distribuzione.
-@end quotation
-
 L'estensione @code{time} aggiunge due funzioni, di nome
 @code{gettimeofday()} e @code{sleep()}, come segue:
 
@@ -43656,6 +43664,34 @@ numero intero).
 Dettagli di implementazione: a seconda della disponibilit@`a nel sistema in uso,
 questa funzione tenta di usare @code{nanosleep()} o @code{select()} per
 ottenere il tempo di attesa richiesto.
+
+@cindex @code{strptime()} (funzione estesa)
+@cindex funzione estesa @subentry @code{strptime()}
+@item timeval = strptime(@var{string}, @var{format})
+Questa funzione accetta due argomenti, una stringa che rappresenta
+una data e un'ora e una stringa di formato che descrive i dati
+contenuti nella prima stringa.
+Viene richiamata la funzione di libreria C @code{strptime()},
+con i valori passati alla funzione.
+Se la scansione dei parametri risulta essere corretta, i risultati
+sono quindi passati alla funzione di libreria C @code{mktime()},
+i cui risultati vengono poi restituiti, e contengono il numero di
+secondi passato dall'inizio del tempo in Unix (01 gennaio 1970),
+nel fuso orario del computer, a prescindere da qualsiasi specificazione
+di fuso orario contenuta negli argomenti passati alla funzione.
+(Ciò equivale alla funzione predefinita @code{systime()} di
+@command{gawk}.
+Altrimenti, in caso di errore, viene restituito @minus{}1.
+
+Notare che la routine di libreria C @code{strptime()} qui
+richiamata ignora ogni indicazione di fuso orario nella stringa
+che descrive la data, restituendo sempre valori relativi al
+fuso orario del computer.
+@ignore
+It might be better to have this
+routine return a string similar to what @command{gawk}'s @code{mktime()}
+function expects, but we ran out of energy.
+@end ignore
 @end table
 
 @node Esempio di estensione API Test
