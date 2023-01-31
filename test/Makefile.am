@@ -318,6 +318,9 @@ EXTRA_DIST = \
 	fcall_exit2.ok \
 	fflush.ok \
 	fflush.sh \
+	fieldassign.awk \
+	fieldassign.in \
+	fieldassign.ok \
 	fieldwdth.awk \
 	fieldwdth.in \
 	fieldwdth.ok \
@@ -1459,7 +1462,8 @@ BASIC_TESTS = \
 	delarprm delfunc dfacheck2 dfamb1 dfastress divzero divzero2 \
 	dynlj eofsplit \
 	eofsrc1 escapebrace exit2 exitval1 exitval2 exitval3 fcall_exit \
-	fcall_exit2 fldchg fldchgnf fldterm fnamedat fnarray fnarray2 \
+	fcall_exit2 \
+	fieldassign fldchg fldchgnf fldterm fnamedat fnarray fnarray2 \
 	fnaryscl fnasgnm fnmisc fordel forref forsimp fsbs fscaret fsnul1 \
 	fsrs fsspcoln fstabplus funsemnl funsmnam funstack getline \
 	getline2 getline3 getline4 getline5 getlnbuf getlnfa getnr2tb \
