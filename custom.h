@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2022,
+ * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2023,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -71,6 +71,13 @@ typedef long int_fast32_t;
 typedef long long int_fast64_t;
 typedef unsigned long long uint_fast64_t;
 #endif /* __VAX */
+#endif
+/* Still lacking a lot of C99 Support in OpenVMS */
+#ifndef __bool_true_false_are_defined
+typedef _Bool bool;
+#define true 1
+#define false 0
+#define __bool_true_false_are_defined 1
 #endif
 #endif /* __VMS */
 
