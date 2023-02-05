@@ -2871,7 +2871,9 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 		set_record(s, cnt, field_width);
 	else {			/* assignment to variable */
 		unref(*lhs);
-		*lhs = make_string(s, cnt);
+		// s could be NULL if cnt == 0, avoid passing a null
+		// pointer to make_string().
+		*lhs = make_string(s != NULL ? s : "", cnt);
 		(*lhs)->flags |= USER_INPUT;
 	}
 
@@ -2915,7 +2917,9 @@ do_getline(int into_variable, IOBUF *iop)
 		NODE **lhs;
 		lhs = POP_ADDRESS();
 		unref(*lhs);
-		*lhs = make_string(s, cnt);
+		// s could be NULL if cnt == 0, avoid passing a null
+		// pointer to make_string().
+		*lhs = make_string(s != NULL ? s : "", cnt);
 		(*lhs)->flags |= USER_INPUT;
 	}
 	return make_number((AWKNUM) 1.0);
