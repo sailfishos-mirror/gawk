@@ -29,7 +29,7 @@ $!
 $! This procedure may not guess the options correctly for all architectures,
 $! and is a work in progress.
 $!
-$! Copyright (C) 2014 the Free Software Foundation, Inc.
+$! Copyright (C) 2014-2023 the Free Software Foundation, Inc.
 $!
 $! This file is part of GAWK, the GNU implementation of the
 $! AWK Progamming Language.
@@ -60,6 +60,7 @@ $! 09-Apr-2005	J. Malmberg	Update for RSYNC and large file.
 $! 29-Sep-2011	J. Malmberg	Update for Bash 4.2
 $! 01-Mar-2012	J. Malmberg	Warn about getcwd(0,0)
 $! 21-Dec-2012	J. Malmberg	Update for gawk
+$! 02-Feb-2023`	J. Malmberg	Add HAVE_C_BOOL special case
 $!============================================================================
 $!
 $ss_normal = 1
@@ -398,6 +399,16 @@ $	if key2 .eqs. "GETGROUPS_T"
 $	then
 $	    write tf "#ifndef ''key2'"
 $	    write tf "#define ''key2' gid_t"
+$	    write tf "#endif"
+$	    goto cfgh_in_loop1
+$	endif
+$!
+$	if key2 .eqs. "HAVE_C_BOOL"
+$	then
+$	    write tf "#if (defined(__DECC) && __DECC_VER >= 60400000)"
+$	    write tf "#define ''key2' 1"
+$           write tf "#else"
+$           write tf "#undef HAVE_C_BOOL"
 $	    write tf "#endif"
 $	    goto cfgh_in_loop1
 $	endif
