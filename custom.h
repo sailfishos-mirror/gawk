@@ -72,12 +72,13 @@ typedef long long int_fast64_t;
 typedef unsigned long long uint_fast64_t;
 #endif /* __VAX */
 #endif
-/* Still lacking a lot of C99 Support in OpenVMS */
-#ifndef __bool_true_false_are_defined
-typedef _Bool bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
+/* All currently supported OpenVMS compilers appear to have HAVE_C_BOOL.
+   The generic config_h.com is used instead of configure is not able to
+   understand the extra code in config.h.in so it comments it out.
+   This code is needed to activate the stdbool.h
+*/
+#if (defined(HAVE_C_BOOL) && defined(HAVE_STDBOOL_H))
+#include <stdbool.h>
 #endif
 #endif /* __VMS */
 
