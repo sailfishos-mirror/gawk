@@ -270,8 +270,11 @@ dir_take_control_of(awk_input_buf_t *iobuf)
 	dp = fdopendir(iobuf->fd);
 #else
 	dp = opendir(iobuf->name);
-	if (dp != NULL)
+	if (dp != NULL) {
+		if (iobuf->fd != INVALID_HANDLE)
+			(void) close(iobuf->fd);
 		iobuf->fd = dirfd(dp);
+	}
 #endif
 	if (dp == NULL) {
 		warning(ext_id, _("dir_take_control_of: opendir/fdopendir failed: %s"),

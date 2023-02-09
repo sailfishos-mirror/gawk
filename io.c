@@ -3847,7 +3847,7 @@ errno_io_retry(void)
 
 /*
  * get_a_record --- read a record from IOP into out,
- * return length of EOF, set RT.
+ * return length or EOF, set RT.
  * Note that errcode is never NULL, and the caller initializes *errcode to 0.
  * If I/O would block, return -2.
  */

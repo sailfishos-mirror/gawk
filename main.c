@@ -593,6 +593,14 @@ add_preassign(enum assign_type type, char *val)
 static void
 usage(int exitval, FILE *fp)
 {
+	static const char gnu_url[] = "https://ftp.gnu.org/gnu/gawk";
+	static const char beta_url[] = "https://www.skeeve.com/gawk";
+	const char *url;
+	int major_version, minor_version, patchlevel;
+
+	major_version = minor_version = patchlevel = 0;
+	sscanf(PACKAGE_VERSION, "%d.%d.%d", & major_version, & minor_version, & patchlevel);
+
 	/* Not factoring out common stuff makes it easier to translate. */
 	fprintf(fp, _("Usage: %s [POSIX or GNU style options] -f progfile [--] file ...\n"),
 		myname);
@@ -655,6 +663,17 @@ printed version.  This same information may be found at\n\
 https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.\n\
 PLEASE do NOT try to report bugs by posting in comp.lang.awk,\n\
 or by using a web forum such as Stack Overflow.\n\n"), fp);
+
+	// 5.2.60 is beta release on master, will become 5.3.0.
+	// 5.2.2a is beta release on stable, will become 5.2.3.
+	if (patchlevel >= 60 || isalpha(PACKAGE_VERSION[strlen(PACKAGE_VERSION)-1]))
+		url = beta_url;
+	else
+		url = gnu_url;
+
+	/* ditto */
+	fprintf(fp, _("Source code for gawk may be obtained from\n%s/gawk-%s.tar.gz\n\n"),
+		url, PACKAGE_VERSION);
 
 	/* ditto */
 	fputs(_("gawk is a pattern scanning and processing language.\n\
