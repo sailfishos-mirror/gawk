@@ -59,9 +59,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH December, 2022
-@set VERSION 5.2
-@set PATCHLEVEL 2
+@set UPDATE-MONTH February, 2023
+@set VERSION 5.3
+@set PATCHLEVEL 0
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
 @set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
@@ -658,6 +658,7 @@ particular records in a file and perform operations upon them.
 * Close Return Value::                  Using the return value from
                                         @code{close()}.
 * Nonfatal::                            Enabling Nonfatal Output.
+* Noflush::                             Speeding Up Pipe Output.
 * Output Summary::                      Output summary.
 * Output Exercises::                    Exercises.
 * Values::                              Constants, Variables, and Regular
@@ -10006,6 +10007,7 @@ and discusses the @code{close()} built-in function.
                                 @command{gawk} allows access to inherited file
                                 descriptors.
 * Close Files And Pipes::       Closing Input and Output Files and Pipes.
+* Noflush::                     Speeding Up Pipe Output.
 * Nonfatal::                    Enabling Nonfatal Output.
 * Output Summary::              Output summary.
 * Output Exercises::            Exercises.
@@ -11507,8 +11509,53 @@ pipes; thus, the return value cannot be used portably.
 In POSIX mode (@pxref{Options}), @command{gawk} just returns zero
 when closing a pipe.
 
+@node Noflush
+@section Speeding Up Pipe Output
+@c FIXME: Add indexing
+
+This @value{SECTION} describes a @command{gawk}-specific feature.
+
+Normally, when you send data down a pipeline to a command with
+@code{print} or @code{printf}, @command{gawk} @dfn{flushes} the
+output down the pipe. That is, output is not buffered, but
+written directly.  This assures, that pipeline output
+intermixed with @command{gawk}'s output comes out in the
+expected order:
+
+@example
+print "something"			# goes to standard output
+print "someting else" | "some-command"	# also to standard output
+print "more stuff"			# and this too
+@end example
+
+There can be a price to pay for this; flushing data down
+the pipeline uses more CPU time, and in certain environments
+this can become expensive.
+
+You can tell @command{gawk} not to flush buffered data in
+one of two ways:
+
+@itemize @bullet
+@item
+Set @code{PROCINFO["BUFFERPIPE"]} to any value. When this is done,
+@command{gawk} will buffer data for all pipelines.
+
+@item
+Set @code{PROCINFO["@var{command}", "BUFFERPIPE"]} to any value.
+In this case, only @var{command}'s data will be fully buffered.
+@end itemize
+
+You @emph{must} create one or the other of these elements
+in @code{PROCINFO} before the first @code{print} or
+@code{printf} to the pipeline.  Doing so after output has
+already been sent is too late.
+
+Be aware that using this feature may change the output behavior of
+your programs, so exercise caution.
+
 @node Nonfatal
 @section Enabling Nonfatal Output
+@c FIXME: Add indexing
 
 This @value{SECTION} describes a @command{gawk}-specific feature.
 
@@ -16616,6 +16663,14 @@ to test for these elements
 The following elements allow you to change @command{gawk}'s behavior:
 
 @table @code
+@item PROCINFO["BUFFERPIPE"]
+If this element exists, all output to pipelines becomes buffered.
+@xref{Noflush}.
+
+@item PROCINFO["@var{command}", "BUFFERPIPE"]
+Make output to @var{command} buffered.
+@xref{Noflush}.
+
 @item PROCINFO["NONFATAL"]
 If this element exists, then I/O errors for all redirections become nonfatal.
 @xref{Nonfatal}.
@@ -42152,6 +42207,10 @@ Version 5.3 added the following features:
 @item
 Comma separated value (CSV) field splitting
 (@pxref{Comma Separated Fields}).
+
+@item
+The ability to make @command{gawk} buffer output to pipes
+(@pxref{Noflush}).
 
 @item
 The need for GNU @code{libsigsegv} was removed from @command{gawk}.
