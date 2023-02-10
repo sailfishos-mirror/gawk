@@ -260,6 +260,7 @@ static void find_input_parser(IOBUF *iop);
 static bool find_output_wrapper(awk_output_buf_t *outbuf);
 static void init_output_wrapper(awk_output_buf_t *outbuf);
 static bool find_two_way_processor(const char *name, struct redirect *rp);
+static bool avoid_flush(const char *name);
 
 static RECVALUE rs1scan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 static RECVALUE rsnullscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
@@ -954,7 +955,11 @@ redirect_string(const char *str, size_t explen, bool not_string,
 
 			/* set close-on-exec */
 			os_close_on_exec(fileno(rp->output.fp), str, "pipe", "to");
-			rp->flag |= RED_NOBUF;
+
+			// Allow the user to say they don't want pipe output
+			// to be flushed all the time.
+			if (! avoid_flush(str))
+				rp->flag |= RED_NOBUF;
 			break;
 		case redirect_pipein:
 			if (extfd >= 0) {
@@ -4481,4 +4486,15 @@ init_output_wrapper(awk_output_buf_t *outbuf)
 	outbuf->gawk_fflush = gawk_fflush;
 	outbuf->gawk_ferror = gawk_ferror;
 	outbuf->gawk_fclose = gawk_fclose;
+}
+
+/* avoid_flush --- return true if should not flush a pipe every time */
+
+static bool
+avoid_flush(const char *name)
+{
+	static const char bufferpipe[] = "BUFFERPIPE";
+
+	return in_PROCINFO(bufferpipe, NULL, NULL) != NULL
+		|| in_PROCINFO(name, bufferpipe, NULL) != NULL;
 }
