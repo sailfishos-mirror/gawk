@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2022,
+ * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2023,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -71,6 +71,14 @@ typedef long int_fast32_t;
 typedef long long int_fast64_t;
 typedef unsigned long long uint_fast64_t;
 #endif /* __VAX */
+#endif
+/* All currently supported OpenVMS compilers appear to have HAVE_C_BOOL.
+   The generic config_h.com is used instead of configure is not able to
+   understand the extra code in config.h.in so it comments it out.
+   This code is needed to activate the stdbool.h
+*/
+#if (defined(HAVE_C_BOOL) && defined(HAVE_STDBOOL_H))
+#include <stdbool.h>
 #endif
 #endif /* __VMS */
 

@@ -260,6 +260,7 @@ static void find_input_parser(IOBUF *iop);
 static bool find_output_wrapper(awk_output_buf_t *outbuf);
 static void init_output_wrapper(awk_output_buf_t *outbuf);
 static bool find_two_way_processor(const char *name, struct redirect *rp);
+static bool avoid_flush(const char *name);
 
 static RECVALUE rs1scan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 static RECVALUE rsnullscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
@@ -951,7 +952,11 @@ redirect_string(const char *str, size_t explen, bool not_string,
 
 			/* set close-on-exec */
 			os_close_on_exec(fileno(rp->output.fp), str, "pipe", "to");
-			rp->flag |= RED_NOBUF;
+
+			// Allow the user to say they don't want pipe output
+			// to be flushed all the time.
+			if (! avoid_flush(str))
+				rp->flag |= RED_NOBUF;
 			break;
 		case redirect_pipein:
 			if (extfd >= 0) {
@@ -2868,7 +2873,9 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 		set_record(s, cnt, field_width);
 	else {			/* assignment to variable */
 		unref(*lhs);
-		*lhs = make_string(s, cnt);
+		// s could be NULL if cnt == 0, avoid passing a null
+		// pointer to make_string().
+		*lhs = make_string(s != NULL ? s : "", cnt);
 		(*lhs)->flags |= USER_INPUT;
 	}
 
@@ -2912,7 +2919,9 @@ do_getline(int into_variable, IOBUF *iop)
 		NODE **lhs;
 		lhs = POP_ADDRESS();
 		unref(*lhs);
-		*lhs = make_string(s, cnt);
+		// s could be NULL if cnt == 0, avoid passing a null
+		// pointer to make_string().
+		*lhs = make_string(s != NULL ? s : "", cnt);
 		(*lhs)->flags |= USER_INPUT;
 	}
 	return make_number((AWKNUM) 1.0);
@@ -3840,7 +3849,7 @@ errno_io_retry(void)
 
 /*
  * get_a_record --- read a record from IOP into out,
- * return length of EOF, set RT.
+ * return length or EOF, set RT.
  * Note that errcode is never NULL, and the caller initializes *errcode to 0.
  * If I/O would block, return -2.
  */
@@ -4474,4 +4483,15 @@ init_output_wrapper(awk_output_buf_t *outbuf)
 	outbuf->gawk_fflush = gawk_fflush;
 	outbuf->gawk_ferror = gawk_ferror;
 	outbuf->gawk_fclose = gawk_fclose;
+}
+
+/* avoid_flush --- return true if should not flush a pipe every time */
+
+static bool
+avoid_flush(const char *name)
+{
+	static const char bufferpipe[] = "BUFFERPIPE";
+
+	return in_PROCINFO(bufferpipe, NULL, NULL) != NULL
+		|| in_PROCINFO(name, bufferpipe, NULL) != NULL;
 }
