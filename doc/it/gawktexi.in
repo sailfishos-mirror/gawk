@@ -56,9 +56,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Dicembre 2022
-@set VERSION 5.2
-@set PATCHLEVEL 2
+@set UPDATE-MONTH Febbraio 2023
+@set VERSION 5.3
+@set PATCHLEVEL 0
 
 @c added Italian hyphenation stuff
 @hyphenation{ven-go-no o-met-te-re o-met-ten-do}
@@ -73,7 +73,7 @@
 @set TITLE GAWK: Programmare efficacemente in AWK
 @end ifclear
 @set SUBTITLE Una Guida Utente per GNU Awk
-@set EDITION 5.2
+@set EDITION 5.3
 
 @iftex
 @set DOCUMENT libro
@@ -772,6 +772,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         @code{close()}.
 * Continuazione dopo errori::           Abilitare continuazione dopo errori
                                         in output.
+* Noflush::                             Velocizzare output da @dfn{pipe}.
 * Sommario di Output::                  Sommario di Output.
 * Esercizi su Output::                  Esercizi.
 * Valori::                              Costanti, variabili ed espressioni
@@ -10521,6 +10522,7 @@ e parla della funzione predefinita @code{close()}.
 				file gi@`a aperti a inizio esecuzione
 * Chiusura file e @dfn{pipe}::  Chiudere file in input e di output e
                                 @dfn{pipe}.
+* Noflush::                     Velocizzare output da @dfn{pipe}.
 * Continuazione dopo errori::   Abilitare continuazione dopo errori
                                 in output.
 * Sommario di Output::          Sommario di Output.
@@ -12138,8 +12140,63 @@ portabile.
 In modalit@`a POSIX (@pxref{Opzioni}), @command{gawk} restituisce solo zero
 quando chiude una @dfn{pipe}.
 
+@node Noflush
+@section Velocizzare output da @dfn{pipe}
+@c FIXME: Add indexing
+
+Questa
+@end ifnotinfo
+@ifinfo
+Questo
+@end ifinfo
+@value{SECTION} descrive una funzionalit@`a propria di @command{gawk}.
+
+Normalmente, quando si spediscono data tramite una @dfn{pipe} a
+un comando, usando le istruzioni @code{print} o @code{printf},
+@command{gawk} scarica l'output verso la @dfn{pipe}.
+Ovvero, l'output non @`e bufferizzato, ma scritto direttamente.
+Ci@`o garantisce che l'output della @dfn{pipe}, insieme a quello
+generato da @command{gawk} viene scritto enll'ordine che ci si
+aspetta:
+
+@example
+print "qualcosa"			# va allo standard output
+print "qualcos'altro" | "un-comando"	# anche allo standard output
+print "ulteriori cose"			# come pure questo
+@end example
+
+Fare ci@`o ha un prezzo; scaricare dati nella @dfn{pipe} usa
+pi@`u tempo CPU, e in alcuni ambienti tale consumo pu@`o
+essere eccessivo.
+
+Si pu@`o chiedere a @command{gawk} di non scaricare direttamente dati
+ma di bufferizzarli, in uno dei seguenti due modi:
+
+@itemize @bullet
+@item
+Impostare @code{PROCINFO["BUFFERPIPE"]} a un valore qualsiasi.
+Dopo aver fatto questo, @command{gawk} bufferizzer@`a i dati per tutte
+le @dfn{pipe}.
+
+@item
+Impostare @code{PROCINFO["@var{un-comando}", "BUFFERPIPE"]} a un
+valore qualsiasi. In tal caso, solo i dati relativi al comando
+@var{un-comando} saranno bufferizzati.
+@end itemize
+
+Uno degli elementi visti sopra @emph{deve} essere impostato nel
+vettore @code{PROCINFO} @emph{prima} di eseguire la prima istruzione
+@code{print} o @code{printf} diretta alla @dfn{pipe}.
+Se lo si fa dopo che dell'output @`e gi@`a stato inviato alla @dfn{pipe},
+@`e troppo tardi.
+
+Utilizzare questa funzionalit@`a pu@`o modificare il comportamento
+dell'output [cambiando l'ordine di quel che viene stampato],
+quindi occorre stare attenti a quello che si fa.
+
 @node Continuazione dopo errori
 @section Abilitare continuazione dopo errori in output
+@c FIXME: Add indexing
 
 @ifnotinfo
 Questa
@@ -17675,6 +17732,14 @@ I seguenti elementi consentono di modificare il comportamento di
 @command{gawk}:
 
 @table @code
+@item PROCINFO["BUFFERPIPE"]
+Se questo elemento esiste, tutto l'output alla @dfn{pipe} viene
+bufferizzato.
+
+@item PROCINFO["@var{un-comando}", "BUFFERPIPE"]
+Rende bufferizzato l'output del comnado @var{un-comando}.
+@xref{Noflush}.
+
 @item PROCINFO["NONFATAL"]
 Se questo elemento esiste, gli errori di I/O per tutte le ridirezioni
 consentono la prosecuzione del programma.
@@ -45653,24 +45718,22 @@ persistente (PMA) @`e disponibile.
 
 @end itemize
 
-La Versione 5.3 ha aggiunto le seguenti funzionalit@`a:
+La versione 5.3 ha aggiunto le seguenti funzionalit@`a:
 
 @itemize
 @item
-Divisione di campi per i file CSV
-[Campi Separati da Virgola]
+Divisione in campi per file di tipo CSV (Campi separati da virgola)
 (@pxref{Campi separati da virgola}).
+
+@item
+La possibilit@`a che @command{gawk} bufferizzi l'output a @dfn{pipe}
+(@pxref{Noflush}).
 
 @item
 La necessit@`a di utilizzare la libreria GNU @code{libsigsegv}
 @`e stata rimossa da @command{gawk}.
-Il valore aggiunto non @`e mai stato grande, e il suo utilizzo
-creava problemi in alcuni sistemi operativi.
-
-@item
-L'elemento @code{"pma"} nel vettore
-@code{PROCINFO}
-(@pxref{Variabili predefinite}).
+Il valore aggiunto relativo non @`e mai stato grande e la funzionalit@`a
+causava problemi in alcuni sistemi.
 
 @end itemize
 
