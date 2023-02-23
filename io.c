@@ -3178,7 +3178,7 @@ find_input_parser(IOBUF *iop)
 	awk_input_parser_t *ip, *ip2;
 
 	/* if already associated with an input parser, bail out early */
-	if (iop->public.get_record != NULL)
+	if (iop->public.get_record != NULL || iop->public.read_func != read)
 		return;
 
 	ip = ip2 = NULL;
