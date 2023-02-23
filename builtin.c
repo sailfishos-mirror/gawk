@@ -192,7 +192,7 @@ efwrite(const void *ptr,
 	}
 	if (flush
 	  && ((fp == stdout && output_is_tty)
-	      || (rp != NULL && (rp->flag & RED_NOBUF) != 0)))
+	      || (rp != NULL && (rp->flag & RED_FLUSH) != 0)))
 		efflush(fp, from, rp);
 }
 

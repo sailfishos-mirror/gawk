@@ -972,7 +972,7 @@ struct redirect {
 		RED_READ	= 4,
 		RED_WRITE	= 8,
 		RED_APPEND	= 16,
-		RED_NOBUF	= 32,
+		RED_FLUSH	= 32,
 		RED_USED	= 64,	/* closed temporarily to reuse fd */
 		RED_EOF		= 128,
 		RED_TWOWAY	= 256,
