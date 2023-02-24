@@ -694,7 +694,7 @@ redflags2str(int flags)
 		{ RED_READ,	"RED_READ" },
 		{ RED_WRITE,	"RED_WRITE" },
 		{ RED_APPEND,	"RED_APPEND" },
-		{ RED_NOBUF,	"RED_NOBUF" },
+		{ RED_FLUSH,	"RED_FLUSH" },
 		{ RED_EOF,	"RED_EOF" },
 		{ RED_TWOWAY,	"RED_TWOWAY" },
 		{ RED_PTY,	"RED_PTY" },
@@ -746,8 +746,8 @@ check_duplicated_redirections(const char *name, size_t len,
 	};
 	int i = 0, j = sizeof(mixtures) / sizeof(mixtures[0]);
 
-	oldflags &= ~(RED_NOBUF|RED_EOF|RED_PTY);
-	newflags &= ~(RED_NOBUF|RED_EOF|RED_PTY);
+	oldflags &= ~(RED_FLUSH|RED_EOF|RED_PTY);
+	newflags &= ~(RED_FLUSH|RED_EOF|RED_PTY);
 
 	for (i = 0; i < j; i++) {
 		bool both_have_common = \
@@ -878,7 +878,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 						(redirect_flags_t) rp->flag, (redirect_flags_t) tflag);
 			}
 
-			if (((rp->flag & ~(RED_NOBUF|RED_EOF|RED_PTY)) == tflag
+			if (((rp->flag & ~(RED_FLUSH|RED_EOF|RED_PTY)) == tflag
 			    || (outflag != 0
 				&& (rp->flag & (RED_FILE|RED_WRITE)) == outflag))) {
 				break;
@@ -956,7 +956,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			// Allow the user to say they don't want pipe output
 			// to be flushed all the time.
 			if (! avoid_flush(str))
-				rp->flag |= RED_NOBUF;
+				rp->flag |= RED_FLUSH;
 			break;
 		case redirect_pipein:
 			if (extfd >= 0) {
@@ -1037,7 +1037,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 						close(fd);
 				}
 				if (rp->output.fp != NULL && os_isatty(fd))
-					rp->flag |= RED_NOBUF;
+					rp->flag |= RED_FLUSH;
 
 				/* Move rp to the head of the list. */
 				if (! new_rp && red_head != rp) {
@@ -3183,7 +3183,7 @@ find_input_parser(IOBUF *iop)
 	awk_input_parser_t *ip, *ip2;
 
 	/* if already associated with an input parser, bail out early */
-	if (iop->public.get_record != NULL)
+	if (iop->public.get_record != NULL || iop->public.read_func != read)
 		return;
 
 	ip = ip2 = NULL;

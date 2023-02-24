@@ -192,7 +192,7 @@ efwrite(const void *ptr,
 	}
 	if (flush
 	  && ((fp == stdout && output_is_tty)
-	      || (rp != NULL && (rp->flag & RED_NOBUF) != 0)))
+	      || (rp != NULL && (rp->flag & RED_FLUSH) != 0)))
 		efflush(fp, from, rp);
 }
 
@@ -4324,6 +4324,21 @@ do_typeof(int nargs)
 			}
 		}
 		break;
+	case Node_var:
+		/*
+ 		 * This can happen when a Node_elem_new gets turned into a Node_var.
+		 * BEGIN {
+		 * 	f(a["b"])
+		 * 	print typeof(a["b"])
+		 * }
+		 *
+		 * function f(x)
+		 * {
+		 * 	return x
+		 * }
+		 */
+		arg = arg->var_value;
+		// fall through
 	case Node_val:
 		switch (fixtype(arg)->flags & (STRING|NUMBER|USER_INPUT|REGEX|BOOLVAL)) {
 		case NUMBER|BOOLVAL:
@@ -4385,14 +4400,6 @@ do_typeof(int nargs)
 			res = "untyped";
 		}
 		deref = false;
-		break;
-	case Node_var:
-		/*
-		 * Note: this doesn't happen because the function calling code
-		 * in interpret.h pushes Node_var->var_value.
-		 */
-		fatal(_("typeof: invalid argument type `%s'"),
-				nodetype2str(arg->type));
 		break;
 	default:
 		fatal(_("typeof: unknown argument type `%s'"),
