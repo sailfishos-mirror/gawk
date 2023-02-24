@@ -168,6 +168,7 @@ set_comma_field(long num,
 	n->stptr = val->stptr;
 	n->stlen = val->stlen;
 	n->flags = (STRCUR|STRING|USER_INPUT|MALLOC);
+	freenode(val);
 }
 
 /* rebuild_record --- Someone assigned a value to $(something).
