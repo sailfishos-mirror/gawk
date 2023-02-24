@@ -984,7 +984,7 @@ enum redirect_flags {
 	RED_READ	= 4,
 	RED_WRITE	= 8,
 	RED_APPEND	= 16,
-	RED_NOBUF	= 32,
+	RED_FLUSH	= 32,
 	RED_USED	= 64,	/* closed temporarily to reuse fd */
 	RED_EOF		= 128,
 	RED_TWOWAY	= 256,
@@ -2054,6 +2054,9 @@ fixtype(NODE *n)
 static inline bool
 boolval(NODE *t)
 {
+	if (t->type == Node_var)	// could have come from converted Node_elem_new
+		t = t->var_value;
+
 	(void) fixtype(t);
 	if ((t->flags & NUMBER) != 0)
 		return ! is_zero(t);
