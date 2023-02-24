@@ -2031,6 +2031,9 @@ fixtype(NODE *n)
 static inline bool
 boolval(NODE *t)
 {
+	if (t->type == Node_var)	// could have come from converted Node_elem_new
+		t = t->var_value;
+
 	(void) fixtype(t);
 	if ((t->flags & NUMBER) != 0)
 		return ! is_zero(t);
