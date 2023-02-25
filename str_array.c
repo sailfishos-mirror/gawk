@@ -790,7 +790,7 @@ static unsigned long
 fnv1a_hash_string(const char *str, size_t len, unsigned long hsize, size_t *code)
 {
 	/* FNV-1a */
-	register unsigned ret = 2166136261U;
+	unsigned ret = 2166136261U;
 
 	while (len > 0) {
 		ret ^= (unsigned char) (*str++);

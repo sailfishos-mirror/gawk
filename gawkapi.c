@@ -178,7 +178,7 @@ awk_value_to_node(const awk_value_t *retval)
 			mpfr_init(ext_ret_val->mpg_numbr);
 			tval = mpfr_set(ext_ret_val->mpg_numbr, (mpfr_srcptr) retval->num_ptr, ROUND_MODE);
 			IEEE_FMT(ext_ret_val->mpg_numbr, tval);
-			mpfr_clear(retval->num_ptr);
+			mpfr_clear((mpfr_ptr) retval->num_ptr);
 #else
 			fatal(_("awk_value_to_node: MPFR not supported"));
 #endif
@@ -190,7 +190,7 @@ awk_value_to_node(const awk_value_t *retval)
 			ext_ret_val = make_number_node(MPZN);
 			mpz_init(ext_ret_val->mpg_i);
 			mpz_set(ext_ret_val->mpg_i, (mpz_ptr) retval->num_ptr);
-			mpz_clear(retval->num_ptr);
+			mpz_clear((mpz_ptr) retval->num_ptr);
 #else
 			fatal(_("awk_value_to_node: MPFR not supported"));
 #endif

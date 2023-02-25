@@ -800,6 +800,7 @@ format_tree(
 
 	bool modifier_seen[sizeof(bad_modifiers)-1];
 #define modifier_index(c)  (strchr(bad_modifiers, c) - bad_modifiers)
+	bool need_to_add_thousands = false;
 
 #define INITIAL_OUT_SIZE	64
 	emalloc(obuf, char *, INITIAL_OUT_SIZE, "format_tree");
@@ -1617,7 +1618,7 @@ mpf1:
 				setlocale(LC_NUMERIC, "");
 #endif
 
-			bool need_to_add_thousands = false;
+			need_to_add_thousands = false;
 			switch (fmt_type) {
 #ifdef HAVE_MPFR
 			case MP_INT_WITH_PREC:
@@ -1644,7 +1645,7 @@ mpf1:
 			default:
 				if (have_prec || tolower(cs1) != 'a') {
 					sprintf(cp, "*.*%c", cs1);
-					while ((size_t)(nc = snprintf(obufout, ofre, cpbuf,
+					while ((nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw, (int) prec,
 						     (double) tmpval)) >= (int) ofre)
 						chksize(nc)
@@ -1652,7 +1653,7 @@ mpf1:
 					// For %a and %A, use the default precision if it
 					// wasn't supplied by the user.
 					sprintf(cp, "*%c", cs1);
-					while ((size_t)(nc = snprintf(obufout, ofre, cpbuf,
+					while ((nc = snprintf(obufout, ofre, cpbuf,
 						     (int) fw,
 						     (double) tmpval)) >= (int) ofre)
 						chksize(nc)

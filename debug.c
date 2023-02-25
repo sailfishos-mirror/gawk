@@ -625,7 +625,7 @@ print_lines(char *src, int start_line, int nlines)
 		supposed_len = pos[i] - pos[i - 1];
 		len = read(s->fd, p, supposed_len);
 		switch (len) {
-		case -1:
+		case (size_t) -1:
 			d_error(_("cannot read source file `%s': %s"),
 						src, strerror(errno));
 			return -1;

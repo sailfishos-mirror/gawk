@@ -1754,7 +1754,7 @@ parse_args(int argc, char **argv)
 		case 'T':	// --persist[=file]
 #ifdef USE_PERSISTENT_MALLOC
 			if (optarg == NULL)
-				optarg = "/some/file";
+				optarg = (char *) "/some/file";
 			fatal(_("Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."), optarg);
 #else
 			warning(_("Persistent memory is not supported."));
@@ -1928,7 +1928,7 @@ check_pma_security(const char *pma_file)
 	} else if (euid == 0) {
 		fprintf(stderr, _("%s: fatal: using persistent memory is not allowed when running as root.\n"), myname);
 		exit(EXIT_FATAL);
-	} else if (sbuf.st_uid != euid) {
+	} else if (sbuf.st_uid != (uid_t) euid) {
 		fprintf(stderr, _("%s: warning: %s is not owned by euid %d.\n"),
 				myname, pma_file, euid);
 	}
