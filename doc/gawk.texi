@@ -36980,7 +36980,7 @@ is invoked with the @option{--version} option.
 @cindex customized input parser
 
 By default, @command{gawk} reads text files as its input. It uses the value
-of @code{RS} to find the end of the record, and then uses @code{FS}
+of @code{RS} to find the end of an input record, and then uses @code{FS}
 (or @code{FIELDWIDTHS} or @code{FPAT}) to split it into fields (@pxref{Reading Files}).
 Additionally, it sets the value of @code{RT} (@pxref{Built-in Variables}).
 
@@ -37082,8 +37082,9 @@ are as follows:
 The name of the file.
 
 @item int fd;
-A file descriptor for the file.  If @command{gawk} was able to
-open the file, then @code{fd} will @emph{not} be equal to
+A file descriptor for the file.  @command{gawk} attempts to open
+the file for reading using the @code{open()} system call. If it was
+able to open the file, then @code{fd} will @emph{not} be equal to
 @code{INVALID_HANDLE}. Otherwise, it will.
 
 @item struct stat sbuf;
@@ -37151,12 +37152,12 @@ input records.  The parameters are as follows:
 @item char **out
 This is a pointer to a @code{char *} variable that is set to point
 to the record.  @command{gawk} makes its own copy of the data, so
-the extension must manage this storage.
+your extension must manage this storage.
 
 @item struct awk_input *iobuf
-This is the @code{awk_input_buf_t} for the file.  The fields should be
-used for reading data (@code{fd}) and for managing private state
-(@code{opaque}), if any.
+This is the @code{awk_input_buf_t} for the file.  Two of its fields should
+be used by your extension: @code{fd} for reading data, and @code{opaque}
+for managing any private state.
 
 @item int *errcode
 If an error occurs, @code{*errcode} should be set to an appropriate
@@ -37168,7 +37169,7 @@ If the concept of a ``record terminator'' makes sense, then
 @code{*rt_start} should be set to point to the data to be used for
 @code{RT}, and @code{*rt_len} should be set to the length of the
 data. Otherwise, @code{*rt_len} should be set to zero.
-@command{gawk} makes its own copy of this data, so the
+Here too, @command{gawk} makes its own copy of this data, so your
 extension must manage this storage.
 
 @item const awk_fieldwidth_info_t **field_width
@@ -37179,7 +37180,9 @@ field parsing mechanism. Note that this structure will not
 be copied by @command{gawk}; it must persist at least until the next call
 to @code{get_record} or @code{close_func}. Note also that @code{field_width} is
 @code{NULL} when @code{getline} is assigning the results to a variable, thus
-field parsing is not needed. If the parser does set @code{*field_width},
+field parsing is not needed.
+
+If the parser sets @code{*field_width},
 then @command{gawk} uses this layout to parse the input record,
 and the @code{PROCINFO["FS"]} value will be @code{"API"} while this record
 is active in @code{$0}.
@@ -37233,7 +37236,7 @@ based upon the value of an @command{awk} variable, as the XML extension
 from the @code{gawkextlib} project does (@pxref{gawkextlib}).
 In the latter case, code in a @code{BEGINFILE} rule
 can look at @code{FILENAME} and @code{ERRNO} to decide whether or
-not to activate an input parser (@pxref{BEGINFILE/ENDFILE}).
+not to activate your input parser (@pxref{BEGINFILE/ENDFILE}).
 
 You register your input parser with the following function:
 
