@@ -2481,7 +2481,7 @@ yyreduce:
 
 			merge_comments(yyvsp[0], NULL);
 			ip = list_create(instruction(Op_no_op));
-			yyval = list_append(ip, yyvsp[0]); 
+			yyval = list_append(ip, yyvsp[0]);
 		} else
 			yyval = NULL;
 	  }

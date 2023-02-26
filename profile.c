@@ -669,7 +669,7 @@ cleanup:
 				NODE *n = pp_top();
 
 				if (pc->expr_count == 1
-				    && n->pp_str[0] == '(' 
+				    && n->pp_str[0] == '('
 				    && n->pp_str[n->pp_len - 1] == ')') {
 					n = pp_pop();
 
@@ -1990,7 +1990,7 @@ pp_func(INSTRUCTION *pc, void *data ATTRIBUTE_UNUSED)
 		print_comment(pc->comment, -1);	/* -1 ==> don't indent */
 
 	indent(pc->nexti->exec_count);
-	
+
 	bool malloced = false;
 	char *name = adjust_namespace(func->vname, & malloced);
 	fprintf(prof_fp, "%s %s(", op2str(Op_K_function), name);

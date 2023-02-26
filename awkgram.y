@@ -641,7 +641,7 @@ statement
 
 			merge_comments($2, NULL);
 			ip = list_create(instruction(Op_no_op));
-			$$ = list_append(ip, $2); 
+			$$ = list_append(ip, $2);
 		} else
 			$$ = NULL;
 	  }
