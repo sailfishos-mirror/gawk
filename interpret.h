@@ -794,6 +794,7 @@ mod:
 			break;
 
 		case Op_store_field:
+		case Op_store_field_exp:
 		{
 			/* field assignment optimization,
 			 * see awkgram.y (optimize_assignment)
@@ -816,6 +817,10 @@ mod:
 			UNFIELD(*lhs, r);
 			/* field variables need the string representation: */
 			force_string(*lhs);
+			if (op == Op_store_field_exp) {
+				UPREF(*lhs);
+				PUSH(*lhs);
+			}
 		}
 			break;
 

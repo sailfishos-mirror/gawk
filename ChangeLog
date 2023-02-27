@@ -2,6 +2,18 @@
 
 	* gawkmisc.c: Use #elif. Update copyright year.
 
+	Unrelated: Fix handling of $a = $b so that it's done OK also in
+	expressions, and not just in statements. This fixes a memory
+	leak seen with valgrind in test/fieldassign.awk.
+
+	* awk.h (enum opcodeval): Add new member, Op_store_field_exp.
+	* awkgram.y (mk_assignment): Generate Op_store_field_exp under the
+	right circumstances.
+	(optimize_assignment): Remove case for Op_field_spec_lhs.
+	* eval.c (optypes): Add entry for Op_store_field.
+	* interpret.h (r_interpret): Handle Op_store_field in the switch.
+	* profile.c (pprint): Same.
+
 2023-02-26         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* Multiple files: Remove trailing whitespace.
