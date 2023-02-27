@@ -39912,9 +39912,9 @@ registrate, quando viene invocato specificando l'opzione @option{--version}.
 @cindex input @subentry analizzatore di @subentry personalizzato
 
 Per default, @command{gawk} legge file di testo come input.  Il valore della
-variabile @code{RS} @`e usato per determinare la fine di un record, e subito
-dopo la variabile @code{FS} (o @code{FIELDWIDTHS} o @code{FPAT}) viene usata
-per suddividerlo in campi
+variabile @code{RS} @`e usato per determinare la fine di un record in input,
+e subito dopo la variabile @code{FS} (o @code{FIELDWIDTHS} o @code{FPAT})
+viene usata per suddividerlo in campi
 @iftex
 (@pxrefil{Leggere file}).
 @end iftex
@@ -40030,10 +40030,12 @@ inizialmente) da @code{@var{XXX}_can_take_file()}, e quelli che sono usati da
 Il nome del file.
 
 @item int fd;
-Un descrittore di file per il file.  Se @command{gawk} riesce ad aprire
-il file, il valore di @code{fd} @emph{non} sar@`a uguale a
-@code{INVALID_HANDLE} [descrittore non valido].  In caso contrario,
-quello sar@`a il valore.
+Un descrittore di file per il file.  @command{gawk} tenta di aprire
+il file in lettura usando la chiamata di sistema @code{open()}.
+Se il file viene effettivamente aperto, il valore di @code{fd}
+@emph{non} sar@`a uguale a @code{INVALID_HANDLE}
+[descrittore non valido].
+In caso contrario, il valore sar@`a quello.
 
 @item struct stat sbuf;
 Se il descrittore di file @`e valido, @command{gawk} avr@`a riempito i campi di
@@ -40102,14 +40104,16 @@ record in input.  I parametri sono i seguenti:
 
 @table @code
 @item char **out
-Questo @`e un puntatore a una variabile @code{char *} che @`e impostatata in modo
-da puntare al record.  @command{gawk} usa una sua copia locale dei dati,
-quindi l'estensione deve gestire la relativa area di memoria.
+Questo @`e un puntatore a una variabile @code{char *} che @`e impostatata
+in modo da puntare al record.  @command{gawk} usa una sua copia locale dei
+dati, quindi l'estensione dell'utente deve gestire la relativa area di
+memoria.
 
 @item struct awk_input *iobuf
-Questa @`e la struttura @code{awk_input_buf_t} per il file.  I campi dovrebbero
-essere usati per leggere i dati (@code{fd}) e per gestire lo stato privato
-(@code{opaque}), se necessario.
+Questa @`e la struttura @code{awk_input_buf_t} per il file.
+Due dei suoi campi dovrebbero essere usati dall'estensione utente:
+@code{fd} per leggere i dati, e @code{opaque} per gestire lo stato privato
+se necessario.
 
 @item int *errcode
 Se si verifica un errore, @code{*errcode} dovrebbe essere impostato a un
@@ -40121,8 +40125,8 @@ Se il concetto ``fine record'' @`e applicabile,
 @code{*rt_start} dovrebbe essere impostato per puntare ai dati da usare come
 @code{RT}, e @code{*rt_len} dovrebbe essere impostata alla lunghezza di quel
 campo.  In caso contrario, @code{*rt_len} dovrebbe essere impostata a zero.
-@command{gawk} usa una sua copia di questi dati, quindi l'estensione deve
-gestire tale memoria.
+Anche qui @command{gawk} usa una sua copia di questi dati, quindi
+l'estensione utente deve gestire tale memoria.
 
 @item const awk_fieldwidth_info_t **field_width
 Se @code{field_width} non @`e @code{NULL}, @code{*field_width} sar@`a
@@ -40134,6 +40138,7 @@ inoltre essa deve rimanere disponibile almeno fino alla successiva chiamata a
 @code{get_record} o a @code{close_func}.  Si noti inoltre che
 @code{field_width} vale @code{NULL} quando @code{getline} sta assegnando
 i risultati a una variabile, e quindi un'analisi del campo non @`e necessaria.
+
 Se l'analizzatore imposta @code{*field_width},
 allora @command{gawk} usa questa descrizione per analizzare il record in
 input, e il valore di @code{PROCINFO["FS"]} sar@`a @code{"API"} finch@'e questo
@@ -40192,7 +40197,8 @@ valore preso da una variabile @command{awk}, come fa l'estensione XML
 inclusa nel progetto @code{gawkextlib} (@pxref{gawkextlib}).
 In quest'ultimo caso, il codice in una regola @code{BEGINFILE}
 pu@`o controllare @code{FILENAME} ed @code{ERRNO} per decidere se
-attivare un analizzatore di input (@pxref{BEGINFILE/ENDFILE}) oppure no.
+attivare un analizzatore di input utente oppure no
+(@pxref{BEGINFILE/ENDFILE}).
 
 Un analizzatore di input va registrato usando la seguente funzione:
 

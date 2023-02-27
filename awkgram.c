@@ -2481,7 +2481,7 @@ yyreduce:
 
 			merge_comments(yyvsp[0], NULL);
 			ip = list_create(instruction(Op_no_op));
-			yyval = list_append(ip, yyvsp[0]); 
+			yyval = list_append(ip, yyvsp[0]);
 		} else
 			yyval = NULL;
 	  }
@@ -8368,7 +8368,8 @@ mk_assignment(INSTRUCTION *lhs, INSTRUCTION *rhs, INSTRUCTION *op)
 	else
 		ip = lhs;
 
-	(void) list_append(ip, op);
+	if (tp->opcode != Op_field_spec_lhs || op->opcode != Op_assign)
+		(void) list_append(ip, op);
 
 	if (tp->opcode == Op_push_lhs
 			&& tp->memory->type == Node_var
@@ -8380,9 +8381,14 @@ mk_assignment(INSTRUCTION *lhs, INSTRUCTION *rhs, INSTRUCTION *op)
 		(void) list_append(ip, instruction(Op_var_assign));
 		ip->lasti->assign_var = tp->memory->var_assign;
 	} else if (tp->opcode == Op_field_spec_lhs) {
-		(void) list_append(ip, instruction(Op_field_assign));
-		ip->lasti->field_assign = (Func_ptr) 0;
-		tp->target_assign = ip->lasti;
+		if (op->opcode == Op_assign) {
+			bcfree(op);
+			tp->opcode = Op_store_field_exp;
+		} else {
+			(void) list_append(ip, instruction(Op_field_assign));
+			ip->lasti->field_assign = (Func_ptr) 0;
+			tp->target_assign = ip->lasti;
+		}
 	} else if (tp->opcode == Op_subscript_lhs) {
 		(void) list_append(ip, instruction(Op_subscript_assign));
 	}
@@ -8471,21 +8477,6 @@ optimize_assignment(INSTRUCTION *exp)
 				i3->nexti = NULL;
 				bcfree(i1);          /* Op_assign */
 				exp->lasti = i3;     /* update Op_list */
-				return exp;
-			}
-			break;
-
-		case Op_field_spec_lhs:
-			if (i2->nexti->opcode == Op_assign
-					&& i2->nexti->nexti == i1
-					&& i1->opcode == Op_field_assign
-			) {
-				/* $n = .. */
-				i2->opcode = Op_store_field;
-				bcfree(i2->nexti);  /* Op_assign */
-				i2->nexti = NULL;
-				bcfree(i1);          /* Op_field_assign */
-				exp->lasti = i2;    /* update Op_list */
 				return exp;
 			}
 			break;

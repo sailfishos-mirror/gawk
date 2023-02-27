@@ -298,6 +298,7 @@ static struct optypetab {
 	{ "Op_store_var", " = " },
 	{ "Op_store_sub", " = " },
 	{ "Op_store_field", " = " },
+	{ "Op_store_field_exp", " = " },
 	{ "Op_assign_times", " *= " },
 	{ "Op_assign_quotient", " /= " },
 	{ "Op_assign_mod", " %= " },

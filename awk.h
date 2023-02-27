@@ -634,6 +634,7 @@ typedef enum opcodeval {
 	Op_store_var,		/* simple variable assignment optimization */
 	Op_store_sub,		/* array[subscript] assignment optimization */
 	Op_store_field,  	/* $n assignment optimization */
+	Op_store_field_exp,  	/* $n assignment optimization in an expression */
 	Op_assign_times,
 	Op_assign_quotient,
 	Op_assign_mod,

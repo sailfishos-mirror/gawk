@@ -1,7 +1,7 @@
-This is gawkinet.info, produced by makeinfo version 6.8 from
+This is gawkinet.info, produced by makeinfo version 7.0.1 from
 gawkinet.texi.
 
-This is Edition 1.6 of 'TCP/IP Internetworking with 'gawk'', for the
+This is Edition 1.6 of ‘TCP/IP Internetworking with ‘gawk’’, for the
 5.2.0 (or later) version of the GNU implementation of AWK.
 
 
@@ -12,19 +12,19 @@ This is Edition 1.6 of 'TCP/IP Internetworking with 'gawk'', for the
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with the
-Invariant Sections being "GNU General Public License", the Front-Cover
+Invariant Sections being “GNU General Public License”, the Front-Cover
 texts being (a) (see below), and with the Back-Cover Texts being (b)
 (see below).  A copy of the license is included in the section entitled
-"GNU Free Documentation License".
+“GNU Free Documentation License”.
 
-  a. "A GNU Manual"
+  a. “A GNU Manual”
 
-  b. "You have the freedom to copy and modify this GNU manual.  Buying
+  b. “You have the freedom to copy and modify this GNU manual.  Buying
      copies from the FSF supports it in developing GNU and promoting
-     software freedom."
+     software freedom.”
 INFO-DIR-SECTION Network applications
 START-INFO-DIR-ENTRY
-* awkinet: (gawkinet).          TCP/IP Internetworking With 'gawk'.
+* awkinet: (gawkinet).          TCP/IP Internetworking With ‘gawk’.
 END-INFO-DIR-ENTRY
 
 
@@ -33,10 +33,10 @@ File: gawkinet.info,  Node: Top,  Next: Preface,  Prev: (dir),  Up: (dir)
 General Introduction
 ********************
 
-This file documents the networking features in GNU Awk ('gawk') version
+This file documents the networking features in GNU Awk (‘gawk’) version
 4.0 and later.
 
-   This is Edition 1.6 of 'TCP/IP Internetworking with 'gawk'', for the
+   This is Edition 1.6 of ‘TCP/IP Internetworking with ‘gawk’’, for the
 5.2.0 (or later) version of the GNU implementation of AWK.
 
 
@@ -47,16 +47,16 @@ This file documents the networking features in GNU Awk ('gawk') version
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with the
-Invariant Sections being "GNU General Public License", the Front-Cover
+Invariant Sections being “GNU General Public License”, the Front-Cover
 texts being (a) (see below), and with the Back-Cover Texts being (b)
 (see below).  A copy of the license is included in the section entitled
-"GNU Free Documentation License".
+“GNU Free Documentation License”.
 
-  a. "A GNU Manual"
+  a. “A GNU Manual”
 
-  b. "You have the freedom to copy and modify this GNU manual.  Buying
+  b. “You have the freedom to copy and modify this GNU manual.  Buying
      copies from the FSF supports it in developing GNU and promoting
-     software freedom."
+     software freedom.”
 
 * Menu:
 
@@ -75,7 +75,7 @@ texts being (a) (see below), and with the Back-Cover Texts being (b)
 * Basic Protocols::                The basic protocols.
 * Ports::                          The idea behind ports.
 * Making Connections::             Making TCP/IP connections.
-* Gawk Special Files::             How to do 'gawk' networking.
+* Gawk Special Files::             How to do ‘gawk’ networking.
 * Special File Fields::            The fields in the special file name.
 * Comparing Protocols::            Differences between the protocols.
 * File /inet/tcp::                 The TCP special file.
@@ -110,28 +110,28 @@ Preface
 *******
 
 In May of 1997, Jürgen Kahrs felt the need for network access from
-'awk', and, with a little help from me, set about adding features to do
-this for 'gawk'.  At that time, he wrote the bulk of this Info file.
+‘awk’, and, with a little help from me, set about adding features to do
+this for ‘gawk’.  At that time, he wrote the bulk of this Info file.
 
-   The code and documentation were added to the 'gawk' 3.1 development
+   The code and documentation were added to the ‘gawk’ 3.1 development
 tree, and languished somewhat until I could finally get down to some
-serious work on that version of 'gawk'.  This finally happened in the
+serious work on that version of ‘gawk’.  This finally happened in the
 middle of 2000.
 
    Meantime, Jürgen wrote an article about the Internet special files
-and '|&' operator for 'Linux Journal', and made a networking patch for
-the production versions of 'gawk' available from his home page.  In
-August of 2000 (for 'gawk' 3.0.6), this patch also made it to the main
-GNU 'ftp' distribution site.
+and ‘|&’ operator for ‘Linux Journal’, and made a networking patch for
+the production versions of ‘gawk’ available from his home page.  In
+August of 2000 (for ‘gawk’ 3.0.6), this patch also made it to the main
+GNU ‘ftp’ distribution site.
 
-   For release with 'gawk', I edited Jürgen's prose for English grammar
+   For release with ‘gawk’, I edited Jürgen’s prose for English grammar
 and style, as he is not a native English speaker.  I also rearranged the
 material somewhat for what I felt was a better order of presentation,
 and (re)wrote some of the introductory material.
 
    The majority of this document and the code are his work, and the high
 quality and interesting ideas speak for themselves.  It is my hope that
-these features will be of significant value to the 'awk' community.
+these features will be of significant value to the ‘awk’ community.
 
 
 Arnold Robbins
@@ -145,7 +145,7 @@ File: gawkinet.info,  Node: Introduction,  Next: Using Networking,  Prev: Prefac
 *********************
 
 This major node provides a (necessarily) brief introduction to computer
-networking concepts.  For many applications of 'gawk' to TCP/IP
+networking concepts.  For many applications of ‘gawk’ to TCP/IP
 networking, we hope that this is enough.  For more advanced tasks, you
 will need deeper background, and it may be necessary to switch to
 lower-level programming in C or C++.
@@ -180,7 +180,7 @@ When you make a phone call, the following steps occur:
      network, refuses to answer the call.
 
   4. Assuming the other party answers, the connection between you is now
-     a "duplex" (two-way), "reliable" (no data lost), sequenced (data
+     a “duplex” (two-way), “reliable” (no data lost), sequenced (data
      comes out in the order sent) data stream.
 
   5. You and your friend may now talk freely, with the phone system
@@ -190,7 +190,7 @@ When you make a phone call, the following steps occur:
 
    The same steps occur in a duplex reliable computer networking
 connection.  There is considerably more overhead in setting up the
-communications, but once it's done, data moves in both directions,
+communications, but once it’s done, data moves in both directions,
 reliably, in sequence.
 
 
@@ -215,21 +215,21 @@ following.
   5. One or more may get lost in the mail.  (Although, fortunately, this
      does not occur very often.)
 
-  6. In a computer network, one or more "packets" may also arrive
-     multiple times.  (This doesn't happen with the postal system!)
+  6. In a computer network, one or more “packets” may also arrive
+     multiple times.  (This doesn’t happen with the postal system!)
 
    The important characteristics of datagram communications, like those
 of the postal system are thus:
 
-   * Delivery is "best effort;" the data may never get there.
+   • Delivery is “best effort;” the data may never get there.
 
-   * Each message is self-contained, including the source and
+   • Each message is self-contained, including the source and
      destination addresses.
 
-   * Delivery is _not_ sequenced; packets may arrive out of order,
+   • Delivery is _not_ sequenced; packets may arrive out of order,
      and/or multiple times.
 
-   * Unlike the phone system, overhead is considerably lower.  It is not
+   • Unlike the phone system, overhead is considerably lower.  It is not
      necessary to set up the call first.
 
    The price the user pays for the lower overhead of datagram
@@ -245,7 +245,7 @@ File: gawkinet.info,  Node: The TCP/IP Protocols,  Next: Making Connections,  Pr
 
 The Internet Protocol Suite (usually referred to as just TCP/IP)(1)
 consists of a number of different protocols at different levels or
-"layers."  For our purposes, three protocols provide the fundamental
+“layers.” For our purposes, three protocols provide the fundamental
 communications mechanisms.  All other defined protocols are referred to
 as user-level protocols (e.g., HTTP, used later in this Info file).
 
@@ -269,8 +269,8 @@ File: gawkinet.info,  Node: Basic Protocols,  Next: Ports,  Prev: The TCP/IP Pro
 IP
      The Internet Protocol.  This protocol is almost never used directly
      by applications.  It provides the basic packet delivery and routing
-     infrastructure of the Internet.  Much like the phone company's
-     switching centers or the Post Office's trucks, it is not of much
+     infrastructure of the Internet.  Much like the phone company’s
+     switching centers or the Post Office’s trucks, it is not of much
      day-to-day interest to the regular user (or programmer).  It
      happens to be a best effort datagram protocol.  In the early
      twenty-first century, there are two versions of this protocol in
@@ -281,11 +281,11 @@ IP
           addresses, on which most of the current Internet is based.
 
      IPv6
-          The "next generation" of the Internet Protocol, with 128-bit
+          The “next generation” of the Internet Protocol, with 128-bit
           addresses.  This protocol is in wide use in certain parts of
           the world, but has not yet replaced IPv4.(1)
 
-     Versions of the other protocols that sit "atop" IP exist for both
+     Versions of the other protocols that sit “atop” IP exist for both
      IPv4 and IPv6.  However, as the IPv6 versions are fundamentally the
      same as the original IPv4 versions, we will not distinguish further
      between them.
@@ -293,14 +293,14 @@ IP
 UDP
      The User Datagram Protocol.  This is a best effort datagram
      protocol.  It provides a small amount of extra reliability over IP,
-     and adds the notion of "ports", described in *note TCP and UDP
+     and adds the notion of “ports”, described in *note TCP and UDP
      Ports: Ports.
 
 TCP
      The Transmission Control Protocol.  This is a duplex, reliable,
      sequenced byte-stream protocol, again layered on top of IP, and
      also providing the notion of ports.  This is the protocol that you
-     will most likely use when using 'gawk' for network programming.
+     will most likely use when using ‘gawk’ for network programming.
 
    All other user-level protocols use either TCP or UDP to do their
 basic communications.  Examples are SMTP (Simple Mail Transfer
@@ -309,7 +309,7 @@ Protocol).
 
    ---------- Footnotes ----------
 
-   (1) There isn't an IPv5.
+   (1) There isn’t an IPv5.
 
 
 File: gawkinet.info,  Node: Ports,  Prev: Basic Protocols,  Up: The TCP/IP Protocols
@@ -323,20 +323,20 @@ than one person at the location; thus you have to further quantify the
 recipient by putting a person or company name on the envelope.
 
    In the phone system, one phone number may represent an entire
-company, in which case you need a person's extension number in order to
+company, in which case you need a person’s extension number in order to
 reach that individual directly.  Or, when you call a home, you have to
-say, "May I please speak to ..."  before talking to the person directly.
+say, “May I please speak to ...” before talking to the person directly.
 
    IP networking provides the concept of addressing.  An IP address
 represents a particular computer, but no more.  In order to reach the
 mail service on a system, or the FTP or WWW service on a system, you
 must have some way to further specify which service you want.  In the
-Internet Protocol suite, this is done with "port numbers", which
+Internet Protocol suite, this is done with “port numbers”, which
 represent the services, much like an extension number used with a phone
 number.
 
    Port numbers are 16-bit integers.  Unix and Unix-like systems reserve
-ports below 1024 for "well known" services, such as SMTP, FTP, and HTTP.
+ports below 1024 for “well known” services, such as SMTP, FTP, and HTTP.
 Numbers 1024 and above may be used by any application, although there is
 no promise made that a particular port number is always available.
 
@@ -346,22 +346,22 @@ File: gawkinet.info,  Node: Making Connections,  Prev: The TCP/IP Protocols,  Up
 1.4 Making TCP/IP Connections (And Some Terminology)
 ====================================================
 
-Two terms come up repeatedly when discussing networking: "client" and
-"server".  For now, we'll discuss these terms at the "connection level",
+Two terms come up repeatedly when discussing networking: “client” and
+“server”.  For now, we’ll discuss these terms at the “connection level”,
 when first establishing connections between two processes on different
 systems over a network.  (Once the connection is established, the higher
-level, or "application level" protocols, such as HTTP or FTP, determine
+level, or “application level” protocols, such as HTTP or FTP, determine
 who is the client and who is the server.  Often, it turns out that the
 client and server are the same in both roles.)
 
-   The "server" is the system providing the service, such as the web
-server or email server.  It is the "host" (system) which is _connected
+   The “server” is the system providing the service, such as the web
+server or email server.  It is the “host” (system) which is _connected
 to_ in a transaction.  For this to work though, the server must be
 expecting connections.  Much as there has to be someone at the office
 building to answer the phone,(1) the server process (usually) has to be
 started first and be waiting for a connection.
 
-   The "client" is the system requesting the service.  It is the system
+   The “client” is the system requesting the service.  It is the system
 _initiating the connection_ in a transaction.  (Just as when you pick up
 the phone to call an office or store.)
 
@@ -373,19 +373,19 @@ can a new one be built up on the same port.  This is contrary to the
 usual behavior of fully developed web servers which have to avoid
 situations in which they are not reachable.  We have to pay this price
 in order to enjoy the benefits of a simple communication paradigm in
-'gawk'.)
+‘gawk’.)
 
    Furthermore, once the connection is established, communications are
-"synchronous".(2)  I.e., each end waits on the other to finish
+“synchronous”.(2)  I.e., each end waits on the other to finish
 transmitting, before replying.  This is much like two people in a phone
 conversation.  While both could talk simultaneously, doing so usually
-doesn't work too well.
+doesn’t work too well.
 
    In the case of TCP, the synchronicity is enforced by the protocol
-when sending data.  Data writes "block" until the data have been
+when sending data.  Data writes “block” until the data have been
 received on the other end.  For both TCP and UDP, data reads block until
 there is incoming data waiting to be read.  This is summarized in the
-following table, where an "x" indicates that the given action blocks.
+following table, where an “x” indicates that the given action blocks.
 
 TCP        x       x
 UDP        x
@@ -394,33 +394,33 @@ UDP        x
 
    (1) In the days before voice mail systems!
 
-   (2) For the technically savvy, data reads block--if there's no
+   (2) For the technically savvy, data reads block—if there’s no
 incoming data, the program is made to wait until there is, instead of
-receiving a "there's no data" error return.
+receiving a “there’s no data” error return.
 
 
 File: gawkinet.info,  Node: Using Networking,  Next: Some Applications and Techniques,  Prev: Introduction,  Up: Top
 
-2 Networking With 'gawk'
+2 Networking With ‘gawk’
 ************************
 
-The 'awk' programming language was originally developed as a
+The ‘awk’ programming language was originally developed as a
 pattern-matching language for writing short programs to perform data
-manipulation tasks.  'awk''s strength is the manipulation of textual
+manipulation tasks.  ‘awk’’s strength is the manipulation of textual
 data that is stored in files.  It was never meant to be used for
 networking purposes.  To exploit its features in a networking context,
-it's necessary to use an access mode for network connections that
+it’s necessary to use an access mode for network connections that
 resembles the access of files as closely as possible.
 
-   'awk' is also meant to be a prototyping language.  It is used to
+   ‘awk’ is also meant to be a prototyping language.  It is used to
 demonstrate feasibility and to play with features and user interfaces.
-This can be done with file-like handling of network connections.  'gawk'
+This can be done with file-like handling of network connections.  ‘gawk’
 trades the lack of many of the advanced features of the TCP/IP family of
 protocols for the convenience of simple connection handling.  The
 advanced features are available when programming in C or Perl.  In fact,
 the network programming in this major node is very similar to what is
-described in books such as 'Internet Programming with Python', 'Advanced
-Perl Programming', or 'Web Client Programming with Perl'.
+described in books such as ‘Internet Programming with Python’, ‘Advanced
+Perl Programming’, or ‘Web Client Programming with Perl’.
 
    However, you can do the programming here without first having to
 learn object-oriented ideology; underlying languages such as Tcl/Tk,
@@ -432,7 +432,7 @@ protocol is much less important for most users.
 
 * Menu:
 
-* Gawk Special Files::          How to do 'gawk' networking.
+* Gawk Special Files::          How to do ‘gawk’ networking.
 * TCP Connecting::              Making a TCP connection.
 * Troubleshooting::             Troubleshooting TCP/IP connections.
 * Interacting::                 Interacting with a service.
@@ -448,30 +448,30 @@ protocol is much less important for most users.
 
 File: gawkinet.info,  Node: Gawk Special Files,  Next: TCP Connecting,  Prev: Using Networking,  Up: Using Networking
 
-2.1 'gawk''s Networking Mechanisms
+2.1 ‘gawk’’s Networking Mechanisms
 ==================================
 
-The '|&' operator for use in communicating with a "coprocess" is
+The ‘|&’ operator for use in communicating with a “coprocess” is
 described in *note Two-way Communications With Another Process:
 (gawk)Two-way I/O. It shows how to do two-way I/O to a separate process,
-sending it data with 'print' or 'printf' and reading data with
-'getline'.  If you haven't read it already, you should detour there to
+sending it data with ‘print’ or ‘printf’ and reading data with
+‘getline’.  If you haven’t read it already, you should detour there to
 do so.
 
-   'gawk' transparently extends the two-way I/O mechanism to simple
-networking through the use of special file names.  When a "coprocess"
+   ‘gawk’ transparently extends the two-way I/O mechanism to simple
+networking through the use of special file names.  When a “coprocess”
 that matches the special files we are about to describe is started,
-'gawk' creates the appropriate network connection, and then two-way I/O
+‘gawk’ creates the appropriate network connection, and then two-way I/O
 proceeds as usual.
 
    At the C, C++, and Perl level, networking is accomplished via
-"sockets", an Application Programming Interface (API) originally
+“sockets”, an Application Programming Interface (API) originally
 developed at the University of California at Berkeley that is now used
 almost universally for TCP/IP networking.  Socket level programming,
 while fairly straightforward, requires paying attention to a number of
 details, as well as using binary data.  It is not well-suited for use
-from a high-level language like 'awk'.  The special files provided in
-'gawk' hide the details from the programmer, making things much simpler
+from a high-level language like ‘awk’.  The special files provided in
+‘gawk’ hide the details from the programmer, making things much simpler
 and easier to use.
 
    The special file name for network access is made up of several
@@ -495,39 +495,39 @@ File: gawkinet.info,  Node: Special File Fields,  Next: Comparing Protocols,  Pr
 
 This node explains the meaning of all of the fields, as well as the
 range of values and the defaults.  All of the fields are mandatory.  To
-let the system pick a value, or if the field doesn't apply to the
-protocol, specify it as '0' (zero):
+let the system pick a value, or if the field doesn’t apply to the
+protocol, specify it as ‘0’ (zero):
 
 NET-TYPE
-     This is one of 'inet4' for IPv4, 'inet6' for IPv6, or 'inet' to use
+     This is one of ‘inet4’ for IPv4, ‘inet6’ for IPv6, or ‘inet’ to use
      the system default (which is likely to be IPv4).  For the rest of
-     this document, we will use the generic '/inet' in our descriptions
-     of how 'gawk''s networking works.
+     this document, we will use the generic ‘/inet’ in our descriptions
+     of how ‘gawk’’s networking works.
 
 PROTOCOL
      Determines which member of the TCP/IP family of protocols is
      selected to transport the data across the network.  There are two
-     possible values (always written in lowercase): 'tcp' and 'udp'.
+     possible values (always written in lowercase): ‘tcp’ and ‘udp’.
      The exact meaning of each is explained later in this node.
 
 LOCALPORT
      Determines which port on the local machine is used to communicate
-     across the network.  Application-level clients usually use '0' to
-     indicate they do not care which local port is used--instead they
+     across the network.  Application-level clients usually use ‘0’ to
+     indicate they do not care which local port is used—instead they
      specify a remote port to connect to.
 
      It is vital for application-level servers to use a number different
-     from '0' here because their service has to be available at a
+     from ‘0’ here because their service has to be available at a
      specific publicly known port number.  It is possible to use a name
-     from '/etc/services' here.
+     from ‘/etc/services’ here.
 
 HOSTNAME
      Determines which remote host is to be at the other end of the
      connection.  Application-level clients must enter a name different
-     from '0'.  The name can be either symbolic (e.g.,
-     'jpl-devvax.jpl.nasa.gov') or numeric (e.g., '128.149.1.143').
+     from ‘0’.  The name can be either symbolic (e.g.,
+     ‘jpl-devvax.jpl.nasa.gov’) or numeric (e.g., ‘128.149.1.143’).
 
-     Application-level servers must fill this field with a '0' to
+     Application-level servers must fill this field with a ‘0’ to
      indicate their being open for all other hosts to connect to them
      and enforce connection level server behavior this way.  It is not
      possible for an application-level server to restrict its
@@ -535,19 +535,19 @@ HOSTNAME
 
 REMOTEPORT
      Determines which port on the remote machine is used to communicate
-     across the network.  For '/inet/tcp' and '/inet/udp',
-     application-level clients _must_ use a number other than '0' to
+     across the network.  For ‘/inet/tcp’ and ‘/inet/udp’,
+     application-level clients _must_ use a number other than ‘0’ to
      indicate to which port on the remote machine they want to connect.
 
-     Application-level servers must not fill this field with a '0'.
+     Application-level servers must not fill this field with a ‘0’.
      Instead they specify a local port to which clients connect.  It is
-     possible to use a name from '/etc/services' here.
+     possible to use a name from ‘/etc/services’ here.
 
    Experts in network programming will notice that the usual
 client/server asymmetry found at the level of the socket API is not
 visible here.  This is for the sake of simplicity of the high-level
 concept.  If this asymmetry is necessary for your application, use
-another language.  For 'gawk', it is more important to enable users to
+another language.  For ‘gawk’, it is more important to enable users to
 write a client program with a minimum of code.  What happens when first
 accessing a network connection is seen in the following pseudocode:
 
@@ -567,7 +567,7 @@ accessing a network connection is seen in the following pseudocode:
 fields of the special file name.  When in doubt, *note Table 2.1:
 table-inet-components. gives you the combinations of values and their
 meaning.  If this table is too complicated, focus on the three lines
-printed in *bold*.  All the examples in *note Networking With 'gawk':
+printed in *bold*.  All the examples in *note Networking With ‘gawk’:
 Using Networking, use only the patterns printed in bold letters.
 
 
@@ -590,7 +590,7 @@ tcp, udp    x           0           x           Invalid
 tcp, udp    0           0           0           Invalid
 tcp, udp    0           x           0           Invalid
 
-Table 2.1: '/inet' Special File Components
+Table 2.1: ‘/inet’ Special File Components
 
    In general, TCP is the preferred mechanism to use.  It is the
 simplest protocol to understand and to use.  Use UDP only if
@@ -615,7 +615,7 @@ available and demonstrate the differences between them.
 
 File: gawkinet.info,  Node: File /inet/tcp,  Next: File /inet/udp,  Prev: Comparing Protocols,  Up: Comparing Protocols
 
-2.1.2.1 '/inet/tcp'
+2.1.2.1 ‘/inet/tcp’
 ...................
 
 Once again, always use TCP. (Use UDP when low overhead is a necessity.)
@@ -646,7 +646,7 @@ started first, and it waits for the receiver to read a line.
 
 File: gawkinet.info,  Node: File /inet/udp,  Prev: File /inet/tcp,  Up: Comparing Protocols
 
-2.1.2.2 '/inet/udp'
+2.1.2.2 ‘/inet/udp’
 ...................
 
 The server and client programs that use UDP are almost identical to
@@ -671,13 +671,13 @@ started first:
        close("/inet/udp/0/localhost/8888")
      }
 
-   In the case of UDP, the initial 'print' command is the one that
-actually sends data so that there is a connection.  UDP and "connection"
+   In the case of UDP, the initial ‘print’ command is the one that
+actually sends data so that there is a connection.  UDP and “connection”
 sounds strange to anyone who has learned that UDP is a connectionless
-protocol.  Here, "connection" means that the 'connect()' system call has
-completed its work and completed the "association" between a certain
+protocol.  Here, “connection” means that the ‘connect()’ system call has
+completed its work and completed the “association” between a certain
 socket and an IP address.  Thus there are subtle differences between
-'connect()' for TCP and UDP; see the man page for details.(1)
+‘connect()’ for TCP and UDP; see the man page for details.(1)
 
    UDP cannot guarantee that the datagrams at the receiving end will
 arrive in exactly the same order they were sent.  Some datagrams could
@@ -689,7 +689,7 @@ stateless services like the original versions of NFS.
    ---------- Footnotes ----------
 
    (1) This subtlety is just one of many details that are hidden in the
-socket API, invisible and intractable for the 'gawk' user.  The
+socket API, invisible and intractable for the ‘gawk’ user.  The
 developers are currently considering how to rework the network
 facilities to make them easier to understand and use.
 
@@ -699,9 +699,9 @@ File: gawkinet.info,  Node: TCP Connecting,  Next: Troubleshooting,  Prev: Gawk 
 2.2 Establishing a TCP Connection
 =================================
 
-Let's observe a network connection at work.  Type in the following
+Let’s observe a network connection at work.  Type in the following
 program and watch the output.  Within a second, it connects via TCP
-('/inet/tcp') to a remote server and asks the service 'daytime' on the
+(‘/inet/tcp’) to a remote server and asks the service ‘daytime’ on the
 machine what time it is:
 
      BEGIN {
@@ -714,43 +714,43 @@ machine what time it is:
        close(daytime_connection)
      }
 
-   Even experienced 'awk' users will find the fourth and sixth line
+   Even experienced ‘awk’ users will find the fourth and sixth line
 strange in two respects:
 
-   * A string containing the name of a special file is used as a shell
-     command that pipes its output into 'getline'.  One would rather
+   • A string containing the name of a special file is used as a shell
+     command that pipes its output into ‘getline’.  One would rather
      expect to see the special file being read like any other file
-     ('getline < "/inet/tcp/0/time-a-g.nist.gov/daytime"').
+     (‘getline < "/inet/tcp/0/time-a-g.nist.gov/daytime"’).
 
-   * The operator '|&' has not been part of any 'awk' implementation
-     (until now).  It is actually the only extension of the 'awk'
+   • The operator ‘|&’ has not been part of any ‘awk’ implementation
+     (until now).  It is actually the only extension of the ‘awk’
      language needed (apart from the special files) to introduce network
      access.
 
-   The '|&' operator was introduced in 'gawk' 3.1 in order to overcome
-the crucial restriction that access to files and pipes in 'awk' is
+   The ‘|&’ operator was introduced in ‘gawk’ 3.1 in order to overcome
+the crucial restriction that access to files and pipes in ‘awk’ is
 always unidirectional.  It was formerly impossible to use both access
 modes on the same file or pipe.  Instead of changing the whole concept
-of file access, the '|&' operator behaves exactly like the usual pipe
+of file access, the ‘|&’ operator behaves exactly like the usual pipe
 operator except for two additions:
 
-   * Normal shell commands connected to their 'gawk' program with a '|&'
-     pipe can be accessed bidirectionally.  The '|&' turns out to be a
-     quite general, useful, and natural extension of 'awk'.
+   • Normal shell commands connected to their ‘gawk’ program with a ‘|&’
+     pipe can be accessed bidirectionally.  The ‘|&’ turns out to be a
+     quite general, useful, and natural extension of ‘awk’.
 
-   * Pipes that consist of a special file name for network connections
+   • Pipes that consist of a special file name for network connections
      are not executed as shell commands.  Instead, they can be read and
      written to, just like a full-duplex network connection.
 
-   In the earlier example, the '|&' operator tells 'getline' to read a
-line from the special file '/inet/tcp/0/time-a-g.nist.gov/daytime'.  We
+   In the earlier example, the ‘|&’ operator tells ‘getline’ to read a
+line from the special file ‘/inet/tcp/0/time-a-g.nist.gov/daytime’.  We
 could also have printed a line into the special file.  But instead we
 just consumed an empty leading line, printed it, then read a line with
 the time, printed that, and closed the connection.  (While we could just
-let 'gawk' close the connection by finishing the program, in this Info
+let ‘gawk’ close the connection by finishing the program, in this Info
 file we are pedantic and always explicitly close the connections.)
 
-   Network services like 'daytime' are not really useful because there
+   Network services like ‘daytime’ are not really useful because there
 are so many better ways to print the current time.  In the early days of
 TCP networking, such a service may have looked like a good idea for
 testing purposes.  Later, simple TCP services like these have been used
@@ -760,7 +760,7 @@ services.  The list of servers (https://tf.nist.gov/tf-cgi/servers.cgi)
 that still support the legacy service daytime
 (https://en.wikipedia.org/wiki/Daytime_Protocol) can be found at
 Wikipedia.  We hesitated to use this service in this manual because it
-is hard to find servers that still support services like 'daytime'
+is hard to find servers that still support services like ‘daytime’
 openly to the Internet.  Later on we will see that some of these
 nostalgic protocols have turned into security risks.
 
@@ -778,14 +778,14 @@ network programming.
    For the rest of this major node, we will assume you work on a
 POSIX-style system that supports TCP/IP. If the previous example program
 does not run on your machine, it may help to replace the value assigned
-to the variable 'daytime_server' with the name (or the IP address) of
+to the variable ‘daytime_server’ with the name (or the IP address) of
 another server from the list mentioned above.  Now you should see the
 date and time being printed by the program, otherwise you may have run
-out of servers that support the 'daytime' service.
+out of servers that support the ‘daytime’ service.
 
-   Try changing the service to 'chargen' or 'ftp'.  This way, the
+   Try changing the service to ‘chargen’ or ‘ftp’.  This way, the
 program connects to other services that should give you some response.
-If you are curious, you should have a look at your '/etc/services' file.
+If you are curious, you should have a look at your ‘/etc/services’ file.
 It could look like this:
 
      # /etc/services:
@@ -821,27 +821,27 @@ It could look like this:
 usually support.  If your GNU/Linux machine does not do so, it may be
 that these services are switched off in some startup script.  Systems
 running some flavor of Microsoft Windows usually do _not_ support these
-services.  Nevertheless, it _is_ possible to do networking with 'gawk'
+services.  Nevertheless, it _is_ possible to do networking with ‘gawk’
 on Microsoft Windows.(1)  The first column of the file gives the name of
 the service, and the second column gives a unique number and the
 protocol that one can use to connect to this service.  The rest of the
-line is treated as a comment.  You see that some services ('echo')
+line is treated as a comment.  You see that some services (‘echo’)
 support TCP as well as UDP.
 
    ---------- Footnotes ----------
 
    (1) Microsoft preferred to ignore the TCP/IP family of protocols
 until 1995.  Then came the rise of the Netscape browser as a landmark
-"killer application."  Microsoft added TCP/IP support and their own
+“killer application.” Microsoft added TCP/IP support and their own
 browser to Microsoft Windows 95 at the last minute.  They even
 back-ported their TCP/IP implementation to Microsoft Windows for
 Workgroups 3.11, but it was a rather rudimentary and half-hearted
-implementation.  Nevertheless, the equivalent of '/etc/services' resides
-under 'C:\WINNT\system32\drivers\etc\services' on Microsoft Windows 2000
+implementation.  Nevertheless, the equivalent of ‘/etc/services’ resides
+under ‘C:\WINNT\system32\drivers\etc\services’ on Microsoft Windows 2000
 and Microsoft Windows XP. On Microsoft Windows 7, 8 and 10 there is a
-directory '%WinDir%\System32\Drivers\Etc' that holds the 'hosts' file
+directory ‘%WinDir%\System32\Drivers\Etc’ that holds the ‘hosts’ file
 (https://support.microsoft.com/en-us/help/972034/how-to-reset-the-hosts-file-back-to-the-default)
-and probably also a 'services' file
+and probably also a ‘services’ file
 (https://www.ibm.com/support/knowledgecenter/SSRNYG_7.2.1/com.ibm.rational.synergy.install.win.doc/topics/sg_r_igw_services_file.html).
 
 
@@ -852,8 +852,8 @@ File: gawkinet.info,  Node: Interacting,  Next: Setting Up,  Prev: Troubleshooti
 
 The next program begins really interacting with a network service by
 printing something into the special file.  It asks the so-called
-'finger' service if a user of the machine is logged in.  When testing
-this program, try to change the variable 'finger_server' to some other
+‘finger’ service if a user of the machine is logged in.  When testing
+this program, try to change the variable ‘finger_server’ to some other
 machine name in your local network:
 
      BEGIN {
@@ -869,15 +869,15 @@ machine name in your local network:
 program repeatedly reads lines that come as a reply.  When no more lines
 are available (because the service has closed the connection), the
 program also closes the connection.  If you tried to replace
-'finger_server' with some other server name, the script probably
+‘finger_server’ with some other server name, the script probably
 reported being unable to open the connection, because most servers today
 no longer support this service.  Try replacing the login name of
-Professor Nace ('wnace') with another login name (like 'help').  You
+Professor Nace (‘wnace’) with another login name (like ‘help’).  You
 will receive a list of login names similar to the one you asked for.  In
 the 1980s you could get a list of all users currently logged in by
-asking for an empty string ('""').
+asking for an empty string (‘""’).
 
-   The final 'close()' call could be safely deleted from the above
+   The final ‘close()’ call could be safely deleted from the above
 script, because the operating system closes any open connection by
 default when a script reaches the end of execution.  But, in order to
 avoid portability problems, it is best to always close connections
@@ -885,9 +885,9 @@ explicitly.  With the Linux kernel, for example, proper closing results
 in flushing of buffers.  Letting the close happen by default may result
 in discarding buffers.
 
-   When looking at '/etc/services' you may have noticed that the
-'daytime' service is also available with 'udp'.  In the earlier
-examples, change 'tcp' to 'udp' and try if the 'finger' and 'daytime'
+   When looking at ‘/etc/services’ you may have noticed that the
+‘daytime’ service is also available with ‘udp’.  In the earlier
+examples, change ‘tcp’ to ‘udp’ and try if the ‘finger’ and ‘daytime’
 clients still work as expected.  They probably will not respond because
 a wise administrator switched off these services.  But if they do, you
 may see the expected day and time message.  The program then hangs,
@@ -897,8 +897,8 @@ and UDP. When using UDP, neither party is automatically informed about
 the other closing the connection.  Continuing to experiment this way
 reveals many other subtle differences between TCP and UDP. To avoid such
 trouble, you should always remember the advice Douglas E. Comer and
-David Stevens give in Volume III of their series 'Internetworking With
-TCP' (page 14):
+David Stevens give in Volume III of their series ‘Internetworking With
+TCP’ (page 14):
 
      When designing client-server applications, beginners are strongly
      advised to use TCP because it provides reliable,
@@ -910,19 +910,19 @@ TCP' (page 14):
    This advice is actually quite dated and we hesitated to repeat it
 here.  But we left it in because we are still observing beginners
 running into this pitfall.  While this advice has aged quite well, some
-other ideas from the 1980s have not.  The 'finger' service may still be
+other ideas from the 1980s have not.  The ‘finger’ service may still be
 available in Microsoft Windows Server 2019
 (https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/finger),
 but it turned out to be a never-ending cause of trouble.  First of all,
 it is now obvious that a server should never reveal personal data about
 its users to anonymous client software that connects over the wild wild
-Internet.  So every server on the Internet should reject 'finger'
+Internet.  So every server on the Internet should reject ‘finger’
 requests (by disabling the port and by disabling the software serving
 this port).  But things got even worse in 2020 when it turned out that
-even the client software (the 'finger' command documented in the link
+even the client software (the ‘finger’ command documented in the link
 above) is a security problem.  A tool called DarkFinger
 (https://seclists.org/fulldisclosure/2020/Sep/30) allows to leverage the
-Microsoft Windows 'finger.exe' as a file downloader and help evade
+Microsoft Windows ‘finger.exe’ as a file downloader and help evade
 network security devices.
 
 
@@ -933,16 +933,16 @@ File: gawkinet.info,  Node: Setting Up,  Next: Email,  Prev: Interacting,  Up: U
 
 The preceding programs behaved as clients that connect to a server
 somewhere on the Internet and request a particular service.  Now we set
-up such a service to mimic the behavior of the 'daytime' service.  Such
+up such a service to mimic the behavior of the ‘daytime’ service.  Such
 a server does not know in advance who is going to connect to it over the
 network.  Therefore, we cannot insert a name for the host to connect to
 in our special file name.
 
    Start the following program in one window.  Notice that the service
-does not have the name 'daytime', but the number '8888'.  From looking
-at '/etc/services', you know that names like 'daytime' are just
+does not have the name ‘daytime’, but the number ‘8888’.  From looking
+at ‘/etc/services’, you know that names like ‘daytime’ are just
 mnemonics for predetermined 16-bit integers.  Only the system
-administrator ('root') could enter our new service into '/etc/services'
+administrator (‘root’) could enter our new service into ‘/etc/services’
 with an appropriate name.  Also notice that the service name has to be
 entered into a different field of the special file name because we are
 setting up a server, not a client:
@@ -955,34 +955,34 @@ setting up a server, not a client:
    Now open another window on the same machine.  Copy the client program
 given as the first example (*note Establishing a TCP Connection: TCP
 Connecting.) to a new file and edit it, changing the variable
-'daytime_server' to 'localhost' and the port name 'daytime' to '8888'.
+‘daytime_server’ to ‘localhost’ and the port name ‘daytime’ to ‘8888’.
 Then start the modified client.  You should get a reply like this:
 
      $ gawk -f awklib/eg/network/daytimeclient.awk
-     -| Sun Dec 27 17:33:57 CET 2020
-     -| Sun Dec 27 17:33:57 CET 2020
+     ⊣ Sun Dec 27 17:33:57 CET 2020
+     ⊣ Sun Dec 27 17:33:57 CET 2020
 
 Both programs explicitly close the connection.
 
    Now we will intentionally make a mistake to see what happens when the
-name '8888' (the port) is already used by another service.  Start the
+name ‘8888’ (the port) is already used by another service.  Start the
 server program in both windows.  The first one works, but the second one
 complains that it could not open the connection.  Each port on a single
 machine can only be used by one server program at a time.  Now terminate
-the server program and change the name '8888' to 'echo'.  After
+the server program and change the name ‘8888’ to ‘echo’.  After
 restarting it, the server program does not run any more, and you know
-why: there is already an 'echo' service running on your machine.  But
-even if this isn't true, you would not get your own 'echo' server
+why: there is already an ‘echo’ service running on your machine.  But
+even if this isn’t true, you would not get your own ‘echo’ server
 running on a Unix machine, because the ports with numbers smaller than
-1024 ('echo' is at port 7) are reserved for 'root'.  On machines running
+1024 (‘echo’ is at port 7) are reserved for ‘root’.  On machines running
 some flavor of Microsoft Windows, there is no restriction that reserves
-ports 1 to 1024 for a privileged user; hence, you can start an 'echo'
+ports 1 to 1024 for a privileged user; hence, you can start an ‘echo’
 server there.  Even in later version of Microsoft Windows, this
-restriction of the Unix world seems to have never been adopted 'Does
-windows(10/server-2016) have privileged ports?'
+restriction of the Unix world seems to have never been adopted ‘Does
+windows(10/server-2016) have privileged ports?’
 (https://social.technet.microsoft.com/Forums/windowsserver/en-US/334f0770-eda9-475a-a27f-46b80ab7e872/does-windows10server2016-have-privileged-ports-?forum=ws2016).
 In Microsoft Windows it is the level of the firewall that handles port
-access restrictions, not the level of the operating system's kernel.
+access restrictions, not the level of the operating system’s kernel.
 
    Turning this short server program into something really useful is
 simple.  Imagine a server that first reads a file name from the client
@@ -1004,8 +1004,8 @@ contents of the named file across the net.  The server-side processing
 could also be the execution of a command that is transmitted across the
 network.  From this example, you can see how simple it is to open up a
 security hole on your machine.  If you allow clients to connect to your
-machine and execute arbitrary commands, anyone would be free to do 'rm
--rf *'.
+machine and execute arbitrary commands, anyone would be free to do ‘rm
+-rf *’.
 
    The client side connects to port number 8888 on the server side and
 sends the name of the desired file to be sent across the same TCP
@@ -1058,16 +1058,16 @@ the first email the server has in store:
        close(POPService)
      }
 
-   We redefine the record separators 'RS' and 'ORS' because the protocol
+   We redefine the record separators ‘RS’ and ‘ORS’ because the protocol
 (POP) requires CR-LF to separate lines.  After identifying yourself to
-the email service, the command 'retr 1' instructs the service to send
+the email service, the command ‘retr 1’ instructs the service to send
 the first of all your email messages in line.  If the service replies
-with something other than '+OK', the program exits; maybe there is no
+with something other than ‘+OK’, the program exits; maybe there is no
 email.  Otherwise, the program first announces that it intends to finish
-reading email, and then redefines 'RS' in order to read the entire email
+reading email, and then redefines ‘RS’ in order to read the entire email
 as multiline input in one record.  From the POP RFC, we know that the
 body of the email always ends with a single line containing a single
-dot.  The program looks for this using 'RS = "\r\n\\.\r\n"'.  When it
+dot.  The program looks for this using ‘RS = "\r\n\\.\r\n"’.  When it
 finds this sequence in the mail message, it quits.  You can invoke this
 program as often as you like; it does not delete the message it reads,
 but instead leaves it on the server.
@@ -1078,14 +1078,14 @@ but instead leaves it on the server.
 simple when email was young in the 20th century.  These days,
 unencrypted plaintext authentication is usually disallowed on non-secure
 connections.  Since encryption of network connections is not supported
-in 'gawk', you should not use 'gawk' to write such scripts.  We left
+in ‘gawk’, you should not use ‘gawk’ to write such scripts.  We left
 this node as it is because it demonstrates how application level
 protocols work in principle (a command being issued by the client
 followed by a reply coming back).  Unfortunately, modern application
 level protocols are much more flexible in the sequence of actions.  For
 example, modern POP3 servers may introduce themselves with an unprompted
 initial line that arrives before the initial command.  Dealing with such
-variance is not worth the effort in 'gawk'.
+variance is not worth the effort in ‘gawk’.
 
 
 File: gawkinet.info,  Node: Web page,  Next: Primitive Service,  Prev: Email,  Up: Using Networking
@@ -1105,7 +1105,7 @@ retrieving a web page.  It uses the prehistoric syntax of HTTP 0.9,
 which almost all web servers still support.  The most noticeable thing
 about it is that the program directs the request to the local proxy
 server whose name you insert in the special file name (which in turn
-calls 'www.yahoo.com'):
+calls ‘www.yahoo.com’):
 
      BEGIN {
        RS = ORS = "\r\n"
@@ -1116,14 +1116,14 @@ calls 'www.yahoo.com'):
        close(HttpService)
      }
 
-   Again, lines are separated by a redefined 'RS' and 'ORS'.  The 'GET'
+   Again, lines are separated by a redefined ‘RS’ and ‘ORS’.  The ‘GET’
 request that we send to the server is the only kind of HTTP request that
 existed when the web was created in the early 1990s.  HTTP calls this
-'GET' request a "method," which tells the service to transmit a web page
+‘GET’ request a “method,” which tells the service to transmit a web page
 (here the home page of the Yahoo!  search engine).  Version 1.0 added
-the request methods 'HEAD' and 'POST'.  The current version of HTTP is
-1.1,(1)(2) and knows the additional request methods 'OPTIONS', 'PUT',
-'DELETE', and 'TRACE'.  You can fill in any valid web address, and the
+the request methods ‘HEAD’ and ‘POST’.  The current version of HTTP is
+1.1,(1)(2) and knows the additional request methods ‘OPTIONS’, ‘PUT’,
+‘DELETE’, and ‘TRACE’.  You can fill in any valid web address, and the
 program prints the HTML code of that page to your screen.
 
    Notice the similarity between the responses of the POP and HTTP
@@ -1132,7 +1132,7 @@ and then you get the body of the page in HTML. The lines of the headers
 also have the same form as in POP. There is the name of a parameter,
 then a colon, and finally the value of that parameter.
 
-   Images ('.png' or '.gif' files) can also be retrieved this way, but
+   Images (‘.png’ or ‘.gif’ files) can also be retrieved this way, but
 then you get binary data that should be redirected into a file.  Another
 application is calling a CGI (Common Gateway Interface) script on some
 server.  CGI scripts are used when the contents of a web page are not
@@ -1154,11 +1154,11 @@ obsolete by RFC 2616, an update without any substantial changes.
 
    (2) Version 2.0 of HTTP (https://en.wikipedia.org/wiki/HTTP/2) was
 defined in RFC7540 (https://tools.ietf.org/html/rfc7540) and was derived
-from Google's SPDY (https://en.wikipedia.org/wiki/SPDY) protocol.  It is
+from Google’s SPDY (https://en.wikipedia.org/wiki/SPDY) protocol.  It is
 said to be widely supported.  As of 2020 the most popular web sites
 still identify themselves as supporting HTTP/1.1.  Version 3.0 of HTTP
 (https://en.wikipedia.org/wiki/HTTP/3) is still a draft and was derived
-from Google's QUIC (https://en.wikipedia.org/wiki/QUIC) protocol.
+from Google’s QUIC (https://en.wikipedia.org/wiki/QUIC) protocol.
 
 
 File: gawkinet.info,  Node: Primitive Service,  Next: Interacting Service,  Prev: Web page,  Up: Using Networking
@@ -1167,12 +1167,12 @@ File: gawkinet.info,  Node: Primitive Service,  Next: Interacting Service,  Prev
 ===========================
 
 Now we know enough about HTTP to set up a primitive web service that
-just says '"Hello, world"' when someone connects to it with a browser.
+just says ‘"Hello, world"’ when someone connects to it with a browser.
 Compared to the situation in the preceding node, our program changes the
 role.  It tries to behave just like the server we have observed.  Since
 we are setting up a server here, we have to insert the port number in
-the 'localport' field of the special file name.  The other two fields
-(HOSTNAME and REMOTEPORT) have to contain a '0' because we do not know
+the ‘localport’ field of the special file name.  The other two fields
+(HOSTNAME and REMOTEPORT) have to contain a ‘0’ because we do not know
 in advance which host will connect to our service.
 
    In the early 1990s, all a server had to do was send an HTML document
@@ -1191,7 +1191,7 @@ The steps are as follows:
      bytes will be sent.  The header is terminated as usual with an
      empty line.
 
-  3. Send the '"Hello, world"' body in HTML. The useless 'while' loop
+  3. Send the ‘"Hello, world"’ body in HTML. The useless ‘while’ loop
      swallows the request of the browser.  We could actually omit the
      loop, and on most machines the program would still work.  First,
      start the following program:
@@ -1215,7 +1215,7 @@ The steps are as follows:
 point to <http://localhost:8080> (the browser needs to know on which
 port our server is listening for requests).  If this does not work, the
 browser probably tries to connect to a proxy server that does not know
-your machine.  If so, change the browser's configuration so that the
+your machine.  If so, change the browser’s configuration so that the
 browser does not try to use a proxy to connect to your machine.
 
 
@@ -1233,13 +1233,13 @@ Applications and Techniques::.
 * CGI Lib::                     A simple CGI library.
 
    Setting up a web service that allows user interaction is more
-difficult and shows us the limits of network access in 'gawk'.  In this
-node, we develop a main program (a 'BEGIN' pattern and its action) that
+difficult and shows us the limits of network access in ‘gawk’.  In this
+node, we develop a main program (a ‘BEGIN’ pattern and its action) that
 will become the core of event-driven execution controlled by a graphical
 user interface (GUI). Each HTTP event that the user triggers by some
 action within the browser is received in this central procedure.
 Parameters and menu choices are extracted from this request, and an
-appropriate measure is taken according to the user's choice:
+appropriate measure is taken according to the user’s choice:
 
      BEGIN {
        if (MyHost == "") {
@@ -1289,7 +1289,7 @@ appropriate measure is taken according to the user's choice:
    This web server presents menu choices in the form of HTML links.
 Therefore, it has to tell the browser the name of the host it is
 residing on.  When starting the server, the user may supply the name of
-the host from the command line with 'gawk -v MyHost="Rumpelstilzchen"'.
+the host from the command line with ‘gawk -v MyHost="Rumpelstilzchen"’.
 If the user does not do this, the server looks up the name of the host
 it is running on for later use as a web address in HTML documents.  The
 same applies to the port number.  These values are inserted later into
@@ -1297,7 +1297,7 @@ the HTML content of the web pages to refer to the home system.
 
    Each server that is built around this core has to initialize some
 application-dependent variables (such as the default home page) in a
-function 'SetUpServer()', which is called immediately before entering
+function ‘SetUpServer()’, which is called immediately before entering
 the infinite loop of the server.  For now, we will write an instance
 that initiates a trivial interaction.  With this home page, the client
 user can click on two possible choices, and receive the current date
@@ -1316,13 +1316,13 @@ either in human-readable format or in seconds since 1970:
 
    On the first run through the main loop, the default line terminators
 are set and the default home page is copied to the actual home page.
-Since this is the first run, 'GETARG["Method"]' is not initialized yet,
+Since this is the first run, ‘GETARG["Method"]’ is not initialized yet,
 hence the case selection over the method does nothing.  Now that the
 home page is initialized, the server can start communicating to a client
 browser.
 
    It does so by printing the HTTP header into the network connection
-('print ... |& HttpService').  This command blocks execution of the
+(‘print ... |& HttpService’).  This command blocks execution of the
 server script until a client connects.
 
    If you compare this server script with the primitive one we wrote
@@ -1336,15 +1336,15 @@ always displaying the same time of day although time advances each
 second.
 
    Having supplied the initial home page to the browser with a valid
-document stored in the parameter 'Prompt', it closes the connection and
+document stored in the parameter ‘Prompt’, it closes the connection and
 waits for the next request.  When the request comes, a log line is
 printed that allows us to see which request the server receives.  The
-final step in the loop is to call the function 'CGI_setup()', which
+final step in the loop is to call the function ‘CGI_setup()’, which
 reads all the lines of the request (coming from the browser), processes
-them, and stores the transmitted parameters in the array 'PARAM'.  The
+them, and stores the transmitted parameters in the array ‘PARAM’.  The
 complete text of these application-independent functions can be found in
 *note A Simple CGI Library: CGI Lib.  For now, we use a simplified
-version of 'CGI_setup()':
+version of ‘CGI_setup()’:
 
      function CGI_setup(   method, uri, version, i) {
        delete GETARG;         delete MENU;        delete PARAM
@@ -1370,26 +1370,26 @@ version of 'CGI_setup()':
 of request parameters.  The rest of the function serves the purpose of
 filling the global parameters with the extracted new values.  To
 accomplish this, the name of the requested resource is split into parts
-and stored for later evaluation.  If the request contains a '?', then
+and stored for later evaluation.  If the request contains a ‘?’, then
 the request has CGI variables seamlessly appended to the web address.
-Everything in front of the '?' is split up into menu items, and
-everything behind the '?' is a list of 'VARIABLE=VALUE' pairs (separated
-by '&') that also need splitting.  This way, CGI variables are isolated
+Everything in front of the ‘?’ is split up into menu items, and
+everything behind the ‘?’ is a list of ‘VARIABLE=VALUE’ pairs (separated
+by ‘&’) that also need splitting.  This way, CGI variables are isolated
 and stored.  This procedure lacks recognition of special characters that
 are transmitted in coded form(1).  Here, any optional request header and
 body parts are ignored.  We do not need header parameters and the
 request body.  However, when refining our approach or working with the
-'POST' and 'PUT' methods, reading the header and body becomes
+‘POST’ and ‘PUT’ methods, reading the header and body becomes
 inevitable.  Header parameters should then be stored in a global array
 as well as the body.
 
    On each subsequent run through the main loop, one request from a
-browser is received, evaluated, and answered according to the user's
+browser is received, evaluated, and answered according to the user’s
 choice.  This can be done by letting the value of the HTTP method guide
-the main loop into execution of the procedure 'HandleGET()', which
-evaluates the user's choice.  In this case, we have only one
+the main loop into execution of the procedure ‘HandleGET()’, which
+evaluates the user’s choice.  In this case, we have only one
 hierarchical level of menus, but in the general case, menus are nested.
-The menu choices at each level are separated by '/', just as in file
+The menu choices at each level are separated by ‘/’, just as in file
 names.  Notice how simple it is to construct menus of arbitrary depth:
 
      function HandleGET() {
@@ -1402,18 +1402,18 @@ names.  Notice how simple it is to construct menus of arbitrary depth:
 
    The disadvantage of this approach is that our server is slow and can
 handle only one request at a time.  Its main advantage, however, is that
-the server consists of just one 'gawk' program.  No need for installing
-an 'httpd', and no need for static separate HTML files, CGI scripts, or
-'root' privileges.  This is rapid prototyping.  This program can be
+the server consists of just one ‘gawk’ program.  No need for installing
+an ‘httpd’, and no need for static separate HTML files, CGI scripts, or
+‘root’ privileges.  This is rapid prototyping.  This program can be
 started on the same host that runs your browser.  Then let your browser
 point to <http://localhost:8080>.
 
    It is also possible to include images into the HTML pages.  Most
-browsers support the not very well-known '.xbm' format, which may
+browsers support the not very well-known ‘.xbm’ format, which may
 contain only monochrome pictures but is an ASCII format.  Binary images
 are possible but not so easy to handle.  Another way of including images
 is to generate them with a tool such as GNUPlot, by calling the tool
-with the 'system()' function or through a pipe.
+with the ‘system()’ function or through a pipe.
 
    ---------- Footnotes ----------
 
@@ -1426,27 +1426,27 @@ File: gawkinet.info,  Node: CGI Lib,  Prev: Interacting Service,  Up: Interactin
 --------------------------
 
      HTTP is like being married: you have to be able to handle whatever
-     you're given, while being very careful what you send back.
-                          -- _Phil Smith III,
+     you’re given, while being very careful what you send back.
+                          — _Phil Smith III,
          <http://www.netfunny.com/rhf/jokes/99/Mar/http.html>_
 
    In *note A Web Service with Interaction: Interacting Service, we saw
-the function 'CGI_setup()' as part of the web server "core logic"
+the function ‘CGI_setup()’ as part of the web server “core logic”
 framework.  The code presented there handles almost everything necessary
-for CGI requests.  One thing it doesn't do is handle encoded characters
-in the requests.  For example, an '&' is encoded as a percent sign
-followed by the hexadecimal value: '%26'.  These encoded values should
+for CGI requests.  One thing it doesn’t do is handle encoded characters
+in the requests.  For example, an ‘&’ is encoded as a percent sign
+followed by the hexadecimal value: ‘%26’.  These encoded values should
 be decoded.  Following is a simple library to perform these tasks.  This
 code is used for all web server examples throughout the rest of this
 Info file.  If you want to use it for your own web server, store the
-source code into a file named 'inetlib.awk'.  Then you can include these
+source code into a file named ‘inetlib.awk’.  Then you can include these
 functions into your code by placing the following statement into your
 program (on the first line of your script):
 
      @include inetlib.awk
 
 But beware, this mechanism is only possible if you invoke your web
-server script with 'igawk' instead of the usual 'awk' or 'gawk'.  Here
+server script with ‘igawk’ instead of the usual ‘awk’ or ‘gawk’.  Here
 is the code:
 
      # CGI Library and core of a web server
@@ -1531,10 +1531,10 @@ is the code:
                  MENU[i] = _CGI_decode(MENU[i])
      }
 
-   This isolates details in a single function, 'CGI_setup()'.  Decoding
+   This isolates details in a single function, ‘CGI_setup()’.  Decoding
 of encoded characters is pushed off to a helper function,
-'_CGI_decode()'.  The use of the leading underscore ('_') in the
-function name is intended to indicate that it is an "internal" function,
+‘_CGI_decode()’.  The use of the leading underscore (‘_’) in the
+function name is intended to indicate that it is an “internal” function,
 although there is nothing to enforce this:
 
      function _CGI_decode(str,   hexdigs, i, pre, code1, code2,
@@ -1567,10 +1567,10 @@ although there is nothing to enforce this:
 
    This works by splitting the string apart around an encoded character.
 The two digits are converted to lowercase characters and looked up in a
-string of hex digits.  Note that '0' is not in the string on purpose;
-'index()' returns zero when it's not found, automatically giving the
+string of hex digits.  Note that ‘0’ is not in the string on purpose;
+‘index()’ returns zero when it’s not found, automatically giving the
 correct value!  Once the hexadecimal value is converted from characters
-in a string into a numerical value, 'sprintf()' converts the value back
+in a string into a numerical value, ‘sprintf()’ converts the value back
 into a real character.  The following is a simple test harness for the
 above functions:
 
@@ -1590,21 +1590,21 @@ above functions:
    And this is the result when we run it:
 
      $ gawk -f testserv.awk
-     -| MENU["4"] = www.gnu.org
-     -| MENU["5"] = cgi-bin
-     -| MENU["6"] = foo
-     -| MENU["1"] = http
-     -| MENU["2"] =
-     -| MENU["3"] =
-     -| PARAM["1"] = p1=stuff
-     -| PARAM["2"] = p2=stuff&junk
-     -| PARAM["3"] = percent=a % sign
-     -| GETARG["p1"] = stuff
-     -| GETARG["percent"] = a % sign
-     -| GETARG["p2"] = stuff&junk
-     -| GETARG["Method"] = GET
-     -| GETARG["Version"] = 1.0
-     -| GETARG["URI"] = http://www.gnu.org/cgi-bin/foo?p1=stuff&
+     ⊣ MENU["4"] = www.gnu.org
+     ⊣ MENU["5"] = cgi-bin
+     ⊣ MENU["6"] = foo
+     ⊣ MENU["1"] = http
+     ⊣ MENU["2"] =
+     ⊣ MENU["3"] =
+     ⊣ PARAM["1"] = p1=stuff
+     ⊣ PARAM["2"] = p2=stuff&junk
+     ⊣ PARAM["3"] = percent=a % sign
+     ⊣ GETARG["p1"] = stuff
+     ⊣ GETARG["percent"] = a % sign
+     ⊣ GETARG["p2"] = stuff&junk
+     ⊣ GETARG["Method"] = GET
+     ⊣ GETARG["Version"] = 1.0
+     ⊣ GETARG["URI"] = http://www.gnu.org/cgi-bin/foo?p1=stuff&
      p2=stuff%26junk&percent=a %25 sign
 
 
@@ -1615,7 +1615,7 @@ File: gawkinet.info,  Node: Simple Server,  Next: Caveats,  Prev: Interacting Se
 
 In the preceding node, we built the core logic for event-driven GUIs.
 In this node, we finally extend the core to a real application.  No one
-would actually write a commercial web server in 'gawk', but it is
+would actually write a commercial web server in ‘gawk’, but it is
 instructive to see that it is feasible in principle.
 
    The application is ELIZA, the famous program by Joseph Weizenbaum
@@ -1646,19 +1646,19 @@ and append the following code:
        TopFooter = "</BODY></HTML>"
      }
 
-   'SetUpServer()' is similar to the previous example, except for
-calling another function, 'SetUpEliza()'.  This approach can be used to
+   ‘SetUpServer()’ is similar to the previous example, except for
+calling another function, ‘SetUpEliza()’.  This approach can be used to
 implement other kinds of servers.  The only changes needed to do so are
-hidden in the functions 'SetUpServer()' and 'HandleGET()'.  Perhaps it
-might be necessary to implement other HTTP methods.  The 'igawk' program
-that comes with 'gawk' may be useful for this process.
+hidden in the functions ‘SetUpServer()’ and ‘HandleGET()’.  Perhaps it
+might be necessary to implement other HTTP methods.  The ‘igawk’ program
+that comes with ‘gawk’ may be useful for this process.
 
    When extending this example to a complete application, the first
-thing to do is to implement the function 'SetUpServer()' to initialize
+thing to do is to implement the function ‘SetUpServer()’ to initialize
 the HTML pages and some variables.  These initializations determine the
 way your HTML pages look (colors, titles, menu items, etc.).
 
-   The function 'HandleGET()' is a nested case selection that decides
+   The function ‘HandleGET()’ is a nested case selection that decides
 which page the user wants to see next.  Each nesting level refers to a
 menu level of the GUI. Each case implements a certain action of the
 menu.  At the deepest level of case selection, the handler essentially
@@ -1699,7 +1699,7 @@ Initially the user does not say anything; then ELIZA resets its money
 counter and asks the user to tell what comes to mind open-heartedly.
 The subsequent answers are converted to uppercase characters and stored
 for later comparison.  ELIZA presents the bill when being confronted
-with a sentence that contains the phrase "shut up."  Otherwise, it looks
+with a sentence that contains the phrase “shut up.” Otherwise, it looks
 for keywords in the sentence, conjugates the rest of the sentence,
 remembers the keyword for later use, and finally selects an answer from
 the set of possible answers:
@@ -1747,9 +1747,9 @@ the set of possible answers:
        return answer
      }
 
-   In the long but simple function 'SetUpEliza()', you can see tables
-for conjugation, keywords, and answers.(1)  The associative array 'k'
-contains indices into the array of answers 'r'.  To choose an answer,
+   In the long but simple function ‘SetUpEliza()’, you can see tables
+for conjugation, keywords, and answers.(1)  The associative array ‘k’
+contains indices into the array of answers ‘r’.  To choose an answer,
 ELIZA just picks an index randomly:
 
      function SetUpEliza() {
@@ -1786,8 +1786,8 @@ ELIZA just picks an index randomly:
      }
 
    Some interesting remarks and details (including the original source
-code of ELIZA) are found on Mark Humphrys's home page 'How my program
-passed the Turing Test' (https://computing.dcu.ie/~humphrys/eliza.html).
+code of ELIZA) are found on Mark Humphrys’s home page ‘How my program
+passed the Turing Test’ (https://computing.dcu.ie/~humphrys/eliza.html).
 Wikipedia provides much background information about ELIZA
 (https://en.wikipedia.org/wiki/ELIZA), including the original design of
 the software and its early implementations.
@@ -1795,7 +1795,7 @@ the software and its early implementations.
    ---------- Footnotes ----------
 
    (1) The version shown here is abbreviated.  The full version comes
-with the 'gawk' distribution.
+with the ‘gawk’ distribution.
 
 
 File: gawkinet.info,  Node: Caveats,  Next: Challenges,  Prev: Simple Server,  Up: Using Networking
@@ -1809,19 +1809,19 @@ The behavior of a networked application sometimes looks noncausal
 because it is not reproducible in a strong sense.  Whether a network
 application works or not sometimes depends on the following:
 
-   * How crowded the underlying network is
+   • How crowded the underlying network is
 
-   * If the party at the other end is running or not
+   • If the party at the other end is running or not
 
-   * The state of the party at the other end
+   • The state of the party at the other end
 
    The most difficult problems for a beginner arise from the hidden
-states of the underlying network.  After closing a TCP connection, it's
+states of the underlying network.  After closing a TCP connection, it’s
 often necessary to wait a short while before reopening the connection.
 Even more difficult is the establishment of a connection that previously
-ended with a "broken pipe."  Those connections have to "time out" for a
+ended with a “broken pipe.” Those connections have to “time out” for a
 minute or so before they can reopen.  Check this with the command
-'netstat -a', which provides a list of still-active connections.
+‘netstat -a’, which provides a list of still-active connections.
 
 
 File: gawkinet.info,  Node: Challenges,  Prev: Caveats,  Up: Using Networking
@@ -1835,7 +1835,7 @@ Loebner Prize is the first formal instantiation of a Turing Test.  Hugh
 Loebner agreed with The Cambridge Center for Behavioral Studies to
 underwrite a contest designed to implement the Turing Test.  Dr. Loebner
 pledged a Grand Prize of $100,000 for the first computer whose responses
-were indistinguishable from a human's.  Each year an annual prize of
+were indistinguishable from a human’s.  Each year an annual prize of
 $2000 and a bronze medal is awarded to the _most_ human computer.  The
 winner of the annual contest is the best entry relative to other entries
 that year, irrespective of how good it is in an absolute sense.  Here is
@@ -1887,20 +1887,20 @@ behave so much like a human being that it can win this prize.  It is
 quite common to let these programs talk to each other via network
 connections.  But during the competition itself, the program and its
 computer have to be present at the place the competition is held.  We
-all would love to see a 'gawk' program win in such an event.  Maybe it
+all would love to see a ‘gawk’ program win in such an event.  Maybe it
 is up to you to accomplish this?
 
    Some other ideas for useful networked applications:
-   * Read the file 'doc/awkforai.txt' in earlier 'gawk'
+   • Read the file ‘doc/awkforai.txt’ in earlier ‘gawk’
      distributions.(1)  It was written by Ronald P. Loui (at the time,
      Associate Professor of Computer Science, at Washington University
      in St.  Louis, <loui@ai.wustl.edu>) and summarizes why he taught
-     'gawk' to students of Artificial Intelligence.  Here are some
+     ‘gawk’ to students of Artificial Intelligence.  Here are some
      passages from the text:
 
           The GAWK manual can be consumed in a single lab session and
           the language can be mastered by the next morning by the
-          average student.  GAWK's automatic initialization, implicit
+          average student.  GAWK’s automatic initialization, implicit
           coercion, I/O support and lack of pointers forgive many of the
           mistakes that young programmers are likely to make.  Those who
           have seen C but not mastered it are happy to see that GAWK
@@ -1910,17 +1910,17 @@ is up to you to accomplish this?
           There are further simple answers.  Probably the best is the
           fact that increasingly, undergraduate AI programming is
           involving the Web.  Oren Etzioni (University of Washington,
-          Seattle) has for a while been arguing that the "softbot" is
-          replacing the mechanical engineers' robot as the most
+          Seattle) has for a while been arguing that the “softbot” is
+          replacing the mechanical engineers’ robot as the most
           glamorous AI testbed.  If the artifact whose behavior needs to
           be controlled in an intelligent way is the software agent,
           then a language that is well-suited to controlling the
           software environment is the appropriate language.  That would
           imply a scripting language.  If the robot is KAREL, then the
-          right language is "turn left; turn right."  If the robot is
+          right language is “turn left; turn right.” If the robot is
           Netscape, then the right language is something that can
-          generate 'netscape -remote
-          'openURL(http://cs.wustl.edu/~loui)'' with elan.
+          generate ‘netscape -remote
+          'openURL(http://cs.wustl.edu/~loui)'’ with elan.
           ...
           AI programming requires high-level thinking.  There have
           always been a few gifted programmers who can write high-level
@@ -1934,17 +1934,17 @@ is up to you to accomplish this?
           strings.  A language that provides the best support for string
           processing in the end provides the best support for logic, for
           the exploration of various logics, and for most forms of
-          symbolic processing that AI might choose to call "reasoning"
-          instead of "logic."  The implication is that PROLOG, which
+          symbolic processing that AI might choose to call “reasoning”
+          instead of “logic.” The implication is that PROLOG, which
           saves the AI programmer from having to write a unifier, saves
           perhaps two dozen lines of GAWK code at the expense of
           strongly biasing the logic and representational expressiveness
           of any approach.
 
-     Now that 'gawk' itself can connect to the Internet, it should be
+     Now that ‘gawk’ itself can connect to the Internet, it should be
      obvious that it is suitable for writing intelligent web agents.
 
-   * 'awk' is strong at pattern recognition and string processing.  So,
+   • ‘awk’ is strong at pattern recognition and string processing.  So,
      it is well suited to the classic problem of language translation.
      A first try could be a program that knows the 100 most frequent
      English words and their counterparts in German or French.  The
@@ -1955,9 +1955,9 @@ is up to you to accomplish this?
      in return.  As soon as this works, more effort can be spent on a
      real translation program.
 
-   * Another dialogue-oriented application (on the verge of ridicule) is
-     the email "support service."  Troubled customers write an email to
-     an automatic 'gawk' service that reads the email.  It looks for
+   • Another dialogue-oriented application (on the verge of ridicule) is
+     the email “support service.” Troubled customers write an email to
+     an automatic ‘gawk’ service that reads the email.  It looks for
      keywords in the mail and assembles a reply email accordingly.  By
      carefully investigating the email header, and repeating these
      keywords through the reply email, it is rather simple to give the
@@ -1968,7 +1968,7 @@ is up to you to accomplish this?
 
    ---------- Footnotes ----------
 
-   (1) The file is no longer distributed with 'gawk', since the
+   (1) The file is no longer distributed with ‘gawk’, since the
 copyright on the file is not clear.
 
 
@@ -1981,24 +1981,24 @@ In this major node, we look at a number of self-contained scripts, with
 an emphasis on concise networking.  Along the way, we work towards
 creating building blocks that encapsulate often-needed functions of the
 networking world, show new techniques that broaden the scope of problems
-that can be solved with 'gawk', and explore leading edge technology that
+that can be solved with ‘gawk’, and explore leading edge technology that
 may shape the future of networking.
 
    We often refer to the site-independent core of the server that we
 built in *note A Simple Web Server: Simple Server.  When building new
 and nontrivial servers, we always copy this building block and append
-new instances of the two functions 'SetUpServer()' and 'HandleGET()'.
+new instances of the two functions ‘SetUpServer()’ and ‘HandleGET()’.
 
    This makes a lot of sense, since this scheme of event-driven
-execution provides 'gawk' with an interface to the most widely accepted
-standard for GUIs: the web browser.  Now, 'gawk' can rival even Tcl/Tk.
+execution provides ‘gawk’ with an interface to the most widely accepted
+standard for GUIs: the web browser.  Now, ‘gawk’ can rival even Tcl/Tk.
 
-   Tcl and 'gawk' have much in common.  Both are simple scripting
+   Tcl and ‘gawk’ have much in common.  Both are simple scripting
 languages that allow us to quickly solve problems with short programs.
-But Tcl has Tk on top of it, and 'gawk' had nothing comparable up to
+But Tcl has Tk on top of it, and ‘gawk’ had nothing comparable up to
 now.  While Tcl needs a large and ever-changing library (Tk, which was
-originally bound to the X Window System), 'gawk' needs just the
-networking interface and some kind of browser on the client's side.
+originally bound to the X Window System), ‘gawk’ needs just the
+networking interface and some kind of browser on the client’s side.
 Besides better portability, the most important advantage of this
 approach (embracing well-established standards such HTTP and HTML) is
 that _we do not need to change the language_.  We let others do the work
@@ -2024,20 +2024,20 @@ File: gawkinet.info,  Node: PANIC,  Next: GETURL,  Prev: Some Applications and T
 3.1 PANIC: An Emergency Web Server
 ==================================
 
-At first glance, the '"Hello, world"' example in *note A Primitive Web
+At first glance, the ‘"Hello, world"’ example in *note A Primitive Web
 Service: Primitive Service, seems useless.  By adding just a few lines,
 we can turn it into something useful.
 
    The PANIC program tells everyone who connects that the local site is
 not working.  When a web server breaks down, it makes a difference if
-customers get a strange "network unreachable" message, or a short
+customers get a strange “network unreachable” message, or a short
 message telling them that the server has a problem.  In such an
 emergency, the hard disk and everything on it (including the regular web
 service) may be unavailable.  Rebooting the web server off a USB drive
 makes sense in this setting.
 
    To use the PANIC program as an emergency web server, all you need are
-the 'gawk' executable and the program below on a USB drive.  By default,
+the ‘gawk’ executable and the program below on a USB drive.  By default,
 it connects to port 8080.  A different value may be supplied on the
 command line:
 
@@ -2070,7 +2070,7 @@ GETURL is a versatile building block for shell scripts that need to
 retrieve files from the Internet.  It takes a web address as a
 command-line parameter and tries to retrieve the contents of this
 address.  The contents are printed to standard output, while the header
-is printed to '/dev/stderr'.  A surrounding shell script could analyze
+is printed to ‘/dev/stderr’.  A surrounding shell script could analyze
 the contents and extract the text or the links.  An ASCII browser could
 be written around GETURL. But more interestingly, web robots are
 straightforward to write on top of GETURL. On the Internet, you can find
@@ -2080,10 +2080,10 @@ usually much more complex internally and at least 10 times as big.
    At first, GETURL checks if it was called with exactly one web
 address.  Then, it checks if the user chose to use a special proxy
 server whose name is handed over in a variable.  By default, it is
-assumed that the local machine serves as proxy.  GETURL uses the 'GET'
+assumed that the local machine serves as proxy.  GETURL uses the ‘GET’
 method by default to access the web page.  By handing over the name of a
-different method (such as 'HEAD'), it is possible to choose a different
-behavior.  With the 'HEAD' method, the user does not receive the body of
+different method (such as ‘HEAD’), it is possible to choose a different
+behavior.  With the ‘HEAD’ method, the user does not receive the body of
 the page content, but does receive the header:
 
      BEGIN {
@@ -2114,7 +2114,7 @@ the page content, but does receive the header:
    This program can be changed as needed, but be careful with the last
 lines.  Make sure transmission of binary data is not corrupted by
 additional line breaks.  Even as it is now, the byte sequence
-'"\r\n\r\n"' would disappear if it were contained in binary data.  Don't
+‘"\r\n\r\n"’ would disappear if it were contained in binary data.  Don’t
 get caught in a trap when trying a quick fix on this one.
 
 
@@ -2131,27 +2131,27 @@ GNU/Linux in embedded PCs.  These systems are small and usually do not
 have a keyboard or a display.  Therefore it is difficult to set up their
 configuration.  There are several widespread ways to set them up:
 
-   * DIP switches
+   • DIP switches
 
-   * Read Only Memories such as EPROMs
+   • Read Only Memories such as EPROMs
 
-   * Serial lines or some kind of keyboard
+   • Serial lines or some kind of keyboard
 
-   * Network connections via 'telnet' or SNMP
+   • Network connections via ‘telnet’ or SNMP
 
-   * HTTP connections with HTML GUIs
+   • HTTP connections with HTML GUIs
 
    In this node, we look at a solution that uses HTTP connections to
 control variables of an embedded system that are stored in a file.
 Since embedded systems have tight limits on resources like memory, it is
 difficult to employ advanced techniques such as SNMP and HTTP servers.
-'gawk' fits in quite nicely with its single executable which needs just
+‘gawk’ fits in quite nicely with its single executable which needs just
 a short script to start working.  The following program stores the
 variables in a file, and a concurrent process in the embedded system may
 read the file.  The program uses the site-independent part of the simple
 web server that we developed in *note A Web Service with Interaction:
 Interacting Service.  As mentioned there, all we have to do is to write
-two new procedures 'SetUpServer()' and 'HandleGET()':
+two new procedures ‘SetUpServer()’ and ‘HandleGET()’:
 
      function SetUpServer() {
        TopHeader = "<HTML><title>Remote Configuration</title>"
@@ -2168,18 +2168,18 @@ two new procedures 'SetUpServer()' and 'HandleGET()':
        if (ConfigFile == "") ConfigFile = "config.asc"
      }
 
-   The function 'SetUpServer()' initializes the top level HTML texts as
+   The function ‘SetUpServer()’ initializes the top level HTML texts as
 usual.  It also initializes the name of the file that contains the
 configuration parameters and their values.  In case the user supplies a
 name from the command line, that name is used.  The file is expected to
 contain one parameter per line, with the name of the parameter in column
 one and the value in column two.
 
-   The function 'HandleGET()' reflects the structure of the menu tree as
+   The function ‘HandleGET()’ reflects the structure of the menu tree as
 usual.  The first menu choice tells the user what this is all about.
 The second choice reads the configuration file line by line and stores
 the parameters and their values.  Notice that the record separator for
-this file is '"\n"', in contrast to the record separator for HTTP. The
+this file is ‘"\n"’, in contrast to the record separator for HTTP. The
 third menu choice builds an HTML table to show the contents of the
 configuration file just read.  The fourth choice does the real work of
 changing parameters, and the last one just saves the configuration into
@@ -2244,15 +2244,15 @@ bookmark file with pointers to interesting web sites.  It is impossible
 to regularly check by hand if any of these sites have changed.  A
 program is needed to automatically look at the headers of web pages and
 tell which ones have changed.  URLCHK does the comparison after using
-GETURL with the 'HEAD' method to retrieve the header.
+GETURL with the ‘HEAD’ method to retrieve the header.
 
    Like GETURL, this program first checks that it is called with exactly
 one command-line parameter.  URLCHK also takes the same command-line
-variables 'Proxy' and 'ProxyPort' as GETURL, because these variables are
+variables ‘Proxy’ and ‘ProxyPort’ as GETURL, because these variables are
 handed over to GETURL for each URL that gets checked.  The one and only
 parameter is the name of a file that contains one line for each URL. In
 the first column, we find the URL, and the second and third columns hold
-the length of the URL's body when checked for the two last times.  Now,
+the length of the URL’s body when checked for the two last times.  Now,
 we follow this plan:
 
   1. Read the URLs from the file and remember their most recent lengths
@@ -2301,11 +2301,11 @@ those lines that differ in their second and third columns:
    Another thing that may look strange is the way GETURL is called.
 Before calling GETURL, we have to check if the proxy variables need to
 be passed on.  If so, we prepare strings that will become part of the
-command line later.  In 'GetHeader', we store these strings together
+command line later.  In ‘GetHeader’, we store these strings together
 with the longest part of the command line.  Later, in the loop over the
-URLs, 'GetHeader' is appended with the URL and a redirection operator to
-form the command that reads the URL's header over the Internet.  GETURL
-always sends the headers to '/dev/stderr'.  That is the reason why we
+URLs, ‘GetHeader’ is appended with the URL and a redirection operator to
+form the command that reads the URL’s header over the Internet.  GETURL
+always sends the headers to ‘/dev/stderr’.  That is the reason why we
 need the redirection operator to have the header piped in.
 
    This program is not perfect because it assumes that changing URLs
@@ -2335,20 +2335,20 @@ the Bourne shell:
    Notice that the regular expression for URLs is rather crude.  A
 precise regular expression is much more complex.  But this one works
 rather well.  One problem is that it is unable to find internal links of
-an HTML document.  Another problem is that 'ftp', 'telnet', 'news',
-'mailto', and other kinds of links are missing in the regular
+an HTML document.  Another problem is that ‘ftp’, ‘telnet’, ‘news’,
+‘mailto’, and other kinds of links are missing in the regular
 expression.  However, it is straightforward to add them, if doing so is
 necessary for other tasks.
 
    This program reads an HTML file and prints all the HTTP links that it
-finds.  It relies on 'gawk''s ability to use regular expressions as the
-record separator.  With 'RS' set to a regular expression that matches
+finds.  It relies on ‘gawk’’s ability to use regular expressions as the
+record separator.  With ‘RS’ set to a regular expression that matches
 links, the second action is executed each time a non-empty link is
-found.  We can find the matching link itself in 'RT'.
+found.  We can find the matching link itself in ‘RT’.
 
-   The action could use the 'system()' function to let another GETURL
+   The action could use the ‘system()’ function to let another GETURL
 retrieve the page, but here we use a different approach.  This simple
-program prints shell commands that can be piped into 'sh' for execution.
+program prints shell commands that can be piped into ‘sh’ for execution.
 This way it is possible to first extract the links, wrap shell commands
 around them, and pipe all the shell commands into a file.  After editing
 the file, execution of the file retrieves only those files that we
@@ -2358,10 +2358,10 @@ pages like this:
      gawk -f geturl.awk http://www.suse.de | gawk -f webgrab.awk | sh
 
    After this, you will find the contents of all referenced documents in
-files named 'doc*.html' even if they do not contain HTML code.  The most
+files named ‘doc*.html’ even if they do not contain HTML code.  The most
 annoying thing is that we always have to pass the proxy to GETURL. If
 you do not like to see the headers of the web pages appear on the
-screen, you can redirect them to '/dev/null'.  Watching the headers
+screen, you can redirect them to ‘/dev/null’.  Watching the headers
 appear can be quite interesting, because it reveals interesting details
 such as which web server the companies use.  Now, it is clear how the
 clever marketing people use web robots to determine the market shares of
@@ -2371,11 +2371,11 @@ Microsoft and Netscape in the web server market.
 firewall.  After attaching a browser to port 80, we usually catch a
 glimpse of the bright side of the server (its home page).  With a tool
 like GETURL at hand, we are able to discover some of the more concealed
-or even "indecent" services (i.e., lacking conformity to standards of
+or even “indecent” services (i.e., lacking conformity to standards of
 quality).  It can be exciting to see the fancy CGI scripts that lie
 there, revealing the inner workings of the server, ready to be called:
 
-   * With a command such as:
+   • With a command such as:
 
           gawk -f geturl.awk http://any.host.on.the.net/cgi-bin/
 
@@ -2386,18 +2386,18 @@ there, revealing the inner workings of the server, ready to be called:
      If there are subdirectories with configuration data of the web
      server, this can also be quite interesting to read.
 
-   * The well-known Apache web server usually has its CGI files in the
-     directory '/cgi-bin'.  There you can often find the scripts
-     'test-cgi' and 'printenv'.  Both tell you some things about the
+   • The well-known Apache web server usually has its CGI files in the
+     directory ‘/cgi-bin’.  There you can often find the scripts
+     ‘test-cgi’ and ‘printenv’.  Both tell you some things about the
      current connection and the installation of the web server.  Just
      call:
 
           gawk -f geturl.awk http://any.host.on.the.net/cgi-bin/test-cgi
           gawk -f geturl.awk http://any.host.on.the.net/cgi-bin/printenv
 
-   * Sometimes it is even possible to retrieve system files like the web
-     server's log file--possibly containing customer data--or even the
-     file '/etc/passwd'.  (We don't recommend this!)
+   • Sometimes it is even possible to retrieve system files like the web
+     server’s log file—possibly containing customer data—or even the
+     file ‘/etc/passwd’.  (We don’t recommend this!)
 
    *Caution:* Although this may sound funny or simply irrelevant, we are
 talking about severe security holes.  Try to explore your own system
@@ -2435,28 +2435,28 @@ File: gawkinet.info,  Node: STATIST,  Next: MAZE,  Prev: WEBGRAB,  Up: Some Appl
     -10           5            0            5           10" ]
 
 
-In the HTTP server examples we've shown thus far, we never present an
+In the HTTP server examples we’ve shown thus far, we never present an
 image to the browser and its user.  Presenting images is one task.
 Generating images that reflect some user input and presenting these
 dynamically generated images is another.  In this node, we use GNUPlot
-for generating '.png', '.ps', or '.gif' files.(1)
+for generating ‘.png’, ‘.ps’, or ‘.gif’ files.(1)
 
    The program we develop takes the statistical parameters of two
 samples and computes the t-test statistics.  As a result, we get the
 probabilities that the means and the variances of both samples are the
 same.  In order to let the user check plausibility, the program presents
 an image of the distributions.  The statistical computation follows
-'Numerical Recipes in C: The Art of Scientific Computing' by William H.
+‘Numerical Recipes in C: The Art of Scientific Computing’ by William H.
 Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery.
-Since 'gawk' does not have a built-in function for the computation of
-the beta function, we use the 'ibeta()' function of GNUPlot.  As a side
+Since ‘gawk’ does not have a built-in function for the computation of
+the beta function, we use the ‘ibeta()’ function of GNUPlot.  As a side
 effect, we learn how to use GNUPlot as a sophisticated calculator.  The
-comparison of means is done as in 'tutest', paragraph 14.2, page 613,
-and the comparison of variances is done as in 'ftest', page 611 in
-'Numerical Recipes'.
+comparison of means is done as in ‘tutest’, paragraph 14.2, page 613,
+and the comparison of variances is done as in ‘ftest’, page 611 in
+‘Numerical Recipes’.
 
    As usual, we take the site-independent code for servers and append
-our own functions 'SetUpServer()' and 'HandleGET()':
+our own functions ‘SetUpServer()’ and ‘HandleGET()’:
 
      function SetUpServer() {
        TopHeader = "<HTML><title>Statistics with GAWK</title>"
@@ -2472,20 +2472,20 @@ our own functions 'SetUpServer()' and 'HandleGET()':
      }
 
    Here, you see the menu structure that the user sees.  Later, we will
-see how the program structure of the 'HandleGET()' function reflects the
+see how the program structure of the ‘HandleGET()’ function reflects the
 menu structure.  What is missing here is the link for the image we
 generate.  In an event-driven environment, request, generation, and
 delivery of images are separated.
 
-   Notice the way we initialize the 'GnuPlot' command string for the
+   Notice the way we initialize the ‘GnuPlot’ command string for the
 pipe.  By default, GNUPlot outputs the generated image via standard
-output, as well as the results of 'print'(ed) calculations via standard
+output, as well as the results of ‘print’(ed) calculations via standard
 error.  The redirection causes standard error to be mixed into standard
-output, enabling us to read results of calculations with 'getline'.  By
+output, enabling us to read results of calculations with ‘getline’.  By
 initializing the statistical parameters with some meaningful defaults,
 we make sure the user gets an image the first time he uses the program.
 
-   Following is the rather long function 'HandleGET()', which implements
+   Following is the rather long function ‘HandleGET()’, which implements
 the contents of this service by reacting to the different kinds of
 requests from the browser.  Before you start playing with this script,
 make sure that your browser supports JavaScript and that it also has
@@ -2572,16 +2572,16 @@ menu choice.  The third menu choice shows us that generation and
 presentation of an image are two separate actions.  While the latter
 takes place quite instantly in the third menu choice, the former takes
 place in the much longer second choice.  Image data passes from the
-generating action to the presenting action via the variable 'Image' that
-contains a complete '.png' image, which is otherwise stored in a file.
-If you prefer '.ps' or '.gif' images over the default '.png' images, you
+generating action to the presenting action via the variable ‘Image’ that
+contains a complete ‘.png’ image, which is otherwise stored in a file.
+If you prefer ‘.ps’ or ‘.gif’ images over the default ‘.png’ images, you
 may select these options by uncommenting the appropriate lines.  But
 remember to do so in two places: when telling GNUPlot which kind of
 images to generate, and when transmitting the image at the end of the
 program.
 
-   Looking at the end of the program, the way we pass the 'Content-type'
-to the browser is a bit unusual.  It is appended to the 'OK' of the
+   Looking at the end of the program, the way we pass the ‘Content-type’
+to the browser is a bit unusual.  It is appended to the ‘OK’ of the
 first header line to make sure the type information becomes part of the
 header.  The other variables that get transmitted across the network are
 made empty, because in this case we do not have an HTML document to
@@ -2589,22 +2589,22 @@ transmit, but rather raw image data to contain in the body.
 
    Most of the work is done in the second menu choice.  It starts with a
 strange JavaScript code snippet.  When first implementing this server,
-we used a short '"<IMG SRC=" MyPrefix "/Image>"' here.  But then
+we used a short ‘"<IMG SRC=" MyPrefix "/Image>"’ here.  But then
 browsers got smarter and tried to improve on speed by requesting the
 image and the HTML code at the same time.  When doing this, the browser
 tries to build up a connection for the image request while the request
 for the HTML text is not yet completed.  The browser tries to connect to
-the 'gawk' server on port 8080 while port 8080 is still in use for
+the ‘gawk’ server on port 8080 while port 8080 is still in use for
 transmission of the HTML text.  The connection for the image cannot be
-built up, so the image appears as "broken" in the browser window.  We
+built up, so the image appears as “broken” in the browser window.  We
 solved this problem by telling the browser to open a separate window for
 the image, but only after a delay of 1000 milliseconds.  By this time,
 the server should be ready for serving the next request.
 
    But there is one more subtlety in the JavaScript code.  Each time the
 JavaScript code opens a window for the image, the name of the image is
-appended with a timestamp ('systime()').  Why this constant change of
-name for the image?  Initially, we always named the image 'Image', but
+appended with a timestamp (‘systime()’).  Why this constant change of
+name for the image?  Initially, we always named the image ‘Image’, but
 then the Netscape browser noticed the name had _not_ changed since the
 previous request and displayed the previous image (caching behavior).
 The server core is implemented so that browsers are told _not_ to cache
@@ -2626,24 +2626,24 @@ available.  Therefore we insert the JavaScript code here to initiate the
 opening of the image in a separate window.  Then, we prepare some
 variables that will be passed to GNUPlot for calculation of the
 probabilities.  Prior to reading the results, we must temporarily change
-'RS' because GNUPlot separates lines with newlines.  After instructing
-GNUPlot to generate a '.png' (or '.ps' or '.gif') image, we initiate the
+‘RS’ because GNUPlot separates lines with newlines.  After instructing
+GNUPlot to generate a ‘.png’ (or ‘.ps’ or ‘.gif’) image, we initiate the
 insertion of some text, explaining the resulting probabilities.  The
-final 'plot' command actually generates the image data.  This raw binary
+final ‘plot’ command actually generates the image data.  This raw binary
 has to be read in carefully without adding, changing, or deleting a
-single byte.  Hence the unusual initialization of 'Image' and completion
-with a 'while' loop.
+single byte.  Hence the unusual initialization of ‘Image’ and completion
+with a ‘while’ loop.
 
    When using this server, it soon becomes clear that it is far from
 being perfect.  It mixes source code of six scripting languages or
 protocols:
 
-   * GNU 'awk' implements a server for the protocol:
-   * HTTP which transmits:
-   * HTML text which contains a short piece of:
-   * JavaScript code opening a separate window.
-   * A Bourne shell script is used for piping commands into:
-   * GNUPlot to generate the image to be opened.
+   • GNU ‘awk’ implements a server for the protocol:
+   • HTTP which transmits:
+   • HTML text which contains a short piece of:
+   • JavaScript code opening a separate window.
+   • A Bourne shell script is used for piping commands into:
+   • GNUPlot to generate the image to be opened.
 
    After all this work, the GNUPlot image opens in the JavaScript window
 where it can be viewed by the user.
@@ -2656,11 +2656,11 @@ negative variances causes invalid results.
    ---------- Footnotes ----------
 
    (1) Due to licensing problems, the default installation of GNUPlot
-disables the generation of '.gif' files.  If your installed version does
-not accept 'set term gif', just download and install the most recent
+disables the generation of ‘.gif’ files.  If your installed version does
+not accept ‘set term gif’, just download and install the most recent
 version of GNUPlot and the GD library (https://libgd.github.io/) by
 Thomas Boutell.  Otherwise you still have the chance to generate some
-ASCII-art style images with GNUPlot by using 'set term dumb'.  (We tried
+ASCII-art style images with GNUPlot by using ‘set term dumb’.  (We tried
 it and it worked.)
 
 
@@ -2670,19 +2670,19 @@ File: gawkinet.info,  Node: MAZE,  Next: MOBAGWHO,  Prev: STATIST,  Up: Some App
 ===================================================
 
      In the long run, every program becomes rococo, and then rubble.
-                           -- _Alan Perlis_
+                            — _Alan Perlis_
 
-   By now, we know how to present arbitrary 'Content-type's to a
+   By now, we know how to present arbitrary ‘Content-type’s to a
 browser.  In this node, our server presents a 3D world to our browser.
 The 3D world is described in a scene description language (VRML, Virtual
 Reality Modeling Language) that allows us to travel through a
 perspective view of a 2D maze with our browser.  Browsers with a VRML
 plugin enable exploration of this technology.  We could do one of those
-boring 'Hello world' examples here, that are usually presented when
+boring ‘Hello world’ examples here, that are usually presented when
 introducing novices to VRML. If you have never written any VRML code,
 have a look at the VRML FAQ. Presenting a static VRML scene is a bit
-trivial; in order to expose 'gawk''s capabilities, we will present a
-dynamically generated VRML scene.  The function 'SetUpServer()' is very
+trivial; in order to expose ‘gawk’’s capabilities, we will present a
+dynamically generated VRML scene.  The function ‘SetUpServer()’ is very
 simple because it only sets the default HTML page and initializes the
 random number generator.  As usual, the surrounding server lets you
 browse the maze.
@@ -2699,14 +2699,14 @@ browse the maze.
        srand()
      }
 
-   The function 'HandleGET()' is a bit longer because it first computes
+   The function ‘HandleGET()’ is a bit longer because it first computes
 the maze and afterwards generates the VRML code that is sent across the
 network.  As shown in the STATIST example (*note STATIST::), we set the
 type of the content to VRML and then store the VRML representation of
 the maze as the page content.  We assume that the maze is stored in a 2D
 array.  Initially, the maze consists of walls only.  Then, we add an
 entry and an exit to the maze and let the rest of the work be done by
-the function 'MakeMaze()'.  Now, only the wall fields are left in the
+the function ‘MakeMaze()’.  Now, only the wall fields are left in the
 maze.  By iterating over the these fields, we generate one line of VRML
 code for each wall field.
 
@@ -2756,8 +2756,8 @@ code for each wall field.
        }
      }
 
-   Finally, we have a look at 'MakeMaze()', the function that generates
-the 'Maze' array.  When entered, this function assumes that the array
+   Finally, we have a look at ‘MakeMaze()’, the function that generates
+the ‘Maze’ array.  When entered, this function assumes that the array
 has been initialized so that each element represents a wall element and
 the maze is initially full of wall elements.  Only the entrance and the
 exit of the maze should have been left free.  The parameters of the
@@ -2774,7 +2774,7 @@ but it is done much simpler recursively.
 
    Notice that elements with coordinates that are both odd are assumed
 to be on our way through the maze and the generating process cannot
-terminate as long as there is such an element not being 'delete'd.  All
+terminate as long as there is such an element not being ‘delete’d.  All
 other elements are potentially part of the wall.
 
      function MakeMaze(x, y) {
@@ -2805,52 +2805,52 @@ File: gawkinet.info,  Node: MOBAGWHO,  Next: STOXPRED,  Prev: MAZE,  Up: Some Ap
      make it so simple that there are obviously no deficiencies, and the
      other way is to make it so complicated that there are no obvious
      deficiencies.
-                           -- _C.A.R. Hoare_
+                           — _C.A.R. Hoare_
 
-   A "mobile agent" is a program that can be dispatched from a computer
+   A “mobile agent” is a program that can be dispatched from a computer
 and transported to a remote server for execution.  This is called
-"migration", which means that a process on another system is started
+“migration”, which means that a process on another system is started
 that is independent from its originator.  Ideally, it wanders through a
 network while working for its creator or owner.  In places like the UMBC
 Agent Web, people are quite confident that (mobile) agents are a
 software engineering paradigm that enables us to significantly increase
 the efficiency of our work.  Mobile agents could become the mediators
 between users and the networking world.  For an unbiased view at this
-technology, see the remarkable paper 'Mobile Agents: Are they a good
-idea?'.(1)
+technology, see the remarkable paper ‘Mobile Agents: Are they a good
+idea?’.(1)
 
    When trying to migrate a process from one system to another, a server
 process is needed on the receiving side.  Depending on the kind of
 server process, several ways of implementation come to mind.  How the
 process is implemented depends upon the kind of server process:
 
-   * HTTP can be used as the protocol for delivery of the migrating
+   • HTTP can be used as the protocol for delivery of the migrating
      process.  In this case, we use a common web server as the receiving
      server process.  A universal CGI script mediates between migrating
      process and web server.  Each server willing to accept migrating
      agents makes this universal service available.  HTTP supplies the
-     'POST' method to transfer some data to a file on the web server.
-     When a CGI script is called remotely with the 'POST' method instead
-     of the usual 'GET' method, data is transmitted from the client
-     process to the standard input of the server's CGI script.  So, to
+     ‘POST’ method to transfer some data to a file on the web server.
+     When a CGI script is called remotely with the ‘POST’ method instead
+     of the usual ‘GET’ method, data is transmitted from the client
+     process to the standard input of the server’s CGI script.  So, to
      implement a mobile agent, we must not only write the agent program
      to start on the client side, but also the CGI script to receive the
      agent on the server side.
 
-   * The 'PUT' method can also be used for migration.  HTTP does not
-     require a CGI script for migration via 'PUT'.  However, with common
+   • The ‘PUT’ method can also be used for migration.  HTTP does not
+     require a CGI script for migration via ‘PUT’.  However, with common
      web servers there is no advantage to this solution, because web
      servers such as Apache require explicit activation of a special
-     'PUT' script.
+     ‘PUT’ script.
 
-   * 'Agent Tcl' pursues a different course; it relies on a dedicated
+   • ‘Agent Tcl’ pursues a different course; it relies on a dedicated
      server process with a dedicated protocol specialized for receiving
      mobile agents.
 
    Our agent example abuses a common web server as a migration tool.
 So, it needs a universal CGI script on the receiving side (the web
-server).  The receiving script is activated with a 'POST' request when
-placed into a location like '/httpd/cgi-bin/PostAgent.sh'.
+server).  The receiving script is activated with a ‘POST’ request when
+placed into a location like ‘/httpd/cgi-bin/PostAgent.sh’.
 
      #!/bin/sh
      MobAg=/tmp/MobileAgent.$$
@@ -2862,9 +2862,9 @@ placed into a location like '/httpd/cgi-bin/PostAgent.sh'.
      gawk 'BEGIN { print "\r\nAgent started" }'
      rm $MobAg      # delete script file of agent
 
-   By making its process id ('$$') part of the unique file name, the
+   By making its process id (‘$$’) part of the unique file name, the
 script avoids conflicts between concurrent instances of the script.
-First, all lines from standard input (the mobile agent's source code)
+First, all lines from standard input (the mobile agent’s source code)
 are copied into this unique file.  Then, the agent is started as a
 concurrent process and a short message reporting this fact is sent to
 the submitting client.  Finally, the script file of the mobile agent is
@@ -2881,14 +2881,14 @@ Self-Reference
      Each migrating instance of an agent is started in a way that
      enables it to read its own source code from standard input and use
      the code for subsequent migrations.  This is necessary because it
-     needs to treat the agent's code as data to transmit.  'gawk' is not
+     needs to treat the agent’s code as data to transmit.  ‘gawk’ is not
      the ideal language for such a job.  Lisp and Tcl are more suitable
      because they do not make a distinction between program code and
      data.
 
 Independence
      After migration, the agent is not linked to its former home in any
-     way.  By reporting 'Agent started', it waves "Goodbye" to its
+     way.  By reporting ‘Agent started’, it waves “Goodbye” to its
      origin.  The originator may choose to terminate or not.
 
    The originating agent itself is started just like any other
@@ -2897,10 +2897,10 @@ letting the name of the original host migrate with the agent, the agent
 that migrates to a host far away from its origin can report the result
 back home.  Having arrived at the end of the journey, the agent
 establishes a connection and reports the results.  This is the reason
-for determining the name of the host with 'uname -n' and storing it in
-'MyOrigin' for later use.  We may also set variables with the '-v'
+for determining the name of the host with ‘uname -n’ and storing it in
+‘MyOrigin’ for later use.  We may also set variables with the ‘-v’
 option from the command line.  This interactivity is only of importance
-in the context of starting a mobile agent; therefore this 'BEGIN'
+in the context of starting a mobile agent; therefore this ‘BEGIN’
 pattern and its action do not take part in migration:
 
      BEGIN {
@@ -2919,7 +2919,7 @@ pattern and its action do not take part in migration:
        }
      }
 
-   Since 'gawk' cannot manipulate and transmit parts of the program
+   Since ‘gawk’ cannot manipulate and transmit parts of the program
 directly, the source code is read and stored in strings.  Therefore, the
 program scans itself for the beginning and the ending of functions.
 Each line in between is appended to the code string until the end of the
@@ -2939,7 +2939,7 @@ that the order of the functions is preserved during migration:
 
    The web server code in *note A Web Service with Interaction:
 Interacting Service, was first developed as a site-independent core.
-Likewise, the 'gawk'-based mobile agent starts with an agent-independent
+Likewise, the ‘gawk’-based mobile agent starts with an agent-independent
 core, to which can be appended application-dependent functions.  What
 follows is the only application-independent function needed for the
 mobile agent:
@@ -2963,54 +2963,54 @@ mobile agent:
        close(HttpService)
      }
 
-   The 'migrate()' function prepares the aforementioned strings
+   The ‘migrate()’ function prepares the aforementioned strings
 containing the program code and transmits them to a server.  A
-consequence of this modular approach is that the 'migrate()' function
-takes some parameters that aren't needed in this application, but that
-will be in future ones.  Its mandatory parameter 'Destination' holds the
+consequence of this modular approach is that the ‘migrate()’ function
+takes some parameters that aren’t needed in this application, but that
+will be in future ones.  Its mandatory parameter ‘Destination’ holds the
 name (or IP address) of the server that the agent wants as a host for
-its code.  The optional parameter 'MobCode' may contain some 'gawk' code
+its code.  The optional parameter ‘MobCode’ may contain some ‘gawk’ code
 that is inserted during migration in front of all other code.  The
-optional parameter 'Label' may contain a string that tells the agent
+optional parameter ‘Label’ may contain a string that tells the agent
 what to do in program execution after arrival at its new home site.  One
 of the serious obstacles in implementing a framework for mobile agents
 is that it does not suffice to migrate the code.  It is also necessary
-to migrate the state of execution of the agent.  In contrast to 'Agent
-Tcl', this program does not try to migrate the complete set of
+to migrate the state of execution of the agent.  In contrast to ‘Agent
+Tcl’, this program does not try to migrate the complete set of
 variables.  The following conventions apply:
 
-   * Each variable in an agent program is local to the current host and
+   • Each variable in an agent program is local to the current host and
      does _not_ migrate.
 
-   * The array 'MOBFUN' shown above is an exception.  It is handled by
-     the function 'migrate()' and does migrate with the application.
+   • The array ‘MOBFUN’ shown above is an exception.  It is handled by
+     the function ‘migrate()’ and does migrate with the application.
 
-   * The other exception is the array 'MOBVAR'.  Each variable that
+   • The other exception is the array ‘MOBVAR’.  Each variable that
      takes part in migration has to be an element of this array.
-     'migrate()' also takes care of this.
+     ‘migrate()’ also takes care of this.
 
-   Now it's clear what happens to the 'Label' parameter of the function
-'migrate()'.  It is copied into 'MOBVAR["Label"]' and travels alongside
+   Now it’s clear what happens to the ‘Label’ parameter of the function
+‘migrate()’.  It is copied into ‘MOBVAR["Label"]’ and travels alongside
 the other data.  Since traveling takes place via HTTP, records must be
-separated with '"\r\n"' in 'RS' and 'ORS' as usual.  The code assembly
+separated with ‘"\r\n"’ in ‘RS’ and ‘ORS’ as usual.  The code assembly
 for migration takes place in three steps:
 
-   * Iterate over 'MOBFUN' to collect all functions verbatim.
+   • Iterate over ‘MOBFUN’ to collect all functions verbatim.
 
-   * Prepare a 'BEGIN' pattern and put assignments to mobile variables
+   • Prepare a ‘BEGIN’ pattern and put assignments to mobile variables
      into the action part.
 
-   * Transmission itself resembles GETURL: the header with the request
-     and the 'Content-length' is followed by the body.  In case there is
+   • Transmission itself resembles GETURL: the header with the request
+     and the ‘Content-length’ is followed by the body.  In case there is
      any reply over the network, it is read completely and echoed to
      standard output to avoid irritating the server.
 
    The application-independent framework is now almost complete.  What
-follows is the 'END' pattern which executes when the mobile agent has
+follows is the ‘END’ pattern which executes when the mobile agent has
 finished reading its own code.  First, it checks whether it is already
 running on a remote host or not.  In case initialization has not yet
-taken place, it starts 'MyInit()'.  Otherwise (later, on a remote host),
-it starts 'MyJob()':
+taken place, it starts ‘MyInit()’.  Otherwise (later, on a remote host),
+it starts ‘MyJob()’:
 
      END {
        if (ARGC != 2) exit    # stop when called with wrong parameters
@@ -3020,9 +3020,9 @@ it starts 'MyJob()':
          MyJob()              # so we do our job
      }
 
-   All that's left to extend the framework into a complete application
-is to write two application-specific functions: 'MyInit()' and
-'MyJob()'.  Keep in mind that the former is executed once on the
+   All that’s left to extend the framework into a complete application
+is to write two application-specific functions: ‘MyInit()’ and
+‘MyJob()’.  Keep in mind that the former is executed once on the
 originating host, while the latter is executed after each migration:
 
      function MyInit() {
@@ -3036,11 +3036,11 @@ originating host, while the latter is executed after each migration:
      }
 
    As mentioned earlier, this agent takes the name of its origin
-('MyOrigin') with it.  Then, it takes the name of its first destination
+(‘MyOrigin’) with it.  Then, it takes the name of its first destination
 and goes there for further work.  Notice that this name has the port
 number of the web server appended to the name of the server, because the
-function 'migrate()' needs it this way to create the 'HttpService'
-variable.  Finally, it waits for the result to arrive.  The 'MyJob()'
+function ‘migrate()’ needs it this way to create the ‘HttpService’
+variable.  Finally, it waits for the result to arrive.  The ‘MyJob()’
 function runs on the remote host:
 
      function MyJob() {
@@ -3060,20 +3060,20 @@ function runs on the remote host:
        }
      }
 
-   After migrating, the first thing to do in 'MyJob()' is to delete the
+   After migrating, the first thing to do in ‘MyJob()’ is to delete the
 name of the current host from the list of hosts to visit.  Now, it is
-time to start the real work by appending the host's name to the result
+time to start the real work by appending the host’s name to the result
 string, and reading line by line who is logged in on this host.  A very
-annoying circumstance is the fact that the elements of 'MOBVAR' cannot
-hold the newline character ('"\n"').  If they did, migration of this
-string would not work because the string wouldn't obey the syntax rule
-for a string in 'gawk'.  'SUBSEP' is used as a temporary replacement.
+annoying circumstance is the fact that the elements of ‘MOBVAR’ cannot
+hold the newline character (‘"\n"’).  If they did, migration of this
+string would not work because the string wouldn’t obey the syntax rule
+for a string in ‘gawk’.  ‘SUBSEP’ is used as a temporary replacement.
 
    If the list of hosts to visit holds at least one more entry, the
 agent migrates to that place to go on working there.  Otherwise, we
-replace the 'SUBSEP's with a newline character in the resulting string,
+replace the ‘SUBSEP’s with a newline character in the resulting string,
 and report it to the originating host, whose name is stored in
-'MOBVAR["MyOrigin"]'.
+‘MOBVAR["MyOrigin"]’.
 
    ---------- Footnotes ----------
 
@@ -3094,21 +3094,21 @@ File: gawkinet.info,  Node: STOXPRED,  Next: PROTBASE,  Prev: MOBAGWHO,  Up: Som
      ape-descendent life forms are so amazingly primitive that they
      still think digital watches are a pretty neat idea.
 
-     This planet has -- or rather had -- a problem, which was this: most
+     This planet has — or rather had — a problem, which was this: most
      of the people living on it were unhappy for pretty much of the
      time.  Many solutions were suggested for this problem, but most of
      these were largely concerned with the movements of small green
-     pieces of paper, which is odd because it wasn't the small green
+     pieces of paper, which is odd because it wasn’t the small green
      pieces of paper that were unhappy.
-      -- _Douglas Adams, 'The Hitch Hiker's Guide to the Galaxy'_
+      — _Douglas Adams, ‘The Hitch Hiker’s Guide to the Galaxy’_
 
    Valuable services on the Internet are usually _not_ implemented as
 mobile agents.  There are much simpler ways of implementing services.
-All Unix systems provide, for example, the 'cron' service.  Unix system
+All Unix systems provide, for example, the ‘cron’ service.  Unix system
 users can write a list of tasks to be done each day, each week, twice a
-day, or just once.  The list is entered into a file named 'crontab'.
+day, or just once.  The list is entered into a file named ‘crontab’.
 For example, to distribute a newsletter on a daily basis this way, use
-'cron' for calling a script each day early in the morning:
+‘cron’ for calling a script each day early in the morning:
 
      # run at 8 am on weekdays, distribute the newsletter
      0 8 * * 1-5   $HOME/bin/daily.job >> $HOME/log/newsletter 2>&1
@@ -3159,7 +3159,7 @@ anybody.
              ...
 
    The script as a whole is rather long.  In order to ease the pain of
-studying other people's source code, we have broken the script up into
+studying other people’s source code, we have broken the script up into
 meaningful parts which are invoked one after the other.  The basic
 structure of the script is as follows:
 
@@ -3173,16 +3173,16 @@ structure of the script is as follows:
      }
 
    The earlier parts store data into variables and arrays which are
-subsequently used by later parts of the script.  The 'Init()' function
+subsequently used by later parts of the script.  The ‘Init()’ function
 first checks if the script is invoked correctly (without any
 parameters).  If not, it informs the user of the correct usage.  What
 follows are preparations for the retrieval of the historical quote data.
-The names of the 30 stock shares are stored in an array 'name' along
-with the current date in 'day', 'month', and 'year'.
+The names of the 30 stock shares are stored in an array ‘name’ along
+with the current date in ‘day’, ‘month’, and ‘year’.
 
    All users who are separated from the Internet by a firewall and have
 to direct their Internet accesses to a proxy must supply the name of the
-proxy to this script with the '-v Proxy=NAME' option.  For most users,
+proxy to this script with the ‘-v Proxy=NAME’ option.  For most users,
 the default proxy and port number should suffice.
 
      function Init() {
@@ -3221,22 +3221,22 @@ values):
 
    Lines contain values of the same time instant, whereas columns are
 separated by commas and contain the kind of data that is described in
-the header (first) line.  At first, 'gawk' is instructed to separate
-columns by commas ('FS = ","').  In the loop that follows, a connection
+the header (first) line.  At first, ‘gawk’ is instructed to separate
+columns by commas (‘FS = ","’).  In the loop that follows, a connection
 to the Yahoo server is first opened, then a download takes place, and
 finally the connection is closed.  All this happens once for each ticker
 symbol.  In the body of this loop, an Internet address is built up as a
 string according to the rules of the Yahoo server.  The starting and
 ending date are chosen to be exactly the same, but one year apart in the
-past.  All the action is initiated within the 'printf' command which
+past.  All the action is initiated within the ‘printf’ command which
 transmits the request for data to the Yahoo server.
 
-   In the inner loop, the server's data is first read and then scanned
+   In the inner loop, the server’s data is first read and then scanned
 line by line.  Only lines which have six columns and the name of a month
 in the first column contain relevant data.  This data is stored in the
-two-dimensional array 'quote'; one dimension being time, the other being
-the ticker symbol.  During retrieval of the first stock's data, the
-calendar names of the time instances are stored in the array 'day'
+two-dimensional array ‘quote’; one dimension being time, the other being
+the ticker symbol.  During retrieval of the first stock’s data, the
+calendar names of the time instances are stored in the array ‘day’
 because we need them later.
 
      function ReadQuotes() {
@@ -3289,8 +3289,8 @@ algorithm: _If a stock fell yesterday, assume it will also fall today;
 if it rose yesterday, assume it will rise today_.  (Feel free to replace
 this algorithm with a smarter one.)  If a stock changed in the same
 direction on two consecutive days, this is an indication which should be
-highlighted.  Two-day advances are stored in 'hot' and two-day declines
-in 'avoid'.
+highlighted.  Two-day advances are stored in ‘hot’ and two-day declines
+in ‘avoid’.
 
    The rest of the function is a sanity check.  It counts the number of
 correct predictions in relation to the total number of predictions one
@@ -3329,9 +3329,9 @@ could have made in the year before.
        }
      }
 
-   At this point the hard work has been done: the array 'predict'
+   At this point the hard work has been done: the array ‘predict’
 contains the predictions for all the ticker symbols.  It is up to the
-function 'Report()' to find some nice words to present the desired
+function ‘Report()’ to find some nice words to present the desired
 information.
 
      function Report() {
@@ -3368,8 +3368,8 @@ information.
        report = report "you should visit a doctor who can treat your ailment."
      }
 
-   The function 'SendMail()' goes through the list of customers and
-opens a pipe to the 'mail' command for each of them.  Each one receives
+   The function ‘SendMail()’ goes through the list of customers and
+opens a pipe to the ‘mail’ command for each of them.  Each one receives
 an email message with a proper subject heading and is addressed with his
 full name.
 
@@ -3396,7 +3396,7 @@ to complete, depending upon network traffic and the speed of the
 available Internet link.  The quality of the prediction algorithm is
 likely to be disappointing.  Try to find a better one.  Should you find
 one with a success rate of more than 50%, please tell us about it!  It
-is only for the sake of curiosity, of course.  ':-)'
+is only for the sake of curiosity, of course.  ‘:-)’
 
 
 File: gawkinet.info,  Node: PROTBASE,  Prev: STOXPRED,  Up: Some Applications and Techniques
@@ -3406,15 +3406,15 @@ File: gawkinet.info,  Node: PROTBASE,  Prev: STOXPRED,  Up: Some Applications an
 
      Inside every large problem is a small problem struggling to get
      out.(1)
-                  -- _With apologies to C.A.R. Hoare_
+                  — _With apologies to C.A.R. Hoare_
 
-   Yahoo's database of stock market data is just one among the many
+   Yahoo’s database of stock market data is just one among the many
 large databases on the Internet.  Another one is located at NCBI
 (National Center for Biotechnology Information).  Established in 1988 as
 a national resource for molecular biology information, NCBI creates
 public databases, conducts research in computational biology, develops
 software tools for analyzing genome data, and disseminates biomedical
-information.  In this section, we look at one of NCBI's public services,
+information.  In this section, we look at one of NCBI’s public services,
 which is called BLAST (Basic Local Alignment Search Tool).
 
    You probably know that the information necessary for reproducing
@@ -3436,35 +3436,35 @@ chose to offer their database service through popular Internet
 protocols.  There are four basic ways to use the so-called BLAST
 services:
 
-   * The easiest way to use BLAST is through the web.  Users may simply
+   • The easiest way to use BLAST is through the web.  Users may simply
      point their browsers at the NCBI home page and link to the BLAST
      pages.  NCBI provides a stable URL that may be used to perform
      BLAST searches without interactive use of a web browser.  This is
      what we will do later in this section.  A demonstration client and
-     a 'README' file demonstrate how to access this URL.
+     a ‘README’ file demonstrate how to access this URL.
 
-   * Currently, 'blastcl3' is the standard network BLAST client.  You
-     can download 'blastcl3' from the anonymous FTP location.
+   • Currently, ‘blastcl3’ is the standard network BLAST client.  You
+     can download ‘blastcl3’ from the anonymous FTP location.
 
-   * BLAST 2.0 can be run locally as a full executable and can be used
+   • BLAST 2.0 can be run locally as a full executable and can be used
      to run BLAST searches against private local databases, or
      downloaded copies of the NCBI databases.  BLAST 2.0 executables may
      be found on the NCBI anonymous FTP server.
 
-   * The NCBI BLAST Email server is the best option for people without
+   • The NCBI BLAST Email server is the best option for people without
      convenient access to the web.  A similarity search can be performed
      by sending a properly formatted mail message containing the
      nucleotide or protein query sequence to <blast@ncbi.nlm.nih.gov>.
      The query sequence is compared against the specified database using
      the BLAST algorithm and the results are returned in an email
      message.  For more information on formulating email BLAST searches,
-     you can send a message consisting of the word "HELP" to the same
+     you can send a message consisting of the word “HELP” to the same
      address, <blast@ncbi.nlm.nih.gov>.
 
    Our starting point is the demonstration client mentioned in the first
-option.  The 'README' file that comes along with the client explains the
+option.  The ‘README’ file that comes along with the client explains the
 whole process in a nutshell.  In the rest of this section, we first show
-what such requests look like.  Then we show how to use 'gawk' to
+what such requests look like.  Then we show how to use ‘gawk’ to
 implement a client in about 10 lines of code.  Finally, we show how to
 interpret the result returned from the service.
 
@@ -3472,10 +3472,10 @@ interpret the result returned from the service.
 amino acid and nucleic acid codes, with these exceptions: lower-case
 letters are accepted and are mapped into upper-case; a single hyphen or
 dash can be used to represent a gap of indeterminate length; and in
-amino acid sequences, 'U' and '*' are acceptable letters (see below).
+amino acid sequences, ‘U’ and ‘*’ are acceptable letters (see below).
 Before submitting a request, any numerical digits in the query sequence
 should either be removed or replaced by appropriate letter codes (e.g.,
-'N' for unknown nucleic acid residue or 'X' for unknown amino acid
+‘N’ for unknown nucleic acid residue or ‘X’ for unknown amino acid
 residue).  The nucleic acid codes supported are:
 
      A --> adenosine               M --> A C (amino)
@@ -3491,7 +3491,7 @@ residue).  The nucleic acid codes supported are:
    Now you know the alphabet of nucleotide sequences.  The last two
 lines of the following example query show such a sequence, which is
 obviously made up only of elements of the alphabet just described.
-Store this example query into a file named 'protbase.request'.  You are
+Store this example query into a file named ‘protbase.request’.  You are
 now ready to send it to the server with the demonstration client.
 
      PROGRAM blastn
@@ -3503,38 +3503,38 @@ now ready to send it to the server with the demonstration client.
      caccaccatggacagcaaa
 
    The actual search request begins with the mandatory parameter
-'PROGRAM' in the first column followed by the value 'blastn' (the name
+‘PROGRAM’ in the first column followed by the value ‘blastn’ (the name
 of the program) for searching nucleic acids.  The next line contains the
-mandatory search parameter 'DATALIB' with the value 'month' for the
+mandatory search parameter ‘DATALIB’ with the value ‘month’ for the
 newest nucleic acid sequences.  The third line contains an optional
-'EXPECT' parameter and the value desired for it.  The fourth line
-contains the mandatory 'BEGIN' directive, followed by the query sequence
+‘EXPECT’ parameter and the value desired for it.  The fourth line
+contains the mandatory ‘BEGIN’ directive, followed by the query sequence
 in FASTA/Pearson format.  Each line of information must be less than 80
 characters in length.
 
-   The "month" database contains all new or revised sequences released
+   The “month” database contains all new or revised sequences released
 in the last 30 days and is useful for searching against new sequences.
-There are five different blast programs, 'blastn' being the one that
+There are five different blast programs, ‘blastn’ being the one that
 compares a nucleotide query sequence against a nucleotide sequence
 database.
 
    The last server directive that must appear in every request is the
-'BEGIN' directive.  The query sequence should immediately follow the
-'BEGIN' directive and must appear in FASTA/Pearson format.  A sequence
+‘BEGIN’ directive.  The query sequence should immediately follow the
+‘BEGIN’ directive and must appear in FASTA/Pearson format.  A sequence
 in FASTA/Pearson format begins with a single-line description.  The
 description line, which is required, is distinguished from the lines of
-sequence data that follow it by having a greater-than ('>') symbol in
+sequence data that follow it by having a greater-than (‘>’) symbol in
 the first column.  For the purposes of the BLAST server, the text of the
 description is arbitrary.
 
-   If you prefer to use a client written in 'gawk', just store the
-following 10 lines of code into a file named 'protbase.awk' and use this
-client instead.  Invoke it with 'gawk -f protbase.awk protbase.request'.
+   If you prefer to use a client written in ‘gawk’, just store the
+following 10 lines of code into a file named ‘protbase.awk’ and use this
+client instead.  Invoke it with ‘gawk -f protbase.awk protbase.request’.
 Then wait a minute and watch the result coming in.  In order to
-replicate the demonstration client's behavior as closely as possible,
+replicate the demonstration client’s behavior as closely as possible,
 this client does not use a proxy server.  We could also have extended
 the client program in *note Retrieving Web Pages: GETURL, to implement
-the client request from 'protbase.awk' as a special case.
+the client request from ‘protbase.awk’ as a special case.
 
      { request = request "\n" $0 }
 
@@ -3560,7 +3560,7 @@ prints the complete result coming from the server.
 you can ignore.  Then there are some comments about the query having
 been filtered to avoid spuriously high scores.  After this, there is a
 reference to the paper that describes the software being used for
-searching the data base.  After a repetition of the original query's
+searching the data base.  After a repetition of the original query’s
 description we find the list of significant alignments:
 
      Sequences producing significant alignments:                        (bits)  Value
@@ -3597,9 +3597,9 @@ for the databases from which the sequences were derived.
      Patents                           pat|country|number
      GenInfo Backbone Id               bbs|number
 
-   For example, an identifier might be 'gb|AC021182.14|AC021182', where
-the 'gb' tag indicates that the identifier refers to a GenBank sequence,
-'AC021182.14' is its GenBank ACCESSION, and 'AC021182' is the GenBank
+   For example, an identifier might be ‘gb|AC021182.14|AC021182’, where
+the ‘gb’ tag indicates that the identifier refers to a GenBank sequence,
+‘AC021182.14’ is its GenBank ACCESSION, and ‘AC021182’ is the GenBank
 LOCUS. The identifier contains no spaces, so that a space indicates the
 end of the identifier.
 
@@ -3627,29 +3627,29 @@ fragment on chromosome 7.  If you are still reading at this point, you
 are probably interested in finding out more about Computational Biology
 and you might appreciate the following hints.
 
-  1. There is a book called 'Introduction to Computational Biology' by
+  1. There is a book called ‘Introduction to Computational Biology’ by
      Michael S. Waterman, which is worth reading if you are seriously
      interested.  You can find a good book review on the Internet.
 
-  2. While Waterman's book explains the algorithms employed internally
+  2. While Waterman’s book explains the algorithms employed internally
      in the database search engines, most practitioners prefer to
      approach the subject differently.  The applied side of
      Computational Biology is called Bioinformatics, and emphasizes the
      tools available for day-to-day work as well as how to actually
      _use_ them.  One of the very few affordable books on Bioinformatics
-     is 'Developing Bioinformatics Computer Skills'.
+     is ‘Developing Bioinformatics Computer Skills’.
 
   3. The sequences _gawk_ and _gnuawk_ are in widespread use in the
      genetic material of virtually every earthly living being.  Let us
      take this as a clear indication that the divine creator has
-     intended 'gawk' to prevail over other scripting languages such as
-     'perl', 'tcl', or 'python' which are not even proper sequences.
+     intended ‘gawk’ to prevail over other scripting languages such as
+     ‘perl’, ‘tcl’, or ‘python’ which are not even proper sequences.
      (:-)
 
    ---------- Footnotes ----------
 
-   (1) What C.A.R. Hoare actually said was "Inside every large program
-is a small program struggling to get out."
+   (1) What C.A.R. Hoare actually said was “Inside every large program
+is a small program struggling to get out.”
 
 
 File: gawkinet.info,  Node: Links,  Next: GNU Free Documentation License,  Prev: Some Applications and Techniques,  Up: Top
@@ -3660,19 +3660,19 @@ File: gawkinet.info,  Node: Links,  Next: GNU Free Documentation License,  Prev:
 This section lists the URLs for various items discussed in this Info
 file.  They are presented in the order in which they appear.
 
-'Internet Programming with Python'
+‘Internet Programming with Python’
      <http://cewing.github.io/training.python_web/html/index.html>
 
-'Advanced Perl Programming'
+‘Advanced Perl Programming’
      <http://www.oreilly.com/catalog/advperl>
 
-'Web Client Programming with Perl'
+‘Web Client Programming with Perl’
      <http://www.oreilly.com/catalog/webclient>
 
-Richard Stevens's home page and book
+Richard Stevens’s home page and book
      <http://www.kohala.com/start>
 
-Volume III of 'Internetworking with TCP/IP', by Comer and Stevens
+Volume III of ‘Internetworking with TCP/IP’, by Comer and Stevens
      <http://www.cs.purdue.edu/homes/dec/tcpip3s.cont.html>
 
 XBM Graphics File Format
@@ -3681,7 +3681,7 @@ XBM Graphics File Format
 GNUPlot
      <http://www.gnuplot.info>
 
-Mark Humphrys' Eliza page
+Mark Humphrys’ Eliza page
      <https://computing.dcu.ie/~humphrys/eliza.html>
 
 Eliza on Wikipedia
@@ -3715,7 +3715,7 @@ MiniSQL
 Market Share Surveys
      <http://www.netcraft.com/survey>
 
-'Numerical Recipes in C: The Art of Scientific Computing'
+‘Numerical Recipes in C: The Art of Scientific Computing’
      <http://numerical.recipes/>
 
 VRML
@@ -3754,10 +3754,10 @@ FASTA/Pearson Format
 Fasta/Pearson Sequence in Java
      <http://www.kazusa.or.jp/java/codon_table_java/>
 
-Book Review of 'Introduction to Computational Biology'
+Book Review of ‘Introduction to Computational Biology’
      <https://dl.acm.org/doi/abs/10.1145/332925.332927>
 
-'Developing Bioinformatics Computer Skills'
+‘Developing Bioinformatics Computer Skills’
      <http://www.oreilly.com/catalog/bioskills/>
 
 
@@ -3768,7 +3768,7 @@ GNU Free Documentation License
 
                      Version 1.3, 3 November 2008
 
-     Copyright (C) 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
      <http://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies
@@ -3777,14 +3777,14 @@ GNU Free Documentation License
   0. PREAMBLE
 
      The purpose of this License is to make a manual, textbook, or other
-     functional and useful document "free" in the sense of freedom: to
+     functional and useful document “free” in the sense of freedom: to
      assure everyone the effective freedom to copy and redistribute it,
      with or without modifying it, either commercially or
      noncommercially.  Secondarily, this License preserves for the
      author and publisher a way to get credit for their work, while not
      being considered responsible for modifications made by others.
 
-     This License is a kind of "copyleft", which means that derivative
+     This License is a kind of “copyleft”, which means that derivative
      works of the document must themselves be free in the same sense.
      It complements the GNU General Public License, which is a copyleft
      license designed for free software.
@@ -3805,18 +3805,18 @@ GNU Free Documentation License
      be distributed under the terms of this License.  Such a notice
      grants a world-wide, royalty-free license, unlimited in duration,
      to use that work under the conditions stated herein.  The
-     "Document", below, refers to any such manual or work.  Any member
-     of the public is a licensee, and is addressed as "you".  You accept
+     “Document”, below, refers to any such manual or work.  Any member
+     of the public is a licensee, and is addressed as “you”.  You accept
      the license if you copy, modify or distribute the work in a way
      requiring permission under copyright law.
 
-     A "Modified Version" of the Document means any work containing the
+     A “Modified Version” of the Document means any work containing the
      Document or a portion of it, either copied verbatim, or with
      modifications and/or translated into another language.
 
-     A "Secondary Section" is a named appendix or a front-matter section
+     A “Secondary Section” is a named appendix or a front-matter section
      of the Document that deals exclusively with the relationship of the
-     publishers or authors of the Document to the Document's overall
+     publishers or authors of the Document to the Document’s overall
      subject (or to related matters) and contains nothing that could
      fall directly within that overall subject.  (Thus, if the Document
      is in part a textbook of mathematics, a Secondary Section may not
@@ -3825,7 +3825,7 @@ GNU Free Documentation License
      of legal, commercial, philosophical, ethical or political position
      regarding them.
 
-     The "Invariant Sections" are certain Secondary Sections whose
+     The “Invariant Sections” are certain Secondary Sections whose
      titles are designated, as being those of Invariant Sections, in the
      notice that says that the Document is released under this License.
      If a section does not fit the above definition of Secondary then it
@@ -3833,13 +3833,13 @@ GNU Free Documentation License
      contain zero Invariant Sections.  If the Document does not identify
      any Invariant Sections then there are none.
 
-     The "Cover Texts" are certain short passages of text that are
+     The “Cover Texts” are certain short passages of text that are
      listed, as Front-Cover Texts or Back-Cover Texts, in the notice
      that says that the Document is released under this License.  A
      Front-Cover Text may be at most 5 words, and a Back-Cover Text may
      be at most 25 words.
 
-     A "Transparent" copy of the Document means a machine-readable copy,
+     A “Transparent” copy of the Document means a machine-readable copy,
      represented in a format whose specification is available to the
      general public, that is suitable for revising the document
      straightforwardly with generic text editors or (for images composed
@@ -3851,7 +3851,7 @@ GNU Free Documentation License
      been arranged to thwart or discourage subsequent modification by
      readers is not Transparent.  An image format is not Transparent if
      used for any substantial amount of text.  A copy that is not
-     "Transparent" is called "Opaque".
+     “Transparent” is called “Opaque”.
 
      Examples of suitable formats for Transparent copies include plain
      ASCII without markup, Texinfo input format, LaTeX input format,
@@ -3864,23 +3864,23 @@ GNU Free Documentation License
      the machine-generated HTML, PostScript or PDF produced by some word
      processors for output purposes only.
 
-     The "Title Page" means, for a printed book, the title page itself,
+     The “Title Page” means, for a printed book, the title page itself,
      plus such following pages as are needed to hold, legibly, the
      material this License requires to appear in the title page.  For
-     works in formats which do not have any title page as such, "Title
-     Page" means the text near the most prominent appearance of the
-     work's title, preceding the beginning of the body of the text.
+     works in formats which do not have any title page as such, “Title
+     Page” means the text near the most prominent appearance of the
+     work’s title, preceding the beginning of the body of the text.
 
-     The "publisher" means any person or entity that distributes copies
+     The “publisher” means any person or entity that distributes copies
      of the Document to the public.
 
-     A section "Entitled XYZ" means a named subunit of the Document
+     A section “Entitled XYZ” means a named subunit of the Document
      whose title either is precisely XYZ or contains XYZ in parentheses
      following text that translates XYZ in another language.  (Here XYZ
      stands for a specific section name mentioned below, such as
-     "Acknowledgements", "Dedications", "Endorsements", or "History".)
-     To "Preserve the Title" of such a section when you modify the
-     Document means that it remains a section "Entitled XYZ" according
+     “Acknowledgements”, “Dedications”, “Endorsements”, or “History”.)
+     To “Preserve the Title” of such a section when you modify the
+     Document means that it remains a section “Entitled XYZ” according
      to this definition.
 
      The Document may include Warranty Disclaimers next to the notice
@@ -3910,7 +3910,7 @@ GNU Free Documentation License
 
      If you publish printed copies (or copies in media that commonly
      have printed covers) of the Document, numbering more than 100, and
-     the Document's license notice requires Cover Texts, you must
+     the Document’s license notice requires Cover Texts, you must
      enclose the copies in covers that carry, clearly and legibly, all
      these Cover Texts: Front-Cover Texts on the front cover, and
      Back-Cover Texts on the back cover.  Both covers must also clearly
@@ -3982,15 +3982,15 @@ GNU Free Documentation License
           the Addendum below.
 
        G. Preserve in that license notice the full lists of Invariant
-          Sections and required Cover Texts given in the Document's
+          Sections and required Cover Texts given in the Document’s
           license notice.
 
        H. Include an unaltered copy of this License.
 
-       I. Preserve the section Entitled "History", Preserve its Title,
+       I. Preserve the section Entitled “History”, Preserve its Title,
           and add to it an item stating at least the title, year, new
           authors, and publisher of the Modified Version as given on the
-          Title Page.  If there is no section Entitled "History" in the
+          Title Page.  If there is no section Entitled “History” in the
           Document, create one stating the title, year, authors, and
           publisher of the Document as given on its Title Page, then add
           an item describing the Modified Version as stated in the
@@ -4000,12 +4000,12 @@ GNU Free Documentation License
           for public access to a Transparent copy of the Document, and
           likewise the network locations given in the Document for
           previous versions it was based on.  These may be placed in the
-          "History" section.  You may omit a network location for a work
+          “History” section.  You may omit a network location for a work
           that was published at least four years before the Document
           itself, or if the original publisher of the version it refers
           to gives permission.
 
-       K. For any section Entitled "Acknowledgements" or "Dedications",
+       K. For any section Entitled “Acknowledgements” or “Dedications”,
           Preserve the Title of the section, and preserve in the section
           all the substance and tone of each of the contributor
           acknowledgements and/or dedications given therein.
@@ -4014,11 +4014,11 @@ GNU Free Documentation License
           in their text and in their titles.  Section numbers or the
           equivalent are not considered part of the section titles.
 
-       M. Delete any section Entitled "Endorsements".  Such a section
+       M. Delete any section Entitled “Endorsements”.  Such a section
           may not be included in the Modified Version.
 
        N. Do not retitle any existing section to be Entitled
-          "Endorsements" or to conflict in title with any Invariant
+          “Endorsements” or to conflict in title with any Invariant
           Section.
 
        O. Preserve any Warranty Disclaimers.
@@ -4027,15 +4027,15 @@ GNU Free Documentation License
      appendices that qualify as Secondary Sections and contain no
      material copied from the Document, you may at your option designate
      some or all of these sections as invariant.  To do this, add their
-     titles to the list of Invariant Sections in the Modified Version's
+     titles to the list of Invariant Sections in the Modified Version’s
      license notice.  These titles must be distinct from any other
      section titles.
 
-     You may add a section Entitled "Endorsements", provided it contains
+     You may add a section Entitled “Endorsements”, provided it contains
      nothing but endorsements of your Modified Version by various
-     parties--for example, statements of peer review or that the text
-     has been approved by an organization as the authoritative
-     definition of a standard.
+     parties—for example, statements of peer review or that the text has
+     been approved by an organization as the authoritative definition of
+     a standard.
 
      You may add a passage of up to five words as a Front-Cover Text,
      and a passage of up to 25 words as a Back-Cover Text, to the end of
@@ -4073,10 +4073,10 @@ GNU Free Documentation License
      combined work.
 
      In the combination, you must combine any sections Entitled
-     "History" in the various original documents, forming one section
-     Entitled "History"; likewise combine any sections Entitled
-     "Acknowledgements", and any sections Entitled "Dedications".  You
-     must delete all sections Entitled "Endorsements."
+     “History” in the various original documents, forming one section
+     Entitled “History”; likewise combine any sections Entitled
+     “Acknowledgements”, and any sections Entitled “Dedications”.  You
+     must delete all sections Entitled “Endorsements.”
 
   6. COLLECTIONS OF DOCUMENTS
 
@@ -4097,16 +4097,16 @@ GNU Free Documentation License
 
      A compilation of the Document or its derivatives with other
      separate and independent documents or works, in or on a volume of a
-     storage or distribution medium, is called an "aggregate" if the
+     storage or distribution medium, is called an “aggregate” if the
      copyright resulting from the compilation is not used to limit the
-     legal rights of the compilation's users beyond what the individual
+     legal rights of the compilation’s users beyond what the individual
      works permit.  When the Document is included in an aggregate, this
      License does not apply to the other works in the aggregate which
      are not themselves derivative works of the Document.
 
      If the Cover Text requirement of section 3 is applicable to these
      copies of the Document, then if the Document is less than one half
-     of the entire aggregate, the Document's Cover Texts may be placed
+     of the entire aggregate, the Document’s Cover Texts may be placed
      on covers that bracket the Document within the aggregate, or the
      electronic equivalent of covers if the Document is in electronic
      form.  Otherwise they must appear on printed covers that bracket
@@ -4128,8 +4128,8 @@ GNU Free Documentation License
      this License or a notice or disclaimer, the original version will
      prevail.
 
-     If a section in the Document is Entitled "Acknowledgements",
-     "Dedications", or "History", the requirement (section 4) to
+     If a section in the Document is Entitled “Acknowledgements”,
+     “Dedications”, or “History”, the requirement (section 4) to
      Preserve its Title (section 1) will typically require changing the
      actual title.
 
@@ -4170,7 +4170,7 @@ GNU Free Documentation License
 
      Each version of the License is given a distinguishing version
      number.  If the Document specifies that a particular numbered
-     version of this License "or any later version" applies to it, you
+     version of this License “or any later version” applies to it, you
      have the option of following the terms and conditions either of
      that specified version or of any later version that has been
      published (not as a draft) by the Free Software Foundation.  If the
@@ -4178,29 +4178,29 @@ GNU Free Documentation License
      choose any version ever published (not as a draft) by the Free
      Software Foundation.  If the Document specifies that a proxy can
      decide which future versions of this License can be used, that
-     proxy's public statement of acceptance of a version permanently
+     proxy’s public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
   11. RELICENSING
 
-     "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
+     “Massive Multiauthor Collaboration Site” (or “MMC Site”) means any
      World Wide Web server that publishes copyrightable works and also
      provides prominent facilities for anybody to edit those works.  A
      public wiki that anybody can edit is an example of such a server.
-     A "Massive Multiauthor Collaboration" (or "MMC") contained in the
+     A “Massive Multiauthor Collaboration” (or “MMC”) contained in the
      site means any set of copyrightable works thus published on the MMC
      site.
 
-     "CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0
+     “CC-BY-SA” means the Creative Commons Attribution-Share Alike 3.0
      license published by Creative Commons Corporation, a not-for-profit
      corporation with a principal place of business in San Francisco,
      California, as well as future copyleft versions of that license
      published by that same organization.
 
-     "Incorporate" means to publish or republish a Document, in whole or
+     “Incorporate” means to publish or republish a Document, in whole or
      in part, as part of another Document.
 
-     An MMC is "eligible for relicensing" if it is licensed under this
+     An MMC is “eligible for relicensing” if it is licensed under this
      License, and if all works that were first published under this
      License somewhere other than this MMC, and subsequently
      incorporated in whole or in part into the MMC, (1) had no cover
@@ -4227,7 +4227,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts."  line with this:
+Texts, replace the “with...Texts.” line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -4433,63 +4433,63 @@ Index
 
 
 Tag Table:
-Node: Top1108
-Node: Preface4769
-Node: Introduction6144
-Node: Stream Communications7170
-Node: Datagram Communications8344
-Node: The TCP/IP Protocols9974
-Ref: The TCP/IP Protocols-Footnote-110658
-Node: Basic Protocols10815
-Ref: Basic Protocols-Footnote-112860
-Node: Ports12889
-Node: Making Connections14296
-Ref: Making Connections-Footnote-116854
-Ref: Making Connections-Footnote-216901
-Node: Using Networking17082
-Node: Gawk Special Files19405
-Node: Special File Fields21214
-Ref: table-inet-components25114
-Node: Comparing Protocols26426
-Node: File /inet/tcp26960
-Node: File /inet/udp27946
-Ref: File /inet/udp-Footnote-129658
-Node: TCP Connecting29912
-Node: Troubleshooting33347
-Ref: Troubleshooting-Footnote-136111
-Node: Interacting37068
-Node: Setting Up41426
-Node: Email45975
-Ref: Email-Footnote-148397
-Node: Web page49205
-Ref: Web page-Footnote-152025
-Ref: Web page-Footnote-252223
-Node: Primitive Service52717
-Node: Interacting Service55451
-Ref: Interacting Service-Footnote-164606
-Node: CGI Lib64638
-Node: Simple Server71638
-Ref: Simple Server-Footnote-179440
-Node: Caveats79541
-Node: Challenges80684
-Ref: Challenges-Footnote-189426
-Node: Some Applications and Techniques89527
-Node: PANIC91988
-Node: GETURL93714
-Node: REMCONF96347
-Node: URLCHK101843
-Node: WEBGRAB105687
-Node: STATIST110151
-Ref: STATIST-Footnote-1123300
-Node: MAZE123743
-Node: MOBAGWHO129968
-Ref: MOBAGWHO-Footnote-1143870
-Node: STOXPRED143938
-Node: PROTBASE158230
-Ref: PROTBASE-Footnote-1171397
-Node: Links171512
-Node: GNU Free Documentation License174403
-Node: Index199523
+Node: Top1138
+Node: Preface4831
+Node: Introduction6252
+Node: Stream Communications7282
+Node: Datagram Communications8466
+Node: The TCP/IP Protocols10114
+Ref: The TCP/IP Protocols-Footnote-110801
+Node: Basic Protocols10958
+Ref: Basic Protocols-Footnote-113023
+Node: Ports13054
+Node: Making Connections14474
+Ref: Making Connections-Footnote-117080
+Ref: Making Connections-Footnote-217127
+Node: Using Networking17317
+Node: Gawk Special Files19680
+Node: Special File Fields21541
+Ref: table-inet-components25534
+Node: Comparing Protocols26850
+Node: File /inet/tcp27384
+Node: File /inet/udp28374
+Ref: File /inet/udp-Footnote-130114
+Node: TCP Connecting30372
+Node: Troubleshooting33905
+Ref: Troubleshooting-Footnote-136697
+Node: Interacting37677
+Node: Setting Up42111
+Node: Email46750
+Ref: Email-Footnote-149196
+Node: Web page50016
+Ref: Web page-Footnote-152892
+Ref: Web page-Footnote-253090
+Node: Primitive Service53588
+Node: Interacting Service56344
+Ref: Interacting Service-Footnote-165601
+Node: CGI Lib65633
+Node: Simple Server72715
+Ref: Simple Server-Footnote-180574
+Node: Caveats80679
+Node: Challenges81841
+Ref: Challenges-Footnote-190644
+Node: Some Applications and Techniques90749
+Node: PANIC93244
+Node: GETURL94982
+Node: REMCONF97637
+Node: URLCHK103171
+Node: WEBGRAB107043
+Node: STATIST111585
+Ref: STATIST-Footnote-1124892
+Node: MAZE125347
+Node: MOBAGWHO131612
+Ref: MOBAGWHO-Footnote-1145781
+Node: STOXPRED145849
+Node: PROTBASE160242
+Ref: PROTBASE-Footnote-1173572
+Node: Links173691
+Node: GNU Free Documentation License176614
+Node: Index201937
 
 End Tag Table
 

@@ -539,15 +539,28 @@ cleanup:
 			break;
 
 		case Op_store_field:
+		case Op_store_field_exp:
+		{
+			char *assignment, *final;
+
 			t1 = pp_pop(); /* field num */
 			if (is_binary(t1->type))
 				pp_parenthesize(t1);
 			t2 = pp_pop(); /* r.h.s. */
-			fprintf(prof_fp, "$%s%s%s", t1->pp_str, op2str(pc->opcode), t2->pp_str);
+			assignment = pp_group3(t1->pp_str, op2str(pc->opcode), t2->pp_str);
+			final = pp_group3("$", assignment, "");
+			efree(assignment);
 			pp_free(t2);
 			pp_free(t1);
-			if ((flags & IN_FOR_HEADER) == 0)
-				pc = end_line(pc);
+			if (pc->opcode == Op_store_field_exp)
+				pp_push(pc->opcode, final, CAN_FREE, NULL);
+			else {
+				fprintf(prof_fp, "%s", final);
+				efree(final);
+				if ((flags & IN_FOR_HEADER) == 0)
+					pc = end_line(pc);
+			}
+		}
 			break;
 
 		case Op_concat:
@@ -669,7 +682,7 @@ cleanup:
 				NODE *n = pp_top();
 
 				if (pc->expr_count == 1
-				    && n->pp_str[0] == '(' 
+				    && n->pp_str[0] == '('
 				    && n->pp_str[n->pp_len - 1] == ')') {
 					n = pp_pop();
 
@@ -1990,7 +2003,7 @@ pp_func(INSTRUCTION *pc, void *data ATTRIBUTE_UNUSED)
 		print_comment(pc->comment, -1);	/* -1 ==> don't indent */
 
 	indent(pc->nexti->exec_count);
-	
+
 	bool malloced = false;
 	char *name = adjust_namespace(func->vname, & malloced);
 	fprintf(prof_fp, "%s %s(", op2str(Op_K_function), name);

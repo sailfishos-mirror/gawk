@@ -495,7 +495,7 @@ make_typed_regex(const char *re, size_t len)
 	else
 #endif
 	n2->numbr = 0;
-	n2->flags |= NUMCUR|STRCUR|REGEX; 
+	n2->flags |= NUMCUR|STRCUR|REGEX;
 	n2->flags &= ~(STRING|NUMBER);
 
 	return n2;

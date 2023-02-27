@@ -1,5 +1,5 @@
 #: 200810_ Prettyprint weirdness to show Arnold
-BEGIN {	
+BEGIN {
 	IGNORECASE = 1; 
 	printf("\n");
 	printf("test \"%s\"\tin FUNCTAB=%s (good!)\n","masterlib::libfunc","masterlib::libfunc" in FUNCTAB);

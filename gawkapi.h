@@ -507,7 +507,7 @@ typedef struct gawk_api {
 	/* Next, registration functions: */
 
 	/*
-	 * Add a function to the interpreter, returns true upon success. 
+	 * Add a function to the interpreter, returns true upon success.
 	 * Gawk does not modify what func points to, but the extension
 	 * function itself receives this pointer and can modify what it
 	 * points to, thus it's not const.

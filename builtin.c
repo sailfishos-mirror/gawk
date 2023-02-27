@@ -2771,7 +2771,7 @@ do_match(int nargs)
 		dest = POP_PARAM();
 		if (dest->type != Node_var_array)
 			fatal(_("match: third argument is not an array"));
-		check_symtab_functab(dest, "match", 
+		check_symtab_functab(dest, "match",
 				_("%s: cannot use %s as third argument"));
 		assoc_clear(dest);
 	}

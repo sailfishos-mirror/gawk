@@ -148,7 +148,7 @@ function print_first_field(str)
     first = get_first_field(str)
     printf("(%s)", first)
 }
-function fill_info_for_user(user,   
+function fill_info_for_user(user,
                             pwent, fields, groupnames, grent, groups, i)
 {
     pwent = getpwnam(user)

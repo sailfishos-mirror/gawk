@@ -40,7 +40,7 @@ BEGIN {
 
 	if (i != j)
 		printf("mismatch: %d from `ls -afi' and %d from `ls -lna'\n", i, j) > "/dev/stderr"
-	
+
 	for (i = 1; i in names; i++)
 		printf("%s/%s/%s\n", ino[names[i]], names[i], (ftype_unknown ? "u" : type[names[i]]))
 }

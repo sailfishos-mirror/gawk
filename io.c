@@ -3385,12 +3385,19 @@ iop_alloc(int fd, const char *name, int errno_val)
 
 	if (fd != INVALID_HANDLE)
 		fstat(fd, & iop->public_.sbuf);
-#if defined(__MINGW32__)
-	else if (errno_val == EISDIR) {
-		iop->public_.sbuf.st_mode = (_S_IFDIR | _S_IRWXU);
-		iop->public_.fd = FAKE_FD_VALUE;
-	}
+	else {
+#ifdef HAVE_LSTAT
+		int (*statf)(const char *, struct stat *) = lstat;
+#else
+		int (*statf)(const char *, struct stat *) = stat;
 #endif
+		/*
+		 * Try to fill in the stat struct. If it fails, zero
+		 * it out.
+		 */
+		if (statf(name, & iop->public_.sbuf) < 0)
+			memset(& iop->public_.sbuf, 0, sizeof(struct stat));
+	}
 
 	return iop;
 }
