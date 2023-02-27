@@ -316,6 +316,7 @@ esac
 # Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
 AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
 	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper \
+	lstat \
 	mbrlen memcmp memcpy memmove memset \
 	mkstemp mtrace posix_openpt setenv setlocale setsid sigprocmask \
 	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
