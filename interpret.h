@@ -2,10 +2,10 @@
  * interpret.h ---  run a list of instructions.
  */
 
-/* 
+/*
  * Copyright (C) 1986, 1988, 1989, 1991-2023,
  * the Free Software Foundation, Inc.
- * 
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
  *
@@ -794,6 +794,7 @@ mod:
 			break;
 
 		case Op_store_field:
+		case Op_store_field_exp:
 		{
 			/* field assignment optimization,
 			 * see awkgram.y (optimize_assignment)
@@ -816,6 +817,10 @@ mod:
 			UNFIELD(*lhs, r);
 			/* field variables need the string representation: */
 			force_string(*lhs);
+			if (op == Op_store_field_exp) {
+				UPREF(*lhs);
+				PUSH(*lhs);
+			}
 		}
 			break;
 

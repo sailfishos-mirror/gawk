@@ -1703,7 +1703,7 @@ incr_scan(char **scanp, size_t len, mbstate_t *mbs)
  * # Each loop iteration must consume some characters, except for the first field.
  * # So a null field is only valid as a first field or after a non-null separator.
  * # A null record has no fields (not a single null field).
- * 
+ *
  * function refpatsplit(string, fields, pattern, seps,
  *         parse_start, sep_start, field_start, field_length, field_found, nf) # locals
  * {
@@ -1714,26 +1714,26 @@ incr_scan(char **scanp, size_t len, mbstate_t *mbs)
  *     # - field length: length of the parsed field
  *     # - field_found: flag for succesful field match
  *     # - nf: Number of fields found so far
- *     
+ *
  *     # Prepare for parsing
  *     parse_start = 1   # first not yet parsed char
  *     nf = 0            # fields found so far
  *     delete fields
  *     delete seps
- * 
+ *
  *     # Loop that consumes the whole record
  *     while (parse_start <= length(string)) {  # still something to parse
- *     
+ *
  *         # first attempt to match the next field
  *         sep_start = parse_start
  *         field_found = match(substr(string, parse_start), pattern)
- *         
+ *
  *         # check for an invalid null field and retry one character away
  *         if (nf > 0 && field_found && RSTART == 1 && RLENGTH == 0) {
  *             parse_start++
  *             field_found = match(substr(string, parse_start), pattern)
  *         }
- *         
+ *
  *         # store the (sep[n-1],field[n]) pair
  *         if (field_found) {
  *             field_start = parse_start + RSTART - 1
@@ -1741,14 +1741,14 @@ incr_scan(char **scanp, size_t len, mbstate_t *mbs)
  *             seps[nf] = substr(string, sep_start, field_start-sep_start)
  *             fields[++nf] = substr(string, field_start, field_length)
  *             parse_start = field_start + field_length
- *             
+ *
  *         # store the final extra sep after the last field
  *         } else {
  *             seps[nf] = substr(string, sep_start)
  *             parse_start = length(string) + 1
  *         }
  *     }
- *     
+ *
  *     return nf
  * }
  */
@@ -1789,7 +1789,7 @@ fpat_parse_field(long up_to,	/* parse only up to this field number */
 		start = scan;
 		field_found = research(rp, scan, 0, (end - scan), regex_flags) != -1;
 
-		/* check for an invalid null field and retry one character away */ 
+		/* check for an invalid null field and retry one character away */
 		if (nf > 0 && field_found && REEND(rp, scan) == 0) { /* invalid null field */
 			increment_scan(& scan, end - scan);
 			field_found = research(rp, scan, 0, (end - scan), regex_flags) != -1;
@@ -1829,7 +1829,7 @@ fpat_parse_field(long up_to,	/* parse only up to this field number */
 	 * If the last field extends up to the end of the record, generate
 	 * a null trailing separator
 	 */
-	if (sep_arr != NULL && scan == end && field_found) 
+	if (sep_arr != NULL && scan == end && field_found)
 		set_element(nf, scan, 0L, sep_arr);
 
 	*buf = scan;
