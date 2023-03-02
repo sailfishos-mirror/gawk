@@ -879,30 +879,16 @@ mod:
 			break;
 
 		case Op_assign:
-		{
-			NODE *save_lhs;
-
 			lhs = POP_ADDRESS();
 			r = TOP_SCALAR();
-			/*
-			 * 1/2023:
-			 * The old NODE pointed to by *lhs has to be freed.
-			 * But we can't free it too early, in case it's both $0 and $1
-			 * (Test case was gawk 'gsub(/./, "@") && $0=$1'). So we save
-			 * the old one, and after the assignment, we free it, since
-			 * $0 and $1 have the same stptr value but only $0 has MALLOC
-			 * in the flags. Whew!
-			 */
-			save_lhs = *lhs;
+			unref(*lhs);
 			if (r->type == Node_elem_new) {
 				DEREF(r);
 				r = dupnode(Nnull_string);
 			}
 			UPREF(r);
 			UNFIELD(*lhs, r);
-			unref(save_lhs);
 			REPLACE(r);
-		}
 			break;
 
 		case Op_subscript_assign:

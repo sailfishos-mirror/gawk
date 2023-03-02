@@ -98,6 +98,12 @@
  * for arrays that will have subarrays as elements; however it is
  * a good idea to always do this.  This restriction may be relaxed
  * in a subsequent revision of the API.
+ *
+ * NOTE: While each routine in the API has a few lines of summary for it
+ * in this header, said summaries are not standalone, adequate documentation. You
+ * should read the chapter in the gawk manual on writing extensions. Find it online
+ * at https://www.gnu.org/software/gawk/manual/html_node/Dynamic-Extensions.html,
+ * or in the Info files distributed with gawk.
  */
 
 /* Allow use in C++ code.  */

@@ -37091,11 +37091,20 @@ the file for reading using the @code{open()} system call. If it was
 able to open the file, then @code{fd} will @emph{not} be equal to
 @code{INVALID_HANDLE}. Otherwise, it will.
 
+An extension can decide that it doesn't want to use the open file descriptor
+provided by @command{gawk}. In such a case it can close the file and
+set @code{fd} to @code{INVALID_HANDLE}, or it can leave it alone and
+keep it's own file descriptor in private data pointed to by the
+@code{opaque} pointer (see further in this list). In any case, if
+the file descriptor is valid, it should @emph{not} just overwrite the
+value with something else; doing so would cause a resource leak.
+
 @item struct stat sbuf;
 If the file descriptor is valid, then @command{gawk} will have filled
 in this structure via a call to the @code{fstat()} system call.
 Otherwise, if the @code{lstat()} system call is available, it will
 use that. If @code{lstat()} is not available, then it uses @code{stat()}.
+
 Getting the file's information allows extensions to check the type of
 the file even if it could not be opened.  This occurs, for example,
 on Windows systems when trying to use @code{open()} on a directory.
@@ -37138,7 +37147,7 @@ This function pointer should point to a function that creates the input
 records.  Said function is the core of the input parser.  Its behavior
 is described in the text following this list.
 
-@item ssize_t (*read_func)();
+@item ssize_t (*read_func)(int, void *, size_t);
 This function pointer should point to a function that has the
 same behavior as the standard POSIX @code{read()} system call.
 It is an alternative to the @code{get_record} pointer.  Its behavior
@@ -37252,14 +37261,6 @@ In the latter case, code in a @code{BEGINFILE} rule
 can look at @code{FILENAME} and @code{ERRNO} to decide whether or
 not to activate your input parser (@pxref{BEGINFILE/ENDFILE}).
 
-You register your input parser with the following function:
-
-@table @code
-@item void register_input_parser(awk_input_parser_t *input_parser);
-Register the input parser pointed to by @code{input_parser} with
-@command{gawk}.
-@end table
-
 If you would like to override the default field parsing mechanism for a given
 record, then you must populate an @code{awk_fieldwidth_info_t} structure,
 which looks like this:
@@ -37303,6 +37304,14 @@ calculate the appropriate size of a variable-length
 be used as an argument to @code{malloc()} or in a union to allocate space
 statically. Please refer to the @code{readdir_test} sample extension for an
 example.
+
+You register your input parser with the following function:
+
+@table @code
+@item void register_input_parser(awk_input_parser_t *input_parser);
+Register the input parser pointed to by @code{input_parser} with
+@command{gawk}.
+@end table
 
 @node Output Wrappers
 @subsubsection Customized Output Wrappers
@@ -37407,10 +37416,12 @@ what it does.
 The @code{@var{XXX}_can_take_file()} function should make a decision based
 upon the @code{name} and @code{mode} fields, and any additional state
 (such as @command{awk} variable values) that is appropriate.
+@command{gawk} attempts to open the named file for writing.  The @code{fp}
+member will be @code{NULL} only if it fails.
 
 When @command{gawk} calls @code{@var{XXX}_take_control_of()}, that function should fill
 in the other fields as appropriate, except for @code{fp}, which it should just
-use normally.
+use normally if it's not @code{NULL}.
 
 You register your output wrapper with the following function:
 
