@@ -5626,10 +5626,15 @@ directory possono essere necessarie per organizzare i file da includere.
 Vista la possibilit@`a di specificare opzioni @option{-f} multiple, il
 meccanismo @code{@@include} non @`e strettamente necessario.
 Comunque, la direttiva @code{@@include} pu@`o essere d'aiuto nel costruire
-programmi @command{gawk} autosufficienti, riducendo cos@`{@dotless{i}} la necessit@`a
-di scrivere righe di comando complesse e tediose.
+programmi @command{gawk} autosufficienti, riducendo cos@`{@dotless{i}} la
+necessit@`a di scrivere righe di comando complesse e tediose.
 In particolare, @code{@@include} @`e molto utile per scrivere @dfn{script} CGI
 eseguibili da pagine web.
+
+La direttiva @code{@@include} e l'opzione @option{-i}/@option{--include}
+sulla riga di comando sono completamente equivalenti. Un programma sorgente
+incluso non viene caricato di nuovo se @`e stato gi@`a caricato
+in precedenza.
 
 Le regole usate per trovare un file sorgente, descritte
 @iftex
@@ -40037,9 +40042,34 @@ Se il file viene effettivamente aperto, il valore di @code{fd}
 [descrittore non valido].
 In caso contrario, il valore sar@`a quello.
 
+Un'estensione pu@`o decidere che non desidera usare il descrittore
+di file aperto che le viene passato da @command{gawk}.
+In tal caso pu@`o chiudere il file e impostare il relativo
+descrittore di file @code{fd} al valore @code{INVALID_HANDLE},
+oppure ignorarlo e mantenere un suo proprio descrittore di file
+nei suoi dati privati, raggiungibili usando il puntatore
+@code{opaque} (vedere pi@`u sotto in questa lista).
+In ogni caso, se il descrittore di file @`e valido, @emph{non}
+dovrebbe essere sovrascritto con un altro valore; se lo si fa,
+si causa una perdita di dati.
+
 @item struct stat sbuf;
 Se il descrittore di file @`e valido, @command{gawk} avr@`a riempito i campi di
 questa struttura invocando la chiamata di sistema @code{fstat()}.
+Altrimenti, se la chiamata di sistema @code{lstat()} @`e disponibile,
+essa verr@`a usata. Se neppure @code{lstat()} @`e disponibile, allora
+verr@`a usata la chiamata di sistema @code{stat()}.
+
+L'ottenere informazioni relative al file consente alle estensioni di
+controllare il tipo di file, anche se non sar@`a poi possibile aprirlo.
+Ci@`o capita, per esempio, nei sistemi Windows, quando si tenta di
+usare @code{open()} su una directory.
+
+Se @command{gawk} non sar@`a riuscito a ottenere le informazioni
+relative al file, allora @code{sbuf} conterr@`a zeri binari.
+In particolare, il codice dell'estensione pu@`o testare se il campo
+@samp{sbuf.st_mode == 0}.  Se @`e questo il caso, allora in
+@code{sbuf} non @`e contenuta alcuna informazione.
 @end table
 
 La funzione @code{@var{XXX}_can_take_file()} dovrebbe esaminare i campi di
@@ -40077,7 +40107,7 @@ Questo puntatore a funzione dovrebbe puntare a una funzione che crea i record
 in input.  Tale funzione @`e il nucleo centrale dell'analizzatore di input.
 Il suo modo di operare @`e descritto nel testo che segue questo elenco.
 
-@item ssize_t (*read_func)();
+@item ssize_t (*read_func)(int, void *, size_t);
 Questo puntatore a funzione dovrebbe puntare a una funzione che ha lo
 stesso comportamento della chiamata di sistema standard POSIX @code{read()}.
 @`E in alternativa al puntatore a @code{get_record}.  Il relativo comportamento
@@ -40200,14 +40230,6 @@ pu@`o controllare @code{FILENAME} ed @code{ERRNO} per decidere se
 attivare un analizzatore di input utente oppure no
 (@pxref{BEGINFILE/ENDFILE}).
 
-Un analizzatore di input va registrato usando la seguente funzione:
-
-@table @code
-@item void register_input_parser(awk_input_parser_t *input_parser);
-Registra l'analizzatore di input puntato da @code{input_parser} con
-@command{gawk}.
-@end table
-
 Se si vuole ignorare il meccanismo di default per l'analisi dei campi
 per un determinato record, si deve riempire una struttura
 @code{awk_fieldwidth_info_t} che ha questo aspetto:
@@ -40252,6 +40274,14 @@ per calcolare la dimensione appropriata della struttura a lunghezza variabile
 dimensione pu@`o essere usata come argomento per @code{malloc()} o in una
 struttura @dfn{union} per allocare spazio staticamente.
 Per un esempio si pu@`o vedere l'estensione di esempio @code{readdir_test}.
+
+Un analizzatore di input va registrato usando la seguente funzione:
+
+@table @code
+@item void register_input_parser(awk_input_parser_t *input_parser);
+Registra l'analizzatore di input puntato da @code{input_parser} con
+@command{gawk}.
+@end table
 
 @node Processori di output
 @subsubsection Registrare un processore di output
@@ -40368,11 +40398,14 @@ appropriate per fare il lavoro richiesto.
 La funzione @code{@var{XXX}_can_take_file()} dovrebbe decidere in base ai
 campi @code{nome} e @code{modo}, e a ogni altro ulteriore indicatore di stato
 (p.es., valori di variabili @command{awk}) adatto allo scopo.
+@command{gawk} tenta di aprire in scrittura il file indicato.
+L'elemento @code{fp} varr@`a @code{NULL} solo se non si riesci ad aprire
+il file.
 
 Quando @command{gawk} chiama @code{@var{XXX}_take_control_of()}, la funzione
 dovrebbe riempire i rimanenti campi
 in modo opportuno, tranne che per @code{fp}, che dovrebbe essere usato
-normalmente.
+normalmente se il suo valore non @`e @code{NULL}.
 
 Il processore di output va registrato usando la seguente funzione:
 
