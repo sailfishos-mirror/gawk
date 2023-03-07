@@ -8332,6 +8332,22 @@ append_rule(INSTRUCTION *pattern, INSTRUCTION *action)
 	return rule_block[rule];
 }
 
+/*
+ * 3/2023:
+ * mk_assignment() is called when an assignment statement is seen,
+ * as an expression.  optimize_assignment() is called when an expression
+ * is seen as statement (inside braces).
+ *
+ * When a field assignment is seen, it needs to be optizimed into
+ * Op_store_field_exp or Op_store_field to avoid memory management
+ * issues. Thus, the Op_field_spec_lhs -> Op_store_field_expr
+ * change is done in mk_assignment. (Consider foo && $0 = $1, the
+ * assignment is part of an expression.)
+ *
+ * If the assignment is in a statement, then optimize_assignment()
+ * turn Op_store_field_expr into Op_store_field.
+ */
+
 /* mk_assignment --- assignment bytecodes */
 
 static INSTRUCTION *
@@ -8433,6 +8449,11 @@ optimize_assignment(INSTRUCTION *exp)
 
 	i2 = NULL;
 	i1 = exp->lasti;
+
+	if (i1->opcode == Op_store_field_exp) {
+		i1->opcode = Op_store_field;
+		return exp;
+	}
 
 	if (   i1->opcode != Op_assign
 	    && i1->opcode != Op_field_assign)
