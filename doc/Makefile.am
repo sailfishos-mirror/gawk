@@ -34,14 +34,15 @@ png_images = gawk_api-figure1.png gawk_api-figure2.png gawk_api-figure3.png \
 html_images = $(png_images) gawk_statist.jpg
 
 fig_images = $(png_images:%.png=%.fig)
-txt_images = $(png_images:%.png=%.txt) statist.txt
-eps_images = $(txt_images:%.txt=%.eps)
-pdf_images = $(txt_images:%.txt=%.pdf)
+txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
+eps_images = $(txt_images:%.txt=%.eps) gawk_statist.eps
+pdf_images = $(txt_images:%.txt=%.pdf) gawk_statist.pdf
 
 EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	README.card ad.block setter.outline \
 	awkcard.in awkforai.txt texinfo.tex cardfonts \
 	$(fig_images) $(txt_images) $(eps_images) $(pdf_images) \
+	$(html_images) \
 	gawktexi.in sidebar.awk \
 	it \
 	macros colors no.colors $(man_MANS) \

@@ -124,6 +124,9 @@
 /* Define to 1 if the system has the type 'long long int'. */
 #undef HAVE_LONG_LONG_INT
 
+/* Define to 1 if you have the `lstat' function. */
+#undef HAVE_LSTAT
+
 /* Define to 1 if you have the `mbrlen' function. */
 #define HAVE_MBRLEN 1
 
@@ -367,7 +370,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.2.1"
+#define PACKAGE_STRING "GNU Awk 5.2.1a"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -376,7 +379,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.2.1"
+#define PACKAGE_VERSION "5.2.1a"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -504,7 +507,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.2.1"
+#define VERSION "5.2.1a"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
