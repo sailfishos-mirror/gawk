@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012-2019, 2021, 2022, the Free Software Foundation, Inc.
+ * Copyright (C) 2012-2019, 2021, 2022, 2023, the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -99,7 +99,7 @@
  * a good idea to always do this.  This restriction may be relaxed
  * in a subsequent revision of the API.
  *
- * NOTE: While each routine in the API has a few lines of summary for it
+ * 3. While each routine in the API has a few lines of summary for it
  * in this header, said summaries are not standalone, adequate documentation. You
  * should read the chapter in the gawk manual on writing extensions. Find it online
  * at https://www.gnu.org/software/gawk/manual/html_node/Dynamic-Extensions.html,
