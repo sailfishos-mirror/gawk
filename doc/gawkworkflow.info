@@ -1,10 +1,11 @@
 This is gawkworkflow.info, produced by makeinfo version 7.0.1 from
 gawkworkflow.texi.
 
-Copyright © 2017, 2018, 2019, 2020, 2022 Free Software Foundation, Inc.
+Copyright © 2017, 2018, 2019, 2020, 2022, 2023 Free Software Foundation,
+Inc.
 
 
-   This is Edition 0.74 of ‘Participating in ‘gawk’ Development’.
+   This is Edition 0.75 of ‘Participating in ‘gawk’ Development’.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -35,11 +36,11 @@ General Introduction
 This file describes how to participate in software development for GNU
 Awk (‘gawk’) (http://www.gnu.org/software/gawk).
 
-   Copyright © 2017, 2018, 2019, 2020, 2022 Free Software Foundation,
-Inc.
+   Copyright © 2017, 2018, 2019, 2020, 2022, 2023 Free Software
+Foundation, Inc.
 
 
-   This is Edition 0.74 of ‘Participating in ‘gawk’ Development’.
+   This is Edition 0.75 of ‘Participating in ‘gawk’ Development’.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -1005,6 +1006,11 @@ _Generate a single large patch_
      Mail the ‘python.diff’ file to the appropriate mailing list along
      with a description of what you’ve changed and why.
 
+     The patch file will likely contain changes to generated files, such
+     as ‘awkgram.c’ or ‘Makefile.in’.  If you are comfortable manually
+     editing the patch file to remove those changes, do so.  If not,
+     then send the file as-is and the maintainer will handle it.
+
 _Generate a set of patches that in toto comprise your changes_
      To do this, use ‘git format-patch’:
 
@@ -1164,7 +1170,8 @@ without commit access:
   3. If necessary, update the documentation: ‘doc/gawktexi.in’ and/or
      ‘doc/gawk.1’.
 
-  4. Use ‘git diff > mychange.diff’ to create a patch file.
+  4. Use ‘git diff > mychange.diff’ to create a patch file.  (If you
+     want, remove the diffs for generated files.)
 
   5. Send it to the mailing list for discussion.
 
@@ -1281,7 +1288,7 @@ Savannah repo.
      otherwise, you should _always_ start branches for new features from
      ‘master’, and not from the current “stable” branch.
 
-     Use ‘checkout -b feature/FEATURE_NAME’ to create the initial
+     Use ‘git checkout -b feature/FEATURE_NAME’ to create the initial
      branch.  You may then elect to keep it purely local, or to push it
      up to Savannah for review, even if the feature is not yet totally
      “ready for prime time.”
@@ -1827,7 +1834,7 @@ Index
 * gawktexi.in documentation:             Developing patches.   (line 13)
 * GCC, the GNU Compiler Collection:      Compilers.            (line  6)
 * generating a single patch:             Submitting Changes.   (line 14)
-* generating multiple patches:           Submitting Changes.   (line 24)
+* generating multiple patches:           Submitting Changes.   (line 29)
 * gettext:                               GNU Tools.            (line 27)
 * git branch command, -a option:         Remotes.              (line  6)
 * git command, git branch:               Repo Copies.          (line 39)
@@ -1868,8 +1875,8 @@ Index
 * git command, git pull <2>:             Rebasing.             (line 10)
 * git command, git checkout <5>:         Submitting Changes.   (line 18)
 * git command, git diff <1>:             Submitting Changes.   (line 18)
-* git command, git format-patch:         Submitting Changes.   (line 24)
-* git command, git checkout <6>:         Submitting Changes.   (line 27)
+* git command, git format-patch:         Submitting Changes.   (line 29)
+* git command, git checkout <6>:         Submitting Changes.   (line 32)
 * git command, git checkout <7>:         Removing Branches.    (line  9)
 * git command, git pull <3>:             Removing Branches.    (line  9)
 * git command, git branch <1>:           Removing Branches.    (line  9)
@@ -1883,10 +1890,10 @@ Index
 * git command, git merge:                Points to remember.   (line 37)
 * git command, git clone <2>:            ssh clone.            (line 10)
 * git command, git diff <3>:             Developing patches.   (line 16)
-* git command, git diff <4>:             Developing patches.   (line 26)
-* git command, git add <1>:              Developing patches.   (line 26)
-* git command, git commit <1>:           Developing patches.   (line 26)
-* git command, git push <1>:             Developing patches.   (line 26)
+* git command, git diff <4>:             Developing patches.   (line 27)
+* git command, git add <1>:              Developing patches.   (line 27)
+* git command, git commit <1>:           Developing patches.   (line 27)
+* git command, git push <1>:             Developing patches.   (line 27)
 * git command, git checkout <11>:        Developing new features.
                                                                (line  9)
 * git command, git pull <6>:             Developing new features.
@@ -1960,7 +1967,7 @@ Index
 * ownership of directories:              General practices.    (line 17)
 * pager.status configuration setting:    Configuring git.      (line 24)
 * patch, single, generation of:          Submitting Changes.   (line 14)
-* patches, multiple, generation of:      Submitting Changes.   (line 24)
+* patches, multiple, generation of:      Submitting Changes.   (line 29)
 * pcc compiler:                          Compilers.            (line 40)
 * pcc compiler, Git mirror:              Compilers.            (line 50)
 * Portable C compiler:                   Compilers.            (line 40)
@@ -1994,69 +2001,69 @@ Index
 
 
 Tag Table:
-Node: Top1162
-Node: Preface5303
-Node: Intended Audience5874
-Node: This Manual6756
-Node: Conventions8317
-Node: Acknowledgments9838
-Node: Reviewers10275
-Node: Contributing10596
-Node: Using Git14050
-Node: Push Pull14810
-Node: Repo Copies16376
-Ref: savannah-repo17391
-Ref: your-repo18448
-Ref: Repo Copies-Footnote-120167
-Node: Local Branches20224
-Ref: your-repo-222045
-Ref: Local Branches-Footnote-123131
-Node: Branches are state23189
-Node: Repo State23924
-Node: Local State26108
-Node: Remotes26776
-Node: Configuring git28133
-Ref: Configuring git-Footnote-130543
-Node: Development without commit access30714
-Node: Cloning31774
-Ref: Cloning-Footnote-133339
-Node: Switching Branches33406
-Node: Starting A New Branch34040
-Ref: Starting A New Branch-Footnote-136024
-Ref: Starting A New Branch-Footnote-236084
-Node: Undoing a change36166
-Node: Saving Without Committing36790
-Node: Updating38374
-Node: Rebasing38889
-Node: Merge Conflicts39511
-Node: Submitting Changes41788
-Ref: Submitting Changes-Footnote-143972
-Ref: Submitting Changes-Footnote-244011
-Ref: Submitting Changes-Footnote-344047
-Node: Removing Branches44095
-Node: Points to remember44631
-Node: Development with commit access46340
-Node: Initial setup46993
-Node: ssh clone47797
-Node: Developing patches48387
-Node: Developing new features49752
-Node: Developing fixes51664
-Node: General practices52755
-Node: Repo Maintenance57584
-Ref: Repo Maintenance-Footnote-160495
-Node: Development Stuff60631
-Node: Coding style61200
-Ref: Coding style-Footnote-161862
-Node: Doing paperwork61956
-Node: Tools62755
-Node: GNU Tools63345
-Node: Compilers65578
-Ref: Compilers-Footnote-168258
-Node: Debugging68296
-Node: Cheat Sheet69107
-Node: Resources73214
-Node: TODO73799
-Node: Index74021
+Node: Top1168
+Node: Preface5315
+Node: Intended Audience5886
+Node: This Manual6768
+Node: Conventions8329
+Node: Acknowledgments9850
+Node: Reviewers10287
+Node: Contributing10608
+Node: Using Git14062
+Node: Push Pull14822
+Node: Repo Copies16388
+Ref: savannah-repo17403
+Ref: your-repo18460
+Ref: Repo Copies-Footnote-120179
+Node: Local Branches20236
+Ref: your-repo-222057
+Ref: Local Branches-Footnote-123143
+Node: Branches are state23201
+Node: Repo State23936
+Node: Local State26120
+Node: Remotes26788
+Node: Configuring git28145
+Ref: Configuring git-Footnote-130555
+Node: Development without commit access30726
+Node: Cloning31786
+Ref: Cloning-Footnote-133351
+Node: Switching Branches33418
+Node: Starting A New Branch34052
+Ref: Starting A New Branch-Footnote-136036
+Ref: Starting A New Branch-Footnote-236096
+Node: Undoing a change36178
+Node: Saving Without Committing36802
+Node: Updating38386
+Node: Rebasing38901
+Node: Merge Conflicts39523
+Node: Submitting Changes41800
+Ref: Submitting Changes-Footnote-144271
+Ref: Submitting Changes-Footnote-244310
+Ref: Submitting Changes-Footnote-344346
+Node: Removing Branches44394
+Node: Points to remember44930
+Node: Development with commit access46639
+Node: Initial setup47292
+Node: ssh clone48096
+Node: Developing patches48686
+Node: Developing new features50110
+Node: Developing fixes52022
+Node: General practices53113
+Node: Repo Maintenance57946
+Ref: Repo Maintenance-Footnote-160857
+Node: Development Stuff60993
+Node: Coding style61562
+Ref: Coding style-Footnote-162224
+Node: Doing paperwork62318
+Node: Tools63117
+Node: GNU Tools63707
+Node: Compilers65940
+Ref: Compilers-Footnote-168620
+Node: Debugging68658
+Node: Cheat Sheet69469
+Node: Resources73576
+Node: TODO74161
+Node: Index74383
 
 End Tag Table
 

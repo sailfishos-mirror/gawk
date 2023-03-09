@@ -28,10 +28,10 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH July, 2022
+@set UPDATE-MONTH March, 2023
 
 @set TITLE Participating in @command{gawk} Development
-@set EDITION 0.74
+@set EDITION 0.75
 
 @iftex
 @set DOCUMENT booklet
@@ -144,13 +144,13 @@ Fax: +1-617-542-2652
 Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="http://www.gnu.org">http://www.gnu.org/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2017, 2018, 2019, 2020, 2022
+<literallayout class="normal">Copyright &copy; 2017, 2018, 2019, 2020, 2022, 2023
 Free Software Foundation, Inc.
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2017, 2018, 2019, 2020, 2022
+Copyright @copyright{} 2017, 2018, 2019, 2020, 2022, 2023
 Free Software Foundation, Inc.
 @end ifnotdocbook
 @sp 2
@@ -1301,6 +1301,12 @@ $ @kbd{git diff master > /tmp/python.diff}
 Mail the @file{python.diff} file to the appropriate mailing list
 along with a description of what you've changed and why.
 
+The patch file will likely contain changes to generated files,
+such as @file{awkgram.c} or @file{Makefile.in}.  If you are
+comfortable manually editing the patch file to remove those
+changes, do so. If not, then send the file as-is and the
+maintainer will handle it.
+
 @cindex @command{git} command @subentry @code{git format-patch}
 @cindex generating multiple patches
 @cindex patches, multiple, generation of
@@ -1493,6 +1499,7 @@ and/or @file{doc/gawk.1}.
 @cindex @command{git} command @subentry @code{git diff}
 @item
 Use @samp{git diff > mychange.diff} to create a patch file.
+(If you want, remove the diffs for generated files.)
 
 @item
 Send it to the mailing list for discussion.
@@ -1644,7 +1651,7 @@ Unless you can convince the maintainer (and the other developers!) otherwise,
 you should @emph{always} start branches for new features from @code{master},
 and not from the current ``stable'' branch.
 
-Use @samp{checkout -b feature/@var{feature_name}} to create the initial branch.
+Use @samp{git checkout -b feature/@var{feature_name}} to create the initial branch.
 You may then elect to keep it purely local, or to push it up to Savannah for
 review, even if the feature is not yet totally ``ready for prime time.''
 @end table

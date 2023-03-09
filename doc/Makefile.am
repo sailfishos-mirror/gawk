@@ -29,27 +29,24 @@ info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi
 
 man_MANS = gawk.1 gawkbug.1 pm-gawk.1
 
+png_images = gawk_api-figure1.png gawk_api-figure2.png gawk_api-figure3.png \
+	gawk_array-elements.png gawk_general-program.png gawk_process-flow.png
+html_images = $(png_images) gawk_statist.jpg
+
+fig_images = $(png_images:%.png=%.fig)
+txt_images = $(png_images:%.png=%.txt) statist.txt
+eps_images = $(txt_images:%.txt=%.eps)
+pdf_images = $(txt_images:%.txt=%.pdf)
+
 EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	README.card ad.block setter.outline \
 	awkcard.in awkforai.txt texinfo.tex cardfonts \
-	api-figure1.eps api-figure1.fig api-figure1.pdf \
-	api-figure1.png api-figure1.txt \
-	api-figure2.eps api-figure2.fig api-figure2.pdf \
-	api-figure2.png api-figure2.txt \
-	api-figure3.eps api-figure3.fig api-figure3.pdf \
-	api-figure3.png api-figure3.txt \
-	array-elements.eps array-elements.fig array-elements.pdf \
-	array-elements.png array-elements.txt \
+	$(fig_images) $(txt_images) $(eps_images) $(pdf_images) \
 	gawktexi.in sidebar.awk \
-	general-program.eps general-program.fig general-program.pdf \
-	general-program.png general-program.txt \
 	it \
-	process-flow.eps process-flow.fig process-flow.pdf \
-	process-flow.png process-flow.txt \
 	macros colors no.colors $(man_MANS) \
 	lflashlight-small.xpic lflashlight.eps lflashlight.pdf \
 	rflashlight-small.xpic rflashlight.eps rflashlight.pdf \
-	statist.jpg statist.eps statist.pdf statist.txt \
 	wordlist wordlist2 wordlist3 wordlist4 wordlist5 wordlist6 \
 	bc_notes
 
@@ -159,3 +156,30 @@ spellinet:
 	@echo ==== gawkinet.texi ====
 	export LC_ALL=C ; spell "$(srcdir)"/gawkinet.texi | \
 	sort -u | comm -23 - "$(srcdir)"/wordlist4
+
+# Install/unistall graphic image files in the info/ dir
+
+imagedir = $(infodir)
+image_DATA = $(html_images)
+
+# Install/unistall graphic image files in the html doc dir
+
+install-html-local:
+	@$(NORMAL_INSTALL)
+	@list='$(html_images)'; test -n "$(htmldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(htmldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(htmldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+		$(INSTALL_DATA) $$p "$(DESTDIR)$(htmldir)" || exit $$?; \
+	done;
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	@list='$(html_images)'; test -n "$(htmldir)" || list=; \
+	for p in $$list; do \
+	  echo " rm -rf '$(DESTDIR)$(htmldir)/$$p'"; \
+	  rm -rf "$(DESTDIR)$(htmldir)/$$p"; \
+	done
+
