@@ -206,7 +206,9 @@ do_sleep(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	return make_number(rc, result);
 }
 
-#ifdef HAVE_STRPTIME
+#ifndef HAVE_STRPTIME
+#include "../missing_d/strptime.c"
+#endif
 
 /*  do_strptime --- call strptime */
 
@@ -257,14 +259,10 @@ done0:
 	return result;
 }
 
-#endif
-
 static awk_ext_func_t func_table[] = {
 	{ "gettimeofday", do_gettimeofday, 0, 0, awk_false, NULL },
 	{ "sleep", do_sleep, 1, 1, awk_false, NULL },
-#ifdef HAVE_STRPTIME
 	{ "strptime", do_strptime, 2, 2, awk_false, NULL },
-#endif
 };
 
 /* define the dl_load function using the boilerplate macro */
