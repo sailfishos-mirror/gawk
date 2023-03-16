@@ -1173,6 +1173,7 @@ extern enum do_flag_values {
 	DO_PROFILE	   = 0x02000,	/* profile the program */
 	DO_DEBUG	   = 0x04000,	/* debug the program */
 	DO_MPFR		   = 0x08000,	/* arbitrary-precision floating-point math */
+	DO_CSV		   = 0x10000,	/* process comma-separated-value files */
 } do_flags;
 
 #define do_traditional      (do_flags & DO_TRADITIONAL)
@@ -1187,6 +1188,7 @@ extern enum do_flag_values {
 #define do_sandbox          (do_flags & DO_SANDBOX)
 #define do_debug            (do_flags & DO_DEBUG)
 #define do_mpfr             (do_flags & DO_MPFR)
+#define do_csv              (do_flags & DO_CSV)
 
 extern bool do_optimize;
 extern int use_lc_numeric;
@@ -1569,6 +1571,7 @@ extern NODE *get_actual_argument(NODE *, int, bool);
 #endif
 /* field.c */
 extern void init_fields(void);
+extern void init_csv_fields(void);
 extern void set_record(const char *buf, int cnt, const awk_fieldwidth_info_t *);
 extern void reset_record(void);
 extern void rebuild_record(void);
@@ -1629,6 +1632,7 @@ extern int isdirpunct(int c);
 /* io.c */
 extern void init_sockets(void);
 extern void init_io(void);
+extern void init_csv_records(void);
 extern void register_input_parser(awk_input_parser_t *input_parser);
 extern void register_output_wrapper(awk_output_wrapper_t *wrapper);
 extern void register_two_way_processor(awk_two_way_processor_t *processor);

@@ -288,8 +288,11 @@ NEED_SANDBOX = sandbox1
 # List of tests that need --traditional
 NEED_TRADITIONAL = litoct tradanch rscompat
 
-# Lists of tests that need the PMA allocator and a backing file
+# List of tests that need the PMA allocator and a backing file
 NEED_PMA = pma
+
+# List of tests that need --csv
+NEED_CSV = csv1
 
 # Lists of tests that run a shell script
 RUN_SHELL = exit fflush localenl modifiers next randtest rtlen rtlen01
@@ -2721,7 +2724,7 @@ crlf:
 
 csv1:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --csv < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 dbugeval2:

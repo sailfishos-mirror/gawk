@@ -265,6 +265,7 @@ static bool avoid_flush(const char *name);
 static RECVALUE rs1scan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 static RECVALUE rsnullscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 static RECVALUE rsrescan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
+static RECVALUE csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 
 static RECVALUE (*matchrec)(IOBUF *iop, struct recmatch *recm, SCANSTATE *state) = rs1scan;
 
@@ -339,6 +340,15 @@ init_io()
 	 */
 	if (PROCINFO_node != NULL)
 		read_can_timeout = true;
+}
+
+/* init_csv_records --- set up for CSV handling */
+
+void
+init_csv_records(void)
+{
+	if (do_csv)
+		matchrec = csvscan;
 }
 
 
@@ -3820,6 +3830,14 @@ find_longest_terminator:
 	return REC_OK;
 }
 
+/* csvscan --- handle --csv mode */
+
+static RECVALUE
+csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
+{
+	return rs1scan(iop, recm, state);	// XXX so it'll compile and run
+}
+
 /* retryable --- return true if PROCINFO[<filename>, "RETRY"] exists */
 
 static inline int
@@ -4069,6 +4087,13 @@ get_a_record(char **out,        /* pointer to pointer to data */
 void
 set_RS()
 {
+	/*
+	 * Setting RS does nothing if CSV mode, warn in that case,
+	 * but don't warn on first call which happens at initialization.
+	 */
+	static bool first_time = true;
+	static bool warned = false;
+
 	static NODE *save_rs = NULL;
 
 	/*
@@ -4099,9 +4124,15 @@ set_RS()
 	refree(RS_re[1]);
 	RS_re[0] = RS_re[1] = RS_regexp = NULL;
 
+	if (! first_time && ! warned && do_csv) {
+		warned = true;
+		warning(_("assignment to RS has no effect when using --csv"));
+	}
+
 	if (RS->stlen == 0) {
 		RS_is_null = true;
-		matchrec = rsnullscan;
+		if (first_time || ! do_csv)
+			matchrec = rsnullscan;
 	} else if ((RS->stlen > 1 || (RS->flags & REGEX) != 0) && ! do_traditional) {
 		static bool warned = false;
 
@@ -4109,17 +4140,23 @@ set_RS()
 		RS_re[1] = make_regexp(RS->stptr, RS->stlen, true, true, true);
 		RS_regexp = RS_re[IGNORECASE];
 
-		matchrec = rsrescan;
+		if (first_time || ! do_csv)
+			matchrec = rsrescan;
 
 		if (do_lint_extensions && ! warned) {
 			lintwarn(_("multicharacter value of `RS' is a gawk extension"));
 			warned = true;
 		}
-	} else
-		matchrec = rs1scan;
+	} else {
+		if (first_time || ! do_csv)
+			matchrec = rs1scan;
+	}
 set_FS:
 	if (current_field_sep() == Using_FS)
 		set_FS();
+
+	if (first_time)
+		first_time = false;
 }
 
 
