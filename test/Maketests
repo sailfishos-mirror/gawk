@@ -1417,6 +1417,11 @@ csv1:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --csv < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+csv2:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --csv >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 dbugeval2:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --debug < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
