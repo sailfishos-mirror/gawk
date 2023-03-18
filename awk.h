@@ -1569,7 +1569,7 @@ extern NODE *get_actual_argument(NODE *, int, bool);
 #endif
 /* field.c */
 extern void init_fields(void);
-extern void set_record(const char *buf, int cnt, const awk_fieldwidth_info_t *);
+extern void set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *);
 extern void reset_record(void);
 extern void rebuild_record(void);
 extern void set_NF(void);
