@@ -13,7 +13,7 @@ $! This generates a []config.h file and also a config_vms.h file,
 $! which is used to supplement that file.
 $!
 $!
-$! Copyright (C) 2014, 2016, 2019 the Free Software Foundation, Inc.
+$! Copyright (C) 2014, 2016, 2019, 2023 the Free Software Foundation, Inc.
 $!
 $! This file is part of GAWK, the GNU implementation of the
 $! AWK Progamming Language.
@@ -199,6 +199,16 @@ $ write cvh "#include <stdio.h>"
 $ write cvh "#include <time.h>"
 $ write cvh "#include <stsdef.h>"
 $ write cvh "#include <string.h>"
+$ write cvh "#ifndef _POSIX_C_SOURCE"
+$ write cvh "#define _POSIX_C_SOURCE 2"
+$ write cvh "#define _XOPEN_SOURCE 1"
+$ write cvh "#define _XOPEN_SOURCE_EXTENDED 1"
+$ write cvh "#include <stat.h>"
+$ write cvh "#undef _POSIX_C_SOURCE"
+$ write cvh "#undef _XOPEN_SOURCE"
+$ write cvh "#undef _XOPEN_SOURCE_EXTENDED"
+$ write cvh "#endif"
+$ write cvh "#define HAVE_STRPTIME 1"
 $ write cvh "#undef getopt"
 $ write cvh "#undef optopt"
 $ write cvh "#undef optind"
