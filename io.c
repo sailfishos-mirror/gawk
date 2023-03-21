@@ -3835,7 +3835,43 @@ find_longest_terminator:
 static RECVALUE
 csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 {
-	return rs1scan(iop, recm, state);	// XXX so it'll compile and run
+	char *bp;
+	char rs = '\n';
+	static bool in_quote = false;
+
+	memset(recm, '\0', sizeof(struct recmatch));
+	*(iop->dataend) = rs;   /* set sentinel */
+	recm->start = iop->off; /* beginning of record */
+
+	if (*state == NOSTATE)  /* reset in_quote at the beginning of the record */
+		in_quote = false;
+
+	bp = iop->off;
+	if (*state == INDATA)   /* skip over data we've already seen */
+		bp += iop->scanoff;
+
+	/* look for a newline outside quotes */
+	do {
+		while (*bp != rs) { 
+			if (*bp == '\"')
+				in_quote = !in_quote;
+			bp++;
+		}
+	} while (in_quote && bp < iop->dataend && bp++);
+
+	/* set len to what we have so far, in case this is all there is */
+	recm->len = bp - recm->start;
+
+	if (bp < iop->dataend) {        /* found it in the buffer */
+		recm->rt_start = bp;
+		recm->rt_len = 1;
+		*state = NOSTATE;
+		return REC_OK;
+	} else {
+		*state = INDATA;
+		iop->scanoff = bp - iop->off;
+		return NOTERM;
+	}
 }
 
 /* retryable --- return true if PROCINFO[<filename>, "RETRY"] exists */
