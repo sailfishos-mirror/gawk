@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012-2019, 2021, 2022, the Free Software Foundation, Inc.
+ * Copyright (C) 2012-2019, 2021, 2022, 2023, the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -98,6 +98,12 @@
  * for arrays that will have subarrays as elements; however it is
  * a good idea to always do this.  This restriction may be relaxed
  * in a subsequent revision of the API.
+ *
+ * 3. While each routine in the API has a few lines of summary for it
+ * in this header, said summaries are not standalone, adequate documentation. You
+ * should read the chapter in the gawk manual on writing extensions. Find it online
+ * at https://www.gnu.org/software/gawk/manual/html_node/Dynamic-Extensions.html,
+ * or in the Info files distributed with gawk.
  */
 
 /* Allow use in C++ code.  */
@@ -504,7 +510,7 @@ typedef struct gawk_api {
 	/* Next, registration functions: */
 
 	/*
-	 * Add a function to the interpreter, returns true upon success. 
+	 * Add a function to the interpreter, returns true upon success.
 	 * Gawk does not modify what func points to, but the extension
 	 * function itself receives this pointer and can modify what it
 	 * points to, thus it's not const.

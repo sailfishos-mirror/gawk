@@ -1,3 +1,83 @@
+2023-03-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h: Update copyright year. Small edit in leading comment.
+
+	Unrelated:
+
+	* NEWS: Updated. Update copyright year.
+
+2023-03-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (optimize_assignment): Turn Op_store_field_exp
+	into Op_store_field.  Add some explanatory comments.
+
+2023-03-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* interpret.h (r_interpret): Revert this change of 2023-01-23,
+	it's handled by the fix of 2023-02-27.
+
+	| * interpret.h (r_interpret): Op_assign case, don't unref the
+	| old lhs NODE until after the assignment. See test case in
+	| the comment in the code and test/fieldassign.awk. Thanks to
+	| Yasuhiro Yamada <yamada@gr3.ie> for the report.
+
+	* gawkapi.h: Add a note at the top pointing to the online
+	documentation, warning that the header file's comments aren't
+	enough. Thanks to Eli Zaretskii <eliz@gnu.org> for the suggestion.
+
+2023-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c: Use #elif. Update copyright year.
+
+	Unrelated: Fix handling of $a = $b so that it's done OK also in
+	expressions, and not just in statements. This fixes a memory
+	leak seen with valgrind in test/fieldassign.awk.
+
+	* awk.h (enum opcodeval): Add new member, Op_store_field_exp.
+	* awkgram.y (mk_assignment): Generate Op_store_field_exp under the
+	right circumstances.
+	(optimize_assignment): Remove case for Op_field_spec_lhs.
+	* eval.c (optypes): Add entry for Op_store_field.
+	* interpret.h (r_interpret): Handle Op_store_field in the switch.
+	* profile.c (pprint): Same.
+
+	Unrelated: Improve how information is passed to input parsers:
+
+	* io.c (iop_alloc): lstat() or stat() the file if could not be opened.
+	See the doc for explanation as to why.
+	* NEWS: Updated.
+
+2023-02-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Multiple files: Remove trailing whitespace.
+
+2023-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* field.c (set_comma_field): Free the string node. Fixes a
+	memory leak. Thanks to Andrew Schorr for the report.
+
+2023-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (boolval): Handle Node_var. Thanks to
+	Daniel Pouzzner <douzzer@mega.nu> for the report, relayed
+	by Andrew Schorr.
+	* builtin.c (do_typeof): Handle Node_var, could come from a
+	converted Node_elem_new. Thanks to Andrew Schorr for the
+	report.
+
+2023-02-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* io.c (find_input_parser): Improve check to see if iop is
+	already being handled by an input parser. Found by
+	code inspection.
+
+	Unrelated:
+
+	* awk.h (struct redirect): Change RED_NOBUF to RED_FLUSH.
+	* builtin.c (efwrite): Ditto
+	* io.c (redflags2str, check_duplicated_redirections,
+	redirect_string): Ditto.
+
 2023-02-12         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* NEWS: Updated.
@@ -49,7 +129,7 @@
 	(check_pma_security): New routine.
 	(main): Call it.
 	(UPDATE_YEAR): Bump to 2023.
-	(NEWS): Updated.
+	* NEWS: Updated.
 
 2023-01-03         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -256,7 +336,7 @@
 	Emanuel Attila Czirai <corre.a.buscar@gmail.com> for the report,
 	and to Jan Alexander Steffens (heftig)" <heftig@archlinux.org>
 	for the fix.
-	
+
 2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.2.0: Release tar ball made.
@@ -753,7 +833,7 @@
 	* gawkapi.c (awk_value_to_node): Clear the GMP/MPFR values
 	returned from the C extension after setting the internal
 	variable.
-	
+
 2022-02-22         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Enable interval expressions even for --traditional, as BWK
@@ -1521,7 +1601,7 @@
 	* NEWS: Updated.
 
 2020-07-10         Arnold D. Robbins     <arnold@skeeve.com>
-	
+
 	Fix printf issues. Thanks to Michal Jaegermann for the report.
 
 	* cint_array.c (cint_dump): Fix printf formats.
@@ -1877,7 +1957,7 @@
 
 2020-01-14         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
-	* cint_array.c (cint_array_init): Fix off-by-one error in array 
+	* cint_array.c (cint_array_init): Fix off-by-one error in array
 	bounds overflow check for an NHAT value set in the environment.
 	Thanks to Michael Builov <mbuilov@gmail.com> for the report.
 
@@ -2231,7 +2311,7 @@
 	* awkgram.y (errcount): No longer static.
 	* command.y (dbg_errcount): Renamed from errcount.
 	* main.c (catchsig, catchsegv): If errcount > 0, just exit,
-	don't abort.  
+	don't abort.
 
 2019-04-12         Arnold D. Robbins     <arnold@skeeve.com>
 

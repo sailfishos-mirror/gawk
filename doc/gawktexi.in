@@ -45,7 +45,7 @@
 @ifnottex
 @set TIMES *
 @end ifnottex
-        
+
 @c Let texinfo.tex give us full section titles
 @xrefautomaticsectiontitle on
 
@@ -68,7 +68,7 @@
 @set TITLE GAWK: Effective AWK Programming
 @end ifclear
 @set SUBTITLE A User's Guide for GNU Awk
-@set EDITION 5.2
+@set EDITION 5.3
 
 @iftex
 @set DOCUMENT book
@@ -5024,6 +5024,10 @@ thus reducing the need for writing complex and tedious command lines.
 In particular, @code{@@include} is very useful for writing CGI scripts
 to be run from web pages.
 
+The @code{@@include} directive and the @option{-i}/@option{--include}
+command line option are completely equivalent. An included program
+source is not loaded if it has been previously loaded.
+
 The rules for finding a source file described in @ref{AWKPATH Variable} also
 apply to files loaded with @code{@@include}.
 
@@ -5238,7 +5242,7 @@ non-option argument, even if it begins with @samp{-}.
 @itemize @value{MINUS}
 @item
 However, when an option itself requires an argument, and the option is separated
-from that argument on the command line by at least one space, the space 
+from that argument on the command line by at least one space, the space
 is ignored, and the argument is considered to be related to the option.  Thus, in
 the invocation, @samp{gawk -F x}, the @samp{x} is treated as belonging to the
 @option{-F} option, not as a separate non-option argument.
@@ -6120,10 +6124,10 @@ Subject: Re: [bug-gawk] Does gawk character classes follow this?
 > From: arnold@skeeve.com
 > Date: Fri, 15 Feb 2019 03:01:34 -0700
 > Cc: pengyu.ut@gmail.com, bug-gawk@gnu.org
-> 
+>
 > I get the feeling that there's something really bothering you, but
 > I don't understand what.
-> 
+>
 > Can you clarify, please?
 
 I thought I already did: we cannot be expected to provide a definitive
@@ -8673,7 +8677,7 @@ processing on the next record @emph{right now}.  For example:
 @{
     while ((start = index($0, "/*")) != 0) @{
         out = substr($0, 1, start - 1)  # leading part of the string
-        rest = substr($0, start + 2)    # ... */ ...    
+        rest = substr($0, start + 2)    # ... */ ...
         while ((end = index(rest, "*/")) == 0) @{  # is */ in trailing part?
             # get more text
             if (getline <= 0) @{
@@ -9299,7 +9303,7 @@ on a per-command or per-connection basis.
 the attempt to read from the underlying device may
 succeed in a later attempt. This is a limitation, and it also
 means that you cannot use this to multiplex input from
-two or more sources.  @xref{Retrying Input} for a way to enable 
+two or more sources.  @xref{Retrying Input} for a way to enable
 later I/O attempts to succeed.
 
 Assigning a timeout value prevents read operations from being
@@ -11296,7 +11300,7 @@ intact, as part of the string:
 @example
 $ @kbd{nawk 'BEGIN @{ print "hello, \}
 > @kbd{world" @}'}
-@print{} hello, 
+@print{} hello,
 @print{} world
 @end example
 
@@ -16437,7 +16441,7 @@ conceptually, if the element values are eight, @code{"foo"},
 @ifnotdocbook
 @float Figure,figure-array-elements
 @caption{A contiguous array}
-@center @image{array-elements, , , A Contiguous Array}
+@center @image{gawk_array-elements, , , A Contiguous Array}
 @end float
 @end ifnotdocbook
 
@@ -22864,7 +22868,7 @@ $ cat @kbd{test.awk}
 @print{}    rewound = 1
 @print{}    rewind()
 @print{} @}
-@print{} 
+@print{}
 @print{} @{ print FILENAME, FNR, $0 @}
 
 $ @kbd{gawk -f rewind.awk -f test.awk data }
@@ -25579,7 +25583,7 @@ exist:
 
 @example
 @c file eg/prog/id.awk
-function fill_info_for_user(user,   
+function fill_info_for_user(user,
                             pwent, fields, groupnames, grent, groups, i)
 @{
     pwent = getpwnam(user)
@@ -29589,20 +29593,20 @@ using ptys can help deal with buffering deadlocks.
 
 Suppose @command{gawk} were unable to add numbers.
 You could use a coprocess to do it. Here's an exceedingly
-simple program written for that purpose: 
+simple program written for that purpose:
 
 @example
 $ @kbd{cat add.c}
-#include <stdio.h> 
+#include <stdio.h>
 
-int 
-main(void) 
-@{ 
-    int x, y; 
-    while (scanf("%d %d", & x, & y) == 2) 
-        printf("%d\n", x + y); 
-    return 0; 
-@} 
+int
+main(void)
+@{
+    int x, y;
+    while (scanf("%d %d", & x, & y) == 2)
+        printf("%d\n", x + y);
+    return 0;
+@}
 $ @kbd{cc -O add.c -o add}      @ii{Compile the program}
 @end example
 
@@ -29615,15 +29619,15 @@ $ @kbd{echo 1 2 |}
 @end example
 
 And it would deadlock, because @file{add.c} fails to call
-@samp{setlinebuf(stdout)}. The @command{add} program freezes. 
+@samp{setlinebuf(stdout)}. The @command{add} program freezes.
 
-Now try instead: 
+Now try instead:
 
 @example
 $ @kbd{echo 1 2 |}
 > @kbd{gawk -v cmd=add 'BEGIN @{ PROCINFO[cmd, "pty"] = 1 @}}
 > @kbd{                 @{ print |& cmd; cmd |& getline x; print x @}'}
-@print{} 3 
+@print{} 3
 @end example
 
 By using a pty, @command{gawk} fools the standard I/O library into
@@ -30214,7 +30218,7 @@ Terence Kelly, the author of the persistent memory allocator
 @command{gawk} uses, provides the following advice about the backing file:
 
 @quotation
-Regarding backing file size, I recommend making it far larger  
+Regarding backing file size, I recommend making it far larger
 than all of the data that will ever reside in it, assuming
 that the file system supports sparse files.  The ``pay only
 for what you use'' aspect of sparse files ensures that the
@@ -30302,8 +30306,8 @@ ACM @cite{Queue} magazine, Vol. 20 No. 2 (March/April 2022),
 @uref{https://dl.acm.org/doi/pdf/10.1145/3534855, PDF},
 @uref{https://queue.acm.org/detail.cfm?id=3534855, HTML}.
 This paper explains the design of the PMA
-allocator used in persistent @command{gawk}.  
-  
+allocator used in persistent @command{gawk}.
+
 @item @cite{Persistent Scripting}
 Zi Fan Tan, Jianan Li, Haris Volos, and Terence Kelly,
 Non-Volatile Memory Workshop (NVMW) 2022,
@@ -30315,7 +30319,7 @@ non-volatile memory; note that the interface differs slightly.
 @item @cite{Persistent Memory Programming on Conventional Hardware}
 Terence Kelly,
 ACM @cite{Queue} magazine Vol. 17 No. 4 (July/Aug 2019),
-@uref{https://dl.acm.org/doi/pdf/10.1145/3358955.3358957, PDF}, 
+@uref{https://dl.acm.org/doi/pdf/10.1145/3358955.3358957, PDF},
 @uref{https://queue.acm.org/detail.cfm?id=3358957, HTML}.
 This paper describes simple techniques for persistent memory for C/C++
 code on conventional computers that lack non-volatile memory hardware.
@@ -30325,8 +30329,8 @@ Terence Kelly,
 ACM @cite{Queue} magazine Vol. 18 No. 2 (March/April 2020),
 @uref{https://dl.acm.org/doi/pdf/10.1145/3400899.3400902, PDF},
 @uref{https://queue.acm.org/detail.cfm?id=3400902, HTML}.
-This paper describes a simple and robust testbed for testing software  
-against real power failures.  
+This paper describes a simple and robust testbed for testing software
+against real power failures.
 
 @item @cite{Crashproofing the Original NoSQL Key/Value Store}
 Terence Kelly,
@@ -34557,7 +34561,7 @@ It's Euler's modification to Newton's method for calculating pi.
 
 Take a look at lines (23) - (25)  here: http://mathworld.wolfram.com/PiFormulas.htm
 
-The algorithm I wrote simply expands the multiply by 2 and works from the innermost expression outwards.  I used this to program HP calculators because it's quite easy to modify for tiny memory devices with smallish word sizes.   
+The algorithm I wrote simply expands the multiply by 2 and works from the innermost expression outwards.  I used this to program HP calculators because it's quite easy to modify for tiny memory devices with smallish word sizes.
 
 http://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899
 
@@ -34927,7 +34931,7 @@ This is shown in @inlineraw{docbook, <xref linkend="figure-load-extension"/>}.
 @ifnotdocbook
 @float Figure,figure-load-extension
 @caption{Loading the extension}
-@center @image{api-figure1, , , Loading the extension}
+@center @image{gawk_api-figure1, , , Loading the extension}
 @end float
 @end ifnotdocbook
 
@@ -34954,7 +34958,7 @@ This is shown in @inlineraw{docbook, <xref linkend="figure-register-new-function
 @ifnotdocbook
 @float Figure,figure-register-new-function
 @caption{Registering a new function}
-@center @image{api-figure2, , , Registering a new Function}
+@center @image{gawk_api-figure2, , , Registering a new Function}
 @end float
 @end ifnotdocbook
 
@@ -34982,7 +34986,7 @@ This is shown in @inlineraw{docbook, <xref linkend="figure-call-new-function"/>}
 @ifnotdocbook
 @float Figure,figure-call-new-function
 @caption{Calling the new function}
-@center @image{api-figure3, , , Calling the new function}
+@center @image{gawk_api-figure3, , , Calling the new function}
 @end float
 @end ifnotdocbook
 
@@ -35915,7 +35919,7 @@ is invoked with the @option{--version} option.
 @cindex customized input parser
 
 By default, @command{gawk} reads text files as its input. It uses the value
-of @code{RS} to find the end of the record, and then uses @code{FS}
+of @code{RS} to find the end of an input record, and then uses @code{FS}
 (or @code{FIELDWIDTHS} or @code{FPAT}) to split it into fields (@pxref{Reading Files}).
 Additionally, it sets the value of @code{RT} (@pxref{Built-in Variables}).
 
@@ -36017,13 +36021,33 @@ are as follows:
 The name of the file.
 
 @item int fd;
-A file descriptor for the file.  If @command{gawk} was able to
-open the file, then @code{fd} will @emph{not} be equal to
+A file descriptor for the file.  @command{gawk} attempts to open
+the file for reading using the @code{open()} system call. If it was
+able to open the file, then @code{fd} will @emph{not} be equal to
 @code{INVALID_HANDLE}. Otherwise, it will.
+
+An extension can decide that it doesn't want to use the open file descriptor
+provided by @command{gawk}. In such a case it can close the file and
+set @code{fd} to @code{INVALID_HANDLE}, or it can leave it alone and
+keep it's own file descriptor in private data pointed to by the
+@code{opaque} pointer (see further in this list). In any case, if
+the file descriptor is valid, it should @emph{not} just overwrite the
+value with something else; doing so would cause a resource leak.
 
 @item struct stat sbuf;
 If the file descriptor is valid, then @command{gawk} will have filled
 in this structure via a call to the @code{fstat()} system call.
+Otherwise, if the @code{lstat()} system call is available, it will
+use that. If @code{lstat()} is not available, then it uses @code{stat()}.
+
+Getting the file's information allows extensions to check the type of
+the file even if it could not be opened.  This occurs, for example,
+on Windows systems when trying to use @code{open()} on a directory.
+
+If @command{gawk} was not able to get the file information, then
+@code{sbuf} will be zeroed out. In particular, extension code
+can check if @samp{sbuf.st_mode == 0}. If that's true, then there
+is no information in @code{sbuf}.
 @end table
 
 The @code{@var{XXX}_can_take_file()} function should examine these
@@ -36058,7 +36082,7 @@ This function pointer should point to a function that creates the input
 records.  Said function is the core of the input parser.  Its behavior
 is described in the text following this list.
 
-@item ssize_t (*read_func)();
+@item ssize_t (*read_func)(int, void *, size_t);
 This function pointer should point to a function that has the
 same behavior as the standard POSIX @code{read()} system call.
 It is an alternative to the @code{get_record} pointer.  Its behavior
@@ -36086,12 +36110,12 @@ input records.  The parameters are as follows:
 @item char **out
 This is a pointer to a @code{char *} variable that is set to point
 to the record.  @command{gawk} makes its own copy of the data, so
-the extension must manage this storage.
+your extension must manage this storage.
 
 @item struct awk_input *iobuf
-This is the @code{awk_input_buf_t} for the file.  The fields should be
-used for reading data (@code{fd}) and for managing private state
-(@code{opaque}), if any.
+This is the @code{awk_input_buf_t} for the file.  Two of its fields should
+be used by your extension: @code{fd} for reading data, and @code{opaque}
+for managing any private state.
 
 @item int *errcode
 If an error occurs, @code{*errcode} should be set to an appropriate
@@ -36103,7 +36127,7 @@ If the concept of a ``record terminator'' makes sense, then
 @code{*rt_start} should be set to point to the data to be used for
 @code{RT}, and @code{*rt_len} should be set to the length of the
 data. Otherwise, @code{*rt_len} should be set to zero.
-@command{gawk} makes its own copy of this data, so the
+Here too, @command{gawk} makes its own copy of this data, so your
 extension must manage this storage.
 
 @item const awk_fieldwidth_info_t **field_width
@@ -36114,7 +36138,9 @@ field parsing mechanism. Note that this structure will not
 be copied by @command{gawk}; it must persist at least until the next call
 to @code{get_record} or @code{close_func}. Note also that @code{field_width} is
 @code{NULL} when @code{getline} is assigning the results to a variable, thus
-field parsing is not needed. If the parser does set @code{*field_width},
+field parsing is not needed.
+
+If the parser sets @code{*field_width},
 then @command{gawk} uses this layout to parse the input record,
 and the @code{PROCINFO["FS"]} value will be @code{"API"} while this record
 is active in @code{$0}.
@@ -36168,15 +36194,7 @@ based upon the value of an @command{awk} variable, as the XML extension
 from the @code{gawkextlib} project does (@pxref{gawkextlib}).
 In the latter case, code in a @code{BEGINFILE} rule
 can look at @code{FILENAME} and @code{ERRNO} to decide whether or
-not to activate an input parser (@pxref{BEGINFILE/ENDFILE}).
-
-You register your input parser with the following function:
-
-@table @code
-@item void register_input_parser(awk_input_parser_t *input_parser);
-Register the input parser pointed to by @code{input_parser} with
-@command{gawk}.
-@end table
+not to activate your input parser (@pxref{BEGINFILE/ENDFILE}).
 
 If you would like to override the default field parsing mechanism for a given
 record, then you must populate an @code{awk_fieldwidth_info_t} structure,
@@ -36201,7 +36219,7 @@ Set this to @code{awk_true} if the field lengths are specified in terms
 of potentially multi-byte characters, and set it to @code{awk_false} if
 the lengths are in terms of bytes.
 Performance will be better if the values are supplied in
-terms of bytes. 
+terms of bytes.
 
 @item size_t nf;
 Set this to the number of fields in the input record, i.e. @code{NF}.
@@ -36216,11 +36234,19 @@ for @code{$1}, and so on through the @code{fields[nf-1]} element containing the 
 @end table
 
 A convenience macro @code{awk_fieldwidth_info_size(numfields)} is provided to
-calculate the appropriate size of a variable-length 
+calculate the appropriate size of a variable-length
 @code{awk_fieldwidth_info_t} structure containing @code{numfields} fields. This can
 be used as an argument to @code{malloc()} or in a union to allocate space
 statically. Please refer to the @code{readdir_test} sample extension for an
 example.
+
+You register your input parser with the following function:
+
+@table @code
+@item void register_input_parser(awk_input_parser_t *input_parser);
+Register the input parser pointed to by @code{input_parser} with
+@command{gawk}.
+@end table
 
 @node Output Wrappers
 @subsubsection Customized Output Wrappers
@@ -36325,10 +36351,12 @@ what it does.
 The @code{@var{XXX}_can_take_file()} function should make a decision based
 upon the @code{name} and @code{mode} fields, and any additional state
 (such as @command{awk} variable values) that is appropriate.
+@command{gawk} attempts to open the named file for writing.  The @code{fp}
+member will be @code{NULL} only if it fails.
 
 When @command{gawk} calls @code{@var{XXX}_take_control_of()}, that function should fill
 in the other fields as appropriate, except for @code{fp}, which it should just
-use normally.
+use normally if it's not @code{NULL}.
 
 You register your output wrapper with the following function:
 
@@ -37583,7 +37611,7 @@ The following function allows extensions to access and manipulate redirections.
 Look up file @code{name} in @command{gawk}'s internal redirection table.
 If @code{name} is @code{NULL} or @code{name_len} is zero, return
 data for the currently open input file corresponding to @code{FILENAME}.
-(This does not access the @code{filetype} argument, so that may be undefined).  
+(This does not access the @code{filetype} argument, so that may be undefined).
 If the file is not already open, attempt to open it.
 The @code{filetype} argument must be zero-terminated and should be one of:
 
@@ -38950,22 +38978,22 @@ all the variables and functions in the @code{inplace} namespace
 @c endfile
 @ignore
 @c file eg/lib/inplace.awk
-# 
+#
 # Copyright (C) 2013, 2017, 2019 the Free Software Foundation, Inc.
-# 
+#
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
-# 
+#
 # GAWK is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # GAWK is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
@@ -40930,6 +40958,10 @@ The dynamic extension interface was completely redone
 Redirected @code{getline} became allowed inside
 @code{BEGINFILE} and @code{ENDFILE}
 (@pxref{BEGINFILE/ENDFILE}).
+
+@item
+Support for nonfatal I/O
+(@pxref{Nonfatal}).
 
 @item
 The @code{where} command was added to the debugger
@@ -43527,7 +43559,7 @@ This is an @command{awk} interpreter written in the
 @uref{https://golang.org/, Go programming language}.
 It implements POSIX @command{awk}, with a few minor extensions.
 Source code is available from @uref{https://github.com/benhoyt/goawk}.
-The author wrote a nice 
+The author wrote a nice
 @uref{https://benhoyt.com/writings/goawk/, article}
 describing the implementation.
 
@@ -44655,7 +44687,7 @@ See @inlineraw{docbook, <xref linkend="figure-general-flow"/>}.
 @ifnotdocbook
 @float Figure,figure-general-flow
 @caption{General Program Flow}
-@center @image{general-program, , , General program flow}
+@center @image{gawk_general-program, , , General program flow}
 @end float
 @end ifnotdocbook
 
@@ -44693,7 +44725,7 @@ as shown in @inlineraw{docbook, <xref linkend="figure-process-flow"/>}:
 @ifnotdocbook
 @float Figure,figure-process-flow
 @caption{Basic Program Steps}
-@center @image{process-flow, , , Basic Program Stages}
+@center @image{gawk_process-flow, , , Basic Program Stages}
 @end float
 @end ifnotdocbook
 

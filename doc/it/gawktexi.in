@@ -56,9 +56,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Dicembre 2022
-@set VERSION 5.2
-@set PATCHLEVEL 2
+@set UPDATE-MONTH Febbraio 2023
+@set VERSION 5.3
+@set PATCHLEVEL 0
 
 @c added Italian hyphenation stuff
 @hyphenation{ven-go-no o-met-te-re o-met-ten-do}
@@ -73,7 +73,7 @@
 @set TITLE GAWK: Programmare efficacemente in AWK
 @end ifclear
 @set SUBTITLE Una Guida Utente per GNU Awk
-@set EDITION 5.2
+@set EDITION 5.3
 
 @iftex
 @set DOCUMENT libro
@@ -772,6 +772,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         @code{close()}.
 * Continuazione dopo errori::           Abilitare continuazione dopo errori
                                         in output.
+* Noflush::                             Velocizzare output da @dfn{pipe}.
 * Sommario di Output::                  Sommario di Output.
 * Esercizi su Output::                  Esercizi.
 * Valori::                              Costanti, variabili ed espressioni
@@ -5625,10 +5626,15 @@ directory possono essere necessarie per organizzare i file da includere.
 Vista la possibilit@`a di specificare opzioni @option{-f} multiple, il
 meccanismo @code{@@include} non @`e strettamente necessario.
 Comunque, la direttiva @code{@@include} pu@`o essere d'aiuto nel costruire
-programmi @command{gawk} autosufficienti, riducendo cos@`{@dotless{i}} la necessit@`a
-di scrivere righe di comando complesse e tediose.
+programmi @command{gawk} autosufficienti, riducendo cos@`{@dotless{i}} la
+necessit@`a di scrivere righe di comando complesse e tediose.
 In particolare, @code{@@include} @`e molto utile per scrivere @dfn{script} CGI
 eseguibili da pagine web.
+
+La direttiva @code{@@include} e l'opzione @option{-i}/@option{--include}
+sulla riga di comando sono completamente equivalenti. Un programma sorgente
+incluso non viene caricato di nuovo se @`e stato gi@`a caricato
+in precedenza.
 
 Le regole usate per trovare un file sorgente, descritte
 @iftex
@@ -10521,6 +10527,7 @@ e parla della funzione predefinita @code{close()}.
 				file gi@`a aperti a inizio esecuzione
 * Chiusura file e @dfn{pipe}::  Chiudere file in input e di output e
                                 @dfn{pipe}.
+* Noflush::                     Velocizzare output da @dfn{pipe}.
 * Continuazione dopo errori::   Abilitare continuazione dopo errori
                                 in output.
 * Sommario di Output::          Sommario di Output.
@@ -12138,8 +12145,63 @@ portabile.
 In modalit@`a POSIX (@pxref{Opzioni}), @command{gawk} restituisce solo zero
 quando chiude una @dfn{pipe}.
 
+@node Noflush
+@section Velocizzare output da @dfn{pipe}
+@c FIXME: Add indexing
+
+Questa
+@end ifnotinfo
+@ifinfo
+Questo
+@end ifinfo
+@value{SECTION} descrive una funzionalit@`a propria di @command{gawk}.
+
+Normalmente, quando si spediscono data tramite una @dfn{pipe} a
+un comando, usando le istruzioni @code{print} o @code{printf},
+@command{gawk} scarica l'output verso la @dfn{pipe}.
+Ovvero, l'output non @`e bufferizzato, ma scritto direttamente.
+Ci@`o garantisce che l'output della @dfn{pipe}, insieme a quello
+generato da @command{gawk} viene scritto enll'ordine che ci si
+aspetta:
+
+@example
+print "qualcosa"			# va allo standard output
+print "qualcos'altro" | "un-comando"	# anche allo standard output
+print "ulteriori cose"			# come pure questo
+@end example
+
+Fare ci@`o ha un prezzo; scaricare dati nella @dfn{pipe} usa
+pi@`u tempo CPU, e in alcuni ambienti tale consumo pu@`o
+essere eccessivo.
+
+Si pu@`o chiedere a @command{gawk} di non scaricare direttamente dati
+ma di bufferizzarli, in uno dei seguenti due modi:
+
+@itemize @bullet
+@item
+Impostare @code{PROCINFO["BUFFERPIPE"]} a un valore qualsiasi.
+Dopo aver fatto questo, @command{gawk} bufferizzer@`a i dati per tutte
+le @dfn{pipe}.
+
+@item
+Impostare @code{PROCINFO["@var{un-comando}", "BUFFERPIPE"]} a un
+valore qualsiasi. In tal caso, solo i dati relativi al comando
+@var{un-comando} saranno bufferizzati.
+@end itemize
+
+Uno degli elementi visti sopra @emph{deve} essere impostato nel
+vettore @code{PROCINFO} @emph{prima} di eseguire la prima istruzione
+@code{print} o @code{printf} diretta alla @dfn{pipe}.
+Se lo si fa dopo che dell'output @`e gi@`a stato inviato alla @dfn{pipe},
+@`e troppo tardi.
+
+Utilizzare questa funzionalit@`a pu@`o modificare il comportamento
+dell'output [cambiando l'ordine di quel che viene stampato],
+quindi occorre stare attenti a quello che si fa.
+
 @node Continuazione dopo errori
 @section Abilitare continuazione dopo errori in output
+@c FIXME: Add indexing
 
 @ifnotinfo
 Questa
@@ -17675,6 +17737,14 @@ I seguenti elementi consentono di modificare il comportamento di
 @command{gawk}:
 
 @table @code
+@item PROCINFO["BUFFERPIPE"]
+Se questo elemento esiste, tutto l'output alla @dfn{pipe} viene
+bufferizzato.
+
+@item PROCINFO["@var{un-comando}", "BUFFERPIPE"]
+Rende bufferizzato l'output del comnado @var{un-comando}.
+@xref{Noflush}.
+
 @item PROCINFO["NONFATAL"]
 Se questo elemento esiste, gli errori di I/O per tutte le ridirezioni
 consentono la prosecuzione del programma.
@@ -18211,10 +18281,10 @@ concettualmente, se i valori degli elementi sono 8, @code{"pippo"},
 @float Figura,vettore-elementi
 @caption{Un vettore contiguo}
 @ifset SMALLPRINT
-@center @image{vettore-elementi, 11cm, , Un vettore contiguo}
+@center @image{gawk-vettore-elementi, 11cm, , Un vettore contiguo}
 @end ifset
 @ifclear SMALLPRINT
-@center @image{vettore-elementi, , , Un vettore contiguo}
+@center @image{gawk-vettore-elementi, , , Un vettore contiguo}
 @end ifclear
 @end float
 @end ifnotdocbook
@@ -18223,7 +18293,7 @@ concettualmente, se i valori degli elementi sono 8, @code{"pippo"},
 <figure id="vettore-elementi" float="0">
 <title>Un vettore contiguo</title>
 <mediaobject>
-<imageobject role="web"><imagedata fileref="vettore-elementi.png" format="PNG"/></imageobject>
+<imageobject role="web"><imagedata fileref="gawk-vettore-elementi.png" format="PNG"/></imageobject>
 </mediaobject>
 </figure>
 @end docbook
@@ -38664,10 +38734,10 @@ Questo si pu@`o vedere in @inlineraw{docbook, <xref linkend="figura-carica-esten
 @float Figura,figura-carica-estensione
 @caption{Caricamento dell'estensione}
 @ifclear SMALLPRINT
-@center @image{api-figura1, , , Caricamento dell'estensione}
+@center @image{gawk-api-figura1, , , Caricamento dell'estensione}
 @end ifclear
 @ifset SMALLPRINT
-@center @image{api-figura1, 11cm, , Caricamento dell'estensione}
+@center @image{gawk-api-figura1, 11cm, , Caricamento dell'estensione}
 @end ifset
 
 @end float
@@ -38677,7 +38747,7 @@ Questo si pu@`o vedere in @inlineraw{docbook, <xref linkend="figura-carica-esten
 <figure id="figura-carica-estensione" float="0">
 <title>Caricamento dell'estensione</title>
 <mediaobject>
-<imageobject role="web"><imagedata fileref="api-figura1.png" format="PNG"/></imageobject>
+<imageobject role="web"><imagedata fileref="gawk-api-figura1.png" format="PNG"/></imageobject>
 </mediaobject>
 </figure>
 @end docbook
@@ -38705,10 +38775,10 @@ Questo @`e shown in @inlineraw{docbook, <xref linkend="figura-registrare-una-nuo
 @float Figura,figura-registrare-una-nuova-funzione
 @caption{Registrare una nuova funzione}
 @ifclear SMALLPRINT
-@center @image{api-figura2, , , Registrare una nuova funzione}
+@center @image{gawk-api-figura2, , , Registrare una nuova funzione}
 @end ifclear
 @ifset SMALLPRINT
-@center @image{api-figura2, 11cm , , Registrare una nuova funzione}
+@center @image{gawk-api-figura2, 11cm , , Registrare una nuova funzione}
 @end ifset
 @end float
 @end ifnotdocbook
@@ -38717,7 +38787,7 @@ Questo @`e shown in @inlineraw{docbook, <xref linkend="figura-registrare-una-nuo
 <figure id="figura-registrare-una-nuova-funzione" float="0">
 <title>Registering a new function</title>
 <mediaobject>
-<imageobject role="web"><imagedata fileref="api-figura2.png" format="PNG"/></imageobject>
+<imageobject role="web"><imagedata fileref="gawk-api-figura2.png" format="PNG"/></imageobject>
 </mediaobject>
 </figure>
 @end docbook
@@ -38745,10 +38815,10 @@ Questo @`e mostrato in @inlineraw{docbook, <xref linkend="figura-chiamata-nuova-
 @float Figura,figura-chiamata-nuova-funzione
 @caption{Chiamata della nuova funzione}
 @ifclear SMALLPRINT
-@center @image{api-figura3, , , Chiamata della nuova funzione}
+@center @image{gawk-api-figura3, , , Chiamata della nuova funzione}
 @end ifclear
 @ifset SMALLPRINT
-@center @image{api-figura3,11cm , , Chiamata della nuova funzione}
+@center @image{gawk-api-figura3,11cm , , Chiamata della nuova funzione}
 @end ifset
 @end float
 @end ifnotdocbook
@@ -38757,7 +38827,7 @@ Questo @`e mostrato in @inlineraw{docbook, <xref linkend="figura-chiamata-nuova-
 <figure id="figura-chiamata-nuova-funzione" float="0">
 <title>Chiamata della nuova funzione</title>
 <mediaobject>
-<imageobject role="web"><imagedata fileref="api-figura3.png" format="PNG"/></imageobject>
+<imageobject role="web"><imagedata fileref="gawk-api-figura3.png" format="PNG"/></imageobject>
 </mediaobject>
 </figure>
 @end docbook
@@ -39847,9 +39917,9 @@ registrate, quando viene invocato specificando l'opzione @option{--version}.
 @cindex input @subentry analizzatore di @subentry personalizzato
 
 Per default, @command{gawk} legge file di testo come input.  Il valore della
-variabile @code{RS} @`e usato per determinare la fine di un record, e subito
-dopo la variabile @code{FS} (o @code{FIELDWIDTHS} o @code{FPAT}) viene usata
-per suddividerlo in campi
+variabile @code{RS} @`e usato per determinare la fine di un record in input,
+e subito dopo la variabile @code{FS} (o @code{FIELDWIDTHS} o @code{FPAT})
+viene usata per suddividerlo in campi
 @iftex
 (@pxrefil{Leggere file}).
 @end iftex
@@ -39965,14 +40035,41 @@ inizialmente) da @code{@var{XXX}_can_take_file()}, e quelli che sono usati da
 Il nome del file.
 
 @item int fd;
-Un descrittore di file per il file.  Se @command{gawk} riesce ad aprire
-il file, il valore di @code{fd} @emph{non} sar@`a uguale a
-@code{INVALID_HANDLE} [descrittore non valido].  In caso contrario,
-quello sar@`a il valore.
+Un descrittore di file per il file.  @command{gawk} tenta di aprire
+il file in lettura usando la chiamata di sistema @code{open()}.
+Se il file viene effettivamente aperto, il valore di @code{fd}
+@emph{non} sar@`a uguale a @code{INVALID_HANDLE}
+[descrittore non valido].
+In caso contrario, il valore sar@`a quello.
+
+Un'estensione pu@`o decidere che non desidera usare il descrittore
+di file aperto che le viene passato da @command{gawk}.
+In tal caso pu@`o chiudere il file e impostare il relativo
+descrittore di file @code{fd} al valore @code{INVALID_HANDLE},
+oppure ignorarlo e mantenere un suo proprio descrittore di file
+nei suoi dati privati, raggiungibili usando il puntatore
+@code{opaque} (vedere pi@`u sotto in questa lista).
+In ogni caso, se il descrittore di file @`e valido, @emph{non}
+dovrebbe essere sovrascritto con un altro valore; se lo si fa,
+si causa una perdita di dati.
 
 @item struct stat sbuf;
 Se il descrittore di file @`e valido, @command{gawk} avr@`a riempito i campi di
 questa struttura invocando la chiamata di sistema @code{fstat()}.
+Altrimenti, se la chiamata di sistema @code{lstat()} @`e disponibile,
+essa verr@`a usata. Se neppure @code{lstat()} @`e disponibile, allora
+verr@`a usata la chiamata di sistema @code{stat()}.
+
+L'ottenere informazioni relative al file consente alle estensioni di
+controllare il tipo di file, anche se non sar@`a poi possibile aprirlo.
+Ci@`o capita, per esempio, nei sistemi Windows, quando si tenta di
+usare @code{open()} su una directory.
+
+Se @command{gawk} non sar@`a riuscito a ottenere le informazioni
+relative al file, allora @code{sbuf} conterr@`a zeri binari.
+In particolare, il codice dell'estensione pu@`o testare se il campo
+@samp{sbuf.st_mode == 0}.  Se @`e questo il caso, allora in
+@code{sbuf} non @`e contenuta alcuna informazione.
 @end table
 
 La funzione @code{@var{XXX}_can_take_file()} dovrebbe esaminare i campi di
@@ -40010,7 +40107,7 @@ Questo puntatore a funzione dovrebbe puntare a una funzione che crea i record
 in input.  Tale funzione @`e il nucleo centrale dell'analizzatore di input.
 Il suo modo di operare @`e descritto nel testo che segue questo elenco.
 
-@item ssize_t (*read_func)();
+@item ssize_t (*read_func)(int, void *, size_t);
 Questo puntatore a funzione dovrebbe puntare a una funzione che ha lo
 stesso comportamento della chiamata di sistema standard POSIX @code{read()}.
 @`E in alternativa al puntatore a @code{get_record}.  Il relativo comportamento
@@ -40037,14 +40134,16 @@ record in input.  I parametri sono i seguenti:
 
 @table @code
 @item char **out
-Questo @`e un puntatore a una variabile @code{char *} che @`e impostatata in modo
-da puntare al record.  @command{gawk} usa una sua copia locale dei dati,
-quindi l'estensione deve gestire la relativa area di memoria.
+Questo @`e un puntatore a una variabile @code{char *} che @`e impostatata
+in modo da puntare al record.  @command{gawk} usa una sua copia locale dei
+dati, quindi l'estensione dell'utente deve gestire la relativa area di
+memoria.
 
 @item struct awk_input *iobuf
-Questa @`e la struttura @code{awk_input_buf_t} per il file.  I campi dovrebbero
-essere usati per leggere i dati (@code{fd}) e per gestire lo stato privato
-(@code{opaque}), se necessario.
+Questa @`e la struttura @code{awk_input_buf_t} per il file.
+Due dei suoi campi dovrebbero essere usati dall'estensione utente:
+@code{fd} per leggere i dati, e @code{opaque} per gestire lo stato privato
+se necessario.
 
 @item int *errcode
 Se si verifica un errore, @code{*errcode} dovrebbe essere impostato a un
@@ -40056,8 +40155,8 @@ Se il concetto ``fine record'' @`e applicabile,
 @code{*rt_start} dovrebbe essere impostato per puntare ai dati da usare come
 @code{RT}, e @code{*rt_len} dovrebbe essere impostata alla lunghezza di quel
 campo.  In caso contrario, @code{*rt_len} dovrebbe essere impostata a zero.
-@command{gawk} usa una sua copia di questi dati, quindi l'estensione deve
-gestire tale memoria.
+Anche qui @command{gawk} usa una sua copia di questi dati, quindi
+l'estensione utente deve gestire tale memoria.
 
 @item const awk_fieldwidth_info_t **field_width
 Se @code{field_width} non @`e @code{NULL}, @code{*field_width} sar@`a
@@ -40069,6 +40168,7 @@ inoltre essa deve rimanere disponibile almeno fino alla successiva chiamata a
 @code{get_record} o a @code{close_func}.  Si noti inoltre che
 @code{field_width} vale @code{NULL} quando @code{getline} sta assegnando
 i risultati a una variabile, e quindi un'analisi del campo non @`e necessaria.
+
 Se l'analizzatore imposta @code{*field_width},
 allora @command{gawk} usa questa descrizione per analizzare il record in
 input, e il valore di @code{PROCINFO["FS"]} sar@`a @code{"API"} finch@'e questo
@@ -40127,15 +40227,8 @@ valore preso da una variabile @command{awk}, come fa l'estensione XML
 inclusa nel progetto @code{gawkextlib} (@pxref{gawkextlib}).
 In quest'ultimo caso, il codice in una regola @code{BEGINFILE}
 pu@`o controllare @code{FILENAME} ed @code{ERRNO} per decidere se
-attivare un analizzatore di input (@pxref{BEGINFILE/ENDFILE}) oppure no.
-
-Un analizzatore di input va registrato usando la seguente funzione:
-
-@table @code
-@item void register_input_parser(awk_input_parser_t *input_parser);
-Registra l'analizzatore di input puntato da @code{input_parser} con
-@command{gawk}.
-@end table
+attivare un analizzatore di input utente oppure no
+(@pxref{BEGINFILE/ENDFILE}).
 
 Se si vuole ignorare il meccanismo di default per l'analisi dei campi
 per un determinato record, si deve riempire una struttura
@@ -40181,6 +40274,14 @@ per calcolare la dimensione appropriata della struttura a lunghezza variabile
 dimensione pu@`o essere usata come argomento per @code{malloc()} o in una
 struttura @dfn{union} per allocare spazio staticamente.
 Per un esempio si pu@`o vedere l'estensione di esempio @code{readdir_test}.
+
+Un analizzatore di input va registrato usando la seguente funzione:
+
+@table @code
+@item void register_input_parser(awk_input_parser_t *input_parser);
+Registra l'analizzatore di input puntato da @code{input_parser} con
+@command{gawk}.
+@end table
 
 @node Processori di output
 @subsubsection Registrare un processore di output
@@ -40297,11 +40398,14 @@ appropriate per fare il lavoro richiesto.
 La funzione @code{@var{XXX}_can_take_file()} dovrebbe decidere in base ai
 campi @code{nome} e @code{modo}, e a ogni altro ulteriore indicatore di stato
 (p.es., valori di variabili @command{awk}) adatto allo scopo.
+@command{gawk} tenta di aprire in scrittura il file indicato.
+L'elemento @code{fp} varr@`a @code{NULL} solo se non si riesci ad aprire
+il file.
 
 Quando @command{gawk} chiama @code{@var{XXX}_take_control_of()}, la funzione
 dovrebbe riempire i rimanenti campi
 in modo opportuno, tranne che per @code{fp}, che dovrebbe essere usato
-normalmente.
+normalmente se il suo valore non @`e @code{NULL}.
 
 Il processore di output va registrato usando la seguente funzione:
 
@@ -45425,6 +45529,10 @@ La funzione @code{getline} ridiretta @`e stata resa possibile all'interno di
 (@pxref{BEGINFILE/ENDFILE}).
 
 @item
+Supporto per continuare dopo errori di I/O non fatali
+@xref{Continuazione dopo errori}.
+
+@item
 Il comando @code{where} @`e stato aggiunto al debugger
 (@pxref{Stack di esecuzione}).
 
@@ -45653,24 +45761,22 @@ persistente (PMA) @`e disponibile.
 
 @end itemize
 
-La Versione 5.3 ha aggiunto le seguenti funzionalit@`a:
+La versione 5.3 ha aggiunto le seguenti funzionalit@`a:
 
 @itemize
 @item
-Divisione di campi per i file CSV
-[Campi Separati da Virgola]
+Divisione in campi per file di tipo CSV (Campi separati da virgola)
 (@pxref{Campi separati da virgola}).
+
+@item
+La possibilit@`a che @command{gawk} bufferizzi l'output a @dfn{pipe}
+(@pxref{Noflush}).
 
 @item
 La necessit@`a di utilizzare la libreria GNU @code{libsigsegv}
 @`e stata rimossa da @command{gawk}.
-Il valore aggiunto non @`e mai stato grande, e il suo utilizzo
-creava problemi in alcuni sistemi operativi.
-
-@item
-L'elemento @code{"pma"} nel vettore
-@code{PROCINFO}
-(@pxref{Variabili predefinite}).
+Il valore aggiunto relativo non @`e mai stato grande e la funzionalit@`a
+causava problemi in alcuni sistemi.
 
 @end itemize
 
@@ -49652,10 +49758,10 @@ Si veda la @inlineraw{docbook, <xref linkend="figura-generica-flusso"/>}.
 @float Figura,figura-generica-flusso
 @caption{Flusso generico di un programma}
 @ifclear SMALLPRINT
-@center @image{programma-generico, , , Flusso generico di un programma}
+@center @image{gawk-programma-generico, , , Flusso generico di un programma}
 @end ifclear
 @ifset SMALLPRINT
-@center @image{programma-generico, 11cm, , Flusso generico di un programma}
+@center @image{gawk-programma-generico, 11cm, , Flusso generico di un programma}
 @end ifset
 @end float
 @end ifnotdocbook
@@ -49664,7 +49770,7 @@ Si veda la @inlineraw{docbook, <xref linkend="figura-generica-flusso"/>}.
 <figure id="figura-generica-flusso" float="0">
 <title>Flusso generico di un programma</title>
 <mediaobject>
-<imageobject role="web"><imagedata fileref="programma-generico.png" format="PNG"/></imageobject>
+<imageobject role="web"><imagedata fileref="gawk-programma-generico.png" format="PNG"/></imageobject>
 </mediaobject>
 </figure>
 @end docbook
@@ -49702,10 +49808,10 @@ come si vede nella @inlineraw{docbook, <xref linkend="figura-flusso-elaborazione
 @float Figura,figura-flusso-elaborazione
 @caption{Fasi di un programma generico}
 @ifclear SMALLPRINT
-@center @image{flusso-elaborazione, , , Fasi di un programma generico}
+@center @image{gawk-flusso-elaborazione, , , Fasi di un programma generico}
 @end ifclear
 @ifset SMALLPRINT
-@center @image{flusso-elaborazione, 11cm , , Fasi di un programma generico}
+@center @image{gawk-flusso-elaborazione, 11cm , , Fasi di un programma generico}
 @end ifset
 @end float
 @end ifnotdocbook
@@ -49714,7 +49820,7 @@ come si vede nella @inlineraw{docbook, <xref linkend="figura-flusso-elaborazione
 <figura id="figura-flusso-elaborazione" float="0">
 <title>Fasi di un programma generico</title>
 <mediaobject>
-<imageobject role="web"><imagedata fileref="flusso-elaborazione.png" format="PNG"/></imageobject>
+<imageobject role="web"><imagedata fileref="gawk-flusso-elaborazione.png" format="PNG"/></imageobject>
 </mediaobject>
 </figure>
 @end docbook
