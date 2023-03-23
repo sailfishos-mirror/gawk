@@ -3854,7 +3854,15 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 	do {
 		while (*bp != rs) { 
 			if (*bp == '\"')
-				in_quote = !in_quote;
+				in_quote = ! in_quote;
+			else if (*bp == '\r') {	// strip CRs
+				size_t count = (iop->dataend - bp);
+
+				// shift it all down by one
+				memmove(bp, bp + 1, count);
+				iop->dataend--;
+				bp--;	// compensate for the upcoming bp++
+			}
 			bp++;
 		}
 	} while (in_quote && bp < iop->dataend && bp++);
