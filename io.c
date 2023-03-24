@@ -4168,9 +4168,12 @@ set_RS()
 	refree(RS_re[1]);
 	RS_re[0] = RS_re[1] = RS_regexp = NULL;
 
-	if (! first_time && ! warned && do_csv) {
-		warned = true;
-		warning(_("assignment to RS has no effect when using --csv"));
+	if (! first_time && do_csv) {
+		if (! warned) {
+			warned = true;
+			warning(_("assignment to RS has no effect when using --csv"));
+		}
+		return;
 	}
 
 	if (RS->stlen == 0) {
