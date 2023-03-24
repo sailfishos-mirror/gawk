@@ -689,8 +689,6 @@ parse_escape(const char **string_ptr, bool *unicode)
 				break;
 			}
 		}
-		if (do_lint && j == 8 && isxdigit((unsigned char)*(*string_ptr)))
-			lintwarn(_("\\u escape \\u%.*s of %d characters probably not interpreted the way you expect"), 8, start, 8);
 		*unicode = true;
 		return i;
 	case '\\':
