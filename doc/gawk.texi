@@ -22190,8 +22190,59 @@ a fatal error, so @command{awk} will not report the second
 error. If you comment out that call, though, then @command{awk}
 does report the second error.
 
-Usually, such things aren't a big issue, but it's worth
-being aware of them.
+Here is a more extreme example:
+
+@example
+BEGIN @{
+    funky(a)
+    if (A == 0)
+        print "<" a ">"
+    else
+        print a[1]
+@}
+
+function funky(arr)
+@{
+    if (A == 0)
+        arr = 1
+    else
+        arr[1] = 1
+@}
+@end example
+
+Here, the function uses its parameter differently depending upon the
+value of the global variable @code{A}. If @code{A} is zero, the
+parameter @code{arr} is treated as a scalar.  Otherwise it's treated
+as an array.
+
+There are two ways this program might behave. @command{awk} could notice
+that in the main program, @code{a} is subscripted, and so mark it as
+an array before the program even begins to run.  BWK @code{awk}, @code{mawk},
+and possibly others do this:
+
+@example
+$ @kbd{nawk -v A=0 -f funky.awk}
+@error{} nawk: can't assign to a; it's an array name.
+@error{}  source line number 11
+$ @kbd{nawk -v A=1 -f funky.awk}
+@print{} 1
+@end example
+
+Or @command{awk} could wait until runtime to set the type of @code{a}.
+In this case, since @code{a} was never assigned used before being
+passed to the function, how the function uses it forces the type to
+be resolved to either scalar or array.  @command{gawk}
+and the MKS @command{awk} do this:
+
+@example
+$ @kbd{gawk -v A=0 -f funky.awk}
+@print{} <>
+$ @kbd{gawk -v A=1 -f funky.awk }
+@print{} 1
+@end example
+
+POSIX does not specify the correct behavior, so be aware that different
+implementations work differently.
 
 @node Indirect Calls
 @section Indirect Function Calls
