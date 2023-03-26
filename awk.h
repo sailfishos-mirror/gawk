@@ -1738,7 +1738,7 @@ extern NODE *make_str_node(const char *s, size_t len, int flags);
 extern NODE *make_bool_node(bool value);
 extern NODE *make_typed_regex(const char *re, size_t len);
 extern void *more_blocks(int id);
-extern int parse_escape(const char **string_ptr);
+extern int parse_escape(const char **string_ptr, bool *unicode);
 extern NODE *str2wstr(NODE *n, size_t **ptr);
 extern NODE *wstr2str(NODE *n);
 #define force_wstring(n)	str2wstr(n, NULL)
