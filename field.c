@@ -114,6 +114,15 @@ init_fields()
 	field0_valid = true;
 }
 
+/* init_csv_fields --- set up to handle --csv */
+
+void
+init_csv_fields(void)
+{
+	if (do_csv)
+		parse_field = comma_parse_field;
+}
+
 /* grow_fields --- acquire new fields as needed */
 
 static void
@@ -771,6 +780,7 @@ sc_parse_field(long up_to,	/* parse only up to this field number */
  * via (*parse_field)().  This variation is for when FS is a comma,
  * we do very basic CSV parsing, the same as BWK awk.
  */
+
 static long
 comma_parse_field(long up_to,	/* parse only up to this field number */
 	char **buf,	/* on input: string to parse; on output: point to start next */
@@ -1163,7 +1173,10 @@ do_split(int nargs)
 	if ((sep->flags & REGEX) != 0)
 		sep = sep->typed_re;
 
-	if (   (sep->re_flags & FS_DFLT) != 0
+	if (do_csv && (sep->re_flags & FS_DFLT) != 0 && nargs == 3) {
+		fs = NULL;
+		parseit = comma_parse_field;
+	} else if (   (sep->re_flags & FS_DFLT) != 0
 	    && current_field_sep() == Using_FS
 	    && ! RS_is_null) {
 		parseit = parse_field;
@@ -1184,15 +1197,6 @@ do_split(int nargs)
 		} else if (fs->stlen == 1 && (sep->re_flags & CONSTANT) == 0) {
 			if (fs->stptr[0] == ' ') {
 				parseit = def_parse_field;
-			} else if (fs->stptr[0] == ',' && ! do_posix) {
-				static bool warned = false;
-
-				parseit = comma_parse_field;
-
-				if (do_lint && ! warned) {
-					warned = true;
-					lintwarn(_("split: CSV parsing is a non-standard extension"));
-				}
 			} else
 				parseit = sc_parse_field;
 		} else {
@@ -1285,11 +1289,29 @@ do_patsplit(int nargs)
 static void
 set_parser(parse_field_func_t func)
 {
+	/*
+	 * Setting FS does nothing if CSV mode, warn in that case,
+	 * but don't warn on first call which happens at initialization.
+	 */
+	static bool first_time = true;
+	static bool warned = false;
+
+	if (! first_time && do_csv) {
+		if (! warned) {
+			warned = true;
+			warning(_("assignment to FS/FIELDWIDTHS/FPAT has no effect when using --csv"));
+		}
+		return;
+	}
+
 	normal_parse_field = func;
 	if (! api_parser_override && parse_field != func) {
 		parse_field = func;
 	        update_PROCINFO_str("FS", current_field_sep_str());
 	}
+
+	if (first_time)
+		first_time = false;
 }
 
 /* set_FIELDWIDTHS --- handle an assignment to FIELDWIDTHS */
@@ -1503,8 +1525,6 @@ choose_fs_function:
 			else if (fs->stptr[0] == '\\')
 				/* same special case */
 				strcpy(buf, "[\\\\]");
-			else if (fs->stptr[0] == ',' && ! do_posix)
-				set_parser(comma_parse_field);
 			else
 				set_parser(sc_parse_field);
 		}

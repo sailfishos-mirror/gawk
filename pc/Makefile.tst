@@ -190,7 +190,8 @@ GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
-	clos1way5 clos1way6 colonwarn commas crlf csv1 dbugeval dbugeval2 \
+	clos1way5 clos1way6 colonwarn commas crlf csv1 csv2 csv3 \
+	dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	elemnew1 elemnew2 elemnew3 errno exit fieldwdth forcenum fpat1 fpat2 \
@@ -288,8 +289,11 @@ NEED_SANDBOX = sandbox1
 # List of tests that need --traditional
 NEED_TRADITIONAL = litoct tradanch rscompat
 
-# Lists of tests that need the PMA allocator and a backing file
+# List of tests that need the PMA allocator and a backing file
 NEED_PMA = pma
+
+# List of tests that need --csv
+NEED_CSV = csv1 csv2 csv3
 
 # Lists of tests that run a shell script
 RUN_SHELL = exit fflush localenl modifiers next randtest rtlen rtlen01
@@ -2721,7 +2725,17 @@ crlf:
 
 csv1:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --csv < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+csv2:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --csv >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+csv3:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --csv < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 dbugeval2:
