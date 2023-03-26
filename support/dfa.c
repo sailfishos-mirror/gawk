@@ -67,7 +67,10 @@ c_isdigit (char c)
 #ifndef FALLTHROUGH
 # if 201710L < __STDC_VERSION__
 #  define FALLTHROUGH [[__fallthrough__]]
-# elif (__GNUC__ >= 7) || (__clang_major__ >= 10)
+# elif ((__GNUC__ >= 7) \
+        || (defined __apple_build_version__ \
+            ? __apple_build_version__ >= 12000000 \
+            : __clang_major__ >= 10))
 #  define FALLTHROUGH __attribute__ ((__fallthrough__))
 # else
 #  define FALLTHROUGH ((void) 0)
@@ -1199,8 +1202,13 @@ lex (struct dfa *dfa)
      On the plus side, this avoids having a duplicate of the
      main switch inside the backslash case.  On the minus side,
      it means that just about every case tests the backslash flag.  */
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; ; i++)
     {
+      /* This loop should consume at most a backslash and some other
+         character.  */
+      if (2 <= i)
+        abort ();
+
       if (! dfa->lex.left)
         return dfa->lex.lasttok = END;
       int c = fetch_wc (dfa);
@@ -1588,11 +1596,6 @@ lex (struct dfa *dfa)
           return dfa->lex.lasttok = c;
         }
     }
-
-  /* The above loop should consume at most a backslash
-     and some other character.  */
-  abort ();
-  return END;                   /* keeps pedantic compilers happy.  */
 }
 
 static void

@@ -172,6 +172,7 @@ static const struct option optab[] = {
 	{ "bignum",		no_argument,		NULL,	'M' },
 	{ "characters-as-bytes", no_argument,		& do_binary,	 'b' },
 	{ "copyright",		no_argument,		NULL,	'C' },
+	{ "csv",		no_argument,		NULL,	'k' },
 	{ "debug",		optional_argument,	NULL,	'D' },
 	{ "dump-variables",	optional_argument,	NULL,	'd' },
 	{ "exec",		required_argument,	NULL,	'E' },
@@ -376,6 +377,9 @@ main(int argc, char **argv)
 		}
 	}
 
+	if (do_csv && do_posix)
+		fatal(_("`--posix' and `--csv' conflict"));
+
 	if (do_lint) {
 		if (os_is_setuid())
 			lintwarn(_("running %s setuid root may be a security problem"), myname);
@@ -415,6 +419,10 @@ main(int argc, char **argv)
 
 	/* Set up the special variables */
 	init_vars();
+
+	/* set up CSV */
+	init_csv_records();
+	init_csv_fields();
 
 	/* Set up the field variables */
 	init_fields();
@@ -625,6 +633,7 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-h\t\t\t--help\n"), fp);
 	fputs(_("\t-i includefile\t\t--include=includefile\n"), fp);
 	fputs(_("\t-I\t\t\t--trace\n"), fp);
+	fputs(_("\t-k\t\t\t--csv\n"), fp);
 	fputs(_("\t-l library\t\t--load=library\n"), fp);
 	/*
 	 * TRANSLATORS: the "fatal", "invalid" and "no-ext" here are literal
@@ -1106,6 +1115,9 @@ load_procinfo()
 	update_PROCINFO_str("pma", get_pma_version());
 #endif /* USE_PERSISTENT_MALLOC */
 
+	if (do_csv)
+		update_PROCINFO_num("CSV", 1);
+
 	load_procinfo_argv();
 	return PROCINFO_node;
 }
@@ -1570,7 +1582,7 @@ parse_args(int argc, char **argv)
 	/*
 	 * The + on the front tells GNU getopt not to rearrange argv.
 	 */
-	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:Il:L::nNo::Op::MPrSstVYZ:";
+	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSstVYZ:";
 	int old_optind;
 	int c;
 	char *scan;
@@ -1667,6 +1679,10 @@ parse_args(int argc, char **argv)
 
 		case 'I':
 			do_itrace = true;
+			break;
+
+		case 'k':	// k is for "comma". it's a stretch, I know
+			do_flags |= DO_CSV;
 			break;
 
 		case 'l':

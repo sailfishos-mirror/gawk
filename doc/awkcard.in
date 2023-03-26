@@ -275,6 +275,8 @@ Include library AWK code in \*(FIfile\*(FR.
 See \fHAwk Program Execution\*(FR.
 .TI "\*(FC\-I\*(FR, \*(FC\-\^\-trace\*(FR
 Print the internal byte code names as they are executed.
+.TI "\*(FC\-k\*(FR, \*(FC\-\^\-csv\*(FR
+Enable CSV special processing. See the manual for details.
 .TI "\*(FC\-l \*(FIlib\*(FR, \*(FC\-\^\-load \*(FIlib\*(FR
 Load dynamic extension \*(FIlib\fP.
 See \fHDynamic Extensions\*(FR.
@@ -302,9 +304,7 @@ Send profiling data to \*(FIfile\*(FR
 (default: \*(FCawkprof.out\*(FR).
 The profile contains execution counts in the left margin.
 .TI "\*(FC\-P\*(FR, \*(FC\-\^\-posix\*(FR
-Disable common and GNU extensions.
-.TI "\*(FC\-r\*(FR, \*(FC\-\^\-re\-interval\*(FR
-Does nothing; for backwards compatibility only.\*(CB
+Disable common and GNU extensions.\*(CB
 .in -4n
 .EB "\s+2\f(HBCOMMAND LINE ARGUMENTS (\*(GK\f(HB)\*(FR\s0"
 
@@ -316,6 +316,8 @@ Does nothing; for backwards compatibility only.\*(CB
 .ES
 .fi
 .in +4n
+.TI "\*(FC\-r\*(FR, \*(FC\-\^\-re\-interval\*(FR
+Does nothing; for backwards compatibility only.
 .TI "\*(FC\-s\*(FR, \*(FC\-\^\-no\-optimize\*(FR
 Disable internal optimizations.
 .TI "\*(FC\-S\*(FR, \*(FC\-\^\-sandbox\*(FR
@@ -405,9 +407,9 @@ Either the pattern  or the action may be missing, but
 not both. If the pattern is missing, the action is
 executed for every input record.
 A missing action is equivalent to
-.sp .5
-	\*(FC{ print }\fP
-.sp .5
+.\" .sp .5
+\*(FC{ print }\fP
+.\" .sp .5
 which prints the entire record.
 .sp .5
 Comments begin with the \*(FC#\*(FR character, and continue until the
@@ -972,7 +974,8 @@ lp8 lp8 lp8 lp8.
 \*(FC\ef\fP~form feed~\*(FC\ev\fP~vertical tab
 \*(FC\en\fP~newline~\*(FC\e\e\fP~backslash
 \*(FC\e\*(FIddd\*(FR~octal value \*(FIddd\fP~\*(CL\*(FC\ex\*(FIhh\*(FR~hex value \*(FIhh\fP\*(CD
-\*(FC\e"\fP~double quote~\*(FC\e/\fP~forward slash\*(CX
+\*(FC\e"\fP~double quote~\*(FC\e/\fP~forward slash
+\*(CL\*(FC\eu\*(FIhh...\fR~unicode character\*(CX
 .TE
 .EB "\s+2\f(HBESCAPE SEQUENCES\*(FR\s0"
 .sp

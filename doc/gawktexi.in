@@ -1492,6 +1492,10 @@ Document minimally and release.
 
 After eight years, add another part @code{egrep} and two
 more parts C.  Document very well and release.
+
+After 35 more years, add Unicode and CSV support, sprinkle lightly with
+a few choice features from @command{gawk}, document very well again,
+and release.
 @end sidebar
 
 @cindex Aho, Alfred
@@ -4085,6 +4089,20 @@ the program. The trace is printed to standard error. Each ``op code''
 is preceded by a @code{+}
 sign in the output.
 
+@item @option{-k}
+@itemx @option{--csv}
+@cindex @option{-k} option
+@cindex @option{--csv} option
+@cindex comma separated values (CSV) data @subentry @option{-k} option
+@cindex comma separated values (CSV) data @subentry @option{--csv} option
+@cindex CSV (comma separated values) data @subentry @option{-k} option
+@cindex CSV (comma separated values) data @subentry @option{--csv} option
+@cindex op-codes, trace of internal
+Enable special processing for files with comma separated values
+(CSV). @xref{Comma Separated Fields}.
+This option cannot be used with @option{--posix}. Attempting to do
+causes a fatal error.
+
 @item @option{-l} @var{ext}
 @itemx @option{--load} @var{ext}
 @cindex @option{-l} option
@@ -5557,6 +5575,25 @@ As of @value{PVERSION} 4.2, only two digits
 are processed.
 @end quotation
 
+@cindex @code{\} (backslash) @subentry @code{\u} escape sequence
+@cindex backslash (@code{\}) @subentry @code{\u} escape sequence
+@cindex common extensions @subentry @code{\u} escape sequence
+@cindex extensions @subentry common @subentry @code{\u} escape sequence
+@item \u@var{hh}@dots{}
+The hexadecimal value @var{hh}, where @var{hh} stands for a sequence
+of hexadecimal digits (@samp{0}--@samp{9}, and either @samp{A}--@samp{F}
+or @samp{a}--@samp{f}).  A maximum of eight digits are allowed after
+the @samp{\u}. Any further hexadecimal digits are treated as simple
+letters or numbers.  @value{COMMONEXT}
+(The @samp{\u} escape sequence is not allowed in POSIX awk.)
+
+This escape sequence is intended for designating a character in the
+Unicode character set.  @command{gawk} first converts the given digits
+into an integer and then translates the given ``wide character''
+value into the current locale's multibyte encoding (even if that
+is a not a Unicode locale).  If the given bytes do not represent
+a valid character, the value becomes @code{"?"}.
+
 @cindex @code{\} (backslash) @subentry @code{\/} escape sequence
 @cindex backslash (@code{\}) @subentry @code{\/} escape sequence
 @item \/
@@ -6715,6 +6752,12 @@ If @code{RS} is any single character, that character separates records.
 Otherwise (in @command{gawk}), @code{RS} is treated as a regular expression.
 This mechanism is explained in greater detail shortly.
 
+@quotation NOTE
+When @command{gawk} is invoked with the @option{--csv} option, nothing
+in this @value{SECTION} applies. @xref{Comma Separated Fields}, for the
+details.
+@end quotation
+
 @menu
 * awk split records::           How standard @command{awk} splits records.
 * gawk split records::          How @command{gawk} splits records.
@@ -7395,7 +7438,6 @@ Shell programmers take note:  @command{awk} does @emph{not} use the
 name @code{IFS} that is used by the POSIX-compliant shells (such as
 the Unix Bourne shell, @command{sh}, or Bash).
 
-@c FIXME: This needs reworking now that we have CSV
 @cindex @code{FS} variable @subentry changing value of
 The value of @code{FS} can be changed in the @command{awk} program with the
 assignment operator, @samp{=} (@pxref{Assignment Ops}).
@@ -7405,7 +7447,7 @@ is read with the proper separator.  To do this, use the special
 @code{BEGIN} pattern
 (@pxref{BEGIN/END}).
 For example, here we set the value of @code{FS} to the string
-@code{","}:
+@code{":"}:
 
 @example
 awk 'BEGIN @{ FS = "," @} ; @{ print $2 @}'
@@ -7416,7 +7458,7 @@ awk 'BEGIN @{ FS = "," @} ; @{ print $2 @}'
 Given the input line:
 
 @example
-John Q. Smith, 29 Oak St., Walamazoo, MI 42139
+John Q. Smith: 29 Oak St.: Walamazoo: MI 42139
 @end example
 
 @noindent
@@ -7432,7 +7474,7 @@ person's name in the example we just used might have a title or
 suffix attached, such as:
 
 @example
-John Q. Smith, LXIX, 29 Oak St., Walamazoo, MI 42139
+John Q. Smith: LXIX: 29 Oak St.: Walamazoo: MI 42139
 @end example
 
 @noindent
@@ -7622,27 +7664,30 @@ behaves this way.
 @node Comma Separated Fields
 @subsection Working With Comma Separated Value Files
 
-@cindex comma separated values (CSV) data @subentry parsing with @code{FS}
-@cindex CSV (comma separated values) data @subentry parsing with @code{FS}
-@cindex @code{FS} variable @subentry character "," as
-@cindex @code{FS} variable @subentry parsing CSV files
+@cindex comma separated values (CSV) data @subentry records and fields
+@cindex CSV (comma separated values) data @subentry records and fields
 Many commonly-used tools use a comma to separate fields, instead of whitespace.
 This is particularly true of popular spreadsheet programs.  There is no
 universally accepted standard for the format of these files, although
-@uref{http://www.ietf.org/rfc/rfc4180.txt, RFC 4180} lists the common
+@uref{http://www.ietf.org/rfc/rfc4180, RFC 4180} lists the common
 practices.
 
 For decades, anyone wishing to work with CSV files and @command{awk}
-had to ``roll their own'' solution. (For example, @pxref{Splitting By Content}).
-In 2023, Brian Kernighan decided to add basic CSV support to his version of
+had to ``roll their own'' solution.
+(For an example, @pxref{Splitting By Content}).
+In 2023, Brian Kernighan decided to add CSV support to his version of
 @command{awk}.  In order to keep up, @command{gawk} too provides the same
 support as his version.
-To use CSV data, set @code{FS} equal to a string with a single comma, like so: @samp{FS = ","}.
+To use CSV data, invoke @command{gawk} with either of the
+@option{-k} or @option{--csv} options.
 
 Fields in CSV files are separated by commas.  In order to allow a comma
 to appear inside a field (i.e., as data), the field may be quoted
 by beginning and ending it with double quotes.  In order to allow a double
-quote inside a double-quoted field, two double quotes are used.
+quote inside a field, the field @emph{must} be quoted, and two double quotes are used
+to represent an actual double quote.
+The double quote that starts a quoted field must be the first
+character after the comma.
 @ref{table-csv-examples} shows some examples.
 
 @float Table,table-csv-examples
@@ -7653,22 +7698,40 @@ quote inside a double-quoted field, two double quotes are used.
 @item @code{"quoted data"} @tab @code{quoted data}
 @item @code{"quoted, data"} @tab @code{quoted, data}
 @item @code{"She said ""Stop!""."} @tab @code{She said "Stop!".}
-@item @code{She said "Stop!".} @tab @code{She said "Stop!".}
 @end multitable
 @end float
 
-The double-quote that starts a quoted field must be the first
-character after the comma.
+Additionally, and here's where it gets messy, newlines are also
+allowed inside double-quoted fields!
+In order to deal with such things, when processing CSV files,
+@command{gawk} scans the input data looking for newlines that
+are not enclosed in double quotes. Thus, use of the @option{--csv}
+totally overrides normal record processing with @code{RS} (@pxref{Records}).
 
-Some programs that support CSV-formatted data even allow fields to
-include embedded newlines (such as a postal address, for example).
-This is @emph{not} supported in either BWK @command{awk} or in
-@command{gawk}. This cannot be done using only facilities in the
-@command{awk} language, since @command{awk} first splits the input
-into records, and the default record separator is a newline.
-Thus any newline embedded in a field simply terminates the record.
+Many CSV files are imported from systems where the line terminator
+for text files is a carriage-return--line-feed pair
+(CR-LF, @code{\r} followed by @code{\n}).
+For ease of use, when processing CSV files, @command{gawk} simply
+strips out any carriage-return characters in the input.
 
-CSV input parsing is disabled in POSIX mode.
+The behavior of the @code{split()} function (not formally discussed
+yet, see @ref{String Functions}) differs slightly when processing CSV
+files. When called with two arguments
+(@samp{split(@var{string}, @var{array})}), @code{split()}
+does CSV-based splitting.  Otherwise, it behaves normally.
+
+If @option{--csv} has been used, @code{PROCINFO["CSV"]} will
+exist. Otherwise, it will not. @xref{Auto-set}.
+
+Finally, if @option{--csv} has been used, assigning a value
+to any of @code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, or
+@code{RS} generates a warning message.
+
+To be clear, @command{gawk} takes
+@uref{http://www.ietf.org/rfc/rfc4180, RFC 4180} as its
+specification for CSV input data.  There are no mechanisms
+for accepting nonstandard CSV data, such as files that use
+a semicolon instead of a comma as the separator.
 
 @node Command Line Field Separator
 @subsection Setting @code{FS} from the Command Line
@@ -7852,6 +7915,10 @@ The following list summarizes how fields are split, based on the value
 of @code{FS} (@samp{==} means ``is equal to''):
 
 @table @code
+@item @asis{@command{gawk} was invoked with @option{--csv}}
+Field splitting follows the rules given in @ref{Comma Separated Fields}.
+The value of @code{FS} is ignored.
+
 @item FS == " "
 Fields are separated by runs of whitespace.  Leading and trailing
 whitespace are ignored.  This is the default.
@@ -8105,6 +8172,9 @@ four, and @code{$4} has the value @code{"ddd"}.
 @node Splitting By Content
 @section Defining Fields by Content
 
+@strong{FIXME}: This whole section needs rewriting now
+that @command{gawk} has built-in CSV parsing. Sigh.
+
 @menu
 * More CSV::                    More on CSV files.
 * FS versus FPAT::              A subtle difference.
@@ -8126,7 +8196,7 @@ what they are, and not by what they are not.
 @cindex CSV (comma separated values) data @subentry parsing with @code{FPAT}
 @cindex Comma separated values (CSV) data @subentry parsing with @code{FPAT}
 The most notorious such case
-is so-called @dfn{comma-separated values} (CSV) data. Many spreadsheet programs,
+is comma-separated values (CSV) data. Many spreadsheet programs,
 for example, can export their data into text files, where each record is
 terminated with a newline, and fields are separated by commas. If
 commas only separated the data, there wouldn't be an issue. The problem comes when
@@ -8369,7 +8439,9 @@ The value is @code{"FS"} if regular field splitting is being used,
 or @code{"FPAT"} if content-based field splitting is being used:
 
 @example
-if (PROCINFO["FS"] == "FS")
+if ("CSV" in PROCINFO)
+    @var{CSV-based field splitting} @dots{}
+else if (PROCINFO["FS"] == "FS")
     @var{regular field splitting} @dots{}
 else if (PROCINFO["FS"] == "FIELDWIDTHS")
     @var{fixed-width field splitting} @dots{}
@@ -8380,7 +8452,7 @@ else
 @end example
 
 This information is useful when writing a function that needs to
-temporarily change @code{FS} or @code{FIELDWIDTHS}, read some records,
+temporarily change @code{FS}, @code{FIELDWIDTHS}, or @code{FPAT}, read some records,
 and then restore the original settings (@pxref{Passwd Functions} for an
 example of such a function).
 
@@ -10955,9 +11027,9 @@ intermixed with @command{gawk}'s output comes out in the
 expected order:
 
 @example
-print "something"			# goes to standard output
-print "someting else" | "some-command"	# also to standard output
-print "more stuff"			# and this too
+print "something"                       # goes to standard output
+print "something else" | "some-command" # also to standard output
+print "more stuff"                      # and this too
 @end example
 
 There can be a price to pay for this; flushing data down
@@ -18538,11 +18610,6 @@ any trailing
 whitespace goes into @code{@var{seps}[@var{n}]}, where @var{n} is the
 return value of
 @code{split()} (i.e., the number of elements in @var{array}).
-If @var{fieldsep} is a comma, and @command{gawk} is not in POSIX mode,
-then the string is split using the CSV parsing rules, as for @code{FS}
-(@pxref{Comma Separated Fields}). In this case, the @var{seps}
-array is not filled in, since each element would simply consist of
-a string containing a comma.
 
 The @code{split()} function splits strings into pieces in the same way
 that input lines are split into fields.  For example:
@@ -18571,6 +18638,13 @@ seps[2] = "-"
 
 @noindent
 The value returned by this call to @code{split()} is three.
+
+If @command{gawk} is invoked with @option{--csv}, then a two-argument
+call to @code{split()} splits the string using the CSV parsing rules as
+described in @ref{Comma Separated Fields}.  With three and four arguments,
+@code{split()} works as just described.  The four-argument call makes
+no sense, since each element of @var{seps} would simply consist of a
+string containing a comma.
 
 @cindex differences in @command{awk} and @command{gawk} @subentry @code{split()} function
 As with input field-splitting, when the value of @var{fieldsep} is
@@ -41159,6 +41233,10 @@ Comma separated value (CSV) field splitting
 @item
 The ability to make @command{gawk} buffer output to pipes
 (@pxref{Noflush}).
+
+@item
+The @samp{\u} escape sequence
+(@pxref{Escape Sequences})
 
 @item
 The need for GNU @code{libsigsegv} was removed from @command{gawk}.

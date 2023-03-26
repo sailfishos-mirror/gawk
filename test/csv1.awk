@@ -1,6 +1,6 @@
-BEGIN {
-	FS = ","
-}
+# BEGIN {
+# 	FS = ","
+# }
 
 {
 	printf(" \t%s\t", $0)

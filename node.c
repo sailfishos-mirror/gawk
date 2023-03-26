@@ -454,7 +454,8 @@ make_str_node(const char *s, size_t len, int flags)
 
 			c = *pf++;
 			if (c == '\\') {
-				c = parse_escape(&pf);
+				bool unicode;
+				c = parse_escape(&pf, &unicode);
 				if (c < 0) {
 					if (do_lint)
 						lintwarn(_("backslash string continuation is not portable"));
@@ -462,7 +463,23 @@ make_str_node(const char *s, size_t len, int flags)
 						continue;
 					c = '\\';
 				}
-				*ptm++ = c;
+				if (unicode) {
+					char buf[20];
+					size_t n;
+					mbstate_t mbs;
+					int i;
+
+					memset(& mbs, 0, sizeof(mbs));
+
+					n = wcrtomb(buf, c, & mbs);
+					if (n == (size_t) -1)	// bad value
+						*ptm++ = '?';
+					else {
+						for (i = 0; i < n; i++)
+							*ptm++ = buf[i];
+					}
+				} else
+					*ptm++ = c;
 			} else
 				*ptm++ = c;
 		}
@@ -540,17 +557,19 @@ r_unref(NODE *tmp)
  * If \ is followed by 000, we return 0 and leave the string pointer after the
  * zeros.  A value of 0 does not mean end of string.
  *
- * POSIX doesn't allow \x.
+ * POSIX doesn't allow \x or \u.
  */
 
 int
-parse_escape(const char **string_ptr)
+parse_escape(const char **string_ptr, bool *unicode)
 {
 	int c = *(*string_ptr)++;
 	int i;
 	int count;
 	int j;
 	const char *start;
+
+	*unicode = false;
 
 	if (do_lint_old) {
 		switch (c) {
@@ -637,6 +656,40 @@ parse_escape(const char **string_ptr)
 		}
 		if (do_lint && j == 2 && isxdigit((unsigned char)*(*string_ptr)))
 			lintwarn(_("hex escape \\x%.*s of %d characters probably not interpreted the way you expect"), 3, start, 3);
+		return i;
+	case 'u':
+		if (do_lint) {
+			static bool warned = false;
+
+			if (! warned) {
+				warned = true;
+				lintwarn(_("POSIX does not allow `\\u' escapes"));
+			}
+		}
+		if (do_posix)
+			return ('u');
+		if (! isxdigit((unsigned char) (*string_ptr)[0])) {
+			warning(_("no hex digits in `\\u' escape sequence"));
+			return ('u');
+		}
+		start = *string_ptr;
+		for (i = j = 0; j < 8; j++) {
+			/* do outside test to avoid multiple side effects */
+			c = (unsigned char) *(*string_ptr)++;
+			if (isxdigit(c)) {
+				i *= 16;
+				if (isdigit(c))
+					i += c - '0';
+				else if (isupper(c))
+					i += c - 'A' + 10;
+				else
+					i += c - 'a' + 10;
+			} else {
+				(*string_ptr)--;
+				break;
+			}
+		}
+		*unicode = true;
 		return i;
 	case '\\':
 	case '"':

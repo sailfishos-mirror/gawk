@@ -1,3 +1,45 @@
+2023-03-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Add support for \u escape sequence.
+
+	* awk.h (parse_escaape): New bool* parameter for unicode.
+	* node.c (make_str_node): Deal with a \u escape.
+	(parse_escape): Handle \u.
+	* re.c (make_regexp): Deal with a \u escape.
+
+2023-03-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* io.c (set_RS): Fix first time and warning logic for csv mode.
+
+2023-03-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* io.c (csvscan): Strip CRs.
+
+2023-03-21         Manuel Collado        <mcollado2011@gmail.com>
+
+	* io.c (csvscan): Real implementation.
+
+2023-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* field.c (do_split): Modify behavior for --csv.
+
+2023-03-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (enum do_flag_values): Add DO_CSV.
+	(do_csv): New macro.
+	(init_csv_fields, init_csv_records): Add declarations.
+	* field.c (init_csv_fields): New function.
+	(set_parser): Don't set the parser if doing CSV. Add warnings.
+	* io.c (csvscan): New function (placeholder for now).
+	(init_csv_records): New function.
+	(set_RS): Don't set the parser if doing CSV. Add warnings.
+	* main.c (optab): Add new options -k/--csv.
+	(main): Fatal out if --posix and --csv. Call init_csv_records()
+	and init_csv_fields().
+	(usage): Add a line for the new options.
+	(load_procinfo): Install PROCINFO["CSV"] if doing CSV.
+	(parse_args): Update for new options.
+
 2023-03-09         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawkapi.h: Update copyright year. Small edit in leading comment.

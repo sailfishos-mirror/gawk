@@ -108,6 +108,13 @@ BEGIN {
 	next
 }
 
+/^NEED_CSV *=/,/[^\\]$/ {
+	gsub(/(^NEED_CSV *=|\\$)/,"")
+	for (i = 1; i <= NF; i++)
+		csv[$i]
+	next
+}
+
 /^GENTESTS_UNUSED *=/,/[^\\]$/ {
 	gsub(/(^GENTESTS_UNUSED *=|\\$)/,"")
 	for (i = 1; i <= NF; i++)
@@ -228,6 +235,10 @@ function generate(x,	s, i, locale_string)
 	if (x in re_interval) {
 		s = s " --re-interval"
 		delete re_interval[x]
+	}
+	if (x in csv) {
+		s = s " --csv"
+		delete csv[x]
 	}
 	if (x".in" in files) {
 		s = s " < \"$(srcdir)\"/$@.in"
