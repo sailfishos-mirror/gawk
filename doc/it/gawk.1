@@ -20,6 +20,7 @@
 .\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Maggio 2022
 .\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Giugno 2022
 .\"Aggiornam. a gawk-5.2.0 di A.G. Colombo - Luglio 2022
+.\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Marzo  2023
 
 .ds PX \s-1POSIX\s+1
 .ds UX \s-1UNIX\s+1
@@ -257,6 +258,14 @@ Questa trace è stampata sullo standard error.
 Ogni ``codice operativo'' è preceduto da un segno
 .B +
 nell'output.
+.TP
+\fB\-k\fR, \fB\-\^\-csv\fR
+Abilita gestione speciale file CSV
+[Comma Separated Values - Valori Separati da Virgola].
+Vedere il manuale per i dettagli.
+.BR FIXME :
+Eventualmente, fornire un link (URL) qui.
+.TP
 .BI \-l " lib\fR, "\c
 .BI \-\^\-load " lib"
 Carica un'estensione
@@ -656,6 +665,23 @@ Analogamente, assegnare un valore a
 .B $0
 provoca una nuova divisione del record, creando nuovi
 valori per i suoi campi.
+.SS Comma Separated Values [Valori Separati da Virgola]
+Quando è chiamato specificando l'opzione
+.B \-\^\-csv,
+.I gawk
+non usa le regole spiegate sopra per determinare cosa costituisce
+un record e per dividerlo in campi.
+Invece, i record sono delimitati dai caratteri "ritorno a capo",
+che non siano all'interno di un campo CSV [per esempio, un
+campo che contenga un indirizzo completo è normalmente su più
+righe, che però formano un unico campo]. I campi sono separati
+fra loro da una virgola.
+I caratteri "doppio apice" possono essere usati per indicare
+campi che contengono virgole, ritorni a capo, o doppi apici
+[che vanno raddoppiati].
+Vedere il manuale per i dettagli.
+.B FIXME
+Eventualmente, fornire un link (URL) qui.
 .SS Variabili predefinite
 Le variabili predefinite di
 .IR gawk "
