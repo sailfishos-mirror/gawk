@@ -23615,12 +23615,11 @@ prima ancora che il programma inizi la sua esecuzione.
 BWK @code{awk}, @code{mawk}, e forse altri fanno questo:
 
 @example
-$ @kbd{mawk -v A=0 -f funky.awk}
-@error{} mawk: funky.awk: line 6: illegal reference to variable a
-@error{} mawk: funky.awk: line 14: illegal reference to local variable arr
-$ @kbd{mawk -v A=1 -f funky.awk}
-@error{} mawk: funky.awk: line 6: illegal reference to variable a
-@error{} mawk: funky.awk: line 14: illegal reference to local variable arr
+$ @kbd{nawk -v A=0 -f funky.awk}
+@error{} nawk: can't assign to a; it's an array name.
+@error{}  source line number 11
+$ @kbd{nawk -v A=1 -f funky.awk}
+@print{} 1
 @end example
 
 Oppure @command{awk} potrebbe attendere il momento in cui l'istruzione
