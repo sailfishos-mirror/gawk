@@ -1,5 +1,5 @@
 /*
- * filefuncs.c - Builtin functions that provide initial minimal iterface
+ * filefuncs.c - Builtin functions that provide initial minimal interface
  *		 to the file system.
  *
  * Arnold Robbins, update for 3.1, Mon Nov 23 12:53:39 EST 1998
