@@ -4191,7 +4191,6 @@ sign in the output.
 @cindex comma separated values (CSV) data @subentry @option{--csv} option
 @cindex CSV (comma separated values) data @subentry @option{-k} option
 @cindex CSV (comma separated values) data @subentry @option{--csv} option
-@cindex op-codes, trace of internal
 Enable special processing for files with comma separated values
 (CSV). @xref{Comma Separated Fields}.
 This option cannot be used with @option{--posix}. Attempting to do
@@ -7889,7 +7888,7 @@ For example, here we set the value of @code{FS} to the string
 @code{":"}:
 
 @example
-awk 'BEGIN @{ FS = "," @} ; @{ print $2 @}'
+awk 'BEGIN @{ FS = ":" @} ; @{ print $2 @}'
 @end example
 
 @cindex @code{BEGIN} pattern
@@ -8147,11 +8146,45 @@ In order to deal with such things, when processing CSV files,
 are not enclosed in double quotes. Thus, use of the @option{--csv}
 totally overrides normal record processing with @code{RS} (@pxref{Records}).
 
+@cindex sidebar @subentry Carriage-Return--Line-Feed Line Endings In CSV Files
+@ifdocbook
+@docbook
+<sidebar><title>Carriage-Return--Line-Feed Line Endings In CSV Files</title>
+@end docbook
+
+@quotation
+@code{\r\n} @i{is the invention of the devil.}
+@author Brian Kernighan
+@end quotation
+
 Many CSV files are imported from systems where the line terminator
 for text files is a carriage-return--line-feed pair
 (CR-LF, @code{\r} followed by @code{\n}).
 For ease of use, when processing CSV files, @command{gawk} simply
 strips out any carriage-return characters in the input.
+
+@docbook
+</sidebar>
+@end docbook
+@end ifdocbook
+
+@ifnotdocbook
+@cartouche
+@center @b{Carriage-Return--Line-Feed Line Endings In CSV Files}
+
+
+@quotation
+@code{\r\n} @i{is the invention of the devil.}
+@author Brian Kernighan
+@end quotation
+
+Many CSV files are imported from systems where the line terminator
+for text files is a carriage-return--line-feed pair
+(CR-LF, @code{\r} followed by @code{\n}).
+For ease of use, when processing CSV files, @command{gawk} simply
+strips out any carriage-return characters in the input.
+@end cartouche
+@end ifnotdocbook
 
 The behavior of the @code{split()} function (not formally discussed
 yet, see @ref{String Functions}) differs slightly when processing CSV
@@ -11922,7 +11955,8 @@ $ @kbd{gawk 'BEGIN @{ print "hello, \}
 In POSIX mode (@pxref{Options}), @command{gawk} does not
 allow escaped newlines.  Otherwise, it behaves as just described.
 
-BWK @command{awk} and BusyBox @command{awk}
+BWK @command{awk}@footnote{In all examples throughout this @value{DOCUMENT},
+@command{nawk} is BWK @command{awk}.} and BusyBox @command{awk}
 remove the backslash but leave the newline
 intact, as part of the string:
 
@@ -22165,6 +22199,12 @@ in the array.
 @node Dynamic Typing
 @subsection Functions and Their Effects on Variable Typing
 
+@quotation
+@i{It's a desert topping!
+It's a floor wax!}
+@author Saturday Night Live (back when it used to be funny)
+@end quotation
+
 @command{awk} is a very fluid language.
 It is possible that @command{awk} can't tell if an identifier
 represents a scalar variable or an array until runtime.
@@ -22229,7 +22269,7 @@ $ @kbd{nawk -v A=1 -f funky.awk}
 @end example
 
 Or @command{awk} could wait until runtime to set the type of @code{a}.
-In this case, since @code{a} was never assigned used before being
+In this case, since @code{a} was never used before being
 passed to the function, how the function uses it forces the type to
 be resolved to either scalar or array.  @command{gawk}
 and the MKS @command{awk} do this:
@@ -42375,7 +42415,7 @@ The ability to make @command{gawk} buffer output to pipes
 
 @item
 The @samp{\u} escape sequence
-(@pxref{Escape Sequences})
+(@pxref{Escape Sequences}).
 
 @item
 The need for GNU @code{libsigsegv} was removed from @command{gawk}.
@@ -42399,18 +42439,20 @@ the three most widely used freely available versions of @command{awk}
 
 @multitable {@file{/dev/stderr} special file} {BWK @command{awk}} {@command{mawk}} {@command{gawk}} {Now standard}
 @headitem Feature @tab BWK @command{awk} @tab @command{mawk} @tab @command{gawk} @tab Now standard
+@item @code{**} and @code{**=} operators @tab X @tab @tab X @tab
 @item @samp{\x} escape sequence @tab X @tab X @tab X @tab
-@item @code{FS} as null string @tab X @tab X @tab X @tab
+@item @samp{\u} escape sequence @tab X @tab @tab X @tab
 @item @file{/dev/stdin} special file @tab X @tab X @tab X @tab
 @item @file{/dev/stdout} special file @tab X @tab X @tab X @tab
 @item @file{/dev/stderr} special file @tab X @tab X @tab X @tab
+@item @code{BINMODE} variable @tab @tab X @tab X @tab
+@item CSV support @tab X @tab @tab X @tab
+@item @code{FS} as null string @tab X @tab X @tab X @tab
 @item @code{delete} without subscript @tab X @tab X @tab X @tab X
 @item @code{fflush()} function @tab X @tab X @tab X @tab X
+@item @code{func} keyword @tab X @tab @tab X @tab
 @item @code{length()} of an array @tab X @tab X @tab X @tab
 @item @code{nextfile} statement @tab X @tab X @tab X @tab X
-@item @code{**} and @code{**=} operators @tab X @tab @tab X @tab
-@item @code{func} keyword @tab X @tab @tab X @tab
-@item @code{BINMODE} variable @tab @tab X @tab X @tab
 @item @code{RS} as regexp @tab X @tab X @tab X @tab
 @item Time-related functions @tab @tab X @tab X @tab
 @end multitable

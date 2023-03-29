@@ -4571,6 +4571,23 @@ Questa tracciatura @`e stampata sullo standard error.
 Ogni ``codice operativo'' @`e preceduto da un segno @code{+}
 nell'output.
 
+@item @option{-k}
+@itemx @option{--csv}
+@cindex @option{-k} (opzione)
+@cindex opzione @subentry @option{-k}
+@cindex @option{--csv} (opzione)
+@cindex opzione @subentry @option{--csv}
+@cindex campi separati da virgola (CSV) come dati @subentry opzione @option{-k}
+@cindex campi separati da virgola (CSV) come dati @subentry opzione @option{--csv}
+@cindex CSV (dati con valori separati da virgola) @subentry opzione @option{-k}
+@cindex CSV (dati con valori separati da virgola) @subentry opzione @option{--csv}
+@cindex dati CSV (campi separati da virgola) @subentry @option{-k}
+@cindex dati CSV (campi separati da virgola) @subentry @option{--csv}
+Richiede un trattamento speciale per file CSV [valori separati da virgola].
+@xref{Campi separati da virgola}.
+Quest'opzione non pu@`o essere usata insieme all'opzione @option{--posix}.
+Se lo si fa, viene generato un errore fatale.
+
 @item @option{-l} @var{ext}
 @itemx @option{--load} @var{ext}
 @cindex @option{-l} (opzione)
@@ -5720,7 +5737,7 @@ Questa
 @ifinfo
 Questo
 @end ifinfo
-@value{SECTION} descrive funzionalit@`a o opzioni da riga di comando
+@value{SECTION} descrive una funzionalit@`a o opzione da riga di comando
 provenienti da precedenti versioni di @command{gawk} che non sono pi@`u
 disponibili nella versione corrente, o che sono ancora utilizzabili ma sono
 deprecate (ci@`o significa che @emph{non} saranno presenti in una futura
@@ -6227,7 +6244,7 @@ Il valore esadecimale @var{hh}, dove @var{hh} indica una sequenza di cifre
 esadecimali (@samp{0}--@samp{9}, e @samp{A}--@samp{F}
 o @samp{a}--@samp{f}).  Dopo @samp{\x} @`e consentito un massimo di due cifre.
 Ogni ulteriore cifra esadecimale @`e considerata come una semplice
-lettera o numero.  @value{COMMONEXT}
+lettera o numero. @value{COMMONEXT}
 (La sequenza di protezione @samp{\x} non @`e permessa in POSIX awk.)
 
 @quotation ATTENZIONE
@@ -6240,6 +6257,27 @@ Comunque usare pi@`u di due cifre esadecimali produceva risultati indefiniti.
 Dalla @value{PVERSION} 4.2,
 vengono elaborate solo due cifre.
 @end quotation
+
+@cindex @code{\} (barra inversa) @subentry @code{\u} (sequenza di protezione)
+@cindex backslash (@code{\}) @subentry @code{\u} (sequenza di protezione)
+@cindex barra inversa (@code{\}) @subentry @code{\/} (sequenza di protezione)
+@cindex estensioni comuni @subentry @code{\u} (sequenza di protezione)
+@cindex comuni @subentry estensioni @subentry @code{\u} (sequenza di protezione)
+@item \u@var{hh}@dots{}
+Il valore esadecimale @var{hh}, dove @var{hh} indica una sequenza di cifre
+esadecimli (@samp{0}--@samp{9}, e @samp{A}--@samp{F} o
+@samp{a}--@samp{f}).  Un massimo di otto cifre @`e consentito dopo
+la @samp{\u}.  Ogni successiva cifra esadecimale eventualmente immessa
+@`e trattata come una semplice lettera o numero. @value{COMMONEXT}
+(La sequenza di protezione @samp{\u} non @`e ammessa in modalit@`a POSIX.)
+
+Questa sequenza di protezione serve per indicare una lettera o un
+simbolo come specificato nella codifica Unicode.
+@command{gawk} dapprima converte le cifre cos@`{@dotless{i}} specificate in
+un numero intero, e poi traduce il ``carattere largo''
+cos@`{@dotless{i}} specificato nella codifica multibyte locale (anche se la
+codifica locale non @`e Unicode).  Se i byte specificati non
+rappresentano un carattere valido, il valore diviene @code{"?"}.
 
 @cindex @code{\} (barra inversa) @subentry @code{\/} (sequenza di protezione)
 @cindex barra inversa (@code{\}) @subentry @code{\/} (sequenza di protezione)
@@ -6399,7 +6437,6 @@ Le sequenze di protezione descritte
 @ifnotinfo
 prima
 @end ifnotinfo
-
 @iftex
 nella
 @end iftex
@@ -7522,6 +7559,20 @@ il carattere che fa da separatore fra i record.
 Altrimenti (in @command{gawk}), @code{RS} @`e valutata come espressione
 regolare.  Questo meccanismo @`e spiegato pi@`u in dettaglio qui sotto.
 
+@quotation NOTA
+Quando @command{gawk} @`e chiamato con l'opzione @option{--csv}, nulla
+di quanto descritto in
+@ifnotinfo
+questa
+@end ifnotinfo
+@ifinfo
+questo
+@end ifinfo
+@value{SECTION} @`e applicabile.
+@xref{Campi separati da virgola},
+per i dettagli.
+@end quotation
+
 @menu
 * awk divisione record::       Come @command{awk} standard divide i record.
 * gawk divisione record::      Come @command{gawk} divide i record.
@@ -8238,7 +8289,6 @@ I programmatori di shell notino:  @command{awk} @emph{non} usa il
 nome @code{IFS} che @`e usato dalle shell conformi a POSIX (come
 la Unix Bourne shell, @command{sh}, o Bash).
 
-@c FIXME: This needs reworking now that we have CSV
 @cindex @code{FS} (variabile) @subentry cambiare il valore della
 @cindex cambiare @subentry il valore di @code{FS} (variabile)
 Il valore di @code{FS} si pu@`o cambiare nel programma @command{awk} con
@@ -8250,10 +8300,10 @@ ricerca speciale
 @code{BEGIN}
 (@pxref{BEGIN/END}).
 Per esempio, qui impostiamo il valore di @code{FS} alla stringa
-@code{","}:
+@code{":"}:
 
 @example
-awk 'BEGIN @{ FS = "," @} ; @{ print $2 @}'
+awk 'BEGIN @{ FS = ":" @} ; @{ print $2 @}'
 @end example
 
 @cindex @code{BEGIN} (regola)
@@ -8261,7 +8311,7 @@ awk 'BEGIN @{ FS = "," @} ; @{ print $2 @}'
 Data la riga in input:
 
 @example
-John Q. Smith, 29 Oak St., Walamazoo, MI 42139
+John Q. Smith: 29 Oak St.: Walamazoo: MI 42139
 @end example
 
 @noindent
@@ -8277,7 +8327,7 @@ nome della persona dell'esempio che abbiamo appena usato potrebbe avere un
 titolo o un suffisso annesso, come:
 
 @example
-John Q. Smith, LXIX, 29 Oak St., Walamazoo, MI 42139
+John Q. Smith: LXIX: 29 Oak St.: Walamazoo: MI 42139
 @end example
 
 @noindent
@@ -8480,40 +8530,39 @@ si comporta in questo modo.
 @node Campi separati da virgola
 @subsection Lavorare con file CSV
 
-@cindex dati CSV (campi separati da virgola) @subentry analizzare con @code{FS} = ","
-@cindex CSV (campi separati da virgola) come dati @subentry analizzare con @code{FS} = ","
-@cindex Comma Separated Values (CSV) come dati @subentry analizzare con @code{FS} = ","
-@cindex campi separati da virgola (CSV) come dati @subentry analizzare con @code{FS} = ","
-@cindex @code{FS} (variabile) @subentry carattere "," come
-@cindex variabile @subentry @code{FS} @subentry carattere "," come
-@cindex @code{FS} (variabile) @subentry per analizzare file CSV
-@cindex variabile @subentry @code{FS} @subentry per analizzare file CSV
+@cindex CSV (dati con valori separati da virgola) @subentry record e campi
+@cindex dati CSV (dati con valori separati da virgola) @subentry record e campi
+@cindex campi separati da virgola (CSV) come dati @subentry record e campi
 Molti programmi di uso frequente si servono della virgola come separatore
 di campo, invece di usare lo spazio. [Normalmente i file in input
 a @command{gawk} hanno in questo caso come suffisso "csv",
-Comma Separated Value, ovvero Campi Separati da Virgola.]
+Comma Separated Value, ovvero Campi separati da virgola.]
 Questo @`e il caso in particolare per popolari fogli di calcolo.
 Non c'@`e uno standard accettato da tutti che regoli il formato di tali
 file, sebbene il documento
-@uref{http://www.ietf.org/rfc/rfc4180.txt, RFC 4180}
+@uref{http://www.ietf.org/rfc/rfc4180, RFC 4180}
 elenchi le pratiche normalmente seguite.
 
 Per decenni, chi voleva lavorare con file CSV in @command{awk}
 ha dovuto ``trovare da solo'' una soluzione. (Per esempio,
 @pxref{Separazione in base al contenuto}).
 Nel 2023, Brian Kernighan ha deciso di aggiungere un supporto
-iniziale per i file CSV alla sua versione di @command{awk}.
+per i file CSV alla sua versione di @command{awk}.
 Per restare allo stesso livello, anche @command{gawk} rende
 disponibile lo stesso supporto presente nella versione di Brian.
-Per usare dei file contenenti campi CSV, basta assegnare alla variabile
-@code{FS} una stringa che contiene solo una virgola,
-cos@`{@dotless{i}}: @samp{FS = ","}.
+Per usare dei file contenenti campi in formato CSV, basta
+chiamare @command{gawk} specificando come opzione
+@option{-k} oppure @option{--csv}.
 
 I campi nei file CSV sono separati da virgola.  Per consentire la
 presenza di una virgola all'interno di un campo (p.es. come parte
 di un dato), il campo pu@`o essere racchiuso fra doppi apici.
 Per consentire un doppio apice all'interno di un campo racchiuso fra
-doppi apici, si devono inserire due doppi apici.
+doppi apici, il campo stesso @empf{deve} essere racchiuso fra doppi apici
+e due doppi apici vanno specificati per ogni singolo doppio apice
+all'interno del campo.
+Il doppio apice che segnala l'inizio del campo dev'essere
+il primo carattere dopo la virgola [che segna l'inizio del campo].
 La tabella
 @ref{table-csv-examples} mostra alcuni esempi.
 
@@ -8529,22 +8578,48 @@ La tabella
 @end multitable
 @end float
 
-Il doppio apice che inizia un campo fra doppi apici
-dev'essere il primo carattere dopo la virgola.
+Inoltre, ed @`e qui che la situazione si ingarbuglia, all'interno
+di un campo fra doppi apici @`e consentito anche inserire
+il carattere a-capo!
+Per gestire una tale situazione, quando sta trattando un file CSV
+@command{gawk} analizza il file in input alla ricerca di
+caratteri a-capo che non siano racchiusi fra doppi apici.
+Quindi, se si utilizza l'opzione @option{--csv}, il modo
+di gestire i record utilizzando la variabile @code{RS}
+(@pxref{Record}) non viene utilizzato per nulla.
 
-Alcuni programmi che supportano dati in formato CSV consentono
-perfino di avere dei campi che includono dei caratteri a-capo
-(per esempio se un campo @`e un indirizzo postale).
-Questo @emph{non} @`e supportato n@'e in BWK @command{awk}, n@'e
-in @command{gawk}.  Non @`e possibile gestire simili situazioni
-usando solo le funzionalit@`a del linguaggio @command{awk},
-poich@'e @command{awk} divide preliminarmente l'input in
-record, e il separatore di record di default @`e il carattere
-a-capo.
-Quindi, ogni carattere a-capo presente in un campo segna
-semplicemente la fine del record.
+Molti file CSV provengono da sistemi in cui il carattere di
+fine riga per file di testo @`e costituito dalla coppia di
+caratteri a-capo--ritorno-carrello.
+(CR-LF, @code{\r} seguito by @code{\n}).
+Per semplificare la vita, quando @command{gawk} tratta
+dei file CSV, scarta dall'input ogni carattere ritorno-carrello.
 
-Questa funzionalit@`a @`e disabilitata in modalit@`a POSIX.
+Il comportamento della funzione @code{split()} (ancora non
+formalmente trattato, vedere @ref{Funzioni per stringhe})
+@`e leggermento differente quando si abbia a che fare con file CSV.
+Se @`e chiamato con due argomenti
+(@samp{split(@var{stringa}, @var{vettore})}), @code{split()}
+separa i campi con la logica CSV.
+In tutti gli altri casi, il comportamento @`e quello normale.
+
+Se si @`e specificato l'opzione @option{--csv}, l'elemento
+@code{PROCINFO["CSV"]} esister@`a, altrimenti non sar@`a disponibile.
+@xref{Variabili auto-assegnate}.
+
+Infine, se si @`e specificato @option{--csv}, l'assegnazione di
+un vaalore a una delle variabile
+@code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, o @code{RS}
+genera un messaggio di avvertimento.
+
+Per amor di chiarezza, @command{gawk} considera come
+autoritativo per il file in input di tipo CSV
+il documento
+@uref{http://www.ietf.org/rfc/rfc4180, RFC 4180}.
+Non ci sono meccanismi che consentono di accettare file CSV
+in input che non rispettino tali specifiche, p.es. dei
+file che usino come carattere che separa i campi un
+punto-e-virgola al posto della virgola.
 
 @node Separatori campo da riga di comando
 @subsection Impostare @code{FS} dalla riga di comando
@@ -8737,6 +8812,10 @@ Il seguente elenco riassume come i campi vengono divisi, in base al valore
 di @code{FS} (@samp{==} significa ``@`e uguale a''):
 
 @table @code
+@item @asis{@command{gawk} @`e stato chiamato specificando l'opzione @option{--csv}}
+La divisione in campi segue le regole esposte in @ref{Campi separati da virgola}.
+Il valore di @code{FS} @`e ignorato.
+
 @item FS == " "
 I campi sono separati da uno o pi@`u spazi vuoti.  Gli spazi vuoti iniziali
 e finali sono ignorati.  Questo @`e il comportamento di default.
@@ -9046,6 +9125,10 @@ per un esempio di tale funzione).
 @node Separazione in base al contenuto
 @section Definire i campi in base al contenuto
 
+@strong{FIXME}: Quest'intera sezione dev'essere riscritta
+dopo che in @command{gawk} @`e stata introdotta la capacit@`a di analizzare
+file di tipo CSV. Ahim@`e.
+
 @menu
 * Ancora CSV::                  Ancora sui file CSV.
 * FS rispetto a FPAT::          Una differenza sottile.
@@ -9071,12 +9154,12 @@ parole, @code{FS} definisce cosa un campo @emph{non @`e}, invece di cosa
 Tuttavia, ci sono casi in cui effettivamente si ha bisogno di definire i campi
 in base a cosa essi sono, e non in base a cosa non sono.
 
-@cindex dati CSV (campi separati da virgola) @subentry analizzare con @code{FPAT}
 @cindex CSV (campi separati da virgola) come dati @subentry analizzare con @code{FPAT}
-@cindex Comma Separated Values (CSV) come dati @subentry analizzare con @code{FPAT}
+@cindex dati CSV (campi separati da virgola) @subentry analizzare con @code{FPAT}
 @cindex campi separati da virgola (CSV) come dati @subentry analizzare con @code{FPAT}
-Il caso pi@`u emblematico @`e quello dei dati cosiddetti @dfn{comma-separated
-value} (CSV).  Molti fogli elettronici, per esempio, possono esportare i dati
+Il caso pi@`u emblematico
+@`e quello dei dati di tipo CSV (campi separati da virgola).
+Molti fogli elettronici, per esempio, possono esportare i dati
 in file di testo, dove ogni record termina con un ritorno a capo e i campi
 sono separati tra loro da virgole. Se le virgole facessero solo da separatore
 fra i dati non ci sarebbero problemi.  Il problema sorge se uno dei campi
@@ -9344,7 +9427,9 @@ Il valore @`e @code{"FS"} se si usa la maniera normale di divisione dei campi,
 oppure @code{"FPAT"} se si una la divisione in campi in base al contenuto:
 
 @example
-if (PROCINFO["FS"] == "FS")
+if ("CSV" in PROCINFO)
+    @var{divisione in campi secondo le regole CSV} @dots{}
+else if (PROCINFO["FS"] == "FS")
     @var{divisione normale in campi} @dots{}
 else if (PROCINFO["FS"] == "FIELDWIDTHS")
     @var{divisione in campi a lunghezza fissa} @dots{}
@@ -9356,8 +9441,9 @@ else
 @end example
 
 Quest'informazione @`e utile se si sta scrivendo una funzione che
-deve cambiare provvisoriamente @code{FS} o @code{FIELDWIDTHS}, leggere alcuni
-record e poi ripristinare le inpostazioni originali.  Si veda
+deve cambiare provvisoriamente @code{FS}, @code{FIELDWIDTHS}, o
+@code{FPAT}, leggere alcuni
+record e poi tornale alle impostazioni originali.  Si veda
 (@pxref{Funzioni Passwd} per un esempio di una funzione di questo tipo.
 
 @node Righe multiple
@@ -10206,7 +10292,7 @@ Questo
 @value{SECTION} descrive una funzionalit@`a disponibile solo in
 @command{gawk}.
 
-Si pu@`o  specificare un tempo limite in millisecondi per leggere l'input dalla
+Si pu@`o specificare un tempo limite in millisecondi per leggere l'input dalla
 tastiera, da una @dfn{pipe} o da una comunicazione bidirezionale, compresi i
 @dfn{socket} TCP/IP.  Questo pu@`o essere fatto per input, per comando o per
 connessione, impostando un elemento speciale nel vettore @code{PROCINFO}
@@ -20608,12 +20694,6 @@ a inizio stringa viene messo in @code{@var{separatori}[0]} e ogni
 eventuale spazio bianco a fine stringa viene messo in
 @code{@var{separatori}[@var{n}]}, dove @var{n} @`e il valore restituito da
 @code{split()} (cio@`e il numero di elementi in @var{vettore}).
-Se la variabile @var{separacampo} @`e una virgola, e @command{gawk} non @`e
-in modalit@`a POSIX, la stringa viene suddivisa usando le regole di
-analisi dei file CSV, come richiesto dal separatore @code{FS}
-(@pxref{Campi separati da virgola}).  In questo caso il vettore @var{separatori}
-non viene popolato, perch@'e consisterebbe solo di elementi contenenti
-ciascuno una virgola.
 
 La funzione @code{split()} divide le stringhe in pezzi nello stesso
 modo in cui le righe in input sono divise in campi.  Per esempio:
@@ -20642,6 +20722,15 @@ separatori[2] = "-"
 
 @noindent
 Il valore restituito da questa chiamata a @code{split()} @`e tre.
+
+Se @command{gawk} @`e chiamato con l'opzione @option{--csv}, una chiamata
+a @code{split()} con due soli argomenti, divide la stringa usando le
+regole di analisi dei file di dati CSV, come esposto in
+@ref{Campi separati da virgola}.  Con tre o quattro argomenti,
+@code{split()} funzione come visto sopra.  La chiamata con quattro
+argomenti non avrebbe senso per i file CSV, poich@'e ogni elemento
+del vettore @var{separatori} consisterebbe semplicemente in una
+stringa che contiene una virgola.
 
 @cindex differenze tra @command{awk} e @command{gawk} @subentry funzione @code{split()}
 Come nella divisione in campi dei record in input, quando il valore di
@@ -23491,8 +23580,65 @@ un errore fatale, quindi @command{awk} non arriver@`a a segnalare il secondo
 errore.  Se si commenta la prima chiamata e si riesegue il
 programma, a quel punto @command{awk} terminer@`a con un messaggio
 relativo al secondo errore.
-Solitamente queste cose non causano grossi problemi, ma @`e bene
-esserne a conoscenza.
+
+Ecco un esempio pi@`u complesso:
+
+@example
+BEGIN @{
+    funky(a)
+    if (A == 0)
+        print "<" a ">"
+    else
+        print a[1]
+@}
+
+function funky(arr)
+@{
+    if (A == 0)
+        arr = 1
+    else
+        arr[1] = 1
+@}
+@end example
+
+In questo esempio, la funzione usa il parametro che le viene
+passato in modo differente a seconda del valore della variabile
+globale @code{A}.
+Se @code{A} vale zero, il parametro @code{arr} @`e trattato come una
+variabile scalare.  Altrimenti @`e trattato come un vettore.
+
+Ci sono due modi in cui questo programma potrebbe comportarsi.
+@command{awk} potrebbe determinare che, nel programma principale
+@code{a} ha un indice (ossia @`e un elemento di un vettore), e quindi
+considerarlo un vettore (nella fase di analisi del programma, ossia
+prima ancora che il programma inizi la sua esecuzione.
+BWK @code{awk}, @code{mawk}, e forse altri fanno questo:
+
+@example
+$ @kbd{nawk -v A=0 -f funky.awk}
+@error{} nawk: can't assign to a; it's an array name.
+@error{}  source line number 11
+$ @kbd{nawk -v A=1 -f funky.awk}
+@print{} 1
+@end example
+
+Oppure @command{awk} potrebbe attendere il momento in cui l'istruzione
+viene eseguita, per determinare il tipo della variabile @code{a}.
+In tal caso, poich@'e @code{a} non @`e ancora stato usato prima di essere
+passato alla funzione, l'uso che ne fa la funzione determina il tipo
+della variabile, che quindi pu@`o diventare scalare o vettoriale.
+@command{gawk} e MKS @command{awk} si comportano cos@`{@dotless{i}}:
+
+@example
+$ @kbd{gawk -v A=0 -f funky.awk}
+@print{} <>
+$ @kbd{gawk -v A=1 -f funky.awk }
+@print{} 1
+@end example
+
+POSIX non specifica quale dei due comportamenti sia quello corretto,
+quindi occorre essere consapevoli che differenti implementazioni di
+@command{awk} si comportano in modi diversi.
 
 @node Chiamate indirette
 @section Chiamate indirette di funzione
@@ -45771,6 +45917,10 @@ Divisione in campi per file di tipo CSV (Campi separati da virgola)
 @item
 La possibilit@`a che @command{gawk} bufferizzi l'output a @dfn{pipe}
 (@pxref{Noflush}).
+
+@item
+La sequenza di protezione @samp{\u}
+(@pxref{Sequenze di protezione}).
 
 @item
 La necessit@`a di utilizzare la libreria GNU @code{libsigsegv}
