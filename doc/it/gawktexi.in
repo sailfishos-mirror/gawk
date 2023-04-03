@@ -8588,12 +8588,20 @@ Quindi, se si utilizza l'opzione @option{--csv}, il modo
 di gestire i record utilizzando la variabile @code{RS}
 (@pxref{Record}) non viene utilizzato per nulla.
 
+@sidebar Carriage-Return--Line-Feed Line Endings In CSV Files
+@sidebar Fine riga dei file CSV con ritorno-carrello--a-capo
+@quotation
+@code{\r\n} @i{@`e un'invenzione del diavolo.}
+@author Brian Kernighan
+@end quotation
+
 Molti file CSV provengono da sistemi in cui il carattere di
 fine riga per file di testo @`e costituito dalla coppia di
-caratteri a-capo--ritorno-carrello.
+caratteri ritorno-carrello--a-capo.
 (CR-LF, @code{\r} seguito by @code{\n}).
 Per semplificare la vita, quando @command{gawk} tratta
 dei file CSV, scarta dall'input ogni carattere ritorno-carrello.
+@end sidebar
 
 Il comportamento della funzione @code{split()} (ancora non
 formalmente trattato, vedere @ref{Funzioni per stringhe})
@@ -12639,7 +12647,10 @@ In modalit@`a POSIX (@pxref{Opzioni}), @command{gawk} non consente
 caratteri protetti di avanzamento riga.  Altrimenti, il
 comportamento @`e quello descritto sopra.
 
-BKW @command{awk} e BusyBox @command{awk}
+BKW @command{awk}@footnote{In tutti gli esempi contenuti in
+questo @value{DOCUMENT}, il comando @command{nawk}
+richiama BWK @command{awk}.}
+e BusyBox @command{awk}
 tolgono la barra inversa, ma lasciano indisturbato il carattere
 di avanzamento riga, che fa quindi parte della stringa:
 
@@ -23553,6 +23564,13 @@ valore pi@`u alto contenuto nel vettore.
 
 @node Variabili di tipo dinamico
 @subsection Funzioni e loro effetti sul tipo di una variabile
+
+@quotation
+@i{@`E una farcitura per il deserto!@footnote{Si tratta di un
+gioco di parole fra "desert" (deserto) e "dessert" (dolce).}
+@`E una cera per pavimenti!}
+@author Saturday Night Live (quando era ancora divertente)
+@end quotation
 
 @command{awk} @`e un linguaggio molto fluido.
 @`E possible che @command{awk} non sia in grado di stabilire se un
@@ -45945,18 +45963,20 @@ le tre versioni liberamente disponibili pi@`u usate di @command{awk}
 
 @multitable {File speciale @file{/dev/stderr}} {BWK @command{awk} } {@command{mawk}} {@command{gawk}} {Standard attuale}
 @headitem Funzionalit@`a @tab BWK @command{awk} @tab @command{mawk} @tab @command{gawk} @tab Standard attuale
+@item Operatori @code{**} e @code{**=} @tab X @tab @tab X @tab
 @item Sequenza di protezione @samp{\x} @tab X @tab X @tab X @tab
-@item Stringa nulla come @code{FS} @tab X @tab X @tab X @tab
+@item Sequenza di protezione @samp{\u} @tab X @tab @tab X @tab
 @item File speciale @file{/dev/stdin} @tab X @tab X @tab X @tab
 @item File speciale @file{/dev/stdout} @tab X @tab X @tab X @tab
 @item File speciale @file{/dev/stderr} @tab X @tab X @tab X @tab
+@item Variabile @code{BINMODE} @tab @tab X @tab X @tab
+@item Supporto CSV @tab X @tab @tab X @tab
+@item Stringa nulla come @code{FS} @tab X @tab X @tab X @tab
 @item @code{delete} senza indici @tab X @tab X @tab X @tab X
 @item Funzione @code{fflush()} @tab X @tab X @tab X @tab X
+@item Parola chiave @code{func} @tab X @tab @tab X @tab
 @item @code{length()} di un vettore @tab X @tab X @tab X @tab
 @item Istruzione @code{nextfile} @tab X @tab X @tab X @tab X
-@item Operatori @code{**} e @code{**=} @tab X @tab @tab X @tab
-@item Parola chiave @code{func} @tab X @tab @tab X @tab
-@item Variabile @code{BINMODE} @tab @tab X @tab X @tab
 @item @code{RS} come @dfn{regexp} @tab X @tab X @tab X @tab
 @item Funzioni gestione data/ora @tab @tab X @tab X @tab
 @end multitable
