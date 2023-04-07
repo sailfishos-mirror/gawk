@@ -652,8 +652,8 @@ particular records in a file and perform operations upon them.
                                         Pipes.
 * Close Return Value::                  Using the return value from
                                         @code{close()}.
-* Nonfatal::                            Enabling Nonfatal Output.
 * Noflush::                             Speeding Up Pipe Output.
+* Nonfatal::                            Enabling Nonfatal Output.
 * Output Summary::                      Output summary.
 * Output Exercises::                    Exercises.
 * Values::                              Constants, Variables, and Regular
@@ -835,6 +835,8 @@ particular records in a file and perform operations upon them.
                                         shell.
 * Isnumeric Function::                  A function to test whether a value is
                                         numeric.
+* To CSV Function::                     A function to convert output to CSV
+                                        format.
 * Data File Management::                Functions for managing command-line
                                         data files.
 * Filetrans Function::                  A function for handling data file
@@ -21947,6 +21949,7 @@ programming use.
 * Readfile Function::           A function to read an entire file at once.
 * Shell Quoting::               A function to quote strings for the shell.
 * Isnumeric Function::          A function to test whether a value is numeric.
+* To CSV Function::             A function to convert output to CSV format.
 @end menu
 
 @node Strtonum Function
@@ -22777,6 +22780,88 @@ string values with numeric contents where @code{CONVFMT} does not yield
 the original string.
 On the other hand, it uses the @code{typeof()} function
 (@pxref{Type Functions}), which is specific to @command{gawk}.
+
+@node To CSV Function
+@subsection Producing CSV Data
+
+@cindex comma separated values (CSV) data @subentry generating CSV data
+@cindex CSV (comma separated values) data @subentry generating CSV data
+@command{gawk}'s @option{--csv} option causes @command{gawk}
+to process CSV data (@pxref{Comma Separated Fields}).
+
+But what if you have regular data that you want to output
+in CSV format?  This @value{SECTION} provides functions for
+doing that.
+
+The first function, @code{tocsv()}, takes an array of data
+fields as input. The array should be indexed starting from one.
+The optional second parameter is the separator to use. If none
+is supplied, the default is a comma.
+
+The function takes care to quote fields that contain double
+quotes, newlines, or the separator character.  It then builds
+up the final CSV record and returns it.
+
+@cindex @code{tocsv()} user-defined function
+@example
+@c file eg/lib/tocsv.awk
+# tocsv.awk --- convert data to CSV format
+@c endfile
+@ignore
+@c file eg/lib/tocsv.awk
+#
+# Arnold Robbins, arnold@@skeeve.com, Public Domain
+# April 2023
+@c endfile
+@end ignore
+@c file eg/lib/tocsv.awk
+
+function tocsv(fields, sep,     i, j, nfields, result)
+@{
+    if (length(fields) == 0)
+        return ""
+
+    if (sep == "")
+        sep = ","
+    delete nfields
+    for (i = 1; i in fields; i++) @{
+        nfields[i] = fields[i]
+        if (nfields[i] ~ /["\n]/ || index(nfields[i], sep) != 0) @{
+            gsub(/"/, "\"\"", nfields[i])       # double up quotes
+            nfields[i] = "\"" nfields[i] "\""   # wrap in quotes
+        @}
+    @}
+
+    result = nfields[1]
+    j = length(nfields)
+    for (i = 2; i <= j; i++)
+        result = result sep nfields[i]
+
+    return result
+@}
+@c endfile
+@end example
+
+The next function, @code{tocsv_rec()} is a wrapper around
+@code{tocsv()}. Its intended use is for when you want to convert the
+current input record to CSV format.  The function itself simply copies
+the fields into an array to pass to @code{tocsv()} which does the work.
+It accepts an optional separator character as its first parameter,
+which it simply passes on to @code{tocsv()}.
+
+@cindex @code{tocsv_rec()} user-defined function
+@example
+@c file eg/lib/tocsv.awk
+function tocsv_rec(sep,     i, fields)
+@{
+    delete feilds
+    for (i = 1; i <= NF; i++)
+        fields[i] = $i
+
+    return tocsv(fields, sep)
+@}
+@c endfile
+@end example
 
 @node Data File Management
 @section @value{DDF} Management
