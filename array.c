@@ -748,10 +748,16 @@ assoc_info(NODE *subs, NODE *val, NODE *ndump, const char *aname)
 	fprintf(output_fp, "]\n");
 
 	indent(indent_level);
-	if (val->type == Node_val) {
+	switch (val->type) {
+	case Node_val:
 		fprintf(output_fp, "V: [scalar: ");
 		value_info(val);
-	} else {
+		break;
+	case Node_var:
+		fprintf(output_fp, "V: [scalar: ");
+		value_info(val->var_value);
+		break;
+	case Node_var_array:
 		fprintf(output_fp, "V: [");
 		ndump->alevel++;
 		ndump->adepth--;
@@ -759,6 +765,19 @@ assoc_info(NODE *subs, NODE *val, NODE *ndump, const char *aname)
 		ndump->adepth++;
 		ndump->alevel--;
 		indent(indent_level);
+		break;
+	case Node_func:
+		fprintf(output_fp, "V: [user_defined_function");
+		break;
+	case Node_ext_func:
+		fprintf(output_fp, "V: [external_function");
+		break;
+	case Node_builtin_func:
+		fprintf(output_fp, "V: [builtin_function");
+		break;
+	default:
+		cant_happen("unexpected node type %s", nodetype2str(val->type));
+		break;
 	}
 	fprintf(output_fp, "]\n");
 }
