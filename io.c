@@ -3858,14 +3858,6 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 		while (*bp != rs) { 
 			if (*bp == '\"')
 				in_quote = ! in_quote;
-			else if (*bp == '\r') {	// strip CRs
-				size_t count = (iop->dataend - bp);
-
-				// shift it all down by one
-				memmove(bp, bp + 1, count);
-				iop->dataend--;
-				bp--;	// compensate for the upcoming bp++
-			}
 			bp++;
 		}
 	} while (in_quote && bp < iop->dataend && bp++);
@@ -3874,8 +3866,15 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 	recm->len = bp - recm->start;
 
 	if (bp < iop->dataend) {        /* found it in the buffer */
-		recm->rt_start = bp;
-		recm->rt_len = 1;
+		if (bp > iop->off && bp[-1] == '\r') {
+			/* handle CR LF conventional CSV record terminator */
+			recm->rt_start = bp - 1;
+			recm->rt_len = 2;
+		}
+		else {
+			recm->rt_start = bp;
+			recm->rt_len = 1;
+		}
 		*state = NOSTATE;
 		return REC_OK;
 	} else {
