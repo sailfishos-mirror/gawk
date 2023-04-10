@@ -28,7 +28,7 @@ function tocsv(fields, sep,     i, j, nfields, result)
 }
 function tocsv_rec(sep,     i, fields)
 {
-    delete feilds
+    delete fields
     for (i = 1; i <= NF; i++)
         fields[i] = $i
 
