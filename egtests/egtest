@@ -671,6 +671,24 @@ do_testbits() {
 	#      gawk -f testbits.awk -f bits2str.awk
 }
 
+do_tocsv() {
+	echo "*"
+	echo "echo \"{ csvline=tocsv_rec(\",\")\"        >$testpgm"
+	      echo  "{ csvline=tocsv_rec(\",\")"         >$testpgm
+	echo "echo \"print \"BEFORE\",\$0\"             >>$testpgm"
+	      echo  "print \"BEFORE\",\$0"              >>$testpgm
+	echo "echo \"print \"AFTER \",csvline }\"       >>$testpgm"
+	      echo  "print \"AFTER \",csvline }"        >>$testpgm
+	echo "* test data"
+	printf  "p,\"q,r\",s\np,\"q\"\"r\",s\np,\"q,\"\"r\",s\np,\"\",s\np,,s\n"   >$testdata
+	echo "cat $testdata"
+	      cat $testdata
+	echo "*"
+	echo "gawk -f tocsv.awk -f $testpgm $testdata"
+	      gawk -f tocsv.awk -f $testpgm $testdata
+	echo "*"
+}
+
 do_translate() {
 	echo "*"
 	echo "input:"
