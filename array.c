@@ -935,17 +935,24 @@ asort_actual(int nargs, sort_context_t ctxt)
 
 			NODE *value;
 
-			if (r->type == Node_val)
+			switch (r->type) {
+			case Node_val:
 				value = dupnode(r);
-			else if (r->type == Node_var)
+				break;
+			case Node_var:
 				/* SYMTAB ... */
 				value = dupnode(r->var_value);
-			else if (r->type == Node_builtin_func
-				 || r->type == Node_func
-				 || r->type == Node_ext_func) {
+				break;
+			case Node_var_new:
+				value = dupnode(Nnull_string);
+				break;
+			case Node_builtin_func:
+			case Node_func:
+			case Node_ext_func:
 				/* FUNCTAB ... */
 				value = make_string(r->vname, strlen(r->vname));
-			} else {
+				break;
+			case Node_var_array:
 				NODE *arr;
 				arr = make_array();
 				subs = force_string(subs);
@@ -956,6 +963,9 @@ asort_actual(int nargs, sort_context_t ctxt)
 				arr->parent_array = array; /* actual parent, not the temporary one. */
 
 				value = assoc_copy(r, arr);
+				break;
+			default:
+				cant_happen("asort_actual: got unexpected type %s", nodetype2str(r->type));
 			}
 			assoc_set(result, subs, value);
 		}
