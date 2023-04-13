@@ -3860,21 +3860,20 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 				in_quote = ! in_quote;
 			bp++;
 		}
+		if (bp > iop->off && bp[-1] == '\r') {
+			// convert CR-LF to LF by shifting the record
+			memmove(bp - 1, bp, iop->dataend - bp);
+			iop->dataend--;
+			bp--;
+		}
 	} while (in_quote && bp < iop->dataend && bp++);
 
 	/* set len to what we have so far, in case this is all there is */
 	recm->len = bp - recm->start;
 
 	if (bp < iop->dataend) {        /* found it in the buffer */
-		if (bp > iop->off && bp[-1] == '\r') {
-			/* handle CR LF conventional CSV record terminator */
-			recm->rt_start = bp - 1;
-			recm->rt_len = 2;
-		}
-		else {
-			recm->rt_start = bp;
-			recm->rt_len = 1;
-		}
+		recm->rt_start = bp;
+		recm->rt_len = 1;
 		*state = NOSTATE;
 		return REC_OK;
 	} else {

@@ -770,9 +770,9 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         @dfn{pipe}.
 * Valore restituito da @code{close}::   Usare il valore di ritorno restituito da
                                         @code{close()}.
+* Noflush::                             Velocizzare output da @dfn{pipe}.
 * Continuazione dopo errori::           Abilitare continuazione dopo errori
                                         in output.
-* Noflush::                             Velocizzare output da @dfn{pipe}.
 * Sommario di Output::                  Sommario di Output.
 * Esercizi su Output::                  Esercizi.
 * Valori::                              Costanti, variabili ed espressioni
@@ -969,7 +969,9 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Funzione getlocaltime::               Una funzione per ottenere data e
                                         ora nel formato desiderato.
 * Funzione isnumeric::                  Una funzione per controllare se un
-					valore @`e numerico.
+                                        valore @`e numerico.
+* Funzione tocsv::                      Una funzione per convertire l'output
+                                        al formato CSV.
 * Funzione readfile::                   Una funzione per leggere un file
                                         intero in un colpo solo.
 * Apici alla shell::                    Una funzione per passare stringhe
@@ -8588,6 +8590,7 @@ Quindi, se si utilizza l'opzione @option{--csv}, il modo
 di gestire i record utilizzando la variabile @code{RS}
 (@pxref{Record}) non viene utilizzato per nulla.
 
+@cindex Kernighan, Brian @subentry citazioni di
 @sidebar Carriage-Return--Line-Feed Line Endings In CSV Files
 @sidebar Fine riga dei file CSV con ritorno-carrello--a-capo
 @quotation
@@ -8597,10 +8600,12 @@ di gestire i record utilizzando la variabile @code{RS}
 
 Molti file CSV provengono da sistemi in cui il carattere di
 fine riga per file di testo @`e costituito dalla coppia di
-caratteri ritorno-carrello--a-capo.
-(CR-LF, @code{\r} seguito by @code{\n}).
-Per semplificare la vita, quando @command{gawk} tratta
-dei file CSV, scarta dall'input ogni carattere ritorno-carrello.
+caratteri ritorno-carrello--a-capo
+(CR-LF, @samp{\r} seguito da @samp{\n}).
+Per semplificare la vita @command{gawk}, quando tratta
+dei file CSV, include il carattere a-capo a fine record solo
+quando precede immediatamente un carattere ritorno-carrello
+nell'input.
 @end sidebar
 
 Il comportamento della funzione @code{split()} (ancora non
@@ -8616,7 +8621,7 @@ Se si @`e specificato l'opzione @option{--csv}, l'elemento
 @xref{Variabili auto-assegnate}.
 
 Infine, se si @`e specificato @option{--csv}, l'assegnazione di
-un vaalore a una delle variabile
+un valore a una delle variabili
 @code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, o @code{RS}
 genera un messaggio di avvertimento.
 
@@ -19131,9 +19136,10 @@ successivamente:
 
 @example
 @dots{}
-if ("sorted_in" in PROCINFO) @{
+if ("sorted_in" in PROCINFO)
     ordine_salvato = PROCINFO["sorted_in"]
-    PROCINFO["sorted_in"] = "@@val_str_desc" # o qualcos'altro
+
+PROCINFO["sorted_in"] = "@@val_str_desc" # o qualcos'altro
 @}
 @dots{}
 if (ordine_salvato)
@@ -23566,7 +23572,7 @@ valore pi@`u alto contenuto nel vettore.
 @subsection Funzioni e loro effetti sul tipo di una variabile
 
 @quotation
-@i{@`E una farcitura per il deserto!@footnote{Si tratta di un
+@i{@`E una farcitura per il deserto! @*@footnote{Si tratta di un
 gioco di parole fra "desert" (deserto) e "dessert" (dolce).}
 @`E una cera per pavimenti!}
 @author Saturday Night Live (quando era ancora divertente)
@@ -24497,6 +24503,8 @@ programmazione.
                                 con apici alla shell.
 * Funzione isnumeric::          Una funzione per controllare se un valore
 				@`e numerico.
+* Funzione tocsv::              Una funzione per convertire l'output
+                                al formato CSV.
 @end menu
 
 @node Funzione strtonum
@@ -25392,6 +25400,102 @@ uguale a quella originale.
 Tuttavia, per farlo, utilizza la funzione @code{typeof()}
 (@pxref{Funzioni per i tipi}), che @`e disponibile solo in @command{gawk}.
 
+@node Funzione tocsv
+@subsection Produrre output in formato CSV
+
+@cindex campi separati da virgola (CSV) come dati @subentry generare output in formato CSV
+@cindex CSV (dati con valori separati da virgola) @subentry generare output in formato CSV
+@cindex dati CSV (campi separati da virgola) @subentry generati da @command{gawk}
+L'opzione @option{--csv} di @command{gawk} permette di gestire dati di input in formato
+CSV (@pxref{Campi separati da virgola}).
+
+Se si volesse invece, a partire da dati normali, generare in output
+dati in formato CSV?
+@ifnotinfo
+Questa
+@end ifnotinfo
+@ifinfo
+Questo
+@end ifinfo
+@value{SECTION} fornisce delle funzioni che consentono di farlo.
+
+La prima funzione, @code{tocsv()}, ha come input un vettore
+formato da campi di dati.  Il vettore dovrebbe avere come indice
+i numeri, a partire dall'uno. Il secondo parametro, opzionale,
+specifica quale sia il separatore dei campi.  Se non se ne
+specifica uno, quello di default @`e la virgola.
+
+La funzione @`e in grado di mettere correttamente in formato
+CSV campi che contengono al loro interno doppi apici, caratteri
+a-capo, o il carattere stesso usato come separatore.
+Il record finale in formato CSV viene preparato e restituito
+dalla funzione.
+
+@cindex @code{tocsv()} @subentry funzione definita dall'utente
+@cindex funzione definita dall'utente @subentry @code{tocsv()}
+@example
+@c file eg/lib/tocsv.awk
+# tocsv.awk --- convertire dati al formato CSV
+@c endfile
+@ignore
+@c file eg/lib/tocsv.awk
+#
+# Arnold Robbins, arnold@@skeeve.com, Public Domain
+# April 2023
+@c endfile
+@end ignore
+@c file eg/lib/tocsv.awk
+
+function tocsv(campi, sep,     i, j, n_campi, risultato)
+@{
+    if (length(campi) == 0)
+        return ""
+
+    if (sep == "")
+        sep = ","
+    delete n_campi
+    for (i = 1; i in campi; i++) @{
+        n_campi[i] = campi[i]
+        if (n_campi[i] ~ /["\n]/ || index(n_campi[i], sep) != 0) @{
+            gsub(/"/, "\"\"", n_campi[i])       # raddoppia doppi apici
+            n_campi[i] = "\"" n_campi[i] "\""   # fra doppi apici
+        @}
+    @}
+
+    risultato = n_campi[1]
+    j = length(n_campi)
+    for (i = 2; i <= j; i++)
+        risultato = risultato sep n_campi[i]
+
+    return risultato
+@}
+@c endfile
+@end example
+
+La funzione che segue, @code{tocsv_rec()} serve per utilizzare
+@code{tocsv()}.  Si pu@`o usare se si vuol convertire un record in
+input al formato CSV.  La funzione stessa si limita a copiare i
+campi del record in un vettore, che viene poi passato alla funzione
+@code{tocsv()} che effettua la conversione.
+La funzione accetta come suo primo parametro un carattere di
+separazione opzionale, che viene semplicemente passato alla funzione
+@code{tocsv()}.
+
+@cindex @code{tocsv_rec()} @subentry funzione definita dall'utente
+@cindex funzione definita dall'utente @subentry @code{tocsv_rec()}
+@example
+@c file eg/lib/tocsv.awk
+function tocsv_rec(sep,     i, campi)
+@{
+    delete campi
+    for (i = 1; i <= NF; i++)
+        campi[i] = $i
+
+    return tocsv(campi, sep)
+@}
+@c endfile
+@end example
+
 @node Gestione File Dati
 @section Gestione di @value{DF}
 
@@ -25425,7 +25529,7 @@ presenta funzioni utili per gestire @value{DF} da riga di comando.
 @cindex file @subentry gestione di @subentry limiti dei file-dati
 @cindex file @subentry inizializzazione e pulizia
 Ognuna delle regole @code{BEGIN} ed @code{END} viene eseguita esattamente
-solo una volta, rispettivamente all'inizio e alla fine del programma
+una volta sola, rispettivamente all'inizio e alla fine del programma
 @command{awk} (@pxref{BEGIN/END}).
 Una volta noi (gli autori di @command{gawk}) siamo venuti in contatto
 con un utente che
