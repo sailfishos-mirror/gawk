@@ -127,15 +127,17 @@ EXTRA_DIST = \
 	asgext.ok \
 	asort.awk \
 	asort.ok \
+	asortbool.awk \
+	asortbool.ok \
 	asorti.awk \
 	asorti.ok \
+	asortsymtab.awk \
+	asortsymtab.ok \
 	assignnumfield.awk \
 	assignnumfield.in \
 	assignnumfield.ok \
 	assignnumfield2.awk \
 	assignnumfield2.ok \
-	asortbool.awk \
-	asortbool.ok \
 	awkpath.ok \
 	back89.awk \
 	back89.in \
@@ -1502,6 +1504,7 @@ UNIX_TESTS = \
 GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
+	asortsymtab \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
 	clos1way5 clos1way6 colonwarn commas crlf dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
