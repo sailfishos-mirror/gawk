@@ -8124,8 +8124,8 @@ To use CSV data, invoke @command{gawk} with either of the
 Fields in CSV files are separated by commas.  In order to allow a comma
 to appear inside a field (i.e., as data), the field may be quoted
 by beginning and ending it with double quotes.  In order to allow a double
-quote inside a field, the field @emph{must} be quoted, and two double quotes are used
-to represent an actual double quote.
+quote inside a field, the field @emph{must} be quoted, and two double quotes
+represent an actual double quote.
 The double quote that starts a quoted field must be the first
 character after the comma.
 @ref{table-csv-examples} shows some examples.
@@ -8145,8 +8145,10 @@ Additionally, and here's where it gets messy, newlines are also
 allowed inside double-quoted fields!
 In order to deal with such things, when processing CSV files,
 @command{gawk} scans the input data looking for newlines that
-are not enclosed in double quotes. Thus, use of the @option{--csv}
-totally overrides normal record processing with @code{RS} (@pxref{Records}).
+are not enclosed in double quotes. Thus, use of the @option{--csv} option
+totally overrides normal record processing with @code{RS} (@pxref{Records}),
+as well as field splitting with any of @code{FS}, @code{FIELDWIDTHS},
+or @code{FPAT}.
 
 @cindex Kernighan, Brian @subentry quotes
 @cindex sidebar @subentry Carriage-Return--Line-Feed Line Endings In CSV Files
@@ -8163,9 +8165,13 @@ totally overrides normal record processing with @code{RS} (@pxref{Records}).
 Many CSV files are imported from systems where the line terminator
 for text files is a carriage-return--line-feed pair
 (CR-LF, @samp{\r} followed by @samp{\n}).
-For ease of use, when processing CSV files, @command{gawk} simply
-includes the carriage-return character in the record terminator
-when it occurs immediately prior to a line-feed character in the input.
+For ease of use, when processing CSV files, @command{gawk} converts
+CR-LF pairs into a single newline. That is, the @samp{\r} is removed.
+
+This occurs only when a CR is paired with an LF; a standalone CR
+is left alone. This behavior is consistent with with Windows systems
+which automatically convert CR-LF in files into a plain LF in memory,
+and also with the commonly available @command{unix2dos} utility program.
 
 @docbook
 </sidebar>
@@ -8185,9 +8191,13 @@ when it occurs immediately prior to a line-feed character in the input.
 Many CSV files are imported from systems where the line terminator
 for text files is a carriage-return--line-feed pair
 (CR-LF, @samp{\r} followed by @samp{\n}).
-For ease of use, when processing CSV files, @command{gawk} simply
-includes the carriage-return character in the record terminator
-when it occurs immediately prior to a line-feed character in the input.
+For ease of use, when processing CSV files, @command{gawk} converts
+CR-LF pairs into a single newline. That is, the @samp{\r} is removed.
+
+This occurs only when a CR is paired with an LF; a standalone CR
+is left alone. This behavior is consistent with with Windows systems
+which automatically convert CR-LF in files into a plain LF in memory,
+and also with the commonly available @command{unix2dos} utility program.
 @end cartouche
 @end ifnotdocbook
 

@@ -231,6 +231,9 @@ EXTRA_DIST = \
 	csv3.awk \
 	csv3.in \
 	csv3.ok \
+	csvodd.awk \
+	csvodd.in \
+	csvodd.ok \
 	datanonl.awk \
 	datanonl.in \
 	datanonl.ok \
@@ -1513,7 +1516,7 @@ GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
 	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
-	clos1way5 clos1way6 colonwarn commas crlf csv1 csv2 csv3 \
+	clos1way5 clos1way6 colonwarn commas crlf csv1 csv2 csv3 csvodd \
 	dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
@@ -1616,7 +1619,7 @@ NEED_TRADITIONAL = litoct tradanch rscompat
 NEED_PMA = pma
 
 # List of tests that need --csv
-NEED_CSV = csv1 csv2 csv3
+NEED_CSV = csv1 csv2 csv3 csvodd
 
 # Lists of tests that run a shell script
 RUN_SHELL = exit fflush localenl modifiers next randtest rtlen rtlen01
