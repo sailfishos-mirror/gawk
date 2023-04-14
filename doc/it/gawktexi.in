@@ -8561,8 +8561,7 @@ presenza di una virgola all'interno di un campo (p.es. come parte
 di un dato), il campo pu@`o essere racchiuso fra doppi apici.
 Per consentire un doppio apice all'interno di un campo racchiuso fra
 doppi apici, il campo stesso @empf{deve} essere racchiuso fra doppi apici
-e due doppi apici vanno specificati per ogni singolo doppio apice
-all'interno del campo.
+e due doppi apici rappresentano un singolo doppio apice.
 Il doppio apice che segnala l'inizio del campo dev'essere
 il primo carattere dopo la virgola [che segna l'inizio del campo].
 La tabella
@@ -8588,7 +8587,9 @@ Per gestire una tale situazione, quando sta trattando un file CSV
 caratteri a-capo che non siano racchiusi fra doppi apici.
 Quindi, se si utilizza l'opzione @option{--csv}, il modo
 di gestire i record utilizzando la variabile @code{RS}
-(@pxref{Record}) non viene utilizzato per nulla.
+(@pxref{Record}) non viene utilizzato per nulla. E lo stesso
+dicasi per la divisione in campi effettuata tramite
+@code{FS}, @code{FIELDWIDTHS}, o @code{FPAT}.
 
 @cindex Kernighan, Brian @subentry citazioni di
 @sidebar Carriage-Return--Line-Feed Line Endings In CSV Files
@@ -8603,15 +8604,22 @@ fine riga per file di testo @`e costituito dalla coppia di
 caratteri ritorno-carrello--a-capo
 (CR-LF, @samp{\r} seguito da @samp{\n}).
 Per semplificare la vita @command{gawk}, quando tratta
-dei file CSV, include il carattere a-capo a fine record solo
-quando precede immediatamente un carattere ritorno-carrello
-nell'input.
+dei file CSV, converte la coppia di caratteri CR-LF a
+un semplice LF (a-capo). Ovvero, il carattere
+CR (ritorno-carrello) viene eliminato.
+
+Ci@`o capita solo se viene incontrata una coppia di caratteri
+CR-LF adiacenti; un carattere CR isolato non viene toccato.
+Questo comportamento @`e consistente con i sistemi Windows,
+che convertono automaticamente la coppia CR-LF in un file
+in un semplice LF in memoria; allo stesso modo si comporta
+il diffuso comando di utilit@`a, @command{unix2dos}.
 @end sidebar
 
 Il comportamento della funzione @code{split()} (ancora non
 formalmente trattato, vedere @ref{Funzioni per stringhe})
 @`e leggermento differente quando si abbia a che fare con file CSV.
-Se @`e chiamato con due argomenti
+Se @`e chiamata con due argomenti
 (@samp{split(@var{stringa}, @var{vettore})}), @code{split()}
 separa i campi con la logica CSV.
 In tutti gli altri casi, il comportamento @`e quello normale.
