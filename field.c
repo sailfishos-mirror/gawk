@@ -261,13 +261,13 @@ rebuild_record()
  * but better correct than fast.
  */
 void
-set_record(const char *buf, int cnt, const awk_fieldwidth_info_t *fw)
+set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *fw)
 {
 	NODE *n;
 	static char *databuf;
-	static unsigned long databuf_size;
+	static size_t databuf_size;
 #define INITIAL_SIZE	512
-#define MAX_SIZE	((unsigned long) ~0)	/* maximally portable ... */
+#define MAX_SIZE	((size_t) ~0)	/* maximally portable ... */
 
 	purge_record();
 
