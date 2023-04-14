@@ -1,6 +1,6 @@
 /* vms_fwrite.c - augmentation for the fwrite() function.
 
-   Copyright (C) 1991-1996, 2010, 2011, 2014, 2016, 2022
+   Copyright (C) 1991-1996, 2010, 2011, 2014, 2016, 2022, 2023,
    the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify

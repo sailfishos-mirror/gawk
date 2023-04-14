@@ -1,3 +1,12 @@
+2023-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* array.c (asort_actual): Handle Node_elem_new. Add braces
+	for scoping, fixes tcc compiler error (GCC is too permissive!).
+	Update copyright year.
+	* Makefile.am, configure.ac, awk.h, agwkgram.y, builtin.c,
+	command.y, eval.c, field.c, io.c, msg.c, node.c, profile.c,
+	symbol.c: Update copyright year.
+
 2023-04-13         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* array.c (asort_actual): Handle Node_var_new. Can happen
@@ -45,6 +54,21 @@
 2023-03-21         Manuel Collado        <mcollado2011@gmail.com>
 
 	* io.c (csvscan): Real implementation.
+
+2023-03-18         Miguel Pineiro Jr.    <mpj@pineiro.cc>
+
+	Allow records longer than INT_MAX. For test cases,
+	see https://lists.gnu.org/archive/html/bug-gawk/2021-05/msg00003.html.
+
+	* awk.h (set_record): `cnt' is now size_t.
+	* field.c (set_record): `cnt' is now size_t. Adjust databuf_size
+	and MAX_SIZE macro.
+	* io.c (get_a_record): Add new second parameter, size_t *len,
+	which holds the size. Adjust return value meaning. Deal with
+	return from an extension's get_a_record() function.
+	(do_getline_redir): Adjust calling get_a_record().
+	(do_getline): Ditto.
+	(inrec): Ditto.
 
 2023-03-17         Arnold D. Robbins     <arnold@skeeve.com>
 
