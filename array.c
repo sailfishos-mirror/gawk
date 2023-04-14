@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2014, 2016, 2018-2022,
+ * Copyright (C) 1986, 1988, 1989, 1991-2014, 2016, 2018-2023,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -944,6 +944,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 				value = dupnode(r->var_value);
 				break;
 			case Node_var_new:
+			case Node_elem_new:
 				value = dupnode(Nnull_string);
 				break;
 			case Node_builtin_func:
@@ -953,7 +954,9 @@ asort_actual(int nargs, sort_context_t ctxt)
 				value = make_string(r->vname, strlen(r->vname));
 				break;
 			case Node_var_array:
+			{
 				NODE *arr;
+
 				arr = make_array();
 				subs = force_string(subs);
 				arr->vname = subs->stptr;
@@ -964,6 +967,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 
 				value = assoc_copy(r, arr);
 				break;
+			}
 			default:
 				cant_happen("asort_actual: got unexpected type %s", nodetype2str(r->type));
 			}
