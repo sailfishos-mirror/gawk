@@ -21,6 +21,14 @@
 #ifndef DFA_H_
 #define DFA_H_
 
+#ifndef GAWK
+/* This file uses _Noreturn, _GL_ATTRIBUTE_DEALLOC, _GL_ATTRIBUTE_MALLOC,
+   _GL_ATTRIBUTE_PURE, _GL_ATTRIBUTE_RETURNS_NONNULL.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+#endif /* GAWK */
+
 #include "idx.h"
 #include <regex.h>
 #include <stddef.h>
