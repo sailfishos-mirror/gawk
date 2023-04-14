@@ -1,6 +1,6 @@
 /* vms_gawk.c -- parse GAWK command line using DCL syntax
 
-   Copyright (C) 1991-1993, 1996, 2003, 2005, 2011, 2014, 2022
+   Copyright (C) 1991-1993, 1996, 2003, 2005, 2011, 2014, 2022, 2023,
    the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
