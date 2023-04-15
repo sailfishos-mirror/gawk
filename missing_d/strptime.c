@@ -571,6 +571,7 @@ __strptime_internal (rp, fmt, tm, decided, era_cnt LOCALE_PARAM)
                character for character and construct the result while
                doing this.  */
             time_t secs = 0;
+            struct tm *then;
             if (*rp < '0' || *rp > '9')
               /* We need at least one digit.  */
               return NULL;
@@ -582,9 +583,11 @@ __strptime_internal (rp, fmt, tm, decided, era_cnt LOCALE_PARAM)
               }
             while (*rp >= '0' && *rp <= '9');
 
-            if (localtime_r (&secs, tm) == NULL)
+            if ((then = localtime (&secs)) == NULL)
               /* Error in function.  */
               return NULL;
+            else
+              *tm = *then;
           }
           break;
         case 'S':
