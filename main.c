@@ -675,7 +675,7 @@ or by using a web forum such as Stack Overflow.\n\n"), fp);
 
 	// 5.2.60 is beta release on master, will become 5.3.0.
 	// 5.2.2a is beta release on stable, will become 5.2.3.
-	if (patchlevel >= 60 || isalpha(PACKAGE_VERSION[strlen(PACKAGE_VERSION)-1]))
+	if (patchlevel >= 60 || isalpha((int) PACKAGE_VERSION[strlen(PACKAGE_VERSION)-1]))
 		url = beta_url;
 	else
 		url = gnu_url;
