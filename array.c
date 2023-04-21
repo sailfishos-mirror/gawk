@@ -933,7 +933,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 			/* value node */
 			r = *ptr++;
 
-			NODE *value;
+			NODE *value = NULL;
 
 			switch (r->type) {
 			case Node_val:
