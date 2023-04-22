@@ -712,8 +712,7 @@ cleanup:
 		case Op_push_re:
 			if (pc->memory->type != Node_regex && (pc->memory->flags & REGEX) == 0)
 				break;
-			/* else
-				fall through */
+			/* fall through */
 		case Op_match_rec:
 		{
 			if (pc->memory->type == Node_regex) {
