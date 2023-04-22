@@ -275,8 +275,7 @@ uninitialized_scalar:
 				PUSH(m);
 		 		break;
 			}
- 			/* else
-				fall through */
+ 			/* fall through */
 		case Op_push_array:
 			PUSH(pc->memory);
 			break;

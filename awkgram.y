@@ -3867,10 +3867,11 @@ retry:
 	case '{':
 		if (++in_braces == 1)
 			firstline = sourceline;
+		/* fall through */
 	case ';':
 	case ',':
 	case '[':
-			return lasttok = c;
+		return lasttok = c;
 	case ']':
 		c = nextc(true);
 		pushback();

@@ -1157,6 +1157,7 @@ r_get_lhs(NODE *n, bool reference)
 	case Node_var_array:
 		fatal(_("attempt to use array `%s' in a scalar context"),
 				array_vname(n));
+		return NULL;	// silence compiler warnings
 	case Node_array_ref:
 		if (n->orig_array->type == Node_var_array)
 			fatal(_("attempt to use array `%s' in a scalar context"),
