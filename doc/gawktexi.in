@@ -54,7 +54,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH February, 2023
+@set UPDATE-MONTH April, 2023
 @set VERSION 5.3
 @set PATCHLEVEL 0
 
@@ -30351,8 +30351,8 @@ memory like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
-@print{} Copyright (C) 1989, 1991-2022 Free Software Foundation.
+@print{} GNU Awk 5.2.2, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
+@print{} Copyright (C) 1989, 1991-2023 Free Software Foundation.
 @dots{}
 @end example
 
@@ -30488,6 +30488,19 @@ If @command{gawk} is run by the @command{root} user, then
 persistent memory is not allowed. This is to avoid the possibility
 of private data ``leaking'' into the backing file and being
 recovered later by an attacker.
+
+@item
+Over time, the backing file will be filled with memory ``leaked''
+by @command{gawk} as it runs. Most notably this is the memory used
+to compile your program into an internal form before running it,
+which happens each time, but there are other leakages as well.
+(For an extreme example of this, see
+@uref{https://lists.gnu.org/archive/html/bug-gawk/2023-04/msg00025.html,
+this thread} in the @EMAIL{bug-gawk@@gnu-org, bug-gawk at gnu.org}
+mailing list archives.) It is up to you to use @samp{du -sh
+@var{pmafile}} occasionally to monitor how full the file is, and
+arrange to dump any data you may need before the backing file becomes
+full.
 @end itemize
 
 Terence Kelly has provided a separate @cite{@value{PMGAWKTITLE}}
