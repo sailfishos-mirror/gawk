@@ -56,7 +56,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Febbraio 2023
+@set UPDATE-MONTH Aprile 2023
 @set VERSION 5.3
 @set PATCHLEVEL 0
 
@@ -10916,6 +10916,20 @@ $ @kbd{awk 'BEGIN @{}
 >   @kbd{print 17.23, 17.54 @}'}
 @print{} 17 18
 @end example
+
+Ulteriori dettagli su come @command{awk} converte valori numerici
+in stringhe sono disponibili in @ref{Stringhe e numeri}.
+In particolare, per @code{print}, @command{awk} usa il valore
+della variabile predefinita @code{OFMT} invece che quello
+della variabile predefinita @code{CONVFMT} ma, per il resto,
+si comporta esattamente come descritto in
+@ifnotinfo
+quella
+@end ifnotinfo
+@ifinfo
+quel
+@end ifinfo
+@value{SECTION}.
 
 @noindent
 @cindex angolo buio @subentry variabile @subentry @code{OFMT}
@@ -32657,7 +32671,7 @@ secondo argomento:
 @var{populate the array} orig
 n = asort(orig, dest)
 for (i = 1; i <= n; i++)
-    @var{fai qualcosaa con} dest[i]
+    @var{fai qualcosa con} dest[i]
 @end example
 
 In questo caso, @command{gawk} copia il vettore @code{orig} nel vettore
@@ -33644,7 +33658,7 @@ in @command{gawk} in questo modo:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
+@print{} GNU Awk 5.2.2, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
 @print{} Copyright (C) 1989, 1991-2023 Free Software Foundation.
 @dots{}
 @end example
@@ -33806,7 +33820,24 @@ della memoria persistente non @`e consentito.
 Ci@`o al fine di evitare la possibilit@`a che dati "privati"
 siano salvati nel file di appoggio e vengano successivamente
 acceduti da un altro utente o hacker (che a sua volta sia divenuto
-@command{root}.
+@command{root}).
+
+@item
+Col passare del tempo, il file di appoggio si riempir@`a di memoria
+``disseminata'' da @command{gawk} durante le esecuzioni.  
+In prevalenza, si tratta della memoria usata per convertire il
+programma in esecuzione nel formato interno, prima di eseguirlo,
+il che capita a ogni esecuzione, ma ci sono anche altre cause
+per la disseminazione.
+(Per un esempio estremo di questa situazione, si veda
+@uref{https://lists.gnu.org/archive/html/bug-gawk/2023-04/msg00025.html,
+questa serie di messaggi} negli archivi della mailing list
+@EMAIL{bug-gawk@@gnu-org, bug-gawk (chiocciola) gnu.org}.)
+Rimane a carico dell'utente usare di tanto in tanto il comando
+@samp{du -sh @var{pmafile}} per verificare il grado di riempimento
+del file, e per eventualmente scaricare da esso i dati di cui si
+pu@`o aver bisogno, prima che il file di appoggio si riempia
+completamente.
 @end itemize
 
 Terence Kelly ha preparato un documento a parte, dedicato alla
@@ -37602,7 +37633,7 @@ Si pu@`o verificare se il supporto a MPFR @`e disponibile in questo modo:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.2.1, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
+@print{} GNU Awk 5.2.2, API 3.2, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
 @print{} Copyright (C) 1989, 1991-2023 Free Software Foundation.
 @dots{}
 @end example
@@ -48879,6 +48910,19 @@ puntatore alla versione corrente.
 
 Il progetto sembra essere fermo; non ci sono nuove versioni del codice
 a partire dal 2014 circa.
+
+@item @command{cppawk}
+@cindex @command{cppawk}
+@cindex codice sorgente @subentry @command{cppawk}
+@cindex sorgente @subentry codice @subentry @command{cppawk}
+Secondo la pagina web che lo descrive, ``@command{cppawk} @`e un piccolo
+script di shell da chiamare come si chiamerebbe @command{awk}.
+Lo script invoca il preprocessore C (GNU @command{cpp}) sul codice
+programma in Awk e invoca Awk sul file risultante.''
+Questo programma pu@`o essere utile se la funzionalit@`a @code{@@include}
+di @command{gawk} non risponde alle vostre esigenze.
+Per ulteriori informazioni, si veda
+@uref{https://www.kylheku.com/cgit/cppawk/}.
 
 @item Altre versioni
 Si veda anche [in inglese] la sezione ``Versions and implementations''
