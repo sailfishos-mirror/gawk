@@ -249,7 +249,7 @@ dir_can_take_file(const awk_input_buf_t *iobuf)
 	if (iobuf == NULL)
 		return awk_false;
 
-	return (iobuf->fd != INVALID_HANDLE || S_ISDIR(iobuf->sbuf.st_mode));
+	return (S_ISDIR(iobuf->sbuf.st_mode));
 }
 
 /*
@@ -277,8 +277,8 @@ dir_take_control_of(awk_input_buf_t *iobuf)
 	}
 #endif
 	if (dp == NULL) {
-		warning(ext_id, _("dir_take_control_of: opendir/fdopendir failed: %s"),
-				strerror(errno));
+		warning(ext_id, _("dir_take_control_of: %s: opendir/fdopendir failed: %s"),
+				iobuf->name, strerror(errno));
 		update_ERRNO_int(errno);
 		return awk_false;
 	}
