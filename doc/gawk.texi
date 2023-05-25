@@ -5269,10 +5269,20 @@ is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
+@ignore
 The arbitrary precision arithmetic feature is deprecated as of
 @command{gawk} @value{PVERSION} 5.2.
 Use of @option{-M}/@option{--bignum} produces a warning message.
 The feature will be removed in the release of 2024.
+@end ignore
+
+As of
+@command{gawk} @value{PVERSION} 5.2.
+the arbitrary precision arithmetic feature is ``on parole.''
+This feature is now being
+supported by a volunteer in the development team and not by the primary
+maintainer.  If this situation changes, then the feature will be removed.
+For more information see @ref{MPFR On Parole}.
 
 @node Undocumented
 @section Undocumented Options and Features
@@ -6148,8 +6158,11 @@ As in arithmetic, parentheses can change how operators are grouped.
 
 @cindex POSIX @command{awk} @subentry regular expressions and
 @cindex @command{gawk} @subentry regular expressions @subentry precedence
-In POSIX @command{awk} and @command{gawk}, the @samp{*}, @samp{+}, and
-@samp{?} operators stand for themselves when there is nothing in the
+According to the POSIX specification, when @samp{*}, @samp{+}, @samp{?},
+or @samp{@{} are not preceded by a character, the behavior is
+``undefined.''
+In practice, for @command{gawk}, the @samp{*}, @samp{+}, @samp{?} and
+@samp{@{} operators stand for themselves when there is nothing in the
 regexp that precedes them.  For example, @code{/+/} matches a literal
 plus sign.  However, many other versions of @command{awk} treat such a
 usage as a syntax error.
