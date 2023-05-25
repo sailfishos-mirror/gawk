@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 2012-2014, 2017, 2018, 2019, 2023,
+ * Copyright (C) 2012-2014, 2017, 2018, 2019, 2021, 2023,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -110,7 +110,7 @@ ftype(struct dirent *entry, const char *dirname)
 	case DT_REG:	return "f";
 	case DT_SOCK:	return "s";
 	default:
-	case DT_UNKNOWN: break;	// JFS returns 'u', so fall through to stat
+	case DT_UNKNOWN: break; // JFS returns 'u', so fall through and stat
 	}
 #endif
 	char fname[PATH_MAX];
@@ -150,6 +150,7 @@ get_inode(struct dirent *entry, const char *dirname)
 #ifdef __MINGW32__
 	char fname[PATH_MAX];
 	HANDLE fh;
+	BOOL ok;
 	BY_HANDLE_FILE_INFORMATION info;
 
 	sprintf(fname, "%s\\%s", dirname, entry->d_name);
@@ -157,7 +158,9 @@ get_inode(struct dirent *entry, const char *dirname)
 			FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (fh == INVALID_HANDLE_VALUE)
 		return 0;
-	if (GetFileInformationByHandle(fh, &info)) {
+	ok = GetFileInformationByHandle(fh, &info);
+	CloseHandle(fh);
+	if (ok) {
 		long long inode = info.nFileIndexHigh;
 
 		inode <<= 32;
@@ -257,7 +260,7 @@ dir_can_take_file(const awk_input_buf_t *iobuf)
 	if (iobuf == NULL)
 		return awk_false;
 
-	return (iobuf->fd != INVALID_HANDLE || S_ISDIR(iobuf->sbuf.st_mode));
+	return (S_ISDIR(iobuf->sbuf.st_mode));
 }
 
 /*
@@ -278,12 +281,15 @@ dir_take_control_of(awk_input_buf_t *iobuf)
 	dp = fdopendir(iobuf->fd);
 #else
 	dp = opendir(iobuf->name);
-	if (dp != NULL)
+	if (dp != NULL) {
+		if (iobuf->fd != INVALID_HANDLE)
+			(void) close(iobuf->fd);
 		iobuf->fd = dirfd(dp);
+	}
 #endif
 	if (dp == NULL) {
-		warning(ext_id, _("dir_take_control_of: opendir/fdopendir failed: %s"),
-				strerror(errno));
+		warning(ext_id, _("dir_take_control_of: %s: opendir/fdopendir failed: %s"),
+				iobuf->name, strerror(errno));
 		update_ERRNO_int(errno);
 		return awk_false;
 	}
