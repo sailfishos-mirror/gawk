@@ -352,7 +352,7 @@ GENTESTS_UNUSED = Makefile.in checknegtime.awk dtdgport.awk fix-fmtspcl.awk \
 	fmtspcl-mpfr.ok fmtspcl.awk fmtspcl.tok gtlnbufv.awk hello.awk \
 	inchello.awk inclib.awk inplace.1.in inplace.2.in inplace.in \
 	printfloat.awk readdir0.awk valgrind.awk xref.awk \
-	readall1.awk readall2.awk
+	readall1.awk readall2.awk check_retest.awk
 
 
 # List of tests on MinGW that need a different cmp program
@@ -1103,14 +1103,18 @@ readdir:
 readdir_test:
 	@echo $@
 	@-$(AWK) -lreaddir -F$(SLASH) '{printf "[%s] [%s] [%s] [%s]\n", $$1, $$2, $$3, $$4}' "$(top_srcdir)" > $@.ok
-	@-$(AWK) -lreaddir_test '{printf "[%s] [%s] [%s] [%s]\n", $$1, $$2, $$3, $$4}' "$(top_srcdir)" > _$@
+	@-$(AWK) -lreaddir '{printf "[%s] [%s] [%s] [%s]\n", $$1, $$2, $$3, $$4}' "$(top_srcdir)" > _$@
 	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
 
 readdir_retest:
 	@echo $@
-	@-$(AWK) -lreaddir -F$(SLASH) -f "$(srcdir)"/$@.awk "$(top_srcdir)" > $@.ok
-	@-$(AWK) -lreaddir_test -F$(SLASH) -f "$(srcdir)"/$@.awk "$(top_srcdir)" > _$@
-	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
+	@-$(AWK) -lreaddir -F$(SLASH) -f "$(srcdir)"/$@.awk "$(top_srcdir)" > _$@
+	@-if $(AWK) -f "$(srcdir)"/check_retest.awk _$@ ; \
+	then \
+		rm -f _$@ ; \
+	else \
+		echo EXIT CODE: $$? >> _$@ ; \
+	fi
 
 readall:
 	@echo $@
