@@ -4674,7 +4674,7 @@ A partire dalla @value{PVERSION} 5.2,
 le funzionalit@`a di calcolo con precisione arbitraria in @command{gawk}
 sono ``in libert@`a vigilata''.
 Il manutentore principale non curer@`a pi@`u la manutenzione di questa
-funzionalit@`a, ma una delle persone del team di sviluppo l'ha presa in
+funzionalit@`a, ma una delle persone del @dfn{team} di sviluppo l'ha presa in
 carico.  Finch@'e questa situazione rimarr@`a stabile, MPFR continuer@`a
 a essere supportato.  Se la situazione cambia, il supporto a MPFR sar@`a
 rimosso da @command{gawk}.
@@ -5760,10 +5760,22 @@ is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
-La funzionalit@`a di aritmetica a precisione arbitraria @`e deprecata
+@ignore
+The arbitrary precision arithmetic feature is deprecated as of
+@command{gawk} @value{PVERSION} 5.2.
+Use of @option{-M}/@option{--bignum} produces a warning message.
+The feature will be removed in the release of 2024.
+@end ignore
+
+La funzionalit@`a di aritmetica a precisione arbitraria @`e
+``in libert@`a vigilata''
 a partire dalla @value{PVERSION} 5.2 di @command{gawk}.
-Se si usa l'opzione @option{-M}/@option{--bignum} viene emesso un messaggio
-di avvertimento.  La funzionalit@`a verr@`a rimossa nella versione del 2024.
+Questa funzionalit@`a @`e ora supportata da un volontario
+che fa parte del gruppo di sviluppo, ma non dal manutentore
+principale.  Se tale situazione cambier@`a, la funzionalit@`a
+verr@`a rimossa da @command{gawk}.
+Per ulteriori informazione, si veda
+@ref{MPFR in libert@`a vigilata}.
 
 @node Non documentato
 @section Opzioni e funzionalit@`a non documentate
@@ -6658,9 +6670,14 @@ operatori.
 
 @cindex POSIX @command{awk} @subentry espressioni regolari
 @cindex @command{gawk} @subentry espressioni regolari @subentry precedenza
-In POSIX @command{awk} e @command{gawk}, gli operatori @samp{*}, @samp{+}
-e @samp{?} rappresentano se stessi quando non c'@`e nulla prima di essi
-nella @dfn{regexp}.  Per esempio, @code{/+/} individua un semplice segno
+Secondo le specifiche POSIX, quando i metacaratteri
+@samp{*}, @samp{+}, @samp{?} o @samp{@{}
+non sono preceduti da un carattere, il comportamento @`e ``indefinito''.
+In pratica, per @command{gawk}, gli operatori
+@samp{*}, @samp{+}, @samp{?} e @samp{@{}
+rappresentano se stessi
+quando non c'@`e nulla prima di essi nella @dfn{regexp}.
+Per esempio, @code{/+/} individua un semplice segno
 pi@`u.  Tuttavia, molte altre versioni di @command{awk} trattano una
 tale notazione come un errore di sintassi.
 
