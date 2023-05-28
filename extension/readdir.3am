@@ -1,9 +1,11 @@
-.TH READDIR 3am "Oct 30 2019" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH READDIR 3am "May 28 2023" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
 readdir \- directory input parser for gawk
 .SH SYNOPSIS
 .ft CW
 @load "readdir"
+.sp
+BEGIN { PROCINFO["readdir_override"] = \fIany_value\fP }  # optional
 .ft R
 .SH DESCRIPTION
 The
@@ -16,10 +18,11 @@ on the command line (or with
 .BR getline ),
 they are read, with each entry returned as a record.
 .PP
-The record consists of three fields. The first two are the inode number and the
-filename, separated by a forward slash character.
-On systems where the directory entry contains the file type, the record
-has a third field which is a single letter indicating the type of the
+The record consists of three fields
+separated by forward slash characters.
+The first two are the inode number and the
+filename, and
+the third field is a single letter indicating the type of the
 file:
 .B f
 for file,
@@ -32,16 +35,25 @@ for a character device,
 .B p
 for a FIFO,
 .B l
-for a symbolic link,
+for a symbolic link, or
 .B s
 for a socket.
 .PP
+On systems where the directory entry contains the file type, the third
+field is filled in from that information.
 On systems without the file type information, the extension falls back
 to calling
 .IR stat (2),
 in order to provide the information.
 Thus the third field should never be
-.BR u .
+.BR u " (unknown)."
+.PP
+Normally, when reading directories, you should set
+.B FS
+equal to \fB"/"\fP.  However, you may instead chose to create
+\fBPROCINFO["readdir_override"]\fP (with any value). If this element
+exists, when the directory is opened, then the extension automatically
+sets the fields in each record for you.
 .PP
 By default, if a directory cannot be opened (due to permission problems,
 for example),
@@ -81,7 +93,7 @@ BEGIN { FS = "/" }
 Arnold Robbins,
 .BR arnold@skeeve.com .
 .SH COPYING PERMISSIONS
-Copyright \(co 2012, 2013, 2018, 2019
+Copyright \(co 2012, 2013, 2018, 2019, 2023
 Free Software Foundation, Inc.
 .PP
 Permission is granted to make and distribute verbatim copies of

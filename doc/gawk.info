@@ -29698,12 +29698,11 @@ is as follows:
 on the command line (or with ‘getline’), they are read, with each entry
 returned as a record.
 
-   The record consists of three fields.  The first two are the inode
-number and the file name, separated by a forward slash character.  On
-systems where the directory entry contains the file type, the record has
-a third field (also separated by a slash), which is a single letter
-indicating the type of the file.  The letters and their corresponding
-file types are shown in *note Table 17.4: table-readdir-file-types.
+   The record consists of three fields separated by forward slash
+characters.  The first two are the inode number and the file name, and
+the third field is a single letter indicating the type of the file.  The
+letters and their corresponding file types are shown in *note Table
+17.4: table-readdir-file-types.
 
 
 Letter  File type
@@ -29715,17 +29714,14 @@ Letter  File type
 ‘l’     Symbolic link
 ‘p’     Named pipe (FIFO)
 ‘s’     Socket
-‘u’     Anything else (unknown)
 
 Table 17.4: File types returned by the ‘readdir’ extension
 
-   On systems without the file type information, the third field is
-always ‘u’.
-
-     NOTE: On GNU/Linux systems, there are filesystems that don’t
-     support the ‘d_type’ entry (see the readdir(3) manual page), and so
-     the file type is always ‘u’.  You can use the ‘filefuncs’ extension
-     to call ‘stat()’ in order to get correct type information.
+   On systems where the directory entry contains the file type, the
+third field is filled in from that information.  On systems without the
+file type information, the extension falls back to calling the ‘stat()’
+system call in order to provide the information.  Thus the third field
+should never be ‘u’ (for “unknown”).
 
    By default, if a directory cannot be opened (due to permission
 problems, for example), ‘gawk’ will exit.  As with regular files, this
@@ -40209,96 +40205,96 @@ Node: Extension Sample Fork1240055
 Node: Extension Sample Inplace1241331
 Node: Extension Sample Ord1245003
 Node: Extension Sample Readdir1245879
-Ref: table-readdir-file-types1246776
-Node: Extension Sample Revout1247914
-Node: Extension Sample Rev2way1248511
-Node: Extension Sample Read write array1249263
-Node: Extension Sample Readfile1252537
-Node: Extension Sample Time1253668
-Node: Extension Sample API Tests1255958
-Node: gawkextlib1256466
-Node: Extension summary1259502
-Node: Extension Exercises1263360
-Node: Language History1264638
-Node: V7/SVR3.11266352
-Node: SVR41268702
-Node: POSIX1270234
-Node: BTL1271659
-Node: POSIX/GNU1272428
-Node: Feature History1278959
-Node: Common Extensions1298526
-Node: Ranges and Locales1300003
-Ref: Ranges and Locales-Footnote-11304804
-Ref: Ranges and Locales-Footnote-21304831
-Ref: Ranges and Locales-Footnote-31305070
-Node: Contributors1305293
-Node: History summary1311498
-Node: Installation1312944
-Node: Gawk Distribution1313908
-Node: Getting1314400
-Node: Extracting1315399
-Node: Distribution contents1317111
-Node: Unix Installation1325191
-Node: Quick Installation1326013
-Node: Compiling with MPFR1328559
-Node: Shell Startup Files1329265
-Node: Additional Configuration Options1330422
-Node: Configuration Philosophy1332809
-Node: Compiling from Git1335311
-Node: Building the Documentation1335870
-Node: Non-Unix Installation1337282
-Node: PC Installation1337758
-Node: PC Binary Installation1338631
-Node: PC Compiling1339536
-Node: PC Using1340714
-Node: Cygwin1344442
-Node: MSYS1345698
-Node: OpenVMS Installation1346330
-Node: OpenVMS Compilation1347011
-Ref: OpenVMS Compilation-Footnote-11348494
-Node: OpenVMS Dynamic Extensions1348556
-Node: OpenVMS Installation Details1350192
-Node: OpenVMS Running1352627
-Node: OpenVMS GNV1356764
-Node: Bugs1357519
-Node: Bug definition1358443
-Node: Bug address1362094
-Node: Usenet1365685
-Node: Performance bugs1366916
-Node: Asking for help1369934
-Node: Maintainers1371925
-Node: Other Versions1372952
-Node: Installation summary1382295
-Node: Notes1383679
-Node: Compatibility Mode1384489
-Node: Additions1385311
-Node: Accessing The Source1386256
-Node: Adding Code1387791
-Node: New Ports1394927
-Node: Derived Files1399437
-Ref: Derived Files-Footnote-11405284
-Ref: Derived Files-Footnote-21405319
-Ref: Derived Files-Footnote-31405936
-Node: Future Extensions1406050
-Node: Implementation Limitations1406722
-Node: Extension Design1407964
-Node: Old Extension Problems1409128
-Ref: Old Extension Problems-Footnote-11410704
-Node: Extension New Mechanism Goals1410765
-Ref: Extension New Mechanism Goals-Footnote-11414261
-Node: Extension Other Design Decisions1414462
-Node: Extension Future Growth1416661
-Node: Notes summary1417285
-Node: Basic Concepts1418498
-Node: Basic High Level1419183
-Ref: figure-general-flow1419465
-Ref: figure-process-flow1420172
-Ref: Basic High Level-Footnote-11423573
-Node: Basic Data Typing1423762
-Node: Glossary1427180
-Node: Copying1460302
-Node: GNU Free Documentation License1498063
-Node: Index1523386
+Ref: table-readdir-file-types1246668
+Node: Extension Sample Revout1247723
+Node: Extension Sample Rev2way1248320
+Node: Extension Sample Read write array1249072
+Node: Extension Sample Readfile1252346
+Node: Extension Sample Time1253477
+Node: Extension Sample API Tests1255767
+Node: gawkextlib1256275
+Node: Extension summary1259311
+Node: Extension Exercises1263169
+Node: Language History1264447
+Node: V7/SVR3.11266161
+Node: SVR41268511
+Node: POSIX1270043
+Node: BTL1271468
+Node: POSIX/GNU1272237
+Node: Feature History1278768
+Node: Common Extensions1298335
+Node: Ranges and Locales1299812
+Ref: Ranges and Locales-Footnote-11304613
+Ref: Ranges and Locales-Footnote-21304640
+Ref: Ranges and Locales-Footnote-31304879
+Node: Contributors1305102
+Node: History summary1311307
+Node: Installation1312753
+Node: Gawk Distribution1313717
+Node: Getting1314209
+Node: Extracting1315208
+Node: Distribution contents1316920
+Node: Unix Installation1325000
+Node: Quick Installation1325822
+Node: Compiling with MPFR1328368
+Node: Shell Startup Files1329074
+Node: Additional Configuration Options1330231
+Node: Configuration Philosophy1332618
+Node: Compiling from Git1335120
+Node: Building the Documentation1335679
+Node: Non-Unix Installation1337091
+Node: PC Installation1337567
+Node: PC Binary Installation1338440
+Node: PC Compiling1339345
+Node: PC Using1340523
+Node: Cygwin1344251
+Node: MSYS1345507
+Node: OpenVMS Installation1346139
+Node: OpenVMS Compilation1346820
+Ref: OpenVMS Compilation-Footnote-11348303
+Node: OpenVMS Dynamic Extensions1348365
+Node: OpenVMS Installation Details1350001
+Node: OpenVMS Running1352436
+Node: OpenVMS GNV1356573
+Node: Bugs1357328
+Node: Bug definition1358252
+Node: Bug address1361903
+Node: Usenet1365494
+Node: Performance bugs1366725
+Node: Asking for help1369743
+Node: Maintainers1371734
+Node: Other Versions1372761
+Node: Installation summary1382104
+Node: Notes1383488
+Node: Compatibility Mode1384298
+Node: Additions1385120
+Node: Accessing The Source1386065
+Node: Adding Code1387600
+Node: New Ports1394736
+Node: Derived Files1399246
+Ref: Derived Files-Footnote-11405093
+Ref: Derived Files-Footnote-21405128
+Ref: Derived Files-Footnote-31405745
+Node: Future Extensions1405859
+Node: Implementation Limitations1406531
+Node: Extension Design1407773
+Node: Old Extension Problems1408937
+Ref: Old Extension Problems-Footnote-11410513
+Node: Extension New Mechanism Goals1410574
+Ref: Extension New Mechanism Goals-Footnote-11414070
+Node: Extension Other Design Decisions1414271
+Node: Extension Future Growth1416470
+Node: Notes summary1417094
+Node: Basic Concepts1418307
+Node: Basic High Level1418992
+Ref: figure-general-flow1419274
+Ref: figure-process-flow1419981
+Ref: Basic High Level-Footnote-11423382
+Node: Basic Data Typing1423571
+Node: Glossary1426989
+Node: Copying1460111
+Node: GNU Free Documentation License1497872
+Node: Index1523195
 
 End Tag Table
 
