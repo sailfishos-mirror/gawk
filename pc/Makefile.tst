@@ -1103,7 +1103,7 @@ readdir:
 readdir_test:
 	@echo $@
 	@-$(AWK) -lreaddir -F$(SLASH) '{printf "[%s] [%s] [%s] [%s]\n", $$1, $$2, $$3, $$4}' "$(top_srcdir)" > $@.ok
-	@-$(AWK) -lreaddir '{printf "[%s] [%s] [%s] [%s]\n", $$1, $$2, $$3, $$4}' "$(top_srcdir)" > _$@
+	@-$(AWK) -lreaddir 'BEGIN { PROCINFO["readdir_override"] = 1} ; {printf "[%s] [%s] [%s] [%s]\n", $$1, $$2, $$3, $$4}' "$(top_srcdir)" > _$@
 	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
 
 readdir_retest:
