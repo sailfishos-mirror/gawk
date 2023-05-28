@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -91,6 +92,7 @@ typedef struct open_directory {
 		awk_fieldwidth_info_t fw;
 		char buf[awk_fieldwidth_info_size(3)];
 	} u;
+	bool override;
 } open_directory_t;
 #define fw u.fw
 
@@ -116,9 +118,7 @@ ftype(struct dirent *entry, const char *dirname)
 	char fname[PATH_MAX];
 	struct stat sbuf;
 
-	strcpy(fname, dirname);
-	strcat(fname, "/");
-	strcat(fname, entry->d_name);
+	sprintf(fname, "%s/%s", dirname, entry->d_name);
 	if (stat(fname, &sbuf) == 0) {
 		if (S_ISBLK(sbuf.st_mode))
 			return "b";
@@ -228,7 +228,7 @@ dir_get_record(char **out, awk_input_buf_t *iobuf, int *errcode,
 
 	*rt_start = NULL;
 	*rt_len = 0;	/* set RT to "" */
-	if (field_width)
+	if (field_width != NULL && the_dir->override)
 		*field_width = & the_dir->fw;
 	return len;
 }
@@ -308,6 +308,16 @@ dir_take_control_of(awk_input_buf_t *iobuf)
 	iobuf->opaque = the_dir;
 	iobuf->get_record = dir_get_record;
 	iobuf->close_func = dir_close;
+
+	awk_value_t array, index, value;
+	static const char readdir_override[] = "readdir_override";
+
+	if (! sym_lookup("PROCINFO", AWK_ARRAY, & array)) {
+		the_dir->override = false;
+	} else {
+		(void) make_const_string(readdir_override, strlen(readdir_override), & index);
+		the_dir->override = get_array_element(array.array_cookie, & index, AWK_UNDEFINED, & value);
+	}
 
 	return awk_true;
 }
