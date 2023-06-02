@@ -43810,12 +43810,11 @@ directory presenti sulla riga di comando, (o accedute tramite @code{getline}),
 queste sono lette, e ogni elemento della directory @`e restituito come
 un record.
 
-Il record consiste di tre campi. I primi due sono il numero di @dfn{inode} e
-il @value{FN}, separati fra loro da una barra.
-Nei sistemi in cui l'elemento di directory contiene il tipo del file,
-il record ha un terzo campo (pure separato da una barra), composto da una
-sola lettera, che indica il tipo del file.  Le lettere e i tipi di file a cui
-corrispondono sono mostrate
+Il record consiste di tre campi separati da fra loro da barre.
+I primi due sono il numero di @dfn{inode} e il @value{FN},
+e il terzo campo @`e costituito da una sola lettera, che indica il tipo
+del file.
+Le lettere e i tipi di file corrispondenti sono mostrati
 @iftex
 nella
 @end iftex
@@ -43835,20 +43834,16 @@ in
 @item @code{l} @tab Collegamento simbolico
 @item @code{p} @tab @dfn{pipe} con nome (FIFO)
 @item @code{s} @tab @dfn{socket}
-@item @code{u} @tab Tutto il resto (sconosciuto)
 @end multitable
 @end float
 
-Nei sistemi che non contengono l'informazione sul tipo del file, il terzo
-campo @`e sempre @samp{u}.
-
-@quotation NOTA
-Nei sistemi GNU/Linux, ci sono fileystem che non supportano il campo
-@code{d_type} (si veda la pagina di manuale @i{readdir}(3)), e in questo caso
-il tipo di file @`e sempre @samp{u}.  Si pu@`o usare l'estensione
-@code{filefuncs} per chiamare @code{stat()} e ottenere l'informazione
-corretta sul tipo di file.
-@end quotation
+Nei sistemi in cui la descrizione nella directory contiene il tipo
+del file, il terzo campo viene riempito a partire da tale informazione.
+Nei sistemi che non contengono l'informazione sul tipo del file,
+l'estensione invoca la chiamata di sistema @code{stat()} per
+procurarsi l'informazione.
+Quindi il terzo campo non dovrebbe mai valere @samp{u}
+(per ``unknown'' ossia ``sconosciuto'').
 
 Per default, se non @`e possibile aprire una directory (p.es. per problemi
 di autorizzazione), @command{gawk} termina l'esecuzione.
