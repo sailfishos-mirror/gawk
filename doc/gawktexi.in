@@ -39410,6 +39410,12 @@ to calling the @code{stat()} system call
 in order to provide the information.
 Thus the third field should never be @samp{u} (for ``unknown'').
 
+Normally, when reading directories, you should set @code{FS}
+equal to @code{"/"}.  However, you may instead chose to create
+@code{PROCINFO["readdir_override"]} (with any value). If this element
+exists when the directory is opened, then the extension automatically
+sets the fields in each record for you.
+
 By default, if a directory cannot be opened (due to permission problems,
 for example), @command{gawk} will exit.  As with regular files, this
 situation can be handled using a @code{BEGINFILE} rule that checks
