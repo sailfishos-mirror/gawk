@@ -3213,6 +3213,8 @@ do_sub(int nargs, unsigned int flags)
 									*bp++ = *cp;
 							}
 							scan++;
+						} else if (scan+1 == replend) {
+							*bp++ = *scan;
 						} else	/* \q for any q --> q */
 							*bp++ = *++scan;
 					} else if (do_posix) {

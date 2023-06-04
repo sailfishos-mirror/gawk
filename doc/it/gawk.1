@@ -21,6 +21,7 @@
 .\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Giugno 2022
 .\"Aggiornam. a gawk-5.2.0 di A.G. Colombo - Luglio 2022
 .\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Marzo  2023
+.\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Giugno 2023
 
 .ds PX \s-1POSIX\s+1
 .ds UX \s-1UNIX\s+1
@@ -102,7 +103,7 @@ di \*(GN, sia per quelle previste da \*(PX.
 Le opzioni specifiche di
 .I Gawk
 sono usate normalmente nella forma lunga.
-Gli argomenti delle opzioni in forma lunga possono essere uniti ad esse
+Gli argomenti delle opzioni in forma lunga possono essere uniti a esse
 da un segno
 .BR =,
 senza spazi, oppure sono indicati nel successivo
@@ -123,10 +124,9 @@ estensioni
 .IR gawk ,
 elencate nell'ordine alfabetico delle opzioni corte.
 .TP
-.BI \-f " file_di_programma"
-.BI \-\^\-file " file_di_programma"
+.BI \-f " file-di-programma,\fR,\fP " \-\^\-file " file-di-programma"
 Legge il sorgente del programma \*(AK dal file
-.IR file_di_programma ,
+.IR file-di-programma ,
 invece che dal primo argomento della riga di comando.
 Si possono specificare più opzioni
 .B \-f
@@ -134,8 +134,7 @@ I file letti come specificato da
 .B \-f
 sono trattati come se iniziassero con la direttiva implicita \fB@namespace "awk"\fR.
 .TP
-.BI \-F " fs"
-.BI \-\^\-separatore_di_campo " fs"
+.BI \-F " fs\fR, \fP" \-\^\-separatore-di-campo " fs"
 Usa
 .I fs
 come separatore di campo in input (il valore della variabile predefinita
@@ -149,15 +148,13 @@ prima che inizi l'esecuzione del programma.
 Questi valori delle variabili sono messi a disposizione della regola
 .B BEGIN
 di un programma \*(AK.
-.BR \-b ", "\c
-.B \-\^\-characters\-as\-bytes
+.BR \-b ", " \-\^\-characters\-as\-bytes
 Tratta tutti i dati in input come caratteri costituiti da un solo byte.
 L'opzione
 .B "\-\^\-posix"
 ignora questo comportamento.
 .TP
-.BR \-c ", "\c
-.B \-\^\-traditional
+.BR \-c ", " \-\^\-traditional
 Viene eseguito in modalità
 .IR compatibile .
 In questa modalità,
@@ -167,8 +164,7 @@ si comporta esattamente come
 di Brian Kernighan;
 non viene riconosciuta nessuna delle estensioni specifiche di \*(GN.
 .TP
-.BR \-C ", "\c
-.B \-\^\-copyright
+.BR \-C ", " \-\^\-copyright
 Stampa sullo standard output la versione sintetica del messaggio di
 informazione sul copyright \*(GN ed esce senza segnalare errori.
 .TP
@@ -201,10 +197,9 @@ e
 Il debugger è documentato in \*(EP; vedere
 .IR https://www.gnu.org/software/gawk/manual/html_node/Debugger.html#Debugger .
 .TP
-.BI "\-e " testo_del_programma\fR, \fP"\c
-.BI \-\^\-source " testo_del_programma"
+.BI \-e " testo-del-programma\fR, \fP" \-\^\-source " testo-del-programma"
 Usa
-.I testo_del_programma
+.I testo-del-programma
 come codice sorgente del programma \*(AK.
 Ogni argomento specificato da
 .B \-e
@@ -213,24 +208,22 @@ Ogni argomento specificato da
 \fB\-E \fIfile\fR, \fB\-\^\-exec \fIfile\fR
 Simile a
 .BR \-f ,
-comunque, quest'opzione è l'ultima ad essere elaborata.
+comunque, quest'opzione è l'ultima a essere elaborata.
 Dovrebbe essere usata con script
 .B #! ,
 specialmente per applicazioni CGI [Common Gateway Interface], per evitare
 di passare opzioni o codice (!) sulla riga di comando
 da un URL.
 Quest'opzione disabilita gli assegnamenti di variabile da riga di comando.
-.BR \-g ", "\c
-.B \-\^\-gen\-pot
+.BR \-g ", " \-\^\-gen\-pot
 Esamina e analizza il programma \*(AK, e genera un file in formato \*(GN
 .B \&.pot
 (Portable Object Template)
 sullo standard output con elementi relativi a tutte le stringhe localizzabili
 nel programma.  Il programma in sé non viene eseguito.
 .TP
-.BR \-h ", "\c
-.B \-\^\-help
-Scrive sullo standard output un riassunto abbastanza breve delle
+.BR \-h ", " \-\^\-help
+Scrive sullo standard output un breve riassunto delle
 opzioni disponibili.
 In linea con le convenzioni di codifica
 .IR "GNU Coding Standards" ,
@@ -250,8 +243,7 @@ I file letti come specificato da
 .B \-\^\-include
 sono trattati come se iniziassero con la direttiva implicita \fB@namespace "awk"\fR.
 .TP
-.BR \-I ", "\c
-.B \-\^\-trace
+.BR \-I ", " \-\^\-trace
 Stampa i nomi del codice-byte generato internamente, nell'ordine
 in cui sono incontrati durante l'esecuzione del programma.
 Questa trace è stampata sullo standard error.
@@ -266,8 +258,7 @@ Vedere il manuale per i dettagli.
 .BR FIXME :
 Eventualmente, fornire un link (URL) qui.
 .TP
-.BI \-l " lib\fR, "\c
-.BI \-\^\-load " lib"
+.BI \-l " lib\fR, " \-\^\-load " lib"
 Carica un'estensione
 .I gawk
 dalla libreria condivisa
@@ -289,8 +280,7 @@ Vedere
 per la lista di valori possibili per
 .IR valore .
 .TP
-.BR \-M ", "\c
-.B \-\^\-bignum
+.BR \-M ", " \-\^\-bignum
 Forza il calcolo con precisione arbitraria sui numeri.  Quest'opzione
 non ha effetto se
 .I gawk
@@ -314,22 +304,19 @@ Impostare la variabile di ambiente
 a 1 per non far visualizzare il messaggio.
 ..
 .TP
-.BR \-n ", "\c
-.B \-\^\-non\-decimal\-data
+.BR \-n ", " \-\^\-non\-decimal\-data
 Riconosce valori ottali ed esadecimali nei dati in input.
 .I "Usare quest'opzione con molta cautela!"
 .TP
-.BR \-N ", "\c
-.B \-\^\-use\-lc\-numeric
+.BR \-N ", " \-\^\-use\-lc\-numeric
 Forza
 .I gawk
 a usare il carattere di separazione decimale della localizzazione quando
 analizza i dati in input.
 .ig
 .\" Quest'opzione è lasciata intenzionalmente non documentata.
-.BR "\-W nostalgia" ", "\c
-.B \-\^\-nostalgia
-Fornisce momenti di nostalgia per gli utenti di
+.BR "\-W nostalgia" ", " \-\^\-nostalgia
+Fornisce un momento di nostalgia per gli utenti di
 .I awk
 di vecchia data.
 ..
@@ -343,8 +330,7 @@ nella directory corrente.
 Quest'opzione attiva anche l'opzione
 .BR \-\^\-no\-optimize .
 .TP
-.BR \-O ", "\c
-.B \-\^\-optimize
+.BR \-O ", " \-\^\-optimize
 Abilita le ottimizzazioni predefinite di
 .IR gawk
 nella rappresentazione interna del programma.
@@ -363,14 +349,12 @@ viene eseguito più lentamente in questo modo.
 Quest'opzione attiva anche l'opzione
 .BR \-\^\-no\-optimize .
 .TP
-.BR \-P ", "\c
-.B \-\^\-posix
+.BR \-P ", " \-\^\-posix
 Quest'opzione attiva la modalità di
 .IR compatibilità ,
 e disabilita un certo numero di estensioni comuni.
 .TP
-.BR \-r ", "\c
-.B \-\^\-re\-interval
+.BR \-r ", " \-\^\-re\-interval
 Abilita l'uso di
 .I "espressioni di intervallo"
 nelle espressioni regolari.
@@ -378,14 +362,12 @@ Le espressioni di intervallo
 sono rese disponibili per default, ma quest'opzione
 viene lasciata per compatibilità all'indietro.
 .TP
-.BR \-s ", "\c
-.B \-\^\-no\-optimize
+.BR \-s ", " \-\^\-no\-optimize
 Disabilita le ottimizzazioni predefinite di
 .I gawk
 nella rappresentazione interna del programma.
 .TP
-.BR \-S ", "\c
-.B \-\^\-sandbox
+.BR \-S ", " \-\^\-sandbox
 Esegue
 .I gawk
 in modalità "sandbox", disabilitando la funzione
@@ -397,15 +379,13 @@ la ridirezione sull'output con
 e il caricamento delle estensioni dinamiche.
 L'esecuzione di comandi (tramite pipeline) è anch'essa disabilitata.
 .TP
-.BR \-t ", "\c
-.B \-\^\-lint\-old
+.BR \-t ", " \-\^\-lint\-old
 Emette messaggi d'avvertimento relativi a costrutti non portabili
 sulla versione originale di
 .I awk
 per \*(UX.
 .TP
-.BR \-V ", "\c
-.B \-\^\-version
+.BR \-V ", " \-\^\-version
 Scrive sullo standard output la versione di questa particolare copia di
 .IR gawk .
 È utile principalmente per segnalare bug.
@@ -448,7 +428,7 @@ e definizioni di funzione opzionali.
 .PP
 .I Gawk
 prima legge il codice del programma dal/dai
-.IR file_di_programma
+.IR file-di-programma
 se specificato/i,
 dagli argomenti passati a
 .BR \-\^\-source ,
@@ -460,7 +440,7 @@ e
 possono essere usate più volte nella riga di comando.
 .I Gawk
 legge il testo del programma come se tutti i
-.I file_di_programma
+.I file-di-programma
 e i testi sorgenti della riga di comando fossero concatenati.
 .PP
 Oltre a ciò, le righe che iniziano con
@@ -1273,8 +1253,7 @@ OR logico.
 .TP
 .B ?:
 L'espressione condizionale in stile C.  Ha la forma
-.IB espressione1 " ? " espressione2 " : " espressione3\c
-\&.
+.IB espressione1 " ? " espressione2 " : " espressione3\/\fR.
 Se
 .I espressione1
 è vera, il valore dell'espressione è
