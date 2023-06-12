@@ -777,7 +777,7 @@ cmdline_fs(char *str)
 			str[0] = '\t';
 	}
 
-	*tmp = make_str_node(str, strlen(str), SCAN); /* do process escapes */
+	*tmp = make_str_node(str, strlen(str), SCAN | ELIDE_BACK_NL); /* do process escapes */
 	set_FS();
 }
 
