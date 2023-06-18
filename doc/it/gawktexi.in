@@ -3982,6 +3982,40 @@ successiva.  Invece, la combinazione barra inversa-ritorno a capo non viene
 per nulla notata, in quanto ``nascosta'' all'interno del commento.  Quindi,
 il @code{BEGIN} @`e marcato come errore di sintassi.
 
+@cindex dark corner @subentry backslash continuation on command line
+@cindex angolo buio @subentry barra inversa come continuazione sulla riga di comando
+@cindex angolo buio @subentry riga di comando, continuazione con barra inversa
+La continuazione di una riga di comando pu@`o generare anche un'altra situazione
+inattesa.
+Si consideri:
+
+@example
+gawk -F'\
+a' '@dots{}'
+@end example
+
+@noindent
+Questa riga di comando assegna un valore alla variabile predefinita
+@code{FS}. Ma quale valore?
+Ci sono varie possibilit@`a, e in effetti differenti versioni di
+@command{awk} si comportano in modo differente.
+@command{gawk} gestisce questo caso come se si fosse scritto:
+
+@example
+BEGIN @{ FS = "\
+a"
+@}
+@dots{}
+@end example
+
+@noindent
+In altre parole, la barra inversa e il ritorno a capo vengono eliminati,
+e quindi si assegna il valore @code{"a"} alla variabile predefinita
+@code{FS}.  Lo stesso viene fatto quando si assegnano altre variabili
+utilizzando l'opzione @option{-v} (@pxref{Opzioni})
+e per l'assegnamento di variabili sulla riga di comando
+@pxref{Opzioni di assegnamento}).
+
 Chi @`e interessato pu@`o vedere
 @uref{https://lists.gnu.org/archive/html/bug-gawk/2022-10/msg00025.html}
 per una modifica al codice sorgente che consente la continuazione di
@@ -7961,10 +7995,15 @@ campo.
 record corrente.  @command{awk} aggiorna automaticamente il valore di
 @code{NF} ogni volta che legge un record.  Indipendentemente da quanti campi
 ci possano essere, l'ultimo campo in un record pu@`o essere rappresentato da
-@code{$NF}. Cos@`{@dotless{i}}, @code{$NF} @`e lo stesso di @code{$7}, che @`e @samp{carino.}.
+@code{$NF}.
+Cos@`{@dotless{i}}, @code{$NF} @`e lo stesso di @code{$7}, che @`e @samp{carino.}.
 Se si cerca di far riferimento a un campo oltre l'ultimo
 (come @code{$8} quando il record ha solo sette campi), si ottiene
-la stringa nulla.  (Se usato in un'operazione numerica si ottiene zero.)
+la stringa nulla.
+Se usato in un'operazione numerica si ottiene zero.@footnote{Sia in un
+caso che nell'altro, se @`e stata specificata l'opzione @option{--lint},
+@command{gawk} avverte che si sta facendo un riferimento a un campo non
+ancora inizializzato.}
 
 L'uso di @code{$0}, che sarebbe come un riferimento al campo ``numero zero'',
 @`e un caso particolare: rappresenta l'intero record in input.  Si usa quando
@@ -14685,7 +14724,7 @@ il risultato @`e @samp{falso} perch@'e sia @code{$1} che @code{$2}
 sono immessi dall'utente.  Sono stringhe numeriche --- quindi hanno entrambe
 l'attributo @dfn{strnum}, che richiede un confronto di tipo numerico.
 Lo scopo delle regole di confronto e dell'uso di stringhe numeriche @`e quello
-di cercare di produrre il comportamento "meno inaspettato possibile",
+di cercare di produrre il comportamento "meno inatteso possibile",
 pur "facendo la cosa giusta".
 
 I confronti di stringhe e i confronti di espressioni regolari sono molto
@@ -19842,7 +19881,7 @@ versioni commerciali di @command{awk}.
 separati da virgole.  I loro valori sono concatenati in un'unica
 stringa, separati dal valore di @code{SUBSEP}.  Il modo di creazione
 dell'indice non viene immagazzinato; cos@`{@dotless{i}},
-cambiare @code{SUBSEP} potrebbe avere conseguenze inaspettate.  Si pu@`o usare
+cambiare @code{SUBSEP} potrebbe avere conseguenze inattese.  Si pu@`o usare
 @samp{(@var{sub1}, @var{sub2}, @dots{}) in @var{vettore}} per vedere se
 un certo indice multidimensionale esiste in @var{vettore}.
 
