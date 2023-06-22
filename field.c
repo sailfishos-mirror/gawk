@@ -812,7 +812,9 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 		nf = 0;
 
 	if (len == 0) {
-		(*set)(++nf, newfield, 0L, n);
+		// Don't set the field.
+		//	echo | gawk --csv '{ print NF }'
+		// should print 0.
 		return nf;
 	}
 
