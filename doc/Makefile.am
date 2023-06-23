@@ -54,7 +54,7 @@ EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 # Get rid of generated files when cleaning
 CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf
 
-MAKEINFO = @MAKEINFO@ --no-split --force
+MAKEINFO = @MAKEINFO@ -c CHECK_NORMAL_MENU_STRUCTURE=1 --no-split --force
 
 TROFF = groff -t -Tps -U
 SEDME = sed -e "s/^level0 restore/level0 restore flashme 100 72 moveto (Copyright `date '+%m-%d-%y %T'`, FSF, Inc. (all)) show/" \
