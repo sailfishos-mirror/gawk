@@ -53,6 +53,8 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	static struct dfa* dfaregs[2] = { NULL, NULL };
 	static bool nul_warned = false;
 
+	assert(s[len] == '\0');
+
 	if (do_lint && ! nul_warned && memchr(s, '\0', len) != NULL) {
 		nul_warned = true;
 		lintwarn(_("behavior of matching a regexp containing NUL characters is not defined by POSIX"));
@@ -277,10 +279,10 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 		refree(rp);
 		if (! canfatal) {
 			/* rerr already gettextized inside regex routines */
-			error("%s: /%.*s/", rerr, (int) len, s);
+			error("%s: /%s/", rerr, s);
  			return NULL;
 		}
-		fatal("invalid regexp: %s: /%.*s/", rerr, (int) len, s);
+		fatal("invalid regexp: %s: /%s/", rerr, s);
 	}
 
 	/* gack. this must be done *after* re_compile_pattern */

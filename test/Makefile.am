@@ -1134,6 +1134,8 @@ EXTRA_DIST = \
 	regeq.ok \
 	regex3minus.awk \
 	regex3minus.ok \
+	regexpbad.awk \
+	regexpbad.ok \
 	regexpbrack.awk \
 	regexpbrack.in \
 	regexpbrack.ok \
@@ -1504,7 +1506,8 @@ BASIC_TESTS = \
 	paramuninitglobal parse1 parsefld parseme pcntplus posix2008sub \
 	posix_compare prdupval prec printf0 printf1 printfchar prmarscl \
 	prmreuse prt1eval prtoeval rand randtest range1 range2 readbuf \
-	rebrackloc rebt8b1 rebuild redfilnm regeq regex3minus regexpbrack \
+	rebrackloc rebt8b1 rebuild redfilnm regeq regex3minus \
+	regexpbad regexpbrack \
 	regexpbrack2 regexprange regrange reindops reparse resplit \
 	rri1 rs rscompat rsnul1nl rsnulbig rsnulbig2 rsnullre rsnulw \
 	rstest1 rstest2 rstest3 rstest4 rstest5 rswhite scalar sclforin \
