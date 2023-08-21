@@ -454,32 +454,26 @@ make_str_node(const char *s, size_t len, int flags)
 
 			c = *pf++;
 			if (c == '\\') {
-				bool unicode;
-				c = parse_escape(&pf, &unicode);
-				if (c < 0) {
+				const char *result;
+				int nbytes;
+
+				nbytes = parse_escape(&pf, &result);
+				if (nbytes > 0) {
+					while (nbytes--)
+						*ptm++ = *result++;
+				} else if (nbytes == 0) {
+					*ptm++ = '?';
+				} else if (nbytes == -1) {
+					if (do_lint)
+						lintwarn(_("backslash at end of string"));
+					*ptm++ = '\\';
+				} else if (nbytes == -2) {
 					if (do_lint)
 						lintwarn(_("backslash string continuation is not portable"));
-					if ((flags & ELIDE_BACK_NL) != 0)
-						continue;
-					c = '\\';
+					continue;
+				} else {
+					cant_happen("received bad result %d from parse_escape()", nbytes);
 				}
-				if (unicode) {
-					char buf[20];
-					size_t n;
-					mbstate_t mbs;
-					int i;
-
-					memset(& mbs, 0, sizeof(mbs));
-
-					n = wcrtomb(buf, c, & mbs);
-					if (n == (size_t) -1)	// bad value
-						*ptm++ = '?';
-					else {
-						for (i = 0; i < n; i++)
-							*ptm++ = buf[i];
-					}
-				} else
-					*ptm++ = c;
 			} else
 				*ptm++ = c;
 		}
@@ -544,32 +538,30 @@ r_unref(NODE *tmp)
 /*
  * parse_escape:
  *
- * Parse a C escape sequence.  STRING_PTR points to a variable containing a
- * pointer to the string to parse.  That pointer is updated past the
- * characters we use.  The value of the escape sequence is returned.
+ * Parse a C escape sequence.  string_ptr points to a variable containing
+ * a pointer to the string to parse.  result points to a pointer which will
+ * be set to the address of the internal buffer holding the bytes of the
+ * translated escape sequence.
  *
- * A negative value means the sequence \ newline was seen, which is supposed to
- * be equivalent to nothing at all.
- *
- * If \ is followed by a null character, we return a negative value and leave
- * the string pointer pointing at the null character.
- *
- * If \ is followed by 000, we return 0 and leave the string pointer after the
- * zeros.  A value of 0 does not mean end of string.
+ * Return values:
+ *     1 to MB_CUR_MAX: the length of the translated escape sequence
+ *     0 wcrtomb conversion error
+ *    -1 terminal backslash (to be preserved in cmdline strings)
+ *    -2 line continuation  (backslash-newline pair)
  *
  * POSIX doesn't allow \x or \u.
  */
 
 int
-parse_escape(const char **string_ptr, bool *unicode)
+parse_escape(const char **string_ptr, const char **result)
 {
+	static char buf[MB_LEN_MAX];
+	int retval = 1;
 	int c = *(*string_ptr)++;
 	int i;
 	int count;
 	int j;
 	const char *start;
-
-	*unicode = false;
 
 	if (do_lint_old) {
 		switch (c) {
@@ -584,24 +576,33 @@ parse_escape(const char **string_ptr, bool *unicode)
 
 	switch (c) {
 	case 'a':
-		return '\a';
+		buf[0] = '\a';
+		break;
 	case 'b':
-		return '\b';
+		buf[0] = '\b';
+		break;
 	case 'f':
-		return '\f';
+		buf[0] = '\f';
+		break;
 	case 'n':
-		return '\n';
+		buf[0] = '\n';
+		break;
 	case 'r':
-		return '\r';
+		buf[0] = '\r';
+		break;
 	case 't':
-		return '\t';
+		buf[0] = '\t';
+		break;
 	case 'v':
-		return '\v';
+		buf[0] = '\v';
+		break;
 	case '\n':
-		return -2;
+		retval = -2;
+		break;
 	case 0:
 		(*string_ptr)--;
-		return -1;
+		retval = -1;
+		break;
 	case '0':
 	case '1':
 	case '2':
@@ -621,7 +622,8 @@ parse_escape(const char **string_ptr, bool *unicode)
 				break;
 			}
 		}
-		return i;
+		buf[0] = i;
+		break;
 	case 'x':
 		if (do_lint) {
 			static bool warned = false;
@@ -631,11 +633,14 @@ parse_escape(const char **string_ptr, bool *unicode)
 				lintwarn(_("POSIX does not allow `\\x' escapes"));
 			}
 		}
-		if (do_posix)
-			return ('x');
+		if (do_posix) {
+			buf[0] = 'x';
+			break;
+		}
 		if (! isxdigit((unsigned char) (*string_ptr)[0])) {
 			warning(_("no hex digits in `\\x' escape sequence"));
-			return ('x');
+			buf[0] = 'x';
+			break;
 		}
 		start = *string_ptr;
 		for (i = j = 0; j < 2; j++) {
@@ -656,8 +661,13 @@ parse_escape(const char **string_ptr, bool *unicode)
 		}
 		if (do_lint && j == 2 && isxdigit((unsigned char)*(*string_ptr)))
 			lintwarn(_("hex escape \\x%.*s of %d characters probably not interpreted the way you expect"), 3, start, 3);
-		return i;
+		buf[0] = i;
+		break;
 	case 'u':
+	{
+		size_t n;
+		mbstate_t mbs;
+
 		if (do_lint) {
 			static bool warned = false;
 
@@ -666,11 +676,14 @@ parse_escape(const char **string_ptr, bool *unicode)
 				lintwarn(_("POSIX does not allow `\\u' escapes"));
 			}
 		}
-		if (do_posix)
-			return ('u');
+		if (do_posix) {
+			buf[0] = 'u';
+			break;
+		}
 		if (! isxdigit((unsigned char) (*string_ptr)[0])) {
 			warning(_("no hex digits in `\\u' escape sequence"));
-			return ('u');
+			buf[0] = 'u';
+			break;
 		}
 		start = *string_ptr;
 		for (i = j = 0; j < 8; j++) {
@@ -689,11 +702,21 @@ parse_escape(const char **string_ptr, bool *unicode)
 				break;
 			}
 		}
-		*unicode = true;
-		return i;
+		memset(& mbs, 0, sizeof(mbs));
+		n = wcrtomb(buf, i, & mbs);
+		if (n == (size_t) -1) {
+			warning(_("invalid \\u' escape sequence"));
+			retval = 0;
+		} else {
+			/* MB_LEN_MAX is an int, so n fits */
+			retval = (int) n;
+		}
+		break;
+	}
 	case '\\':
 	case '"':
-		return c;
+		buf[0] = c;
+		break;
 	default:
 	{
 		static bool warned[256];
@@ -707,8 +730,12 @@ parse_escape(const char **string_ptr, bool *unicode)
 			warning(_("escape sequence `\\%c' treated as plain `%c'"), uc, uc);
 		}
 	}
-		return c;
+		buf[0] = c;
+		break;
 	}
+
+	*result = buf;
+	return retval;
 }
 
 /* get_numbase --- return the base to use for the number in 's' */
