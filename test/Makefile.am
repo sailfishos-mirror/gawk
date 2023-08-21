@@ -202,6 +202,8 @@ EXTRA_DIST = \
 	clsflnam.ok \
 	cmdlinefsbacknl.sh \
 	cmdlinefsbacknl.ok \
+	cmdlinefsbacknl2.sh \
+	cmdlinefsbacknl2.ok \
 	colonwarn.awk \
 	colonwarn.in \
 	colonwarn.ok \
@@ -1484,7 +1486,7 @@ BASIC_TESTS = \
 	arysubnm aryunasgn asgext assignnumfield assignnumfield2 awkpath \
 	back89 backgsub badassign1 badbuild callparam childin clobber \
 	closebad close_status clsflnam compare compare2 concat1 concat2 \
-	cmdlinefsbacknl \
+	cmdlinefsbacknl cmdlinefsbacknl2 \
 	concat3 concat4 concat5 convfmt datanonl defref delargv delarpm2 \
 	delarprm delfunc dfacheck2 dfamb1 dfastress divzero divzero2 \
 	dynlj eofsplit \

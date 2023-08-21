@@ -777,7 +777,7 @@ cmdline_fs(char *str)
 			str[0] = '\t';
 	}
 
-	*tmp = make_str_node(str, strlen(str), SCAN | ELIDE_BACK_NL); /* do process escapes */
+	*tmp = make_str_node(str, strlen(str), SCAN); /* do process escapes */
 	set_FS();
 }
 
@@ -1277,7 +1277,7 @@ arg_assign(char *arg, bool initing)
 		 * This makes sense, so we do it too.
 		 * In addition, remove \-<newline> as in scanning.
 		 */
-		it = make_str_node(cp, strlen(cp), SCAN | ELIDE_BACK_NL);
+		it = make_str_node(cp, strlen(cp), SCAN);
 		it->flags |= USER_INPUT;
 #ifdef LC_NUMERIC
 		/*

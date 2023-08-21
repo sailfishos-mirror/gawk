@@ -1,3 +1,30 @@
+2023-08-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Change parse_escape() to return an enum instead of relying
+	on manifest constants.
+
+	* awk.h (enum escape_results): New enum.
+	(parse_escape): Now returns a value from it, add nbytes pointer
+	parameter.
+	* node.c (make_str_node): Revised to use switch/case on
+	parse_escape return value.
+	(parse_escape): Update code.
+	* re.c (make_regexp): Revised to use switch/case on parse_escape
+	return value.
+
+2023-08-20         Miguel Pineiro Jr     <mpj@pineiro.cc>
+
+	* awk.h (ELIDE_BACK_NL): Removed.
+	(parse_escape): Update declaration.
+	* main.c (cmdline_fs): Don't use ELIDE_BACK_NL.
+	(arg_assign): Ditto.
+	* node.c (make_str_node): Rework handling of return value
+	from parse_escape.
+	(parse_escape): Change return code to convey more info,
+	fully parse escapes and handle conversion from unicode to
+	UTF-8.
+	* re.c (make_regexp): Rework for new interface to parse_escape.
+
 2023-07-09         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* re.c (make_regexp): In error message, use the original text

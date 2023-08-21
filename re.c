@@ -46,7 +46,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	static size_t buflen;
 	const char *end = s + len;
 	char *dest;
-	int c, c2;
+	int c;
 	static bool first = true;
 	static bool no_dfa = false;
 	size_t i;
@@ -120,8 +120,6 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 		   character.  */
 		if ((gawk_mb_cur_max == 1 || ! is_multibyte) &&
 		    (*src == '\\')) {
-			bool unicode;
-
 			c = *++src;
 			switch (c) {
 			case '\0':	/* \\ before \0, either dynamic data or real end of string */
@@ -147,43 +145,57 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 			case '5':
 			case '6':
 			case '7':
-				c2 = parse_escape(&src, &unicode);
-				if (c2 < 0)
-					cant_happen("received bad result %d from parse_escape()", c2);
+			{
+				const char *result;
+				int nbytes;
+				enum escape_results ret;
+
+				ret = parse_escape(& src, & result, & nbytes);
+				switch (ret) {
+				case ESCAPE_OK:
+				case ESCAPE_CONV_ERR:
+					break;
+				case ESCAPE_TERM_BACKSLASH:
+				case ESCAPE_LINE_CONINUATION:
+					cant_happen(N_("received bad result %d from parse_escape(), nbytes = %d"),
+							(int) ret, nbytes);
+					break;
+				}
+				/*
+				 * Invalid code points produce '?' (0x3F).
+				 * These are quoted so that they're taken
+				 * literally. Unlike \u3F, a metachar.
+				 */
+				if (nbytes == 0) {
+					*dest++ = '\\';
+					*dest++ = '?';
+					break;
+				}
+
 				/*
 				 * Unix awk treats octal (and hex?) chars
 				 * literally in re's, so escape regexp
 				 * metacharacters.
 				 */
-				if (do_traditional
+				if (nbytes == 1
+				    && do_traditional
 				    && ! do_posix
 				    && (isdigit(c) || c == 'x')
-				    && strchr("()|*+?.^$\\[]", c2) != NULL)
+				    && strchr("()|*+?.^$\\[]", *result) != NULL)
 					*dest++ = '\\';
-				if (unicode) {
-					char buf[20];
-					size_t n;
-					mbstate_t mbs;
-					int i;
 
-					memset(& mbs, 0, sizeof(mbs));
-
-					n = wcrtomb(buf, c, & mbs);
-					if (n == (size_t) -1)	// bad value
-						*dest++ = '?';
-					else {
-						for (i = 0; i < n; i++)
-							*dest++ = buf[i];
-					}
-				} else
-					*dest++ = (char) c2;
 				if (do_lint
 				    && ! nul_warned
-				    && c2 == '\0') {
+				    && *result == '\0') {
 					nul_warned = true;
 					lintwarn(_("behavior of matching a regexp containing NUL characters is not defined by POSIX"));
 				}
+
+				/* nbytes is now > 0 */
+				while (nbytes--)
+					*dest++ = *result++;
 				break;
+			}
 			case '8':
 			case '9':	/* a\9b not valid */
 				*dest++ = c;
