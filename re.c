@@ -148,10 +148,19 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 			{
 				const char *result;
 				int nbytes;
+				enum escape_results ret;
 
-				nbytes = parse_escape(&src, &result);
-				if (nbytes < 0)
-					cant_happen("received bad result %d from parse_escape()", nbytes);
+				ret = parse_escape(& src, & result, & nbytes);
+				switch (ret) {
+				case ESCAPE_OK:
+				case ESCAPE_CONV_ERR:
+					break;
+				case ESCAPE_TERM_BACKSLASH:
+				case ESCAPE_LINE_CONINUATION:
+					cant_happen(N_("received bad result %d from parse_escape(), nbytes = %d"),
+							(int) ret, nbytes);
+					break;
+				}
 				/*
 				 * Invalid code points produce '?' (0x3F).
 				 * These are quoted so that they're taken

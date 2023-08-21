@@ -456,23 +456,31 @@ make_str_node(const char *s, size_t len, int flags)
 			if (c == '\\') {
 				const char *result;
 				int nbytes;
+				enum escape_results ret;
 
-				nbytes = parse_escape(&pf, &result);
-				if (nbytes > 0) {
+				ret = parse_escape(& pf, & result, & nbytes);
+				switch (ret) {
+				case ESCAPE_OK:
+					assert(nbytes > 0);
 					while (nbytes--)
 						*ptm++ = *result++;
-				} else if (nbytes == 0) {
+					break;
+				case ESCAPE_CONV_ERR:
 					*ptm++ = '?';
-				} else if (nbytes == -1) {
+					break;
+				case ESCAPE_TERM_BACKSLASH:
 					if (do_lint)
 						lintwarn(_("backslash at end of string"));
 					*ptm++ = '\\';
-				} else if (nbytes == -2) {
+					break;
+				case ESCAPE_LINE_CONINUATION:
 					if (do_lint)
 						lintwarn(_("backslash string continuation is not portable"));
 					continue;
-				} else {
-					cant_happen("received bad result %d from parse_escape()", nbytes);
+				default:
+					cant_happen(N_("received bad result %d from parse_escape(), nbytes = %d"),
+							(int) ret, nbytes);
+					break;
 				}
 			} else
 				*ptm++ = c;
@@ -544,25 +552,26 @@ r_unref(NODE *tmp)
  * translated escape sequence.
  *
  * Return values:
- *     1 to MB_CUR_MAX: the length of the translated escape sequence
- *     0 wcrtomb conversion error
- *    -1 terminal backslash (to be preserved in cmdline strings)
- *    -2 line continuation  (backslash-newline pair)
+ *	ESCAPE_OK,		// nbytes == 1 to MB_CUR_MAX: the length of the translated escape sequence
+ *	ESCAPE_CONV_ERR,	// wcrtomb conversion error
+ *	ESCAPE_TERM_BACKSLASH,	// terminal backslash (to be preserved in cmdline strings)
+ *	ESCAPE_LINE_CONINUATION // line continuation  (backslash-newline pair)
  *
  * POSIX doesn't allow \x or \u.
  */
 
-int
-parse_escape(const char **string_ptr, const char **result)
+enum escape_results
+parse_escape(const char **string_ptr, const char **result, int *nbytes)
 {
 	static char buf[MB_LEN_MAX];
-	int retval = 1;
+	enum escape_results retval = ESCAPE_OK;
 	int c = *(*string_ptr)++;
 	int i;
 	int count;
 	int j;
 	const char *start;
 
+	*nbytes = 1;
 	if (do_lint_old) {
 		switch (c) {
 		case 'a':
@@ -597,11 +606,11 @@ parse_escape(const char **string_ptr, const char **result)
 		buf[0] = '\v';
 		break;
 	case '\n':
-		retval = -2;
+		retval = ESCAPE_LINE_CONINUATION;
 		break;
 	case 0:
 		(*string_ptr)--;
-		retval = -1;
+		retval = ESCAPE_TERM_BACKSLASH;
 		break;
 	case '0':
 	case '1':
@@ -706,10 +715,11 @@ parse_escape(const char **string_ptr, const char **result)
 		n = wcrtomb(buf, i, & mbs);
 		if (n == (size_t) -1) {
 			warning(_("invalid \\u' escape sequence"));
-			retval = 0;
+			retval = ESCAPE_CONV_ERR;
+			*nbytes = 0;
 		} else {
 			/* MB_LEN_MAX is an int, so n fits */
-			retval = (int) n;
+			*nbytes = (int) n;
 		}
 		break;
 	}
