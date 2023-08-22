@@ -478,7 +478,7 @@ make_str_node(const char *s, size_t len, int flags)
 						lintwarn(_("backslash string continuation is not portable"));
 					continue;
 				default:
-					cant_happen(N_("received bad result %d from parse_escape(), nbytes = %d"),
+					cant_happen("received bad result %d from parse_escape(), nbytes = %d",
 							(int) ret, nbytes);
 					break;
 				}
