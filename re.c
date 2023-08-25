@@ -157,7 +157,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 					break;
 				case ESCAPE_TERM_BACKSLASH:
 				case ESCAPE_LINE_CONINUATION:
-					cant_happen(N_("received bad result %d from parse_escape(), nbytes = %d"),
+					cant_happen("received bad result %d from parse_escape(), nbytes = %d",
 							(int) ret, nbytes);
 					break;
 				}
