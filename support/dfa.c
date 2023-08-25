@@ -35,6 +35,28 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+#include <wchar.h>
+
+#include "gettext.h"
+#define _(str) gettext (str)
+
+#include "xalloc.h"
+#include "localeinfo.h"
+
+#if GAWK
+/* Use ISO C 99 API.  */
+# include <wctype.h>
+# define char32_t wchar_t
+# define mbrtoc32 mbrtowc
+# define c32rtomb wcrtomb
+# define c32tob wctob
+# define c32isprint iswprint
+# define c32isspace iswspace
+# define mbszero(p) memset ((p), 0, sizeof (mbstate_t))
+#else
+/* Use ISO C 11 + gnulib API.  */
+# include <uchar.h>
+#endif
 
 /* Pacify gcc -Wanalyzer-null-dereference in areas where GCC
    understandably cannot deduce that the input comes from a
@@ -54,15 +76,6 @@ c_isdigit (char c)
 {
   return '0' <= c && c <= '9';
 }
-
-#include "gettext.h"
-#define _(str) gettext (str)
-
-#include <wchar.h>
-#include <wctype.h>
-
-#include "xalloc.h"
-#include "localeinfo.h"
 
 #ifndef FALLTHROUGH
 # if 201710L < __STDC_VERSION__
@@ -300,8 +313,8 @@ enum
 
   RPAREN,                       /* RPAREN never appears in the parse tree.  */
 
-  WCHAR,                        /* Only returned by lex.  wctok contains
-                                   the wide character representation.  */
+  WCHAR,                        /* Only returned by lex.  wctok contains the
+                                   32-bit wide character representation.  */
 
   ANYCHAR,                      /* ANYCHAR is a terminal symbol that matches
                                    a valid multibyte (or single byte) character.
@@ -394,7 +407,7 @@ struct mb_char_classes
 {
   ptrdiff_t cset;
   bool invert;
-  wchar_t *chars;               /* Normal characters.  */
+  char32_t *chars;              /* Normal characters.  */
   idx_t nchars;
   idx_t nchars_alloc;
 };
@@ -438,7 +451,7 @@ struct lexer_state
   idx_t parens;		/* Count of outstanding left parens.  */
   int minrep, maxrep;	/* Repeat counts for {m,n}.  */
 
-  /* Wide character representation of the current multibyte character,
+  /* 32-bit wide character representation of the current multibyte character,
      or WEOF if there was an encoding error.  Used only if
      MB_CUR_MAX > 1.  */
   wint_t wctok;
@@ -621,9 +634,9 @@ static void regexp (struct dfa *dfa);
    convert just a single byte, to WEOF.  Return the number of bytes
    converted.
 
-   This differs from mbrtowc (PWC, S, N, &D->mbs) as follows:
+   This differs from mbrtoc32 (PWC, S, N, &D->mbs) as follows:
 
-   * PWC points to wint_t, not to wchar_t.
+   * PWC points to wint_t, not to char32_t.
    * The last arg is a dfa *D instead of merely a multibyte conversion
      state D->mbs.
    * N is idx_t not size_t, and must be at least 1.
@@ -640,14 +653,16 @@ mbs_to_wchar (wint_t *pwc, char const *s, idx_t n, struct dfa *d)
 
   if (wc == WEOF)
     {
-      wchar_t wch;
-      size_t nbytes = mbrtowc (&wch, s, n, &d->mbs);
+      char32_t wch;
+      size_t nbytes = mbrtoc32 (&wch, s, n, &d->mbs);
       if (0 < nbytes && nbytes < (size_t) -2)
         {
           *pwc = wch;
+          /* nbytes cannot be == (size) -3 here, since we rely on the
+             'mbrtoc32-regular' module.  */
           return nbytes;
         }
-      memset (&d->mbs, 0, sizeof d->mbs);
+      mbszero (&d->mbs);
     }
 
   *pwc = wc;
@@ -844,15 +859,15 @@ char_context (struct dfa const *dfa, unsigned char c)
   return CTX_NONE;
 }
 
-/* Set a bit in the charclass for the given wchar_t.  Do nothing if WC
+/* Set a bit in the charclass for the given char32_t.  Do nothing if WC
    is represented by a multi-byte sequence.  Even for MB_CUR_MAX == 1,
    this may happen when folding case in weird Turkish locales where
    dotless i/dotted I are not included in the chosen character set.
    Return whether a bit was set in the charclass.  */
 static bool
-setbit_wc (wint_t wc, charclass *c)
+setbit_wc (char32_t wc, charclass *c)
 {
-  int b = wctob (wc);
+  int b = c32tob (wc);
   if (b < 0)
     return false;
 
@@ -1122,7 +1137,7 @@ parse_bracket_exp (struct dfa *dfa)
         known_bracket_exp = false;
       else
         {
-          wchar_t folded[CASE_FOLDED_BUFSIZE + 1];
+          char32_t folded[CASE_FOLDED_BUFSIZE + 1];
           int n = (dfa->syntax.case_fold
                    ? case_folded_counterparts (wc, folded + 1) + 1
                    : 1);
@@ -1564,15 +1579,25 @@ lex (struct dfa *dfa)
             {
               char const *msg;
               char msgbuf[100];
-              if (!iswprint (dfa->lex.wctok))
+              if (!c32isprint (dfa->lex.wctok))
                 msg = _("stray \\ before unprintable character");
-              else if (iswspace (dfa->lex.wctok))
+              else if (c32isspace (dfa->lex.wctok))
                 msg = _("stray \\ before white space");
               else
                 {
-                  int n = snprintf (msgbuf, sizeof msgbuf,
-                                    _("stray \\ before %lc"), dfa->lex.wctok);
-                  msg = 0 <= n && n < sizeof msgbuf ? msgbuf : _("stray \\");
+                  char buf[MB_LEN_MAX + 1];
+                  mbstate_t s;
+                  mbszero (&s);
+                  size_t stored_bytes = c32rtomb (buf, dfa->lex.wctok, &s);
+                  if (stored_bytes < (size_t) -1)
+                    {
+                      buf[stored_bytes] = '\0';
+                      int n = snprintf (msgbuf, sizeof msgbuf,
+                                        _("stray \\ before %s"), buf);
+                      msg = 0 <= n && n < sizeof msgbuf ? msgbuf : _("stray \\");
+                    }
+                  else
+                    msg = _("stray \\");
                 }
               dfawarn (msg);
             }
@@ -1699,8 +1724,9 @@ static void
 addtok_wc (struct dfa *dfa, wint_t wc)
 {
   unsigned char buf[MB_LEN_MAX];
-  mbstate_t s = { 0 };
-  size_t stored_bytes = wcrtomb ((char *) buf, wc, &s);
+  mbstate_t s;
+  mbszero (&s);
+  size_t stored_bytes = c32rtomb ((char *) buf, wc, &s);
   int buflen;
 
   if (stored_bytes != (size_t) -1)
@@ -1905,7 +1931,7 @@ atom (struct dfa *dfa)
 
           if (dfa->syntax.case_fold)
             {
-              wchar_t folded[CASE_FOLDED_BUFSIZE];
+              char32_t folded[CASE_FOLDED_BUFSIZE];
               int n = case_folded_counterparts (dfa->lex.wctok, folded);
               for (int i = 0; i < n; i++)
                 {
@@ -3263,9 +3289,9 @@ build_state (state_num s, struct dfa *d, unsigned char uc)
 /* Multibyte character handling sub-routines for dfaexec.  */
 
 /* Consume a single byte and transit state from 's' to '*next_state'.
-   This function is almost same as the state transition routin in dfaexec.
-   But state transition is done just once, otherwise matching succeed or
-   reach the end of the buffer.  */
+   This is almost the same as the state transition routine in dfaexec.
+   But the state transition is done just once; otherwise, matching succeeds or
+   we reach the end of the buffer.  */
 static state_num
 transit_state_singlebyte (struct dfa *d, state_num s, unsigned char const **pp)
 {
@@ -3472,7 +3498,7 @@ dfaexec_main (struct dfa *d, char const *begin, char *end, bool allow_nl,
 
   if (multibyte)
     {
-      memset (&d->mbs, 0, sizeof d->mbs);
+      mbszero (&d->mbs);
       if (d->mb_follows.alloc == 0)
         alloc_position_set (&d->mb_follows, d->nleaves);
     }
