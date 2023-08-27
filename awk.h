@@ -305,7 +305,7 @@ enum escape_results {
 	ESCAPE_OK,		// nbytes == 1 to MB_CUR_MAX: the length of the translated escape sequence
 	ESCAPE_CONV_ERR,	// wcrtomb conversion error
 	ESCAPE_TERM_BACKSLASH,	// terminal backslash (to be preserved in cmdline strings)
-	ESCAPE_LINE_CONINUATION // line continuation  (backslash-newline pair)
+	ESCAPE_LINE_CONTINUATION	// line continuation  (backslash-newline pair)
 };
 
 /* string hash table */
@@ -1771,7 +1771,7 @@ extern NODE *make_str_node(const char *s, size_t len, int flags);
 extern NODE *make_bool_node(bool value);
 extern NODE *make_typed_regex(const char *re, size_t len);
 extern void *more_blocks(int id);
-extern enum escape_results parse_escape(const char **string_ptr, const char **escseq, int *nbytes);
+extern enum escape_results parse_escape(const char **string_ptr, const char **escseq, size_t *nbytes);
 extern NODE *str2wstr(NODE *n, size_t **ptr);
 extern NODE *wstr2str(NODE *n);
 #define force_wstring(n)	str2wstr(n, NULL)

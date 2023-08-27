@@ -60,11 +60,6 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 		lintwarn(_("behavior of matching a regexp containing NUL characters is not defined by POSIX"));
 	}
 
-	/*
-	 * The number of bytes in the current multibyte character.
-	 * It is 0, when the current character is a singlebyte character.
-	 */
-	size_t is_multibyte = 0;
 	mbstate_t mbs;
 
 	memset(&mbs, 0, sizeof(mbstate_t)); /* Initialize.  */
@@ -95,83 +90,70 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	dest = buf;
 
 	while (src < end) {
-		if (gawk_mb_cur_max > 1 && ! is_multibyte) {
-			/* The previous byte is a singlebyte character, or last byte
-			   of a multibyte character.  We check the next character.  */
-			is_multibyte = mbrlen(src, end - src, &mbs);
-			if (   is_multibyte == 1
-			    || is_multibyte == (size_t) -1
-			    || is_multibyte == (size_t) -2
-			    || is_multibyte == 0) {
-				/* We treat it as a single-byte character.  */
-				is_multibyte = 0;
+		/*
+		 * Keep multibyte characters together. This avoids
+		 * problems if a subsequent byte of a multibyte
+		 * character happens to be a backslash.
+		 */
+		if (gawk_mb_cur_max > 1) {
+			size_t mblen = mbrlen(src, end - src, &mbs);
+
+			/*
+			 * Incomplete (-2), invalid (-1), and
+			 * null (0) characters are excluded here.
+			 * They are read as a sequence of bytes.
+			 */
+			if (mblen > 1 && mblen < (size_t) -2) {
+				size_t i;
+
+				for (i = 0; i < mblen; i++)
+					*dest++ = *src++;
+				continue;
 			}
 		}
 
-		const char *ok_to_escape;
-		if (do_posix)
-			ok_to_escape = "{}()|*+?.^$\\[]/-";
-		else if (do_traditional)
-			ok_to_escape = "()|*+?.^$\\[]/-";
-		else
-			ok_to_escape = "<>`'BywWsS{}()|*+?.^$\\[]/-";
+		/*
+		 * From here *src is a single byte character.
+		 */
+		if (*src != '\\') {
+			*dest++ = *src++;
+			continue;
+		}
 
-		/* We skip multibyte character, since it must not be a special
-		   character.  */
-		if ((gawk_mb_cur_max == 1 || ! is_multibyte) &&
-		    (*src == '\\')) {
-			c = *++src;
-			switch (c) {
-			case '\0':	/* \\ before \0, either dynamic data or real end of string */
-				if (src >= s + len)
-					*dest++ = '\\';	// at end of string, will fatal below
-				else
-					fatal(_("invalid NUL byte in dynamic regexp"));
-				break;
-			case 'a':
-			case 'b':
-			case 'f':
-			case 'n':
-			case 'r':
-			case 't':
-			case 'v':
-			case 'x':
-			case 'u':
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			{
-				const char *result;
-				int nbytes;
-				enum escape_results ret;
+		/* Escape sequence */
+		c = *++src;
+		switch (c) {
+		case '\0':	/* \\ before \0, either dynamic data or real end of string */
+			if (src >= s + len)
+				*dest++ = '\\';	// at end of string, will fatal below
+			else
+				fatal(_("invalid NUL byte in dynamic regexp"));
+			break;
+		case 'a':
+		case 'b':
+		case 'f':
+		case 'n':
+		case 'r':
+		case 't':
+		case 'v':
+		case 'x':
+		case 'u':
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		{
+			const char *result;
+			size_t nbytes;
+			enum escape_results ret;
 
-				ret = parse_escape(& src, & result, & nbytes);
-				switch (ret) {
-				case ESCAPE_OK:
-				case ESCAPE_CONV_ERR:
-					break;
-				case ESCAPE_TERM_BACKSLASH:
-				case ESCAPE_LINE_CONINUATION:
-					cant_happen("received bad result %d from parse_escape(), nbytes = %d",
-							(int) ret, nbytes);
-					break;
-				}
-				/*
-				 * Invalid code points produce '?' (0x3F).
-				 * These are quoted so that they're taken
-				 * literally. Unlike \u3F, a metachar.
-				 */
-				if (nbytes == 0) {
-					*dest++ = '\\';
-					*dest++ = '?';
-					break;
-				}
-
+			ret = parse_escape(& src, & result, & nbytes);
+			switch (ret) {
+			case ESCAPE_OK:
 				/*
 				 * Unix awk treats octal (and hex?) chars
 				 * literally in re's, so escape regexp
@@ -181,10 +163,11 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 				    && do_traditional
 				    && ! do_posix
 				    && (isdigit(c) || c == 'x')
-				    && strchr("()|*+?.^$\\[]", *result) != NULL)
+				    && strchr(metas, *result) != NULL)
 					*dest++ = '\\';
 
-				if (do_lint
+				if (nbytes == 1
+				    && do_lint
 				    && ! nul_warned
 				    && *result == '\0') {
 					nul_warned = true;
@@ -195,49 +178,85 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 				while (nbytes--)
 					*dest++ = *result++;
 				break;
-			}
-			case '8':
-			case '9':	/* a\9b not valid */
-				*dest++ = c;
-				src++;
-			{
-				static bool warned[2];
-
-				if (! warned[c - '8']) {
-					warning(_("regexp escape sequence `\\%c' treated as plain `%c'"), c, c);
-					warned[c - '8'] = true;
-				}
-			}
-				break;
-			case 'y':	/* normally \b */
-				/* gnu regex op */
-				if (! do_traditional) {
-					*dest++ = '\\';
-					*dest++ = 'b';
-					src++;
-					break;
-				}
-				/* else, fall through */
-			default:
-				if (strchr(ok_to_escape, c) == NULL) {
-					static bool warned[256];
-
-					if (! warned[c & 0xFF]) {
-						warning(_("regexp escape sequence `\\%c' is not a known regexp operator"), c);
-						warned[c & 0xFF] = true;
-					}
-				}
+			case ESCAPE_CONV_ERR:
+				/*
+				 * Invalid code points produce '?' (0x3F).
+				 * These are quoted so that they're taken
+				 * literally. Unlike \u3F, a metachar.
+				 */
 				*dest++ = '\\';
-				*dest++ = (char) c;
+				*dest++ = '?';
+				break;
+			default:
+				/*
+				 * The outer switch handles terminal
+				 * backslashes and line continuations.
+				 * parse_escape should never see them
+				 * and therefore it should never return
+				 * ESCAPE_TERM_BACKSLASH nor
+				 * ESCAPE_LINE_CONTINUATION.
+				 *
+				 * This also catches unknown values.
+				 */
+				cant_happen("received bad result %d from parse_escape(), nbytes = %zu",
+						(int) ret, nbytes);
+			}
+			break;
+		}
+		case '8':
+		case '9':	/* a\9b not valid */
+			*dest++ = c;
+			src++;
+		{
+			static bool warned[2];
+
+			if (! warned[c - '8']) {
+				warning(_("regexp escape sequence `\\%c' treated as plain `%c'"), c, c);
+				warned[c - '8'] = true;
+			}
+		}
+			break;
+		case 'y':	/* normally \b */
+			/* gnu regex op */
+			if (! do_traditional) {
+				*dest++ = '\\';
+				*dest++ = 'b';
 				src++;
 				break;
-			} /* switch */
-		} else {
-			c = *src;
-			*dest++ = *src++;	/* not '\\' */
-		}
-		if (gawk_mb_cur_max > 1 && is_multibyte)
-			is_multibyte--;
+			}
+			/* else, fall through */
+		default:
+		  {
+			static const char *ok_to_escape = NULL;
+
+			/*
+			 * The posix and traditional flags do not change
+			 * once the awk program is running. Therefore,
+			 * neither does ok_to_escape.
+			 */
+			if (ok_to_escape == NULL) {
+				if (do_posix)
+					ok_to_escape = "{}()|*+?.^$\\[]/-";
+				else if (do_traditional)
+					ok_to_escape = "()|*+?.^$\\[]/-";
+				else
+					ok_to_escape = "<>`'BywWsS{}()|*+?.^$\\[]/-";
+			}
+
+			if (strchr(ok_to_escape, c) == NULL) {
+				static bool warned[256];
+
+				if (! warned[c & 0xFF]) {
+					warning(_("regexp escape sequence `\\%c' is not a known regexp operator"), c);
+					warned[c & 0xFF] = true;
+				}
+			}
+			*dest++ = '\\';
+			*dest++ = (char) c;
+			src++;
+			break;
+		  }
+		} /* switch */
 	} /* while */
 
 	*dest = '\0';

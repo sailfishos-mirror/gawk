@@ -441,10 +441,15 @@ make_str_node(const char *s, size_t len, int flags)
 			 * character happens to be a backslash.
 			 */
 			if (gawk_mb_cur_max > 1) {
-				int mblen = mbrlen(pf, end-pf, &cur_state);
+				size_t mblen = mbrlen(pf, end-pf, &cur_state);
 
-				if (mblen > 1) {
-					int i;
+				/*
+				 * Incomplete (-2), invalid (-1), and
+				 * null (0) characters are excluded here.
+				 * They are read as a sequence of bytes.
+				 */
+				if (mblen > 1 && mblen < (size_t) -2) {
+					size_t i;
 
 					for (i = 0; i < mblen; i++)
 						*ptm++ = *pf++;
@@ -455,7 +460,7 @@ make_str_node(const char *s, size_t len, int flags)
 			c = *pf++;
 			if (c == '\\') {
 				const char *result;
-				int nbytes;
+				size_t nbytes;
 				enum escape_results ret;
 
 				ret = parse_escape(& pf, & result, & nbytes);
@@ -473,12 +478,12 @@ make_str_node(const char *s, size_t len, int flags)
 						lintwarn(_("backslash at end of string"));
 					*ptm++ = '\\';
 					break;
-				case ESCAPE_LINE_CONINUATION:
+				case ESCAPE_LINE_CONTINUATION:
 					if (do_lint)
 						lintwarn(_("backslash string continuation is not portable"));
 					continue;
 				default:
-					cant_happen("received bad result %d from parse_escape(), nbytes = %d",
+					cant_happen("received bad result %d from parse_escape(), nbytes = %zu",
 							(int) ret, nbytes);
 					break;
 				}
@@ -555,13 +560,13 @@ r_unref(NODE *tmp)
  *	ESCAPE_OK,		// nbytes == 1 to MB_CUR_MAX: the length of the translated escape sequence
  *	ESCAPE_CONV_ERR,	// wcrtomb conversion error
  *	ESCAPE_TERM_BACKSLASH,	// terminal backslash (to be preserved in cmdline strings)
- *	ESCAPE_LINE_CONINUATION // line continuation  (backslash-newline pair)
+ *	ESCAPE_LINE_CONTINUATION	// line continuation  (backslash-newline pair)
  *
  * POSIX doesn't allow \x or \u.
  */
 
 enum escape_results
-parse_escape(const char **string_ptr, const char **result, int *nbytes)
+parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 {
 	static char buf[MB_LEN_MAX];
 	enum escape_results retval = ESCAPE_OK;
@@ -606,7 +611,7 @@ parse_escape(const char **string_ptr, const char **result, int *nbytes)
 		buf[0] = '\v';
 		break;
 	case '\n':
-		retval = ESCAPE_LINE_CONINUATION;
+		retval = ESCAPE_LINE_CONTINUATION;
 		break;
 	case 0:
 		(*string_ptr)--;
@@ -718,8 +723,7 @@ parse_escape(const char **string_ptr, const char **result, int *nbytes)
 			retval = ESCAPE_CONV_ERR;
 			*nbytes = 0;
 		} else {
-			/* MB_LEN_MAX is an int, so n fits */
-			*nbytes = (int) n;
+			*nbytes = n;
 		}
 		break;
 	}

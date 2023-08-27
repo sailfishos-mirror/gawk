@@ -1,3 +1,40 @@
+2023-08-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (make_regexp): When do_traditional and looking to see
+	if an escape created a metacharacter, use `metas' instead of
+	a separate string, since BWK awk now also handles interval
+	expressions. Found by inspection.
+
+2023-08-25         Miguel Pineiro Jr     <mpj@pineiro.cc>
+
+	* awk.h (enum escape_results): Fix ESCAPE_LINE_CONINUATION typo.
+	* node.c (make_str_node): Ditto.
+	* (parse_escape): Ditto.
+	* re.c (make_regexp): Ditto.
+
+	Unrelated: Use size_t for multibyte character lengths (aside
+	from it being the type which the interfaces return, using it
+	avoids implementation-defined behavior when -1 or -2 is cast
+	to size_t then stored in an int).
+
+	* node.c (make_str_node): Change mblen from int to size_t.
+
+	Unrelated: Change the length of a translated escape sequence
+	from int to size_t (to match the underlying interfaces).
+
+	* awk.h (parse_escape): Change prototype.
+	* node.c (make_str_node): Adjust to accomodate new type.
+	* (parse_escape): Ditto.
+	* re.c (make_regexp): Ditto.
+
+	Unrelated: Clarify make_regexp, inspired by make_str_node.
+
+	* re.c (make_regexp): Copy multibyte characters at once, move
+	the escape sequence post-processing into the switch statement
+	to explicitly connect a return value with its handling, add a
+	default case to catch unrecognized values, and move ok_to_escape
+	next to where it's used (and only set it once).
+
 2023-08-21         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* node.c (make_str_node): Don't use N_() in cant_happen message.
