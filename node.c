@@ -851,7 +851,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * Create the array.
 	 */
 	if (ptr != NULL) {
-		ezalloc(*ptr, size_t *, sizeof(size_t) * n->stlen, "str2wstr");
+		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1), "str2wstr");
 	}
 
 	sp = n->stptr;
@@ -922,6 +922,11 @@ str2wstr(NODE *n, size_t **ptr)
 			break;
 		}
 	}
+
+	/* Needed for zero-length matches at the end of a string */
+	assert(sp - n->stptr == n->stlen);
+	if (ptr != NULL)
+		(*ptr)[sp - n->stptr] = i;
 
 	*wsp = L'\0';
 	n->wstlen = wsp - n->wstptr;

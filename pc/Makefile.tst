@@ -235,7 +235,7 @@ LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 \
 	fmttest fnarydel fnparydl jarebug lc_num1 mbfw1 \
 	mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
-	mtchi18n nlstringtest rebt8b2 rtlenmb sort1 sprintfc
+	mtchi18n mtchi18n2 nlstringtest rebt8b2 rtlenmb sort1 sprintfc
 
 SHLIB_TESTS = \
 	apiterm \
@@ -315,7 +315,8 @@ NEED_LOCALE_C = \
 
 NEED_LOCALE_EN = \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 ignrcas2 lc_num1 \
-	mbfw1 mbprintf1 mbprintf3 mbprintf4 mbstr1 mbstr2 posix_compare \
+	mbfw1 mbprintf1 mbprintf3 mbprintf4 mbstr1 mbstr2 \
+	mtchi18n2 posix_compare \
 	printhuge reint2 rri1 subamp subi18n wideidx wideidx2 \
 	widesub widesub2 widesub3 widesub4 unicode1
 
@@ -3733,6 +3734,12 @@ mtchi18n:
 	@echo $@ $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=RUS_RUS.1251; export GAWKLOCALE; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mtchi18n2:
+	@echo $@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA.1252; export GAWKLOCALE; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 rebt8b2:

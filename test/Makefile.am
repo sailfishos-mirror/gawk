@@ -833,6 +833,8 @@ EXTRA_DIST = \
 	mtchi18n.awk \
 	mtchi18n.in \
 	mtchi18n.ok \
+	mtchi18n2.awk \
+	mtchi18n2.ok \
 	nasty.awk \
 	nasty.ok \
 	nasty2.awk \
@@ -1576,7 +1578,7 @@ LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 \
 	fmttest fnarydel fnparydl jarebug lc_num1 mbfw1 \
 	mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
-	mtchi18n nlstringtest rebt8b2 rtlenmb sort1 sprintfc
+	mtchi18n mtchi18n2 nlstringtest rebt8b2 rtlenmb sort1 sprintfc
 
 SHLIB_TESTS = \
 	apiterm \
@@ -1651,7 +1653,8 @@ NEED_LOCALE_C = \
 
 NEED_LOCALE_EN = \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 ignrcas2 lc_num1 \
-	mbfw1 mbprintf1 mbprintf3 mbprintf4 mbstr1 mbstr2 posix_compare \
+	mbfw1 mbprintf1 mbprintf3 mbprintf4 mbstr1 mbstr2 \
+	mtchi18n2 posix_compare \
 	printhuge reint2 rri1 subamp subi18n wideidx wideidx2 \
 	widesub widesub2 widesub3 widesub4 unicode1
 
