@@ -1,3 +1,16 @@
+2023-09-01         Miguel Pineiro Jr     <mpj@pineiro.cc>
+
+	Fix the handling of zero-length matches in multibyte locales.
+	Thanks to Ed Morton <mortoneccc@comcast.net> for the report.
+
+	* builtin.c (do_match): Translate rstart (byte idx to char idx)
+	even when rlength is zero. For this we tweak the conversion of
+	rlength to keep it in bounds when rstart and rlength are both 0.
+	* node.c (str2wstr): Add an entry to the indices array for the
+	terminating null. It facilitates the tweak above and is needed
+	to translate the idx of a zero-width match at the end of the
+	string.
+
 2023-08-27         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* re.c (make_regexp): When do_traditional and looking to see
