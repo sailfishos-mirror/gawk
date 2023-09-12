@@ -305,8 +305,8 @@ typedef struct awk_two_way_processor {
 	awk_const struct awk_two_way_processor *awk_const next;  /* for use by gawk */
 } awk_two_way_processor_t;
 
-#define gawk_api_major_version 3
-#define gawk_api_minor_version 2
+#define gawk_api_major_version 4
+#define gawk_api_minor_version 0
 
 /* Current version of the API. */
 enum {
@@ -500,7 +500,7 @@ typedef struct gawk_api {
 	 * Currently only do_lint is prone to change, but we reserve
 	 * the right to allow the others to do so also.
 	 */
-#define DO_FLAGS_SIZE	6
+#define DO_FLAGS_SIZE	7
 	awk_const int do_flags[DO_FLAGS_SIZE];
 /* Use these as indices into do_flags[] array to check the values */
 #define gawk_do_lint		0
@@ -509,6 +509,7 @@ typedef struct gawk_api {
 #define gawk_do_sandbox		3
 #define gawk_do_debug		4
 #define gawk_do_mpfr		5
+#define gawk_do_csv		6
 
 	/* Next, registration functions: */
 
@@ -872,6 +873,7 @@ typedef struct gawk_api {
 #define do_sandbox	(api->do_flags[gawk_do_sandbox])
 #define do_debug	(api->do_flags[gawk_do_debug])
 #define do_mpfr		(api->do_flags[gawk_do_mpfr])
+#define do_csv		(api->do_flags[gawk_do_csv])
 
 #define get_argument(count, wanted, result) \
 	(api->api_get_argument(ext_id, count, wanted, result))
