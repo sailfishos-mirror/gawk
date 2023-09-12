@@ -1178,7 +1178,7 @@ do_split(int nargs)
 	if (do_csv && (sep->re_flags & FS_DFLT) != 0 && nargs == 3) {
 		fs = NULL;
 		parseit = comma_parse_field;
-	} else if (   (sep->re_flags & FS_DFLT) != 0
+	} else if ((sep->re_flags & FS_DFLT) != 0
 	    && current_field_sep() == Using_FS
 	    && ! RS_is_null) {
 		parseit = parse_field;
