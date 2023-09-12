@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012-2019, 2021, 2022, the Free Software Foundation, Inc.
+ * Copyright (C) 2012-2019, 2021, 2022, 2023, the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -1600,12 +1600,13 @@ void
 init_ext_api()
 {
 	/* force values to 1 / 0 */
-	api_impl.do_flags[0] = (do_lint ? 1 : 0);
-	api_impl.do_flags[1] = (do_traditional ? 1 : 0);
-	api_impl.do_flags[2] = (do_profile ? 1 : 0);
-	api_impl.do_flags[3] = (do_sandbox ? 1 : 0);
-	api_impl.do_flags[4] = (do_debug ? 1 : 0);
-	api_impl.do_flags[5] = (do_mpfr ? 1 : 0);
+	api_impl.do_flags[gawk_do_lint] = (do_lint ? 1 : 0);
+	api_impl.do_flags[gawk_do_traditional] = (do_traditional ? 1 : 0);
+	api_impl.do_flags[gawk_do_profile] = (do_profile ? 1 : 0);
+	api_impl.do_flags[gawk_do_sandbox] = (do_sandbox ? 1 : 0);
+	api_impl.do_flags[gawk_do_debug] = (do_debug ? 1 : 0);
+	api_impl.do_flags[gawk_do_mpfr] = (do_mpfr ? 1 : 0);
+	api_impl.do_flags[gawk_do_csv] = (do_csv ? 1 : 0);
 }
 
 /* update_ext_api --- update the variables in the API that can change */
