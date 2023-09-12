@@ -3643,7 +3643,7 @@ Stampare la lunghezza della riga pi@`u lunga in @file{data}:
 
 @example
 expand data | awk '@{ if (x < length($0)) x = length($0) @}
-                   END @{ print "la lunghezza massima di una riga @`e" x @}'
+                   END @{ print "lunghezza massima di riga @`e" x @}'
 @end example
 
 Questo esempio @`e leggermente diverso da quello precedente:
@@ -8616,7 +8616,7 @@ I campi nei file CSV sono separati da virgola.  Per consentire la
 presenza di una virgola all'interno di un campo (p.es. come parte
 di un dato), il campo pu@`o essere racchiuso fra doppi apici.
 Per consentire un doppio apice all'interno di un campo racchiuso fra
-doppi apici, il campo stesso @empf{deve} essere racchiuso fra doppi apici
+doppi apici, il campo stesso @emph{deve} essere racchiuso fra doppi apici
 e due doppi apici rappresentano un singolo doppio apice.
 Il doppio apice che segnala l'inizio del campo dev'essere
 il primo carattere dopo la virgola [che segna l'inizio del campo].
@@ -8896,10 +8896,6 @@ Il valore di @code{FS} @`e ignorato.
 @item FS == " "
 I campi sono separati da uno o pi@`u spazi vuoti.  Gli spazi vuoti iniziali
 e finali sono ignorati.  Questo @`e il comportamento di default.
-
-@item FS == ","
-I campi sono separati da virgola, con regole speciali per inserire in un
-campo virgole e/o doppi apici.
 
 @item FS == @var{qualsiasi altro carattere singolo}
 I campi sono separati da ogni ricorrenza del carattere.  Ricorrenze
@@ -9202,9 +9198,11 @@ per un esempio di tale funzione).
 @node Separazione in base al contenuto
 @section Definire i campi in base al contenuto
 
-@strong{FIXME}: Quest'intera sezione dev'essere riscritta
+@quotation NOTA
+Quest'intera sezione dev'essere riscritta
 dopo che in @command{gawk} @`e stata introdotta la capacit@`a di analizzare
 file di tipo CSV. Ahim@`e.
+@end quotation
 
 @menu
 * Ancora CSV::                  Ancora sui file CSV.
@@ -9325,7 +9323,7 @@ questo tipo:
 @example
 if (substr($i, 1, 1) == "\"") @{
     len = length($i)
-    $i = substr($i, 2, len - 2) # Ottiene il testo tra doppi apici
+    $i = substr($i, 2, len - 2) # Ottiene testo tra doppi apici
 @}
 @end example
 
@@ -42380,23 +42378,33 @@ se le opzioni della riga di comando corrispondenti sono state specificate
 quando @command{gawk} @`e stato chiamato.  Le variabili sono:
 
 @table @code
+@item do_csv
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--csv}.
+
 @item do_debug
-Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato con l'opzione @option{--debug}.
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--debug}.
 
 @item do_lint
-Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato con l'opzione @option{--lint}.
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--lint}.
 
 @item do_mpfr
-Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato con l'opzione @option{--bignum}.
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--bignum}.
 
 @item do_profile
-Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato con l'opzione @option{--profile}.
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--profile}.
 
 @item do_sandbox
-Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato con l'opzione @option{--sandbox}.
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--sandbox}.
 
 @item do_traditional
-Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato con l'opzione @option{--traditional}.
+Questa variabile @`e @dfn{true} se @command{gawk} @`e stato invocato
+con l'opzione @option{--traditional}.
 @end table
 
 Il valore di @code{do_lint} pu@`o cambiare se il codice @command{awk}
@@ -46137,7 +46145,17 @@ La versione 5.3 ha aggiunto le seguenti funzionalit@`a:
 @itemize
 @item
 Divisione in campi per file di tipo CSV (Campi separati da virgola)
+e l'opzione da riga di comando @option{--csv}
 (@pxref{Campi separati da virgola}).
+
+@item
+L'elemento di vettore @code{PROCINFO["CSV"]} esiste se @command{gawk}
+@`e stato invocato con l'opzione @option{--csv}
+(@pxref{Variabili auto-assegnate}).
+
+@item
+La variabile informativa per l'API @code{do_csv}
+(@pxref{Variabili informative di estens. API}).
 
 @item
 La possibilit@`a che @command{gawk} bufferizzi l'output a @dfn{pipe}
