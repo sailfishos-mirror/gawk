@@ -2957,6 +2957,8 @@ do_match(int nargs)
  *
  * 7/2011: Reverted backslash handling to what it used to be. It was in
  * gawk for too long. Should have known better.
+ *
+ * 9/2023: Update for matches of null strings around multibyte characters.
  */
 
 /*
@@ -3259,8 +3261,20 @@ do_sub(int nargs, unsigned int flags)
 	empty:
 		/* catch the case of gsub(//, "blah", whatever), i.e. empty regexp */
 		if (matchstart == matchend && matchend < text + textlen) {
-			*bp++ = *matchend;
-			matchend++;
+			// copy in regular text
+			if (gawk_mb_cur_max == 1) {
+				*bp++ = *matchend;
+				matchend++;
+			} else {
+				mbstate_t mbs;
+				size_t i, j;
+
+				memset(& mbs, 0, sizeof(mbs));
+				j = mbrlen(matchend, (target->stptr + target->stlen) - matchend, & mbs);
+				// FIXME: Error checking on the value of `j' would be a good idea....
+				for (i = 0; i < j; i++)
+					*bp++ = *matchend++;
+			}
 		}
 		textlen = text + textlen - matchend;
 		text = matchend;
