@@ -159,7 +159,8 @@ BASIC_TESTS = \
 	fnaryscl fnasgnm fnmisc fordel forref forsimp fsbs fscaret fsnul1 \
 	fsrs fsspcoln fstabplus funsemnl funsmnam funstack getline \
 	getline2 getline3 getline4 getline5 getlnbuf getlnfa getnr2tb \
-	getnr2tm gsubasgn gsubtest gsubtst2 gsubtst3 gsubtst4 gsubtst5 \
+	getnr2tm gsubasgn gsubnulli18n \
+	gsubtest gsubtst2 gsubtst3 gsubtst4 gsubtst5 \
 	gsubtst6 gsubtst7 gsubtst8 hex hex2 hsprint inpref inputred intest \
 	intprec iobug1 leaddig leadnl litoct longsub longwrds manglprm \
 	math membug1 memleak messages minusstr mmap8k nasty nasty2 negexp \
@@ -314,7 +315,8 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
-	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 ignrcas2 lc_num1 \
+	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
+	gsubnulli18n ignrcas2 lc_num1 \
 	mbfw1 mbprintf1 mbprintf3 mbprintf4 mbstr1 mbstr2 \
 	mtchi18n2 posix_compare \
 	printhuge reint2 rri1 subamp subi18n wideidx wideidx2 \
@@ -1794,6 +1796,12 @@ getnr2tm:
 gsubasgn:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+gsubnulli18n:
+	@echo $@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA.1252; export GAWKLOCALE; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 gsubtest:
