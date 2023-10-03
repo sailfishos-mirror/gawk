@@ -961,6 +961,8 @@ EXTRA_DIST = \
 	lintold.ok \
 	lintplus.awk \
 	lintplus.ok \
+	lintplus2.awk \
+	lintplus2.ok \
 	lintset.awk \
 	lintset.ok \
 	lintwarn.awk \
@@ -1812,8 +1814,8 @@ GAWK_EXT_TESTS = \
 	incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 include include2 \
 	indirectbuiltin indirectcall indirectcall2 \
 	indirectcall3 intarray iolint isarrayunset lint \
-	lintexp lintindex lintint lintlength lintold lintplus lintset \
-	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 \
+	lintexp lintindex lintint lintlength lintold lintplus lintplus2 \
+	lintset lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 \
 	mdim1 mdim2 mdim3 mdim4 mdim5 mdim6 mdim7 mdim8 \
 	mixed1 mktime modifiers muldimposix nastyparm negtime \
 	next nondec nondec2 nonfatal1 nonfatal2 nonfatal3 nsawk1a nsawk1b \
@@ -1861,7 +1863,7 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \
-	defref fmtspcl lintexp lintindex lintint lintlength lintplus \
+	defref fmtspcl lintexp lintindex lintint lintlength lintplus lintplus2 \
 	lintwarn noeffect nofmtch nonl shadow uninit2 uninit3 uninit4 \
 	uninit5 uninitialized
 
@@ -1884,7 +1886,7 @@ NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
 NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 muldimposix posix_compare
 
 # List of tests that need --pretty-print
-NEED_PRETTY = nsprof1 nsprof2 \
+NEED_PRETTY = lintplus2 nsprof1 nsprof2 \
 	profile4 profile5 profile8 profile9 profile10 profile11 profile13 \
 	profile14 profile15 profile16 profile17
 
@@ -4906,6 +4908,11 @@ lintold:
 lintplus:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+lintplus2:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint --pretty-print=_$@ >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 lintset:

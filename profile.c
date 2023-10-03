@@ -624,6 +624,7 @@ cleanup:
 		case Op_newfile:
 		case Op_get_record:
 		case Op_lint:
+		case Op_lint_plus:
 		case Op_jmp:
 		case Op_jmp_false:
 		case Op_jmp_true:
