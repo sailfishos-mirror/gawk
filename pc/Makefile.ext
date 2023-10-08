@@ -31,7 +31,7 @@ SIMPLE_EXTENSIONS = inplace.$(SOEXT) ordchr.$(SOEXT) readfile.$(SOEXT)\
  revoutput.$(SOEXT) revtwoway.$(SOEXT) testext.$(SOEXT)
 ALL_EXTENSIONS = filefuncs.$(SOEXT) fnmatch.$(SOEXT) inplace.$(SOEXT)\
  intdiv.$(SOEXT) ordchr.$(SOEXT) readdir.$(SOEXT) readfile.$(SOEXT) \
- revoutput.$(SOEXT) readdir_test.$(SOEXT) revtwoway.$(SOEXT) rwarray.$(SOEXT) \
+ revoutput.$(SOEXT) revtwoway.$(SOEXT) rwarray.$(SOEXT) \
  testext.$(SOEXT) time.$(SOEXT)
 
 extensions: $(ALL_EXTENSIONS)
@@ -44,9 +44,6 @@ intdiv.$(SOEXT): intdiv.c
 
 readdir.$(SOEXT): readdir.c gawkdirfd.h
 	gcc -I.. -DHAVE_DIRENT_H -shared -gdwarf-2 -g3 -static-libgcc -o $@ readdir.c
-
-readdir_test.$(SOEXT): readdir_test.c gawkdirfd.h
-	gcc -I.. -DHAVE_DIRENT_H -shared -gdwarf-2 -g3 -static-libgcc -o $@ readdir_test.c
 
 rwarray.$(SOEXT): rwarray.c
 	gcc -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ rwarray.c -lws2_32

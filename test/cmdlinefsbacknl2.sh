@@ -1,6 +1,6 @@
 #!/bin/sh
 
-awk=$AWK
+awk="$AWK -v BINMODE=2"
 
 # Both of these succeeded:
 # export LC_CTYPE=C

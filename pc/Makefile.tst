@@ -208,6 +208,7 @@ GAWK_EXT_TESTS = \
 	indirectbuiltin indirectcall indirectcall2 \
 	indirectcall3 intarray iolint isarrayunset lint \
 	lintexp lintindex lintint lintlength lintold lintplus lintplus2 \
+	lintplus3 \
 	lintset lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 \
 	mdim1 mdim2 mdim3 mdim4 mdim5 mdim6 mdim7 mdim8 \
 	mixed1 mktime modifiers muldimposix nastyparm negtime \
@@ -257,6 +258,7 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4
 # List of the tests which should be run with --lint option:
 NEED_LINT = \
 	defref fmtspcl lintexp lintindex lintint lintlength lintplus lintplus2 \
+	lintplus3 \
 	lintwarn noeffect nofmtch nonl shadow uninit2 uninit3 uninit4 \
 	uninit5 uninitialized
 
@@ -3124,6 +3126,11 @@ lintplus:
 lintplus2:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint --pretty-print=_$@ >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+lintplus3:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 lintset:
