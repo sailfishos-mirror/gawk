@@ -719,7 +719,7 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 		memset(& mbs, 0, sizeof(mbs));
 		n = wcrtomb(buf, i, & mbs);
 		if (n == (size_t) -1) {
-			warning(_("invalid \\u' escape sequence"));
+			warning(_("invalid `\\u' escape sequence"));
 			retval = ESCAPE_CONV_ERR;
 			*nbytes = 0;
 		} else {
