@@ -1692,13 +1692,17 @@ Preparare una concisa documentazione e distribuire.
 
 Dopo otto anni, aggiungere un'altra parte di @code{egrep} e altre due
 parti di C.  Documentare molto bene e distribuire.
+
+Dopo ulteriori 35 anni, aggiungere il supporto per Unicode e CSV,
+spruzzare leggermente con alcune funzionalit@`a di @command{gawk},
+documentare ancora molto bene e distribuire.
 @end sidebar
 
 @cindex Aho, Alfred
 @cindex Weinberger, Peter
 @cindex Kernighan, Brian
 @cindex @command{awk} @subentry storia di
-Il nome @command{awk} deriva dalle iniziali dei suoi progettisti: Alfred V.@:
+Il nome @command{awk} deriva dalle iniziali dei suoi ideatori: Alfred V.@:
 Aho, Peter J.@: Weinberger e Brian W.@: Kernighan.  La versione originale di
 @command{awk} fu scritta nel 1977 negli AT&T Bell Laboratories.
 Nel 1985, una nuova versione rese il linguaggio di programmazione
@@ -1707,7 +1711,7 @@ multipli ed espressioni regolari calcolate.
 Questa nuova versione ebbe larga diffusione con Unix System V
 Release 3.1 (1987).
 La versione in System V Release 4 (1989) ha aggiunto alcune nuove funzionalit@`a
-e ha fatto pulizia nel comportamento di alcuni degli ``punti oscuri'' del
+e ha chiarito il comportamento in alcuni dei ``punti oscuri'' del
 linguaggio.  Le specifiche per @command{awk} nello standard POSIX Command
 Language and Utilities ha in seguito reso pi@`u chiaro il linguaggio.  Sia i
 progettisti di @command{gawk} che quelli dell'originale @command{awk} dei Bell
@@ -6312,20 +6316,23 @@ vengono elaborate solo due cifre.
 @cindex estensioni comuni @subentry @code{\u} (sequenza di protezione)
 @cindex comuni @subentry estensioni @subentry @code{\u} (sequenza di protezione)
 @item \u@var{hh}@dots{}
-Il valore esadecimale @var{hh}, dove @var{hh} indica una sequenza di cifre
-esadecimli (@samp{0}--@samp{9}, e @samp{A}--@samp{F} o
-@samp{a}--@samp{f}).  Un massimo di otto cifre @`e consentito dopo
-la @samp{\u}.  Ogni successiva cifra esadecimale eventualmente immessa
-@`e trattata come una semplice lettera o numero. @value{COMMONEXT}
-(La sequenza di protezione @samp{\u} non @`e ammessa in modalit@`a POSIX.)
+Il valore esadecimale @var{hh}, dove @var{hh} indica una sequenza di una o pi@`u
+cifre esadecimli (@samp{0}--@samp{9}, e @samp{A}--@samp{F} o
+@samp{a}--@samp{f}).  Un massimo di otto cifre @`e consentito dopo la
+@samp{\u}.  Ogni successiva cifra esadecimale eventualmente immessa @`e
+trattata come una semplice lettera o numero. @value{COMMONEXT} (La sequenza
+di protezione @samp{\u} non @`e ammessa in modalit@`a POSIX.)
 
-Questa sequenza di protezione serve per indicare una lettera o un
-simbolo come specificato nella codifica Unicode.
+Questa sequenza di protezione serve per indicare un carattere che fa parte
+dell'insieme dei caratteri della lingua locale corrente.@footnote{Normalmente,
+si tratta di una localizzazione basata sulla codifica Unicode, ma non sempre
+@`e questo il caso.}
 @command{gawk} dapprima converte le cifre cos@`{@dotless{i}} specificate in
 un numero intero, e poi traduce il ``carattere largo''
-cos@`{@dotless{i}} specificato nella codifica multibyte locale (anche se la
-codifica locale non @`e Unicode).  Se i byte specificati non
-rappresentano un carattere valido, il valore diviene @code{"?"}.
+cos@`{@dotless{i}} specificato nella codifica multibyte locale corrente.
+Se il valore del ``carattere largo'' specificato non rappresenta un carattere
+valido, il valore diviene @code{"?"}. @command{gawk} emette in tal caso
+un messaggio di avvertimento.
 
 @cindex @code{\} (barra inversa) @subentry @code{\/} (sequenza di protezione)
 @cindex barra inversa (@code{\}) @subentry @code{\/} (sequenza di protezione)
@@ -6838,8 +6845,8 @@ carattere incluso tra le parentesi quadre aperta e chiusa.
 All'interno di un'espressione tra parentesi quadre, una
 @dfn{espressione di intervallo} @`e formata da due caratteri separati da un
 trattino.  Individua ogni singolo carattere compreso tra i due caratteri,
-ordinati secondo l'insieme di caratteri in uso nel sistema.  Per esempio,
-@samp{[0-9]} equivale a @samp{[0123456789]}.
+ordinati secondo l'insieme di caratteri locali, correntemente in uso nel
+sistema.  Per esempio, @samp{[0-9]} equivale a @samp{[0123456789]}.
 (Si veda @ref{Intervalli e localizzazione} per una spiegazione di come
 lo standard POSIX e @command{gawk} sono cambiati nel corso degli anni.
 La cosa ha un interesse principalmente storico.)
@@ -14553,8 +14560,7 @@ se in realt@`a @`e un insieme di caratteri e quindi anche una stringa.
 Cos@`{@dotless{i}}, ad esempio, la costante di stringa @w{@code{" +3.14"}},
 quando appare nel codice sorgente di un programma,
 @`e una stringa --- anche se sembra numerica --- e non
-viene @emph{mai} trattato come numero
-ai fini di un confronto.
+viene @emph{mai} trattato come numero nel caso di un confronto.
 
 In breve, quando un operando @`e una stringa ``pura'', come una costante di
 stringa, viene effettuato un confronto di stringa.  In caso contrario viene
@@ -21189,8 +21195,8 @@ fare.
 
 @cindex Brian Kernighan @subentry @command{awk} di
 In entrambi i livelli, @command{awk} ricerca un dato insieme di caratteri
-che possono venire dopo una
-barra inversa.  A livello lessicale, cerca le sequenze di protezione
+che possono venire dopo una barra inversa.
+A livello lessicale, cerca le sequenze di protezione
 elencate
 @iftex
 nella
@@ -29657,9 +29663,9 @@ non dei byte.  Per questo motivo, in @command{gawk}, le funzioni
 @code{length()}, @code{substr()}, @code{split()}, @code{match()} e
 le altre funzioni di manipolazione di stringhe
 (@pxref{Funzioni per stringhe}) funzionano tutte elaborando dei caratteri,
-come definiti dall'insieme di caratteri localizzati [a una determinata lingua]
-e non elaborando dei byte.  (Incidentalmente, non tutte le implementazioni
-di @command{awk} si comportano cos@`{@dotless{i}}).
+come definiti dall'insieme di caratteri correnti [locali a una determinata
+lingua] e non elaborando dei byte.  (Incidentalmente, non tutte le
+implementazioni di @command{awk} si comportano cos@`{@dotless{i}}).
 
 Non esiste una maniera standard, internamente definita, per distinguere
 i byte dai caratteri in un programma @command{awk}.  Per una implementazione
