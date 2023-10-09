@@ -1,6 +1,7 @@
 #!/bin/sh
 
 awk="$AWK -v BINMODE=2"
+SED="sed -e '/^\$/d' -e 's/[ 	][ 	]*/ /g' -e 's/  *\$//'"
 
 # Both of these succeeded:
 # export LC_CTYPE=C
@@ -10,9 +11,9 @@ export LC_CTYPE="en_US.UTF-8"
 # Test terminal backslash handling. Each test should produce "5c 0a"
 # (a backslash followed by a newline). Presently, master produces "0a".
 #
-$awk -F'\' 'BEGIN { print FS }' | od -An -tx1
-$awk -v s='\' 'BEGIN { print s }' | od -An -tx1
-echo | $awk '{ print s }' s='\' | od -An -tx1
+$awk -F'\' 'BEGIN { print FS }' | od -An -tx1 | eval $SED
+$awk -v s='\' 'BEGIN { print s }' | od -An -tx1 | eval $SED
+echo | $awk '{ print s }' s='\' | od -An -tx1 | eval $SED
 
 
 # These are the same terminal backslash handling tests we just ran, but
@@ -22,11 +23,11 @@ echo | $awk '{ print s }' s='\' | od -An -tx1
 # produces only "0a". The backslash is lost.
 #
 $awk -F'\
-\' 'BEGIN { print FS }' | od -An -tx1
+\' 'BEGIN { print FS }' | od -An -tx1 | eval $SED
 $awk -v s='\
-\' 'BEGIN { print s }' | od -An -tx1
+\' 'BEGIN { print s }' | od -An -tx1 | eval $SED
 echo | $awk '{ print s }' s='\
-\' | od -An -tx1
+\' | od -An -tx1 | eval $SED
 
 
 # \uffffffff (-1)
@@ -42,7 +43,7 @@ echo | $awk '{ print s }' s='\
 $awk 'BEGIN {
 	print "\uFFFFFFFF"	# "?\n"
 	print "\uFFFFFFFE"	# "?\n"
-}' | od -An -tx1		# 3f 0a 3f 0a
+}' | od -An -tx1 | eval $SED	# 3f 0a 3f 0a
 
 
 # Again, a negative return value causes confusion, this time producing a
