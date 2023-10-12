@@ -477,6 +477,36 @@ nl_langinfo (int item)
     }
 }
 
+/* Convert a Unicode codepoint UC to the corresponding multibyte string
+   STR in the current system codepage.  Return the number of bytes in
+   STR, or -1 if the codepage does not support UC.  */
+size_t w32_wc_to_lc (int uc, char *str)
+{
+  BOOL used_default = FALSE;
+  wchar_t wc[3];
+  int retval;
+
+  if (uc > 0x10FFFF)
+    return (size_t) -1;
+
+  /* Convert UC to UTF-16.  */
+  wc[1] = wc[2] = 0;
+  if (uc < 0x10000)
+    wc[0] = uc;
+  else
+    {
+      wc[0] = ((uc - 0x10000) >> 10) + 0xD800; /* high surrogate */
+      wc[1] = (uc & 0x3FF) + 0xDC00;	       /* low surrogate */
+    }
+  /* WideCharToMultiByte returns the number of bytes, including the
+     terminating null, written to STR on success, zero on falure.  */
+  retval = WideCharToMultiByte (CP_ACP, 0, wc, -1,
+				str, MB_LEN_MAX, NULL, &used_default);
+  if (!retval || used_default)
+    return (size_t) -1;
+  return retval - 1;	/* exclude the terminating null */
+}
+
 /*
  * On MS-Windows with MinGW, execvp causes the shell and the re-exec'ed
  * dgawk to compete for the keyboard input.

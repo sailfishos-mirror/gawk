@@ -65,6 +65,8 @@ char *w32_setlocale (int, const char *);
 #endif
 #define setlocale(c,v) w32_setlocale(c,v)
 
+size_t w32_wc_to_lc (int, char *);
+
 char *strsignal (int);
 
 #endif	/* __MINGW32__ */
