@@ -336,9 +336,10 @@ NEED_LOCALE_RU = mtchi18n
 EXPECTED_FAIL_MINGW = \
 	backbigs1 backsmalls1 clos1way6 close_status dbugeval4\
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
-	getfile getlnhd ignrcas3 inetdayt inetecht inf-nan-torture \
-	iolint mbfw1 mbprintf1 mbprintf4 mbstr1 mbstr2 \
-	pid pipeio2 pty1 pty2 readdir rstest4 rstest5 status-close timeout
+	getfile getlnhd gsubnulli18n ignrcas3 inetdayt inetecht \
+	inf-nan-torture iolint mbfw1 mbprintf1 mbprintf4 mbstr1 \
+	mbstr2 mtchi18n2 pid pipeio2 pty1 pty2 readdir rstest4 \
+	rstest5 status-close timeout unicode1
 
 
 # List of tests that fail on z/OS
@@ -1802,6 +1803,7 @@ gsubasgn:
 
 gsubnulli18n:
 	@echo $@
+	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA.1252; export GAWKLOCALE; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3637,6 +3639,7 @@ typeof6:
 
 unicode1:
 	@echo $@
+	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA.1252; export GAWKLOCALE; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3758,6 +3761,7 @@ mtchi18n:
 
 mtchi18n2:
 	@echo $@
+	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA.1252; export GAWKLOCALE; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
