@@ -235,10 +235,8 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 			 * neither does ok_to_escape.
 			 */
 			if (ok_to_escape == NULL) {
-				if (do_posix)
+				if (do_posix || do_traditional)
 					ok_to_escape = "{}()|*+?.^$\\[]/-";
-				else if (do_traditional)
-					ok_to_escape = "()|*+?.^$\\[]/-";
 				else
 					ok_to_escape = "<>`'BywWsS{}()|*+?.^$\\[]/-";
 			}
