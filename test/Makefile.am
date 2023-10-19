@@ -1690,14 +1690,16 @@ EXPECTED_FAIL_MINGW = \
 # List of tests that fail on z/OS
 EXPECTED_FAIL_ZOS = \
 	aasort aasorti arraysort asort asorti backbigs1 backsmalls1 \
-	backsmalls2 beginfile1 beginfile2 charasbytes commas clos1way6 concat4 \
-	dfamb1 double1 double2 errno fmttest forcenum getlndir gsubtst5 \
-	ignrcas2 inf-nan-torture iolint lc_num1 mbfw1 mbprintf1 \
-	mbprintf2 mbprintf3 mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n \
-	nlstringtest nofile nonfatal2 numrange posix_compare printhuge \
-	profile5 rebt8b2 regrange reint2 rri1 sigpipe1 sort1 sortfor \
-	sortu space sprintfc subamp subi18n symtab1 symtab11 symtab8 \
-	timeout wideidx wideidx2 widesub widesub2 widesub3 widesub4
+	backsmalls2 beginfile1 beginfile2 charasbytes clos1way6 \
+	cmdlinefsbacknl2 commas concat4 dfamb1 double1 double2 errno \
+	fmttest forcenum getlndir gsubnulli18n gsubtst5 ignrcas2 \
+	inf-nan-torture iolint lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
+	mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest \
+	nofile nonfatal2 numrange posix_compare printhuge profile5 rebt8b2 \
+	regexpbad regrange reint2 rri1 sigpipe1 sort1 sortfor sortu space \
+	sprintfc subamp subi18n symtab1 symtab8 symtab11 timeout unicode1 \
+	wideidx wideidx2 widesub widesub2 widesub3 widesub4
+
 
 ZOS_FAIL = @ZOS_FAIL@
 
