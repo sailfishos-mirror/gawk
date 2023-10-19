@@ -93,6 +93,7 @@ int main(int argc, char **argv)
 	char *place;
 	bool not_bol = false;
 	struct localeinfo localeinfo;
+	int start = 0;
 
 	pma_init(1, NULL);
 
@@ -106,7 +107,7 @@ int main(int argc, char **argv)
 	syn = RE_SYNTAX_GNU_AWK;
 
 	/* parse options, update syntax, ignorecase */
-	while ((c = getopt(argc, argv, "bpit")) != -1) {
+	while ((c = getopt(argc, argv, "bpits:")) != -1) {
 		switch (c) {
 		case 'b':
 			not_bol = true;
@@ -120,6 +121,9 @@ int main(int argc, char **argv)
 		case 't':
 			syn = RE_SYNTAX_AWK;
 			break;
+		case 's':
+			sscanf(optarg, "%d", & start);
+			break;
 		case '?':
 		default:
 			usage(argv[0]);
@@ -129,6 +133,11 @@ int main(int argc, char **argv)
 
 	if (optind == argc)
 		usage(argv[0]);
+
+	if (start < 0 || start > strlen(argv[optind])) {
+		fprintf(stderr, "%s: start index %d is out of range\n", argv[0], start);
+		exit(EXIT_FAILURE);
+	}
 
 	pattern = argv[optind];
 	len = strlen(pattern);
@@ -204,7 +213,7 @@ int main(int argc, char **argv)
 	printf("data: <%s>\n", data);
 
 	/* run the regex matcher */
-	ret = re_search(& pat, data, len, 0, len, NULL);
+	ret = re_search(& pat, data, len, start, len, NULL);
 	printf("re_search with NULL returned position %d (%s)\n", ret, (ret >= 0) ? "true" : "false");
 #if 0
 	printf("pat.allocated = %ld\n", pat.allocated);
@@ -220,7 +229,7 @@ int main(int argc, char **argv)
 	printf("pat.newline_anchor = %d\n", pat.newline_anchor);
 #endif
 
-	ret = re_search(& pat, data, len, 0, len, &regs);
+	ret = re_search(& pat, data, len, start, len, &regs);
 	printf("re_search returned position %d (%s)\n", ret, (ret >= 0) ? "true" : "false");
 #if 0
 	printf("pat.allocated = %ld\n", pat.allocated);
@@ -235,6 +244,9 @@ int main(int argc, char **argv)
 	printf("pat.not_eol = %d\n", pat.not_eol);
 	printf("pat.newline_anchor = %d\n", pat.newline_anchor);
 #endif
+	printf("pat.re_nsub = %d\n", pat.re_nsub);
+	for (int i = 0; i <= pat.re_nsub; i++)
+		printf("\treg[%d].so = %d, reg[%d].eo = %d\n", i, regs.start[i], i, regs.end[i]);
 
 	/* run the dfa matcher */
 	/*
