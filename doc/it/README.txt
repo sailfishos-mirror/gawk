@@ -8,27 +8,22 @@ computer in cui si scarica la distribuzione di gawk.
 utente della funzionalità di Memoria Persistente (pm-gawk),
 disponibile a partire dalle versione 5.2 di Gawk.
 
-Se la sola cosa che interessa è avere una copia del libro
-GAWK e/o del manuale pm-gawk in formato PDF,
+Se la sola cosa che interessa è avere una copia del
+libro Gawk e/o del manuale pm-gawk in formato PDF,
 queste possono semplicemente essere scaricate dal sito:
 
 https://sites.google.com/view/gawkdoc-it/home-page
 
-Per generare il libro localmente, sono disponibili due shell
-script:
+Per generare il libro localmente, è disponibile uno
+shell script:
 
-compila_originale.sh
+compila_gawk.sh
 
-compila_smallprint.sh
-
-La sola differenza è la dimensione della pagina stampata,
-che è più piccola usando il secondo script.
-
-Un terzo script:
+Un secondo script:
 
 genera_formati.sh
 
-genera il libro in vari formati, fra cui i formati
+genera il libro Gawk in vari formati, fra cui i formati
 testo, html e info.
 
 Per generare il Manuale Utente per la Memoria Persistente
@@ -37,6 +32,6 @@ in gawk, è disponibile lo script:
 compila_pma.sh
 
 Per eventuali problemi con la traduzione italiana del
-libro Gawk e/o del Manuale pm-gawk, fare riferimento
+libro Gawk e/o del Manuale utente pm-gawk, fare riferimento
 agli indirizzi email dei traduttori, inseriti all'inizio
 della versione PDF del libro Gawk.

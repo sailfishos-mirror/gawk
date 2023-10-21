@@ -10585,27 +10585,36 @@ Redirecting output using @samp{>}, @samp{>>}, @samp{|}, or @samp{|&}
 asks the system to open a file, pipe, or coprocess only if the particular
 @var{file} or @var{command} you specify has not already been written
 to by your program or if it has been closed since it was last written to.
+In other words, files, pipes, and coprocesses remain open until
+explicitly closed. All further @code{print} and @code{printf} statements
+continue to write to the same open file, pipe, or coprocess.
 
 @cindex troubleshooting @subentry printing
-It is a common error to use @samp{>} redirection for the first @code{print}
-to a file, and then to use @samp{>>} for subsequent output:
+In the shell, when you are building up a file a line at a time, you
+first use @samp{>} to create the file, and then you use @samp{>>} for
+subsequent additions to it, like so:
 
 @example
-# clear the file
-print "Don't panic" > "guide.txt"
-@dots{}
-# append
-print "Avoid improbability generators" >> "guide.txt"
+echo Name: Arnold Robbins > data
+echo Street Address: 1234 A Pretty Street, NE >> data
+echo City and State: MyTown, MyState 12345-6789 >> data
 @end example
 
-@noindent
-This is indeed how redirections must be used from the shell.  But in
-@command{awk}, it isn't necessary.  In this kind of case, a program should
-use @samp{>} for all the @code{print} statements, because the output file
-is only opened once. (It happens that if you mix @samp{>} and @samp{>>}
-output is produced in the expected order. However, mixing the operators
-for the same file is definitely poor style, and is confusing to readers
-of your program.)
+In @command{awk}, the @samp{>} and @samp{>>} operators are subtly
+different.  The operator you use the @emph{first time} you write to a
+file determines how @command{awk} will open (or create) the file.
+If you use @samp{>}, the file is truncated, and then all subsequent
+output appends data to the file, even if additional @code{print} or
+@code{printf} statements continue to use @samp{>}.  If you use @samp{>>}
+the first time, then existing data is not truncated, and all subsequent
+@code{print} or @code{printf} statements append data to the file.
+
+You should be consistent and always use the same operator for all output
+to the same file. (You can mix @samp{>} and @samp{>>}, and nothing bad
+will happen, but mixing the operators is considered to be bad style in
+@command{awk}. If invoked with the @option{--lint} option, @command{gawk}
+issues a warning when it encounters both operators being used for the
+same open file.)
 
 @cindex differences in @command{awk} and @command{gawk} @subentry implementation limitations
 @cindex implementation issues, @command{gawk} @subentry limits
@@ -47539,39 +47548,5 @@ text.  It's ok as one word when it's a metasyntactic variable, though.
 
 ------------------------
 ORA uses filename, thus the macro.
-
-Suggestions:
-------------
-
-Better sidebars can almost sort of be done with:
-
-	@ifdocbook
-	@macro @sidebar{title, content}
-	@inlinefmt{docbook, <sidebar><title>}
-	\title\
-	@inlinefmt{docbook, </title>}
-	\content\
-	@inlinefmt{docbook, </sidebar>}
-	@end macro
-	@end ifdocbook
-
-
-	@ifnotdocbook
-	@macro @sidebar{title, content}
-	@cartouche
-	@center @b{\title\}
-
-	\content\
-	@end cartouche
-	@end macro
-	@end ifnotdocbook
-
-But to use it you have to say
-
-	@sidebar{Title Here,
-	@include file-with-content
-	}
-
-which sorta sucks.
 
 TODO:

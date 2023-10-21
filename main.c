@@ -1727,7 +1727,7 @@ parse_args(int argc, char **argv)
 			break;
 
 		case 'p':
-			if (do_pretty_print)
+			if (do_pretty_print && ! do_profile)
 				warning(_("`--profile' overrides `--pretty-print'"));
 			do_flags |= DO_PROFILE;
 			/* fall through */

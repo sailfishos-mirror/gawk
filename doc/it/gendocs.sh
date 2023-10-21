@@ -2,9 +2,9 @@
 # gendocs.sh -- generate a GNU manual in many formats.  This script is
 #   mentioned in maintain.texi.  See the help message below for usage details.
 
-scriptversion=2022-10-25.23
+scriptversion=2023-07-12.10
 
-# Copyright 2003-2022 Free Software Foundation, Inc.
+# Copyright 2003-2023 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ unset use_texi2html
 MANUAL_TITLE=
 PACKAGE=
 EMAIL=webmasters@gnu.org  # please override with --email
-commonarg= # passed to all makeinfo/texi2html invcations.
+commonarg= # passed to all makeinfo/texi2html invocations.
 dirargs=   # passed to all tools (-I dir).
 dirs=      # -I directories.
 htmlarg="--css-ref=https://www.gnu.org/software/gnulib/manual.css -c TOP_NODE_UP_URL=/manual"
@@ -72,18 +72,22 @@ srcfile=
 texarg="-t @finalout"
 
 version="gendocs.sh $scriptversion
-Copyright 2022 Free Software Foundation, Inc.
+
+Copyright 2023 Free Software Foundation, Inc.
 There is NO warranty.  You may redistribute this software
 under the terms of the GNU General Public License.
 For more information about these matters, see the files named COPYING."
 
 usage="Usage: $prog [OPTION]... PACKAGE MANUAL-TITLE
+
 Generate output in various formats from PACKAGE.texinfo (or .texi or
 .txi) source.  See the GNU Maintainers document for a more extensive
 discussion:
   https://www.gnu.org/prep/maintain_toc.html
+
 Options:
   --email ADR use ADR as contact in generated web pages; always give this.
+
   -s SRCFILE   read Texinfo from SRCFILE, instead of PACKAGE.{texinfo|texi|txi}
   -o OUTDIR    write files into OUTDIR, instead of manual/.
   -I DIR       append DIR to the Texinfo search path.
@@ -98,44 +102,57 @@ Options:
   --source ARG include ARG in tar archive of sources.
   --split HOW  make split HTML by node, section, chapter; default node.
   --tex ARG    pass ARG to texi2dvi for DVI and PDF, instead of -t @finalout.
+
   --texi2html  use texi2html to make HTML target, with all split versions.
   --docbook    convert through DocBook too (xml, txt, html, pdf).
+
   --help       display this help and exit successfully.
   --version    display version information and exit successfully.
+
 Simple example: $prog --email bug-gnu-emacs@gnu.org emacs \"GNU Emacs Manual\"
+
 Typical sequence:
   cd PACKAGESOURCE/doc
   wget \"$scripturl\"
   wget \"$templateurl\"
   $prog --email BUGLIST MANUAL \"GNU MANUAL - One-line description\"
+
 Output will be in a new subdirectory \"manual\" (by default;
 use -o OUTDIR to override).  Move all the new files into your web CVS
 tree, as explained in the Web Pages node of maintain.texi.
+
 Please use the --email ADDRESS option so your own bug-reporting
 address will be used in the generated HTML pages.
+
 MANUAL-TITLE is included as part of the HTML <title> of the overall
 manual/index.html file.  It should include the name of the package being
 documented.  manual/index.html is created by substitution from the file
 $GENDOCS_TEMPLATE_DIR/gendocs_template.  (Feel free to modify the
 generic template for your own purposes.)
+
 If you have several manuals, you'll need to run this script several
 times with different MANUAL values, specifying a different output
 directory with -o each time.  Then write (by hand) an overall index.html
 with links to them all.
+
 If a manual's Texinfo sources are spread across several directories,
 first copy or symlink all Texinfo sources into a single directory.
 (Part of the script's work is to make a tar.gz of the sources.)
+
 As implied above, by default monolithic Info files are generated.
 If you want split Info, or other Info options, use --info to override.
+
 You can set the environment variables MAKEINFO, TEXI2DVI, TEXI2HTML,
 and PERL to control the programs that get executed, and
 GENDOCS_TEMPLATE_DIR to control where the gendocs_template file is
 looked for.  With --docbook, the environment variables DOCBOOK2HTML,
 DOCBOOK2PDF, and DOCBOOK2TXT are also consulted.
+
 By default, makeinfo and texi2dvi are run in the default (English)
 locale, since that's the language of most Texinfo manuals.  If you
 happen to have a non-English manual and non-English web site, see the
 SETLANG setting in the source.
+
 Email bug reports or enhancement requests to bug-gnulib@gnu.org.
 "
 
@@ -237,6 +254,7 @@ BEGIN {
 }
 " -e '
 /<img src="(.*?)"/g && ++$need{$1};
+
 END {
   #print "$me: @{[keys %need]}\n";  # for debugging, show images found.
   FILE: for my $f (keys %need) {
@@ -448,11 +466,25 @@ fi
 # ␌
 printf "\nMaking index.html for %s...\n" "$PACKAGE"
 if test -z "$use_texi2html"; then
-  CONDS="/%%IF  *HTML_SECTION%%/,/%%ENDIF  *HTML_SECTION%%/d;\
-         /%%IF  *HTML_CHAPTER%%/,/%%ENDIF  *HTML_CHAPTER%%/d"
+  if test x$split = xnode; then
+    CONDS="/%%IF  *HTML_NODE%%/d;/%%ENDIF  *HTML_NODE%%/d;\
+           /%%IF  *HTML_CHAPTER%%/,/%%ENDIF  *HTML_CHAPTER%%/d;\
+           /%%IF  *HTML_SECTION%%/,/%%ENDIF  *HTML_SECTION%%/d;"
+  elif test x$split = xchapter; then
+    CONDS="/%%IF  *HTML_CHAPTER%%/d;/%%ENDIF  *HTML_CHAPTER%%/d;\
+           /%%IF  *HTML_SECTION%%/,/%%ENDIF  *HTML_SECTION%%/d;\
+           /%%IF  *HTML_NODE%%/,/%%ENDIF  *HTML_NODE%%/d;"
+  elif test x$split = xsection; then
+    CONDS="/%%IF  *HTML_SECTION%%/d;/%%ENDIF  *HTML_SECTION%%/d;\
+           /%%IF  *HTML_CHAPTER%%/,/%%ENDIF  *HTML_CHAPTER%%/d;\
+           /%%IF  *HTML_NODE%%/,/%%ENDIF  *HTML_NODE%%/d;"
+  else
+    CONDS="/%%IF.*%%/d;/%%ENDIF.*%%/d;" # invalid split argument
+  fi
 else
-  # should take account of --split here.
-  CONDS="/%%ENDIF.*%%/d;/%%IF  *HTML_SECTION%%/d;/%%IF  *HTML_CHAPTER%%/d"
+  # for texi2html, we do not take account of --split and simply output
+  # all variants
+  CONDS="/%%IF.*%%/d;/%%ENDIF.*%%/d;"
 fi
 
 curdate=`$SETLANG date '+%B %d, %Y'`
