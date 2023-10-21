@@ -7869,6 +7869,7 @@ isnoeffect(OPCODE type)
 	case Op_push_array:
 	case Op_pop:
 	case Op_lint_plus:
+	case Op_exec_count:
 		return true;
 	default:
 		break;	/* keeps gcc -Wall happy */
