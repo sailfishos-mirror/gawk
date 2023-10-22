@@ -17860,24 +17860,6 @@ for (i in a) @{
 @xref{Walking Arrays} for a user-defined function that ``walks'' an
 arbitrarily dimensioned array of arrays.
 
-Recall that a reference to an uninitialized array element yields a value
-of @code{""}, the null string. This has one important implication when you
-intend to use a subarray as an argument to a function, as illustrated by
-the following example:
-
-@example
-$ @kbd{gawk 'BEGIN @{ split("a b c d", b[1]); print b[1][1] @}'}
-@error{} gawk: cmd. line:1: fatal: split: second argument is not an array
-@end example
-
-The way to work around this is to first force @code{b[1]} to be an array by
-creating an arbitrary index:
-
-@example
-$ @kbd{gawk 'BEGIN @{ b[1][1] = ""; split("a b c d", b[1]); print b[1][1] @}'}
-@print{} a
-@end example
-
 @node Arrays Summary
 @section Summary
 
