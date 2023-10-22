@@ -11776,31 +11776,43 @@ richiede al sistema di aprire un file, una @dfn{pipe} o un coprocesso solo se
 il particolare @var{file} o @var{comando} che si @`e specificato non @`e gi@`a
 stato utilizzato in scrittura dal programma o se @`e stato chiuso
 dopo l'ultima scrittura.
+In altre parole, sia i file che le @dfn{pipe} e i coprocessi rimangono
+aperti finché non vengono esplicitamente chiusi.  Ogni istruzione
+@code{print} e @code{printf} dopo la prima, continua a scrivere
+allo stesso file, @dfn{pipe} o coprocesso.
 
 @cindex debug @subentry stampare
-@`E un errore comune usare la ridirezione @samp{>} per la prima istruzione
-@code{print} verso un file, e in seguito usare @samp{>>} per le successive
-scritture in output:
+In una shell, quando si stia preparando un file una riga per volta,
+si usa @samp{>} per creare il file, e poi si usa @samp{>>} per
+ogni successiva aggiunta al file stesso, come nell'esempio
+seguente:
 
 @example
-# inizializza il file
-print "Non v'allarmate" > "guida.txt"
-@dots{}
-# aggiungi in fondo al file
-print "Evitate generatori di improbabilit@`a" >> "guide.txt"
+echo Nome: Arnold Robbins > dati
+echo Indirizzo: 1234 A Pretty Street, NE >> dati
+echo Città e Stato: MyTown, MyState 12345-6789 >> dati
 @end example
 
-@noindent
-Questo @`e il modo in cui le ridirezioni devono essere usate lavorando
-con la shell.  Ma in @command{awk} ci@`o non @`e necessario.  In casi di questo
-genere, un programma dovrebbe
-usare @samp{>} per tutte le istruzioni @code{print}, perch@'e il file di
-output @`e aperto una sola volta.
-(Usando sia @samp{>} che @samp{>>} nello stesso programma, l'output @`e prodotto
-nell'ordine atteso.
-Tuttavia il mischiare gli operatori per lo stesso file @`e sintomo di uno
-stile di programmazione inelegante, e pu@`o causare confusione in chi legge
-il programma.)
+In @command{awk}, gli operatori @samp{>} e @samp{>>} hanno un
+significato un po' diverso.  L'operatore usato la @emph{prima volta}
+che si scrive un file indica @emph{come} @command{awk} aprirà (o creerà)
+quel file.
+Usando @samp{>}, il file, se esiste, viene riscritto dall'inizio
+(o viene creato se non esiste). Tutte le successive operazioni di
+scrittura aggiungono dati al file, anche se le successive istruzioni
+@code{print} o @code{printf} continuano a usare @samp{>}.
+Usando invece @samp{>>} la prima volta, il file non viene
+riscritto dall'inizio (ma viene creato se non esiste).  Tutte le
+successive operazioni @code{print} o @code{printf} aggiungono dati
+al file.
+
+Per consistenza, sarebbe bene usare sempre un unico operatore per
+tutto l'output diretto a uno stesso file.
+(Si possono mischiare @samp{>} e @samp{>>}, e la cosa non ha effetti
+negativi, ma mischiare gli operatori è considerato cattivo stile in
+@command{awk}.  Se invocato con l'opzione @option{--lint}, @command{gawk}
+emette un messaggio di avvertimento quando entrambi gli
+operatori vengono usati per uno stesso file aperto.)
 
 @cindex differenze tra @command{awk} e @command{gawk} @subentry limitazioni di implementazione
 @cindex problemi di implementazione @subentry @command{gawk} @subentry limitazioni
@@ -19844,26 +19856,6 @@ for (i in a) @{
 @noindent
 @xref{Visitare vettori} per una funzione definita dall'utente che
 ``visita'' un vettore di vettori di dimensioni arbitrarie.
-
-Si ricordi che un riferimento a un elemento di un vettore non
-inizializzato genera un elemento con valore uguale a @code{""}, la stringa
-nulla. Questo ha
-un'importante implicazione quando s'intende usare un sottovettore come
-argomento di una funzione, come illustrato nel seguente esempio:
-
-@example
-$ @kbd{gawk 'BEGIN @{ split("a b c d", b[1]); print b[1][1] @}'}
-@error{} gawk: riga com.:1: fatale: split: secondo argomento
-@error{}                                      non-vettoriale
-@end example
-
-Il modo per aggirare quest'ostacolo @`e quello di definire prima @code{b[1]}
-come vettore creando un indice arbitrario:
-
-@example
-$ @kbd{gawk 'BEGIN @{ b[1][1] = ""; split("a b c d", b[1]); print b[1][1] @}'}
-@print{} a
-@end example
 
 @node Sommario dei vettori
 @section Sommario
@@ -52953,39 +52945,5 @@ text.  It's ok as one word when it's a metasyntactic variable, though.
 
 ------------------------
 ORA uses filename, thus the macro.
-
-Suggestions:
-------------
-
-Better sidebars can almost sort of be done with:
-
-	@ifdocbook
-	@macro @sidebar{title, content}
-	@inlinefmt{docbook, <sidebar><title>}
-	\title\
-	@inlinefmt{docbook, </title>}
-	\content\
-	@inlinefmt{docbook, </sidebar>}
-	@end macro
-	@end ifdocbook
-
-
-	@ifnotdocbook
-	@macro @sidebar{title, content}
-	@cartouche
-	@center @b{\title\}
-
-	\content\
-	@end cartouche
-	@end macro
-	@end ifnotdocbook
-
-But to use it you have to say
-
-	@sidebar{Title Here,
-	@include file-with-content
-	}
-
-which sorta sucks.
 
 TODO:
