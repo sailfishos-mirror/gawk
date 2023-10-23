@@ -1494,42 +1494,39 @@ BASIC_TESTS = \
 	aryprm2 aryprm3 aryprm4 aryprm5 aryprm6 aryprm7 aryprm8 aryprm9 \
 	arysubnm aryunasgn asgext assignnumfield assignnumfield2 awkpath \
 	back89 backgsub badassign1 badbuild callparam childin clobber \
-	closebad close_status clsflnam compare compare2 concat1 concat2 \
-	cmdlinefsbacknl cmdlinefsbacknl2 \
-	concat3 concat4 concat5 convfmt datanonl defref delargv delarpm2 \
-	delarprm delfunc dfacheck2 dfamb1 dfastress divzero divzero2 \
-	dynlj eofsplit \
+	close_status closebad clsflnam cmdlinefsbacknl cmdlinefsbacknl2 \
+	compare compare2 concat1 concat2 concat3 concat4 concat5 \
+	convfmt datanonl defref delargv delarpm2 delarprm delfunc \
+	dfacheck2 dfamb1 dfastress divzero divzero2 dynlj eofsplit \
 	eofsrc1 escapebrace exit2 exitval1 exitval2 exitval3 fcall_exit \
-	fcall_exit2 \
-	fieldassign fldchg fldchgnf fldterm fnamedat fnarray fnarray2 \
-	fnaryscl fnasgnm fnmisc fordel forref forsimp fsbs fscaret fsnul1 \
-	fsrs fsspcoln fstabplus funsemnl funsmnam funstack getline \
-	getline2 getline3 getline4 getline5 getlnbuf getlnfa getnr2tb \
-	getnr2tm gsubasgn gsubnulli18n \
-	gsubtest gsubtst2 gsubtst3 gsubtst4 gsubtst5 \
-	gsubtst6 gsubtst7 gsubtst8 hex hex2 hsprint inpref inputred intest \
-	intprec iobug1 leaddig leadnl litoct longsub longwrds manglprm \
-	math membug1 memleak messages minusstr mmap8k nasty nasty2 negexp \
-	negrange nested nfldstr nfloop nfneg nfset nlfldsep nlinstr \
-	nlstrina noeffect nofile nofmtch noloop1 noloop2 nonl noparms \
-	nors nulinsrc nulrsend numindex numrange numstr1 numsubstr octsub \
-	ofmt ofmta ofmtbig ofmtfidl ofmts ofmtstrnum ofs1 onlynl opasnidx \
-	opasnslf paramasfunc1 paramasfunc2 paramdup paramres paramtyp \
-	paramuninitglobal parse1 parsefld parseme pcntplus posix2008sub \
-	posix_compare prdupval prec printf0 printf1 printfchar prmarscl \
-	prmreuse prt1eval prtoeval rand randtest range1 range2 readbuf \
-	rebrackloc rebt8b1 rebuild redfilnm regeq regex3minus \
-	regexpbad regexpbrack \
-	regexpbrack2 regexprange regrange reindops reparse resplit \
-	rri1 rs rscompat rsnul1nl rsnulbig rsnulbig2 rsnullre rsnulw \
-	rstest1 rstest2 rstest3 rstest4 rstest5 rswhite scalar sclforin \
-	sclifin setrec0 setrec1 sigpipe1 sortempty sortglos spacere \
-	splitargv splitarr splitdef splitvar splitwht status-close \
-	strcat1 strfieldnum strnum1 strnum2 strtod subamp subback \
-	subi18n subsepnm subslash substr swaplns synerr1 synerr2 synerr3 \
-	tailrecurse tradanch trailbs tweakfld uninit2 uninit3 uninit4 \
-	uninit5 uninitialized unterm uparrfs uplus wideidx wideidx2 \
-	widesub widesub2 widesub3 widesub4 wjposer1 zero2 zeroe0 zeroflag
+	fcall_exit2 fieldassign fldchg fldchgnf fldterm fnamedat \
+	fnarray fnarray2 fnaryscl fnasgnm fnmisc fordel forref forsimp \
+	fsbs fscaret fsnul1 fsrs fsspcoln fstabplus funsemnl funsmnam \
+	funstack getline getline2 getline3 getline4 getline5 getlnbuf \
+	getlnfa getnr2tb getnr2tm gsubasgn gsubnulli18n gsubtest gsubtst2 \
+	gsubtst3 gsubtst4 gsubtst5 gsubtst6 gsubtst7 gsubtst8 hex hex2 \
+	hsprint inpref inputred intest intprec iobug1 leaddig leadnl \
+	litoct longsub longwrds manglprm math membug1 memleak messages \
+	minusstr mmap8k nasty nasty2 negexp negrange nested nfldstr nfloop \
+	nfneg nfset nlfldsep nlinstr nlstrina noeffect nofile nofmtch \
+	noloop1 noloop2 nonl noparms nors nulinsrc nulrsend numindex \
+	numrange numstr1 numsubstr octsub ofmt ofmta ofmtbig ofmtfidl \
+	ofmts ofmtstrnum ofs1 onlynl opasnidx opasnslf paramasfunc1 \
+	paramasfunc2 paramdup paramres paramtyp paramuninitglobal parse1 \
+	parsefld parseme pcntplus posix2008sub posix_compare prdupval prec \
+	printf0 printf1 printfchar prmarscl prmreuse prt1eval prtoeval \
+	rand randtest range1 range2 readbuf rebrackloc rebt8b1 rebuild \
+	redfilnm regeq regex3minus regexpbad regexpbrack regexpbrack2 \
+	regexprange regrange reindops reparse resplit rri1 rs rscompat \
+	rsnul1nl rsnulbig rsnulbig2 rsnullre rsnulw rstest1 rstest2 \
+	rstest3 rstest4 rstest5 rswhite scalar sclforin sclifin setrec0 \
+	setrec1 sigpipe1 sortempty sortglos spacere splitargv splitarr \
+	splitdef splitvar splitwht status-close strcat1 strfieldnum \
+	strnum1 strnum2 strtod subamp subback subi18n subsepnm subslash \
+	substr swaplns synerr1 synerr2 synerr3 tailrecurse tradanch \
+	trailbs tweakfld uninit2 uninit3 uninit4 uninit5 uninitialized \
+	unterm uparrfs uplus wideidx wideidx2 widesub widesub2 widesub3 \
+	widesub4 wjposer1 zero2 zeroe0 zeroflag
 
 UNIX_TESTS = \
 	fflush getlnhd localenl pid pipeio1 pipeio2 poundbang rtlen rtlen01 \
@@ -1537,34 +1534,31 @@ UNIX_TESTS = \
 
 GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
-	arraysort2 arraytype asortbool backw badargs beginfile1 beginfile2 \
-	asortsymtab \
-	binmode1 charasbytes clos1way clos1way2 clos1way3 clos1way4 \
-	clos1way5 clos1way6 colonwarn commas crlf csv1 csv2 csv3 csvodd \
-	dbugeval dbugeval2 \
-	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delsub \
-	devfd devfd1 devfd2 dfacheck1 dumpvars \
-	elemnew1 elemnew2 elemnew3 errno exit fieldwdth forcenum fpat1 fpat2 \
-	fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 fpat9 fpatnull fsfwfs functab1 \
-	functab2 functab3 functab6 funlen fwtest fwtest2 fwtest3 fwtest4 \
-	fwtest5 fwtest6 fwtest7 fwtest8 genpot gensub gensub2 gensub3 gensub4 \
-	getlndir gnuops2 gnuops3 gnureops gsubind icasefs icasers id \
-	igncdym igncfs ignrcas2 ignrcas4 ignrcase incdupe incdupe2 \
-	incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 include include2 \
-	indirectbuiltin indirectcall indirectcall2 \
-	indirectcall3 intarray iolint isarrayunset lint \
-	lintexp lintindex lintint lintlength lintold lintplus lintplus2 \
-	lintplus3 \
-	lintset lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 \
-	mdim1 mdim2 mdim3 mdim4 mdim5 mdim6 mdim7 mdim8 \
-	mixed1 mktime modifiers muldimposix nastyparm negtime \
-	next nondec nondec2 nonfatal1 nonfatal2 nonfatal3 nsawk1a nsawk1b \
-	nsawk1c nsawk2a nsawk2b nsbad nsbad2 nsbad3 nsbad_cmd nsforloop \
-	nsfuncrecurse nsidentifier nsindirect1 nsindirect2 nsprof1 nsprof2 \
-	octdec patsplit posix printfbad1 printfbad2 printfbad3 printfbad4 \
-	printhuge procinfs profile0 profile1 profile2 profile3 profile4 \
-	profile5 profile6 profile7 profile8 profile9 profile10 profile11 \
-	profile12 profile13 profile14 profile15 profile16 profile17 pty1 \
+	arraysort2 arraytype asortbool asortsymtab backw badargs \
+	beginfile1 beginfile2 binmode1 charasbytes clos1way clos1way2 \
+	clos1way3 clos1way4 clos1way5 clos1way6 colonwarn commas crlf \
+	csv1 csv2 csv3 csvodd dbugeval dbugeval2 dbugeval3 dbugeval4 \
+	dbugtypedre1 dbugtypedre2 delsub devfd devfd1 devfd2 dfacheck1 \
+	dumpvars elemnew1 elemnew2 elemnew3 errno exit fieldwdth forcenum \
+	fpat1 fpat2 fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 fpat9 fpatnull \
+	fsfwfs functab1 functab2 functab3 functab6 funlen fwtest fwtest2 \
+	fwtest3 fwtest4 fwtest5 fwtest6 fwtest7 fwtest8 genpot gensub \
+	gensub2 gensub3 gensub4 getlndir gnuops2 gnuops3 gnureops gsubind \
+	icasefs icasers id igncdym igncfs ignrcas2 ignrcas4 ignrcase \
+	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
+	include include2 indirectbuiltin indirectcall indirectcall2 \
+	indirectcall3 intarray iolint isarrayunset lint lintexp lintindex \
+	lintint lintlength lintold lintplus lintplus2 lintplus3 lintset \
+	lintwarn manyfiles match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 \
+	mdim3 mdim4 mdim5 mdim6 mdim7 mdim8 mixed1 mktime modifiers \
+	muldimposix nastyparm negtime next nondec nondec2 nonfatal1 \
+	nonfatal2 nonfatal3 nsawk1a nsawk1b nsawk1c nsawk2a nsawk2b nsbad \
+	nsbad2 nsbad3 nsbad_cmd nsforloop nsfuncrecurse nsidentifier \
+	nsindirect1 nsindirect2 nsprof1 nsprof2 octdec patsplit posix \
+	printfbad1 printfbad2 printfbad3 printfbad4 printhuge procinfs \
+	profile0 profile1 profile10 profile11 profile12 profile13 \
+	profile14 profile15 profile16 profile17 profile2 profile3 \
+	profile4 profile5 profile6 profile7 profile8 profile9 pty1 \
 	pty2 rebuf regexsub reginttrad regnul1 regnul2 regx8bit reint \
 	reint2 rsgetline rsglstdin rsstart1 rsstart2 rsstart3 rstest6 \
 	sandbox1 shadow shadowbuiltin sortfor sortfor2 sortu sourcesplit \
@@ -1584,21 +1578,16 @@ INET_TESTS = inetdayu inetdayt inetechu inetecht
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 
 LOCALE_CHARSET_TESTS = \
-	asort asorti backbigs1 backsmalls1 backsmalls2 \
-	fmttest fnarydel fnparydl jarebug lc_num1 mbfw1 \
-	mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
-	mtchi18n mtchi18n2 nlstringtest rebt8b2 rtlenmb sort1 sprintfc
+	asort asorti backbigs1 backsmalls1 backsmalls2 fmttest fnarydel \
+	fnparydl jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
+	mbprintf4 mbprintf5 mtchi18n mtchi18n2 nlstringtest rebt8b2 \
+	rtlenmb sort1 sprintfc
 
 SHLIB_TESTS = \
-	apiterm \
-	filefuncs fnmatch fork fork2 fts functab4 functab5 \
-	getfile \
-	indirectbuiltin2 \
-	inplace1 inplace2 inplace2bcomp inplace3 inplace3bcomp \
-	ordchr ordchr2 \
-	readall \
-	readdir readdir_test readdir_retest readfile readfile2 revout \
-	revtwoway rwarray \
+	apiterm filefuncs fnmatch fork fork2 fts functab4 functab5 \
+	getfile indirectbuiltin2 inplace1 inplace2 inplace2bcomp inplace3 \
+	inplace3bcomp ordchr ordchr2 readall readdir readdir_retest \
+	readdir_test readfile readfile2 revout revtwoway rwarray \
 	testext time
 
 # List of the tests which should be run with --debug option:
@@ -1606,10 +1595,9 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \
-	defref fmtspcl lintexp lintindex lintint lintlength lintplus lintplus2 \
-	lintplus3 \
-	lintwarn noeffect nofmtch nonl shadow uninit2 uninit3 uninit4 \
-	uninit5 uninitialized
+	defref fmtspcl lintexp lintindex lintint lintlength lintplus \
+	lintplus2 lintplus3 lintwarn noeffect nofmtch nonl shadow uninit2 \
+	uninit3 uninit4 uninit5 uninitialized
 
 # List of the tests which should be run with --lint-old option:
 NEED_LINT_OLD = lintold
@@ -1618,8 +1606,8 @@ NEED_LINT_OLD = lintold
 NEED_MPFR = \
 	mpfranswer42 mpfrbigint mpfrbigint2 mpfrcase mpfrcase2 \
 	mpfrexprange mpfrfield mpfrieee mpfrmemok1 mpfrnegzero \
-	mpfrnegzero2 mpfrnonum mpfrnr mpfrrem mpfrrnd mpfrrndeval mpfrsort \
-	mpfrsqrt mpfrstrtonum mpfruplus mpgforcenum
+	mpfrnegzero2 mpfrnonum mpfrnr mpfrrem mpfrrnd mpfrrndeval \
+	mpfrsort mpfrsqrt mpfrstrtonum mpfruplus mpgforcenum
 
 # List of tests that need --non-decimal-data
 NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
@@ -1663,11 +1651,10 @@ NEED_LOCALE_C = \
 
 NEED_LOCALE_EN = \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
-	gsubnulli18n ignrcas2 lc_num1 \
-	mbfw1 mbprintf1 mbprintf3 mbprintf4 mbstr1 mbstr2 \
-	mtchi18n2 posix_compare \
-	printhuge reint2 rri1 subamp subi18n wideidx wideidx2 \
-	widesub widesub2 widesub3 widesub4 unicode1
+	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
+	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 \
+	subamp subi18n unicode1 wideidx wideidx2 widesub widesub2 \
+	widesub3 widesub4
 
 # Unused at the moment, since nlstringtest has additional stuff it does
 # NEED_LOCALE_FR =
