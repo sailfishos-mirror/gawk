@@ -3325,8 +3325,9 @@ done:
 			return make_str_node(buf, textlen, ALREADY_MALLOCED);
 		} else if ((target->flags & STRING) == 0) {
 			/* return a copy of original string */
+			NODE *copy = make_str_node(target->stptr, target->stlen, 0);
 			DEREF(target);
-			return make_str_node(target->stptr, target->stlen, 0);
+			return copy;
 		}
 
 		/* return the original string */
