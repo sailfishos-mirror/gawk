@@ -1319,8 +1319,11 @@ setup_frame(INSTRUCTION *pc)
 
 		/* $0 needs to be passed by value to a function */
 		if (m == fields_arr[0]) {
+			NODE *copy;
+
+			copy = dupnode(m);	// will be real copy
 			DEREF(m);
-			m = dupnode(m);
+			m = copy;
 		}
 
 		switch (m->type) {
