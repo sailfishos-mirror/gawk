@@ -86,6 +86,9 @@ extern int errno;
 /* We can handle multibyte strings.  */
 #include <wchar.h>
 #include <wctype.h>
+#ifdef __CYGWIN__ /* Define helper function for large Unicode values */
+extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
+#endif
 
 #ifdef STDC_HEADERS
 #include <float.h>
