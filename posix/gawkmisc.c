@@ -316,3 +316,22 @@ cygwin_premain2(int argc, char **argv, struct per_process *myself)
 	setmode(fileno (stdin), O_TEXT);
 }
 #endif
+
+#ifdef __CYGWIN__
+size_t
+wcitomb (char *s, int wc, mbstate_t *ps)
+{
+	/* If s is NULL, behave as if s pointed to an internal buffer and wc
+	   was a null wide character (L'').  wcrtomb will do that for us*/
+	if (wc <= 0xffff || !s)
+		return wcrtomb (s, (wchar_t) wc, ps);
+
+	wchar_t wc_arr[2];
+	const wchar_t *wcp = wc_arr;
+
+	wc -= 0x10000;
+	wc_arr[0] = (wc >> 10) + 0xd800;
+	wc_arr[1] = (wc & 0x3ff) + 0xdc00;
+	return wcsnrtombs (s, &wcp, 2, SIZE_MAX, ps);
+}
+#endif

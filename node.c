@@ -720,6 +720,9 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 		}
 #ifdef __MINGW32__
 		n = w32_wc_to_lc (i, buf);
+#elif defined (__CYGWIN__)
+		memset(& mbs, 0, sizeof(mbs));
+		n = wcitomb(buf, i, & mbs);
 #else
 		memset(& mbs, 0, sizeof(mbs));
 		n = wcrtomb(buf, i, & mbs);
