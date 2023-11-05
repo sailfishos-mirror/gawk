@@ -23,12 +23,13 @@
 .\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Marzo    2023
 .\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Giugno   2023
 .\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Ottobre  2023
+.\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Novembre 2023
 
 .ds PX \s-1POSIX\s+1
 .ds UX \s-1UNIX\s+1
 .ds GN \s-1GNU\s+1
 .ds AK \s-1AWK\s+1
-.ds EP \fIGAWK: Programmare efficacemente in AWK\fP
+.ds EP \fIGAWK: Effective AWK Programming\fP
 .if !\n(.g \{\
 .	if !\w|\*(lq| \{\
 .		ds lq ``
@@ -39,7 +40,7 @@
 .		if \w'\(rq' .ds rq "\(rq
 .	\}
 .\}
-.TH GAWK 1 "22 Ottobre 2023" "Free Software Foundation" "Comandi di utilità"
+.TH GAWK 1 "02 Novembre 2023" "Free Software Foundation" "Comandi di utilità"
 .SH NOME
 gawk \- linguaggio per il riconoscimento e il trattamento di espressioni
 regolari
@@ -71,7 +72,7 @@ di Aho, Kernighan e Weinberger.
 fornisce le funzionalità aggiuntive presenti nella versione corrente
 di
 .I awk
- di Brian Kernighan e numerose estensioni specifiche di \*(GN.
+di Brian Kernighan e numerose estensioni specifiche di \*(GN.
 .PP
 La riga di comando contiene opzioni per
 .I gawk
@@ -195,7 +196,7 @@ può solo fare il debug di programmi sorgenti AWK specificati tramite le opzioni
 .B \-f
 e
 .B \-\^\-include .
-Il debugger è documentato in \*(EP; vedere
+Il debugger è documentato in \*(EP; vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Debugger.html#Debugger .
 .TP
 .BI \-e " testo-del-programma\fR, \fP" \-\^\-source " testo-del-programma"
@@ -254,10 +255,10 @@ nell'output.
 .TP
 \fB\-k\fR, \fB\-\^\-csv\fR
 Abilita gestione speciale file CSV
-[Comma Separated Values - Valori Separati da Virgola].
-Vedere il manuale per i dettagli.
-.BR FIXME :
-Eventualmente, fornire un link (URL) qui.
+[Comma Separated Values].
+Vedere più avanti la sottosezione
+.BR "Valori Separati da Virgola"
+per ulteriori dettagli.
 .TP
 .BI \-l " lib\fR, " \-\^\-load " lib"
 Carica un'estensione
@@ -275,8 +276,7 @@ La procedura di inizializzazione della libreria si suppone avere come nome
 \fB\-L \fR[\fIvalore\fR], \fB\-\^\-lint\fR[\fB=\fIvalore\fR]
 Emette messaggi d'avvertimento relativi a costrutti dubbi o non portabili
 su altre implementazioni di \*(AK.
-Con l'argomento opzionale
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Options.html#Options
 per la lista di valori possibili per
 .IR valore .
@@ -586,7 +586,7 @@ necessario, ed elencate più avanti.
 Normalmente i record sono separati dal carattere newline.  Si può controllare il
 modo in cui i record sono separati assegnando valori alla variabile predefinita
 .BR RS .
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Records.html
 per i dettagli.
 .SS Campi
@@ -602,7 +602,7 @@ Inoltre, le variabile
 e
 .B PATH
 possono essere usate per controllare la divisione in campi dell'input.
-Vedere i dettagli, a partire da
+Vedere [in inglese] i dettagli, a partire da
 .IR https://www.gnu.org/software/gawk/manual/html_node/Fields.html .
 .PP
 Ogni campo nel record in input può essere individuato dalla sua posizione:
@@ -646,28 +646,31 @@ Analogamente, assegnare un valore a
 .B $0
 provoca una nuova divisione del record, creando nuovi
 valori per i suoi campi.
-.SS Comma Separated Values [Valori Separati da Virgola]
-Quando è chiamato specificando l'opzione
-.B \-\^\-csv,
+.SS Valori Separati da Virgola
+Quando è chiamato specificando come opzione
+.B \-k
+oppure
+.B \-\^\-csv
+[Comma Separated Values],
 .I gawk
 non usa le regole spiegate sopra per determinare cosa costituisce
 un record e per dividerlo in campi.
-Invece, i record sono delimitati dai caratteri "ritorno a capo",
-che non siano all'interno di un campo CSV [per esempio, un
-campo che contenga un indirizzo completo è normalmente su più
-righe, che però formano un unico campo]. I campi sono separati
-fra loro da una virgola.
+In questo caso, un record è delimitato solo dai caratteri
+"ritorno a capo" che NON siano all'interno di un campo CSV
+[per esempio, un campo che contiene un indirizzo completo è
+normalmente su più righe, che però formano un unico campo].
+I campi del record sono separati fra loro da una virgola.
 I caratteri "doppio apice" possono essere usati per indicare
 campi che contengono virgole, ritorni a capo, o doppi apici
-[che vanno raddoppiati].
-Vedere il manuale per i dettagli.
-.B FIXME
-Eventualmente, fornire un link (URL) qui.
+[questi ultimi vanno in tal caso raddoppiati].
+Vedere [in inglese]
+.I https://www.gnu.org/software/gawk/manual/html_node/Comma-Separated-Fields.html
+per ulteriori dettagli.
 .SS Variabili predefinite
 Le variabili predefinite di
 .IR gawk "
-sono listate qui sotto.
-La lista è volutamente concisa. Per dettagli, vedere
+sono listate qui di seguito.
+La lista è volutamente concisa. Per dettagli, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Built_002din-Variables .
 .TP "\w'\fBFIELDWIDTHS\fR'u+1n"
 .B ARGC
@@ -687,7 +690,7 @@ Vettore degli argomenti della riga di comando.  Il vettore è indicizzato da
 .B BINMODE
 Su sistemi non-POSIX, specifica l'uso della modalità \*(lqbinaria\*(rq per tutto
 l'I/O da e verso i file.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/PC-Using.html
 per i dettagli.
 .TP
@@ -749,7 +752,7 @@ come separatore di campo.
 .TP
 .B FS
 Il separatore di campo, quello predefinito è uno spazio.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Field-Separators.html
 per i dettagli.
 .TP
@@ -766,7 +769,7 @@ applicandola al vettore
 .B IGNORECASE
 Controlla la sensibilità alla distinzione tra maiuscole e minuscole
 in tutte le espressioni regolari e nelle operazioni sulle stringhe.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Case_002dsensitivity.html
 per i dettagli.
 .TP
@@ -798,14 +801,14 @@ La precisione di lavoro di numeri a virgola mobile con precisione arbitraria,
 .B PROCINFO
 Gli elementi di questo vettore forniscono accesso alle informazioni
 sul programma  \*(AK in esecuzione.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Auto_002dset
 per i dettagli.
 .TP
 .B ROUNDMODE
 La modalità di arrotondamento da usare per operazioni sui numeri con precisione
 arbitraria, quella predefinita è \fB"N"\fR (IEEE-754 roundTiesToEven mode).
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Setting-the-rounding-mode
 per i dettagli.
 .TP
@@ -852,7 +855,7 @@ localizzate delle stringhe del programma.
 I vettori hanno per indice un'espressione tra parentesi quadre
 .RB ( [ " e " ] ).
 Se l'espressione è formata da una lista di espressioni
-.RI ( expr ", " expr " .\|.\|.)"
+.RI ( espress. ", " espress. " .\|.\|.)"
 l'indice del vettore è una stringa ottenuta concatenando
 i valori (stringa) di ogni espressione, separati dal valore della
 variabile
@@ -910,7 +913,7 @@ basta specificare il nome del vettore stesso senza indici.
 .I gawk
 supporta veri vettori multidimensionali.  Non richiede che
 tali vettori siano ``rettangolare'' come in C or C++.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Arrays
 per i dettagli.
 .SS Spazi-dei-nomi
@@ -942,7 +945,7 @@ nomi di uno spazio-dei-nomi.  I nomi di ulteriori funzioni, fornite da
 .I gawk
 possono essere usati come nomi di uno spazio-dei-nomi o come semplici
 identificativi in altri spazi-dei-nomi.
-Per ulteriori dettagli, vedere
+Per ulteriori dettagli, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Namespaces.html#Namespaces .
 .SS Notazione e conversione delle variabili
 Le variabili e i campi
@@ -1018,7 +1021,7 @@ Le costanti stringa in \*(AK sono sequenze di caratteri racchiusi tra
 doppi apici (come \fB"valore"\fR).  All'interno delle stringhe, sono riconosciute alcune
 .IR "sequenze di protezione" ,
 come in C.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Escape-Sequences
 per i dettagli.
 .SS Costanti di tipo Regexp
@@ -1157,7 +1160,7 @@ l'azione associata è eseguita per ogni record in input che corrisponde
 all'espressione regolare.
 Le espressioni regolari hanno la stessa forma di quelle di
 .IR egrep (1),
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Regexp.html
 per i dettagli sulle espressioni regolari
 .PP
@@ -1193,7 +1196,7 @@ Essa individua tutti i record a partire da quello che ha corrispondenza con
 .IR criterio1 ,
 fino a quello che corrisponde a
 .IR criterio2 ,
-compreso.  Non può essere combinata con alcun'altra espressione.
+compreso.  Non può essere combinata con altre espressioni.
 .SS Azioni
 Le istruzioni di azione sono racchiuse tra parentesi graffe,
 .B {
@@ -1435,7 +1438,7 @@ Esegue il comando
 .IR riga-di-comando ,
 e ne restituisce il valore d'uscita.
 (può non essere disponibile sui sistemi non-\*(PX).
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/I_002fO-Functions.html#I_002fO-Functions
 per tutti i dettagli sul valore restituito dal comando eseguito.
 .PP
@@ -1493,7 +1496,7 @@ Le versioni di \*(AK dell'istruzione
 .B printf
 e della funzione
 .B sprintf()
-soono simili a quelle del linguaggio C. Per i dettagli, vedere
+sono simili a quelle del linguaggio C. Per i dettagli, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Printf.html .
 .SS Nomi di file speciali
 Effettuando delle ridirezioni di
@@ -1637,7 +1640,8 @@ Il valore restituito è il valore precedente
 del seme.
 .SS Funzioni di stringa
 .I Gawk
-offre le seguenti funzioni di stringa seguenti predefinite; ulteriori dettagli in
+offre le seguenti funzioni di stringa seguenti predefinite;
+per ulteriori dettagli vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/String-Functions .
 .TP "\w'\fBsprintf(\fIformato\^\fB\^, \fIlista-espressioni\^\fB)\fR'u+1n"
 \fBasort(\fIs \fR[\fB, \fId\fR [\fB, \fIcome\fR] ]\fB)\fR
@@ -1672,7 +1676,7 @@ La stringa facoltativa
 controlla la direzione e il modo del confronto.
 Valori ammissibili per
 .I come
-sono descritti in
+sono descritti [in inglese] in
 .IR https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html#String-Functions .
 .IR s " e " d
 possono specificare lo stesso vettore; la cosa ha senso nel
@@ -1766,7 +1770,7 @@ Si usi
 .B \e&
 per indicare il carattere
 .BR &
-inteso letteralmente (va scritto come \fB"\e\e&"\fP; vedere
+inteso letteralmente (va scritto come \fB"\e\e&"\fP; vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Gory-Details.html#Gory-Details
 per una trattazione più completa delle regole sull'uso della "e commerciale" (ampersand)
 e delle barre inverse nel testo di rimpiazzo di
@@ -1813,7 +1817,7 @@ Si noti che l'ordine degli argomenti è lo stesso in uso per l'operatore
 .IB stringa " ~"
 .IR espressione-regolare .
 .ft R
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html#String-Functions
 per una descrizione di come il vettore
 .I a
@@ -1852,7 +1856,7 @@ e
 .I seps
 sono svuotati all'inizio dell'operazione.
 La suddivisione si comporta come la suddivisione in campi con
-.BR FPAT .
+.BR FPAT ,
 descritta sopra.
 .TP
 \fBsplit(\fIs\fB, \fIa \fR[\fB, \fIr\fR [\fB, \fIseps\fR] ]\fB)\fR
@@ -1956,7 +1960,7 @@ lavorano in termini di caratteri, non di byte.
 .SS Funzioni di tempo
 .I Gawk
 mette a disposizione le seguenti funzioni per ottenere data e ora
-e per formattarle come desiderato. I dettagli si trovano in
+e per formattarle come desiderato. I dettagli si trovano [in inglese] in
 .IR https://www.gnu.org/software/gawk/manual/html_node/Time-Functions .
 .TP "\w'\fBsystime()\fR'u+1n"
 \fBmktime(\fIdatespec\fR [\fB, \fIutc-flag\fR]\fB)\fR
@@ -1978,7 +1982,7 @@ non contiene sufficienti elementi o se il tempo risultante
 è fuori intervallo,
 .B mktime()
 restituisce \-1.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Time-Functions.html#Time-Functions
 per i dettagli di
 .IR datespec .
@@ -2082,7 +2086,7 @@ o
 .SS Funzioni di internazionalizzazione
 Le seguenti funzioni possono essere usate all'interno di un programma AWK
 per tradurre stringhe in fase di esecuzione del programma.
-Per informazioni dettagliate, vedere
+Per informazioni dettagliate, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/I18N-Functions.html#I18N-Functions .
 .TP
 \fBbindtextdomain(\fIdirectory \fR[\fB, \fIdominio\fR]\fB)\fR
@@ -2236,7 +2240,7 @@ all'interpretatore
 in esecuzione tramite l'istruzione
 .BR @load .
 Una descrizione dettagliata non è possibile in questa pagina di manuale;
-vedere
+vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Dynamic-Extensions.html#Dynamic-Extensions .
 .SH SEGNALI
 Il profilo
@@ -2280,7 +2284,7 @@ potrebbe invece stampare
 .B "bonjour, monde"
 se eseguito in Francia.
 .PP
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Internationalization.html#Internationalization
 per i passi necessari per produrre ed eseguire un programma \*(AK
 localizzabile.
@@ -2288,7 +2292,7 @@ localizzabile.
 .I Gawk
 ha fin troppe estensioni rispetto alla versione \*(PX di
 .IR awk .
-Esse sono descritte in
+Esse sono descritte [in inglese] in
 .IR https://www.gnu.org/software/gawk/manual/html_node/POSIX_002fGNU.html .
 Tutte le estensioni possono essere disabilitate
 invocando
@@ -2447,7 +2451,7 @@ siete pregati di usare il programma
 .IR gawkbug (1)
 per segnalarlo.
 .PP
-Istruzioni dettagliate per segnalare un bug sono disponibili in
+Istruzioni dettagliate per segnalare un bug sono disponibili [in inglese]
 IR https://www.gnu.org/software/gawk/manual/html_node/Bugs.html .
 .I Per piacere,
 leggete attentamente e seguite le istruzioni là disponibili.
@@ -2475,13 +2479,17 @@ e
 .IR "The AWK Programming Language" ,
 Alfred V.\& Aho, Brian W.\& Kernighan, Peter J.\& Weinberger,
 Addison-Wesley, 1988.  ISBN 0-201-07981-X.
+Seconda edizione: Addison-Wesley, 2023.  ISBN 9-780138-269722.
 .PP
 \*(EP,
-Edizione 5.2, disponibile con il codice sorgente
+Edizione 5.3, distribuito con il codice sorgente
 .IR gawk .
-La versione originale corrente di questo documento è
+La versione originale aggiornata del libro è
 disponibile online a:
 .IR https://www.gnu.org/software/gawk/manual .
+La traduzione italiana aggiornata del libro è
+disponibile online a:
+.IR https://sites.google.com/view/gawkdoc-it .
 .PP
 La documentazione di
 .B gettext
@@ -2570,7 +2578,7 @@ the original English text does that.
 Copyright \(co 1989, 1991, 1992, 1993, 1994, 1995, 1996,
 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2007, 2009,
 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-2020, 2021, 2022
+2020, 2021, 2022, 2023
 Free Software Foundation, Inc.
 .PP
 È permesso stampare e distribuire copie letterali di questa pagina
