@@ -129,7 +129,7 @@ BEGIN {
         }
         close(input[stackptr])
     }
-}'  # close quote ends `expand_prog' variable
+}'  # closing single quote ends `expand_prog' variable
 
 processed_program=$(gawk -- "$expand_prog" /dev/stdin << EOF
 $program
