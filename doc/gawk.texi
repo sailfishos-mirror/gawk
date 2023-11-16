@@ -2630,7 +2630,8 @@ This was explained earlier
 (@pxref{Read Terminal}).
 Note that you don't usually need single quotes around the @value{FN} that you
 specify with @option{-f}, because most @value{FN}s don't contain any of the shell's
-special characters.  Notice that in @file{advice}, the @command{awk}
+special characters. (If your @value{FN}s have spaces in them, then you
+will need the single quotes.)  Notice that in @file{advice}, the @command{awk}
 program did not have single quotes around it.  The quotes are only needed
 for programs that are provided on the @command{awk} command line.
 (Also, placing the program in a file allows us to use a literal single quote in the program
@@ -2777,10 +2778,10 @@ $ @kbd{awk 'BEGIN @{ print "hello" @} # let's be cute'}
 The shell sees that the first two quotes match, and that
 a new quoted object begins at the end of the command line.
 It therefore prompts with the secondary prompt, waiting for more input.
-With Unix @command{awk}, closing the quoted string produces this result:
+With BWK @command{awk}, closing the quoted string produces this result:
 
 @example
-$ @kbd{awk '@{ print "hello" @} # let's be cute'}
+$ @kbd{nawk '@{ print "hello" @} # let's be cute'}
 > @kbd{'}
 @error{} awk: can't open file be
 @error{}  source line number 1
@@ -2825,7 +2826,7 @@ or empty, string.
 The null string is character data that has no value.
 In other words, it is empty.  It is written in @command{awk} programs
 like this: @code{""}. In the shell, it can be written using single
-or double quotes: @code{""} or @code{''}. Although the null string has
+or double quotes: @code{''} or @code{""}. Although the null string has
 no characters in it, it does exist. For example, consider this command:
 
 @example
@@ -2873,7 +2874,7 @@ Because certain characters within double-quoted text are processed by the shell,
 they must be @dfn{escaped} within the text.  Of note are the characters
 @samp{$}, @samp{`}, @samp{\}, and @samp{"}, all of which must be preceded by
 a backslash within double-quoted text if they are to be passed on literally
-to the program.  (The leading backslash is stripped first.)
+to the program.  (The shell strips the leading backslash first.)
 Thus, the example seen
 @ifnotinfo
 previously
@@ -3025,7 +3026,7 @@ it is worth addressing.
 @cindex Brink, Jeroen
 The ``shells'' on Microsoft Windows systems use the double-quote
 character for quoting, and make it difficult or impossible to include an
-escaped double-quote character in a command-line script.  The following
+escaped double quote character in a command-line script.  The following
 example, courtesy of Jeroen Brink, shows how to escape the double quotes
 from this one liner script that prints all lines in a file surrounded by
 double quotes:
@@ -3042,14 +3043,14 @@ follows:
 gawk "@{ print \"\042\" $0 \"\042\" @}" @var{file}
 @end example
 
-In this example the @samp{\042} is the octal code for a double-quote;
+In this example the @samp{\042} is the octal code for a double quote;
 @command{gawk} converts it into a real double-quote for output by
 the @code{print} statement.
 
-In MS-Windows escaping double-quotes is a little tricky because you use
-backslashes to escape double-quotes, but backslashes themselves are not
+In MS-Windows escaping double quotes is a little tricky because you use
+backslashes to escape double quotes, but backslashes themselves are not
 escaped in the usual way; indeed they are either duplicated or not,
-depending upon whether there is a subsequent double-quote.  The MS-Windows
+depending upon whether there is a subsequent double quote.  The MS-Windows
 rule for double-quoting a string is the following:
 
 @enumerate
@@ -3064,7 +3065,7 @@ Let @var{N} be the number of backslash(es) tailing the original string,
 @math{2@value{TIMES}@var{N}} backslash(es)
 
 @item
-Surround the resulting string by double-quotes.
+Surround the resulting string by double quotes.
 @end enumerate
 
 So to double-quote the one-liner script @samp{@{ print "\"" $0 "\"" @}}
@@ -3077,7 +3078,7 @@ gawk "@{ print \"\\\"\" $0 \"\\\"\" @}" @var{file}
 @noindent
 However, the use of @samp{\042} instead of @samp{\\\"} is also possible
 and easier to read, because backslashes that are not followed by a
-double-quote don't need duplication.
+double quote don't need duplication.
 
 @node Sample Data Files
 @section @value{DDF}s for the Examples
@@ -5326,8 +5327,6 @@ non-option argument, are placed in @code{ARGV} as explained in
 Adjusting @code{ARGC} and @code{ARGV}
 affects how @command{awk} processes input.
 
-@c ----------------------------------------
-
 @item
 The three standard options for all versions of @command{awk} are
 @option{-f}, @option{-F}, and @option{-v}.  @command{gawk} supplies these
@@ -5517,9 +5516,9 @@ Some characters cannot be included literally in string constants
 (@code{"foo"}) or regexp constants (@code{/foo/}).
 Instead, they should be represented with @dfn{escape sequences},
 which are character sequences beginning with a backslash (@samp{\}).
-One use of an escape sequence is to include a double-quote character in
+One use of an escape sequence is to include a double quote character in
 a string constant.  Because a plain double quote ends the string, you
-must use @samp{\"} to represent an actual double-quote character as a
+must use @samp{\"} to represent an actual double quote character as a
 part of the string.  For example:
 
 @example
@@ -5660,7 +5659,7 @@ This sequence is used when you want to write a string
 constant that contains a double quote
 (such as @code{"He said \"hi!\" to her."}).
 Because the string is delimited by
-double quotes, you need to escape any quote that is part of the string,
+double quotes, you need to escape any double quote that is part of the string,
 in order to tell @command{awk} to keep processing the rest of the string.
 @end table
 
@@ -6347,7 +6346,7 @@ on the right.  This is true of any string-valued expression (such as
 @code{digits_regexp}, shown in the previous example), not just string constants.
 @end quotation
 
-@cindex regexp constants @subentry slashes vs.@: quotes
+@cindex regexp constants @subentry slashes vs.@: double quotes
 @cindex @code{\} (backslash) @subentry in regexp constants
 @cindex backslash (@code{\}) @subentry in regexp constants
 @cindex @code{"} (double quote) @subentry in regexp constants
@@ -8344,12 +8343,12 @@ $7 = <USA>
 Note the embedded comma in the value of @code{$3}.
 
 A straightforward improvement when processing CSV data of this sort
-would be to remove the quotes when they occur, with something like this:
+would be to remove the double quotes when they occur, with something like this:
 
 @example
 if (substr($i, 1, 1) == "\"") @{
     len = length($i)
-    $i = substr($i, 2, len - 2)    # Get text within the two quotes
+    $i = substr($i, 2, len - 2)    # Get text within the two double quotes
 @}
 @end example
 
@@ -8390,9 +8389,12 @@ available for splitting regular strings (@pxref{String Functions}).
 
 @quotation NOTE
 Given that @command{gawk} now has built-in CSV parsing
-(@pxref{Comma Separated Fields}), the examples presented here are obsolete.
+(@pxref{Comma Separated Fields}), the examples presented here are obsolete,
+since you can use the @option{--csv} option (in which case
+@code{FPAT} field parsing doesn't take effect).
 Nonetheless, it remains useful as an example of what @code{FPAT}-based
-field parsing can do.
+field parsing can do, or if you must use a version of @command{gawk}
+prior to 5.3.
 @end quotation
 
 @node More CSV
@@ -8400,9 +8402,9 @@ field parsing can do.
 
 @cindex Collado, Manuel
 Manuel Collado notes that in addition to commas, a CSV field can also
-contains quotes, that have to be escaped by doubling them. The previously
+contain double quotes, that have to be escaped by doubling them. The previously
 described regexps fail to accept quoted fields with both commas and
-quotes inside. He suggests that the simplest @code{FPAT} expression that
+double quotes inside. He suggests that the simplest @code{FPAT} expression that
 recognizes this kind of fields is @code{/([^,]*)|("([^"]|"")+")/}. He
 provides the following input data to test these variants:
 
@@ -9662,7 +9664,7 @@ The simple statement @samp{print} with no items is equivalent to
 line, use @samp{print ""}.
 To print a fixed piece of text, use a string constant, such as
 @w{@code{"Don't Panic"}}, as one item.  If you forget to use the
-double-quote characters, your text is taken as an @command{awk}
+double quote characters, your text is taken as an @command{awk}
 expression, and you will probably get an error.  Keep in mind that a
 space is printed between any two items.
 
@@ -10759,10 +10761,10 @@ the proper way to write an error message then becomes:
 print "Serious error detected!" > "/dev/stderr"
 @end example
 
-@cindex troubleshooting @subentry quotes with file names
-Note the use of quotes around the @value{FN}.
+@cindex troubleshooting @subentry double quotes with file names
+Note the use of double quotes around the @value{FN}.
 Like with any other redirection, the value must be a string.
-It is a common error to omit the quotes, which leads
+It is a common error to omit the double quotes, which leads
 to confusing results.
 
 @command{gawk} does not treat these @value{FN}s as special when
@@ -14598,7 +14600,7 @@ Variable substitution via quoting works, but can potentially be
 messy.  It requires a good understanding of the shell's quoting rules
 (@pxref{Quoting}),
 and it's often difficult to correctly
-match up the quotes when reading the program.
+match up the different quotes when reading the program.
 
 A better method is to use @command{awk}'s variable assignment feature
 (@pxref{Assignment Options})
@@ -21826,7 +21828,7 @@ manageable and making programs more readable.
 
 @cindex Kernighan, Brian @subentry quotes
 @cindex Plauger, P.J.@:
-In their seminal 1976 book, @cite{Software Tools},@footnote{Sadly, over 35
+In their seminal 1976 book, @cite{Software Tools},@footnote{Sadly, almost 50
 years later, many of the lessons taught by this book have yet to be
 learned by a vast number of practicing programmers.} Brian Kernighan
 and P.J.@: Plauger wrote:
@@ -22912,8 +22914,8 @@ function tocsv(fields, sep,     i, j, nfields, result)
     for (i = 1; i in fields; i++) @{
         nfields[i] = fields[i]
         if (nfields[i] ~ /["\n]/ || index(nfields[i], sep) != 0) @{
-            gsub(/"/, "\"\"", nfields[i])       # double up quotes
-            nfields[i] = "\"" nfields[i] "\""   # wrap in quotes
+            gsub(/"/, "\"\"", nfields[i])       # double up the double quotes
+            nfields[i] = "\"" nfields[i] "\""   # wrap in double quotes
         @}
     @}
 
@@ -26655,20 +26657,6 @@ As a side note, this program does not follow our recommended convention of namin
 global variables with a leading capital letter.  Doing that would
 make the program a little easier to follow.
 
-@ifset FOR_PRINT
-@cindex Kernighan, Brian @subentry quotes
-The logic for choosing which lines to print represents a @dfn{state
-machine}, which is ``a device which can be in one of a set number
-of stable conditions depending on its previous condition and on the
-present values of its inputs.''@footnote{This definition is from
-@uref{https://www.lexico.com/en/definition/state_machine}.} Brian
-Kernighan suggests that ``an alternative approach to state machines is
-to just read the input into an array, then use indexing.  It's almost
-always easier code, and for most inputs where you would use this, just
-as fast.''  Consider how to rewrite the logic to follow this suggestion.
-@end ifset
-
-
 @node Wc Program
 @subsection Counting Things
 
@@ -28451,7 +28439,7 @@ the program is done:
         @}
         close(input[stackptr])
     @}
-@}'  # close quote ends `expand_prog' variable
+@}'  # closing single quote ends `expand_prog' variable
 
 processed_program=$(gawk -- "$expand_prog" /dev/stdin << EOF
 $program
@@ -31152,7 +31140,7 @@ BEGIN @{
 @item
 Mark all translatable strings with a leading underscore (@samp{_})
 character.  It @emph{must} be adjacent to the opening
-quote of the string.  For example:
+double quote of the string.  For example:
 
 @example
 print _"hello, world"
