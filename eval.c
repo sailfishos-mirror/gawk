@@ -1560,7 +1560,7 @@ cmp_scalars(scalar_cmp_t comparison_type)
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t1));
 	}
 
-	if ((t1->flags & STRING) != 0 || (t2->flags & STRING) != 0) {
+	if ((t1->flags & (STRING|REGEX)) != 0 || (t2->flags & (STRING|REGEX)) != 0) {
 		bool use_strcmp = (comparison_type == SCALAR_EQ || comparison_type == SCALAR_NEQ);
 		di = cmp_nodes(t1, t2, use_strcmp);
 
