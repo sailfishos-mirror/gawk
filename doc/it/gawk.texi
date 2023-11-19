@@ -2924,10 +2924,11 @@ Questo @`e gi@`a stato spiegato prima
 (@pxref{Leggere dal terminale}).
 Si noti che normalmente non serve mettere apici singoli nel @value{FN} che si
 fornisce con @option{-f}, perch@'e di solito i @value{FNS} non contengono
-caratteri che sono speciali per la shell.  Si noti che in @file{consiglio},
-il programma @command{awk} non ha dei doppi apici che lo delimitano.  I
-doppi apici sono necessari solo per programmi scritti direttamente sulla riga
-di comando di @command{awk}.
+caratteri che sono speciali per la shell.  (Nel caso i vostri @value{FNS}s
+contengano spazi, gli apici singoli saranno necessari.)
+Si noti che nel file @file{consiglio}, il programma @command{awk} non ha dei
+doppi apici che lo delimitano.  I doppi apici sono necessari solo per
+programmi scritti direttamente sulla riga di comando di @command{awk}.
 (Inoltre, se il programma si trova in un file, @`e possibile usare un apice
 singolo all'interno del programma, invece del magico @samp{\47}.)
 
@@ -3088,11 +3089,11 @@ La shell considera il secondo apice singolo come delimitatore del testo
 precedente, e trova che un nuovo testo tra apici ha inizio verso la fine
 della riga di comando.  A causa di ci@`o emette una richiesta secondaria di
 input, e si mette in attesa di ulteriore input.
-Con il comando @command{awk} Unix, se si chiude l'ulteriore stringa tra
+Usando BWK @command{awk}, se si chiude l'ulteriore stringa tra
 apici singoli il risultato @`e il seguente:
 
 @example
-$ @kbd{awk '@{ print "Ciao" @} # un'idea brillante'}
+$ @kbd{nawk '@{ print "Ciao" @} # un'idea brillante'}
 > @kbd{'}
 @error{} awk: fatale: non riesco ad aprire file `brillante'
 @error{}              in lettura (File o directory non esistente)
@@ -3146,7 +3147,7 @@ o vuota.
 La stringa nulla @`e una variabile, di tipo carattere, che non ha un valore.
 In altre parole, @`e vuota.  Nei programmi @command{awk} si scrive cos@`{@dotless{i}}:
 @code{""}.  Nella shell la si pu@`o scrivere usando apici sia singoli
-che doppi: @code{""} oppure @code{''}.  Sebbena la stringa nulla non contenga
+che doppi: @code{''} oppure @code{""}.  Sebbena la stringa nulla non contenga
 alcun carattere, essa esiste lo stesso.  Si consideri questo comando:
 
 @example
@@ -3207,7 +3208,8 @@ del testo stesso.  Sono da tener presenti i caratteri
 @samp{$}, @samp{`}, @samp{\}, e @samp{"}, tutti i quali devono essere
 preceduti da una barra inversa quando ricorrono all'interno di un testo
 racchiuso tra doppi apici, per poter essere passati letteralmente al
-programma.  (La barra inversa viene tolta prima del passaggio al programma.)
+programma.  (La shell toglie la barra inversa prima di passare il testo
+al programma.)
 Quindi, l'esempio visto
 @ifnotinfo
 precedentemente
@@ -6017,8 +6019,6 @@ in
 @c And I wrote:
 Modificando le variabili @code{ARGC} e @code{ARGV}
 si cambia il modo in cui @command{awk} tratta i file in input.
-
-@c ----------------------------------------
 
 @item
 Le tre opzioni standard per tutte le versioni di @command{awk} sono
@@ -9345,7 +9345,7 @@ questo tipo:
 @example
 if (substr($i, 1, 1) == "\"") @{
     len = length($i)
-    $i = substr($i, 2, len - 2) # Ottiene testo tra doppi apici
+    $i = substr($i, 2, len - 2) # Ottiene testo tra i due doppi apici
 @}
 @end example
 
@@ -9389,10 +9389,13 @@ per suddividere normali stringhe (@pxref{Funzioni per stringhe}).
 @quotation NOTA
 Poich@'e @command{gawk} consente ora un trattamento diretto dei
 file di tipo CSV (@pxref{Campi separati da virgola}), gli esempi
-presentati qui sono obsoleti.
+presentati qui sono obsoleti, dato che @`e possibile usare
+l'opzione @option{--csv}, (in tal caso la suddivisione in
+campi viene fatta senza utilizzare la variabile @code{FPAT}).
 Nonostante ci@`o, rimangono utili come esempio di ci@`o che
 un'analisi dei campi utilizzando la variabile @code{FPAT}
-permette di fare.
+permette di fare, o se si sta usando una versione di
+@command{gawk} precedente la versione 5.3.
 @end quotation
 
 @node Ancora CSV
@@ -9400,9 +9403,9 @@ permette di fare.
 
 @cindex Collado, Manuel
 Manuel Collado fa notare che, oltre alle virgole, un campo CSV pu@`o anche
-contenere apici, che devono essere protetti raddoppiandoli.
+contenere doppi apici, che devono essere protetti raddoppiandoli.
 Le espressione regolari descritte sopra non sono in grado di accettare
-campi fra apici che contengano al loro interno sia virgole che apici.
+campi fra apici che contengano al loro interno sia virgole che doppi apici.
 Egli suggerisce che l'espressione pi@`u semplice di @code{FPAT} in grado
 di riconoscere tale tipo di campi @`e @code{/([^,]*)|("([^"]|"")+")/}.
 Egli ha preparato questo input come test per riconoscere queste varianti:
@@ -11777,7 +11780,7 @@ il particolare @var{file} o @var{comando} che si @`e specificato non @`e gi@`a
 stato utilizzato in scrittura dal programma o se @`e stato chiuso
 dopo l'ultima scrittura.
 In altre parole, sia i file che le @dfn{pipe} e i coprocessi rimangono
-aperti finché non vengono esplicitamente chiusi.  Ogni istruzione
+aperti finch@'e non vengono esplicitamente chiusi.  Ogni istruzione
 @code{print} e @code{printf} dopo la prima, continua a scrivere
 allo stesso file, @dfn{pipe} o coprocesso.
 
@@ -11790,12 +11793,12 @@ seguente:
 @example
 echo Nome: Arnold Robbins > dati
 echo Indirizzo: 1234 A Pretty Street, NE >> dati
-echo Città e Stato: MyTown, MyState 12345-6789 >> dati
+echo Citt@`a e Stato: MyTown, MyState 12345-6789 >> dati
 @end example
 
 In @command{awk}, gli operatori @samp{>} e @samp{>>} hanno un
 significato un po' diverso.  L'operatore usato la @emph{prima volta}
-che si scrive un file indica @emph{come} @command{awk} aprirà (o creerà)
+che si scrive un file indica @emph{come} @command{awk} aprir@`a (o creer@`a)
 quel file.
 Usando @samp{>}, il file, se esiste, viene riscritto dall'inizio
 (o viene creato se non esiste). Tutte le successive operazioni di
@@ -11809,7 +11812,7 @@ al file.
 Per consistenza, sarebbe bene usare sempre un unico operatore per
 tutto l'output diretto a uno stesso file.
 (Si possono mischiare @samp{>} e @samp{>>}, e la cosa non ha effetti
-negativi, ma mischiare gli operatori è considerato cattivo stile in
+negativi, ma mischiare gli operatori @`e considerato cattivo stile in
 @command{awk}.  Se invocato con l'opzione @option{--lint}, @command{gawk}
 emette un messaggio di avvertimento quando entrambi gli
 operatori vengono usati per uno stesso file aperto.)
@@ -16226,7 +16229,8 @@ La sostituzione di variabile attraverso gli apici funziona, ma pu@`o
 facilmente generare difficolt@`a.  Richiede una buona comprensione delle
 regole per l'uso degli apici nella shell
 (@pxref{Protezione}),
-e spesso @`e difficile accoppiare i vari apici quando si legge il programma.
+e spesso @`e difficile accoppiare i differenti apici quando si legge il
+programma.
 
 Un metodo migliore @`e quello di usare la funzionalit@`a di assegnamento delle
 variabili di @command{awk}
@@ -24333,10 +24337,9 @@ pi@`u gestibile, e rendendo i programmi pi@`u leggibili.
 @cindex Kernighan, Brian @subentry citazioni di
 @cindex Plauger, P.J.@:
 Nel loro autorevole libro del 1976,
-@cite{Software Tools},@footnote{Purtroppo, a distanza di oltre 35 anni,
-molte delle
-lezioni impartite da questo libro devono ancora essere apprese da un gran
-numero di programmatori professionisti.}
+@cite{Software Tools},@footnote{Purtroppo, a distanza di una cinquantina
+d'anni, molte delle lezioni impartite da questo libro devono ancora essere
+imparate da un gran numero di programmatori professionisti.}
 Brian Kernighan e P.J.@: Plauger hanno scritto:
 
 @quotation
@@ -25571,8 +25574,8 @@ function tocsv(campi, sep,     i, j, n_campi, risultato)
     for (i = 1; i in campi; i++) @{
         n_campi[i] = campi[i]
         if (n_campi[i] ~ /["\n]/ || index(n_campi[i], sep) != 0) @{
-            gsub(/"/, "\"\"", n_campi[i])       # raddoppia doppi apici
-            n_campi[i] = "\"" n_campi[i] "\""   # fra doppi apici
+            gsub(/"/, "\"\"", n_campi[i])       # raddoppia i doppi apici
+            n_campi[i] = "\"" n_campi[i] "\""   # racchiudi fra doppi apici
         @}
     @}
 
@@ -29628,23 +29631,6 @@ raccomandabile, di assegnare alle variabili globali un nome
 con la lettera iniziale maiuscola.  Se lo si fosse fatto, il programma
 sarebbe stato un po' pi@`u semplice da comprendere.
 
-@ifset FOR_PRINT
-@cindex Kernighan, Brian @subentry citazioni di
-La logica per scegliere quali righe stampare rappresenta una
-@dfn{macchina a stati},
-che @`e ``un dispositivo che pu@`o trovarsi in una tra un dato numero
-di condizioni stabili, a seconda della sua condizione precedente e del valore
-corrente dei suoi input.''@footnote{Questa @`e la definizione data in
-@uref{https://www.lexico.com/en/definition/state_machine}.}
-Brian Kernighan suggerisce che
-``un approccio alternativo alle macchine a stati @`e di leggere tutto l'input
-e metterlo in un vettore, e poi usare l'indicizzazione.  @`E quasi sempre pi@`u
-facile da programmare e, per la maggior parte degli input in cui si pu@`o
-usare, altrettanto veloce in esecuzione.''  Riscrivere la logica del
-programma seguendo questa indicazione.
-@end ifset
-
-
 @node Programma wc
 @subsection Contare cose
 
@@ -31598,7 +31584,7 @@ di zero, il programma @`e terminato:
         @}
         close(input[indice_pila])
     @}
-@}'  # l'apice chiude la variabile `progr_che_espande'
+@}'  # l'apice singolo termina la variabile `progr_che_espande'
 
 programma_elaborato=$(gawk -- "$progr_che_espande" /dev/stdin << EOF
 $programma
@@ -34800,11 +34786,11 @@ larghezza dinamica dei campi, e della capacit@`a di precisione:
 
 @example
 $ @kbd{gawk 'BEGIN @{}
->    @kbd{printf("%*.*s\n", 10, 20, "hello")}
->    @kbd{printf("%3$*2$.*1$s\n", 20, 10, "hello")}
+>    @kbd{printf("%*.*s\n", 10, 20, "ciao")}
+>    @kbd{printf("%3$*2$.*1$s\n", 20, 10, "ciao")}
 > @kbd{@}'}
-@print{}      hello
-@print{}      hello
+@print{}      ciao
+@print{}      ciao
 @end example
 
 @quotation NOTA
@@ -44972,6 +44958,16 @@ emettendo un messaggio di avvertimento
 Errori in output usando @code{print} e @code{printf} non provocano
 necessariamente la fine del programma
 (@pxref{Continuazione dopo errori})
+
+@item
+Gli spazi-dei-nomi e l'utilizzo di @code{::} per attribuire un
+identificativo a un particolare spazio-dei-nomi
+@iftex
+(@pxrefil{Spazi-dei-nomi}).
+@end iftex
+@ifnottex
+(@pxref{Spazi-dei-nomi}).
+@end ifnottex
 @end itemize
 
 @item
