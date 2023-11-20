@@ -2952,7 +2952,7 @@ err:
 			errno = 0;
 			l = strtol(tokstart, &end, 0);
 			if (errno != 0) {
-				yyerror(_("%s"), strerror(errno));
+				yyerror("%s", strerror(errno));
 				errno = 0;
 				return '\n';
 			}
