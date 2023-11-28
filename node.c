@@ -62,9 +62,6 @@ r_force_number(NODE *n)
 
 	if (n->type == Node_elem_new) {
 		n->type = Node_val;
-		n->flags &= ~STRING;
-		n->stptr[0] = '0';	// STRCUR is still set
-		n->stlen = 1;
 
 		return n;
 	}

@@ -1434,6 +1434,10 @@ EXTRA_DIST = \
 	typeof5.ok \
 	typeof6.awk \
 	typeof6.ok \
+	typeof7.awk \
+	typeof7.ok \
+	typeof8.awk \
+	typeof8.ok \
 	unicode1.awk \
 	unicode1.ok \
 	uninit2.awk \
@@ -1570,7 +1574,7 @@ GAWK_EXT_TESTS = \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
 	typeof4 typeof5 typeof6 unicode1 watchpoint1 \
-	re_test
+	re_test typeof7 typeof8
 
 ARRAYDEBUG_TESTS = arrdbg
 
