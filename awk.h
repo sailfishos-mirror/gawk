@@ -1989,7 +1989,6 @@ force_string_fmt(NODE *s, const char *fmtstr, int fmtidx)
 {
 	if (s->type == Node_elem_new) {
 		s->type = Node_val;
-		s->flags &= ~NUMBER;
 
 		return s;
 	}
@@ -2029,6 +2028,11 @@ unref(NODE *r)
 static inline NODE *
 force_number(NODE *n)
 {
+	if (n->type == Node_elem_new) {
+		n->type = Node_val;
+
+		return n;
+	}
 	return (n->flags & NUMCUR) != 0 ? n : str2number(n);
 }
 

@@ -222,7 +222,7 @@ GAWK_EXT_TESTS = \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
 	typeof4 typeof5 typeof6 unicode1 watchpoint1 \
-	re_test
+	re_test typeof7 typeof8
 
 ARRAYDEBUG_TESTS = arrdbg
 EXTRA_TESTS = inftest regtest ignrcas3 
@@ -3634,6 +3634,16 @@ unicode1:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 re_test:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+typeof7:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+typeof8:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@

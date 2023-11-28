@@ -4369,10 +4369,16 @@ do_typeof(int nargs)
 			res = "string";
 			// fall through
 		case NUMBER|STRING:
-			if (arg == Nnull_string || (arg->flags & NULL_FIELD) != 0) {
+		{
+			int flags = STRING|NUMBER|STRCUR|NUMCUR;
+
+			if (   arg == Nnull_string		// unassigned scalar
+			    || (arg->flags & NULL_FIELD) != 0	// unassigned field
+			    || (arg->flags & flags) == flags) {	// Node_elem_new used as scalar value
 				res = "unassigned";
 				break;
 			}
+		}
 			/* fall through */
 		default:
 			if (res == NULL) {

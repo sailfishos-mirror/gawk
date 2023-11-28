@@ -810,6 +810,9 @@ particular records in a file and perform operations upon them.
                                         returns.
 * Dynamic Typing::                      How variable types can change at
                                         runtime.
+* Dynamic Typing Awk::                  Dynamic typing in standard
+                                        @command{awk}.
+* Dynamic Typing Gawk::                 Dynamic typing in @command{gawk}.
 * Indirect Calls::                      Choosing the function to call at
                                         runtime.
 * Functions Summary::                   Summary of functions.
@@ -17943,6 +17946,7 @@ be called.
 @menu
 * Built-in::                    Summarizes the built-in functions.
 * User-defined::                Describes User-defined functions in detail.
+* Dynamic Typing::              How variable types can change at runtime.
 * Indirect Calls::              Choosing the function to call at runtime.
 * Functions Summary::           Summary of functions.
 @end menu
@@ -20390,38 +20394,11 @@ the result of calling @code{split()}. (I.e., @var{x} has the strnum
 attribute; @pxref{Variable Typing}.)
 
 @item "unassigned"
-@var{x} is a scalar variable that has not been assigned a value yet.
-For example:
-
-@example
-BEGIN @{
-    # creates a[1] but it has no assigned value
-    a[1]
-    print typeof(a[1])  # unassigned
-@}
-@end example
+@var{x} is a @emph{scalar} variable that has not been assigned a value yet.
 
 @item "untyped"
 @var{x} has not yet been used yet at all; it can become a scalar or an
-array.  The typing could even conceivably differ from run to run of
-the same program! For example:
-
-@example
-BEGIN @{
-    print "initially, typeof(v) = ", typeof(v)
-
-    if ("FOO" in ENVIRON)
-        make_scalar(v)
-    else
-        make_array(v)
-
-    print "typeof(v) =", typeof(v)
-@}
-
-function make_scalar(p,    l) @{ l = p @}
-
-function make_array(p) @{ p[1] = 1 @}
-@end example
+array.
 
 @end table
 @end table
@@ -20443,32 +20420,8 @@ The @code{typeof()} function is general; it allows you to determine
 if a variable or function parameter is a scalar (number, string,
 or strongly typed regexp) or an array.
 
-Normally, passing a variable that has never been used to a built-in
-function causes it to become a scalar variable (unassigned).
-However, @code{isarray()} and @code{typeof()} are different; they do
-not change their arguments from untyped to unassigned.
-
-This applies to both variables denoted by simple identifiers
-and array elements that come into existence simply by referencing them.
-Consider:
-
-@example
-$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
-@print{} untyped
-@end example
-
-Note that prior to @value{PVERSION} 5.2, array elements
-that come into existence simply by referencing them
-were different, they were automatically forced to be scalars:
-
-@example
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["foo"]) @}'}
-@print{} unassigned
-@end example
+We delay further discussion of @code{unassigned} vs.@: @code{untyped}
+to @ref{Dynamic Typing Gawk}.
 
 @node I18N Functions
 @subsection String-Translation Functions
@@ -20535,7 +20488,6 @@ them (i.e., to tell @command{awk} what they should do).
                                 does.
 * Function Calling::            Calling user-defined functions.
 * Return Statement::            Specifying the value a function returns.
-* Dynamic Typing::              How variable types can change at runtime.
 @end menu
 
 @node Definition Syntax
@@ -21242,7 +21194,7 @@ the program reports (predictably) that 99,385 is the largest value
 in the array.
 
 @node Dynamic Typing
-@subsection Functions and Their Effects on Variable Typing
+@section Variable Typing Is Dynamic
 
 @cindex Saturday Night Live
 @quotation
@@ -21254,6 +21206,16 @@ It's a floor wax!}
 @command{awk} is a very fluid language.
 It is possible that @command{awk} can't tell if an identifier
 represents a scalar variable or an array until runtime.
+
+@menu
+* Dynamic Typing Awk::          Dynamic typing in standard @command{awk}.
+* Dynamic Typing Gawk::         Dynamic typing in @command{gawk}.
+@end menu
+
+@node Dynamic Typing Awk
+@subsection Dynamic Typing In Standard @command{awk}
+
+Let's first discuss standard @command{awk}.
 Here is an annotated sample program:
 
 @example
@@ -21329,6 +21291,133 @@ $ @kbd{gawk -v A=1 -f funky.awk }
 
 POSIX does not specify the correct behavior, so be aware that different
 implementations work differently.
+
+@node Dynamic Typing Gawk
+@subsection Dynamic Typing In @command{gawk}
+
+@quotation
+@i{Hc Svnt Dracones} (``Here be dragons'')
+@author The Lenox Globe @c @footnote{See @uref{https://wiki.gis.com/wiki/index.php/Here_be_dragons}.}
+@end quotation
+
+Things in @command{gawk} can be a little more unexpected.
+Because @command{gawk} allows arrays of arrays, the same
+dynamic typing can be applied to array elements that
+have been created but not used.
+
+@example
+BEGIN @{
+    funky(a[1])
+    if (A == 0)
+        print "<" a[1] ">"
+    else
+        print a[1][1]
+@}
+
+function funky(arr)
+@{
+    if (A == 0)
+        arr = 1
+    else
+        arr[1] = 1
+@}
+@end example
+
+@noindent
+When run, the results are the same as in the earlier case:
+
+@example
+$ @kbd{gawk -v A=0 -f funky2.awk}
+@print{} <>
+$ @kbd{gawk -v A=1 -f funky2.awk}
+@print{} 1
+@end example
+
+The @code{typeof()} function provides us a ``window'' into @command{gawk}'s
+inner workings.
+Let's see how using a variable or array element can change
+it's type dynamically.
+Let's start with using a variable as a scalar:
+
+@example
+BEGIN @{
+    print typeof(a)         # we don't know what a is yet
+    printf("a = %d\n", a)   # use it as a scalar
+    print typeof(a)         # now we know it's not an array
+@}
+@end example
+
+@noindent
+When run:
+
+@example
+$ @kbd{gawk -f typing1.awk}
+@print{} untyped
+@print{} a = 0
+@print{} unassigned
+@end example
+
+Initially, @code{a} is @code{untyped}, since we don't know yet if it's
+an array or scalar.
+After using it in the call to @code{printf()}, we know it's a scalar.
+However, since it was never given a concrete value (number, string, or regexp),
+it's type is @code{unassigned}.
+
+@command{gawk} is peculiar in that we can do the same thing, but
+change @code{a} into an array:
+
+@example
+BEGIN @{
+    print typeof(a)               # we don't know what a is yet
+    a[1]                          # make a into an array
+    print typeof(a[1])            # but we don't know what a[1] is yet
+    printf("a[1] = %d\n", a[1])   # use it as a scalar
+    print typeof(a[1])            # now we know it's not an array
+@}
+@end example
+
+@noindent
+When run:
+
+@example
+$ @kbd{gawk -f typing2.awk}
+@print{} untyped
+@print{} untyped
+@print{} a[1] = 0
+@print{} unassigned
+@end example
+
+Normally, passing a variable that has never been used to a built-in
+function causes it to become a scalar variable (@code{unassigned}).
+However, @code{isarray()} and @code{typeof()} are different; they do
+not change their arguments from @code{untyped} to @code{unassigned}.
+
+As we saw, this applies to both variables denoted by simple identifiers
+and array elements that come into existence simply by referencing them:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} untyped
+@end example
+
+Note that prior to @value{PVERSION} 5.2, array elements
+that come into existence simply by referencing them
+were different, they were automatically forced to be scalars:
+
+@example
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} unassigned
+@end example
+
+To sum up, variables and array elements get their nature (array or scalar)
+``fixed'' upon first use.  This can lead to some weird cases, and it is
+best to avoid taking advantage of @command{gawk}'s dynamic nature, other
+than in the standard manner of passing untyped variables and array
+elements as function parameters.
 
 @node Indirect Calls
 @section Indirect Function Calls
@@ -21786,6 +21875,11 @@ values may be returned by a function.
 If a variable that has never been used is passed to a user-defined
 function, how that function treats the variable can set its nature:
 either scalar or array.
+
+@item
+@command{gawk} is even more fluid in its designation of variables
+and array elements as scalars or arrays. However, this can lead
+to weird situations, so you should tread carefully.
 
 @item
 @command{gawk} provides indirect function calls using a special syntax.
