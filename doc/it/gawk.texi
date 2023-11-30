@@ -945,6 +945,10 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         funzione restituisce.
 * Variabili di tipo dinamico::          Come cambiare tipo a una variabile in
                                         fase di esecuzione del programma.
+* Variabili di tipo dinamico in Awk::   Come cambiare tipo a una variabile in
+                                        @command{awk} standard.
+* Variabili di tipo dinamico in Gawk::  Come cambiare tipo a una variabile in
+                                        @command{gawk}.
 * Chiamate indirette::                  Scegliere la funzione da chiamare in
                                         fase di esecuzione del programma.
 * Sommario delle funzioni::             Sommario delle funzioni.
@@ -19950,6 +19954,8 @@ programma quale funzione chiamare.
 * Funzioni predefinite::            Riepilogo delle funzioni predefinite.
 * Funzioni definite dall'utente::   Descrizione dettagliata delle funzioni
                                     definite dall'utente.
+* Variabili di tipo dinamico::      Come cambiare tipo a una variabile in
+                                    fase di esecuzione del programma.
 * Chiamate indirette::              Scegliere la funzione da chiamare in
                                     fase di esecuzione del programma.
 * Sommario delle funzioni::         Sommario delle funzioni.
@@ -22738,39 +22744,12 @@ come un campo o il risultato di una chiamata a @code{split()}.
 @pxref{Tipi di variabile}.)
 
 @item "unassigned"
-@var{x} @`e una variabile scalare a cui non @`e ancora stato assegnato un valore.
-Per esempio:
-
-@example
-BEGIN @{
-    # crea a[1] ma non gli attribuisce alcun valore
-    a[1]
-    print typeof(a[1])  # non assegnato
-@}
-@end example
+@var{x} @`e una variabile @emph{scalare} a cui non @`e ancora stato assegnato
+un valore.
 
 @item "untyped"
 @var{x} non @`e stata usata per nulla; pu@`o diventare uno scalare o un
-vettore.  @`E anche possibile che il tipo sia differente, in differenti
-esecuzioni del medesimo programma!
-Per esempio:
-
-@example
-BEGIN @{
-    print "all'inizio, typeof(v) = ", typeof(v)
-
-    if ("FOO" in ENVIRON)
-        make_scalar(v)
-    else
-        make_array(v)
-
-    print "typeof(v) =", typeof(v)
-@}
-
-function make_scalar(p,    l) @{ l = p @}
-
-function make_array(p) @{ p[1] = 1 @}
-@end example
+vettore.
 
 @end table
 @end table
@@ -22792,35 +22771,8 @@ La funzione @code{typeof()} @`e generale; consente di determinare
 se una variabile o un parametro di funzione @`e uno scalare, (numero,
 stringa o @dfn{regexp} fortemente tipizzata), oppure un vettore.
 
-Normalmente, se si passa una variabile che non @`e stata mai usata
-a una funzione predefinita, la variabile stessa viene creata come
-variabile scalare di tipo non ancora assegnato (unassigned).
-Tuttavia, se si chiama @code{isarray()} e @code{typeof()} queste
-funzioni non cambiano gli argomenti che vengono passati loro da
-non ancora tipizzati (untyped) a non ancora assegnati (unassigned).
-
-Ci@`o vale sia per variabili scalari che per
-elementi di vettore generati semplicemente facendo
-un riferimento agli stessi.
-Si consideri:
-
-@example
-$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk 'BEGIN @{ print typeof(x["pippo"]) @}'}
-@print{} untyped
-@end example
-
-Notare che prima della @value{PVERSION} 5.2, gli elementi di
-vettore generati facendo un riferimento agli stessi
-venivano automaticamente definiti come scalari:
-
-@example
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["pippo"]) @}'}
-@print{} unassigned
-@end example
+Per l'approfondimento delle differenze fra @code{unassigned} e @code{untyped}
+si veda @ref{Variabili di tipo dinamico in Gawk}.
 
 @node Funzioni di internazionalizzazione
 @subsection Funzioni per tradurre stringhe
@@ -22901,8 +22853,6 @@ ma dipende dall'utente la loro definizione
 * Chiamata di una funzione::    Chiamare funzioni definite dall'utente.
 * Istruzione return::           Specificare il valore che una
                                 funzione restituisce.
-* Variabili di tipo dinamico::  Come cambiare tipo a una variabile in
-                                fase di esecuzione del programma.
 @end menu
 
 @node Sintassi delle definizioni
@@ -23687,7 +23637,7 @@ il programma trova (come si pu@`o immaginare) che 99.385 @`e il
 valore pi@`u alto contenuto nel vettore.
 
 @node Variabili di tipo dinamico
-@subsection Funzioni e loro effetti sul tipo di una variabile
+@section Il tipo delle variabili @`e dinamico
 
 @quotation
 @i{@`E una farcitura per il deserto! @*@footnote{Si tratta di un
@@ -23700,6 +23650,18 @@ gioco di parole fra "desert" (deserto) e "dessert" (dolce).}
 @`E possible che @command{awk} non sia in grado di stabilire se un
 identificativo rappresenta una variabile scalare o un vettore,
 prima dell'effettiva esecuzione di un programma.
+
+@menu
+* Variabili di tipo dinamico in Awk::   Come cambiare tipo a una variabile in
+                                        @command{awk}.
+* Variabili di tipo dinamico in Gawk::  Come cambiare tipo a una variabile in
+                                        @command{gawk}.
+@end menu
+
+@node Variabili di tipo dinamico in Awk
+@subsection Come cambiare tipo a una variabile in @command{awk} standard
+
+Esaminiamo prima il caso di @command{awk} standard.
 Ecco un esempio di programma commentato:
 
 @example
@@ -23727,14 +23689,14 @@ Ecco un esempio pi@`u complesso:
 
 @example
 BEGIN @{
-    funky(a)
+    strano(a)
     if (A == 0)
         print "<" a ">"
     else
         print a[1]
 @}
 
-function funky(arr)
+function strano(arr)
 @{
     if (A == 0)
         arr = 1
@@ -23753,14 +23715,14 @@ Ci sono due modi in cui questo programma potrebbe comportarsi.
 @command{awk} potrebbe determinare che, nel programma principale
 @code{a} ha un indice (ossia @`e un elemento di un vettore), e quindi
 considerarlo un vettore (nella fase di analisi del programma, ossia
-prima ancora che il programma inizi la sua esecuzione.
+prima ancora che il programma inizi la sua esecuzione).
 BWK @code{awk}, @code{mawk}, e forse altri fanno questo:
 
 @example
-$ @kbd{nawk -v A=0 -f funky.awk}
+$ @kbd{nawk -v A=0 -f strano.awk}
 @error{} nawk: can't assign to a; it's an array name.
 @error{}  source line number 11
-$ @kbd{nawk -v A=1 -f funky.awk}
+$ @kbd{nawk -v A=1 -f strano.awk}
 @print{} 1
 @end example
 
@@ -23772,15 +23734,149 @@ della variabile, che quindi pu@`o diventare scalare o vettoriale.
 @command{gawk} e MKS @command{awk} si comportano cos@`{@dotless{i}}:
 
 @example
-$ @kbd{gawk -v A=0 -f funky.awk}
+$ @kbd{gawk -v A=0 -f strano.awk}
 @print{} <>
-$ @kbd{gawk -v A=1 -f funky.awk }
+$ @kbd{gawk -v A=1 -f strano.awk }
 @print{} 1
 @end example
 
 POSIX non specifica quale dei due comportamenti sia quello corretto,
 quindi occorre essere consapevoli che differenti implementazioni di
 @command{awk} si comportano in modi diversi.
+
+@node Variabili di tipo dinamico in Gawk
+@subsection Come cambiare tipo a una variabile in @command{gawk}
+
+@quotation
+@i{Hc Svnt Dracones} (``Qui ci sono i draghi'')
+@author The Lenox Globe @c @footnote{Si veda @uref{https://wiki.gis.com/wiki/index.php/Here_be_dragons}.}
+@end quotation
+
+In @command{gawk} la situazione pu@`o essere un po' pi@`u inaspettata. 
+Poich@'e @command{gawk} consente di avere vettori di vettori,
+la stessa tipizzazione dinamica pu@`o essere applicata a elementi
+di vettore che sono stati creati ma non ancora usati.
+
+@example
+BEGIN @{
+    strano(a[1])
+    if (A == 0)
+        print "<" a[1] ">"
+    else
+        print a[1][1]
+@}
+
+function strano(variabile)
+@{
+    if (A == 0)
+        variabile = 1
+    else
+        variabile[1] = 1
+@}
+@end example
+
+@noindent
+Quando si esegue questo @dfn{script}, i risultati sono gli stessi
+che nel caso precedente:
+
+@example
+$ @kbd{gawk -v A=0 -f strano2.awk}
+@print{} <>
+$ @kbd{gawk -v A=1 -f strano2.awk}
+@print{} 1
+@end example
+
+La funzione @code{typeof()} ci consente di aprire una ``finestra''
+sul funzionamento interno di @command{gawk}.
+Vediamo come, utilizzandola, una variabile o un elemento di un
+vettore pu@`o modificare dinamicamente il proprio tipo.
+Per cominciare, usiamo una variabile come scalare:
+
+@example
+BEGIN @{
+    print typeof(a)         # non sappiamo ancora il tipo variabile
+    printf("a = %d\n", a)   # la usiamo come scalare
+    print typeof(a)         # ora sappiamo che non @`e un vettore
+@}
+@end example
+
+@noindent
+Eseguendo lo @dfn{script}:
+
+@example
+$ @kbd{gawk -f tipizzare1.awk}
+@print{} untyped
+@print{} a = 0
+@print{} unassigned
+@end example
+
+Inizialmente, @code{a} @`e di tipo @code{untyped}, poich@'e ancora non
+sappiamo se @`e una variabile scalare o un vettore.
+Dopo averla usata nell'istruzione @code{printf()}, sappiamo che si tratta
+di una variabile scalare.
+Tuttavia, poich@'e non le @`e ancora stato assegnato esplicitamente un valore
+(numero, stringa, o @dfn{regexp}), il suo tipo risulta essere
+@code{unassigned}.
+
+In aggiunta a ci@`o, in @command{gawk}, @`e possibile cambiare
+@code{a} facendolo diventare un vettore:
+
+@example
+BEGIN @{
+    print typeof(a)               # non sappiamo ancora il tipo variabile
+    a[1]                          # la definiamo come elemento di vettore
+    print typeof(a[1])            # ma ancora non sappiamo cosa @`e a[1]
+    printf("a[1] = %d\n", a[1])   # la usiamo come scalare
+    print typeof(a[1])            # ora sappiamo che non @`e un vettore
+@}
+@end example
+
+@noindent
+Eseguendo lo @dfn{script}:
+
+@example
+$ @kbd{gawk -f tipizzare2.awk}
+@print{} untyped
+@print{} untyped
+@print{} a[1] = 0
+@print{} unassigned
+@end example
+
+Normalmente, se si passa una variabile non ancora usata a una funzione
+predefinita, questa viene considerata come una variabile scalare
+(@code{unassigned}).
+Tuttavia le funzioni @code{isarray()} e @code{typeof()} si comportano
+in modo differente, e non cambiano i loro argomenti dal tipo
+@code{untyped} al tipo @code{unassigned}.
+
+Come visto sopra, ci@`o vale sia per variabili il cui nome @`e un semplice
+identificativo, sia per quelle che sono elementi di un vettore, che viene
+creato quando si fa riferimento ad esso:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} untyped
+@end example
+
+Si noti che prima della @value{PVERSION} 5.2, gli elementi
+di un vettore, creati facendo riferimento ad esso, erano automaticamente
+considerati come scalari:
+
+@example
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} unassigned
+@end example
+
+Per riassumere, alle variabili e agli elementi di un vettore viene
+attribuito un tipo (vettore o scalare) quando vengono usati la prima
+volta.  Ci@`o pu@`o generare qualche caso strano, ed @`e meglio evitare
+di utilizzare questa capacit@`a ``dinamica'' di @command{gawk}, tranne che
+nella maniera standard, ossia passando, come parametri di funzione,
+variabili e vettori non ancora tipizzati.
 
 @node Chiamate indirette
 @section Chiamate indirette di funzione
@@ -24289,7 +24385,13 @@ funzione.  Una funzione pu@`o solo restituire valori di tipo scalare.
 @item
 Se una variabile che non @`e stata mai usata @`e passata a una funzione
 definita dall'utente, il modo con cui quella funzione elabora la variabile
-ne pu@`o determinare il tipo: o scalare o vettoriale.
+ne pu@`o determinare il tipo: scalare o vettoriale.
+
+@item
+@command{gawk} @`e ancora pi@`u dinamico nell'attribuire alle variabili
+e agli elementi di un vettore il tipo, ossia se scalare o vettoriale.
+Tuttavia ci@`o pu@`o portare a situazioni limite strane, quindi occorre
+prestare attenzione quando si usa questa funzionalit@`a.
 
 @item
 @command{gawk} consente la chiamata indiretta di funzioni usando una sintassi
