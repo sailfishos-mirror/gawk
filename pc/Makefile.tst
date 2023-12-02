@@ -222,7 +222,7 @@ GAWK_EXT_TESTS = \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
 	typeof4 typeof5 typeof6 unicode1 watchpoint1 \
-	re_test typeof7 typeof8
+	re_test typeof7 typeof8 dbugarray1
 
 ARRAYDEBUG_TESTS = arrdbg
 EXTRA_TESTS = inftest regtest ignrcas3 
@@ -243,7 +243,9 @@ SHLIB_TESTS = \
 
 
 # List of the tests which should be run with --debug option:
-NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4
+NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4 \
+	     dbugarray1
+
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \
@@ -3646,6 +3648,11 @@ typeof7:
 typeof8:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+dbugarray1:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --debug < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 double1:
