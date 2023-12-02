@@ -1096,6 +1096,7 @@ print_array(volatile NODE *arr, char *arr_name)
 	volatile NODE *r;
 	volatile int ret = 0;
 	volatile jmp_buf pager_quit_tag_stack;
+	static int level = 0;
 
 	if (assoc_empty((NODE *) arr)) {
 		gprintf(out_fp, _("array `%s' is empty\n"), arr_name);
@@ -1108,14 +1109,20 @@ print_array(volatile NODE *arr, char *arr_name)
 	list = assoc_list((NODE *) arr, "@ind_str_asc", SORTED_IN);
 
 	PUSH_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);
+	// level variable is so that we can print things like a[1][2][3] = 123 correctly.
 	if (setjmp(pager_quit_tag) == 0) {
+		level++;
 		for (i = 0; ret == 0 && i < num_elems; i++) {
 			subs = list[i];
 			r = *assoc_lookup((NODE *) arr, subs);
-			if (r->type == Node_var_array)
+			if (level == 1)
+				gprintf(out_fp, "%s", arr_name);
+			if (r->type == Node_var_array) {
+				if (level >= 1)
+					gprintf(out_fp, "[\"%.*s\"]", (int) subs->stlen, subs->stptr);
 				ret = print_array(r, r->vname);
-			else {
-				gprintf(out_fp, "%s[\"%.*s\"] = ", arr_name, (int) subs->stlen, subs->stptr);
+			} else {
+				gprintf(out_fp, "[\"%.*s\"] = ", (int) subs->stlen, subs->stptr);
 				valinfo((NODE *) r, gprintf, out_fp);
 			}
 		}
@@ -1127,6 +1134,7 @@ print_array(volatile NODE *arr, char *arr_name)
 	for (i = 0; i < num_elems; i++)
 		unref(list[i]);
 	efree(list);
+	level--;
 
 	return ret;
 }
