@@ -800,6 +800,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 	static struct redirect *save_rp = NULL;	/* hold onto rp that should
 	                                         * be freed for reuse
 	                                         */
+	int save_errno;
 
 	if (do_sandbox)
 		fatal(_("redirection not allowed in sandbox mode"));
@@ -982,15 +983,20 @@ redirect_string(const char *str, size_t explen, bool not_string,
 		case redirect_input:
 			direction = "from";
 			fd = (extfd >= 0) ? extfd : devopen(str, binmode("r"));
-			if (fd == INVALID_HANDLE && errno == EISDIR) {
-				*errflg = EISDIR;
-				/* do not free rp, saving it for reuse (save_rp = rp) */
-				return NULL;
-			}
+			save_errno = errno;
+			/* don't fail before letting registered
+			   parsers a chance to take control */
 			rp->iop = iop_alloc(fd, str, errno);
 			find_input_parser(rp->iop);
 			iop_finish(rp->iop);
 			if (! rp->iop->valid) {
+				if (fd == INVALID_HANDLE && save_errno == EISDIR) {
+					*errflg = EISDIR;
+					iop_close(rp->iop);
+					rp->iop = NULL;
+					/* do not free rp, saving it for reuse (save_rp = rp) */
+					return NULL;
+				}
 				if (! do_traditional && rp->iop->errcode != 0)
 					update_ERRNO_int(rp->iop->errcode);
 				iop_close(rp->iop);
