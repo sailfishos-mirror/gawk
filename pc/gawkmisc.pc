@@ -106,9 +106,6 @@ optimal_bufsize(fd, stb)
 int fd;
 struct stat *stb;
 {
-	/* force all members to zero in case OS doesn't use all of them. */
-	memset(stb, '\0', sizeof(struct stat));
-
 	/*
 	 * DOS doesn't have the file system block size in the
 	 * stat structure. So we have to make some sort of reasonable
@@ -116,6 +113,12 @@ struct stat *stb;
 	 * meant for in the first place.
 	 */
 #define	DEFBLKSIZE	BUFSIZ
+
+	if (S_ISDIR(stb->st_mode))
+		return DEFBLKSIZE;
+
+	/* force all members to zero in case OS doesn't use all of them. */
+	memset(stb, '\0', sizeof(struct stat));
 
 	if (fstat(fd, stb) == -1)
 		fatal("can't stat fd %d (%s)", fd, strerror(errno));
