@@ -1084,6 +1084,18 @@ print_field(long field_num)
 	}
 }
 
+/* print_array_names --- print the stack of array names */
+
+static void
+print_array_names(const char **names, size_t num_names, FILE *out_fp)
+{
+	size_t i;
+
+	gprintf(out_fp, "%s", names[0]);
+	for (i = 1; i < num_names; i++)
+		gprintf(out_fp, "[\"%s\"]", names[i]);
+}
+
 /* print_array --- print the contents of an array */
 
 static int
@@ -1096,7 +1108,18 @@ print_array(volatile NODE *arr, char *arr_name)
 	volatile NODE *r;
 	volatile int ret = 0;
 	volatile jmp_buf pager_quit_tag_stack;
-	static int level = 0;
+
+	// manage a stack of names for printing deeply nested arrays
+	static const char **names = NULL;
+	static size_t cur_name = 0;
+	static size_t num_names = 0;
+#define INITIAL_NAME_COUNT	10
+
+	if (names == NULL) {
+		emalloc(names, const char **, INITIAL_NAME_COUNT * sizeof(char *), "print_array");
+		memset(names, 0, INITIAL_NAME_COUNT * sizeof(char *));
+		num_names = INITIAL_NAME_COUNT;
+	}
 
 	if (assoc_empty((NODE *) arr)) {
 		gprintf(out_fp, _("array `%s' is empty\n"), arr_name);
@@ -1109,19 +1132,22 @@ print_array(volatile NODE *arr, char *arr_name)
 	list = assoc_list((NODE *) arr, "@ind_str_asc", SORTED_IN);
 
 	PUSH_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);
-	// level variable is so that we can print things like a[1][2][3] = 123 correctly.
 	if (setjmp(pager_quit_tag) == 0) {
-		level++;
+		// push name onto stack
+		if (cur_name >= num_names) {
+			num_names *= 2;
+			erealloc(names, const char **, num_names * sizeof(char *), "print_array");
+		}
+		names[cur_name++] = arr_name;
+
+		// and print the array
 		for (i = 0; ret == 0 && i < num_elems; i++) {
 			subs = list[i];
 			r = *assoc_lookup((NODE *) arr, subs);
-			if (level == 1)
-				gprintf(out_fp, "%s", arr_name);
 			if (r->type == Node_var_array) {
-				if (level >= 1)
-					gprintf(out_fp, "[\"%.*s\"]", (int) subs->stlen, subs->stptr);
 				ret = print_array(r, r->vname);
 			} else {
+				print_array_names(names, cur_name, out_fp);
 				gprintf(out_fp, "[\"%.*s\"] = ", (int) subs->stlen, subs->stptr);
 				valinfo((NODE *) r, gprintf, out_fp);
 			}
@@ -1130,11 +1156,11 @@ print_array(volatile NODE *arr, char *arr_name)
 		ret = 1;
 
 	POP_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);
+	cur_name--;
 
 	for (i = 0; i < num_elems; i++)
 		unref(list[i]);
 	efree(list);
-	level--;
 
 	return ret;
 }
