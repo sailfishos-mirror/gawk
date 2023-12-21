@@ -1,3 +1,18 @@
+2023-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Try to close a race condition window on SIGPIPE. See the thread at
+	https://lists.gnu.org/archive/html/bug-gawk/2023-12/msg00011.html.
+	Thanks to Andreas Schwab <schwab@suse.de>.
+
+	* awk.h (ignore_sigpipe, set_sigpipe_to_default): Remove decls,
+	they're not functions.
+	(do_nothing_on_signal): Add declaration.
+	(silent_catch_sigpipe): New macro.
+	* builtin.c (do_system): Replace call of set_sigpipe_to_default()
+	with call to silent_catch_sigpipe().
+	* io.c (redirect_string, gawk_popen): Ditto.
+	(do_nothing_on_signal): New function.
+
 2023-12-12  Eli Zaretskii  <eliz@gnu.org>
 
 	* io.c (redirect_string): Check registered parsers before failing

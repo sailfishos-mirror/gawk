@@ -1668,8 +1668,7 @@ extern bool inrec(IOBUF *iop, int *errcode);
 extern int nextfile(IOBUF **curfile, bool skipping);
 extern bool is_non_fatal_std(FILE *fp);
 extern bool is_non_fatal_redirect(const char *str, size_t len);
-extern void ignore_sigpipe(void);
-extern void set_sigpipe_to_default(void);
+extern void do_nothing_on_signal(int sig);
 extern bool non_fatal_flush_std_file(FILE *fp);
 extern size_t gawk_fwrite(const void *buf, size_t size, size_t count, FILE *fp, void *opaque);
 
@@ -2160,9 +2159,11 @@ str_terminate_f(NODE *n, char *savep)
 #define ignore_sigpipe() signal(SIGPIPE, SIG_IGN)
 #define set_sigpipe_to_default() signal(SIGPIPE, SIG_DFL)
 #define die_via_sigpipe() (signal(SIGPIPE, SIG_DFL), kill(getpid(), SIGPIPE))
+#define silent_catch_sigpipe() signal(SIGPIPE, do_nothing_on_signal)
 #else
 #define ignore_sigpipe()
 #define set_sigpipe_to_default()
+#define silent_catch_sigpipe()
 #ifdef __MINGW32__
 /* 0xC0000008 is EXCEPTION_INVALID_HANDLE, somewhat appropriate for EPIPE */
 #define die_via_sigpipe() exit(0xC0000008)
