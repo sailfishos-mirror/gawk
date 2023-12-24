@@ -250,6 +250,9 @@ EXTRA_DIST = \
 	dbugarray2.awk \
 	dbugarray2.in \
 	dbugarray2.ok \
+	dbugarray3.awk \
+	dbugarray3.in \
+	dbugarray3.ok \
 	dbugeval.in \
 	dbugeval.ok \
 	dbugeval2.awk \
@@ -1580,7 +1583,7 @@ GAWK_EXT_TESTS = \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
 	typeof4 typeof5 typeof6 unicode1 watchpoint1 \
-	re_test typeof7 typeof8 dbugarray1 dbugarray2
+	re_test typeof7 typeof8 dbugarray1 dbugarray2 dbugarray3
 
 ARRAYDEBUG_TESTS = arrdbg
 
@@ -1605,7 +1608,7 @@ SHLIB_TESTS = \
 
 # List of the tests which should be run with --debug option:
 NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4 \
-	     dbugarray1 dbugarray2
+	     dbugarray1 dbugarray2 dbugarray3
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \

@@ -1145,7 +1145,13 @@ print_array(volatile NODE *arr, char *arr_name)
 			subs = list[i];
 			r = *assoc_lookup((NODE *) arr, subs);
 			if (r->type == Node_var_array) {
-				ret = print_array(r, r->vname);
+				// 12/2023: Use sub->stptr here, not r->vname, since
+				// a subarray could have been created via
+				// split() or some other mechanism where flags has NUMINT in it.
+				// In this case, r->vname can be NULL, so pass in the
+				// subscript itself.  This should be fixed in the code that
+				// builds such arrays.
+				ret = print_array(r, subs->stptr);
 			} else {
 				print_array_names(names, cur_name, out_fp);
 				gprintf(out_fp, "[\"%.*s\"] = ", (int) subs->stlen, subs->stptr);
