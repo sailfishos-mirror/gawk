@@ -1682,6 +1682,10 @@ find_subscript(struct list_item *item, NODE **ptr)
 	NODE *sub, *r;
 	int i = 0, count = item->num_subs;
 
+	// without this check, in_array() will SEGV...
+	if (symbol->type == Node_var_new || symbol->type == Node_elem_new)
+		return -1;
+
 	r = *ptr = NULL;
 	for (i = 0; i < count; i++) {
 		sub = item->subs[i];
