@@ -950,7 +950,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			(void) flush_io();
 
 			os_restore_mode(fileno(stdin));
-			set_sigpipe_to_default();
+			silent_catch_sigpipe();
 			/*
 			 * Don't check failure_fatal; see input pipe below.
 			 * Note that the failure happens upon failure to fork,
@@ -2777,7 +2777,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	FILE *current;
 
 	os_restore_mode(fileno(stdin));
-	set_sigpipe_to_default();
+	silent_catch_sigpipe();
 
 	current = popen(cmd, binmode("r"));
 
@@ -4427,7 +4427,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 static long
 get_read_timeout(IOBUF *iop)
 {
-	long tmout = 0;
+	long tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
 
 	if (PROCINFO_node != NULL) {
 		const char *name = iop->public_.name;
@@ -4451,8 +4451,7 @@ get_read_timeout(IOBUF *iop)
 			(void) force_number(val);
 			tmout = get_number_si(val);
 		}
-	} else
-		tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
+	}
 
 	/* overwrite read routine only if an extension has not done so */
 	if ((iop->public_.read_func == ( ssize_t(*)(int, void *, size_t) ) read) && tmout > 0)
@@ -4595,4 +4594,20 @@ avoid_flush(const char *name)
 
 	return in_PROCINFO(bufferpipe, NULL, NULL) != NULL
 		|| in_PROCINFO(name, bufferpipe, NULL) != NULL;
+}
+
+/* do_nothing_on_signal --- empty signal catcher for SIGPIPE */
+
+/*
+ * See the thread starting at
+ * https://lists.gnu.org/archive/html/bug-gawk/2023-12/msg00011.html.
+ *
+ * The hope is that by using this do-nothing function to catch
+ * SIGPIPE, instead of setting it to default, that when race conditions
+ * occur, gawk won't fatal out.
+ */
+
+void
+do_nothing_on_signal(int sig)
+{
 }
