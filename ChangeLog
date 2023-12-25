@@ -1,3 +1,51 @@
+2023-12-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* debug.c (serialize_list): Fix a compiler warning about
+	an unused variable.
+
+2024-12-25         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* io.c (get_read_timeout): Make gawk match the doc and have
+	GAWK_READ_TIMEOUT work if no entry in PROCINFO. Thanks
+	to Ed Morton for the report.
+
+2023-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* debug.c (print_array): Use the subscript as the
+	subarray name instead of the `vname' field. This field
+	is not there for arrays created with NUMINT subscripts.
+	Thanks again to Hermann Peifer for the report.
+
+	Unrelated:
+
+	* debug.c (find_subscript): Fail early on Node_var_new
+	and Node_elem_new.  Thanks yet again to Hermann Peifer
+	for the report.
+
+2023-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix multidimensional array printing in the debugger, again.
+	Thanks again to Hermann Peifer for the report.
+
+	* debug.c (print_array): Maintain a stack of array names
+	and indexes, and print it when printing the value.
+	(print_array_names): New function.
+
+2023-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Try to close a race condition window on SIGPIPE. See the thread at
+	https://lists.gnu.org/archive/html/bug-gawk/2023-12/msg00011.html.
+	Thanks to Andreas Schwab <schwab@suse.de>.
+
+	* awk.h (ignore_sigpipe, set_sigpipe_to_default): Remove decls,
+	they're not functions.
+	(do_nothing_on_signal): Add declaration.
+	(silent_catch_sigpipe): New macro.
+	* builtin.c (do_system): Replace call of set_sigpipe_to_default()
+	with call to silent_catch_sigpipe().
+	* io.c (redirect_string, gawk_popen): Ditto.
+	(do_nothing_on_signal): New function.
+
 2023-12-12  Eli Zaretskii  <eliz@gnu.org>
 
 	* io.c (redirect_string): Check registered parsers before failing
