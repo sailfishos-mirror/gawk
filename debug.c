@@ -4513,7 +4513,7 @@ serialize_list(int type)
 	int cnum = 0;
 	struct condition *cndn = NULL;
 	void *ptr, *end_ptr;
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 	HIST_ENTRY *h = NULL;
 #endif
 
