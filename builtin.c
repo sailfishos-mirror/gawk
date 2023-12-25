@@ -2269,7 +2269,7 @@ do_system(int nargs)
 		cmd[tmp->stlen] = '\0';
 
 		os_restore_mode(fileno(stdin));
-		set_sigpipe_to_default();
+		silent_catch_sigpipe();
 
 		status = system(cmd);
 		/*
