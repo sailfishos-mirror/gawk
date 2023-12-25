@@ -4424,7 +4424,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 static long
 get_read_timeout(IOBUF *iop)
 {
-	long tmout = 0;
+	long tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
 
 	if (PROCINFO_node != NULL) {
 		const char *name = iop->public.name;
@@ -4448,8 +4448,7 @@ get_read_timeout(IOBUF *iop)
 			(void) force_number(val);
 			tmout = get_number_si(val);
 		}
-	} else
-		tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
+	}
 
 	/* overwrite read routine only if an extension has not done so */
 	if ((iop->public.read_func == ( ssize_t(*)() ) read) && tmout > 0)
