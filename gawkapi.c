@@ -72,16 +72,17 @@ api_get_argument(awk_ext_id_t id, size_t count,
 	if (arg->type == Node_var_new || arg->type == Node_elem_new) {
 		if (wanted == AWK_UNDEFINED)
 			return awk_true;
-		else if (wanted == AWK_ARRAY) {
+		else if (wanted == AWK_ARRAY)
 			goto array;
-		} else {
+		else
 			goto scalar;
-		}
 	}
 
 	/* at this point, we have real type */
 	if (arg->type == Node_var_array || arg->type == Node_array_ref) {
-		if (wanted != AWK_ARRAY && wanted != AWK_UNDEFINED)
+		if (wanted == AWK_UNDEFINED)
+			return awk_true;
+		else if (wanted != AWK_ARRAY)
 			return awk_false;
 		goto array;
 	} else
@@ -624,11 +625,9 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 				val->val_type = AWK_REGEX;
 				break;
 			case NUMBER|STRING:
-				if (node == Nnull_string) {
-					val->val_type = AWK_UNDEFINED;
-					break;
-				}
-				/* fall through */
+				// this can come from a Node_elem_new, as well as Nnull_string
+				val->val_type = AWK_UNDEFINED;
+				break;
 			default:
 				warning(_("node_to_awk_value detected invalid flags combination `%s'; please file a bug report"), flags2str(node->flags));
 				val->val_type = AWK_UNDEFINED;
@@ -661,11 +660,9 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 				ret = awk_true;
 				break;
 			case NUMBER|STRING:
-				if (node == Nnull_string) {
-					val->val_type = AWK_UNDEFINED;
-					break;
-				}
-				/* fall through */
+				// this can come from a Node_elem_new, as well as Nnull_string
+				val->val_type = AWK_UNDEFINED;
+				break;
 			default:
 				warning(_("node_to_awk_value detected invalid flags combination `%s'; please file a bug report"), flags2str(node->flags));
 				val->val_type = AWK_UNDEFINED;
@@ -691,11 +688,9 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 				val->val_type = AWK_REGEX;
 				break;
 			case NUMBER|STRING:
-				if (node == Nnull_string) {
-					val->val_type = AWK_UNDEFINED;
-					break;
-				}
-				/* fall through */
+				// this can come from a Node_elem_new, as well as Nnull_string
+				val->val_type = AWK_UNDEFINED;
+				break;
 			default:
 				warning(_("node_to_awk_value detected invalid flags combination `%s'; please file a bug report"), flags2str(node->flags));
 				val->val_type = AWK_UNDEFINED;
@@ -727,12 +722,10 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 				ret = awk_true;
 				break;
 			case NUMBER|STRING:
-				if (node == Nnull_string) {
-					val->val_type = AWK_UNDEFINED;
-					ret = awk_true;
-					break;
-				}
-				/* fall through */
+				// this can come from a Node_elem_new, as well as Nnull_string
+				val->val_type = AWK_UNDEFINED;
+				ret = awk_true;
+				break;
 			default:
 				warning(_("node_to_awk_value detected invalid flags combination `%s'; please file a bug report"), flags2str(node->flags));
 				val->val_type = AWK_UNDEFINED;
