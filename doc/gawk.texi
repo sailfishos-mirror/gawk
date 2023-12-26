@@ -37019,10 +37019,14 @@ value type, as appropriate.  This behavior is summarized in
 @multitable @columnfractions .50 .50
 @headitem @tab Type of Actual Value
 @end multitable
+@ignore
+@c 12/2023: Texinfo.tex has morphed enough that this produces
+@c bad output, so comment it out.
 @c 10/2014: Thanks to Karl Berry for this bit to reduce the space:
 @tex
 \vglue-1.1\baselineskip
 @end tex
+@end ignore
 @c @multitable @columnfractions .166 .166 .198 .15 .15 .166
 @multitable {Requested} {Undefined} {Number} {Number} {Scalar} {Regex} {Number} {Array} {Undefined}
 @headitem @tab @tab String @tab Strnum @tab Number @tab Regex @tab Bool @tab Array @tab Undefined
@@ -37067,6 +37071,33 @@ value type, as appropriate.  This behavior is summarized in
 @end verbatim
 @end ifplaintext
 @end float
+
+There are a number of points of note:
+
+@itemize @bullet
+@item
+A request for @code{AWK_UNDEFINED} always returns true, filling in
+the actual type of the particular value.  You can think of this
+as a sort of ``wildcard'' request.
+
+@item
+Requesting an @code{AWK_STRING} causes @command{gawk} to convert any
+scalar value to a string result, and that is what is retuned.
+
+@item
+Requesting an @code{AWK_NUMBER} causes @command{gawk} to convert any
+scalar value, except for a regexp, to a numeric result, and
+that is what is retuned.
+
+Conversion between string and number in the API thus parallels how
+@command{gawk} behaves in running code.
+
+@item
+The API functions do @emph{not} distinguish between @code{"undefined"}
+and @code{"unassigned"} as returned by @code{typeof()} (@pxref{Dynamic
+Typing Gawk}).  @code{AWK_UNDEFINED} serves for both. This is unlikely
+to change, as the documentation and code are already complicated enough.
+@end itemize
 
 @node Accessing Parameters
 @subsection Accessing and Updating Parameters
