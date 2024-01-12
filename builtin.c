@@ -2169,7 +2169,19 @@ do_systime(int nargs ATTRIBUTE_UNUSED)
 
 	check_exact_args(nargs, "systime", 0);
 
+#ifdef HAVE_CLOCK_GETTIME
+	struct timespec the_time;
+
+	(void) clock_gettime(CLOCK_REALTIME, & the_time);
+	lclock = the_time.tv_sec;
+#elif defined(HAVE_GETTIMEOFDAY)
+	struct timeval the_time;
+
+	(void) gettimeofday(& the_time, NULL);
+	lclock = the_time.tv_sec;
+#else
 	(void) time(& lclock);
+#endif
 	return make_number((AWKNUM) lclock);
 }
 
