@@ -114,7 +114,6 @@ do_gettimeofday(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	{
 		struct timespec tv;
 		clock_gettime(CLOCK_REALTIME, & tv);
-		curtime = tv.tv_sec + 0.0;
 		curtime = tv.tv_sec+(tv.tv_nsec/1000000000.0);
 	}
 #elif defined(HAVE_GETTIMEOFDAY)
