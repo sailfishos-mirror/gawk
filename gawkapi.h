@@ -496,6 +496,12 @@ typedef struct gawk_api {
 	 * These can change on the fly as things happen within gawk.
 	 * Currently only do_lint is prone to change, but we reserve
 	 * the right to allow the others to do so also.
+	 *
+	 * N.B. If we ever again need to add an additional do_flags value,
+	 * it would be wise to convert this from an array to a bitmask. If
+	 * we add a new do_flags value and bump DO_FLAGS_SIZE, then it requires
+	 * us to increment the ABI version. If we use a bitmask instead, then
+	 * we will be free to add new flags without breaking ABI compatibility.
 	 */
 #define DO_FLAGS_SIZE	7
 	awk_const int do_flags[DO_FLAGS_SIZE];
