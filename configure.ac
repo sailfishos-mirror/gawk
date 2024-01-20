@@ -436,14 +436,8 @@ dnl check for readline support
 GAWK_CHECK_READLINE
 
 dnl check for mpfr support
-case `uname -m` in
-*'Power Macintosh'*)
-	: ;;
-*)
-	case $SKIP_MPFR in
-	no)	GNUPG_CHECK_MPFR
-		;;
-	esac
+case $SKIP_MPFR in
+no)	GNUPG_CHECK_MPFR
 	;;
 esac
 
