@@ -816,6 +816,20 @@ str2wstr(NODE *n, size_t **ptr)
 	assert((n->flags & (STRING|STRCUR)) != 0);
 
 	/*
+	 * For use by do_match, create and fill in an array.
+	 * For each byte `i' in n->stptr (the original string),
+	 * a[i] is equal to `j', where `j' is the corresponding wchar_t
+	 * in the converted wide string.
+	 *
+	 * This is needed even for Nnull_string or Null_field.
+	 *
+	 * Create the array.
+	 */
+	if (ptr != NULL) {
+		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1), "str2wstr");
+	}
+
+	/*
 	 * Don't convert global null string or global null field
 	 * variables to a wide string. They are both zero-length anyway.
 	 * This also avoids future double-free errors while releasing
@@ -847,18 +861,6 @@ str2wstr(NODE *n, size_t **ptr)
 
 	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 1), "str2wstr");
 	wsp = n->wstptr;
-
-	/*
-	 * For use by do_match, create and fill in an array.
-	 * For each byte `i' in n->stptr (the original string),
-	 * a[i] is equal to `j', where `j' is the corresponding wchar_t
-	 * in the converted wide string.
-	 *
-	 * Create the array.
-	 */
-	if (ptr != NULL) {
-		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1), "str2wstr");
-	}
 
 	sp = n->stptr;
 	src_count = n->stlen;
