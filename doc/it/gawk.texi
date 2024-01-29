@@ -5904,7 +5904,7 @@ accetta un nome di vettore, opzionale, come secondo argomento, il quale,
 se presente sar@`a svuotato degli eventuali contenuti, e riempito con
 alcune informazioni che descrivono l'implementazione interna della
 variabile.  Ci@`o pu@`o essere utile per il debug.  Per ora viene
-restituita una versione formato testo dei flag per le variabili di
+restituita una versione formato testo dei @dfn{flag} per le variabili di
 tipo scalare, e il tipo di implementazione interna per i vettori.
 Per quest'interfaccia sono possibili variazioni in futuro, e quindi
 i valori restituiti possono non rimanere fissi.
@@ -21920,7 +21920,7 @@ I valori di questi numeri possono non essere negli intervalli specificati; per
 esempio, un'ora di @minus{}1 sta a indicare 1 ora prima di mezzanotte.
 Viene adottato il calendario gregoriano con l'origine posta all'anno zero,
 con l'anno 0 che viene prima dell'anno 1 e l'anno @minus{}1 che viene prima
-dell'anno 0.  Se il flag @var{utc-flag} @`e specificato ed @`e diverso da zero
+dell'anno 0.  Se il @dfn{flag} @var{utc-flag} @`e specificato ed @`e diverso da zero
 e dalla stringa nulla, si suppone che l'ora sia quella del fuso orario UTC;
 altrimenti l'ora @`e considerata essere quella del fuso orario locale.  Se
 l'indicatore @var{DST}
@@ -22220,6 +22220,17 @@ La data in formato OpenVMS (p.es., @samp{20-JUN-1991}).
 
 In aggiunta a ci@`o, le notazioni alternative sono riconosciute, ma al
 loro posto sono usate quelle normali.
+
+@quotation NOTA
+Analogamente a quanto si pu@`o specificare in @code{printf()}, alcune
+versioni di @code{strftime()} consentono di usare dei @dfn{flag} tra
+il carattere @code{%} e la lettera che specifica il formato.
+Controllare la pagina di manuale di @code{strftime()} per
+verificare se i @dfn{flag} sono supportati o meno, e quali @dfn{flag}
+sono disponibili.  Va comunque tenuto presente che l'utilizzo di tali
+@dfn{flag} diminuisce la portabilit@`a dello @dfn{script} ad altri
+sistemi operativi.
+@end quotation
 
 @cindex @code{date} (programma di utilit@`a POSIX)
 @cindex programma di utilit@`a POSIX @subentry @command{date}
@@ -28136,7 +28147,7 @@ function prepara_lista_caratteri(    campo, i, j, f, g, n, m, t,
 @end example
 
 Poi viene la regola che elabora i dati.  Se l'opzione @option{-s} @`e stata
-specificata, il flag @code{sopprimi}
+specificata, il @dfn{flag} @code{sopprimi}
 @`e vero.  La prima istruzione
 @code{if} accerta che il record in input abbia il separatore di
 campo.  Se @command{cut} sta elaborando dei campi, e @code{sopprimi} @`e vero,
@@ -28594,7 +28605,7 @@ function sintassi()
 @end example
 
 Il primo passo @`e quello di scandire le opzioni usando @code{getopt()},
-e di impostare varie variabili di tipo flag a seconda delle opzioni
+e di impostare varie variabili di tipo @dfn{flag} a seconda delle opzioni
 specificate:
 
 @example
@@ -28638,7 +28649,7 @@ dal vettore @code{PROCINFO} dell'utente corrente, oppure
 dal database degli utenti e delle password, per un
 utente il cui nome sia stato specificato nella riga di
 comando.
-In quest'ultimo caso, viene impostato il flag @code{real_ids_only},
+In quest'ultimo caso, viene impostato il @dfn{flag} @code{real_ids_only},
 poich@'e non @`e possibile stampare informazioni riguardo agli
 ID di utente e di gruppo effettivi:
 
@@ -29311,7 +29322,7 @@ di elaborare ogni @value{FN} in @code{ARGV} come dati in input.
 
 @cindex @dfn{flag} (indicatore), variabili di tipo
 @cindex variabili @subentry di tipo indicatore (@dfn{flag})
-Se il primo argomento @`e @option{-a}, la variabile flag
+Se il primo argomento @`e @option{-a}, la variabile @dfn{flag}
 @code{append} viene impostata a vero, e sia @code{ARGV[1]} che
 @code{copia[1]} vengono cancellati. Se @code{ARGC} @`e minore di due, nessun
 @value{FN} @`e stato fornito, e @code{tee} stampa un messaggio di sintassi ed
@@ -34849,7 +34860,7 @@ $ @kbd{gawk 'BEGIN @{}
 @end example
 
 Se presenti, gli specificatori di posizione precedono, nella specifica di
-formato, i flag, la larghezza del campo e/o la precisione.
+formato, i @dfn{flag}, la larghezza del campo e/o la precisione.
 
 Gli specificatori di posizione possono essere usati anche se si specifica una
 larghezza dinamica dei campi, e della capacit@`a di precisione:
@@ -38866,7 +38877,7 @@ BEGIN @{
     if (! adequate_math_precision(fpbits)) @{
         print("Errore: la precisione di calcolo disponibile non basta.\n" \
               "Provare ancora specificando l'argomento -M?") > "/dev/stderr"
-        # Nota: pu@`o essere necessario impostare un flag a questo punto
+        # Nota: pu@`o essere necessario impostare un @dfn{flag} a questo punto
 	#       per evitare di eseguire delle eventuali regole END
         exit 1
     @}
@@ -40702,7 +40713,7 @@ Impostare al numero di campi nel record in input, cio@`e a @code{NF}.
 Questo @`e un vettore di lunghezza variabile la cui dimensione effettiva
 dovrebbe essere @code{nf}.
 Per ogni campo, l'elemento @code{skip} dovrebbe essere impostato al numero
-di caratteri o byte, come richiesto dal flag @code{use_chars},
+di caratteri o byte, come richiesto dal @dfn{flag} @code{use_chars},
 da saltare prima dell'inizio di questo campo.  L'elemento @code{len} fornisce
 la lunghezza del campo.  I valori in @code{fields[0]} forniscono l'informazione
 per @code{$1}, e cos@`{@dotless{i}} via, fino all'elemento @code{fields[nf-1]} che contiene
@@ -41682,8 +41693,8 @@ nuovi elementi che possono essere aggiunti a un vettore con un
 singolo ciclo che percorre tutta la lista.
 
 @item enum @{ @dots{} @} flags;
-Un insieme di valori di flag che passano informazione tra l'estensione
-e @command{gawk}.  Per ora c'@`e solo un flag disponibile:
+Un insieme di valori di @dfn{flag} che passano informazione tra l'estensione
+e @command{gawk}.  Per ora c'@`e solo un @dfn{flag} disponibile:
 @code{AWK_ELEMENT_DELETE}.
 Se lo si imposta, @command{gawk} elimina l'elemento in questione dal vettore
 originale, dopo che il vettore ``appiattito'' @`e stato rilasciato.
@@ -41961,7 +41972,7 @@ che si vorrebbe eliminare, la funzione imposta il @dfn{bit}
 @code{AWK_ELEMENT_DELETE} nel campo @code{flags}
 dell'elemento.  Quando il vettore @`e stato interamente percorso, @command{gawk}
 visita il vettore appiattito, ed elimina ogni elemento in cui il relativo
-@dfn{bit} della flag sia impostato:
+@dfn{bit} della @dfn{flag} sia impostato:
 
 @example
     for (i = 0; i < flat_array->count; i++) @{
@@ -43529,28 +43540,28 @@ gli indici che puntano a tali valori vengono ignorati.
 
 @item flags
 Questo dovrebbe essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o pi@`u dei
-seguenti valori dei flag costanti predefiniti.
-Almeno uno dei due flag @code{FTS_LOGICAL}
+seguenti valori dei @dfn{flag} costanti predefiniti.
+Almeno uno dei due @dfn{flag} @code{FTS_LOGICAL}
 o @code{FTS_PHYSICAL} dev'essere impostato; in caso contrario
 @code{fts()} restituisce una segnalazione di errore e imposta @code{ERRNO}.
-I flag sono:
+I @dfn{flag} sono:
 
 @c nested table
 @table @code
 @item FTS_LOGICAL
 Passa in rassegna i file in modo ``logico'', e quindi l'informazione restituita
 per un collegamento simbolico @`e quella relativa al file puntato, e non al
-collegamento simbolico stesso.  Questo flag @`e mutuamente esclusivo con
+collegamento simbolico stesso.  Questo @dfn{flag} @`e mutuamente esclusivo con
 @code{FTS_PHYSICAL}.
 
 @item FTS_PHYSICAL
 Passa in rassegna i file in modo ``fisico'', e quindi l'informazione restituita
 per un collegamento simbolico @`e quella relativa al collegamento simbolico
-stesso.  Questo flag @`e mutuamente esclusivo con @code{FTS_LOGICAL}.
+stesso.  Questo @dfn{flag} @`e mutuamente esclusivo con @code{FTS_LOGICAL}.
 
 @item FTS_NOCHDIR
 Per migliorare le prestazioni, la routine di libreria C @code{fts()}
-cambia directory mentre percorre una gerarchia di file.  Questo flag
+cambia directory mentre percorre una gerarchia di file.  Questo @dfn{flag}
 disabilita quell'ottimizzazione.
 
 @item FTS_COMFOLLOW
@@ -43614,8 +43625,8 @@ contenuto nella directory.  Se un elemento della directory @`e un
 file, l'azione del programma @`e la stessa descritta sopra per un file.
 Se invece la directory contiene delle sottodirectory, l'elemento creato
 nel vettore @`e (ricorsivamente) a sua volta un vettore che descrive la
-sottodirectory.  Se fra i flag @`e stato
-specificato il flag @code{FTS_SEEDOT},
+sottodirectory.  Se fra i @dfn{flag} @`e stato
+specificato il @dfn{flag} @code{FTS_SEEDOT},
 ci sar@`a anche un elemento di nome
 @code{".."}.  Questo elemento sar@`a un vettore contenente i dati restituiti
 da un'invocazione di @code{stat()}.
@@ -43668,7 +43679,7 @@ un valore differente, diverso da zero, se si @`e verificato un errore.
 
 Oltre a rendere disponibile la funzione @code{fnmatch()}, l'estensione
 di @code{fnmatch} definisce una costante (@code{FNM_NOMATCH}), e un vettore
-con dei valori di flag, di nome @code{FNM}.
+con dei valori di @dfn{flag}, di nome @code{FNM}.
 
 Gli argomenti per @code{fnmatch()} sono:
 
@@ -43680,14 +43691,14 @@ L'espressione regolare con cui confrontare @value{FN}
 La stringa @value{FN}
 
 @item flags
-Pu@`o valere zero o essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o pi@`u flag
+Pu@`o valere zero o essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o pi@`u @dfn{flag}
 nel vettore @code{FNM}
 @end table
 
-I flag sono i seguenti:
+I @dfn{flag} sono i seguenti:
 
 @multitable @columnfractions .40 .60
-@headitem Elemento del vettore @tab Flag corrispondente definito da @code{fnmatch()}
+@headitem Elemento del vettore @tab @dfn{flag} corrispondente definito da @code{fnmatch()}
 @item @code{FNM["CASEFOLD"]} @tab @code{FNM_CASEFOLD}
 @item @code{FNM["FILE_NAME"]} @tab @code{FNM_FILE_NAME}
 @item @code{FNM["LEADING_DIR"]} @tab @code{FNM_LEADING_DIR}
@@ -48133,7 +48144,7 @@ La versione OpenVMS di @command{gawk} comprende un'interfaccia in stile
 per ulteriori dettagli).  Un effetto indesiderato della duplice analisi della
 riga di comando @`e che se c'@`e solo un unico parametro (come nel programma
 con le righe contenenti doppi apici), il comando diviene ambiguo.  Per evitare
-questo inconveniente, il flag, normalmente non necessario, @option{--} @`e
+questo inconveniente, il @dfn{flag}, normalmente non necessario, @option{--} @`e
 necessario per forzare un esame dei parametri in stile Unix, piuttosto che
 nella modalit@`a @code{DCL}.
 Se qualsiasi altra opzione preceduta dal segno @option{-} (o pi@`u parametri,
@@ -50987,7 +50998,7 @@ gestito direttamente dal sistema operativo in cui viene eseguito
 @command{gawk} --- per esempio, @file{/dev/stderr}.
 (@xref{File speciali}).
 
-@item Flag [Indicatore]
+@item @dfn{flag} [Indicatore]
 Una variabile [di tipo booleano] che, se verificata, indica la presenza o
 l'assenza di qualche condizione.
 
