@@ -90,4 +90,4 @@ DEBUG = -gdwarf-4 -g3
 DEFS = -DGAWK -DHAVE_CONFIG_H -I"$(srcdir)/.."
 
 distclean-local:
-	rm -fr .deps
+	rm -fr .deps malloc/.deps
