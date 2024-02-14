@@ -43771,7 +43771,13 @@ else
 L'estensione @code{inplace} svolge un lavoro simile a quello
 dell'opzione @option{-i} nel programma di utilit@`a GNU @command{sed},
 che svolge delle funzioni di modifica ``al volo'' su ogni file in input.
-Viene usato il file @file{inplace.awk}, caricato dinamicamente, per richiamare
+Come il comando GNU @command{sed}, l'estensione @code{inplace} 
+sostituisce i collegamenti (sia simbolici che fisici) con dei nuovi file.
+Se si vuole operare sul file originale (e non sui collegamenti al file
+stesso), occorre prima procurarsi il suo percorso completo, per esempio
+utilizzando il comando @command{realpath}, che fa parte del pacchetto GNU
+Coreutils.
+Si usa il file @file{inplace.awk}, caricato dinamicamente, per richiamare
 l'estensione in maniera corretta:
 
 @example
