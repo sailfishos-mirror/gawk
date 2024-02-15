@@ -133,7 +133,7 @@ spellmanual:
 spellnotes:
 	@echo ==== notes.texi ====;
 	export LC_ALL=C ; spell "$(srcdir)"/notes.texi | \
-	sort -u | comm -23 - "$(srcdir)"/wordlist
+	sort -u | comm -23 - "$(srcdir)"/wordlist7
 
 spellworkflow:
 	@echo ==== gawkworkflow.texi ====
