@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012-2019, 2021, 2022, 2023, the Free Software Foundation, Inc.
+ * copyright (c) 2012-2019, 2021-2024, the free software foundation, inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.

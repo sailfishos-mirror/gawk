@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 1995-2023 the Free Software Foundation, Inc.
+dnl Copyright (C) 1995-2024 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -310,6 +310,7 @@ AC_SEARCH_LIBS(isnan, m)
 AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
 	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper \
 	gettimeofday clock_gettime lstat \
+	getdtablesize \
 	mbrlen memcmp memcpy memmove memset \
 	mkstemp mtrace posix_openpt setenv setlocale setsid sigprocmask \
 	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
