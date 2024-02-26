@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2024 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -1668,9 +1668,11 @@ extern bool inrec(IOBUF *iop, int *errcode);
 extern int nextfile(IOBUF **curfile, bool skipping);
 extern bool is_non_fatal_std(FILE *fp);
 extern bool is_non_fatal_redirect(const char *str, size_t len);
-extern void do_nothing_on_signal(int sig);
 extern bool non_fatal_flush_std_file(FILE *fp);
 extern size_t gawk_fwrite(const void *buf, size_t size, size_t count, FILE *fp, void *opaque);
+#ifndef PIPES_SIMULATED
+extern int wait_any(int interesting);
+#endif
 
 /* main.c */
 extern int arg_assign(char *arg, bool initing);
@@ -2159,11 +2161,9 @@ str_terminate_f(NODE *n, char *savep)
 #define ignore_sigpipe() signal(SIGPIPE, SIG_IGN)
 #define set_sigpipe_to_default() signal(SIGPIPE, SIG_DFL)
 #define die_via_sigpipe() (signal(SIGPIPE, SIG_DFL), kill(getpid(), SIGPIPE))
-#define silent_catch_sigpipe() signal(SIGPIPE, do_nothing_on_signal)
 #else
 #define ignore_sigpipe()
 #define set_sigpipe_to_default()
-#define silent_catch_sigpipe()
 #ifdef __MINGW32__
 /* 0xC0000008 is EXCEPTION_INVALID_HANDLE, somewhat appropriate for EPIPE */
 #define die_via_sigpipe() exit(0xC0000008)

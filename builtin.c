@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2024,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -79,6 +79,7 @@ extern bool output_is_tty;
 extern FILE *output_fp;
 
 static const char *add_thousands(const char *original, struct lconv *loc);
+static int gawk_system(const char *command);
 
 #define POP_TWO_SCALARS(s1, s2) \
 s2 = POP_SCALAR(); \
@@ -2281,9 +2282,8 @@ do_system(int nargs)
 		cmd[tmp->stlen] = '\0';
 
 		os_restore_mode(fileno(stdin));
-		silent_catch_sigpipe();
 
-		status = system(cmd);
+		status = gawk_system(cmd);
 		/*
 		 * 3/2016. What to do with ret? It's never simple.
 		 * POSIX says to use the full return value. BWK awk
@@ -2307,7 +2307,6 @@ do_system(int nargs)
 
 		if ((BINMODE & BINMODE_INPUT) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
-		ignore_sigpipe();
 
 		cmd[tmp->stlen] = save;
 	}
@@ -4698,6 +4697,31 @@ add_thousands(const char *original, struct lconv *loc)
 	reverse(newbuf);
 
 	return newbuf;
+}
+
+/* gawk_system --- specialized version for gawk */
+
+int
+gawk_system(const char *command)
+{
+#if defined(VMS) || defined(__MINGW32__)
+	return system(command);
+#else /* ! (defined(VMS) || defined(__MINGW32__)) */
+	pid_t childpid, pid;
+	int status;
+
+	if ((childpid = fork()) == 0) {
+		// child
+		set_sigpipe_to_default();
+		execl("/bin/sh", "sh", "-c", command, NULL);
+		_exit(errno == ENOENT ? 127 : 126);
+	} else {
+		// parent
+		status = wait_any(childpid);
+
+		return status;
+	}
+#endif /* defined(VMS) || defined(__MINGW32__) */
 }
 
 #if 0

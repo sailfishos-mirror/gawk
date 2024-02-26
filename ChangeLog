@@ -1,3 +1,23 @@
+2024-02-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Another attempt to fix the race conditions on SIGPIPE. See
+	https://lists.gnu.org/archive/html/bug-gawk/2023-12/msg00011.html.
+
+	* awk.h (do_nothing_on_signal): Remove declaration.
+	(wait_any): Add declaration.
+	* builtin.c (gawk_system): New function.
+	(do_system): Call it.
+	* io.c (wait_any): Make extern, not static.
+	(gawk_popen_write, gawk_popen_write_close): New functions.
+	(redirect_string): Call gawk_popen_write.
+	(close_rp): Call gawk_popen_write_close.
+	(do_nothing_on_signal): Removed.
+	(getdtablesize): Define as a macro if needed.
+	* configure.ac: Add check for getdtablesize.
+
+	* awk.h, builtin.c, io.c, node.c, gawkapi.h, configure.ac: Updated
+	copyright years also.
+
 2024-02-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* .gitignore: Ignore .dirstamp files. Thanks to "M"

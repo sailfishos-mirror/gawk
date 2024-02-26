@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2024,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -41,6 +41,10 @@
 
 #ifndef O_ACCMODE
 #define O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
+#endif
+
+#ifndef HAVE_GETDTABLESIZE
+#define getdtablesize()	(1024)	/* should be big enough */
 #endif
 
 #if ! defined(S_ISREG) && defined(S_IFREG)
@@ -246,10 +250,9 @@ struct recmatch {
 static int iop_close(IOBUF *iop);
 static void close_one(void);
 static int close_redir(struct redirect *rp, bool exitwarn, two_way_close_type how);
-#ifndef PIPES_SIMULATED
-static int wait_any(int interesting);
-#endif
 static IOBUF *gawk_popen(const char *cmd, struct redirect *rp);
+static FILE *gawk_popen_write(const char *cmd);
+static int gawk_popen_write_close(FILE *fp);
 static IOBUF *iop_alloc(int fd, const char *name, int errno_val);
 static IOBUF *iop_finish(IOBUF *iop);
 static int gawk_pclose(struct redirect *rp);
@@ -947,17 +950,15 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			(void) flush_io();
 
 			os_restore_mode(fileno(stdin));
-			silent_catch_sigpipe();
 			/*
 			 * Don't check failure_fatal; see input pipe below.
 			 * Note that the failure happens upon failure to fork,
 			 * using a non-existant program will still succeed the
 			 * popen().
 			 */
-			if ((rp->output.fp = popen(str, binmode("w"))) == NULL)
+			if ((rp->output.fp = gawk_popen_write(str)) == NULL)
 				fatal(_("cannot open pipe `%s' for output: %s"),
 						str, strerror(errno));
-			ignore_sigpipe();
 
 			/* set close-on-exec */
 			os_close_on_exec(fileno(rp->output.fp), str, "pipe", "to");
@@ -1344,7 +1345,7 @@ close_rp(struct redirect *rp, two_way_close_type how)
 		}
 	} else if ((rp->flag & (RED_PIPE|RED_WRITE)) == (RED_PIPE|RED_WRITE)) {
 		/* write to pipe */
-		status = sanitize_exit_status(pclose(rp->output.fp));
+		status = sanitize_exit_status(gawk_popen_write_close(rp->output.fp));
 		if ((BINMODE & BINMODE_INPUT) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
 
@@ -2561,7 +2562,7 @@ use_pipes:
  * block signals instead to avoid interfering with installed signal handlers.
  */
 
-static int
+int
 wait_any(int interesting)	/* pid of interest, if any */
 {
 	int pid;
@@ -2774,13 +2775,13 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	FILE *current;
 
 	os_restore_mode(fileno(stdin));
-	silent_catch_sigpipe();
 
+	set_sigpipe_to_default();
 	current = popen(cmd, binmode("r"));
+	ignore_sigpipe();
 
 	if ((BINMODE & BINMODE_INPUT) != 0)
 		os_setbinmode(fileno(stdin), O_BINARY);
-	ignore_sigpipe();
 
 	if (current == NULL)
 		return NULL;
@@ -4593,18 +4594,104 @@ avoid_flush(const char *name)
 		|| in_PROCINFO(name, bufferpipe, NULL) != NULL;
 }
 
-/* do_nothing_on_signal --- empty signal catcher for SIGPIPE */
-
 /*
  * See the thread starting at
  * https://lists.gnu.org/archive/html/bug-gawk/2023-12/msg00011.html.
  *
- * The hope is that by using this do-nothing function to catch
- * SIGPIPE, instead of setting it to default, that when race conditions
- * occur, gawk won't fatal out.
+ * We do our version of popen for write pipes in order
+ * to be able to reset SIGPIPE. Bleah.
  */
 
-void
-do_nothing_on_signal(int sig)
+typedef struct write_pipe {
+	FILE *fp;
+	pid_t pid;
+} write_pipe;
+
+static write_pipe *open_pipes = NULL;
+
+/* gawk_popen_write --- open a pipe for writing, set up a FILE * return value. */
+
+static FILE *
+gawk_popen_write(const char *cmd)
 {
+#if defined(VMS) || defined(__MINGW32__)
+	return popen(cmd, binmode("w"));
+#else
+	size_t i;
+	pid_t childpid;
+	int pipefds[2];
+
+	if (pipe(pipefds) < 0)
+		return NULL;
+
+	if (open_pipes == NULL) {
+		int count = getdtablesize();
+
+		emalloc(open_pipes, write_pipe *, sizeof(write_pipe) * count,
+				"gawk_popen_write");
+		memset(open_pipes, 0, sizeof(write_pipe) * count);
+	}
+
+	childpid = fork();
+	if (childpid == 0) {
+		// in the child
+		(void) close(pipefds[1]);	// close write end in the child
+		(void) close(0);
+		if (dup(pipefds[0]) != 0)
+			fatal(_("gawk_popen_write: failed to move pipe fd to standard input"));
+		(void) close(pipefds[0]);
+		set_sigpipe_to_default();
+		execl("/bin/sh", "sh", "-c", cmd, NULL);
+		_exit(errno == ENOENT ? 127 : 126);
+	} else if (childpid < 0) {
+		(void) close(pipefds[0]);
+		(void) close(pipefds[1]);
+		return NULL;
+	}
+
+	(void) close(pipefds[0]);	// don't need the read end in the parent
+	FILE *fp = fdopen(pipefds[1], binmode("w"));
+	if (fp == NULL) {
+		(void) close(pipefds[1]);
+		return NULL;
+	}
+
+	int index = pipefds[1];	// use the write file desciptor.
+	open_pipes[index].pid = childpid;
+	open_pipes[index].fp = fp;
+
+	return fp;
+#endif
+}
+
+/* gawk_popen_write_close --- close a FILE * that we created */
+
+static int
+gawk_popen_write_close(FILE *fp)
+{
+#if defined(VMS) || defined(__MINGW32__)
+	return pclose(fp);
+#else
+	int status, index;
+
+	if (open_pipes == NULL || fp == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	index = fileno(fp);
+	if (open_pipes[index].fp == fp) {
+		(void) fflush(fp);
+		(void) fclose(fp);
+		status = wait_any(open_pipes[index].pid);
+
+		open_pipes[index].fp = NULL;
+		open_pipes[index].pid = 0;
+
+		return status;
+	}
+
+	errno = EBADF;
+	return -1;
+#endif
 }
