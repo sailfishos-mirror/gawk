@@ -178,7 +178,7 @@ function generate_shell(x,	s)
 	print x ":"
 	printf "\t@echo $@\n"
 
-	printf "\t@-$(LOCALES) AWK=\"$(AWKPROG)\" \"$(srcdir)\"/$@.sh %s > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
+	printf "\t@-$(LOCALES) AWK=\"$(AWKPROG) $(GAWK_TEST_ARGS)\" \"$(srcdir)\"/$@.sh %s > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
 	printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
 	
 }
