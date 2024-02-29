@@ -3214,7 +3214,7 @@ do_sub(int nargs, unsigned int flags)
 					if (flags & GENSUB) {	/* gensub, behave sanely */
 						if (isdigit((unsigned char) scan[1])) {
 							size_t dig = scan[1] - '0';
-							if (dig < NUMSUBPATS(rp, target->stptr) && SUBPATSTART(rp, tp->stptr, dig) != -1) {
+							if (dig < NUMSUBPATS(rp, target->stptr) && SUBPATSTART(rp, target->stptr, dig) != -1) {
 								char *start, *end;
 
 								start = target->stptr
