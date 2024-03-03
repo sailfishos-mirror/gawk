@@ -39495,6 +39495,11 @@ For each regular file that is processed, the extension redirects
 standard output to a temporary file configured to have the same owner
 and permissions as the original.  After the file has been processed,
 the extension restores standard output to its original destination.
+(Due to this implementation, it helps to redirect @command{gawk}'s
+standard output to @file{/dev/null}, instead of leaving it set to
+your terminal, so that output will be block-buffered instead of
+line-buffered.)
+
 If @code{inplace::suffix} is not an empty string, the original file is
 linked to a backup @value{FN} created by appending that suffix.  Finally,
 the temporary file is renamed to the original @value{FN}.
@@ -39525,9 +39530,12 @@ $ @kbd{gawk -i inplace -v inplace::suffix=.bak '@{ gsub(/foo/, "bar") @}}
 > @kbd{@{ print @}' file1 file2 file3}
 @end example
 
-Please note that, while the extension does attempt to preserve ownership and permissions, it makes no attempt to copy the ACLs from the original file.
+Please note that, while the extension does attempt to preserve ownership
+and permissions, it makes no attempt to copy the ACLs from the original
+file.
 
-If the program dies prematurely, as might happen if an unhandled signal is received, a temporary file may be left behind.
+If the program dies prematurely, as might happen if an unhandled signal
+is received, a temporary file may be left behind.
 
 @node Extension Sample Ord
 @subsection Character and Numeric values: @code{ord()} and @code{chr()}
