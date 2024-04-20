@@ -1553,6 +1553,9 @@ cmp_scalars(scalar_cmp_t comparison_type)
 	t1 = elem_new_to_scalar(t1);
 	t2 = elem_new_to_scalar(t2);
 
+	t1 = fixtype(t1);
+	t2 = fixtype(t2);
+
 	if (t1->type == Node_var_array) {
 		DEREF(t2);
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t1));
@@ -1583,9 +1586,6 @@ cmp_scalars(scalar_cmp_t comparison_type)
 			break;
 		}
 	} else {
-		fixtype(t1);
-		fixtype(t2);
-
 #ifdef HAVE_MPFR
 		if (do_mpfr)
 			ret = mpg_cmp_as_numbers(t1, t2, comparison_type);
