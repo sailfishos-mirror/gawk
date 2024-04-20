@@ -43878,7 +43878,12 @@ standard output verso un file temporaneo definito in modo da avere lo stesso
 proprietario e le stesse autorizzazioni del file originale.  Dopo che il file
 @`e stato elaborato, l'estensione riporta lo standard output alla sua
 destinazione originale.
-Se @code{INPLACE_SUFFIX} non @`e una stringa vuota, il file originale @`e
+(A motivo dell'implementazione, ha senso ridirigere lo standard output
+di @command{gawk} a @file{/dev/null}, invece di lasciarlo impostato al
+terminale in uso; in questo modo, l'output verr@`a scritto in blocchi,
+ossia in maniera pi@`u efficiente rispetto alla scrittura riga per riga).
+
+Se @code{inplace::suffix} non @`e una stringa vuota, il file originale @`e
 collegato a un @value{FN} di backup, creato aggiungendo il
 suffisso al nome originale.
 Infine, il file temporaneo @`e rinominato in modo da essere lo stesso del
@@ -43908,7 +43913,7 @@ $ @kbd{gawk -i inplace '@{ gsub(/pippo/, "pluto") @}; @{ print @}' file1 file2 f
 Per mantenere una copia di backup del file originale, si provi a fare cos@`{@dotless{i}}:
 
 @example
-$ @kbd{gawk -i inplace -v INPLACE_SUFFIX=.bak '@{ gsub(/pippo/, "pluto") @}}
+$ @kbd{gawk -i inplace -v inplace::suffix=.bak '@{ gsub(/pippo/, "pluto") @}}
 > @kbd{@{ print @}' file1 file2 file3}
 @end example
 
