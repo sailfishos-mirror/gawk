@@ -1,6 +1,6 @@
 /* locale information
 
-   Copyright 2016-2023 Free Software Foundation, Inc.
+   Copyright 2016-2024 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,11 @@
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 struct localeinfo
 {
@@ -64,3 +69,8 @@ extern void init_localeinfo (struct localeinfo *);
 enum { CASE_FOLDED_BUFSIZE = 32 };
 
 extern int case_folded_counterparts (wint_t, char32_t[CASE_FOLDED_BUFSIZE]);
+
+
+#ifdef __cplusplus
+}
+#endif
