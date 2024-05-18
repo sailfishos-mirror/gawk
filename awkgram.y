@@ -5112,7 +5112,7 @@ check_params(char *fname, int pcount, INSTRUCTION *list)
 				_("function `%s': cannot use function name as parameter name"), fname);
 		} else if (is_std_var(name)) {
 			error_ln(p->source_line,
-				_("function `%s': cannot use special variable `%s' as a function parameter"),
+				_("function `%s': parameter `%s': POSIX disallows using a special variable as a function parameter"),
 					fname, name);
 		} else if (strchr(name, ':') != NULL)
 			error_ln(p->source_line,
