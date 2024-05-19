@@ -4707,7 +4707,7 @@ gawk_system(const char *command)
 #if defined(VMS) || defined(__MINGW32__)
 	return system(command);
 #else /* ! (defined(VMS) || defined(__MINGW32__)) */
-	pid_t childpid, pid;
+	pid_t childpid;
 	int status;
 
 	if ((childpid = fork()) == 0) {
