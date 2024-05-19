@@ -4620,7 +4620,6 @@ gawk_popen_write(const char *cmd)
 #if defined(VMS) || defined(__MINGW32__)
 	return popen(cmd, binmode("w"));
 #else
-	size_t i;
 	pid_t childpid;
 	int pipefds[2];
 
