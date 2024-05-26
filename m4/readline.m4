@@ -66,6 +66,8 @@ dnl action if false:
 dnl action if cross compiling:
 		[AC_LINK_IFELSE(
 			[AC_LANG_PROGRAM([[#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>]],		dnl includes
 			dnl function body
