@@ -7096,6 +7096,11 @@ then
 	then
 		CFLAGS="$CFLAGS -Wall -fno-builtin"
 	fi
+
+	if grep -i '^mallocdebug$' $srcdir/.developing > /dev/null
+	then
+		CFLAGS="$CFLAGS -DUSE_REAL_MALLOC"
+	fi
 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 else
@@ -15012,18 +15017,21 @@ fi
 
 if test "$GCC" = yes &&
    test -f $srcdir/.developing &&
-   grep -i debug $srcdir/.developing > /dev/null
+   grep -i '^debug$' $srcdir/.developing > /dev/null
 then
-	for i in awkgram command
-	do
-		rm -f $i.c
-		ed - $i.y << \EOF
+	if grep -i '^yaccdebug$' $srcdir/.developing > /dev/null
+	then
+		for i in awkgram command
+		do
+			rm -f $i.c
+			ed - $i.y << \EOF
 /^%}/a
 %no-lines
 .
 w
 EOF
-	done
+		done
+	fi
 	for i in . support
 	do
 		sed -e '/-O2/s///' -e '/^CFLAGS = /s//&${DEBUG} /' $i/Makefile > foo
