@@ -217,7 +217,7 @@ typedef enum recvalues {
         NOTERM,         /* no terminator found, give me more input data */
         TERMATEND,      /* found terminator at end of buffer */
         TERMNEAREND     /* found terminator close to end of buffer, for when
-			   the RE might be match more data further in
+			   the RE might match more data further in
 			   the file. */
 } RECVALUE;
 
