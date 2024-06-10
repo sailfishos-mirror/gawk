@@ -40,8 +40,9 @@
 #include <sys/stat.h>
 
 #ifdef __VMS
+#ifndef HAVE_NANOSLEEP
 #define HAVE_NANOSLEEP
-#define HAVE_GETTIMEOFDAY
+#endif
 #ifdef gettimeofday
 #undef gettimeofday
 #endif
