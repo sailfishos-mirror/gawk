@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2024,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -25,7 +25,7 @@
  */
 
 /* FIX THIS BEFORE EVERY RELEASE: */
-#define UPDATE_YEAR	2023
+#define UPDATE_YEAR	2024
 
 #include "awk.h"
 #include "getopt.h"
@@ -50,7 +50,6 @@ static void init_vars(void);
 static NODE *load_environ(void);
 static NODE *load_procinfo(void);
 static void catchsig(int sig);
-static void nostalgia(void) ATTRIBUTE_NORETURN;
 static void version(void) ATTRIBUTE_NORETURN;
 static void init_fds(void);
 static void init_groupset(void);
@@ -138,7 +137,6 @@ bool using_persistent_malloc = false;
 int do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
-static int do_nostalgia = false;	/* provide a blast from the past */
 static int do_binary = false;		/* hands off my data! */
 static int do_version = false;		/* print version info */
 static const char *locale = "";		/* default value to setlocale */
@@ -189,7 +187,6 @@ static const struct option optab[] = {
 #endif
 	{ "non-decimal-data",	no_argument,		NULL,	'n' },
 	{ "no-optimize",	no_argument,		NULL,	's' },
-	{ "nostalgia",		no_argument,		& do_nostalgia,	1 },
 	{ "optimize",		no_argument,		NULL,	'O' },
 #if defined(YYDEBUG) || defined(GAWKDEBUG)
 	{ "parsedebug",		no_argument,		NULL,	'Y' },
@@ -336,9 +333,6 @@ main(int argc, char **argv)
 	/* set up the single byte case table */
 	if (gawk_mb_cur_max == 1)
 		load_casetable();
-
-	if (do_nostalgia)
-		nostalgia();
 
 	/* check for POSIXLY_CORRECT environment variable */
 	if (! do_posix && getenv("POSIXLY_CORRECT") != NULL) {
@@ -652,9 +646,6 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-S\t\t\t--sandbox\n"), fp);
 	fputs(_("\t-t\t\t\t--lint-old\n"), fp);
 	fputs(_("\t-V\t\t\t--version\n"), fp);
-#ifdef NOSTALGIA
-	fputs(_("\t-W nostalgia\t\t--nostalgia\n"), fp);
-#endif
 #ifdef GAWKDEBUG
 	fputs(_("\t-Y\t\t\t--parsedebug\n"), fp);
 #endif
@@ -1345,20 +1336,6 @@ catchsig(int sig)
 	} else
 		cant_happen("unexpected signal, number %d (%s)", sig, strsignal(sig));
 	/* NOTREACHED */
-}
-
-/* nostalgia --- print the famous error message and die */
-
-static void
-nostalgia()
-{
-	/*
-	 * N.B.: This string is not gettextized, on purpose.
-	 * So there.
-	 */
-	fprintf(stderr, "awk: bailing out near line 1\n");
-	fflush(stderr);
-	abort();
 }
 
 #ifdef USE_PERSISTENT_MALLOC
