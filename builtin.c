@@ -1429,7 +1429,7 @@ mpf1:
 			 * 	printf("%#.0o\n", 0);
 			 * prints a single 0.
 			 */
-			if (! alt && have_prec && prec == 0 && tmpval == 0)
+			if ((! alt || base != 8) && have_prec && prec == 0 && tmpval == 0)
 				goto pr_tail;
 
 			if (tmpval < 0) {
