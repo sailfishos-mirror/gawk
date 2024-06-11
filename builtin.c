@@ -1058,7 +1058,7 @@ check_pos:
 		case ' ':		/* print ' ' or '-' */
 					/* 'space' flag is ignored */
 					/* if '+' already present  */
-			if (signchar != false)
+			if (signchar != '\0')
 				goto check_pos;
 			/* FALL THROUGH */
 		case '+':		/* print '+' or '-' */
@@ -1500,7 +1500,7 @@ mpf1:
 						cp += 2;
 						fw -= 2;
 					}
-				} else if (base == 8)
+				} else if (base == 8 && ! have_prec)
 					PREPEND('0');
 			}
 			base = 0;
@@ -1552,6 +1552,13 @@ mpf1:
 				if (do_lint)
 					lintwarn(_("[s]printf: value %s is out of range for `%%%c' format"),
 								nan_inf_val, cs1);
+				if (! lj) {
+					fw -= strlen(nan_inf_val);
+					while (fw > prec) {
+						bchunk_one(fill);
+						fw--;
+					}
+				}
 				bchunk(nan_inf_val, strlen(nan_inf_val));
 				s0 = s1;
 				break;
@@ -1612,7 +1619,7 @@ mpf1:
 				*cp++ = '-';
 			if (signchar)
 				*cp++ = signchar;
-			if (alt)
+			if (alt && ! is_zero(arg))
 				*cp++ = '#';
 			if (zero_flag)
 				*cp++ = '0';
