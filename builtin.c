@@ -1509,6 +1509,8 @@ mpf1:
 			prec = cend - cp;
 	pr_tail:
 			if (! lj) {
+				if (fw == 0 && have_prec && prec == 0 && signchar == ' ')
+					fw = 1;	// make the loop run once
 				while (fw > prec) {
 			    		bchunk_one(fill);
 					fw--;
