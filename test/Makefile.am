@@ -1066,6 +1066,8 @@ EXTRA_DIST = \
 	printfchar.awk \
 	printfchar.ok \
 	printfloat.awk \
+	printf-corners.awk \
+	printf-corners.ok \
 	printhuge.awk \
 	printhuge.ok \
 	printlang.awk \
@@ -1548,7 +1550,7 @@ BASIC_TESTS = \
 	substr swaplns synerr1 synerr2 synerr3 tailrecurse tradanch \
 	trailbs tweakfld uninit2 uninit3 uninit4 uninit5 uninitialized \
 	unterm uparrfs uplus wideidx wideidx2 widesub widesub2 widesub3 \
-	match4 strsubscript \
+	match4 strsubscript printf-corners \
 	widesub4 wjposer1 zero2 zeroe0 zeroflag
 
 UNIX_TESTS = \

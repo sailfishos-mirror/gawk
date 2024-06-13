@@ -1298,6 +1298,11 @@ strsubscript:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+printf-corners:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 widesub4:
 	@echo $@ $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
