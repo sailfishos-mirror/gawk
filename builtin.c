@@ -1369,6 +1369,9 @@ mpz0:
 						    && ((zero_flag && ! have_prec)
 							 || (fw == 0 && have_prec)));
 
+				if (base == 8 && have_prec && prec > 0 && ! is_zero(arg) && zero_flag)
+					alt = false;
+
  				fmt_type = have_prec ? MP_INT_WITH_PREC : MP_INT_WITHOUT_PREC;
 				goto fmt0;
 
@@ -1408,6 +1411,9 @@ mpf1:
 				zero_flag = (! lj
 						    && ((zero_flag && ! have_prec)
 							 || (fw == 0 && have_prec)));
+
+				if (base == 8 && have_prec && prec > 0 && ! is_zero(arg) && zero_flag)
+					alt = false;
 
 				(void) mpfr_get_z(mpzval, mf, MPFR_RNDZ);	/* convert to GMP integer */
  				fmt_type = have_prec ? MP_INT_WITH_PREC : MP_INT_WITHOUT_PREC;
