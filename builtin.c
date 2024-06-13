@@ -1397,7 +1397,7 @@ mpf1:
 						}
 
 						tmpval = uval = (uintmax_t) mpfr_get_sj(mf, ROUND_MODE);
-						if (! alt && have_prec && prec == 0 && tmpval == 0)
+						if ((! alt || base != 8) && have_prec && prec == 0 && tmpval == 0)
 							goto pr_tail;	/* printf("%.0x", 0) is no characters */
 						goto int0;
 					}
