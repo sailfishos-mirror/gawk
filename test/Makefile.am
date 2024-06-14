@@ -133,6 +133,7 @@ EXTRA_DIST = \
 	asorti.ok \
 	asortsymtab.awk \
 	asortsymtab.ok \
+	asortsymtab-mpfr.ok \
 	assignnumfield.awk \
 	assignnumfield.in \
 	assignnumfield.ok \
