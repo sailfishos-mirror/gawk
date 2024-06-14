@@ -84,12 +84,7 @@
 @set SECTIONS sezioni
 @set SUBSECTION sottosezione
 @set SUBSECTIONS sottosezioni
-@ifclear SMALLPRINT
 @set DARKCORNER @inmargin{@image{lflashlight,1cm}, @image{rflashlight,1cm}}
-@end ifclear
-@ifset SMALLPRINT
-@set DARKCORNER @inmargin{@image{lflashlight,0.7cm}, @image{rflashlight,0.7cm}}
-@end ifset
 @set COMMONEXT (e.c.)
 @set PAGE pagina
 @end iftex
@@ -480,26 +475,12 @@ URL: @uref{http://www.pluto.it/ildp}@*
 @w{ }
 @sp 9
 
-@ifclear SMALLPRINT
 @center @i{Ai miei genitori, per il loro amore, e per lo splendido esempio che mi hanno dato.}
 @sp 1
 @center @i{A mia moglie, Miriam, per avermi reso completo.
 Grazie per aver costruito la tua vita insieme a me.}
 @sp 1
 @center @i{Ai nostri figli, Chana, Rivka, Nachum e Malka, per aver arricchito le nostre vite in misura incalcolabile.}
-@end ifclear
-
-@ifset SMALLPRINT
-@center @i{Ai miei genitori, per il loro amore,}
-@center @i{ e per lo splendido esempio che mi hanno dato.}
-@sp 1
-@center @i{A mia moglie, Miriam, per avermi reso completo.} @*
-@center @i{ Grazie per aver costruito la tua vita insieme a me.}
-@sp 1
-@center @i{Ai nostri figli, Chana, Rivka, Nachum e Malka,}
-@center @i{per aver arricchito le nostre vite in misura incalcolabile.}
-@end ifset
-
 @sp 1
 @w{ }
 @page
@@ -945,6 +926,10 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         funzione restituisce.
 * Variabili di tipo dinamico::          Come cambiare tipo a una variabile in
                                         fase di esecuzione del programma.
+* Variabili di tipo dinamico in Awk::   Come cambiare tipo a una variabile in
+                                        @command{awk} standard.
+* Variabili di tipo dinamico in Gawk::  Come cambiare tipo a una variabile in
+                                        @command{gawk}.
 * Chiamate indirette::                  Scegliere la funzione da chiamare in
                                         fase di esecuzione del programma.
 * Sommario delle funzioni::             Sommario delle funzioni.
@@ -1304,16 +1289,8 @@ Ai nostri figli Chana, Rivka, Nachum e Malka,
 per aver arricchito le nostre vite in misura incalcolabile.
 @end ifinfo
 
-@ifset SMALLPRINT
-@fonttextsize 10
-@end ifset
-
 @summarycontents
 @contents
-
-@ifset SMALLPRINT
-@fonttextsize 11
-@end ifset
 
 @node Introduzione3
 @unnumbered Introduzione alla Terza Edizione
@@ -2924,10 +2901,11 @@ Questo @`e gi@`a stato spiegato prima
 (@pxref{Leggere dal terminale}).
 Si noti che normalmente non serve mettere apici singoli nel @value{FN} che si
 fornisce con @option{-f}, perch@'e di solito i @value{FNS} non contengono
-caratteri che sono speciali per la shell.  Si noti che in @file{consiglio},
-il programma @command{awk} non ha dei doppi apici che lo delimitano.  I
-doppi apici sono necessari solo per programmi scritti direttamente sulla riga
-di comando di @command{awk}.
+caratteri che sono speciali per la shell.  (Nel caso i vostri @value{FNS}s
+contengano spazi, gli apici singoli saranno necessari.)
+Si noti che nel file @file{consiglio}, il programma @command{awk} non ha dei
+doppi apici che lo delimitano.  I doppi apici sono necessari solo per
+programmi scritti direttamente sulla riga di comando di @command{awk}.
 (Inoltre, se il programma si trova in un file, @`e possibile usare un apice
 singolo all'interno del programma, invece del magico @samp{\47}.)
 
@@ -3088,11 +3066,11 @@ La shell considera il secondo apice singolo come delimitatore del testo
 precedente, e trova che un nuovo testo tra apici ha inizio verso la fine
 della riga di comando.  A causa di ci@`o emette una richiesta secondaria di
 input, e si mette in attesa di ulteriore input.
-Con il comando @command{awk} Unix, se si chiude l'ulteriore stringa tra
+Usando BWK @command{awk}, se si chiude l'ulteriore stringa tra
 apici singoli il risultato @`e il seguente:
 
 @example
-$ @kbd{awk '@{ print "Ciao" @} # un'idea brillante'}
+$ @kbd{nawk '@{ print "Ciao" @} # un'idea brillante'}
 > @kbd{'}
 @error{} awk: fatale: non riesco ad aprire file `brillante'
 @error{}              in lettura (File o directory non esistente)
@@ -3146,7 +3124,7 @@ o vuota.
 La stringa nulla @`e una variabile, di tipo carattere, che non ha un valore.
 In altre parole, @`e vuota.  Nei programmi @command{awk} si scrive cos@`{@dotless{i}}:
 @code{""}.  Nella shell la si pu@`o scrivere usando apici sia singoli
-che doppi: @code{""} oppure @code{''}.  Sebbena la stringa nulla non contenga
+che doppi: @code{''} oppure @code{""}.  Sebbena la stringa nulla non contenga
 alcun carattere, essa esiste lo stesso.  Si consideri questo comando:
 
 @example
@@ -3207,7 +3185,8 @@ del testo stesso.  Sono da tener presenti i caratteri
 @samp{$}, @samp{`}, @samp{\}, e @samp{"}, tutti i quali devono essere
 preceduti da una barra inversa quando ricorrono all'interno di un testo
 racchiuso tra doppi apici, per poter essere passati letteralmente al
-programma.  (La barra inversa viene tolta prima del passaggio al programma.)
+programma.  (La shell toglie la barra inversa prima di passare il testo
+al programma.)
 Quindi, l'esempio visto
 @ifnotinfo
 precedentemente
@@ -5844,21 +5823,7 @@ Questo @value{SECTION} @`e stato lasciato intenzionalmente vuoto.
 @c If these came out in the Info file or TeX document, then they wouldn't
 @c be undocumented, would they?
 
-@command{gawk} ha un'opzione non documentata:
-
-@table @code
-@item -W nostalgia
-@itemx --nostalgia
-Stampa il messaggio @samp{awk: bailing out near line 1} e termina
-con un errore grave.
-Quest'opzione @`e stata ispirata dal comportamento comune delle primissime
-versioni di @command{awk} Unix e da una maglietta [con la scritta].
-Il messaggio @emph{NON} viene tradotto in ambienti non inglesi.
-@c so there! nyah, nyah.
-@end table
-
 Le prime versioni di @command{awk} non richiedevano alcun separatore (a capo
-
 o @samp{;}) tra le regole nei programmi @command{awk}.  Quindi,
 era normale vedere programmi di una riga come:
 
@@ -5925,7 +5890,7 @@ accetta un nome di vettore, opzionale, come secondo argomento, il quale,
 se presente sar@`a svuotato degli eventuali contenuti, e riempito con
 alcune informazioni che descrivono l'implementazione interna della
 variabile.  Ci@`o pu@`o essere utile per il debug.  Per ora viene
-restituita una versione formato testo dei flag per le variabili di
+restituita una versione formato testo dei @dfn{flag} per le variabili di
 tipo scalare, e il tipo di implementazione interna per i vettori.
 Per quest'interfaccia sono possibili variazioni in futuro, e quindi
 i valori restituiti possono non rimanere fissi.
@@ -6017,8 +5982,6 @@ in
 @c And I wrote:
 Modificando le variabili @code{ARGC} e @code{ARGV}
 si cambia il modo in cui @command{awk} tratta i file in input.
-
-@c ----------------------------------------
 
 @item
 Le tre opzioni standard per tutte le versioni di @command{awk} sono
@@ -9345,7 +9308,7 @@ questo tipo:
 @example
 if (substr($i, 1, 1) == "\"") @{
     len = length($i)
-    $i = substr($i, 2, len - 2) # Ottiene testo tra doppi apici
+    $i = substr($i, 2, len - 2) # Ottiene testo tra i due doppi apici
 @}
 @end example
 
@@ -9389,10 +9352,13 @@ per suddividere normali stringhe (@pxref{Funzioni per stringhe}).
 @quotation NOTA
 Poich@'e @command{gawk} consente ora un trattamento diretto dei
 file di tipo CSV (@pxref{Campi separati da virgola}), gli esempi
-presentati qui sono obsoleti.
+presentati qui sono obsoleti, dato che @`e possibile usare
+l'opzione @option{--csv}, (in tal caso la suddivisione in
+campi viene fatta senza utilizzare la variabile @code{FPAT}).
 Nonostante ci@`o, rimangono utili come esempio di ci@`o che
 un'analisi dei campi utilizzando la variabile @code{FPAT}
-permette di fare.
+permette di fare, o se si sta usando una versione di
+@command{gawk} precedente la versione 5.3.
 @end quotation
 
 @node Ancora CSV
@@ -9400,9 +9366,9 @@ permette di fare.
 
 @cindex Collado, Manuel
 Manuel Collado fa notare che, oltre alle virgole, un campo CSV pu@`o anche
-contenere apici, che devono essere protetti raddoppiandoli.
+contenere doppi apici, che devono essere protetti raddoppiandoli.
 Le espressione regolari descritte sopra non sono in grado di accettare
-campi fra apici che contengano al loro interno sia virgole che apici.
+campi fra apici che contengano al loro interno sia virgole che doppi apici.
 Egli suggerisce che l'espressione pi@`u semplice di @code{FPAT} in grado
 di riconoscere tale tipo di campi @`e @code{/([^,]*)|("([^"]|"")+")/}.
 Egli ha preparato questo input come test per riconoscere queste varianti:
@@ -11777,7 +11743,7 @@ il particolare @var{file} o @var{comando} che si @`e specificato non @`e gi@`a
 stato utilizzato in scrittura dal programma o se @`e stato chiuso
 dopo l'ultima scrittura.
 In altre parole, sia i file che le @dfn{pipe} e i coprocessi rimangono
-aperti finché non vengono esplicitamente chiusi.  Ogni istruzione
+aperti finch@'e non vengono esplicitamente chiusi.  Ogni istruzione
 @code{print} e @code{printf} dopo la prima, continua a scrivere
 allo stesso file, @dfn{pipe} o coprocesso.
 
@@ -11790,12 +11756,12 @@ seguente:
 @example
 echo Nome: Arnold Robbins > dati
 echo Indirizzo: 1234 A Pretty Street, NE >> dati
-echo Città e Stato: MyTown, MyState 12345-6789 >> dati
+echo Citt@`a e Stato: MyTown, MyState 12345-6789 >> dati
 @end example
 
 In @command{awk}, gli operatori @samp{>} e @samp{>>} hanno un
 significato un po' diverso.  L'operatore usato la @emph{prima volta}
-che si scrive un file indica @emph{come} @command{awk} aprirà (o creerà)
+che si scrive un file indica @emph{come} @command{awk} aprir@`a (o creer@`a)
 quel file.
 Usando @samp{>}, il file, se esiste, viene riscritto dall'inizio
 (o viene creato se non esiste). Tutte le successive operazioni di
@@ -11809,7 +11775,7 @@ al file.
 Per consistenza, sarebbe bene usare sempre un unico operatore per
 tutto l'output diretto a uno stesso file.
 (Si possono mischiare @samp{>} e @samp{>>}, e la cosa non ha effetti
-negativi, ma mischiare gli operatori è considerato cattivo stile in
+negativi, ma mischiare gli operatori @`e considerato cattivo stile in
 @command{awk}.  Se invocato con l'opzione @option{--lint}, @command{gawk}
 emette un messaggio di avvertimento quando entrambi gli
 operatori vengono usati per uno stesso file aperto.)
@@ -16226,7 +16192,8 @@ La sostituzione di variabile attraverso gli apici funziona, ma pu@`o
 facilmente generare difficolt@`a.  Richiede una buona comprensione delle
 regole per l'uso degli apici nella shell
 (@pxref{Protezione}),
-e spesso @`e difficile accoppiare i vari apici quando si legge il programma.
+e spesso @`e difficile accoppiare i differenti apici quando si legge il
+programma.
 
 Un metodo migliore @`e quello di usare la funzionalit@`a di assegnamento delle
 variabili di @command{awk}
@@ -18501,12 +18468,7 @@ concettualmente, se i valori degli elementi sono 8, @code{"pippo"},
 @ifnotdocbook
 @float Figura,vettore-elementi
 @caption{Un vettore contiguo}
-@ifset SMALLPRINT
-@center @image{gawk-vettore-elementi, 11cm, , Un vettore contiguo}
-@end ifset
-@ifclear SMALLPRINT
 @center @image{gawk-vettore-elementi, , , Un vettore contiguo}
-@end ifclear
 @end float
 @end ifnotdocbook
 
@@ -19946,6 +19908,8 @@ programma quale funzione chiamare.
 * Funzioni predefinite::            Riepilogo delle funzioni predefinite.
 * Funzioni definite dall'utente::   Descrizione dettagliata delle funzioni
                                     definite dall'utente.
+* Variabili di tipo dinamico::      Come cambiare tipo a una variabile in
+                                    fase di esecuzione del programma.
 * Chiamate indirette::              Scegliere la funzione da chiamare in
                                     fase di esecuzione del programma.
 * Sommario delle funzioni::         Sommario delle funzioni.
@@ -21942,7 +21906,7 @@ I valori di questi numeri possono non essere negli intervalli specificati; per
 esempio, un'ora di @minus{}1 sta a indicare 1 ora prima di mezzanotte.
 Viene adottato il calendario gregoriano con l'origine posta all'anno zero,
 con l'anno 0 che viene prima dell'anno 1 e l'anno @minus{}1 che viene prima
-dell'anno 0.  Se il flag @var{utc-flag} @`e specificato ed @`e diverso da zero
+dell'anno 0.  Se il @dfn{flag} @var{utc-flag} @`e specificato ed @`e diverso da zero
 e dalla stringa nulla, si suppone che l'ora sia quella del fuso orario UTC;
 altrimenti l'ora @`e considerata essere quella del fuso orario locale.  Se
 l'indicatore @var{DST}
@@ -22243,6 +22207,17 @@ La data in formato OpenVMS (p.es., @samp{20-JUN-1991}).
 In aggiunta a ci@`o, le notazioni alternative sono riconosciute, ma al
 loro posto sono usate quelle normali.
 
+@quotation NOTA
+Analogamente a quanto si pu@`o specificare in @code{printf()}, alcune
+versioni di @code{strftime()} consentono di usare dei @dfn{flag} tra
+il carattere @code{%} e la lettera che specifica il formato.
+Controllare la pagina di manuale di @code{strftime()} per
+verificare se i @dfn{flag} sono supportati o meno, e quali @dfn{flag}
+sono disponibili.  Va comunque tenuto presente che l'utilizzo di tali
+@dfn{flag} diminuisce la portabilit@`a dello @dfn{script} ad altri
+sistemi operativi.
+@end quotation
+
 @cindex @code{date} (programma di utilit@`a POSIX)
 @cindex programma di utilit@`a POSIX @subentry @command{date}
 @cindex POSIX @command{awk} @subentry @code{date} (programma di utilit@`a)
@@ -22292,6 +22267,14 @@ gawk 'BEGIN  @{
     exit codice_di_ritorno
 @}' "$@@"
 @end example
+
+Questo @dfn{script} @`e stato scritto prima che fosse possibile specificare un
+terzo argomento @var{utc-flag} alla funzione di sistema @code{strftime()}.
+Si consideri come sia possibile modificare il programma per essere eseguito
+interamente in @command{awk} e con l'aggiunta della gestione di un'opzione
+@option{-u} per stampare la data e ora in UTC [Coordinated Universal Time,
+in pratica, secondo l'ora di Greenwich].
+@c FIXME: Next edition, revise the program.
 
 @node Funzioni a livello di bit
 @subsection Funzioni per operazioni di manipolazione bit
@@ -22734,39 +22717,12 @@ come un campo o il risultato di una chiamata a @code{split()}.
 @pxref{Tipi di variabile}.)
 
 @item "unassigned"
-@var{x} @`e una variabile scalare a cui non @`e ancora stato assegnato un valore.
-Per esempio:
-
-@example
-BEGIN @{
-    # crea a[1] ma non gli attribuisce alcun valore
-    a[1]
-    print typeof(a[1])  # non assegnato
-@}
-@end example
+@var{x} @`e una variabile @emph{scalare} a cui non @`e ancora stato assegnato
+un valore.
 
 @item "untyped"
 @var{x} non @`e stata usata per nulla; pu@`o diventare uno scalare o un
-vettore.  @`E anche possibile che il tipo sia differente, in differenti
-esecuzioni del medesimo programma!
-Per esempio:
-
-@example
-BEGIN @{
-    print "all'inizio, typeof(v) = ", typeof(v)
-
-    if ("FOO" in ENVIRON)
-        make_scalar(v)
-    else
-        make_array(v)
-
-    print "typeof(v) =", typeof(v)
-@}
-
-function make_scalar(p,    l) @{ l = p @}
-
-function make_array(p) @{ p[1] = 1 @}
-@end example
+vettore.
 
 @end table
 @end table
@@ -22788,35 +22744,8 @@ La funzione @code{typeof()} @`e generale; consente di determinare
 se una variabile o un parametro di funzione @`e uno scalare, (numero,
 stringa o @dfn{regexp} fortemente tipizzata), oppure un vettore.
 
-Normalmente, se si passa una variabile che non @`e stata mai usata
-a una funzione predefinita, la variabile stessa viene creata come
-variabile scalare di tipo non ancora assegnato (unassigned).
-Tuttavia, se si chiama @code{isarray()} e @code{typeof()} queste
-funzioni non cambiano gli argomenti che vengono passati loro da
-non ancora tipizzati (untyped) a non ancora assegnati (unassigned).
-
-Ci@`o vale sia per variabili scalari che per
-elementi di vettore generati semplicemente facendo
-un riferimento agli stessi.
-Si consideri:
-
-@example
-$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk 'BEGIN @{ print typeof(x["pippo"]) @}'}
-@print{} untyped
-@end example
-
-Notare che prima della @value{PVERSION} 5.2, gli elementi di
-vettore generati facendo un riferimento agli stessi
-venivano automaticamente definiti come scalari:
-
-@example
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["pippo"]) @}'}
-@print{} unassigned
-@end example
+Per l'approfondimento delle differenze fra @code{unassigned} e @code{untyped}
+si veda @ref{Variabili di tipo dinamico in Gawk}.
 
 @node Funzioni di internazionalizzazione
 @subsection Funzioni per tradurre stringhe
@@ -22897,8 +22826,6 @@ ma dipende dall'utente la loro definizione
 * Chiamata di una funzione::    Chiamare funzioni definite dall'utente.
 * Istruzione return::           Specificare il valore che una
                                 funzione restituisce.
-* Variabili di tipo dinamico::  Come cambiare tipo a una variabile in
-                                fase di esecuzione del programma.
 @end menu
 
 @node Sintassi delle definizioni
@@ -23683,7 +23610,7 @@ il programma trova (come si pu@`o immaginare) che 99.385 @`e il
 valore pi@`u alto contenuto nel vettore.
 
 @node Variabili di tipo dinamico
-@subsection Funzioni e loro effetti sul tipo di una variabile
+@section Il tipo delle variabili @`e dinamico
 
 @quotation
 @i{@`E una farcitura per il deserto! @*@footnote{Si tratta di un
@@ -23696,6 +23623,18 @@ gioco di parole fra "desert" (deserto) e "dessert" (dolce).}
 @`E possible che @command{awk} non sia in grado di stabilire se un
 identificativo rappresenta una variabile scalare o un vettore,
 prima dell'effettiva esecuzione di un programma.
+
+@menu
+* Variabili di tipo dinamico in Awk::   Come cambiare tipo a una variabile in
+                                        @command{awk}.
+* Variabili di tipo dinamico in Gawk::  Come cambiare tipo a una variabile in
+                                        @command{gawk}.
+@end menu
+
+@node Variabili di tipo dinamico in Awk
+@subsection Come cambiare tipo a una variabile in @command{awk} standard
+
+Esaminiamo prima il caso di @command{awk} standard.
 Ecco un esempio di programma commentato:
 
 @example
@@ -23723,14 +23662,14 @@ Ecco un esempio pi@`u complesso:
 
 @example
 BEGIN @{
-    funky(a)
+    strano(a)
     if (A == 0)
         print "<" a ">"
     else
         print a[1]
 @}
 
-function funky(arr)
+function strano(arr)
 @{
     if (A == 0)
         arr = 1
@@ -23749,14 +23688,14 @@ Ci sono due modi in cui questo programma potrebbe comportarsi.
 @command{awk} potrebbe determinare che, nel programma principale
 @code{a} ha un indice (ossia @`e un elemento di un vettore), e quindi
 considerarlo un vettore (nella fase di analisi del programma, ossia
-prima ancora che il programma inizi la sua esecuzione.
+prima ancora che il programma inizi la sua esecuzione).
 BWK @code{awk}, @code{mawk}, e forse altri fanno questo:
 
 @example
-$ @kbd{nawk -v A=0 -f funky.awk}
+$ @kbd{nawk -v A=0 -f strano.awk}
 @error{} nawk: can't assign to a; it's an array name.
 @error{}  source line number 11
-$ @kbd{nawk -v A=1 -f funky.awk}
+$ @kbd{nawk -v A=1 -f strano.awk}
 @print{} 1
 @end example
 
@@ -23768,15 +23707,149 @@ della variabile, che quindi pu@`o diventare scalare o vettoriale.
 @command{gawk} e MKS @command{awk} si comportano cos@`{@dotless{i}}:
 
 @example
-$ @kbd{gawk -v A=0 -f funky.awk}
+$ @kbd{gawk -v A=0 -f strano.awk}
 @print{} <>
-$ @kbd{gawk -v A=1 -f funky.awk }
+$ @kbd{gawk -v A=1 -f strano.awk }
 @print{} 1
 @end example
 
 POSIX non specifica quale dei due comportamenti sia quello corretto,
 quindi occorre essere consapevoli che differenti implementazioni di
 @command{awk} si comportano in modi diversi.
+
+@node Variabili di tipo dinamico in Gawk
+@subsection Come cambiare tipo a una variabile in @command{gawk}
+
+@quotation
+@i{Hc Svnt Dracones} (``Qui ci sono i draghi'')
+@author The Lenox Globe @c @footnote{Si veda @uref{https://wiki.gis.com/wiki/index.php/Here_be_dragons}.}
+@end quotation
+
+In @command{gawk} la situazione pu@`o essere un po' pi@`u inaspettata. 
+Poich@'e @command{gawk} consente di avere vettori di vettori,
+la stessa tipizzazione dinamica pu@`o essere applicata a elementi
+di vettore che sono stati creati ma non ancora usati.
+
+@example
+BEGIN @{
+    strano(a[1])
+    if (A == 0)
+        print "<" a[1] ">"
+    else
+        print a[1][1]
+@}
+
+function strano(variabile)
+@{
+    if (A == 0)
+        variabile = 1
+    else
+        variabile[1] = 1
+@}
+@end example
+
+@noindent
+Quando si esegue questo @dfn{script}, i risultati sono gli stessi
+che nel caso precedente:
+
+@example
+$ @kbd{gawk -v A=0 -f strano2.awk}
+@print{} <>
+$ @kbd{gawk -v A=1 -f strano2.awk}
+@print{} 1
+@end example
+
+La funzione @code{typeof()} ci consente di aprire una ``finestra''
+sul funzionamento interno di @command{gawk}.
+Vediamo come, utilizzandola, una variabile o un elemento di un
+vettore pu@`o modificare dinamicamente il proprio tipo.
+Per cominciare, usiamo una variabile come scalare:
+
+@example
+BEGIN @{
+    print typeof(a)         # non sappiamo ancora il tipo variabile
+    printf("a = %d\n", a)   # la usiamo come scalare
+    print typeof(a)         # ora sappiamo che non @`e un vettore
+@}
+@end example
+
+@noindent
+Eseguendo lo @dfn{script}:
+
+@example
+$ @kbd{gawk -f tipizzare1.awk}
+@print{} untyped
+@print{} a = 0
+@print{} unassigned
+@end example
+
+Inizialmente, @code{a} @`e di tipo @code{untyped}, poich@'e ancora non
+sappiamo se @`e una variabile scalare o un vettore.
+Dopo averla usata nell'istruzione @code{printf()}, sappiamo che si tratta
+di una variabile scalare.
+Tuttavia, poich@'e non le @`e ancora stato assegnato esplicitamente un valore
+(numero, stringa, o @dfn{regexp}), il suo tipo risulta essere
+@code{unassigned}.
+
+In aggiunta a ci@`o, in @command{gawk}, @`e possibile cambiare
+@code{a} facendolo diventare un vettore:
+
+@example
+BEGIN @{
+    print typeof(a)               # non sappiamo ancora il tipo variabile
+    a[1]                          # la definiamo come elemento di vettore
+    print typeof(a[1])            # ma ancora non sappiamo cosa @`e a[1]
+    printf("a[1] = %d\n", a[1])   # la usiamo come scalare
+    print typeof(a[1])            # ora sappiamo che non @`e un vettore
+@}
+@end example
+
+@noindent
+Eseguendo lo @dfn{script}:
+
+@example
+$ @kbd{gawk -f tipizzare2.awk}
+@print{} untyped
+@print{} untyped
+@print{} a[1] = 0
+@print{} unassigned
+@end example
+
+Normalmente, se si passa una variabile non ancora usata a una funzione
+predefinita, questa viene considerata come una variabile scalare
+(@code{unassigned}).
+Tuttavia le funzioni @code{isarray()} e @code{typeof()} si comportano
+in modo differente, e non cambiano i loro argomenti dal tipo
+@code{untyped} al tipo @code{unassigned}.
+
+Come visto sopra, ci@`o vale sia per variabili il cui nome @`e un semplice
+identificativo, sia per quelle che sono elementi di un vettore, che viene
+creato quando si fa riferimento ad esso:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} untyped
+@end example
+
+Si noti che prima della @value{PVERSION} 5.2, gli elementi
+di un vettore, creati facendo riferimento ad esso, erano automaticamente
+considerati come scalari:
+
+@example
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
+@print{} untyped
+$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["foo"]) @}'}
+@print{} unassigned
+@end example
+
+Per riassumere, alle variabili e agli elementi di un vettore viene
+attribuito un tipo (vettore o scalare) quando vengono usati la prima
+volta.  Ci@`o pu@`o generare qualche caso strano, ed @`e meglio evitare
+di utilizzare questa capacit@`a ``dinamica'' di @command{gawk}, tranne che
+nella maniera standard, ossia passando, come parametri di funzione,
+variabili e vettori non ancora tipizzati.
 
 @node Chiamate indirette
 @section Chiamate indirette di funzione
@@ -24285,7 +24358,13 @@ funzione.  Una funzione pu@`o solo restituire valori di tipo scalare.
 @item
 Se una variabile che non @`e stata mai usata @`e passata a una funzione
 definita dall'utente, il modo con cui quella funzione elabora la variabile
-ne pu@`o determinare il tipo: o scalare o vettoriale.
+ne pu@`o determinare il tipo: scalare o vettoriale.
+
+@item
+@command{gawk} @`e ancora pi@`u dinamico nell'attribuire alle variabili
+e agli elementi di un vettore il tipo, ossia se scalare o vettoriale.
+Tuttavia ci@`o pu@`o portare a situazioni limite strane, quindi occorre
+prestare attenzione quando si usa questa funzionalit@`a.
 
 @item
 @command{gawk} consente la chiamata indiretta di funzioni usando una sintassi
@@ -24333,10 +24412,9 @@ pi@`u gestibile, e rendendo i programmi pi@`u leggibili.
 @cindex Kernighan, Brian @subentry citazioni di
 @cindex Plauger, P.J.@:
 Nel loro autorevole libro del 1976,
-@cite{Software Tools},@footnote{Purtroppo, a distanza di oltre 35 anni,
-molte delle
-lezioni impartite da questo libro devono ancora essere apprese da un gran
-numero di programmatori professionisti.}
+@cite{Software Tools},@footnote{Purtroppo, a distanza di una cinquantina
+d'anni, molte delle lezioni impartite da questo libro devono ancora essere
+imparate da un gran numero di programmatori professionisti.}
 Brian Kernighan e P.J.@: Plauger hanno scritto:
 
 @quotation
@@ -25571,8 +25649,8 @@ function tocsv(campi, sep,     i, j, n_campi, risultato)
     for (i = 1; i in campi; i++) @{
         n_campi[i] = campi[i]
         if (n_campi[i] ~ /["\n]/ || index(n_campi[i], sep) != 0) @{
-            gsub(/"/, "\"\"", n_campi[i])       # raddoppia doppi apici
-            n_campi[i] = "\"" n_campi[i] "\""   # fra doppi apici
+            gsub(/"/, "\"\"", n_campi[i])       # raddoppia i doppi apici
+            n_campi[i] = "\"" n_campi[i] "\""   # racchiudi fra doppi apici
         @}
     @}
 
@@ -28063,7 +28141,7 @@ function prepara_lista_caratteri(    campo, i, j, f, g, n, m, t,
 @end example
 
 Poi viene la regola che elabora i dati.  Se l'opzione @option{-s} @`e stata
-specificata, il flag @code{sopprimi}
+specificata, il @dfn{flag} @code{sopprimi}
 @`e vero.  La prima istruzione
 @code{if} accerta che il record in input abbia il separatore di
 campo.  Se @command{cut} sta elaborando dei campi, e @code{sopprimi} @`e vero,
@@ -28521,7 +28599,7 @@ function sintassi()
 @end example
 
 Il primo passo @`e quello di scandire le opzioni usando @code{getopt()},
-e di impostare varie variabili di tipo flag a seconda delle opzioni
+e di impostare varie variabili di tipo @dfn{flag} a seconda delle opzioni
 specificate:
 
 @example
@@ -28565,7 +28643,7 @@ dal vettore @code{PROCINFO} dell'utente corrente, oppure
 dal database degli utenti e delle password, per un
 utente il cui nome sia stato specificato nella riga di
 comando.
-In quest'ultimo caso, viene impostato il flag @code{real_ids_only},
+In quest'ultimo caso, viene impostato il @dfn{flag} @code{real_ids_only},
 poich@'e non @`e possibile stampare informazioni riguardo agli
 ID di utente e di gruppo effettivi:
 
@@ -29238,7 +29316,7 @@ di elaborare ogni @value{FN} in @code{ARGV} come dati in input.
 
 @cindex @dfn{flag} (indicatore), variabili di tipo
 @cindex variabili @subentry di tipo indicatore (@dfn{flag})
-Se il primo argomento @`e @option{-a}, la variabile flag
+Se il primo argomento @`e @option{-a}, la variabile @dfn{flag}
 @code{append} viene impostata a vero, e sia @code{ARGV[1]} che
 @code{copia[1]} vengono cancellati. Se @code{ARGC} @`e minore di due, nessun
 @value{FN} @`e stato fornito, e @code{tee} stampa un messaggio di sintassi ed
@@ -29627,23 +29705,6 @@ Incidentalmente, questo programma non segue la convenzione,
 raccomandabile, di assegnare alle variabili globali un nome
 con la lettera iniziale maiuscola.  Se lo si fosse fatto, il programma
 sarebbe stato un po' pi@`u semplice da comprendere.
-
-@ifset FOR_PRINT
-@cindex Kernighan, Brian @subentry citazioni di
-La logica per scegliere quali righe stampare rappresenta una
-@dfn{macchina a stati},
-che @`e ``un dispositivo che pu@`o trovarsi in una tra un dato numero
-di condizioni stabili, a seconda della sua condizione precedente e del valore
-corrente dei suoi input.''@footnote{Questa @`e la definizione data in
-@uref{https://www.lexico.com/en/definition/state_machine}.}
-Brian Kernighan suggerisce che
-``un approccio alternativo alle macchine a stati @`e di leggere tutto l'input
-e metterlo in un vettore, e poi usare l'indicizzazione.  @`E quasi sempre pi@`u
-facile da programmare e, per la maggior parte degli input in cui si pu@`o
-usare, altrettanto veloce in esecuzione.''  Riscrivere la logica del
-programma seguendo questa indicazione.
-@end ifset
-
 
 @node Programma wc
 @subsection Contare cose
@@ -30855,7 +30916,7 @@ ignorate.
 (@pxref{Funzione join}).
 
 I programmi di esempio nel sorgente Texinfo online di @cite{@value{TITLE}}
-(@file{gawktexi.in}) sono stati tutti inseriti tra righe @samp{file} e righe
+(@file{gawk.texi}) sono stati tutti inseriti tra righe @samp{file} e righe
 @samp{endfile}.  La distribuzione di @command{gawk} usa una copia di
 @file{extract.awk} per estrarre i programmi di esempio e per installarne
 molti in una particolare directory dove @command{gawk} li pu@`o trovare.
@@ -31598,7 +31659,7 @@ di zero, il programma @`e terminato:
         @}
         close(input[indice_pila])
     @}
-@}'  # l'apice chiude la variabile `progr_che_espande'
+@}'  # l'apice singolo termina la variabile `progr_che_espande'
 
 programma_elaborato=$(gawk -- "$progr_che_espande" /dev/stdin << EOF
 $programma
@@ -34793,18 +34854,18 @@ $ @kbd{gawk 'BEGIN @{}
 @end example
 
 Se presenti, gli specificatori di posizione precedono, nella specifica di
-formato, i flag, la larghezza del campo e/o la precisione.
+formato, i @dfn{flag}, la larghezza del campo e/o la precisione.
 
 Gli specificatori di posizione possono essere usati anche se si specifica una
 larghezza dinamica dei campi, e della capacit@`a di precisione:
 
 @example
 $ @kbd{gawk 'BEGIN @{}
->    @kbd{printf("%*.*s\n", 10, 20, "hello")}
->    @kbd{printf("%3$*2$.*1$s\n", 20, 10, "hello")}
+>    @kbd{printf("%*.*s\n", 10, 20, "ciao")}
+>    @kbd{printf("%3$*2$.*1$s\n", 20, 10, "ciao")}
 > @kbd{@}'}
-@print{}      hello
-@print{}      hello
+@print{}      ciao
+@print{}      ciao
 @end example
 
 @quotation NOTA
@@ -38810,7 +38871,7 @@ BEGIN @{
     if (! adequate_math_precision(fpbits)) @{
         print("Errore: la precisione di calcolo disponibile non basta.\n" \
               "Provare ancora specificando l'argomento -M?") > "/dev/stderr"
-        # Nota: pu@`o essere necessario impostare un flag a questo punto
+        # Nota: pu@`o essere necessario impostare un @dfn{flag} a questo punto
 	#       per evitare di eseguire delle eventuali regole END
         exit 1
     @}
@@ -39134,13 +39195,7 @@ Questo si pu@`o vedere in @inlineraw{docbook, <xref linkend="figura-carica-esten
 @ifnotdocbook
 @float Figura,figura-carica-estensione
 @caption{Caricamento dell'estensione}
-@ifclear SMALLPRINT
 @center @image{gawk-api-figura1, , , Caricamento dell'estensione}
-@end ifclear
-@ifset SMALLPRINT
-@center @image{gawk-api-figura1, 11cm, , Caricamento dell'estensione}
-@end ifset
-
 @end float
 @end ifnotdocbook
 
@@ -39175,12 +39230,7 @@ Questo @`e shown in @inlineraw{docbook, <xref linkend="figura-registrare-una-nuo
 @ifnotdocbook
 @float Figura,figura-registrare-una-nuova-funzione
 @caption{Registrare una nuova funzione}
-@ifclear SMALLPRINT
 @center @image{gawk-api-figura2, , , Registrare una nuova funzione}
-@end ifclear
-@ifset SMALLPRINT
-@center @image{gawk-api-figura2, 11cm , , Registrare una nuova funzione}
-@end ifset
 @end float
 @end ifnotdocbook
 
@@ -39215,12 +39265,7 @@ Questo @`e mostrato in @inlineraw{docbook, <xref linkend="figura-chiamata-nuova-
 @ifnotdocbook
 @float Figura,figura-chiamata-nuova-funzione
 @caption{Chiamata della nuova funzione}
-@ifclear SMALLPRINT
 @center @image{gawk-api-figura3, , , Chiamata della nuova funzione}
-@end ifclear
-@ifset SMALLPRINT
-@center @image{gawk-api-figura3,11cm , , Chiamata della nuova funzione}
-@end ifset
 @end float
 @end ifnotdocbook
 
@@ -40662,7 +40707,7 @@ Impostare al numero di campi nel record in input, cio@`e a @code{NF}.
 Questo @`e un vettore di lunghezza variabile la cui dimensione effettiva
 dovrebbe essere @code{nf}.
 Per ogni campo, l'elemento @code{skip} dovrebbe essere impostato al numero
-di caratteri o byte, come richiesto dal flag @code{use_chars},
+di caratteri o byte, come richiesto dal @dfn{flag} @code{use_chars},
 da saltare prima dell'inizio di questo campo.  L'elemento @code{len} fornisce
 la lunghezza del campo.  I valori in @code{fields[0]} forniscono l'informazione
 per @code{$1}, e cos@`{@dotless{i}} via, fino all'elemento @code{fields[nf-1]} che contiene
@@ -41098,12 +41143,15 @@ in
 @multitable @columnfractions .50 .50
 @headitem @tab Tipo di valore reale
 @end multitable
+@ignore
+@c 12/2023: Texinfo.tex has morphed enough that this produces
+@c bad output, so comment it out.
 @c 10/2014: Thanks to Karl Berry for this bit to reduce the space:
 @tex
 \vglue-1.1\baselineskip
 @end tex
+@end ignore
 @c @multitable @columnfractions .166 .166 .198 .15 .15 .166
-@ifclear SMALLPRINT
 @multitable {Richiesto} {Indefinito} {Numero} {Numero} {Scalare} {Regexp} {Numero} {Vettore} {Indefinito}
 @headitem @tab @tab Stringa @tab Strnum @tab Numero @tab Regexp @tab Booleano @tab Vettore @tab Indefinito
 @item @tab @b{Stringa} @tab Stringa @tab Stringa @tab Stringa @tab Stringa @tab Stringa @tab false @tab false
@@ -41116,24 +41164,6 @@ in
 @item @tab @b{Indefinito} @tab Stringa @tab Strnum @tab Numero @tab Regexp @tab Booleano @tab Vettore @tab Indefinito
 @item @tab @b{@dfn{Value cookie}} @tab false @tab false @tab false @tab false @tab false @tab false
 @end multitable
-@end ifclear
-
-@ifset SMALLPRINT
-@smallformat
-@multitable {Rich.} {Indef.} {Num.} {Num.} {Scal.} {Regex.} {Num.} {Vett.} {Indef.}
-@headitem @tab @tab Str. @tab Strn. @tab Num. @tab Regex. @tab Bool. @tab Vett. @tab Indef.
-@item @tab @b{Str.} @tab Str. @tab Str. @tab Str. @tab Str. @tab Str. @tab false @tab false
-@item @tab @b{Strn.} @tab false @tab Strn. @tab Strn. @tab false @tab false @tab false @tab false
-@item @tab @b{Num.} @tab Num. @tab Num. @tab Num. @tab false @tab Num. @tab false @tab false
-@item @b{Tipo} @tab @b{Regex.} @tab false @tab false @tab false @tab Regex. @tab Bool. @tab false @tab false
-@item @b{Rich.} @tab @b{Bool.} @tab false @tab false @tab false @tab false @tab Bool. @tab false @tab false
-@item @tab @b{Vett.} @tab false @tab false @tab false @tab false @tab false @tab Vett. @tab false
-@item @tab @b{Scal.} @tab Scal. @tab Scal. @tab Scal. @tab Scal. @tab Scal. @tab false @tab false
-@item @tab @b{Indef.} @tab Str. @tab Strn. @tab Num. @tab Regex. @tab Bool. @tab Vett. @tab Indef.
-@item @tab @b{@dfn{Val. coo.}} @tab false @tab false @tab false @tab false @tab false @tab false
-@end multitable
-@end smallformat
-@end ifset
 @end ifnotdocbook
 @end ifnotplaintext
 @ifplaintext
@@ -41166,6 +41196,38 @@ in
 @end ifplaintext
 @end float
 
+Ci sono alcune considerazioni di cui tener conto:
+
+@itemize @bullet
+@item
+Se si richiede il tipo @code{AWK_UNDEFINED}, la risposta @`e sempre
+@dfn{true}, insieme al tipo effettivamente riscontrato per la
+particolare variabile in questione.  Si pu@`o considerare questo
+caso come una specie di richiesta ``jolly''.
+
+@item
+Se si richiede il tipo @code{AWK_STRING}, @command{gawk} converte
+un valore scalare a una stringa, e questa @`e il valore restituito.
+
+@item
+Se si richiede il tipo @code{AWK_NUMBER}, @command{gawk} converte
+un valore scalare (tranne nel caso di una @dfn{regexp}, a un
+valore numerico, e questo @`e il valore restituito.
+
+La conversione fra numero e stringa nelle funzioni API corrisponde
+quindi al comportamento di @command{gawk} in un programma normale.
+
+@item
+Le funzioni API @emph{non} fanno distinzione fra il tipo
+@code{"undefined"} e il tipo @code{"unassigned"}, come restituiti
+dalla funzione @code{typeof()}
+(@pxref{Variabili di tipo dinamico in Gawk}).
+In entrambi i casi viene restituito @code{AWK_UNDEFINED}.
+@`E improbabile che questa differenza venga rimossa in futuro,
+perch@'e la documentazione e il codice sorgente sono gi@`a
+abbastanza complessi.
+@end itemize
+
 @node Accedere ai parametri
 @subsection Accedere ai parametri e aggiornarli
 
@@ -41179,13 +41241,13 @@ passati all'estensione. Esse sono:
 Riempie la struttura @code{awk_value_t} puntata da @code{risultato}
 con l'argomento numero @code{count}.  Restituisce @dfn{true} se il tipo
 dell'argomento corrisponde
-a quello specificato in @code{wanted}, e @dfn{false} in caso contrario.
+a quello specificato in @code{desiderato}, e @dfn{false} in caso contrario.
 In quest'ultimo caso,
 @code{risultato@w{->}val_type} indica il tipo effettivo dell'argomento
 (@pxref{table-value-types-returned}).  La numerazione degli argomenti parte
 da zero: il primo
 argomento @`e il numero zero, il secondo @`e il numero uno, e cos@`{@dotless{i}} via.
-@code{wanted} indica il tipo di valore atteso.
+@code{desiderato} indica il tipo di valore atteso.
 
 @item awk_bool_t set_argument(size_t count, awk_array_t array);
 Converte un parametro di tipo indefinito in un vettore; ci@`o permette la
@@ -41228,9 +41290,9 @@ Le funzioni sono le seguenti:
 Riempie la struttura @code{awk_value_t} puntata da @code{risultato}
 con il valore della variabile il cui nome @`e nella stringa @code{nome},
 che @`e una normale stringa di caratteri C.
-@code{wanted} indica il tipo di valore atteso.
+@code{desiderato} indica il tipo di valore atteso.
 La funzione restituisce @dfn{true} se il tipo effettivo della variabile @`e quello
-specificato in @code{wanted}, e @dfn{false} in caso contrario.
+specificato in @code{desiderato}, e @dfn{false} in caso contrario.
 In quest'ultimo caso, @code{risultato>val_type} indica il tipo effettivo
 della variabile
 (@pxref{table-value-types-returned}).
@@ -41625,8 +41687,8 @@ nuovi elementi che possono essere aggiunti a un vettore con un
 singolo ciclo che percorre tutta la lista.
 
 @item enum @{ @dots{} @} flags;
-Un insieme di valori di flag che passano informazione tra l'estensione
-e @command{gawk}.  Per ora c'@`e solo un flag disponibile:
+Un insieme di valori di @dfn{flag} che passano informazione tra l'estensione
+e @command{gawk}.  Per ora c'@`e solo un @dfn{flag} disponibile:
 @code{AWK_ELEMENT_DELETE}.
 Se lo si imposta, @command{gawk} elimina l'elemento in questione dal vettore
 originale, dopo che il vettore ``appiattito'' @`e stato rilasciato.
@@ -41670,8 +41732,8 @@ Restituisce @dfn{false} se si verifica un errore.
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_value_t *risultato);
 Per il vettore rappresentato da @code{a_cookie}, restituisce in @code{*risultato}
 il valore dell'elemento il cui indice @`e @code{index}.
-@code{wanted} specifica il tipo di valore che si vuole ritrovare.
-Restituisce @dfn{false} se @code{wanted} non coincide con il tipo di dato o
+@code{desiderato} specifica il tipo di valore che si vuole ritrovare.
+Restituisce @dfn{false} se @code{desiderato} non coincide con il tipo di dato o
 se @code{index} non @`e nel vettore (@pxref{table-value-types-returned}).
 
 Il valore per @code{index} pu@`o essere numerico, nel qual caso @command{gawk}
@@ -41904,7 +41966,7 @@ che si vorrebbe eliminare, la funzione imposta il @dfn{bit}
 @code{AWK_ELEMENT_DELETE} nel campo @code{flags}
 dell'elemento.  Quando il vettore @`e stato interamente percorso, @command{gawk}
 visita il vettore appiattito, ed elimina ogni elemento in cui il relativo
-@dfn{bit} della flag sia impostato:
+@dfn{bit} della @dfn{flag} sia impostato:
 
 @example
     for (i = 0; i < flat_array->count; i++) @{
@@ -43472,28 +43534,28 @@ gli indici che puntano a tali valori vengono ignorati.
 
 @item flags
 Questo dovrebbe essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o pi@`u dei
-seguenti valori dei flag costanti predefiniti.
-Almeno uno dei due flag @code{FTS_LOGICAL}
+seguenti valori dei @dfn{flag} costanti predefiniti.
+Almeno uno dei due @dfn{flag} @code{FTS_LOGICAL}
 o @code{FTS_PHYSICAL} dev'essere impostato; in caso contrario
 @code{fts()} restituisce una segnalazione di errore e imposta @code{ERRNO}.
-I flag sono:
+I @dfn{flag} sono:
 
 @c nested table
 @table @code
 @item FTS_LOGICAL
 Passa in rassegna i file in modo ``logico'', e quindi l'informazione restituita
 per un collegamento simbolico @`e quella relativa al file puntato, e non al
-collegamento simbolico stesso.  Questo flag @`e mutuamente esclusivo con
+collegamento simbolico stesso.  Questo @dfn{flag} @`e mutuamente esclusivo con
 @code{FTS_PHYSICAL}.
 
 @item FTS_PHYSICAL
 Passa in rassegna i file in modo ``fisico'', e quindi l'informazione restituita
 per un collegamento simbolico @`e quella relativa al collegamento simbolico
-stesso.  Questo flag @`e mutuamente esclusivo con @code{FTS_LOGICAL}.
+stesso.  Questo @dfn{flag} @`e mutuamente esclusivo con @code{FTS_LOGICAL}.
 
 @item FTS_NOCHDIR
 Per migliorare le prestazioni, la routine di libreria C @code{fts()}
-cambia directory mentre percorre una gerarchia di file.  Questo flag
+cambia directory mentre percorre una gerarchia di file.  Questo @dfn{flag}
 disabilita quell'ottimizzazione.
 
 @item FTS_COMFOLLOW
@@ -43557,8 +43619,8 @@ contenuto nella directory.  Se un elemento della directory @`e un
 file, l'azione del programma @`e la stessa descritta sopra per un file.
 Se invece la directory contiene delle sottodirectory, l'elemento creato
 nel vettore @`e (ricorsivamente) a sua volta un vettore che descrive la
-sottodirectory.  Se fra i flag @`e stato
-specificato il flag @code{FTS_SEEDOT},
+sottodirectory.  Se fra i @dfn{flag} @`e stato
+specificato il @dfn{flag} @code{FTS_SEEDOT},
 ci sar@`a anche un elemento di nome
 @code{".."}.  Questo elemento sar@`a un vettore contenente i dati restituiti
 da un'invocazione di @code{stat()}.
@@ -43611,7 +43673,7 @@ un valore differente, diverso da zero, se si @`e verificato un errore.
 
 Oltre a rendere disponibile la funzione @code{fnmatch()}, l'estensione
 di @code{fnmatch} definisce una costante (@code{FNM_NOMATCH}), e un vettore
-con dei valori di flag, di nome @code{FNM}.
+con dei valori di @dfn{flag}, di nome @code{FNM}.
 
 Gli argomenti per @code{fnmatch()} sono:
 
@@ -43623,14 +43685,14 @@ L'espressione regolare con cui confrontare @value{FN}
 La stringa @value{FN}
 
 @item flags
-Pu@`o valere zero o essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o pi@`u flag
+Pu@`o valere zero o essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o pi@`u @dfn{flag}
 nel vettore @code{FNM}
 @end table
 
-I flag sono i seguenti:
+I @dfn{flag} sono i seguenti:
 
 @multitable @columnfractions .40 .60
-@headitem Elemento del vettore @tab Flag corrispondente definito da @code{fnmatch()}
+@headitem Elemento del vettore @tab @dfn{flag} corrispondente definito da @code{fnmatch()}
 @item @code{FNM["CASEFOLD"]} @tab @code{FNM_CASEFOLD}
 @item @code{FNM["FILE_NAME"]} @tab @code{FNM_FILE_NAME}
 @item @code{FNM["LEADING_DIR"]} @tab @code{FNM_LEADING_DIR}
@@ -43703,7 +43765,13 @@ else
 L'estensione @code{inplace} svolge un lavoro simile a quello
 dell'opzione @option{-i} nel programma di utilit@`a GNU @command{sed},
 che svolge delle funzioni di modifica ``al volo'' su ogni file in input.
-Viene usato il file @file{inplace.awk}, caricato dinamicamente, per richiamare
+Come il comando GNU @command{sed}, l'estensione @code{inplace} 
+sostituisce i collegamenti (sia simbolici che fisici) con dei nuovi file.
+Se si vuole operare sul file originale (e non sui collegamenti al file
+stesso), occorre prima procurarsi il suo percorso completo, per esempio
+utilizzando il comando @command{realpath}, che fa parte del pacchetto GNU
+Coreutils.
+Si usa il file @file{inplace.awk}, caricato dinamicamente, per richiamare
 l'estensione in maniera corretta:
 
 @example
@@ -43804,7 +43872,12 @@ standard output verso un file temporaneo definito in modo da avere lo stesso
 proprietario e le stesse autorizzazioni del file originale.  Dopo che il file
 @`e stato elaborato, l'estensione riporta lo standard output alla sua
 destinazione originale.
-Se @code{INPLACE_SUFFIX} non @`e una stringa vuota, il file originale @`e
+(A motivo dell'implementazione, ha senso ridirigere lo standard output
+di @command{gawk} a @file{/dev/null}, invece di lasciarlo impostato al
+terminale in uso; in questo modo, l'output verr@`a scritto in blocchi,
+ossia in maniera pi@`u efficiente rispetto alla scrittura riga per riga).
+
+Se @code{inplace::suffix} non @`e una stringa vuota, il file originale @`e
 collegato a un @value{FN} di backup, creato aggiungendo il
 suffisso al nome originale.
 Infine, il file temporaneo @`e rinominato in modo da essere lo stesso del
@@ -43834,7 +43907,7 @@ $ @kbd{gawk -i inplace '@{ gsub(/pippo/, "pluto") @}; @{ print @}' file1 file2 f
 Per mantenere una copia di backup del file originale, si provi a fare cos@`{@dotless{i}}:
 
 @example
-$ @kbd{gawk -i inplace -v INPLACE_SUFFIX=.bak '@{ gsub(/pippo/, "pluto") @}}
+$ @kbd{gawk -i inplace -v inplace::suffix=.bak '@{ gsub(/pippo/, "pluto") @}}
 > @kbd{@{ print @}' file1 file2 file3}
 @end example
 
@@ -44197,19 +44270,7 @@ i cui risultati vengono poi restituiti, e contengono il numero di
 secondi passato dall'inizio del tempo in Unix (01 gennaio 1970),
 nel fuso orario del computer, a prescindere da qualsiasi specificazione
 di fuso orario contenuta negli argomenti passati alla funzione.
-(Ci@`o equivale alla funzione predefinita @code{systime()} di
-@command{gawk}.
 Altrimenti, in caso di errore, viene restituito @minus{}1.
-
-Notare che la routine di libreria C @code{strptime()} qui
-richiamata ignora ogni indicazione di fuso orario nella stringa
-che descrive la data, restituendo sempre valori relativi al
-fuso orario del computer.
-@ignore
-It might be better to have this
-routine return a string similar to what @command{gawk}'s @code{mktime()}
-function expects, but we ran out of energy.
-@end ignore
 @end table
 
 @node Esempio di estensione API Test
@@ -44972,6 +45033,16 @@ emettendo un messaggio di avvertimento
 Errori in output usando @code{print} e @code{printf} non provocano
 necessariamente la fine del programma
 (@pxref{Continuazione dopo errori})
+
+@item
+Gli spazi-dei-nomi e l'utilizzo di @code{::} per attribuire un
+identificativo a un particolare spazio-dei-nomi
+@iftex
+(@pxrefil{Spazi-dei-nomi}).
+@end iftex
+@ifnottex
+(@pxref{Spazi-dei-nomi}).
+@end ifnottex
 @end itemize
 
 @item
@@ -46206,6 +46277,15 @@ La necessit@`a di utilizzare la libreria GNU @code{libsigsegv}
 Il valore aggiunto relativo non @`e mai stato grande e la funzionalit@`a
 causava problemi in alcuni sistemi.
 
+@item
+Il supporto per il sistema OSF/1 @`e stato rimosso.
+
+@ignore
+@item
+L'opzione non documentata @option{--nostalgia} @`e stata rimossa;
+innescava segnalazioni di errore, specie in alcune distribuzioni GNU/Linux.
+@end ignore
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -46962,20 +47042,14 @@ che descrive @command{gawk}.
 Questa pagina @`e distribuita a beneficio degli utenti Unix.
 
 @cindex Texinfo
-@item doc/gawktexi.in
-@itemx doc/sidebar.awk
+@item doc/gawk.texi
 Il file sorgente Texinfo di questo @value{DOCUMENT}.
-Dovrebbe venire elaborato da @file{doc/sidebar.awk}
-prima di essere elaborato con @command{texi2dvi} o @command{texi2pdf}
-per produrre un documento stampato, o
-con @command{makeinfo} per produrre un file Info o HTML.
+Dovrebbe venire elaborato dal comando @command{texi2dvi} o
+da @command{texi2pdf} per produrre un documento stampato, o
+dal comando @command{makeinfo} per produrre un file Info o HTML.
 Il @file{Makefile} si occupa di questa elaborazione e produce
 la versione stampabile tramite i comandi
 @command{texi2dvi} o @command{texi2pdf}.
-
-@item doc/gawk.texi
-Il file prodotto elaborando @file{gawktexi.in}
-tramite @file{sidebar.awk}.
 
 @item doc/gawk.info
 Il file Info generato per questo @value{DOCUMENT}.
@@ -48084,7 +48158,7 @@ La versione OpenVMS di @command{gawk} comprende un'interfaccia in stile
 per ulteriori dettagli).  Un effetto indesiderato della duplice analisi della
 riga di comando @`e che se c'@`e solo un unico parametro (come nel programma
 con le righe contenenti doppi apici), il comando diviene ambiguo.  Per evitare
-questo inconveniente, il flag, normalmente non necessario, @option{--} @`e
+questo inconveniente, il @dfn{flag}, normalmente non necessario, @option{--} @`e
 necessario per forzare un esame dei parametri in stile Unix, piuttosto che
 nella modalit@`a @code{DCL}.
 Se qualsiasi altra opzione preceduta dal segno @option{-} (o pi@`u parametri,
@@ -48685,12 +48759,7 @@ Le persone che si occupano delle varie versioni di @command{gawk} sono:
 @cindex G., Daniel Richard
 @cindex Robbins @subentry Arnold
 @cindex Zaretskii, Eli
-@ifset SMALLPRINT
-@multitable {MS-Windows} {123456789012345678901234567890123456789001234567890}
-@end ifset
-@ifclear SMALLPRINT
 @multitable {MS-Windows con MinGW} {123456789012345678901234567890123456789001234567890}
-@end ifclear
 @item Unix e sistemi POSIX @tab Arnold Robbins, @EMAIL{arnold@@skeeve.com,arnold (chiocciola) skeeve (punto) com}
 
 @item MS-Windows con MinGW @tab Eli Zaretskii, @EMAIL{eliz@@gnu.org,eliz (chiocciola) gnu (punto) org}
@@ -50212,12 +50281,7 @@ Si veda la @inlineraw{docbook, <xref linkend="figura-generica-flusso"/>}.
 @ifnotdocbook
 @float Figura,figura-generica-flusso
 @caption{Flusso generico di un programma}
-@ifclear SMALLPRINT
 @center @image{gawk-programma-generico, , , Flusso generico di un programma}
-@end ifclear
-@ifset SMALLPRINT
-@center @image{gawk-programma-generico, 11cm, , Flusso generico di un programma}
-@end ifset
 @end float
 @end ifnotdocbook
 
@@ -50262,12 +50326,7 @@ come si vede nella @inlineraw{docbook, <xref linkend="figura-flusso-elaborazione
 @ifnotdocbook
 @float Figura,figura-flusso-elaborazione
 @caption{Fasi di un programma generico}
-@ifclear SMALLPRINT
 @center @image{gawk-flusso-elaborazione, , , Fasi di un programma generico}
-@end ifclear
-@ifset SMALLPRINT
-@center @image{gawk-flusso-elaborazione, 11cm , , Fasi di un programma generico}
-@end ifset
 @end float
 @end ifnotdocbook
 
@@ -50953,7 +51012,7 @@ gestito direttamente dal sistema operativo in cui viene eseguito
 @command{gawk} --- per esempio, @file{/dev/stderr}.
 (@xref{File speciali}).
 
-@item Flag [Indicatore]
+@item @dfn{flag} [Indicatore]
 Una variabile [di tipo booleano] che, se verificata, indica la presenza o
 l'assenza di qualche condizione.
 
