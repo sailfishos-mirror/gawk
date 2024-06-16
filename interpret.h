@@ -222,6 +222,7 @@ uninitialized_scalar:
 					// convert very original untyped to scalar
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
+					m->flags &= ~(MPFN | MPZN);
 
 					// set up local param by value
 					m = dupnode(Nnull_string);
@@ -242,6 +243,7 @@ uninitialized_scalar:
 					// convert very original untyped to scalar
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
+					m->flags &= ~(MPFN | MPZN);
 
 					// set up local param by value
 					DEREF(m);
