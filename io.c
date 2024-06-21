@@ -3854,7 +3854,7 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 
 	/* look for a newline outside quotes */
 	do {
-		while (*bp != rs) { 
+		while (*bp != rs && bp < iop->dataend) { 
 			if (*bp == '\"')
 				in_quote = ! in_quote;
 			bp++;
