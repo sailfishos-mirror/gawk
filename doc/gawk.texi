@@ -5688,7 +5688,7 @@ For example, @code{"a\qc"} is the same as @code{"aqc"}.
 @command{gawk} warns you about it.)
 Consider @samp{FS = @w{"[ \t]+\|[ \t]+"}} to use vertical bars
 surrounded by whitespace as the field separator. There should be
-two backslashes in the string: @samp{FS = @w{"[ \t]+\\|[ \t]+"}}.)
+two backslashes in the string: @samp{FS = @w{"[ \t]+\\|[ \t]+"}}.
 @c I did this!  This is why I added the warning.
 
 @cindex @command{gawk} @subentry escape sequences
@@ -5725,7 +5725,7 @@ literally.
 @cartouche Escape Sequences for Metacharacters
 @cindex metacharacters @subentry escape sequences for
 
-Suppose you use an octal or hexadecimal
+Suppose you use an octal or hexadecimal (@code{\x} or @code{\u})
 escape to represent a regexp metacharacter.
 (See @ref{Regexp Operators}.)
 Does @command{awk} treat the character as a literal character or as a regexp
@@ -6534,6 +6534,32 @@ An alternative method would have been to require two backslashes in the
 GNU operators, but this was deemed too confusing. The current
 method of using @samp{\y} for the GNU @samp{\b} appears to be the
 lesser of two evils.
+
+@c July, 2024
+@c Thanks to Alexander Lasky <ALEXANDER.LASKY@sydneywater.com.au> for
+@c suggesting this content.
+@cindex sidebar @subentry Backreferences Are Not Supported
+@cartouche Backreferences Are Not Supported
+In POSIX Basic Regular Expressions (BREs), you can specify what are
+called @dfn{backreferences} in regular expressions. For instance,
+in @command{grep}, a regexp like @samp{\(..\)\1} lets you match
+two instances of the same subexpression in a row, such as @samp{abab} or @samp{2323}.
+
+This construct is not supported in POSIX Extended Regular Expressions
+(EREs) such as are used in @command{awk} and @command{gawk}. Besides being less
+efficient for matching, the numeric escape (@samp{\1} in the example) would conflict
+with the ability to have octal escape sequences in regular expressions
+(@pxref{Escape Sequences}).
+
+This is true even though the underlying regexp matching engine(s) used
+by @command{gawk} or other @command{awk} implementations might support
+such a feature.
+
+We are told that BusyBox @command{awk} (@pxref{Other Versions}) is an
+exception, and that it allows backrefences, but only in dynamic regexps;
+for example @samp{"aa" ~ "(.)\1"}, whereas it treats the @samp{\1} in
+@samp{"aa" ~ /(.)\1/} as an octal escape sequence.
+@end cartouche
 
 @cindex regular expressions @subentry @command{gawk}, command-line options
 @cindex @command{gawk} @subentry command-line options, regular expressions and
