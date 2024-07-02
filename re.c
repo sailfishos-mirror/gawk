@@ -163,7 +163,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 				if (nbytes == 1
 				    && do_traditional
 				    && ! do_posix
-				    && (isdigit(c) || c == 'x')
+				    && (isdigit(c) || c == 'x' || c == 'u')
 				    && strchr(metas, *result) != NULL)
 					*dest++ = '\\';
 
