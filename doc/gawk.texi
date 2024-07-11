@@ -1684,7 +1684,7 @@ supported by POSIX @command{awk} and @command{gawk}.
 @ref{Reading Files},
 describes how @command{awk} reads your data.
 It introduces the concepts of records and fields, as well
-as the @code{getline} command.
+as the @code{getline} function.
 I/O redirection is first described here.
 Network I/O is also briefly introduced here.
 
@@ -5168,7 +5168,7 @@ in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
 As of
-@command{gawk} @value{PVERSION} 5.2.
+@command{gawk} @value{PVERSION} 5.2,
 the arbitrary precision arithmetic feature is ``on parole.''
 This feature is now being
 supported by a volunteer in the development team and not by the primary
@@ -5688,7 +5688,7 @@ For example, @code{"a\qc"} is the same as @code{"aqc"}.
 @command{gawk} warns you about it.)
 Consider @samp{FS = @w{"[ \t]+\|[ \t]+"}} to use vertical bars
 surrounded by whitespace as the field separator. There should be
-two backslashes in the string: @samp{FS = @w{"[ \t]+\\|[ \t]+"}}.)
+two backslashes in the string: @samp{FS = @w{"[ \t]+\\|[ \t]+"}}.
 @c I did this!  This is why I added the warning.
 
 @cindex @command{gawk} @subentry escape sequences
@@ -5725,7 +5725,7 @@ literally.
 @cartouche Escape Sequences for Metacharacters
 @cindex metacharacters @subentry escape sequences for
 
-Suppose you use an octal or hexadecimal
+Suppose you use an octal or hexadecimal (@code{\x} or @code{\u})
 escape to represent a regexp metacharacter.
 (See @ref{Regexp Operators}.)
 Does @command{awk} treat the character as a literal character or as a regexp
@@ -6535,6 +6535,32 @@ GNU operators, but this was deemed too confusing. The current
 method of using @samp{\y} for the GNU @samp{\b} appears to be the
 lesser of two evils.
 
+@c July, 2024
+@c Thanks to Alexander Lasky <ALEXANDER.LASKY@sydneywater.com.au> for
+@c suggesting this content.
+@cindex sidebar @subentry Backreferences Are Not Supported
+@cartouche Backreferences Are Not Supported
+In POSIX Basic Regular Expressions (BREs), you can specify what are
+called @dfn{backreferences} in regular expressions. For instance,
+in @command{grep}, a regexp like @samp{\(..\)\1} lets you match
+two instances of the same subexpression in a row, such as @samp{abab} or @samp{2323}.
+
+This construct is not supported in POSIX Extended Regular Expressions
+(EREs) such as are used in @command{awk} and @command{gawk}. Besides being less
+efficient for matching, the numeric escape (@samp{\1} in the example) would conflict
+with the ability to have octal escape sequences in regular expressions
+(@pxref{Escape Sequences}).
+
+This is true even though the underlying regexp matching engine(s) used
+by @command{gawk} or other @command{awk} implementations might support
+such a feature.
+
+We are told that BusyBox @command{awk} (@pxref{Other Versions}) is an
+exception, and that it allows backrefences, but only in dynamic regexps;
+for example @samp{"aa" ~ "(.)\1"}, whereas it treats the @samp{\1} in
+@samp{"aa" ~ /(.)\1/} as an octal escape sequence.
+@end cartouche
+
 @cindex regular expressions @subentry @command{gawk}, command-line options
 @cindex @command{gawk} @subentry command-line options, regular expressions and
 The various command-line options
@@ -6739,9 +6765,9 @@ By default, each record is one line.  Each
 record is automatically split into chunks called @dfn{fields}.
 This makes it more convenient for programs to work on the parts of a record.
 
-@cindex @code{getline} command
-On rare occasions, you may need to use the @code{getline} command.
-The  @code{getline} command is valuable both because it
+@cindex @code{getline} function
+On rare occasions, you may need to use the @code{getline} function.
+The  @code{getline} function is valuable both because it
 can do explicit input from any number of files, and because the files
 used with it do not have to be named on the @command{awk} command line
 (@pxref{Getline}).
@@ -8703,7 +8729,7 @@ then @command{gawk} sets @code{RT} to the null string.
 @node Getline
 @section Explicit Input with @code{getline}
 
-@cindex @code{getline} command @subentry explicit input with
+@cindex @code{getline} function @subentry explicit input with
 @cindex input @subentry explicit
 So far we have been getting our input data from @command{awk}'s main
 input stream---either the standard input (usually your keyboard, sometimes
@@ -8712,11 +8738,11 @@ files specified on the command line.  The @command{awk} language has a
 special built-in command called @code{getline} that
 can be used to read input under your explicit control.
 
-The @code{getline} command is used in several different ways and should
+The @code{getline} function is used in several different ways and should
 @emph{not} be used by beginners.
-The examples that follow the explanation of the @code{getline} command
+The examples that follow the explanation of the @code{getline} function
 include material that has not been covered yet.  Therefore, come back
-and study the @code{getline} command @emph{after} you have reviewed the
+and study the @code{getline} function @emph{after} you have reviewed the
 rest of
 @ifinfo
 this @value{DOCUMENT}
@@ -8732,12 +8758,12 @@ Parts I and II
 and have a good knowledge of how @command{awk} works.
 
 @cindex @command{gawk} @subentry @code{ERRNO} variable in
-@cindex @code{ERRNO} variable @subentry with @command{getline} command
-@cindex differences in @command{awk} and @command{gawk} @subentry @code{getline} command
-@cindex @code{getline} command @subentry return values
+@cindex @code{ERRNO} variable @subentry with @command{getline} function
+@cindex differences in @command{awk} and @command{gawk} @subentry @code{getline} function
+@cindex @code{getline} function @subentry return values
 @cindex @option{--sandbox} option @subentry input redirection with @code{getline}
 
-The @code{getline} command returns 1 if it finds a record and 0 if
+The @code{getline} function returns 1 if it finds a record and 0 if
 it encounters the end of the file.  If there is some error in getting
 a record, such as a file that cannot be opened, then @code{getline}
 returns @minus{}1.  In this case, @command{gawk} sets the variable
@@ -8777,7 +8803,7 @@ reading lines from files, pipes, and coprocesses is disabled.
 @node Plain Getline
 @subsection Using @code{getline} with No Arguments
 
-The @code{getline} command can be used without arguments to read input
+The @code{getline} function can be used without arguments to read input
 from the current input file.  All it does in this case is read the next
 input record and split it up into fields.  This is useful if you've
 finished processing the current record, but want to do some special
@@ -8843,7 +8869,7 @@ $ @kbd{awk -f strip_comments.awk example_text}
 @print{} no comment
 @end example
 
-This form of the @code{getline} command sets @code{NF},
+This form of the @code{getline} function sets @code{NF},
 @code{NR}, @code{FNR}, @code{RT}, and the value of @code{$0}.
 
 @quotation NOTE
@@ -8858,8 +8884,8 @@ rule in the program.  @xref{Next Statement}.
 
 @node Getline/Variable
 @subsection Using @code{getline} into a Variable
-@cindex @code{getline} command @subentry into a variable
-@cindex variables @subentry @code{getline} command into, using
+@cindex @code{getline} function @subentry into a variable
+@cindex variables @subentry @code{getline} function into, using
 
 You can use @samp{getline @var{var}} to read the next record from
 @command{awk}'s input into the variable @var{var}.  No other processing is
@@ -8903,7 +8929,7 @@ phore
 free
 @end example
 
-The @code{getline} command used in this way sets only the variables
+The @code{getline} function used in this way sets only the variables
 @code{NR}, @code{FNR}, and @code{RT} (and, of course, @var{var}).
 The record is not
 split into fields, so the values of the fields (including @code{$0}) and
@@ -8912,7 +8938,7 @@ the value of @code{NF} do not change.
 @node Getline/File
 @subsection Using @code{getline} from a File
 
-@cindex @code{getline} command @subentry from a file
+@cindex @code{getline} function @subentry from a file
 @cindex input redirection
 @cindex redirection @subentry of input
 @cindex @code{<} (left angle bracket) @subentry @code{<} operator (I/O)
@@ -8954,7 +8980,7 @@ you want your program to be portable to all @command{awk} implementations.
 
 @node Getline/Variable/File
 @subsection Using @code{getline} into a Variable from a File
-@cindex variables @subentry @code{getline} command into, using
+@cindex variables @subentry @code{getline} function into, using
 
 Use @samp{getline @var{var} < @var{file}} to read input
 from the file
@@ -9108,7 +9134,7 @@ have to worry.
 
 @node Getline/Variable/Pipe
 @subsection Using @code{getline} into a Variable from a Pipe
-@cindex variables @subentry @code{getline} command into, using
+@cindex variables @subentry @code{getline} function into, using
 
 When you use @samp{@var{command} | getline @var{var}}, the
 output of @var{command} is sent through a pipe to
@@ -9141,7 +9167,7 @@ program to be portable to other @command{awk} implementations.
 @node Getline/Coprocess
 @subsection Using @code{getline} from a Coprocess
 @cindex coprocesses @subentry @code{getline} from
-@cindex @code{getline} command @subentry coprocesses, using from
+@cindex @code{getline} function @subentry coprocesses, using from
 @cindex @code{|} (vertical bar) @subentry @code{|&} operator (I/O)
 @cindex vertical bar (@code{|}) @subentry @code{|&} operator (I/O)
 @cindex operators @subentry input/output
@@ -9181,7 +9207,7 @@ where coprocesses are discussed in more detail.
 
 @node Getline/Variable/Coprocess
 @subsection Using @code{getline} into a Variable from a Coprocess
-@cindex variables @subentry @code{getline} command into, using
+@cindex variables @subentry @code{getline} function into, using
 
 When you use @samp{@var{command} |& getline @var{var}}, the output from
 the coprocess @var{command} is sent through a two-way pipe to @code{getline}
@@ -9224,12 +9250,12 @@ system permits.
 @cindex side effects @subentry @code{FILENAME} variable
 @cindex @code{FILENAME} variable @subentry @code{getline}, setting with
 @cindex dark corner @subentry @code{FILENAME} variable
-@cindex @code{getline} command @subentry @code{FILENAME} variable and
+@cindex @code{getline} function @subentry @code{FILENAME} variable and
 @cindex @code{BEGIN} pattern @subentry @code{getline} and
 @item
 An interesting side effect occurs if you use @code{getline} without a
 redirection inside a @code{BEGIN} rule. Because an unredirected @code{getline}
-reads from the command-line @value{DF}s, the first @code{getline} command
+reads from the command-line @value{DF}s, the first @code{getline} function
 causes @command{awk} to set the value of @code{FILENAME}. Normally,
 @code{FILENAME} does not have a value inside @code{BEGIN} rules, because you
 have not yet started to process the command-line @value{DF}s.
@@ -9259,6 +9285,40 @@ presents a table summarizing the
 It is worth noting that those variants that do not use redirection
 can cause @code{FILENAME} to be updated if they cause
 @command{awk} to start reading a new input file.
+
+@item
+@code{getline} is not a statement (unlike @code{print}), it's an
+expression. It has a result value, and can be used as part as a
+larger expression, in control statements, and so on.
+Here are examples of the ``read until EOF/error'' idiom:
+
+@example
+while ("sort FILE" | getline line > 0)
+    print line
+while (getline line < "file.txt" > 0)
+    print line
+@end example
+
+If you need to test the error code for being less than zero,
+you need to enclose @code{getline} in parentheses, to avoid
+it being interpreted as input redirection:
+
+@example
+if ((getline VAR) < 0)
+    print "Read error";
+@end example
+
+It is, in fact, best to parenthesize use of @command{getline}
+in all control expressions, as some versions of @command{awk}
+require this. Thus, the previos examples are best written
+this way:
+
+@example
+while (("sort FILE" | getline line) > 0)
+    print line
+while ((getline line < "file.txt") > 0)
+    print line
+@end example
 
 @item
 @cindex Moore, Duncan
@@ -9292,7 +9352,7 @@ know that there is a string value to be assigned.
 
 @node Getline Summary
 @subsection Summary of @code{getline} Variants
-@cindex @code{getline} command @subentry variants
+@cindex @code{getline} function @subentry variants
 
 @ref{table-getline-variants}
 summarizes the eight variants of @code{getline},
@@ -10857,7 +10917,7 @@ Doing so results in unpredictable behavior.
 @cindex output @subentry files, closing
 @cindex pipe @subentry closing
 @cindex coprocesses @subentry closing
-@cindex @code{getline} command @subentry coprocesses, using from
+@cindex @code{getline} function @subentry coprocesses, using from
 
 @menu
 * Close Return Value::          Using the return value from @code{close()}.
@@ -14387,7 +14447,7 @@ rule.  Because @code{BEGIN} rules are executed before any input is read,
 there simply is no input record, and therefore no fields, when
 executing @code{BEGIN} rules.  References to @code{$0} and the fields
 yield a null string or zero, depending upon the context.  One way
-to give @code{$0} a real value is to execute a @code{getline} command
+to give @code{$0} a real value is to execute a @code{getline} function
 without a variable (@pxref{Getline}).
 Another way is simply to assign a value to @code{$0}.
 
@@ -14522,8 +14582,8 @@ either a @code{BEGINFILE} or an @code{ENDFILE} rule.  The @code{nextfile}
 statement is allowed only inside a
 @code{BEGINFILE} rule, not inside an @code{ENDFILE} rule.
 
-@cindex @code{getline} command @subentry @code{BEGINFILE}/@code{ENDFILE} patterns and
-The @code{getline} statement (@pxref{Getline}) is restricted inside
+@cindex @code{getline} function @subentry @code{BEGINFILE}/@code{ENDFILE} patterns and
+The @code{getline} function (@pxref{Getline}) is restricted inside
 both @code{BEGINFILE} and @code{ENDFILE}: only redirected
 forms of @code{getline} are allowed.
 
@@ -14677,7 +14737,7 @@ is used in order to put several statements together in the body of an
 @code{if}, @code{while}, @code{do}, or @code{for} statement.
 
 @item Input statements
-Use the @code{getline} command
+Use the @code{getline} function
 (@pxref{Getline}).
 Also supplied in @command{awk} are the @code{next}
 statement (@pxref{Next Statement})
@@ -23310,7 +23370,7 @@ BEGIN @{
 @c endfile
 @end example
 
-@cindex troubleshooting @subentry @code{getline} command
+@cindex troubleshooting @subentry @code{getline} function
 This works, because the @code{getline} won't be fatal.
 Removing the element from @code{ARGV} with @code{delete}
 skips the file (because it's no longer in the list).
@@ -24157,7 +24217,7 @@ The variable @code{_pw_inited} is used for efficiency, as @code{_pw_init()}
 needs to be called only once.
 
 @cindex @code{PROCINFO} array @subentry testing the field splitting
-@cindex @code{getline} command @subentry @code{_pw_init()} function
+@cindex @code{getline} function @subentry @code{_pw_init()} function
 Because this function uses @code{getline} to read information from
 @command{pwcat}, it first saves the values of @code{FS}, @code{RS}, and @code{$0}.
 It notes in the variable @code{using_fw} whether field splitting
@@ -24429,7 +24489,7 @@ $ @kbd{grcat}
 Here are the functions for obtaining information from the group database.
 There are several, modeled after the C library functions of the same names:
 
-@cindex @code{getline} command @subentry @code{_gr_init()} user-defined function
+@cindex @code{getline} function @subentry @code{_gr_init()} user-defined function
 @cindex @code{_gr_init()} user-defined function
 @cindex user-defined @subentry function @subentry @code{_gr_init()}
 @example
@@ -29840,7 +29900,7 @@ standard error separately.
 
 @cindex deadlocks
 @cindex buffering @subentry input/output
-@cindex @code{getline} command @subentry deadlock and
+@cindex @code{getline} function @subentry deadlock and
 @item
 I/O buffering may be a problem.  @command{gawk} automatically
 flushes all output down the pipe to the coprocess.
@@ -46132,7 +46192,7 @@ Otherwise, refer to the entry for ``recursion.''
 Redirection means performing input from something other than the standard input
 stream, or performing output to something other than the standard output stream.
 
-You can redirect input to the @code{getline} statement using
+You can redirect input to the @code{getline} function using
 the @samp{<}, @samp{|}, and @samp{|&} operators.
 You can redirect the output of the @code{print} and @code{printf} statements
 to a file or a system command, using the @samp{>}, @samp{>>}, @samp{|}, and @samp{|&}
