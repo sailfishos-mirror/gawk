@@ -6556,7 +6556,7 @@ by @command{gawk} or other @command{awk} implementations might support
 such a feature.
 
 We are told that BusyBox @command{awk} (@pxref{Other Versions}) is an
-exception, and that it allows backrefences, but only in dynamic regexps;
+exception, and that it allows backreferences, but only in dynamic regexps;
 for example @samp{"aa" ~ "(.)\1"}, whereas it treats the @samp{\1} in
 @samp{"aa" ~ /(.)\1/} as an octal escape sequence.
 @end cartouche
@@ -8729,13 +8729,14 @@ then @command{gawk} sets @code{RT} to the null string.
 @node Getline
 @section Explicit Input with @code{getline}
 
+@cindexawkfunc{getline}
 @cindex @code{getline} function @subentry explicit input with
 @cindex input @subentry explicit
 So far we have been getting our input data from @command{awk}'s main
 input stream---either the standard input (usually your keyboard, sometimes
 the output from another program) or the
 files specified on the command line.  The @command{awk} language has a
-special built-in command called @code{getline} that
+special built-in function called @code{getline} that
 can be used to read input under your explicit control.
 
 The @code{getline} function is used in several different ways and should
@@ -9308,9 +9309,9 @@ if ((getline VAR) < 0)
     print "Read error";
 @end example
 
-It is, in fact, best to parenthesize use of @command{getline}
+It is, in fact, best to parenthesize calls to @command{getline}
 in all control expressions, as some versions of @command{awk}
-require this. Thus, the previos examples are best written
+require this. Thus, the previous examples are best written
 this way:
 
 @example
@@ -9344,7 +9345,8 @@ BEGIN @{
 Here, the side effect is the @samp{++c}.  Is @code{c} incremented if
 end-of-file is encountered before the element in @code{a} is assigned?
 
-@command{gawk} treats @code{getline} like a function call, and evaluates
+Despite the lack of parentheses when calling @command{getline},
+@command{gawk} evaluates
 the expression @samp{a[++c]} before attempting to read from @file{f}.
 However, some versions of @command{awk} only evaluate the expression once they
 know that there is a string value to be assigned.
