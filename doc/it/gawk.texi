@@ -9733,6 +9733,7 @@ corrisponde a @code{RS}, @command{gawk} imposta @code{RT} alla stringa nulla.
 @node Getline
 @section Richiedere input usando @code{getline}
 
+@cindexawkfunc{getline}
 @cindex @code{getline} (funzione) @subentry input esplicito con
 @cindex input @subentry esplicito
 Finora abbiamo ottenuto i dati di input dal flusso di input principale di
@@ -10332,8 +10333,8 @@ if ((getline VAR) < 0)
     print "Errore di lettura";
 @end example
 
-@`E meglio, in effetti, aggiungere la parentesi quando si usa
-@command{getline} in tutte le espressioni di controllo, e
+@`E meglio, in effetti, aggiungere la parentesi quando si chiama
+@code{getline} in tutte le espressioni di controllo, e
 ci@`o @`e richiesto in alcune versioni di @command{awk}.
 Quindi gli esempi precedenti sarebbero scritti meglio
 in questo modo:
@@ -10370,8 +10371,8 @@ BEGIN @{
 Qui l'effetto secondario @`e @samp{++c}.  Se viene trovata la fine del file
 @emph{prima} di assegnare l'elemento @code{a}, @code{c} @`e incrementato o no?
 
-@command{gawk} tratta @code{getline} come una chiamata di funzione, e valuta
-l'espressione @samp{a[++c]} prima di cercare di leggere da @file{f}.
+Nonostante l'assenza di parentesi, quando si chiama @code{getline} @command{gawk}
+valuta l'espressione @samp{a[++c]} prima di cercare di leggere da @file{f}.
 Comunque, alcune versioni di @command{awk} valutano l'espressione solo
 se c'@`e un valore di stringa da assegnare.
 @end itemize
