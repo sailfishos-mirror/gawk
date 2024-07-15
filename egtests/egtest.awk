@@ -24,6 +24,10 @@ END { print "}" >egi }
 	# this is not part of the stuff to be tested,
 	# it has been prepared in advance
 	if ( wrk ~ "guide-it.po"  ) { next }
+	# gen_float_table tests all three programs: .awk .c .py
+	# no need to specify it three times, gen_float_table.awk is enough
+	if ( wrk ~ "gen-float-table.c"	) { next }
+	if ( wrk ~ "gen-float-table.py"	) { next }
 	nel=split(wrk,el,"/")
 	if ( nel!=3 ) { next }
 	wrk=el[3]

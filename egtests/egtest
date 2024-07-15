@@ -7,7 +7,7 @@
 #
 # it will work only under Linux/Unix
 # it will work only when invoked in the distribution directory
-# (that way the location of the gawktexi.in files is known)
+# (that way the location of the gawk.texi files is known)
 #
 # it can be executed by any user, provided it has access
 # to the gawk distribution directories
@@ -220,8 +220,14 @@ do_gen_float_table() {
 	echo "$vimdiff $tmplib/*.out"
 	wait_go_ahead
 	      $vimdiff $tmplib/*.out
+}
 
-
+do_getlocaltime() {
+	echo "*"
+	echo "* Tested by alarm.awk"
+	echo "*"
+	echo "* getlocaltime routine is contained in gettime.awk"
+	do_alarm
 }
 
 do_getopt() {
@@ -233,14 +239,6 @@ do_getopt() {
 do_gettime() {
 	echo "*"
 	echo "* Tested by alarm.awk"
-	do_alarm
-}
-
-do_getlocaltime() {
-	echo "*"
-	echo "* Tested by alarm.awk"
-	echo "*"
-	echo "* getlocaltime routine is contained in gettime.awk"
 	do_alarm
 }
 
@@ -356,6 +354,7 @@ do_igawk() {
 	echo "cat cut.awk >> $testpgm"
 	      cat cut.awk >> $testpgm
 	echo "*"
+	chmod +x                                           igawk.sh
 	echo "echo abcdefghijklmnopqrstuwwxyz 0123456789 | igawk.sh -f $testpgm -- -c2-8"
 	      echo abcdefghijklmnopqrstuwwxyz 0123456789 | igawk.sh -f $testpgm -- -c2-8
 }
@@ -456,11 +455,11 @@ do_noassign() {
 	echo "BEGIN { print \"==>\",a,b,c,\"<==\"; exit }"
 	echo "BEGIN { print \"==>\",a,b,c,\"<==\"; exit }" > $testpgm
 	echo "* no assignments"
-	echo "gawk -v No_command_assign=1 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm"
-	      gawk -v No_command_assign=1 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm
+	echo "gawk -v No_command_assign=1 -f noassign.awk a=1 b=2 c=3 -f $testpgm"
+	      gawk -v No_command_assign=1 -f noassign.awk a=1 b=2 c=3 -f $testpgm
 	echo "* use assignments"
-	echo "gawk -v No_command_assign=0 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm"
-	      gawk -v No_command_assign=0 -v a=1 -v b=2 -v c=3 -f noassign.awk -f $testpgm
+	echo "gawk -v No_command_assign=0 -f noassign.awk a=1 b=2 c=3 -f $testpgm"
+	      gawk -v No_command_assign=0 -f noassign.awk a=1 b=2 c=3 -f $testpgm
 }
 
 do_ns_passwd() {
@@ -747,6 +746,9 @@ do_wc() {
 	echo "cat $testdata"
 	      cat $testdata
 	echo "*"
+	echo "wc $testdata"
+	      wc $testdata
+	echo "*"
 	echo "gawk -f getopt.awk -f ftrans.awk -f wc.awk -- -c $testdata"
 	      gawk -f getopt.awk -f ftrans.awk -f wc.awk -- -c $testdata
 	echo "*"
@@ -822,9 +824,9 @@ then
 fi
 
 #
-# it must contain the gawktexi.in file
+# it must contain the gawk.texi file
 #
-if [ ! -s "$docen/gawktexi.in" ]
+if [ ! -s "$docen/gawk.texi" ]
 then
 	echo Current directory is $PWD
 	echo This script must be executed in a gawk distribution, in the directory egtests
@@ -832,7 +834,9 @@ then
 	exit
 fi
 
+#
 # just to play it safe, let us check Italian as well
+#
 if [ ! -d "$docit" ]
 then
 	echo Current directory is $PWD
@@ -842,9 +846,9 @@ then
 fi
 
 #
-# it must contain the gawktexi.in file
+# it must contain the gawk.texi file
 #
-if [ ! -s "$docit/gawktexi.in" ]
+if [ ! -s "$docit/gawk.texi" ]
 then
 	echo Current directory is $PWD
 	echo This script must be executed in a gawk distribution, in the directory egtests
@@ -852,7 +856,9 @@ then
 	exit
 fi
 
+#
 # current directory
+#
 export b=${PWD}
 #
 # programs etc. are in this directory
@@ -867,8 +873,9 @@ else
 	mkdir  $s
 fi
 
-# extract both versions, so that all
-# the needed stuff is there
+#
+# extract both versions, so that all the needed stuff is there
+#
 . $b/extracten
 . $b/extractit
 #
@@ -912,9 +919,13 @@ chmod 644 $s/it/eg/data/guide-it.po
 # name of a directory used as a work area
 #
 export tmplib=$s/$lang
+#
 # name of a temporary program needed sometimes
+#
 export testpgm=$tmplib/testpgm.awk
+#
 # name of a temporary datafile needed sometimes
+#
 export testdata=$tmplib/testdata.txt
 
 cd $s/$lang/eg
@@ -922,6 +933,7 @@ cd $s/$lang/eg
 # prepare the list of tests to perform
 #
 list=`find . -type f|gawk -f $b/egtest.awk -v s=$s -v lang=$lang|sort`
+#echo $list
 #
 # working directory during the tests
 #
@@ -929,7 +941,7 @@ cd $s/$lang/eg/prog
 
 while	[ true ]
 do
-	# the parameter for scegli is the number of columns
+	# the parameter for choose is the number of columns
 	# real output is in $s/choice
 	gawk -f $b/choose.awk -v list="$list" -v cols=4 -v s=$s
 	choice=`cat $s/choice`
@@ -945,7 +957,9 @@ do
 		rm -rf $s
 		exit
 	fi
+	#
 	# browse/edit
+	#
 	if [ "$subcmd" = "b" -o "$subcmd" = "e" ]
 	then
 		#echo $sublst
@@ -962,7 +976,9 @@ do
 		done
 		continue
 	fi
+	#
 	# vimdiff
+	#
 	if [ "$subcmd" = "d" -a "$sublst" != "" ]
 	then
 		#echo $sublst
@@ -980,7 +996,9 @@ do
 		done
 		continue
 	fi
+	#
 	# where is the program
+	#
 	if [ "$subcmd" = "w" -a "$sublst" != "" ]
 	then
 		for i in $sublst
@@ -1002,6 +1020,7 @@ do
 	then
 		continue
 	fi
+	#
 	# every other $subcmd does nothing
 	#echo $sublst
 	for i in $sublst
