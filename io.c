@@ -3863,6 +3863,7 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 			// convert CR-LF to LF by shifting the record
 			memmove(bp - 1, bp, iop->dataend - bp);
 			iop->dataend--;
+			*(iop->dataend) = rs;	/* set sentinel */
 			bp--;
 		}
 	} while (in_quote && bp < iop->dataend && bp++);
