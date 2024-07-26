@@ -683,13 +683,12 @@ again:
 		 * [^]] is skipped
 		 */
 		if (*sp == ']' && sp > sp2) {
-			 if (sp[-1] != '['
-			     && sp[-1] != '\\')
-				 ;
-			 else if ((sp - sp2) >= 2
-				  && sp[-1] == '^' && sp[-2] == '[')
-				 ;
-			 else
+			if (sp[-1] != '[' && sp[-1] != '\\')
+				count--;
+			else if ((sp - sp2) >= 2
+				&& sp[-1] == '^' && sp[-2] == '[')
+				;
+			else
 				count--;
 		}
 
