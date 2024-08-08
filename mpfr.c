@@ -422,16 +422,16 @@ mpg_format_val(const char *format, int index, NODE *s)
 		return make_string(result, strlen(result));
 	}
 
-	/* create dummy node for a sole use of format_tree */
+	/* create dummy node for a sole use of format_args */
 	dummy[1] = s;
 	oflags = s->flags;
 
 	if (is_mpg_integer(s) || mpfr_integer_p(s->mpg_numbr)) {
 		/* integral value, use %d */
-		r = format_tree("%d", 2, dummy, 2);
+		r = format_args("%d", 2, dummy, 2);
 		s->stfmt = STFMT_UNUSED;
 	} else {
-		r = format_tree(format, fmt_list[index]->stlen, dummy, 2);
+		r = format_args(format, fmt_list[index]->stlen, dummy, 2);
 		assert(r != NULL);
 		s->stfmt = index;
 	}
