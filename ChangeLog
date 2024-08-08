@@ -1,3 +1,8 @@
+2024-08-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c (format_unsigned_integer, format_signed_integer):
+	Additional fixes. New added tests pass.
+
 2024-07-28         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* TODO: Updated.
@@ -6,14 +11,115 @@
 
 	* re.c (check_bracket_exp): Make the code actually work.
 
+2024-07-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Finish cleaning up the printf refactoring. All tests run, both
+	regular and -M. Test suite is valgrind clean!
+
+	Summary of changes:
+	* printf.c: New file.
+	(format_args): Moved here and renamed from format_tree.  Considerably
+	simplified by moving code out into new routines.
+	(struct flags): New struct.
+	(add_thousands, do_printf, do_sprintf, format_nan_inf, mbc_byte_count,
+	mbc_char_count, out_of_range, printf_common, reverse): Moved to here.
+	(add_alt_format, add_plus_or_space_and_fill, adjust_flags, compute_zero_flag,
+	fill_to_field_width, format_float, format_integer_digits,
+	format_mpg_integer_digits, format_out_of_range, format_signed_integer,
+	format_unsigned_integer, zero_fill_to_precision): New routines.
+
+2024-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Simplify printing of signed integers; move several
+	common tasks out into separate routines, and use char * instead
+	of const char * to avoid a lot of casting.
+
 2024-07-20         Tim Rice              <trice@posteo.net>
 
 	* io.c (csvscan): Set the sentinel if we found CR-LF.
+
+2024-07-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Continuing fixes and cleanups.
+
+2024-07-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated.
+	* printf.c (fill_to_field_width): New function.
+	(format_out_of_range, format_unsigned_integer): Start to use it.
+
+2024-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Continue cleaning up code and removing now-dead code.
+
+2024-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (format_args): Renamed from format_tree. Remove
+	format_tree_old.
+	* debug.c, main.c, mpfr.c, node.c: Adjusted.
+	* printf.c (format_args): Renamed. Removed all old, factored-out
+	code.
+	(format_tree_old): Removed.
+
+2024-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Use mpfr_sprintf() just to generate digits.
+	All tests now passing, even with -M.
+
+2024-07-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Continued progress against the printf-corners test.
+
+2024-07-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Signed and unsigned integer printing and float printing
+	working for current tests. MPFR integer printing also for current
+	tests. A few tests still to go in printf-corners.
+
+2024-07-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Signed printing I think is working. Unsigned is better.
+	Checkpoint commit.
+
+2024-07-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Signed and unsigned integer printing mostly working now.
+	Still to go: Finish that up, get GMP/MPFR integer printing working.
+
+2024-07-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf.c: Lots of cleanup. Floating point format pretty
+	much working. Signed integer printing getting there.
+	Unsigned integer printing still to do.
+
+2024-07-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (format_tree_new, format_tree_old): Add declarations.
+	(format_tree): Temporarily make into a function.
+	* main.c (format_tree): Declare it.
+	(main): Check PRINTF_NEW environment variable and if so,
+	use the new version. Otherwise use the old one.
+	* printf.c (struct flags): Declare.
+	(format_tree_old): The original version.
+	(format_tree_new): The new one, being refactored.
+	(add_thousands): Use the global `loc' variable, not a parameter.
+	static const char *format_integer(NODE *arg, struct flags *flags);
+	(format_mpg_integer, format_float, format_out_of_range,
+	compute_zero_flag): New functions.
 
 2024-07-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* re.c (make_regexp): \u escapes also now treated literally
 	for do_traditional.
+
+2024-06-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Start on printf rework.
+
+	* printf.c: New file, with stuff for printf in it.
+	* builtin.c: Move printf functions into printf.c.
+	* awk.h (efwrite): Add declaration.
+	* Makefile.am (base_source): Added printf.c.
 
 2024-06-21         Arnold D. Robbins     <arnold@skeeve.com>
 
