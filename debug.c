@@ -5227,7 +5227,7 @@ do_print_f(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 
 	PUSH_BINDING(fatal_tag_stack, fatal_tag, fatal_tag_valid);
 	if (setjmp(fatal_tag) == 0)
-		r = format_tree(tmp[0]->stptr, tmp[0]->stlen, tmp, i);
+		r = format_args(tmp[0]->stptr, tmp[0]->stlen, tmp, i);
 	else {
 		/* fatal error, restore exit_val of program */
 		exit_val = EXIT_SUCCESS;

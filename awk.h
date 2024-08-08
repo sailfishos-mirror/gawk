@@ -1483,6 +1483,8 @@ extern NODE *make_regnode(NODETYPE type, NODE *exp);
 extern bool validate_qualified_name(char *token);
 /* builtin.c */
 extern void efflush(FILE *fp, const char *from, struct redirect *rp);
+extern void efwrite(const void *ptr, size_t size, size_t count, FILE *fp, const char *from,
+		struct redirect *rp, bool flush);
 extern double double_to_int(double d);
 extern NODE *do_exp(int nargs);
 extern NODE *do_fflush(int nargs);
@@ -1514,7 +1516,7 @@ extern NODE *do_sub(int nargs, unsigned int flags);
 extern NODE *call_sub(const char *name, int nargs);
 extern NODE *call_match(int nargs);
 extern NODE *call_split_func(const char *name, int nargs);
-extern NODE *format_tree(const char *, size_t, NODE **, long);
+extern NODE *format_args(const char *, size_t, NODE **, long);
 extern NODE *do_lshift(int nargs);
 extern NODE *do_rshift(int nargs);
 extern NODE *do_and(int nargs);

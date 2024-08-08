@@ -246,16 +246,16 @@ r_format_val(const char *format, int index, NODE *s)
 		NODE *dummy[2], *r;
 		unsigned int oflags;
 
-		/* create dummy node for a sole use of format_tree */
+		/* create dummy node for a sole use of format_args */
 		dummy[1] = s;
 		oflags = s->flags;
 
 		if (val == s->numbr) {
 			/* integral value, but outside range of %ld, use %.0f */
-			r = format_tree("%.0f", 4, dummy, 2);
+			r = format_args("%.0f", 4, dummy, 2);
 			s->stfmt = STFMT_UNUSED;
 		} else {
-			r = format_tree(format, fmt_list[index]->stlen, dummy, 2);
+			r = format_args(format, fmt_list[index]->stlen, dummy, 2);
 			assert(r != NULL);
 			s->stfmt = index;
 		}
