@@ -1170,7 +1170,7 @@ reginttrad:
 colonwarn:
 	@echo $@
 	@-for i in 1 2 3 ; \
-	do $(AWK) -f "$(srcdir)"/$@.awk $$i < "$(srcdir)"/$@.in ; \
+	do $(AWK) -f "$(srcdir)"/$@.awk $$i < "$(srcdir)"/$@.in 2>&1 ; \
 	done > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
