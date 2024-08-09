@@ -181,6 +181,8 @@ static INSTRUCTION *ip_beginfile;
 INSTRUCTION *main_beginfile;
 static bool called_from_eval = false;
 
+static bool include_use_current_namespace = false;
+
 static inline INSTRUCTION *list_create(INSTRUCTION *x);
 static inline INSTRUCTION *list_append(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_prepend(INSTRUCTION *l, INSTRUCTION *x);
@@ -205,7 +207,7 @@ extern double fmod(double x, double y);
 %token LEX_AND LEX_OR INCREMENT DECREMENT
 %token LEX_BUILTIN LEX_LENGTH
 %token LEX_EOF
-%token LEX_INCLUDE LEX_EVAL LEX_LOAD LEX_NAMESPACE
+%token LEX_INCLUDE LEX_EVAL LEX_LOAD LEX_NAMESPACE LEX_NSINCLUDE
 %token NEWLINE
 
 /* Lowest to highest */
@@ -298,6 +300,16 @@ rule
 		yyerrok;
 	  }
 	| '@' LEX_INCLUDE source statement_term
+	  {
+		want_source = false;
+		at_seen--;
+		if ($3 != NULL && $4 != NULL) {
+			SRCFILE *s = (SRCFILE *) $3;
+			s->comment = $4;
+		}
+		yyerrok;
+	  }
+	| '@' LEX_NSINCLUDE source statement_term
 	  {
 		want_source = false;
 		at_seen--;
@@ -2335,6 +2347,7 @@ static const struct token tokentab[] = {
 {"namespace",  	Op_symbol,	 LEX_NAMESPACE,	GAWKX,		0,	0},
 {"next",	Op_K_next,	 LEX_NEXT,	0,		0,	0},
 {"nextfile",	Op_K_nextfile, LEX_NEXTFILE,	0,		0,	0},
+{"nsinclude",	Op_symbol,	 LEX_NSINCLUDE,	GAWKX,	0,	0},
 {"or",		Op_builtin,    LEX_BUILTIN,	GAWKX,		do_or,	MPF(or)},
 {"patsplit",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(2)|A(3)|A(4), do_patsplit,	0},
 {"print",	Op_K_print,	 LEX_PRINT,	0,		0,	0},
@@ -2469,7 +2482,7 @@ print_included_from()
 	saveline = sourceline;
 	sourceline = 0;
 
-	for (s = sourcefile; s != NULL && s->stype == SRC_INC; ) {
+	for (s = sourcefile; s != NULL && (s->stype == SRC_INC || s->stype == SRC_NSINC); ) {
 		s = s->next;
 		if (s == NULL || s->fd <= INVALID_HANDLE)
 			continue;
@@ -2481,10 +2494,10 @@ print_included_from()
 		msg("%s %s:%d%c",
 			s->prev == sourcefile ? "In file included from"
 					  : "                 from",
-			(s->stype == SRC_INC ||
+			(s->stype == SRC_INC || s->stype == SRC_NSINC ||
 				 s->stype == SRC_FILE) ? s->src : "cmd. line",
 			line,
-			s->stype == SRC_INC ? ',' : ':'
+			s->stype != SRC_FILE ? ',' : ':'
 		);
 	}
 	sourceline = saveline;
@@ -2886,7 +2899,7 @@ add_srcfile(enum srctype stype, char *src, SRCFILE *thisfile, bool *already_incl
 
 	/* N.B. We do not eliminate duplicate SRC_FILE (-f) programs. */
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
-		if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_EXTLIB) && files_are_same(path, s)) {
+		if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC || s->stype == SRC_EXTLIB) && files_are_same(path, s)) {
 			if (stype == SRC_INC || stype == SRC_EXTLIB) {
 				/* eliminate duplicates */
 				if ((stype == SRC_INC) && (s->stype == SRC_FILE))
@@ -2951,7 +2964,8 @@ include_source(INSTRUCTION *file, void **srcfile_p)
 		return true;
 	}
 
-	s = add_srcfile(SRC_INC, src, sourcefile, &already_included, &errcode);
+	s = add_srcfile(include_use_current_namespace ? SRC_NSINC : SRC_INC,
+		src, sourcefile, &already_included, &errcode);
 	if (s == NULL) {
 		if (already_included)
 			return true;
@@ -2978,7 +2992,12 @@ include_source(INSTRUCTION *file, void **srcfile_p)
 	lasttok = 0;
 	lexeof = false;
 	eof_warned = false;
-	current_namespace = awk_namespace;
+	if (! include_use_current_namespace)
+		current_namespace = awk_namespace;
+	else
+		current_namespace = estrdup(current_namespace, strlen(current_namespace));
+
+	include_use_current_namespace = false;	// reset it
 	*srcfile_p = (void *) s;
 	return true;
 }
@@ -4366,6 +4385,7 @@ retry:
 		int class = tokentab[mid].class;
 
 		switch (class) {
+		case LEX_NSINCLUDE:
 		case LEX_EVAL:
 		case LEX_INCLUDE:
 		case LEX_LOAD:
@@ -4429,11 +4449,15 @@ retry:
 			continue_allowed++;
 
 		switch (class) {
+		case LEX_NSINCLUDE:
+			include_use_current_namespace = true;
+			goto make_at_token;	// can't fall through
 		case LEX_NAMESPACE:
 			want_namespace = true;
 			// fall through
 		case LEX_INCLUDE:
 		case LEX_LOAD:
+	make_at_token:
 			want_source = true;
 			break;
 		case LEX_EVAL:

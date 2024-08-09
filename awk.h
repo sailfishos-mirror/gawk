@@ -1025,6 +1025,7 @@ typedef struct srcfile {
 		SRC_STDIN,
 		SRC_FILE,
 		SRC_INC,
+		SRC_NSINC,
 		SRC_EXTLIB
 	} stype;
 	char *src;	/* name on command line or include statement */

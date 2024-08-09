@@ -459,7 +459,7 @@ main(int argc, char **argv)
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
 		if (s->stype == SRC_EXTLIB)
 			load_ext(s->fullpath);
-		else if (s->stype != SRC_INC)
+		else if (s->stype != SRC_INC && s->stype != SRC_NSINC)
 			have_srcfile = true;
 	}
 

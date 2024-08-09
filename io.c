@@ -3151,7 +3151,7 @@ srcopen(SRCFILE *s)
 
 	if (s->stype == SRC_STDIN)
 		fd = fileno(stdin);
-	else if (s->stype == SRC_FILE || s->stype == SRC_INC)
+	else if (s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 		fd = devopen(s->fullpath, "r");
 
 	/* set binary mode so that debugger byte offset calculations will be right */

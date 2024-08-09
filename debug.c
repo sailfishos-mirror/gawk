@@ -507,7 +507,7 @@ source_find(char *src)
 		return cur_srcfile;
 
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
-		if ((s->stype == SRC_FILE || s->stype == SRC_INC)
+		if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 				&& strcmp(s->src, src) == 0)
 			return s;
 	}
@@ -515,7 +515,7 @@ source_find(char *src)
 	path = find_source(src, & sbuf, & errno_val, false);
 	if (path != NULL) {
 		for (s = srcfiles->next; s != srcfiles; s = s->next) {
-			if ((s->stype == SRC_FILE || s->stype == SRC_INC)
+			if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 			    		&& files_are_same(path, s)) {
 				efree(path);
 				return s;
@@ -760,7 +760,7 @@ do_info(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 		SRCFILE *s;
 		for (s = srcfiles->next; s != srcfiles; s = s->next) {
 			fprintf(out_fp, _("Source file (lines): %s (%d)\n"),
-					(s->stype == SRC_FILE || s->stype == SRC_INC) ? s->src
+					(s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC) ? s->src
 			 		                                      : "cmd. line",
 					s->srclines);
 		}
@@ -2851,7 +2851,8 @@ debug_prog(INSTRUCTION *pc)
 	for (cur_srcfile = srcfiles->prev; cur_srcfile != srcfiles;
 			cur_srcfile = cur_srcfile->prev) {
 		if (cur_srcfile->stype == SRC_FILE
-			|| cur_srcfile->stype == SRC_INC)
+			|| cur_srcfile->stype == SRC_INC
+			|| cur_srcfile->stype == SRC_NSINC)
 			break;
 	}
 
