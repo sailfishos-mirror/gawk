@@ -1627,7 +1627,7 @@ srcfile_generator(const char *text, int state)
 		s = srcfiles->next;
 	}
 	while (s != srcfiles) {
-		if (s->stype != SRC_FILE && s->stype != SRC_INC) {
+		if (s->stype != SRC_FILE && s->stype != SRC_INC && s->stype != SRC_NSINC) {
 			s = s->next;
 			continue;
 		}

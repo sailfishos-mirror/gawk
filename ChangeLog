@@ -1,7 +1,50 @@
+2024-08-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Thanks to Michal Jaegermann for tips on removing
+	compiler warnings:
+
+	* eval.c (opcode2str): Return "" instead of NULL.
+	(cmp_doubles): Default ret to false and add a default case
+	to the switch.
+	* printf.c (format_signed_integer): Add some additional
+	parentheses.
+
+2024-08-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated.
+
 2024-08-06         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* printf.c (format_unsigned_integer, format_signed_integer):
 	Additional fixes. New added tests pass.
+
+2024-08-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Per Andy's suggestion, @ns_include --> @nsinclude.
+
+	* awk.h (SRC_NSINC): Renamed from SRC_NS_INC.
+	* command.y, debug.c, io.c, main.c, profile.c, awkgram.y: All
+	uses adjusted.
+	* awkgram.y (LEX_NSINCLUDE): Renamed from LEX_NS_INCLUDE.
+	(tokentab): "nsinclude" token renamed from "ns_include".
+	(yylex): Adjust logic a bit.
+
+2024-07-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Add @ns_include to include a file into the current namespace.
+
+	* awk.h (struct srcfile): Add new enum value SRC_NS_INC.
+	* awkgram.y (use_current_namespace): New boolean.
+	(LEX_NS_INCLUDE): New token and new production for it.
+	(tokentab): Add "ns_include" token.
+	(print_included_from, add_srcfile, include_source, yylex): Adjust
+	logic.
+	* command.y (srcfile_generator): Handle SRC_NS_INC.
+	* debug.c (source_find): Ditto.
+	(debug_prog): Ditto.
+	* io.c (srcopen): Ditto.
+	* main.c (main): Ditto.
+	* profile.c (print_include_list): Ditto.
 
 2024-07-28         Arnold D. Robbins     <arnold@skeeve.com>
 

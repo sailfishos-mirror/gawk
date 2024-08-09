@@ -947,6 +947,8 @@ particular records in a file and perform operations upon them.
 * Naming Rules::                        Namespace and Component Naming Rules.
 * Internal Name Management::            How names are stored internally.
 * Namespace Example::                   An example of code using a namespace.
+* Inclusion For Namespaces::            Including a file without changing the
+                                        namespace.
 * Namespace And Features::              Namespaces and other @command{gawk}
                                         features.
 * Namespace Summary::                   Summarizing namespaces.
@@ -4958,11 +4960,12 @@ to @code{EXIT_FAILURE}.
 @c text for this section.
 
 This @value{SECTION} describes a feature that is specific to @command{gawk}.
+It discusses how one source file may include another.
 
 @cindex @code{@@} (at-sign) @subentry @code{@@include} directive
 @cindex at-sign (@code{@@}) @subentry @code{@@include} directive
-@cindex file inclusion, @code{@@include} directive
-@cindex including files, @code{@@include} directive
+@cindex file inclusion @subentry @code{@@include} directive
+@cindex including files @subentry @code{@@include} directive
 @cindex @code{@@include} directive @sortas{include directive}
 @cindex @env{AWKPATH} environment variable
 @cindex environment variables @subentry @env{AWKPATH}
@@ -5089,6 +5092,8 @@ apply to files loaded with @code{@@include}.
 Finally, files included with @code{@@include}
 are treated as if they had @samp{@@namespace "awk"}
 at their beginning.  @xref{Changing The Namespace}, for more information.
+However, there is a separate @code{@@nsinclude} command which
+does not change the namespace; see @ref{Inclusion For Namespaces}.
 
 @node Loading Shared Libraries
 @section Loading Dynamic Extensions into Your Program
@@ -33328,6 +33333,8 @@ please report them (@xref{Bugs}).
 * Naming Rules::                Namespace and Component Naming Rules.
 * Internal Name Management::    How names are stored internally.
 * Namespace Example::           An example of code using a namespace.
+* Inclusion For Namespaces::    Including a file without changing the
+                                namespace.
 * Namespace And Features::      Namespaces and other @command{gawk} features.
 * Namespace Summary::           Summarizing namespaces.
 @end menu
@@ -33691,6 +33698,116 @@ $ @kbd{gawk -f ns_passwd.awk -f testpasswd.awk}
 @print{} sys:x:3:3:sys:/dev:/usr/sbin/nologin
 @dots{}
 @end example
+
+@node Inclusion For Namespaces
+@section Including A File Without Changing The Namespace
+
+@cindex @code{@@} (at-sign) @subentry @code{@@nsinclude} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@nsinclude} directive
+@cindex file inclusion @subentry @code{@@nsinclude} directive
+@cindex including files @subentry @code{@@nsinclude} directive
+@cindex @code{@@nsinclude} directive @sortas{nsinclude directive}
+
+As mentioned at the end of @ref{Include Files}, files included with
+@code{@@include} are treated as if they had @samp{@@namespace "awk"}
+at their beginning.  Sometimes, though, this behavior is undesirable.
+
+Consider, for example, the case where you have some significant functions
+in one namespace:
+
+@example
+@@namespace "mylib"
+
+function major_func1(a, b, c) @{ @dots{} @}
+function major_func2(a, b, c) @{ @dots{} @}
+@dots{}
+@end example
+
+@noindent
+From another namespace, you want to call these functions,
+frequently:
+
+@example
+@@namespace "myproj1"
+function job1(a, b, c) @{
+    @dots{}
+    if (mylib::major_func1(a, b, c))
+        @dots{}
+    else if (mylib::major_func2(a, b, c))
+        @dots{}
+    @dots{}
+@}
+@dots{} @ii{and so on} @dots{}
+@end example
+
+@noindent
+Using the @samp{mylib::} prefix everywhere starts to get painful.
+
+You might then try to write some @dfn{forwarding functions}, which you
+would @code{@@include} in each namespace. For example, something
+like this in a file named @file{mylib_forward.awk}:
+
+@example
+function major_func1(a, b, c)
+@{
+    return mylib::major_func1(a, b, c)
+@}
+
+function major_func2(a, b, c)
+@{
+    return mylib::major_func2(a, b, c)
+@}
+@end example
+
+You might then try to @code{@@include} this file in each namespace:
+
+@example
+@@namespace "myproj1"
+@@include "mylib_forward.awk"
+
+function job1(a, b, c) @{
+    @dots{}
+    if (major_func1(a, b, c))       # calls forwarding function
+        @dots{}
+    else if (major_func2(a, b, c))  # ditto
+        @dots{}
+    @dots{}
+@}
+@dots{}
+
+@@namespace "myproj2"
+@@include "mylib_forward.awk"
+@dots{}
+@end example
+
+@noindent
+But this won't work, since @code{@@include} resets the namespace
+to @samp{awk}.
+
+For this reason, @code{@@nsinclude} was added. It works exactly
+the same as @code{@@include}, but it does not change the namespace:
+
+@example
+@@namespace "myproj1"
+@@nsinclude "mylib_forward.awk"
+
+function job1(a, b, c) @{
+    @dots{}
+    if (major_func1(a, b, c))       # calls forwarding function
+        @dots{}
+    else if (major_func2(a, b, c))  # ditto
+        @dots{}
+    @dots{}
+@}
+@dots{}
+
+@@namespace "myproj2"
+@@nsinclude "mylib_forward.awk"
+@dots{}
+@end example
+
+@noindent
+This will work the way we want it to.
 
 @node Namespace And Features
 @section Namespaces and Other @command{gawk} Features

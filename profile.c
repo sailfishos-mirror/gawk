@@ -1354,10 +1354,10 @@ print_include_list(FILE *prof_fp)
 		return;
 
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
-		if (s->stype == SRC_INC) {
+		if (s->stype == SRC_INC || s->stype == SRC_NSINC) {
 			if (! printed_header) {
 				printed_header = true;
-				fprintf(prof_fp, _("\n# Included files (-i and/or @include)\n\n"));
+				fprintf(prof_fp, _("\n# Included files (-i and/or @include and/or @nsinclude)\n\n"));
 			}
 			found = true;
 			fprintf(prof_fp, "# @include \"%s\"", s->src);

@@ -13,7 +13,7 @@
 .		if \w'\(rq' .ds rq "\(rq
 .	\}
 .\}
-.TH GAWK 1 "Apr 24 2024" "Free Software Foundation" "Utility Commands"
+.TH GAWK 1 "Aug 02 2024" "Free Software Foundation" "Utility Commands"
 .SH NAME
 gawk \- pattern scanning and processing language
 .SH SYNOPSIS
@@ -379,6 +379,8 @@ and optional function definitions.
 .PP
 \fB@include "\fIfilename\^\fB"
 .br
+\fB@nsinclude "\fIfilename\^\fB"
+.br
 \fB@load "\fIfilename\^\fB"
 .br
 \fB@namespace "\fIname\^\fB"
@@ -413,6 +415,15 @@ This is equivalent
 to using the
 .B \-\^\-include
 option.
+.PP
+Lines beginning with
+.B @nsinclude
+also include files, but with two differences.
+First, the namespace in the included file is
+.I not
+reset to the default of
+.BR awk ,
+and such files may be included multiple times.
 .PP
 Lines beginning with
 .B @load
@@ -2272,7 +2283,9 @@ and
 .B \-\^\-include
 options, and the
 .B @include
-directive.  If the initial search fails, the path is searched again after
+and
+.B @nsinclude
+directives.  If the initial search fails, the path is searched again after
 appending
 .B \&.awk
 to the filename.
