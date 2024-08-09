@@ -385,7 +385,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.3.0b"
+#define PACKAGE_VERSION "5.3.60"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -513,7 +513,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.3.0b"
+#define VERSION "5.3.60"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
