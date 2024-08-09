@@ -416,7 +416,7 @@ opcode2str(OPCODE op)
 	if (op >= Op_illegal && op < Op_final)
 		return optypes[(int) op].desc;
 	fatal(_("unknown opcode %d"), (int) op);
-	return NULL;
+	return "";	// keeps the compiler happy in some cases
 }
 
 /* op2str --- convert an opcode type to corresponding operator or keyword */
@@ -1614,7 +1614,7 @@ cmp_doubles(const NODE *t1, const NODE *t2, scalar_cmp_t comparison_type)
 
 	bool t1_nan = isnan(t1->numbr);
 	bool t2_nan = isnan(t2->numbr);
-	int ret;
+	int ret = false;
 
 	if ((t1_nan || t2_nan) && comparison_type != SCALAR_NEQ)
 		return false;
@@ -1637,6 +1637,9 @@ cmp_doubles(const NODE *t1, const NODE *t2, scalar_cmp_t comparison_type)
 		break;
 	case SCALAR_GE:
 		ret = (t1->numbr >= t2->numbr);
+		break;
+	default:
+		cant_happen("invalid value %d in cmp_doubles", (int) comparison_type);
 		break;
 	}
 

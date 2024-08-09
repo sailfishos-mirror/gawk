@@ -1036,6 +1036,7 @@ enum srctype {
 	SRC_STDIN,
 	SRC_FILE,
 	SRC_INC,
+	SRC_NSINC,
 	SRC_EXTLIB
 };
 

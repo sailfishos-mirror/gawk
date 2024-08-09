@@ -1024,7 +1024,7 @@ format_signed_integer(NODE *arg, struct flags *flags)
 		return add_plus_or_space_and_fill(number_value, flags);
 	} else if (flags->have_prec &&
 			(val_len < flags->precision ||
-			 flags->negative && val_len - 1 < flags->precision)) {
+			 (flags->negative && val_len - 1 < flags->precision))) {
 		buf1 = zero_fill_to_precision(number_value, flags);
 		val_len = strlen(buf1);
 
