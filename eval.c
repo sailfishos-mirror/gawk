@@ -1545,7 +1545,7 @@ cmp_scalars(scalar_cmp_t comparison_type)
 {
 	NODE *t1, *t2;
 	int di;
-	bool ret;
+	bool ret = false;
 
 	t2 = POP_SCALAR();
 	t1 = TOP();
@@ -1583,6 +1583,9 @@ cmp_scalars(scalar_cmp_t comparison_type)
 			break;
 		case SCALAR_GE:
 			ret = (di >= 0);
+			break;
+		default:
+			cant_happen("invalid value %d in cmp_scalars", (int) comparison_type);
 			break;
 		}
 	} else {
