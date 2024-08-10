@@ -1081,7 +1081,9 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         spazio-dei-nomi e ai suoi componenti.
 * Gestione interna dei nomi::           Come i nomi sono gestiti internamente.
 * Esempio di spazio-dei-nomi::  Esempio di codice che usa uno spazio-dei-nomi.
-* Spazio-dei-nomi e funzionalit@`a::      Lo spazio-dei-nomi e le altre
+* Inclusione per spazio-dei-nomi::      Includere un file senza modificare lo
+                                        spazio-dei-nomi.
+* Spazio-dei-nomi e funzionalit@`a::    Lo spazio-dei-nomi e le altre
                                         funzionalit@`a di @command{gawk}.
 * Sommario sugli spazi-dei-nomi::       Sommario sugli spazi-dei-nomi.
 * Aritmetica del computer::             Una rapida introduzione alla matematica del
@@ -5544,14 +5546,16 @@ Questo
 @end ifinfo
 @value{SECTION} descrive una funzionalit@`a disponibile solo in
 @command{gawk}.
+Tratta di come includere da un file sorgente un altro file sorgente.
 
 @cindex @code{@@} (chiocciola) @subentry @code{@@include} (direttiva)
 @cindex chiocciola (@code{@@}) @subentry @code{@@include} (direttiva)
 @cindex direttiva @subentry @code{@@include}
 @cindex file @subentry includere, direttiva @code{@@include}
-@cindex caricare estensioni @subentry @code{@@load} (direttiva)
-@cindex estensioni @subentry caricare @subentry @code{@@load} (direttiva)
 @cindex includere file @subentry direttiva @code{@@include}
+@cindex direttiva @subentry @code{@@load}
+@cindex estensioni @subentry caricare @subentry @code{@@load} (direttiva)
+@cindex caricare estensioni @subentry direttiva @code{@@load}
 @cindex @env{AWKPATH} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{AWKPATH}
 La direttiva @code{@@include} pu@`o essere usata per leggere file sorgenti
@@ -5690,6 +5694,8 @@ Infine, i file inclusi con @code{@@include} sono considerati
 appartenere allo spazio-dei-nomi @samp{"awk" (@@namespace "awk")}
 a inizio programma. @xref{Cambiare lo spazio-dei-nomi}, per ulteriori
 informazioni.
+Peraltro, c'@`e una direttiva a parte, @code{@@nsinclude}, che non
+modifica lo spazio-dei-nomi; vedere @ref{Inclusione per spazio-dei-nomi}.
 
 @node Caricare librerie condivise
 @section Caricare librerie condivise nel proprio programma
@@ -10312,7 +10318,7 @@ possono far s@`{@dotless{i}} che @code{FILENAME} venga aggiornato se chiedono ad
 
 @item
 @code{getline} non @`e un'istruzione (a differenza di @code{print}), @`e
-un'espressione.  Ha come risultato un valore, e pu@`o essere 
+un'espressione.  Ha come risultato un valore, e pu@`o essere
 usato come parte di un'espressione pi@`u complessa, per istruzioni
 di controllo e cos@`{@dotless{i}} via.
 Ecco degli esempi dell'uso ``lettura fino a errore o a fine-file'':
@@ -23788,7 +23794,7 @@ quindi occorre essere consapevoli che differenti implementazioni di
 @author The Lenox Globe @c @footnote{Si veda @uref{https://wiki.gis.com/wiki/index.php/Here_be_dragons}.}
 @end quotation
 
-In @command{gawk} la situazione pu@`o essere un po' pi@`u inaspettata. 
+In @command{gawk} la situazione pu@`o essere un po' pi@`u inaspettata.
 Poich@'e @command{gawk} consente di avere vettori di vettori,
 la stessa tipizzazione dinamica pu@`o essere applicata a elementi
 di vettore che sono stati creati ma non ancora usati.
@@ -34041,7 +34047,7 @@ acceduti da un altro utente o hacker (che a sua volta sia divenuto
 
 @item
 Col passare del tempo, il file di appoggio si riempir@`a di memoria
-``disseminata'' da @command{gawk} durante le esecuzioni.  
+``disseminata'' da @command{gawk} durante le esecuzioni.
 In prevalenza, si tratta della memoria usata per convertire il
 programma in esecuzione nel formato interno, prima di eseguirlo,
 il che capita a ogni esecuzione, ma ci sono anche altre cause
@@ -36954,6 +36960,8 @@ Chi ne trovasse, @`e pregato di notificarlo (@xref{Bug}).
                                         spazio-dei-nomi ai suoi componenti.
 * Gestione interna dei nomi::           Come i nomi sono gestiti internamente.
 * Esempio di spazio-dei-nomi::  Esempio di codice che usa uno spazio-dei-nomi.
+* Inclusione per spazio-dei-nomi::      Includere un file senza modificare lo
+                                        spazio-dei-nomi.
 * Spazio-dei-nomi e funzionalit@`a::      Lo spazio-dei-nomi e le altre
                                         funzionalit@`a di @command{gawk}.
 * Sommario sugli spazi-dei-nomi::      Sommario sugli spazi-dei-nomi.
@@ -37377,6 +37385,122 @@ $ @kbd{gawk -f ns_passwd.awk -f testpasswd.awk}
 @print{} sys:x:3:3:sys:/dev:/usr/sbin/nologin
 @dots{}
 @end example
+
+@node Inclusione per spazio-dei-nomi
+@section Includere un file senza modificare lo spazio-dei-nomi
+
+@cindex @code{@@} (chiocciola) @subentry @code{@@nsinclude} (direttiva)
+@cindex chiocciola (@code{@@}) @subentry @code{@@nsinclude} (direttiva)
+@cindex direttiva @subentry @code{@@nsinclude}
+@cindex file @subentry includere, direttiva @code{@@nsinclude}
+@cindex includere file @subentry direttiva @code{@@nsinclude}
+@cindex @code{@@nsinclude} direttiva @sortas{nsinclude direttiva}
+
+Come accennato alla fine di @ref{Includere file}, i file inclusi con
+la direttiva @code{@@include} sono gestiti come se avessero al
+loro inizio la direttiva @samp{@@namespace "awk"}.
+In qualche caso, tuttavia, un tale comportamente non @`e desiderabile.
+
+Si consideri, per esempio, il caso un cui una qualche funzione
+significativa si trovi in un altro spazio-dei-nomi:
+
+@example
+@@namespace "mialibreria"
+
+function mia_funzione1(a, b, c) @{ @dots{} @}
+function mia_funzione2(a, b, c) @{ @dots{} @}
+@dots{}
+@end example
+
+@noindent
+Da un altro spazio-dei-nomi, si vuole chiamare queste
+funzioni frequentemente:
+
+@example
+@@namespace "mioprogetto1"
+function lavoro1(a, b, c) @{
+    @dots{}
+    if (mialibreria::mia_funzione1(a, b, c))
+        @dots{}
+    else if (mialibreria::mia_funzione2(a, b, c))
+        @dots{}
+    @dots{}
+@}
+@dots{} @ii{e cos@`{@dotless{i}} via} @dots{}
+@end example
+
+@noindent
+Usare il prefisso @samp{mialibreria::} dappertutto comincia a
+diventare faticoso.
+
+Si potrebbe provare a scrivere alcune @dfn{funzioni di inoltro},
+da includere (tramite @code{@@include}) in ogni spazio-dei-nomi.
+Per esempio, qualcosa come si vede qui sotto, messo in un file
+chiamato @file{mialibreria_inoltra.awk}:
+
+@example
+function mia_funzione1(a, b, c)
+@{
+    return mialibreria::mia_funzione1(a, b, c)
+@}
+
+function mia_funzione2(a, b, c)
+@{
+    return mialibreria::mia_funzione2(a, b, c)
+@}
+@end example
+
+Si potrebbe poi tentare di includere (tramite @code{@@include})
+tale file in ogni spazio-dei-nomi:
+
+@example
+@@namespace "mioprogetto1"
+@@include "mialibreria_inoltra.awk"
+
+function lavoro1(a, b, c) @{
+    @dots{}
+    if (mia_funzione1(a, b, c))       # chiama la funzione di inoltro
+        @dots{}
+    else if (mia_funzione2(a, b, c))  # idem
+        @dots{}
+    @dots{}
+@}
+@dots{}
+
+@@namespace "mioprogetto2"
+@@include "mialibreria_inoltra.awk"
+@dots{}
+@end example
+
+@noindent
+Ma ci@`o non pu@`o funzionare, in quanto @code{@@include} modifica
+lo spazio-dei-nomi ad @samp{awk}.
+
+Per questa ragione, @`e stata aggiunta la direttiva
+@code{@@nsinclude}.  Funziona esattamente come
+@code{@@include}, ma non modifica lo spazio-dei-nomi corrente:
+
+@example
+@@namespace "mioprogetto1"
+@@nsinclude "mialibreria_inoltra.awk"
+
+function lavoro1(a, b, c) @{
+    @dots{}
+    if (mia_funzione1(a, b, c))       # chiama la funzione di inoltre
+        @dots{}
+    else if (mia_funzione2(a, b, c))  # idem
+        @dots{}
+    @dots{}
+@}
+@dots{}
+
+@@namespace "mioprogetto2"
+@@nsinclude "mialibreria_inoltra.awk"
+@dots{}
+@end example
+
+@noindent
+Ci@`o funzioner@`a nella maniera desiderata.
 
 @node Spazio-dei-nomi e funzionalit@`a
 @section Lo spazio-dei-nomi e le altre funzionalit@`a di @command{gawk}
@@ -43834,7 +43958,7 @@ else
 L'estensione @code{inplace} svolge un lavoro simile a quello
 dell'opzione @option{-i} nel programma di utilit@`a GNU @command{sed},
 che svolge delle funzioni di modifica ``al volo'' su ogni file in input.
-Come il comando GNU @command{sed}, l'estensione @code{inplace} 
+Come il comando GNU @command{sed}, l'estensione @code{inplace}
 sostituisce i collegamenti (sia simbolici che fisici) con dei nuovi file.
 Se si vuole operare sul file originale (e non sui collegamenti al file
 stesso), occorre prima procurarsi il suo percorso completo, per esempio
@@ -45196,7 +45320,7 @@ per la manipolazione a livello di bit
 
 @item
 La funzione @code{isarray()} per controllare se una variabile @`e un vettore
-e la funzione più generale @code{typeof()}
+e la funzione pi@`u generale @code{typeof()}
 (@pxref{Funzioni per i tipi})
 
 @item
@@ -46811,6 +46935,11 @@ resto del team di sviluppo.
 John Malmberg ha apportato miglioramenti significativi alla versione
 OpenVMS e alla relativa documentazione.
 
+@item
+@cindex Colombo, Antonio
+Antonio Giovanni Colombo ha riscritto alcuni degli esempi nei primi
+capitoli, che erano diventati anacronistici, e per questo gli sono
+molto grato.
 Ha inoltre preparato con Marco Curreli e mantiene la traduzione in
 italiano di questo libro.
 
