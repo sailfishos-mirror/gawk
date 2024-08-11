@@ -1327,8 +1327,9 @@ fmt0:
 
 	return buf;
 #else
+	static char empty[] = "";
 	cant_happen("%s", "trying to format GMP integer");
-	return NULL;
+	return empty;
 #endif
 }
 
