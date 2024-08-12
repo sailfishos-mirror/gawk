@@ -119,7 +119,7 @@ AWKOBJ1 = array.obj,awkgram.obj,builtin.obj,cint_array.obj,\
 
 AWKOBJ2 = int_array.obj,io.obj,localeinfo.obj,main.obj,mpfr.obj,msg.obj,\
 	node.obj,random.obj,re.obj,regex.obj,replace.obj,\
-	str_array.obj,symbol.obj,version.obj
+	str_array.obj,symbol.obj,version.obj,printf.obj
 
 AWKOBJS = $(AWKOBJ1),$(AWKOBJ2)
 
@@ -201,6 +201,7 @@ main.obj	: main.c
 msg.obj		: msg.c
 mpfr.obj	: mpfr.c
 node.obj	: node.c
+printf.obj      : printf.c
 profile.obj	: profile.c
 random.obj	: $(SUPPORT)random.c $(SUPPORT)random.h
 re.obj		: re.c
