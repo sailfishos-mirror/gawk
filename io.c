@@ -3388,7 +3388,7 @@ iop_alloc(int fd, const char *name, int errno_val)
 
 	iop->public.fd = fd;
 	iop->public.name = name;
-	iop->public.read_func = ( ssize_t(*)() ) read;
+	iop->public.read_func = ( ssize_t(*)(int, void *, size_t) ) read;
 	iop->valid = false;
 	iop->errcode = errno_val;
 
@@ -4448,7 +4448,7 @@ get_read_timeout(IOBUF *iop)
 	}
 
 	/* overwrite read routine only if an extension has not done so */
-	if ((iop->public.read_func == ( ssize_t(*)() ) read) && tmout > 0)
+	if ((iop->public.read_func == ( ssize_t(*)(int, void *, size_t) ) read) && tmout > 0)
 		iop->public.read_func = read_with_timeout;
 
 	return tmout;
