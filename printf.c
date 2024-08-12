@@ -1327,7 +1327,9 @@ fmt0:
 
 	return buf;
 #else
+	static char empty[] = "";
 	cant_happen("%s", "trying to format GMP integer");
+	return empty;
 #endif
 }
 
@@ -1479,7 +1481,7 @@ format_float(NODE *arg, struct flags *flags)
 			buflen *= 2;
 		}
 #else
-		cant_happen("trying to format GMP/MPFR number");
+		cant_happen("%s", "trying to format GMP/MPFR number");
 #endif
 	} else {
 		if (flags->have_prec || tolower(flags->format) != 'a') {

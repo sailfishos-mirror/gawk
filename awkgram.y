@@ -3124,11 +3124,6 @@ get_src_buf()
 	int savelen;
 	struct stat sbuf;
 
-	/*
-	 * No argument prototype on readfunc on purpose,
-	 * avoids problems with some ancient systems where
-	 * the types of arguments to read() aren't up to date.
-	 */
 	static ssize_t (*readfunc)(int, void *, size_t) = NULL;
 
 	if (readfunc == NULL) {

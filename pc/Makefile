@@ -140,7 +140,7 @@ CFLAGS = $(CF) -DGAWK -I. -I./support -DHAVE_CONFIG_H -DDEFPATH=$(DEFPATH) -DDEF
 AWKOBJS1  = array$O builtin$O eval$O field$O floatcomp$O gawkmisc$O io$O main$O
 AWKOBJS2  = ext$O msg$O node$O profile$O re$O replace$O version$O symbol$O
 AWKOBJS3  = debug$O cint_array$O int_array$O mpfr$O str_array$O command$O
-AWKOBJS4  = gawkapi$O
+AWKOBJS4  = gawkapi$O printf$O
 AWKOBJS = $(AWKOBJS1) $(AWKOBJS2) $(AWKOBJS3) $(AWKOBJS4)
 
 ALLOBJS = $(AWKOBJS) awkgram$O getid$O $(OBJ)
