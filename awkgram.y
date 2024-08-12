@@ -63,6 +63,7 @@ static char *tokexpand(void);
 static NODE *set_profile_text(NODE *n, const char *str, size_t len);
 static int check_qualified_special(char *token);
 static char *qualify_name(const char *name, size_t len);
+static void push_ns_onto_namespace_chain(INSTRUCTION *comment);
 static INSTRUCTION *trailing_comment;
 static INSTRUCTION *outer_comment;
 static INSTRUCTION *interblock_comment;
@@ -5040,6 +5041,9 @@ mk_function(INSTRUCTION *fi, INSTRUCTION *def)
 	}
 
 	if (do_pretty_print) {
+		if (namespace_chain == NULL)
+			push_ns_onto_namespace_chain(NULL);
+
 		fi[3].nexti = namespace_chain;
 		namespace_chain = NULL;
 		(void) list_prepend(def, instruction(Op_exec_count));
@@ -5061,6 +5065,18 @@ mk_function(INSTRUCTION *fi, INSTRUCTION *def)
 	/* remove params from symbol table */
 	remove_params(thisfunc);
 	return fi;
+}
+
+/* push_ns_onto_namespace_chain --- update the namespace chain */
+
+static void
+push_ns_onto_namespace_chain(INSTRUCTION *comment)
+{
+	INSTRUCTION *new_ns = instruction(Op_K_namespace);
+	new_ns->comment = comment;
+	new_ns->ns_name = estrdup(current_namespace, strlen(current_namespace));
+	new_ns->nexti = namespace_chain;
+	namespace_chain = new_ns;
 }
 
 /*
@@ -6916,11 +6932,7 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 	efree(ns->lextok);
 
 	// save info and push on front of list of namespaces seen
-	INSTRUCTION *new_ns = instruction(Op_K_namespace);
-	new_ns->comment = comment;
-	new_ns->ns_name = estrdup(current_namespace, strlen(current_namespace));
-	new_ns->nexti = namespace_chain;
-	namespace_chain = new_ns;
+	push_ns_onto_namespace_chain(comment);
 
 	ns->lextok = NULL;
 	bcfree(ns);

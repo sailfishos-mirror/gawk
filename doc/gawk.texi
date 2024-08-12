@@ -3870,6 +3870,9 @@ This option may be given multiple times; the @command{awk}
 program consists of the concatenation of the contents of
 each specified @var{source-file}.
 
+@cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive
+@cindex @code{@@namespace} directive @sortas{namespace directive}
 Files named with @option{-f} are treated as if they had @samp{@@namespace "awk"}
 at their beginning. @xref{Changing The Namespace}, for more information
 on this advanced feature.
@@ -4032,6 +4035,9 @@ $ @kbd{gawk -e 'BEGIN @{ a = 5 ;' -e 'print a @}'}
 However, this is no longer true. If you have any scripts that
 rely upon this feature, you should revise them.
 
+@cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive
+@cindex @code{@@namespace} directive @sortas{namespace directive}
 This is because each @var{program-text} is treated as if it had
 @samp{@@namespace "awk"} at its beginning. @xref{Changing The Namespace},
 for more information.
@@ -4101,6 +4107,9 @@ that @command{gawk} accepts and then exit.
 @cindex @option{-i} option
 @cindex @option{--include} option
 @cindex @command{awk} programs @subentry location of
+@cindex @code{@@} (at-sign) @subentry @code{@@include} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@include} directive
+@cindex @code{@@include} directive @sortas{include directive}
 Read an @command{awk} source library from @var{source-file}.  This option
 is completely equivalent to using the @code{@@include} directive inside
 your program.  It is very similar to the @option{-f} option,
@@ -4113,6 +4122,9 @@ input.  Thus, after processing an @option{-i} argument, @command{gawk}
 still expects to find the main source code via the @option{-f} option
 or on the command line.
 
+@cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive
+@cindex @code{@@namespace} directive @sortas{namespace directive}
 Files named with @option{-i} are treated as if they had @samp{@@namespace "awk"}
 at their beginning.  @xref{Changing The Namespace}, for more information.
 
@@ -4148,13 +4160,16 @@ causes a fatal error.
 @cindex loading extensions
 @cindex @env{AWKLIBPATH} environment variable
 @cindex environment variables @subentry @env{AWKLIBPATH}
+@cindex @code{@@} (at-sign) @subentry @code{@@load} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@load} directive
+@cindex @code{@@load} directive @sortas{load directive}
 Load a dynamic extension named @var{ext}. Extensions
 are stored as system shared libraries.
 This option searches for the library using the @env{AWKLIBPATH}
 environment variable.  The correct library suffix for your platform will be
 supplied by default, so it need not be specified in the extension name.
 The extension initialization routine should be named @code{dl_load()}.
-An alternative is to use the @code{@@load} keyword inside the program to load
+An alternative is to use the @code{@@load} directive inside the program to load
 a shared library.  This advanced feature is described in detail in @ref{Dynamic Extensions}.
 
 @item @option{-L}[@var{value}]
@@ -4747,6 +4762,9 @@ found, and @command{gawk} no longer needs to use @env{AWKPATH}.
 @cindex directories @subentry searching @subentry for loadable extensions
 @cindex search paths @subentry for loadable extensions
 @cindex differences in @command{awk} and @command{gawk} @subentry @code{AWKLIBPATH} environment variable
+@cindex @code{@@} (at-sign) @subentry @code{@@load} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@load} directive
+@cindex @code{@@load} directive @sortas{load directive}
 
 The @env{AWKLIBPATH} environment variable is similar to the @env{AWKPATH}
 variable, but it is used to search for loadable extensions (stored as
@@ -4755,7 +4773,7 @@ than for source files.  If the extension is not found, the path is
 searched again after adding the appropriate shared library suffix for
 the platform.  For example, on GNU/Linux systems, the suffix @samp{.so}
 is used.  The search path specified is also used for extensions loaded
-via the @code{@@load} keyword (@pxref{Loading Shared Libraries}).
+via the @code{@@load} directive (@pxref{Loading Shared Libraries}).
 
 If @env{AWKLIBPATH} does not exist in the environment, or if it has
 an empty value, @command{gawk} uses a default path; this
@@ -4969,13 +4987,13 @@ It discusses how one source file may include another.
 @cindex @code{@@include} directive @sortas{include directive}
 @cindex @env{AWKPATH} environment variable
 @cindex environment variables @subentry @env{AWKPATH}
-The @code{@@include} keyword can be used to read external @command{awk} source
+The @code{@@include} directive can be used to read external @command{awk} source
 files.  This gives you the ability to split large @command{awk} source files
 into smaller, more manageable pieces, and also lets you reuse common @command{awk}
 code from various @command{awk} scripts.  In other words, you can group
 together @command{awk} functions used to carry out specific tasks
 into external files. These files can be used just like function libraries,
-using the @code{@@include} keyword in conjunction with the @env{AWKPATH}
+using the @code{@@include} directive in conjunction with the @env{AWKPATH}
 environment variable.  Note that source files may also be included
 using the @option{-i} option.
 
@@ -5010,7 +5028,7 @@ $ @kbd{gawk -f test2}
 
 @command{gawk} runs the @file{test2} script, which includes @file{test1}
 using the @code{@@include}
-keyword.  So, to include external @command{awk} source files, you just
+directive.  So, to include external @command{awk} source files, you just
 use @code{@@include} followed by the name of the file to be included,
 enclosed in double quotes.
 
@@ -5076,7 +5094,7 @@ to be included.
 
 Given the ability to specify multiple @option{-f} options, the
 @code{@@include} mechanism is not strictly necessary.
-However, the @code{@@include} keyword
+However, the @code{@@include} directive
 can help you in constructing self-contained @command{gawk} programs,
 thus reducing the need for writing complex and tedious command lines.
 In particular, @code{@@include} is very useful for writing CGI scripts
@@ -5089,6 +5107,11 @@ source is not loaded if it has been previously loaded.
 The rules for finding a source file described in @ref{AWKPATH Variable} also
 apply to files loaded with @code{@@include}.
 
+@cindex @code{@@} (at-sign) @subentry @code{@@nsinclude} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@nsinclude} directive
+@cindex file inclusion @subentry @code{@@nsinclude} directive
+@cindex including files @subentry @code{@@nsinclude} directive
+@cindex @code{@@nsinclude} directive @sortas{nsinclude directive}
 Finally, files included with @code{@@include}
 are treated as if they had @samp{@@namespace "awk"}
 at their beginning.  @xref{Changing The Namespace}, for more information.
@@ -5107,7 +5130,7 @@ This @value{SECTION} describes a feature that is specific to @command{gawk}.
 @cindex @code{@@load} directive @sortas{load directive}
 @cindex @env{AWKLIBPATH} environment variable
 @cindex environment variables @subentry @env{AWKLIBPATH}
-The @code{@@load} keyword can be used to read external @command{awk} extensions
+The @code{@@load} directive can be used to read external @command{awk} extensions
 (stored as system shared libraries).
 This allows you to link in compiled code that may offer superior
 performance and/or give you access to extended capabilities not supported
@@ -5350,12 +5373,12 @@ an @command{awk} program to set the exit status.
 
 @item
 @command{gawk} allows you to include other @command{awk} source files into
-your program using the @code{@@include} statement and/or the @option{-i}
+your program using the @code{@@include} directive and/or the @option{-i}
 and @option{-f} command-line options.
 
 @item
 @command{gawk} allows you to load additional functions written in C
-or C++ using the @code{@@load} statement and/or the @option{-l} option.
+or C++ using the @code{@@load} directive and/or the @option{-l} option.
 (This advanced feature is described later, in @ref{Dynamic Extensions}.)
 @end itemize
 
@@ -9023,11 +9046,11 @@ included twice.
 @xref{Close Files And Pipes}.
 
 One deficiency of this program is that it does not process nested
-@code{@@include} statements
-(i.e., @code{@@include} statements in included files)
+@code{@@include} directives
+(i.e., @code{@@include} directives in included files)
 the way a true macro preprocessor would.
 @xref{Igawk Program} for a program
-that does handle nested @code{@@include} statements.
+that does handle nested @code{@@include} directives.
 
 @node Getline/Pipe
 @subsection Using @code{getline} from a Pipe
@@ -16028,6 +16051,9 @@ The identifier is an array.
 @item "builtin"
 The identifier is a built-in function.
 
+@cindex @code{@@} (at-sign) @subentry @code{@@load} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@load} directive
+@cindex @code{@@load} directive @sortas{load directive}
 @item "extension"
 The identifier is an extension function loaded via
 @code{@@load} or @option{-l}.
@@ -26870,6 +26896,9 @@ Loadable extensions are presented in full detail in @ref{Dynamic Extensions}.
 They provide a way to add functions to @command{gawk} which can call
 out to other facilities written in C or C++.
 
+@cindex @code{@@} (at-sign) @subentry @code{@@load} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@load} directive
+@cindex @code{@@load} directive @sortas{load directive}
 For the purposes of
 @file{wc.awk}, it's enough to know that the extension is loaded
 with the @code{@@load} directive, and the additional function we
@@ -28273,7 +28302,7 @@ BEGIN @{
 The following program, @file{igawk.sh}, provides this service.
 It simulates @command{gawk}'s searching of the @env{AWKPATH} variable
 and also allows @dfn{nested} includes (i.e., a file that is included
-with @code{@@include} can contain further @code{@@include} statements).
+with @code{@@include} can contain further @code{@@include} directives).
 @command{igawk} makes an effort to only include files once, so that nested
 includes don't accidentally include a library function twice.
 
@@ -28311,7 +28340,7 @@ gets the text of the file included in the program at the correct point.
 
 @item
 Run an @command{awk} program (naturally) over the shell variable's contents to expand
-@code{@@include} statements.  The expanded program is placed in a second
+@code{@@include} directives.  The expanded program is placed in a second
 shell variable.
 
 @item
@@ -28349,7 +28378,7 @@ These are saved and passed on to @command{gawk}.
 
 @item @option{-f}, @option{--file}, @option{--file=}, @option{-Wfile=}
 The @value{FN} is appended to the shell variable @code{program} with an
-@code{@@include} statement.
+@code{@@include} directive.
 The @command{expr} utility is used to remove the leading option part of the
 argument (e.g., @samp{--file=}).
 (Typical @command{sh} usage would be to use the @command{echo} and @command{sed}
@@ -28473,7 +28502,7 @@ is stored in the shell variable @code{expand_prog}.  Doing this keeps
 the shell script readable.  The @command{awk} program
 reads through the user's program, one line at a time, using @code{getline}
 (@pxref{Getline}).  The input
-@value{FN}s and @code{@@include} statements are managed using a stack.
+@value{FN}s and @code{@@include} directives are managed using a stack.
 As each @code{@@include} is encountered, the current @value{FN} is
 ``pushed'' onto the stack and the file named in the @code{@@include}
 directive becomes the current @value{FN}.  As each file is finished,
@@ -28665,7 +28694,7 @@ considerably.
 @item
 Using a @code{getline} loop in the @code{BEGIN} rule does it all in one
 place.  It is not necessary to call out to a separate loop for processing
-nested @code{@@include} statements.
+nested @code{@@include} directives.
 
 @item
 Instead of saving the expanded program in a temporary file, putting it in a shell variable
@@ -29107,7 +29136,7 @@ suggested that @command{gawk} be modified to automatically read these files
 upon startup.  Instead, it would be very simple to modify @command{igawk}
 to do this. Since @command{igawk} can process nested @code{@@include}
 directives, @file{default.awk} could simply contain @code{@@include}
-statements for the desired library functions.
+directives for the desired library functions.
 Make this change.
 
 @item
@@ -33819,6 +33848,9 @@ with other important @command{gawk} features.
 @cindex namespaces @subentry interaction with @subentry pretty printer
 @cindex profiler, interaction with namespaces
 @cindex pretty printer, interaction with namespaces
+@cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive
+@cindex @code{@@namespace} directive @sortas{namespace directive}
 The profiler and pretty-printer (@pxref{Profiling}) have been enhanced
 to understand namespaces and the namespace naming rules presented in
 @ref{Naming Rules}.  In particular, the output groups functions in the same
@@ -39186,7 +39218,10 @@ $ @kbd{gcc -fPIC -shared -DHAVE_CONFIG_H -c -O -g -I@var{idir} filefuncs.c}
 $ @kbd{gcc -o filefuncs.so -shared filefuncs.o}
 @end example
 
-Once the library exists, it is loaded by using the @code{@@load} keyword:
+@cindex @code{@@} (at-sign) @subentry @code{@@load} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@load} directive
+@cindex @code{@@load} directive @sortas{load directive}
+Once the library exists, it is loaded by using the @code{@@load} directive:
 
 @example
 # file testff.awk
@@ -41823,6 +41858,21 @@ causing bug reports, especially downstream in some of the
 GNU/Linux distributions.
 @end ignore
 
+@end itemize
+
+Version 5.4 added the following features:
+
+@itemize
+
+@cindex @code{@@} (at-sign) @subentry @code{@@nsinclude} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@nsinclude} directive
+@cindex file inclusion @subentry @code{@@nsinclude} directive
+@cindex including files @subentry @code{@@nsinclude} directive
+@cindex @code{@@nsinclude} directive @sortas{nsinclude directive}
+@item
+The @code{@@nsinclude} directive for including files without
+resetting the namespace to @samp{awk}
+(@pxref{Inclusion For Namespaces}).
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -46045,6 +46095,9 @@ Emacs editor.  GNU Emacs is the most widely used version of Emacs today.
 @item FSF
 See ``Free Software Foundation.''
 
+@cindex @code{@@} (at-sign) @subentry @code{@@include} directive
+@cindex at-sign (@code{@@}) @subentry @code{@@include} directive
+@cindex @code{@@include} directive @sortas{include directive}
 @item Function
 A part of an @command{awk} program that can be invoked from every point of
 the program, to perform a task.  @command{awk} has several built-in

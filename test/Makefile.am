@@ -953,6 +953,8 @@ EXTRA_DIST = \
 	nsprof1.ok \
 	nsprof2.awk \
 	nsprof2.ok \
+	nsprof3.awk \
+	nsprof3.ok \
 	nulinsrc.awk \
 	nulinsrc.ok \
 	nulrsend.awk \
@@ -1594,7 +1596,7 @@ GAWK_EXT_TESTS = \
 	symtab3 symtab4 symtab5 symtab6 symtab7 symtab8 symtab9 symtab10 \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
-	typeof4 typeof5 typeof6 unicode1 watchpoint1 \
+	typeof4 typeof5 typeof6 unicode1 watchpoint1 nsprof3 \
 	re_test typeof7 typeof8 dbugarray1 dbugarray2 dbugarray3 dbugarray4
 
 ARRAYDEBUG_TESTS = arrdbg
@@ -1645,7 +1647,7 @@ NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
 NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 muldimposix posix_compare
 
 # List of tests that need --pretty-print
-NEED_PRETTY = lintplus2 nsprof1 nsprof2 \
+NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
 	profile4 profile5 profile8 profile9 profile10 profile11 profile13 \
 	profile14 profile15 profile16 profile17
 
