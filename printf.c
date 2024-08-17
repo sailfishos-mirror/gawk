@@ -1818,7 +1818,8 @@ zero_fill_to_precision(char *number_value, struct flags *flags)
 	int prec = flags->precision;
 	size_t val_len = strlen(number_value);
 
-	buflen = flags->precision + 1;	// we know val_len < precision
+	buflen = (flags->negative || flags->plus || flags->space) +
+			flags->precision + 1;	// we know val_len < precision
 
 	emalloc(buf1, char *, buflen, "zero_fill_to_precision");
 	cp = buf1;
