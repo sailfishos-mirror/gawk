@@ -55,6 +55,7 @@ in_recipe && /^\t/ {
 # End of collected recipe, print it out
 in_recipe && /(^[^\t])|(^$)/ {
 	in_recipe = 0
+	fix_recipe_for_cmp(name)
 	print_recipe()
 
 	print
@@ -82,12 +83,24 @@ function substitutions(test, string)
 	gsub(/-F\//, "-F$(SLASH)", string)
 	gsub(/=@\//, "=@$(SLASH)", string)
 
-	if (string ~ /\$\(CMP\)/ && test in testoutcmp) {
-		gsub(/\$\(CMP\)/, "$(TESTOUTCMP)", string)
-		delete testoutcmp[test]
-	}
-
 	return string
+}
+
+# fix_recipe_for_cmp --- fix $(CMP) in all lines of a recipe
+
+function fix_recipe_for_cmp(test,	i, string)
+{
+	if (! (test in testoutcmp))
+		return
+
+	for (i in recipe_lines) {
+		string = recipe_lines[i]
+		if (string ~ /\$\(CMP\)/ && test in testoutcmp) {
+			gsub(/\$\(CMP\)/, "$(TESTOUTCMP)", string)
+			recipe_lines[i] = string
+		}
+	}
+	delete testoutcmp[test]
 }
 
 # print_recipe --- print out the recipe
