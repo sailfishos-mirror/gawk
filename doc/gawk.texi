@@ -25405,6 +25405,9 @@ of picking the input line apart by characters.
 @node Egrep Program
 @subsection Searching for Regular Expressions in Files
 
+@c FIXME: Add support for multiple regexps in the command line argument
+@c and also for the -f option to read regexps from a file.
+
 @cindex regular expressions @subentry searching for
 @cindex searching @subentry files for regular expressions
 @cindex files @subentry searching for regular expressions
@@ -25417,7 +25420,7 @@ Later there was @command{egrep} (Extended @command{grep}) which used
 what are now called Extended Regular Expressions (EREs). (These are almost
 identical to those available in @command{awk}; @pxref{Regexp}).
 There was also @command{fgrep} (Fast @command{grep}), which searched
-for matches of one more fixed strings.
+for matches of one or more fixed strings.
 
 POSIX chose to combine these three programs into one, simply named
 @command{grep}.  On a POSIX system, @command{grep}'s default behavior
@@ -25553,8 +25556,8 @@ Next comes the code that handles the @command{egrep}-specific behavior.
 if no pattern is supplied with @option{-e}.
 If the pattern is empty, that means no pattern was supplied, so it's
 necessary to print an error message and exit.
-The @command{awk} command-line arguments up to @code{ARGV[Optind]}
-are cleared, so that @command{awk} won't try to process them as files.  If no
+The command-line arguments up to @code{ARGV[Optind]}
+are cleared, so that @command{gawk} won't try to process them as files.  If no
 files are specified, the standard input is used, and if multiple files are
 specified, we make sure to note this so that the @value{FN}s can precede the
 matched lines in the output:
