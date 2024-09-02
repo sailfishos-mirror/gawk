@@ -28289,20 +28289,54 @@ di suddividere la riga in input in singoli caratteri.
 @node Programma egrep
 @subsection Ricercare espressioni regolari nei file
 
+@c FIXME: Add support for multiple regexps in the command line argument
+@c and also for the -f option to read regexps from a file.
+
 @cindex espressioni regolari @subentry ricerca di
 @cindex ricerca @subentry in file @subentry di espressioni regolari
 @cindex file @subentry ricercare espressioni regolari nei
 @cindex @command{egrep} (programma di utilit@`a)
 @cindex programma di utilit@`a @subentry @command{egrep}
-Il programma di utilit@`a @command{egrep} ricerca occorrenze di espressioni
-regolari all'interno di file.  Usa
-espressioni regolari che sono quasi identiche a quelle disponibili in
+I programmi di utilit@`a della "famiglia" @command{grep} cercano
+occorrenze di espressioni regolari all'interno di file.
+Questi programmi hanno una storia insolita.
+Inizialmente esisteva solo @command{grep} (Global Regular Expression Print
+-- Stampa di espressioni regolari globali),
+che utilizza quelle che ora sono definite "espressioni regolari di base"
+(Basic Regular Expressions -- BRE).
+Successivamente fu reso disponibile @command{egrep} (Extended @command{grep})
+che utilizza quelle che ora sono definite "espressioni regolari di estese"
+(Extended Regular Expressions -- ERE).  Queste ultime sono quasi
+identiche a quelle disponibili in @command{awk}.
 @iftex
 @command{awk} (@pxrefil{Espressioni regolari}).
 @end iftex
 @ifnottex
 @command{awk} (@pxref{Espressioni regolari}).
 @end ifnottex
+Esisteva anche @command{fgrep} (Fast @command{grep}), che cercava
+corrispondenze per una o pi@`u stringhe fisse.
+
+Lo standard POSIX ha deciso di unificare questi tre programmi,
+facendone uno solo, che si chiama semplicemente @command{grep}.
+In un sistema conforme allo standard POSIX, il comportamento di
+default di @command{grep} @`e quello di cercare usando le BRE.
+Si specifica l'opzione @option{-E} per richiedere di usare le ERE,
+e l'opzione @option{-F} per richiedere di cercare stringhe fisse.
+
+In pratica, il sistema continua a includere come programmi di
+utilit@`a separati sia @command{egrep} che @command{fgrep}, per
+compatibilit@`a all'indietro.
+@ifnotinfo
+Questa
+@end ifnotinfo
+@ifinfo
+Questo
+@end ifinfo
+@value{SECTION}
+fornisce un'implementazione in @command{awk} di @command{egrep},
+che include tutte le opzioni previste dallo standard POSIX.
+
 Si richiama cos@`{@dotless{i}}:
 
 @display
@@ -28430,7 +28464,7 @@ alcun criterio di ricerca tramite l'opzione @option{-e}.
 Se il criterio di ricerca @`e la stringa nulla, ci@`o significa che non
 @`e stato fornito alcun criterio, quindi @`e necessario stampare un
 messaggio di errore e terminare il programma.
-Gli argomenti della riga di comando di @command{awk} fino ad
+Gli argomenti della riga di comando fino ad
 @code{ARGV[Optind]} vengono cancellati,
 in modo che @command{awk} non tenti di elaborarli come file.  Se
 non @`e stato specificato alcun nome di file, si usa lo standard input, e se
