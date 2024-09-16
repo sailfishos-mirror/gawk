@@ -766,6 +766,8 @@ EXTRA_DIST = \
 	match3.ok \
 	match4.awk \
 	match4.ok \
+	matchuninitialized.awk \
+	matchuninitialized.ok \
 	math.awk \
 	math.ok \
 	mbfw1.awk \
@@ -1554,7 +1556,7 @@ BASIC_TESTS = \
 	substr swaplns synerr1 synerr2 synerr3 tailrecurse tradanch \
 	trailbs tweakfld uninit2 uninit3 uninit4 uninit5 uninitialized \
 	unterm uparrfs uplus wideidx wideidx2 widesub widesub2 widesub3 \
-	match4 strsubscript printf-corners \
+	match4 strsubscript printf-corners matchuninitialized \
 	widesub4 wjposer1 zero2 zeroe0 zeroflag
 
 UNIX_TESTS = \

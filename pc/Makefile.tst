@@ -180,7 +180,7 @@ BASIC_TESTS = \
 	substr swaplns synerr1 synerr2 synerr3 tailrecurse tradanch \
 	trailbs tweakfld uninit2 uninit3 uninit4 uninit5 uninitialized \
 	unterm uparrfs uplus wideidx wideidx2 widesub widesub2 widesub3 \
-	match4 strsubscript printf-corners \
+	match4 strsubscript printf-corners matchuninitialized \
 	widesub4 wjposer1 zero2 zeroe0 zeroflag
 
 UNIX_TESTS = \
@@ -2619,6 +2619,11 @@ printf-corners:
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
 	then $(TESTOUTCMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
 	else $(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
+
+matchuninitialized:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 widesub4:
 	@echo $@ $(ZOS_FAIL)
