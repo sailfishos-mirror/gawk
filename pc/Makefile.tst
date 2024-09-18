@@ -458,7 +458,7 @@ pma-tests:
 	fi
 
 makepmafile: makepmafile.c
-	$(CC) makepmafile.c -o $@
+	$(CC) $(srcdir)/makepmafile.c -o $@
 
 pma:
 	@echo $@
