@@ -569,7 +569,7 @@ do_delete(NODE *symbol, int nsubs)
 
 	for (i = nsubs; i > 0; i--) {
 		subs = PEEK(i - 1);
-		if (subs->type != Node_val) {
+		if (subs->type != Node_val && subs->type != Node_elem_new) {
 			free_subs(i);
 			fatal(_("attempt to use array `%s' in a scalar context"), array_vname(subs));
 		}

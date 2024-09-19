@@ -2,7 +2,7 @@
 # exactly the same, and neither are e+NNN exponents.
 # should run even on old awk
 #
-# Copyright (C) 2011-2015 the Free Software Foundation, Inc.
+# Copyright (C) 2011-2015, 2019, 2024 the Free Software Foundation, Inc.
 # 
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
