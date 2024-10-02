@@ -1,5 +1,6 @@
 BEGIN {
     FPAT = "([^,]*)|(\"([^\"]|\"\")+\")"
+    OFS = "\t"    # Print tab-separated values
 }
 
 {
@@ -9,7 +10,7 @@ BEGIN {
             gsub(/^"|"$/, "", $i)    # Remove enclosing quotes
             gsub(/""/, "\"", $i)    # Convert "" to "
         }
-        # Print tab-separated values
-        printf (i < NF) ? "%s\t" : "%s\n", $i
     }
+    $1 = $1	# force rebuild of the record
+    print
 }

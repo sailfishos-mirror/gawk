@@ -8406,12 +8406,14 @@ recognizes this kind of CSV field is @code{/([^,]*)|("([^"]|"")+")/}.
 The following program uses this improved @code{FPAT} expression to split the
 example CSV fields above, extracts the underlying data from any double-quoted
 fields, and finally prints the data as tab-separated values.
+The latter is accomplished by setting @code{OFS} to a TAB character.
 
 @example
 @c file eg/misc/quoted-csv.awk
 @group
 BEGIN @{
     FPAT = "([^,]*)|(\"([^\"]|\"\")+\")"
+    OFS = "\t"    # Print tab-separated values
 @}
 @end group
 
@@ -8423,9 +8425,9 @@ BEGIN @{
             gsub(/^"|"$/, "", $i)    # Remove enclosing quotes
             gsub(/""/, "\"", $i)    # Convert "" to "
         @}
-        # Print tab-separated values
-        printf (i < NF) ? "%s\t" : "%s\n", $i
     @}
+    $1 = $1	# force rebuild of the record
+    print
 @}
 @end group
 @c endfile
