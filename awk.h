@@ -1746,6 +1746,7 @@ extern void (*lintfunc)(const char *mesg, ...);
 /* profile.c */
 extern void init_profiling_signals(void);
 extern void set_prof_file(const char *filename);
+extern void close_prof_file(void);
 extern void dump_prog(INSTRUCTION *code);
 extern char *pp_number(NODE *n);
 extern char *pp_string(const char *in_str, size_t len, int delim);

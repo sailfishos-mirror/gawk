@@ -67,6 +67,8 @@ static long indent_level = 0;
 static const char tabs[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 static const size_t tabs_len = sizeof(tabs) - 1;
 
+static bool at_start = true;
+
 #define check_indent_level() \
 	if (indent_level + 1 > tabs_len) \
 		/* We're allowed to be snarky, occasionally. */ \
@@ -112,6 +114,17 @@ set_prof_file(const char *file)
 		warning(_("sending profile to standard error"));
 		prof_fp = stderr;
 	}
+}
+
+/* close_prof_file --- close the output file for profiling or pretty-printing */
+
+void
+close_prof_file(void)
+{
+	if (prof_fp != NULL
+	    && fileno(prof_fp) != fileno(stdout)
+	    && fileno(prof_fp) != fileno(stderr))
+		(void) fclose(prof_fp);
 }
 
 /* init_profiling_signals --- set up signal handling for gawk --profile */
@@ -269,7 +282,11 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 					if (! rule_count[rule]++)
 						fprintf(prof_fp, _("\t# %s rule(s)\n\n"), ruletab[rule]);
 					indent(0);
-				}
+				} else if (! at_start)
+					putc('\n', prof_fp);
+				else
+					at_start = false;
+
 				fprintf(prof_fp, "%s {", ruletab[rule]);
 				end_line(pc);
 				skip_comment = true;
@@ -277,6 +294,10 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 				if (do_profile && ! rule_count[rule]++)
 					fprintf(prof_fp, _("\t# Rule(s)\n\n"));
 				ip1 = pc->nexti;
+				if (! at_start)
+					putc('\n', prof_fp);
+				else
+					at_start = false;
 				indent(ip1->exec_count);
 				if (ip1 != (pc + 1)->firsti) {		/* non-empty pattern */
 					pprint(ip1->nexti, (pc + 1)->firsti, NO_PPRINT_FLAGS);
@@ -308,7 +329,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 			indent_out();
 			if (do_profile)
 				indent(0);
-			fprintf(prof_fp, "}\n\n");
+			fprintf(prof_fp, "}\n");
 			pc = (pc + 1)->lasti;
 			break;
 
@@ -1338,7 +1359,7 @@ print_lib_list(FILE *prof_fp)
 		}
 	}
 	if (found)	/* we found some */
-		fprintf(prof_fp, "\n");
+		at_start = false;
 }
 
 /* print_include_list --- print a list of all files included */
@@ -1369,7 +1390,7 @@ print_include_list(FILE *prof_fp)
 		}
 	}
 	if (found)	/* we found some */
-		fprintf(prof_fp, "\n");
+		at_start = false;
 }
 
 /* print_comment --- print comment text with proper indentation */
@@ -1380,6 +1401,13 @@ print_comment(INSTRUCTION* pc, long in)
 	char *text;
 	size_t count;
 	bool after_newline = false;
+
+	if (pc->memory->comment_type == BLOCK_COMMENT) {
+		if (! at_start && indent_level == 0)
+			putc('\n', prof_fp);
+		else
+			at_start = false;
+	}
 
 	count = pc->memory->stlen;
 	text = pc->memory->stptr;
@@ -2031,6 +2059,7 @@ pp_func(INSTRUCTION *pc, void *data ATTRIBUTE_UNUSED)
 	if (do_profile)
 		indent(0);
 	fprintf(prof_fp, "}\n");
+	at_start = false;
 	return 0;
 }
 
@@ -2071,8 +2100,8 @@ pp_namespace(const char *name, INSTRUCTION *comment)
 	// info saved in Op_namespace instructions.
 	current_namespace = name;
 
-	// force newline, could be after a comment
-	fprintf(prof_fp, "\n");
+	if (! at_start)
+		fprintf(prof_fp, "\n");
 
 	if (do_profile)
 		indent(SPACEOVER);
@@ -2082,9 +2111,11 @@ pp_namespace(const char *name, INSTRUCTION *comment)
 	if (comment != NULL) {
 		putc('\t', prof_fp);
 		print_comment(comment, 0);
-		putc('\n', prof_fp);
+		// no newline here, print_comment puts one out
 	} else
-		fprintf(prof_fp, "\n\n");
+		fprintf(prof_fp, "\n");
+
+	at_start = false;
 }
 
 /* pp_namespace_list --- print the list, back to front, using recursion */
