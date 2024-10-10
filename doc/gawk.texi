@@ -813,6 +813,7 @@ particular records in a file and perform operations upon them.
 * Dynamic Typing Awk::                  Dynamic typing in standard
                                         @command{awk}.
 * Dynamic Typing Gawk::                 Dynamic typing in @command{gawk}.
+* Shadowed Variables::                  More about shadowed global variables.
 * Indirect Calls::                      Choosing the function to call at
                                         runtime.
 * Functions Summary::                   Summary of functions.
@@ -18021,6 +18022,7 @@ be called.
 * Built-in::                    Summarizes the built-in functions.
 * User-defined::                Describes User-defined functions in detail.
 * Dynamic Typing::              How variable types can change at runtime.
+* Shadowed Variables::          More about shadowed global variables.
 * Indirect Calls::              Choosing the function to call at runtime.
 * Functions Summary::           Summary of functions.
 @end menu
@@ -20680,6 +20682,7 @@ function definition, because there is no way to name them while their
 names have been taken away for the arguments and local variables.  All other variables
 used in the @command{awk} program can be referenced or set normally in the
 function's body.
+(Also, @pxref{Shadowed Variables}.)
 
 The arguments and local variables last only as long as the function body
 is executing.  Once the body finishes, you can once again access the
@@ -21506,6 +21509,65 @@ To sum up, variables and array elements get their nature (array or scalar)
 best to avoid taking advantage of @command{gawk}'s dynamic nature, other
 than in the standard manner of passing untyped variables and array
 elements as function parameters.
+
+@node Shadowed Variables
+@section A Note On Shadowed Variables
+
+@c Contributed by John Naman <gawker@gmail.com>, October 2024
+
+This @value{SECTION} discusses some aspects of variable shadowing.
+Feel free to skip it upon first reading.
+
+The ``shadowing'' concept is important to know for several reasons.
+
+@table @emph
+@item Name confusion
+Using global identifiers (names) locally can lead to very difficult
+debugging, it complicates writing, reading and maintaining source code,
+and it decreases the portability, (sharing or reuse) of a library of
+@command{awk} functions.
+
+@item Preventing shadowing in functions
+It is a best practice to consistently use a naming convention,
+such as ``global variable and function names start with a capital letter 
+and local names begin with lowercase one.'' This also makes programs
+easier to follow (@pxref{Library Names}).
+
+@item Circumventing shadow restrictions in functions
+The @command{gawk} extension @code{SYMTAB} provides indirect access
+to global variables that are or may be shadowed (see @code{SYMTAB}
+in @ref{Auto-set}).  For example:
+
+@example
+@dots{}
+foo = "global value"
+@dots{}
+
+function test(x,   foo)
+@{
+    # use global value of foo as default
+    foo = (x > 0) ? SYMTAB["foo"] : "local value"
+    @dots{}
+@}
+@end example
+
+@item Solving complex shadowing problems
+The @command{gawk} namespace extension
+provides robust handling of potential name collisions with global 
+variables and functions (@pxref{Namespaces}). Namespaces 
+are useful to prevent shadowing by providing identifiers that are
+common to a group of functions and effectively shadowed from being
+referenced by global functions (See @code{FUNCTAB} in @ref{Auto-set}.)
+@end table
+
+Finally, a shadowing caveat: Variables local to a function are @emph{not}
+``global'' to anything. @code{SYMTAB} elements refer to all @emph{global}
+variables and arrays, but not to @emph{local} variables and arrays.
+If a function @code{A(argA, localA)} calls another function @code{B()},
+the two variables local to @code{A()} are @emph{not} accessible in
+function @code{B()} or any other function.  The global/local distinction
+is also important to remember when passing arguments to a function called
+indirectly (@pxref{Indirect Calls}).
 
 @node Indirect Calls
 @section Indirect Function Calls
@@ -42273,6 +42335,10 @@ Panos Papadopoulos contributed the original text for @ref{Include Files}.
 @item
 @cindex Yawitz, Efraim
 Efraim Yawitz contributed the original text for @ref{Debugger}.
+
+@item
+@cindex Naman, John
+John Naman contributed the original text for @ref{Shadowed Variables}.
 
 @item
 @cindex Schorr, Andrew
