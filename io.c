@@ -3713,11 +3713,19 @@ again:
 	 *              found a simple string match at end, return REC_OK
 	 *      else
 	 *              grow buffer, add more data, try again
+	 *              if possibly a variable length match (in which case more
+	 *                  match could be in next input buffer)
+	 *                      grow buffer, add more data, try again
+	 *              else # simpler re
+	 *                      return REC_OK
+	 *              fi
 	 *      fi
 	 */
 	if (iop->off + reend >= iop->dataend) {
 		if (reisstring(RS->stptr, RS->stlen, RSre, iop->off))
 			return REC_OK;
+		else if (! RSre->maybe_long)
+ 			return REC_OK;
 		else
 			return TERMATEND;
 	}
