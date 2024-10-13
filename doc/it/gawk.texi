@@ -566,7 +566,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                    @command{gawk}.
 * Internazionalizzazione::         Come far s@`{@dotless{i}} che @command{gawk} parli la
                                    vostra lingua.
-* Debugger::                       Il debugger di @command{gawk}.
+* Debugger::                       Il @dfn{debugger} di @command{gawk}.
 * Spazi-dei-nomi::                      Come funzionano gli spazi-dei-nomi
                                    (@dfn{spazi-dei-nomi}) in @command{gawk}.
 * Calcolo con precisione arbitraria:: Calcolo con precisione arbitraria in
@@ -930,6 +930,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         @command{awk} standard.
 * Variabili di tipo dinamico in Gawk::  Come cambiare tipo a una variabile in
                                         @command{gawk}.
+* Variabili oscurate::                  Variabili globali oscurate.
 * Chiamate indirette::                  Scegliere la funzione da chiamare in
                                         fase di esecuzione del programma.
 * Sommario delle funzioni::             Sommario delle funzioni.
@@ -1051,14 +1052,14 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Gawk internazionalizzato::            @command{gawk} stesso @`e
                                         internazionalizzato.
 * Sommario I18N::                       Sommario sull'internazionalizzazione.
-* Debugging::                           Introduzione al debugger di
+* Debugging::                           Introduzione al @dfn{debugger} di
                                         @command{gawk}.
 * Nozioni sul debug::                   Generalit@`a sul debug.
 * Terminologia nel debug::              Concetti fondamentali sul debug.
 * Debug di Awk::                        Il debug di @command{awk}.
 * Esempio di sessione di debug::        Esempio di sessione di debug di
                                         @command{gawk}.
-* Invocazione del debugger::            Come avviare il debugger.
+* Invocazione del debugger::            Come avviare il dfn{debugger}.
 * Trovare il bug::                      Trovare il bug.
 * Lista dei comandi di debug::          I principali comandi di debug.
 * Controllo dei breakpoint::            Controllo dei punti d'interruzione.
@@ -1066,8 +1067,8 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Vedere e modificare dati::            Vedere e modificare dati.
 * Stack di esecuzione::                 Lavorare con lo @dfn{Stack}.
 * Informazioni sul debugger::           Ottenere informazioni sullo stato
-                                        del programma e del debugger.
-* Comandi vari del debugger::           Comandi vari del debugger.
+                                        del programma e del dfn{debugger}.
+* Comandi vari del debugger::           Comandi vari del dfn{debugger}.
 * Supporto per Readline::               Supporto per Readline.
 * Limitazioni::                         Limitazioni.
 * Sommario sul debug::                  Sommario sul debug.
@@ -1720,7 +1721,7 @@ lui scrisse anche il grosso di
 principale di @command{gawk} con la versione 3.1 di @command{gawk}.
 
 John Haque ha riscritto la parte interna di @command{gawk}, mentre metteva a
-punto un debugger a livello di @command{awk}.  Questa versione divenne
+punto un @dfn{debugger} a livello di @command{awk}.  Questa versione divenne
 disponibile come @command{gawk} versione 4.0 nel 2011.
 
 @xref{Contributori}
@@ -1974,7 +1975,7 @@ descrive funzionalit@`a speciali per tradurre i messaggi
 di programma in diverse lingue in fase di esecuzione.
 
 @item
-@ref{Debugger}, descrive il debugger di @command{gawk}.
+@ref{Debugger}, descrive il @dfn{debugger} di @command{gawk}.
 
 @item
 @ref{Spazi-dei-nomi}, descrive come @command{gawk} permette
@@ -2250,7 +2251,8 @@ Questo @value{DOCUMENT} si pu@`o leggere anche dal
 
 @ifclear FOR_PRINT
 Una shell, un editor (Emacs), compilatori ottimizzanti C, C++ e
-Objective-C altamente portabili, un debugger simbolico e dozzine di grandi e
+Objective-C altamente portabili, un @dfn{debugger} simbolico e dozzine di
+grandi e
 piccoli programmi di utilit@`a (come @command{gawk}), sono stati completati e
 sono liberamente disponibili.  Il kernel del sistema operativo GNU (noto come
 HURD), @`e stato rilasciato ma @`e ancora allo stato di sviluppo iniziale.
@@ -4441,10 +4443,10 @@ semplici come @code{i}, @code{j}, etc.).
 @cindex @command{awk} @subentry debug, abilitare
 Abilita l'esecuzione del debug di programmi @command{awk}
 (@pxref{Debugging}).
-Per default, il debugger legge i comandi interattivamente dalla tastiera
+Per default, il @dfn{debugger} legge i comandi interattivamente dalla tastiera
 (standard input).
 L'argomento opzionale @var{file} consente di specificare un file con una lista
-di comandi per il debugger da eseguire in maniera non interattiva.
+di comandi per il @dfn{debugger} da eseguire in maniera non interattiva.
 Non sono consentiti spazi tra @option{-D} e @var{file}, se
 @var{file} viene indicato.
 
@@ -20016,6 +20018,7 @@ programma quale funzione chiamare.
                                     fase di esecuzione del programma.
 * Chiamate indirette::              Scegliere la funzione da chiamare in
                                     fase di esecuzione del programma.
+* Variabili oscurate::              Variabili globali oscurate.
 * Sommario delle funzioni::         Sommario delle funzioni.
 @end menu
 
@@ -23036,7 +23039,7 @@ usare per gli argomenti e quanti si vogliono usare come variabili locali.
 argomenti e le variabili locali, per documentare come va utilizzata quella
 funzione.
 
-@cindex variabili @subentry nascoste
+@cindex variabili @subentry oscurate
 @cindex nascondere valori di variabile
 Durante l'esecuzione del corpo della funzione, gli argomenti e i valori
 delle variabili locali
@@ -23046,6 +23049,7 @@ nel corpo della funzione, perch@'e non c'@`e modo di accedere a esse
 mentre i loro nomi sono stati "occupati" dagli argomenti e dalla variabili
 locali.  Tutte le altre variabili usate nel programma @command{awk}
 possono essere accedute o impostate normalmente nel corpo della funzione.
+(Inoltre, @pxref{Variabili oscurate}.)
 
 Gli argomenti e le variabili locali esistono solo finch@'e il corpo della
 funzione @`e in esecuzione.  Una volta che l'esecuzione @`e terminata,
@@ -23954,6 +23958,80 @@ volta.  Ci@`o pu@`o generare qualche caso strano, ed @`e meglio evitare
 di utilizzare questa capacit@`a ``dinamica'' di @command{gawk}, tranne che
 nella maniera standard, ossia passando, come parametri di funzione,
 variabili e vettori non ancora tipizzati.
+
+@node Variabili oscurate
+@section Variabili globali oscurate
+
+@c Contributed by John Naman <gawker@gmail.com>, October 2024
+
+@ifnotinfo
+Questa
+@end ifnotinfo
+@ifinfo
+Questo
+@end ifinfo
+@value{SECTION}
+tratta di alcuni aspetti delle variabili oscurate.
+Può essere saltato durante una prima lettura.
+
+È importante tenere presente il concetto di ``shadowing''
+[``oscuramento''] per più di un motivo.
+
+@table @emph
+@item Confusione di nomi
+Usare identificativi (nomi) globali a livello locale può rendere molto
+difficile il @dfn{debugging}, aumenta la complessità dello scrivere,
+leggere e manutenere codice sorgente e diminuisce la portabilità
+(possibilità di condividere e riutilizzare) di una libreria di
+funzioni @command{awk}.
+
+@item Prevenire l'oscuramento nelle funzioni
+È una buona pratica usare in maniera consistente una convenzione
+per i nomi, del tipo ``i nomi delle variabili e delle funzioni globali
+iniziano con una lettera maiuscola, mentre i nomi locali iniziano
+con una lettera minuscola.''  Ciò migliora anche la leggibilità
+dei programmi (@pxref{Nomi di variabili di libreria}).
+
+@item Superare restrizioni di oscuramento nelle funzioni
+Il vettore @code{SYMTAB}, che è un'estensione di @command{gawk},
+fornisce un accesso indiretto alle variabili globali che
+possono essere o sono effettivamente oscurate (vedere @code{SYMTAB}
+in @ref{Variabili auto-assegnate}).  Per esempio:
+
+@example
+@dots{}
+foo = "valore globale"
+@dots{}
+
+function test(x,   foo)
+@{
+    # usare il valore globale di foo per default
+    foo = (x > 0) ? SYMTAB["foo"] : "valore locale"
+    @dots{}
+@}
+@end example
+
+@item Risolvere problemi complessi di oscuramento
+L'estensione @dfn{namespace} di @command{gawk} permette la gestione
+accurata di potenziali conflitti di nome tra variabili globali e funzioni
+(@pxref{Spazi-dei-nomi}).  Gli spazi-dei-nomi sono utili per
+prevenite l'oscuramento di variabili, fornendo degli identificativi
+comuni a un gruppo di funzioni, che in questo modo sono effettivamente
+oscurate dall'essere usate da funzioni globali (Vedere @code{FUNCTAB}
+in @ref{Variabili auto-assegnate}.)
+@end table
+
+Per finire, una cosa cui prestare attenzione riguardo all'oscuramento:
+Le variabili locali a una funzione @emph{non} sono in nessun modo
+``globali''. Gli elementi del vettore @code{SYMTAB} si riferiscono tutti
+a variabili e vettori @emph{globali}, e non a variabili e vettori
+@emph{locali}.
+Se una funzione @code{A(argomentoA, localeA)} chiama un'altra funzione
+@code{B()}, le due variabili locali alla funzione @code{A()} @emph{non}
+sono utilizzabili dalla funzione @code{B()} e da nessun'altra funzione.
+È anche importante tener presente la distinzione globale/locale 
+quando si passano argomenti a una funzione chiamata in maniera indiretta
+(@pxref{Chiamate indirette}).
 
 @node Chiamate indirette
 @section Chiamate indirette di funzione
@@ -32484,7 +32562,7 @@ nazionali.
 @iftex
 Il
 @end iftex
-@ref{Debugger}, descrive il debugger dalla riga di comando disponibile
+@ref{Debugger}, descrive il @dfn{debugger} dalla riga di comando disponibile
 all'interno di
 @command{gawk} per individuare errori nei programmi @command{awk}.
 
@@ -35412,7 +35490,7 @@ Se si ha familiarit@`a con GDB, sar@`a facile imparare come usare @command{gawk}
 per eseguire il debug dei propri programmi.
 
 @menu
-* Debugging::                    Introduzione al debugger di @command{gawk}.
+* Debugging::                    Introduzione al @dfn{debugger} di @command{gawk}.
 * Esempio di sessione di debug:: Esempio di sessione di debug.
 * Lista dei comandi di debug::   Principali comandi di debug.
 * Supporto per Readline::        Supporto per Readline.
@@ -35421,7 +35499,7 @@ per eseguire il debug dei propri programmi.
 @end menu
 
 @node Debugging
-@section Introduzione al debugger di @command{gawk}
+@section Introduzione al @dfn{debugger} di @command{gawk}
 
 @ifnotinfo
 Questa
@@ -35442,7 +35520,7 @@ la trattazione del debug in @command{gawk}.
 @node Nozioni sul debug
 @subsection Generalit@`a sul debug
 
-(Se si sono usati dei debugger in altri linguaggi, si pu@`o andare direttamente
+(Se si sono usati dei @dfn{debugger} in altri linguaggi, si pu@`o andare direttamente
 alla @ref{Debug di Awk}.)
 
 Naturalmente, un programma di debug non pu@`o correggere gli errori al posto del
@@ -35453,7 +35531,7 @@ In quel caso, cosa ci si pu@`o aspettare da un tale strumento?  La risposta
 dipende dal linguaggio su cui si effettua il debug, comunque in generale ci si
 pu@`o attendere almeno questo:
 
-@cindex debugger @subentry funzionalit@`a del
+@cindex @dfn{debugger} @subentry funzionalit@`a del
 @itemize @value{BULLET}
 @item
 La possibilit@`a di osservare l'esecuzione delle istruzioni di un programma una
@@ -35487,18 +35565,18 @@ l'autore, o anche di un programma scritto da altri).
 @node Terminologia nel debug
 @subsection Concetti fondamentali sul debug
 
-@cindex debugger @subentry terminologia
+@cindex @dfn{debugger} @subentry terminologia
 Prima di entrare nei dettagli, dobbiamo introdurre diversi
-importanti concetti che valgono per tutti i debugger.
+importanti concetti che valgono per tutti i dfn{debugger}.
 La seguente lista definisce i termini usati nel resto di
 questo @value{CHAPTER}:
 
 @table @dfn
-@cindex @dfn{stack} (pila) delle chiamate @subentry nel debugger
-@cindex debugger @subentry @dfn{stack} di chiamata
-@cindex debugger @subentry pila di chiamata
+@cindex @dfn{stack} (pila) delle chiamate @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry @dfn{stack} di chiamata
+@cindex @dfn{debugger} @subentry pila di chiamata
 @cindex @dfn{stack frame} (debugger)
-@cindex debugger @subentry @dfn{stack frame}
+@cindex @dfn{debugger} @subentry @dfn{stack frame}
 @item @dfn{Stack frame}
 Durante la loro esecuzione i programmi normalmente chiamano delle funzioni.
 Una funzione pu@`o  a sua volta chiamarne un'altra, o pu@`o richiamare se stessa
@@ -35525,8 +35603,8 @@ informazioni su ogni @dfn{stack frame} (come vedremo pi@`u avanti in dettaglio).
 @item Punto d'interruzione
 @cindex @code{breakpoint} (comando del debugger)
 @cindex punto d'interruzione @subentry (@code{breakpoint})
-@cindex debugger @subentry @code{breakpoint}
-@cindex debugger @subentry punto d'interruzione
+@cindex @dfn{debugger} @subentry @code{breakpoint}
+@cindex @dfn{debugger} @subentry punto d'interruzione
 Durante le operazioni di debug, spesso si preferisce lasciare che il programma
 venga eseguito finch@'e non raggiunge un certo punto, e da quel punto in poi si
 continua l'esecuzione un'istruzione alla volta.  Il modo per farlo @`e quello di
@@ -35539,8 +35617,8 @@ vogliono.
 @item Punto d'osservazione
 @cindex @dfn{watchpoint} (debugger)
 @cindex punto d'osservazione @subentry(@code{watchpoint})
-@cindex debugger @subentry @code{watchpoint}
-@cindex debugger @subentry punto d'osservazione
+@cindex @dfn{debugger} @subentry @code{watchpoint}
+@cindex @dfn{debugger} @subentry punto d'osservazione
 Un punto d'osservazione @`e simile a un punto d'interruzione.  La differenza @`e
 che i punti d'interruzione sono orientati attorno al codice; fermano il
 programma quando viene raggiunto un certo punto nel codice.  Un punto
@@ -35569,10 +35647,10 @@ proprio specifico blocco di istruzioni.
 
 Inoltre, poich@'e @command{awk} @`e un linguaggio deliberatamente molto
 conciso, @`e facile perdere di vista tutto ci@`o che avviene ``dentro''
-ogni riga di codice @command{awk}.  Il debugger d@`a l'opportunit@`a di
+ogni riga di codice @command{awk}.  Il dfn{debugger} d@`a l'opportunit@`a di
 guardare le singole istruzioni primitive la cui esecuzione @`e innescata
 dai comandi di alto livello di @command{awk}.@footnote{Le ``istruzioni
-primitive'' sono quelle dallo stesso @command{gawk}; il debugger
+primitive'' sono quelle dallo stesso @command{gawk}; il dfn{debugger} 
 non permette di arrivare al livello delle istruzioni hardware della
 macchina.}
 
@@ -35588,17 +35666,17 @@ del comando POSIX @command{uniq} descritta in precedenza (@pxref{Programma
 uniq}).
 
 @menu
-* Invocazione del debugger::    Come far partire il debugger.
+* Invocazione del debugger::    Come far partire il dfn{debugger}.
 * Trovare il bug::              Trovare il bug.
 @end menu
 
 @node Invocazione del debugger
-@subsection Come avviare il debugger
-@cindex avviare il debugger
-@cindex debugger @subentry come avviarlo
-@cindex debugger @subentry comandi del @seeentry{comando del debugger}
+@subsection Come avviare il dfn{debugger} 
+@cindex avviare il dfn{debugger} 
+@cindex @dfn{debugger} @subentry come avviarlo
+@cindex @dfn{debugger} @subentry comandi del @seeentry{comando del debugger}
 
-Per avviare il debugger in @command{gawk} si richiama il comando esattamente
+Per avviare il dfn{debugger} in @command{gawk} si richiama il comando esattamente
 come al solito, specificando solo un'opzione aggiuntiva,
 @option{--debug}, o la corrispondente opzione breve @option{-D}.
 I file (o il file) che contengono
@@ -35606,7 +35684,7 @@ il programma e ogni codice ulteriore sono immessi sulla riga di comando come
 argomenti a una o pi@`u opzioni @option{-f}. (@command{gawk} non @`e progettato per
 eseguire il debug di programmi scritti sulla riga di comando, ma solo per
 quello di programmi che risiedono su file.)
-Nel nostro caso, il debugger verr@`a invocato in questo modo:
+Nel nostro caso, il dfn{debugger} verr@`a invocato in questo modo:
 
 @example
 $ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -- -1 file_di_input}
@@ -35616,10 +35694,10 @@ $ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -- -1 file_di_input}
 @cindex variabili d'ambiente @subentry @env{AWKPATH}
 @noindent
 dove entrambi i file @file{getopt.awk} e @file{uniq.awk} sono in @env{$AWKPATH}.
-(Gli utenti esperti di GDB o debugger simili dovrebbero tener presente che
+(Gli utenti esperti di GDB o dfn{debugger} simili dovrebbero tener presente che
 questa sintassi @`e leggermente differente da quello che sono abituati a usare.
-Col debugger di @command{gawk}, si danno gli argomenti per eseguire il
-programma nella riga di comando al debugger piuttosto che come parte del
+Col dfn{debugger} di @command{gawk}, si danno gli argomenti per eseguire il
+programma nella riga di comando al dfn{debugger} piuttosto che come parte del
 comando @code{run} al prompt del debugger.)
 Il doppio trattino @option{--} termina le opzioni specificate a @command{gawk}
 sulla riga di comando.  Non @`e strettamente necessaria in questo caso,
@@ -35627,10 +35705,10 @@ ma lo diviente se un'opzione destinata al programma @command{awk}
 @`e in conflitto con qualche opzione di @command{gawk}.
 L'opzione @option{-1} @`e un'opzione per @file{uniq.awk}.
 
-@cindex debugger @subentry prompt
-@cindex prompt del debugger
+@cindex @dfn{debugger} @subentry prompt
+@cindex prompt del dfn{debugger} 
 Invece di eseguire direttamente il programma sul @file{file_di_input}, come
-@command{gawk} farebbe normalmente, il debugger semplicemente carica
+@command{gawk} farebbe normalmente, il dfn{debugger} semplicemente carica
 i file sorgenti del programma, li compila internamente, e poi mostra
 la riga d'invito:
 
@@ -35678,24 +35756,24 @@ ragionevole per un punto d'interruzione in @file{uniq.awk} @`e all'inizio della
 funzione @code{se_sono_uguali()}, che confronta la riga corrente con la precedente.
 Per impostare il punto d'interruzione, usare il comando @code{b} (@dfn{breakpoint}):
 
-@cindex debugger @subentry impostare un punto d'interruzione
+@cindex @dfn{debugger} @subentry impostare un punto d'interruzione
 @cindex @code{breakpoint} (comando del debugger)
-@cindex comando del debugger @subentry @code{breakpoint}
+@cindex comando del dfn{debugger} @subentry @code{breakpoint}
 @cindex @code{break} (comando del debugger)
-@cindex comando del debugger @subentry @code{break}
+@cindex comando del dfn{debugger} @subentry @code{break}
 @cindex @code{b} (comando del debugger)
-@cindex comando del debugger @subentry @code{b} (alias per @code{break})
+@cindex comando del dfn{debugger} @subentry @code{b} (alias per @code{break})
 @example
 gawk> @kbd{b se_sono_uguali}
 @print{} Breakpoint 1 impostato al file `uniq.awk', riga 63
 @end example
 
-Il debugger mostra il file e il numero di riga dove si trova il punto
+Il dfn{debugger} mostra il file e il numero di riga dove si trova il punto
 d'interruzione.  Ora bisogna immettere @samp{r} o @samp{run} e il programma
 viene eseguito fino al primo punto d'interruzione:
 
-@cindex debugger @subentry eseguire il programma
-@cindex comando del debugger @subentry @code{run}
+@cindex @dfn{debugger} @subentry eseguire il programma
+@cindex comando del dfn{debugger} @subentry @code{run}
 @cindex @code{run} (comando del debugger)
 @example
 gawk> @kbd{r}
@@ -35710,13 +35788,13 @@ gawk>
 
 Ora possiamo osservare cosa accade all'interno del nostro programma.
 Prima di tutto, vediamo come siamo arrivati a questo punto.  Sulla riga di
-comando battiamo @samp{bt} (che sta per ``backtrace''), e il debugger risponde
+comando battiamo @samp{bt} (che sta per ``backtrace''), e il dfn{debugger} risponde
 con un listato degli @dfn{stack frame} correnti:
 
-@cindex debugger @subentry elementi pila @subentry visualizzazione
-@cindex comando del debugger @subentry @code{bt} (alias per @code{backtrace})
+@cindex @dfn{debugger} @subentry elementi pila @subentry visualizzazione
+@cindex comando del dfn{debugger} @subentry @code{bt} (alias per @code{backtrace})
 @cindex @code{bt} (comando del debugger) @subentry (alias per @code{backtrace})
-@cindex comando del debugger @subentry @code{backtrace}
+@cindex comando del dfn{debugger} @subentry @code{backtrace}
 @cindex @code{backtrace} (comando del debugger)
 @example
 gawk> @kbd{bt}
@@ -35736,12 +35814,12 @@ essere la chiave per trovare l'origine del problema.)
 Ora che siamo in @code{se_sono_uguali()}, possiamo iniziare a guardare i valori di
 alcune variabili.  Immaginiamo di battere @samp{p n}
 (@code{p} sta per @dfn{print} [stampa]).  Ci aspetteremo di vedere il valore di
-@code{n}, un parametro di @code{se_sono_uguali()}.  In realt@`a, il debugger
+@code{n}, un parametro di @code{se_sono_uguali()}.  In realt@`a, il dfn{debugger} 
 ci d@`a:
 
-@cindex comando del debugger @subentry @code{print}
+@cindex comando del dfn{debugger} @subentry @code{print}
 @cindex @code{print} (comando del debugger)
-@cindex comando del debugger @subentry @code{p} (alias per @code{print})
+@cindex comando del dfn{debugger} @subentry @code{p} (alias per @code{print})
 @cindex @code{p} (comando del debugger) @subentry (alias per @code{print})
 @example
 gawk> @kbd{p n}
@@ -35794,9 +35872,9 @@ ulteriormente, iniziamo a ``scorrere una ad una'' le righe di
 @code{se_sono_uguali()}.  Cominciamo col battere @samp{n} (per ``next''
 [successivo]):
 
-@cindex comando del debugger @subentry @code{n} (alias per @code{next})
+@cindex comando del dfn{debugger} @subentry @code{n} (alias per @code{next})
 @cindex @code{n} (comando del debugger) @subentry (alias per @code{next})
-@cindex comando del debugger @subentry @code{next}
+@cindex comando del dfn{debugger} @subentry @code{next}
 @cindex @code{next} (comando del debugger)
 @example
 @group
@@ -35845,8 +35923,8 @@ del vettore.
 
 Una prima possibilit@`a @`e quella di usare degli indici:
 
-@cindex debugger @subentry stampare singoli elementi di un vettore
-@cindex stampare @subentry singoli elementi di un vettore @subentry nel debugger
+@cindex @dfn{debugger} @subentry stampare singoli elementi di un vettore
+@cindex stampare @subentry singoli elementi di un vettore @subentry nel dfn{debugger} 
 @example
 gawk> @kbd{p vettore_ultima[0]}
 @print{} "0" non presente nel vettore `vettore_ultima'
@@ -35864,8 +35942,8 @@ Questo metodo sarebbe piuttosto lento per un vettore con 100 elementi, per cui
 @command{gawk} fornisce una scorciatoia (che fa venire in mente un altro
 linguaggio che non nominiamo):
 
-@cindex debugger @subentry stampare tutti gli elementi di un vettore
-@cindex stampare @subentry tutti gli elementi di un vettore @subentry nel debugger
+@cindex @dfn{debugger} @subentry stampare tutti gli elementi di un vettore
+@cindex stampare @subentry tutti gli elementi di un vettore @subentry nel dfn{debugger} 
 @example
 gawk> @kbd{p @@vettore_ultima}
 @print{} vettore_ultima["1"] = "awk,"
@@ -35923,7 +36001,7 @@ e il problema @`e risolto!
 @node Lista dei comandi di debug
 @section I principali comandi di debug
 
-L'insieme dei comandi del debugger di @command{gawk} pu@`o essere diviso nelle
+L'insieme dei comandi del dfn{debugger} di @command{gawk} pu@`o essere diviso nelle
 seguenti categorie:
 
 @itemize @value{BULLET}
@@ -35947,8 +36025,8 @@ Ottenere informazioni
 Comandi vari
 @end itemize
 
-@cindex debugger @subentry ripetere dei comandi
-@cindex ripetere dei comandi @subentry nel debugger
+@cindex @dfn{debugger} @subentry ripetere dei comandi
+@cindex ripetere dei comandi @subentry nel dfn{debugger} 
 Ciascuna di esse @`e trattata
 @ifnotinfo
 nelle seguenti
@@ -35959,8 +36037,8 @@ nei seguenti
 @value{SUBSECTIONS}.
 Nelle descrizioni seguenti, i comandi che possono essere abbreviati
 mostrano l'abbreviazione su una seconda riga di descrizione.
-Un nome di comando del debugger pu@`o essere anche troncato se la parte gi@`a scritta
-non @`e ambigua. Il debugger ha la capacit@`a predefinita di ripetere
+Un nome di comando del dfn{debugger} pu@`o essere anche troncato se la parte gi@`a scritta
+non @`e ambigua. Il dfn{debugger} ha la capacit@`a predefinita di ripetere
 automaticamente il precedente comando semplicemente battendo @kbd{Invio}.
 Questo vale per i comandi @code{list}, @code{next}, @code{nexti},
 @code{step}, @code{stepi} e @code{continue} quando sono eseguiti senza
@@ -35972,8 +36050,8 @@ argomenti.
 * Vedere e modificare dati::       Vedere e modificare dati.
 * Stack di esecuzione::            Lavorare con lo @dfn{Stack}.
 * Informazioni sul debugger::      Ottenere informazioni sullo stato del
-                                   programma e del debugger.
-* Comandi vari del debugger::      Comandi vari del debugger.
+                                   programma e del dfn{debugger}.
+* Comandi vari del debugger::      Comandi vari del dfn{debugger}.
 @end menu
 
 @node Controllo dei breakpoint
@@ -35985,8 +36063,8 @@ programma verr@`a eseguito come se non fosse sotto il debugger.  I comandi per
 controllare i punti d'interruzione sono:
 
 @table @asis
-@cindex comando del debugger @subentry @code{b} (alias per @code{break})
-@cindex comando del debugger @subentry @code{break}
+@cindex comando del dfn{debugger} @subentry @code{b} (alias per @code{break})
+@cindex comando del dfn{debugger} @subentry @code{break}
 @cindex @code{break} (comando del debugger)
 @cindex @code{b} (comando del debugger) @subentry (alias per @code{break})
 @cindex impostare @subentry un punto d'interruzione
@@ -36020,12 +36098,12 @@ cancellarlo dalla lista dei punti d'interruzione usando il comando
 
 Specificando un punto d'interruzione, si pu@`o fornire anche una condizione.
 Questa @`e
-un'espressione @command{awk} (racchiusa tra doppi apici) che il debugger
+un'espressione @command{awk} (racchiusa tra doppi apici) che il dfn{debugger} 
 valuta ogni volta che viene raggiunto quel punto d'interruzione. Se la
-condizione @`e vera, il debugger ferma l'esecuzione e rimane in attesa di un
+condizione @`e vera, il dfn{debugger} ferma l'esecuzione e rimane in attesa di un
 comando. Altrimenti, continua l'esecuzione del programma.
 
-@cindex comando del debugger @subentry @code{clear}
+@cindex comando del dfn{debugger} @subentry @code{clear}
 @cindex @code{clear} (comando del debugger)
 @cindex cancellare punto d'interruzione @subentry in una determinata posizione
 @cindex punto d'interruzione @subentry (@code{breakpoint}) @subentry cancellare in una determinata posizione
@@ -36053,22 +36131,22 @@ Cancella il punto (o i punti) d'interruzione impostato/i all'ingresso della
 funzione @var{funzione}.
 @end table
 
-@cindex comando del debugger @subentry @code{condition}
+@cindex comando del dfn{debugger} @subentry @code{condition}
 @cindex @code{condition} (comando del debugger)
 @cindex condizione dei punti d'interruzione
 @item @code{condition} @var{n} @code{"@var{espressione}"}
 Aggiunge una condizione al punto d'interruzione o al punto d'osservazione
 esistente @var{n}. La condizione @`e un'espressione @command{awk}
-@emph{racchiusa tra doppi apici} che il debugger valuta ogni volta che viene
+@emph{racchiusa tra doppi apici} che il dfn{debugger} valuta ogni volta che viene
 raggiunto il punto d'interruzione o il punto d'osservazione. Se la condizione @`e
-vera, il debugger ferma l'esecuzione e attende l'immissione di un comando.
-Altrimenti, il debugger continua l'esecuzione del programma. Se l'espressione
+vera, il dfn{debugger} ferma l'esecuzione e attende l'immissione di un comando.
+Altrimenti, il dfn{debugger} continua l'esecuzione del programma. Se l'espressione
 della condizione non viene specificata, tutte le condizioni esistenti vengono
 rimosse (cio@`e, il punto d'interruzione o di osservazione viene considerato
 incondizionato).
 
-@cindex comando del debugger @subentry @code{d} (alias per @code{delete})
-@cindex comando del debugger @subentry @code{delete}
+@cindex comando del dfn{debugger} @subentry @code{d} (alias per @code{delete})
+@cindex comando del dfn{debugger} @subentry @code{delete}
 @cindex @code{delete} (comando del debugger)
 @cindex @code{d} (comando del debugger) @subentry (alias per @code{delete})
 @cindex cancellare punto d'interruzione @subentry per numero
@@ -36080,7 +36158,7 @@ Cancella i punti d'interruzione specificati o un intervallo di punti
 d'interruzione. Se non vengono forniti argomenti, cancella tutti i
 punti d'interruzione esistenti.
 
-@cindex comando del debugger @subentry @code{disable}
+@cindex comando del dfn{debugger} @subentry @code{disable}
 @cindex @code{disable} (comando del debugger)
 @cindex disabilitare punto d'interruzione
 @cindex punto d'interruzione @subentry (@code{disable}) @subentry come disabilitare o abilitare
@@ -36088,8 +36166,8 @@ punti d'interruzione esistenti.
 Disabilita punti d'interruzione specificati o un intervallo di essi. Senza
 argomenti, disabilita tutti i punti d'interruzione.
 
-@cindex comando del debugger @subentry @code{e} (alias per @code{enable})
-@cindex comando del debugger @subentry @code{enable}
+@cindex comando del dfn{debugger} @subentry @code{e} (alias per @code{enable})
+@cindex comando del dfn{debugger} @subentry @code{enable}
 @cindex @code{enable} (comando del debugger)
 @cindex @code{e} (comando del debugger) @subentry (alias per @code{enable})
 @cindex abilitare un punto d'interruzione
@@ -36110,15 +36188,15 @@ Abilita dei punti d'interruzione @dfn{una tantum}, poi li cancella quando il
 programma si ferma in quel punto.
 @end table
 
-@cindex comando del debugger @subentry @code{ignore}
+@cindex comando del dfn{debugger} @subentry @code{ignore}
 @cindex @code{ignore} (comando del debugger)
 @cindex ignorare un punto d'interruzione
 @item @code{ignore} @var{n} @var{contatore}
 Ignora il punto d'interruzione numero @var{n} le successive
 @var{contatore} volte in cui viene raggiunto.
 
-@cindex comando del debugger @subentry @code{t} (alias per @code{tbreak})
-@cindex comando del debugger @subentry @code{tbreak}
+@cindex comando del dfn{debugger} @subentry @code{t} (alias per @code{tbreak})
+@cindex comando del dfn{debugger} @subentry @code{tbreak}
 @cindex @code{tbreak} (comando del debugger)
 @cindex @code{t} (comando del debugger) @subentry (alias per @code{tbreak})
 @cindex punto d'interruzione @subentry (@code{tbreak}) temporaneo
@@ -36137,11 +36215,11 @@ programma, osservando il suo comportamento.  Ci sono pi@`u comandi per
 controllare l'esecuzione del programma di quelli visti nei precedenti esempi:
 
 @table @asis
-@cindex comando del debugger @subentry @code{commands}
+@cindex comando del dfn{debugger} @subentry @code{commands}
 @cindex @code{commands} (comando del debugger)
-@cindex comando del debugger @subentry @code{silent}
+@cindex comando del dfn{debugger} @subentry @code{silent}
 @cindex @code{silent} (comando del debugger)
-@cindex comando del debugger @subentry @code{end}
+@cindex comando del dfn{debugger} @subentry @code{end}
 @cindex @code{end} (comando del debugger)
 @cindex punto d'interruzione @subentry comandi da eseguire al
 @cindex comandi da eseguire al punto d'interruzione
@@ -36172,10 +36250,10 @@ gawk> @kbd{commands}
 gawk>
 @end example
 
-@cindex comando del debugger @subentry @code{c} (alias per @code{continue})
-@cindex comando del debugger @subentry @code{continue}
-@cindex continuazione @subentry esecuzione programma nel debugger
-@cindex debugger @subentry continuare esecuzione programma
+@cindex comando del dfn{debugger} @subentry @code{c} (alias per @code{continue})
+@cindex comando del dfn{debugger} @subentry @code{continue}
+@cindex continuazione @subentry esecuzione programma nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry continuare esecuzione programma
 @cindex @code{continue} (comando del debugger)
 @item @code{continue} [@var{contatore}]
 @itemx @code{c} [@var{contatore}]
@@ -36184,32 +36262,32 @@ e viene specificato @var{contatore}, il punto d'interruzione in quella
 posizione viene ignorato per le prossime @var{contatore} volte prima di
 fermarsi nuovamente.
 
-@cindex comando del debugger @subentry @code{finish}
+@cindex comando del dfn{debugger} @subentry @code{finish}
 @cindex @code{finish} (comando del debugger)
 @item @code{finish}
 Esegue fino a quando lo @dfn{stack frame} selezionato completa l'esecuzione.
 Stampa il valore restituito.
 
-@cindex comando del debugger @subentry @code{n} (alias per @code{next})
-@cindex comando del debugger @subentry @code{next}
+@cindex comando del dfn{debugger} @subentry @code{n} (alias per @code{next})
+@cindex comando del dfn{debugger} @subentry @code{next}
 @cindex @code{next} (comando del debugger)
 @cindex @code{n} (comando del debugger) @subentry (alias per @code{next})
-@cindex esecuzione di un solo passo @subentry nel debugger
+@cindex esecuzione di un solo passo @subentry nel dfn{debugger} 
 @item @code{next} [@var{contatore}]
 @itemx @code{n} [@var{contatore}]
 Continua l'esecuzione alla successiva riga sorgente, saltando le chiamate di
 funzione.  L'argomento @var{contatore} controlla il numero di ripetizioni
 dell'azione, come in @code{step}.
 
-@cindex comando del debugger @subentry @code{ni} (alias per @code{nexti})
-@cindex comando del debugger @subentry @code{nexti}
+@cindex comando del dfn{debugger} @subentry @code{ni} (alias per @code{nexti})
+@cindex comando del dfn{debugger} @subentry @code{nexti}
 @cindex @code{nexti} (comando del debugger)
 @cindex @code{ni} (comando del debugger) @subentry (alias for @code{nexti})
 @item @code{nexti} [@var{contatore}]
 @itemx @code{ni} [@var{contatore}]
 Esegue una o @var{contatore} istruzioni, comprese le chiamate di funzione.
 
-@cindex comando del debugger @subentry @code{return}
+@cindex comando del dfn{debugger} @subentry @code{return}
 @cindex @code{return} (comando del debugger)
 @item @code{return} [@var{valore}]
 Cancella l'esecuzione di una chiamata di funzione. Se @var{valore} (una
@@ -36219,19 +36297,19 @@ correntemente in esecuzione; cio@`e, il frame numero 0), ignora tutti i frame
 pi@`u interni di quello selezionato, e il chiamante del frame selezionato
 diventa il frame pi@`u interno.
 
-@cindex comando del debugger @subentry @code{r} (alias per @code{run})
-@cindex comando del debugger @subentry @code{run}
+@cindex comando del dfn{debugger} @subentry @code{r} (alias per @code{run})
+@cindex comando del dfn{debugger} @subentry @code{run}
 @cindex @code{run} (comando del debugger)
 @cindex @code{r} (comando del debugger) @subentry (alias per @code{run})
 @item @code{run}
 @itemx @code{r}
 Avvia/riavvia l'esecuzione del programma. Quando il programma viene riavviato,
-il debugger mantiene i punti d'interruzione e di osservazione, la cronologia
+il dfn{debugger} mantiene i punti d'interruzione e di osservazione, la cronologia
 dei comandi, la visualizzazione automatica di variabili, e le opzioni del
 debugger.
 
-@cindex comando del debugger @subentry @code{s} (alias per @code{step})
-@cindex comando del debugger @subentry @code{step}
+@cindex comando del dfn{debugger} @subentry @code{s} (alias per @code{step})
+@cindex comando del dfn{debugger} @subentry @code{step}
 @cindex @code{step} (comando del debugger)
 @cindex @code{s} (comando del debugger) @subentry (alias per @code{step})
 @item @code{step} [@var{contatore}]
@@ -36242,8 +36320,8 @@ all'interno della riga.  Se viene fornito l'argomento @var{contatore},
 esegue il numero di istruzioni specificate prima di fermarsi, a meno che non
 s'imbatta in un punto d'interruzione o di osservazione.
 
-@cindex comando del debugger @subentry @code{si} (alias per @code{stepi})
-@cindex comando del debugger @subentry @code{stepi}
+@cindex comando del dfn{debugger} @subentry @code{si} (alias per @code{stepi})
+@cindex comando del dfn{debugger} @subentry @code{stepi}
 @cindex @code{stepi} (comando del debugger)
 @cindex @code{si} (comando del debugger) @subentry (alias per @code{stepi})
 @item @code{stepi} [@var{contatore}]
@@ -36259,8 +36337,8 @@ in
 @end ifnottex
 @ref{Comandi vari del debugger}.)
 
-@cindex comando del debugger @subentry @code{u} (alias per @code{until})
-@cindex comando del debugger @subentry @code{until}
+@cindex comando del dfn{debugger} @subentry @code{u} (alias per @code{until})
+@cindex comando del dfn{debugger} @subentry @code{until}
 @cindex @code{until} (comando del debugger)
 @cindex @code{u} (comando del debugger) @subentry (alias per @code{until})
 @item @code{until} [[@var{nome-file}@code{:}]@var{n} | @var{funzione}]
@@ -36278,7 +36356,7 @@ lo @dfn{stack frame} corrente non termina l'esecuzione.
 I comandi per vedere e modificare variabili all'interno di @command{gawk} sono:
 
 @table @asis
-@cindex comando del debugger @subentry @code{display}
+@cindex comando del dfn{debugger} @subentry @code{display}
 @cindex @code{display} (comando del debugger)
 @item @code{display} [@var{var} | @code{$}@var{n}]
 Aggiunge la variabile @var{var} (o il campo @code{$@var{n}}) alla lista di
@@ -36300,9 +36378,9 @@ raggiunge un contesto dove la variabile con quel nome non esiste pi@`u.
 Senza argomenti, @code{display} mostra i valori correnti degli elementi della
 lista.
 
-@cindex comando del debugger @subentry @code{eval}
+@cindex comando del dfn{debugger} @subentry @code{eval}
 @cindex @code{eval} (comando del debugger)
-@cindex valutare espressioni @subentry nel debugger
+@cindex valutare espressioni @subentry nel dfn{debugger} 
 @item @code{eval "@var{istruzioni awk}"}
 Valuta @var{istruzioni awk} nel contesto del programma in esecuzione.
 Si pu@`o fare qualsiasi cosa che un programma @command{awk} farebbe: assegnare
@@ -36327,11 +36405,11 @@ definire
 ``variabili locali'' che esistono nel contesto delle @var{istruzioni awk},
 invece di usare variabili o parametri di funzione gi@`a definiti nel programma.
 
-@cindex comando del debugger @subentry @code{p} (alias per @code{print})
-@cindex comando del debugger @subentry @code{print}
+@cindex comando del dfn{debugger} @subentry @code{p} (alias per @code{print})
+@cindex comando del dfn{debugger} @subentry @code{print}
 @cindex @code{print} (comando del debugger)
 @cindex @code{p} (comando del debugger) @subentry (alias per @code{print})
-@cindex stampare @subentry variabili @subentry nel debugger
+@cindex stampare @subentry variabili @subentry nel dfn{debugger} 
 @item @code{print} @var{var1}[@code{,} @var{var2} @dots{}]
 @itemx @code{p} @var{var1}[@code{,} @var{var2} @dots{}]
 Stampa i valori di una o pi@`u variabili o campi di @command{gawk}.
@@ -36357,7 +36435,7 @@ gawk> @kbd{print @@a}
 L'esempio stampa gli indici e i corrispondenti valori di tutti gli elementi
 del vettore @code{a}.
 
-@cindex comando del debugger @subentry @code{printf}
+@cindex comando del dfn{debugger} @subentry @code{printf}
 @cindex @code{printf} (comando del debugger)
 @item @code{printf} @var{formato} [@code{,} @var{arg} @dots{}]
 Stampa un testo formattato. Il @var{formato} pu@`o includere sequenze di
@@ -36366,9 +36444,9 @@ protezione, come @samp{\n}
 Non viene stampato nessun ritorno a capo che non sia stato specificato
 esplicitamente.
 
-@cindex comando del debugger @subentry @code{set}
+@cindex comando del dfn{debugger} @subentry @code{set}
 @cindex @code{set} (comando del debugger)
-@cindex assegnamento @subentry di valori a variabili, nel debugger
+@cindex assegnamento @subentry di valori a variabili, nel dfn{debugger} 
 @item @code{set} @var{var}@code{=}@var{valore}
 Assegna un valore costante (numero o stringa) a una variabile o a un campo di
 @command{awk}.
@@ -36378,33 +36456,33 @@ I valori di stringa devono essere racchiusi tra doppi apici
 Si possono impostare anche delle variabili speciali di @command{awk}, come
 @code{FS}, @code{NF}, @code{NR}, e cos@`{@dotless{i}} via.
 
-@cindex comando del debugger @subentry @code{w} (alias per @code{watch})
-@cindex comando del debugger @subentry @code{watch}
+@cindex comando del dfn{debugger} @subentry @code{w} (alias per @code{watch})
+@cindex comando del dfn{debugger} @subentry @code{watch}
 @cindex @code{watch} (comando del debugger)
 @cindex @code{w} (comando del debugger) @subentry (alias per @code{watch})
 @cindex impostare @subentry un punto d'osservazione
 @item @code{watch} @var{var} | @code{$}@var{n} [@code{"@var{espressione}"}]
 @itemx @code{w} @var{var} | @code{$}@var{n} [@code{"@var{espressione}"}]
 Aggiunge la variabile @var{var} (o il campo @code{$@var{n}}) alla lista dei
-punti d'osservazione.  Il debugger quindi interrompe il programma ogni volta
+punti d'osservazione.  Il dfn{debugger} quindi interrompe il programma ogni volta
 che il valore della variabile o del campo cambia. A ogni elemento osservato
 viene assegnato un numero che pu@`o essere usato per cancellarlo dalla lista
 usando il comando @code{unwatch} [non-osservare pi@`u].
 
 Definendo un punto d'osservazione, si pu@`o anche porre una condizione, che @`e
-un'espressione @command{awk} (racchiusa tra doppi apici) che il debugger valuta
+un'espressione @command{awk} (racchiusa tra doppi apici) che il dfn{debugger} valuta
 ogni volta che viene raggiunto il punto d'osservazione.  Se la condizione @`e
-vera, il debugger interrompe l'esecuzione e rimane in attesa di un comando.
+vera, il dfn{debugger} interrompe l'esecuzione e rimane in attesa di un comando.
 Altrimenti, @command{gawk} prosegue nell'esecuzione del programma.
 
-@cindex comando del debugger @subentry @code{undisplay}
+@cindex comando del dfn{debugger} @subentry @code{undisplay}
 @cindex @code{undisplay} (comando del debugger)
-@cindex interruzione visualizzazioni automatiche @subentry nel debugger
+@cindex interruzione visualizzazioni automatiche @subentry nel dfn{debugger} 
 @item @code{undisplay} [@var{n}]
 Rimuove l'elemento numero @var{n} (o tutti gli elementi, se non vi sono
 argomenti) dalla lista delle visualizzazioni automatiche.
 
-@cindex comando del debugger @subentry @code{unwatch}
+@cindex comando del dfn{debugger} @subentry @code{unwatch}
 @cindex @code{unwatch} (comando del debugger)
 @cindex cancellare punto d'osservazione
 @item @code{unwatch} [@var{n}]
@@ -36424,16 +36502,16 @@ all'interno della pila per vedere qual era lo stato delle cose nelle funzioni
 che hanno chiamato quella in cui ci si trova.  I comandi per far questo sono:
 
 @table @asis
-@cindex comando del debugger @subentry @code{bt} (alias per @code{backtrace})
-@cindex comando del debugger @subentry @code{backtrace}
-@cindex comando del debugger @subentry @code{where} (alias per @code{backtrace})
+@cindex comando del dfn{debugger} @subentry @code{bt} (alias per @code{backtrace})
+@cindex comando del dfn{debugger} @subentry @code{backtrace}
+@cindex comando del dfn{debugger} @subentry @code{where} (alias per @code{backtrace})
 @cindex @code{backtrace} (comando del debugger)
 @cindex @code{bt} (comando del debugger) @subentry (alias per @code{backtrace})
 @cindex @code{where} (comando del debugger) @subentry (alias per @code{backtrace})
-@cindex descrizione di @subentry @dfn{stack}, pila delle @subentry nel debugger
-@cindex @dfn{stack} (pila) delle chiamate @subentry visualizzare nel debugger
-@cindex pila (@dfn{stack}) delle chiamate @subentry visualizzare nel debugger
-@cindex tracciatura @subentry a ritroso @subentry mostrare nel debugger
+@cindex descrizione di @subentry @dfn{stack}, pila delle @subentry nel dfn{debugger} 
+@cindex @dfn{stack} (pila) delle chiamate @subentry visualizzare nel dfn{debugger} 
+@cindex pila (@dfn{stack}) delle chiamate @subentry visualizzare nel dfn{debugger} 
+@cindex tracciatura @subentry a ritroso @subentry mostrare nel dfn{debugger} 
 @item @code{backtrace} [@var{contatore}]
 @itemx @code{bt} [@var{contatore}]
 @itemx @code{where} [@var{contatore}]
@@ -36445,14 +36523,14 @@ ritroso mostra il nome e gli argomenti di ciascuna funzione, il sorgente
 viene mantenuto per i vecchi utenti di GDB che potrebbero essere abituati a
 quel comando.
 
-@cindex comando del debugger @subentry @code{down}
+@cindex comando del dfn{debugger} @subentry @code{down}
 @cindex @code{down} (comando del debugger)
 @item @code{down} [@var{contatore}]
 Sposta @var{contatore} (default 1) frame sotto la pila verso il frame pi@`u interno.
 Poi seleziona e stampa il frame.
 
-@cindex comando del debugger @subentry @code{f} (alias per @code{frame})
-@cindex comando del debugger @subentry @code{frame}
+@cindex comando del dfn{debugger} @subentry @code{f} (alias per @code{frame})
+@cindex comando del dfn{debugger} @subentry @code{frame}
 @cindex @code{frame} (comando del debugger)
 @cindex @code{f} (comando del debugger) @subentry (alias per @code{frame})
 @item @code{frame} [@var{n}]
@@ -36464,7 +36542,7 @@ col numero pi@`u alto @`e quello per il programma principale.  Le informazioni
 stampate comprendono il numero di frame, i nomi delle funzioni e degli
 argomenti, i file sorgenti e le righe sorgenti.
 
-@cindex comando del debugger @subentry @code{up}
+@cindex comando del dfn{debugger} @subentry @code{up}
 @cindex @code{up} (comando del debugger)
 @item @code{up} [@var{contatore}]
 Sposta @var{contatore} (default 1) frame sopra la pila verso il frame pi@`u
@@ -36472,18 +36550,18 @@ esterno.  Poi seleziona e stampa il frame.
 @end table
 
 @node Informazioni sul debugger
-@subsection Ottenere informazioni sullo stato del programma e del debugger
+@subsection Ottenere informazioni sullo stato del programma e del dfn{debugger} 
 
 Oltre che vedere i valori delle variabili, spesso si ha necessit@`a di ottenere
 informazioni di altro tipo sullo stato del programma e dello stesso ambiente di
-debug.  Il debugger di @command{gawk} ha un comando che fornisce
+debug.  Il dfn{debugger} di @command{gawk} ha un comando che fornisce
 quest'informazione, chiamato convenientemente @code{info}.  @code{info}
 @`e usato con uno dei tanti argomenti che dicono esattamente quel che si vuol
 sapere:
 
 @table @asis
-@cindex comando del debugger @subentry @code{i} (alias per @code{info})
-@cindex comando del debugger @subentry @code{info}
+@cindex comando del dfn{debugger} @subentry @code{i} (alias per @code{info})
+@cindex comando del dfn{debugger} @subentry @code{info}
 @cindex @code{info} (comando del debugger)
 @cindex @code{i} (comando del debugger) @subentry (alias per @code{info})
 @item @code{info} @var{cosa}
@@ -36493,78 +36571,78 @@ Il valore di @var{cosa} dovrebbe essere uno dei seguenti:
 @c nested table
 @table @code
 @item args
-@cindex mostrare nel debugger @subentry argomenti delle funzioni
-@cindex debugger @subentry mostrare argomenti delle funzioni
+@cindex mostrare nel dfn{debugger} @subentry argomenti delle funzioni
+@cindex @dfn{debugger} @subentry mostrare argomenti delle funzioni
 Elenca gli argomenti del frame selezionato.
 
 @item break
-@cindex mostrare nel debugger @subentry punti d'interruzione
-@cindex debugger @subentry mostrare punti d'interruzione
+@cindex mostrare nel dfn{debugger} @subentry punti d'interruzione
+@cindex @dfn{debugger} @subentry mostrare punti d'interruzione
 Elenca tutti i punti d'interruzione attualmente impostati.
 
 @item display
-@cindex visualizzazioni automatiche @subentry nel debugger
-@cindex debugger @subentry visualizzazioni automatiche
+@cindex visualizzazioni automatiche @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry visualizzazioni automatiche
 Elenca tutti gli elementi della lista delle visualizzazioni automatiche.
 
 @item frame
-@cindex descrizione di @subentry @dfn{stack frame} delle chiamate @subentry nel debugger
-@cindex debugger @subentry descrizione degli @dfn{stack frame} delle chiamate
+@cindex descrizione di @subentry @dfn{stack frame} delle chiamate @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry descrizione degli @dfn{stack frame} delle chiamate
 D@`a una descrizione degli @dfn{stack frame} selezionati.
 
 @item functions
-@cindex elencare @subentry definizioni delle funzioni @subentry nel debugger
-@cindex debugger @subentry elencare definizioni delle funzioni
+@cindex elencare @subentry definizioni delle funzioni @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry elencare definizioni delle funzioni
 Elenca tutte le definizioni delle funzioni compresi i @value{FNS} e
 i numeri di riga.
 
 @item locals
-@cindex mostrare nel debugger @subentry variabili locali
-@cindex debugger @subentry mostrare variabili locali
+@cindex mostrare nel dfn{debugger} @subentry variabili locali
+@cindex @dfn{debugger} @subentry mostrare variabili locali
 Elenca le variabili locali dei frame selezionati.
 
 @item source
-@cindex mostrare nel debugger @subentry nome del file sorgente corrente
-@cindex debugger @subentry mostrare il nome del file sorgente corrente
-@cindex file @subentry sorgente corrente, mostrare nel debugger
+@cindex mostrare nel dfn{debugger} @subentry nome del file sorgente corrente
+@cindex @dfn{debugger} @subentry mostrare il nome del file sorgente corrente
+@cindex file @subentry sorgente corrente, mostrare nel dfn{debugger} 
 Stampa il nome del file sorgente corrente.  Ogni volta che il programma si
 interrompe, il file sorgente corrente @`e il file che contiene l'istruzione
-corrente.  Quando il debugger viene avviato per la prima volta, il file
+corrente.  Quando il dfn{debugger} viene avviato per la prima volta, il file
 sorgente corrente @`e il primo file incluso attraverso l'opzione @option{-f}.
 Il comando @samp{list @var{nome-file}:@var{numero-riga}} pu@`o essere usato in
 qualsiasi momento per cambiare il sorgente corrente.
 
 @item sources
-@cindex mostrare nel debugger @subentry nome di tutti i file sorgente
-@cindex debugger @subentry mostrare il nome di tutti i file sorgente
+@cindex mostrare nel dfn{debugger} @subentry nome di tutti i file sorgente
+@cindex @dfn{debugger} @subentry mostrare il nome di tutti i file sorgente
 Elenca tutti i file sorgente del programma.
 
 @item variables
-@cindex elencare @subentry tutte le variabili locali @subentry nel debugger
-@cindex debugger @subentry elencare tutte le variabili locali
+@cindex elencare @subentry tutte le variabili locali @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry elencare tutte le variabili locali
 Elenca tutte le variabili locali.
 
 @item watch
-@cindex mostrare nel debugger @subentry punti d'osservazione
-@cindex debugger @subentry mostrare i punti d'osservazione
+@cindex mostrare nel dfn{debugger} @subentry punti d'osservazione
+@cindex @dfn{debugger} @subentry mostrare i punti d'osservazione
 Elenca tutti gli elementi della lista dei punti d'osservazione.
 @end table
 @end table
 
 Ulteriori comandi permettono di avere il controllo sul debugger, la capacit@`a di
-salvare lo stato del debugger e la capacit@`a di eseguire comandi del debugger
+salvare lo stato del dfn{debugger} e la capacit@`a di eseguire comandi del dfn{debugger} 
 da un file.  I comandi sono:
 
 @table @asis
-@cindex comando del debugger @subentry @code{o} (alias per @code{option})
-@cindex comando del debugger @subentry @code{option}
+@cindex comando del dfn{debugger} @subentry @code{o} (alias per @code{option})
+@cindex comando del dfn{debugger} @subentry @code{option}
 @cindex @code{option} (comando del debugger)
 @cindex @code{o} (comando del debugger) @subentry (alias per @code{option})
-@cindex visualizzare le opzioni del debugger
-@cindex debugger @subentry opzioni del
+@cindex visualizzare le opzioni del dfn{debugger} 
+@cindex @dfn{debugger} @subentry opzioni del
 @item @code{option} [@var{nome}[@code{=}@var{valore}]]
 @itemx @code{o} [@var{nome}[@code{=}@var{valore}]]
-Senza argomenti, visualizza le opzioni del debugger disponibili e i loro valori
+Senza argomenti, visualizza le opzioni del dfn{debugger} disponibili e i loro valori
 correnti.  @samp{option @var{nome}} mostra il valore corrente dell'opzione
 cos@`{@dotless{i}} denominata.  @samp{option @var{nome}=@var{valore}} assegna
 un nuovo valore all'opzione.
@@ -36574,57 +36652,57 @@ Le opzioni disponibili sono:
 @c asis for docbook
 @table @asis
 @item @code{history_size}
-@cindex debugger @subentry dimensione della cronologia
+@cindex @dfn{debugger} @subentry dimensione della cronologia
 Imposta il numero massimo di righe da mantenere nel file della cronologia
 @file{./.gawk_history}.  Il valore di default @`e 100.
 
 @item @code{listsize}
-@cindex debugger @subentry numero di righe nella lista di default
+@cindex @dfn{debugger} @subentry numero di righe nella lista di default
 Specifica il numero di righe che @code{list} deve stampare. Il valore di
 default @`e 15.
 
 @item @code{outfile}
-@cindex ridirezionare l'output di @command{gawk} @subentry nel debugger
-@cindex debugger @subentry ridirezionare l'output di @command{gawk}
-Invia l'output di @command{gawk} in un file; l'output del debugger @`e
+@cindex ridirezionare l'output di @command{gawk} @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry ridirezionare l'output di @command{gawk}
+Invia l'output di @command{gawk} in un file; l'output del dfn{debugger} @`e
 visualizzato comunque anche
 nello standard output. Assegnare come valore stringa vuota (@code{""})
 reimposta l'output solo allo standard output.
 
 @item @code{prompt}
-@cindex debugger @subentry prompt
-@cindex prompt del debugger
+@cindex @dfn{debugger} @subentry prompt
+@cindex prompt del dfn{debugger} 
 Cambia la riga per l'immissione dei comandi del debugger.  Il valore di
 default @`e @samp{@w{gawk> }}.
 
 @item @code{save_history} [@code{on} | @code{off}]
-@cindex debugger @subentry file della cronologia
+@cindex @dfn{debugger} @subentry file della cronologia
 Salva la cronologia dei comandi nel file @file{./.gawk_history}.
 L'impostazione di default @`e @code{on}.
 
 @item @code{save_options} [@code{on} | @code{off}]
-@cindex salvataggio opzioni @subentry nel debugger
-@cindex debugger @subentry salvataggio opzioni
+@cindex salvataggio opzioni @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry salvataggio opzioni
 Salva le opzioni correnti nel file @file{./.gawkrc} all'uscita.
 L'impostazione di default @`e @code{on}.
 Le opzioni sono lette di nuovo all'avvio della sessione successiva.
 
 @item @code{trace} [@code{on} | @code{off}]
-@cindex istruzioni @subentry tener traccia delle @subentry nel debugger
-@cindex debugger @subentry tener traccia delle istruzioni
+@cindex istruzioni @subentry tener traccia delle @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry tener traccia delle istruzioni
 Attiva o disattiva il tracciamento delle istruzioni. L'impostazione di default
 @`e @code{off}.
 @end table
 
-@cindex debugger @subentry salvare dei comandi su un file
-@cindex salvare dei comandi su un file @subentry nel debugger
+@cindex @dfn{debugger} @subentry salvare dei comandi su un file
+@cindex salvare dei comandi su un file @subentry nel dfn{debugger} 
 @item @code{save} @var{nome-file}
 Salva i comandi eseguiti nella sessione corrente nel @value{FN} indicato,
 in modo da poterli ripetere in seguito usando il comando @command{source}.
 
 @item @code{source} @var{nome-file}
-@cindex debugger @subentry leggere comandi da un file
-@cindex leggere @subentry comandi da un file nel debugger
+@cindex @dfn{debugger} @subentry leggere comandi da un file
+@cindex leggere @subentry comandi da un file nel dfn{debugger} 
 Esegue comandi contenuti in un file; un errore in un comando non impedisce
 l'esecuzione dei comandi successivi.  In un file di comandi sono consentiti
 i commenti (righe che iniziano con @samp{#}).
@@ -36632,7 +36710,7 @@ Le righe vuote vengono ignorate; esse @emph{non}
 ripetono l'ultimo comando.
 Non si pu@`o riavviare il programma mettendo pi@`u di un comando @code{run}
 nel file. Inoltre, la lista dei comandi pu@`o includere altri comandi
-@code{source}; in ogni caso, il debugger di @command{gawk} non richiama lo
+@code{source}; in ogni caso, il dfn{debugger} di @command{gawk} non richiama lo
 stesso file pi@`u di una volta per evitare ricorsioni infinite.
 
 Oltre al comando @code{source}, o al posto di esso, si possono usare le opzioni
@@ -36642,13 +36720,13 @@ per eseguire comandi da un file in maniera non interattiva
 @end table
 
 @node Comandi vari del debugger
-@subsection Comandi vari del debugger
+@subsection Comandi vari del dfn{debugger} 
 
 Ci sono alcuni altri comandi che non rientrano nelle precedenti categorie,
 come i seguenti:
 
 @table @asis
-@cindex comando del debugger @subentry @code{dump}
+@cindex comando del dfn{debugger} @subentry @code{dump}
 @cindex @code{dump} (comando del debugger)
 @item @code{dump} [@var{nome-file}]
 Riversa il @dfn{byte code} del programma nello standard output o nel file
@@ -36711,26 +36789,26 @@ gawk>
 @end group
 @end smallexample
 
-@cindex comando del debugger @subentry @code{exit}
+@cindex comando del dfn{debugger} @subentry @code{exit}
 @cindex @code{exit} (comando del debugger)
-@cindex uscire dal debugger
-@cindex debugger @subentry uscire dal
+@cindex uscire dal dfn{debugger} 
+@cindex @dfn{debugger} @subentry uscire dal
 @item @code{exit}
-Esce dal debugger.
+Esce dal dfn{debugger}.
 Si veda la voce @samp{quit}, pi@`u avanti in quest'elenco.
 
-@cindex comando del debugger @subentry @code{h} (alias per @code{help})
-@cindex comando del debugger @subentry @code{help}
+@cindex comando del dfn{debugger} @subentry @code{h} (alias per @code{help})
+@cindex comando del dfn{debugger} @subentry @code{help}
 @cindex @code{help} (comando del debugger)
 @cindex @code{h} (comando del debugger) @subentry (alias per @code{help})
 @item @code{help}
 @itemx @code{h}
-Stampa una lista di tutti i comandi del debugger di @command{gawk} con un breve
+Stampa una lista di tutti i comandi del dfn{debugger} di @command{gawk} con un breve
 sommario su come usarli.  @samp{help @var{comando}} stampa l'informazione sul
 comando @var{comando}.
 
-@cindex comando del debugger @subentry @code{l} (alias per @code{list})
-@cindex comando del debugger @subentry @code{list}
+@cindex comando del dfn{debugger} @subentry @code{l} (alias per @code{list})
+@cindex comando del dfn{debugger} @subentry @code{list}
 @cindex @code{list} (comando del debugger)
 @cindex @code{l} (comando del debugger) @subentry (alias per @code{list})
 @item @code{list} [@code{-} | @code{+} | @var{n} | @var{nome-file}@code{:}@var{n} | @var{n}--@var{m} | @var{funzione}]
@@ -36763,22 +36841,22 @@ Stampa righe centrate attorno all'inizio della funzione @var{function}.
 Questo comando pu@`o cambiare il file sorgente corrente.
 @end table
 
-@cindex comando del debugger @subentry @code{q} (alias per @code{quit})
-@cindex comando del debugger @subentry @code{quit}
+@cindex comando del dfn{debugger} @subentry @code{q} (alias per @code{quit})
+@cindex comando del dfn{debugger} @subentry @code{quit}
 @cindex @code{quit} (comando del debugger)
 @cindex @code{q} (comando del debugger) @subentry (alias per @code{quit})
-@cindex uscire dal debugger
-@cindex debugger @subentry uscire dal
+@cindex uscire dal dfn{debugger} 
+@cindex @dfn{debugger} @subentry uscire dal
 @item @code{quit}
 @itemx @code{q}
 Esce dal debugger.  Fare il debug @`e divertente, ma noi tutti a volte
 dobbiamo far fronte ad altri impegni nella vita, e talvolta troviamo il bug
 e possiamo tranquillamente passare a quello successivo!  Come abbiamo visto
-prima, se si sta eseguendo un programma, il debugger avverte quando si batte
+prima, se si sta eseguendo un programma, il dfn{debugger} avverte quando si batte
 @samp{q} o @samp{quit}, in modo da essere sicuri di voler realmente abbandonare
 il debug.
 
-@cindex comando del debugger @subentry @code{trace}
+@cindex comando del dfn{debugger} @subentry @code{trace}
 @cindex @code{trace} (comando del debugger)
 @item @code{trace} [@code{on} | @code{off}]
 Abilita o disabilita la stampa continua delle istruzioni che si stanno per
@@ -36794,10 +36872,10 @@ familiari.
 
 @node Supporto per Readline
 @section Supporto per Readline
-@cindex completamento dei comandi @subentry nel debugger
-@cindex debugger @subentry completamento dei comandi nel
-@cindex espansione della cronologia @subentry nel debugger
-@cindex debugger @subentry espansione della cronologia
+@cindex completamento dei comandi @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry completamento dei comandi nel
+@cindex espansione della cronologia @subentry nel dfn{debugger} 
+@cindex @dfn{debugger} @subentry espansione della cronologia
 
 Se @command{gawk} @`e compilato con
 @uref{http://cnswww.cns.cwru.edu/php/chet/readline/readline.html, la libreria
@@ -36837,17 +36915,17 @@ e
 @node Limitazioni
 @section Limitazioni
 
-@cindex debugger @subentry limitazioni
-@cindex limitazioni @subentry del debugger
-Si spera che il lettore trovi il debugger di @command{gawk} utile e piacevole
+@cindex @dfn{debugger} @subentry limitazioni
+@cindex limitazioni @subentry del dfn{debugger} 
+Si spera che il lettore trovi il dfn{debugger} di @command{gawk} utile e piacevole
 da usare, ma come accade per ogni programma, specialmente nelle sue prime
 versioni, ha ancora delle limitazioni.  Quelle di cui @`e bene essere al corrente sono:
 
 @itemize @value{BULLET}
 @item
-Nella versione presente, il debugger non d@`a una spiegazione dettagliata
+Nella versione presente, il dfn{debugger} non d@`a una spiegazione dettagliata
 dell'errore che
-si @`e commesso quando si immette qualcosa che il debugger ritiene sbagliato.
+si @`e commesso quando si immette qualcosa che il dfn{debugger} ritiene sbagliato.
 La risposta invece @`e solamente @samp{syntax error}.  Quando si arriva a capire
 l'errore commesso, tuttavia, ci si sentir@`a come un vero guru.
 
@@ -36868,7 +36946,7 @@ in @command{gawk}, cos@`{@dotless{i}} come in molti interpreti, @`e fatta su di 
 @code{Op_push}, @code{Op_pop}, e simili sono il pane quotidiano di
 gran parte del codice di @command{gawk}.
 
-Sfortunatamente, al momento, il debugger di @command{gawk} non consente
+Sfortunatamente, al momento, il dfn{debugger} di @command{gawk} non consente
 di esaminare i contenuti della pila.
 Cio@`e, i risultati intermedi della valutazione delle espressioni sono sulla
 pila, ma non @`e possibile stamparli.  Invece, possono essere stampate solo
@@ -36886,7 +36964,7 @@ di @command{awk}, ci si aspetta che chi legge conosca il significato di
 @code{/[^[:alnum:][:blank:]]/}.
 
 @item
-Il debugger di @command{gawk} @`e progettato per essere usato eseguendo un
+Il dfn{debugger} di @command{gawk} @`e progettato per essere usato eseguendo un
 programma (con tutti i suoi parametri) dalla riga di comando, come descritto
 @iftex
 nella
@@ -36900,7 +36978,7 @@ Questo sembra ragionevole per un linguaggio che @`e usato principalmente per
 eseguire programmi piccoli e che non richiedono molto tempo di esecuzione.
 
 @item
-Il debugger di @command{gawk} accetta solo codice sorgente fornito con
+Il dfn{debugger} di @command{gawk} accetta solo codice sorgente fornito con
 l'opzione @option{-f}.
 Se si sta usando uno @dfn{script} di shell che contiene un programma
 @command{awk} che fa parte della riga di comando, e si deve usare il debugger,
@@ -36919,12 +36997,12 @@ rm /tmp/script.$$
 
 @ignore
 @c 11/2016: This no longer applies after all the type cleanup work that's been done.
-C'@`e un altro punto che vale la pena di trattare.  I debugger convenzionali
+C'@`e un altro punto che vale la pena di trattare.  I dfn{debugger} convenzionali
 vengono eseguiti in un processo (e quindi in una parte di memoria)
 separato dal programma su cui eseguono il debug (il @dfn{debuggato}, se
 si vuole).
 
-Il debugger di @command{gawk} @`e diverso; @`e parte integrante di @command{gawk}.
+Il dfn{debugger} di @command{gawk} @`e diverso; @`e parte integrante di @command{gawk}.
 Ci@`o rende possibile, in rari casi, che @command{gawk} diventi un eccellente
 dimostratore del principio d'indeterminazione di Heisenberg, secondo il quale
 il solo atto di osservare una cosa pu@`o modificarla. Si consideri il seguente
@@ -36975,7 +37053,7 @@ con quello vecchio ha richiesto che @command{gawk} lo valutasse e
 stabilisse che era proprio un numero, e questo @`e riflesso nel risultato di
 @code{typeof()}.
 
-Casi come questi in cui il debugger non @`e trasparente rispetto all'esecuzione
+Casi come questi in cui il dfn{debugger} non @`e trasparente rispetto all'esecuzione
 del programma dovrebbero essere rari.  Nel caso che se ne trovi uno, si
 prega di segnalarlo (@pxref{Bug}).
 @end ignore
@@ -36993,24 +37071,24 @@ be added, and of course feel free to try to add them yourself!
 Raramente i programmi funzionano bene al primo colpo.  Trovare gli errori
 che contengono
 viene chiamato @dfn{debugging}, e un programma che aiuta a trovarli @`e un
-@dfn{debugger}.  @command{gawk} ha un debugger incorporato che funziona in
-modo molto simile al debugger GNU, GDB.
+@dfn{debugger}.  @command{gawk} ha un dfn{debugger} incorporato che funziona in
+modo molto simile al dfn{debugger} GNU, GDB.
 
 @item
-I debugger possono eseguire il programma un'istruzione per volta, esaminare e
+I dfn{debugger} possono eseguire il programma un'istruzione per volta, esaminare e
 cambiare i
 valori delle variabili e dei vettori, e fanno tante altre cose per
 permettere di comprendere cosa sta facendo effettivamente il programma in un
 dato momento (a differenza del comportamento atteso).
 
 @item
-Come la maggior parte dei debugger, il debugger di @command{gawk} funziona in
+Come la maggior parte dei debugger, il dfn{debugger} di @command{gawk} funziona in
 termini di @dfn{stack frame}, e si possono inserire sia punti d'interruzione
 (interruzioni a un certo punto del codice) sia punti d'osservazione
 (interruzioni quando il valore di un dato cambia).
 
 @item
-La serie di comandi del debugger @`e abbastanza completa, e permette di
+La serie di comandi del dfn{debugger} @`e abbastanza completa, e permette di
 monitorare i
 punti d'interruzione, l'esecuzione, la visualizzazione e la
 modifica dei dati, di lavorare con le pile, ottenere informazioni, e di
@@ -37018,11 +37096,11 @@ svolgere altri compiti.
 
 @item
 Se la libreria GNU Readline @`e disponibile al momento della compilazione di
-@command{gawk}, viene usata dal debugger per fornire la cronologia della riga
+@command{gawk}, viene usata dal dfn{debugger} per fornire la cronologia della riga
 di comando e delle modifiche apportate durante il debug.
 
 @item
-Normalmente, il debugger non influenza il programma che sta controllando,
+Normalmente, il dfn{debugger} non influenza il programma che sta controllando,
 ma questo pu@`o succedere occasionalmente.
 
 @end itemize
@@ -37624,12 +37702,12 @@ In questo modo i nomi dei componenti sono degli
 identificativi semplici, senza dover usare dappertutto degli
 identificativi qualificati.
 
-@cindex spazio-dei-nomi @subentry interazione con il debugger
-@cindex debugger @subentry interazione con lo spazio-dei-nomi
-L'interazione con il debugger (@pxref{Debugging}) non @`e cambiata
+@cindex spazio-dei-nomi @subentry interazione con il dfn{debugger} 
+@cindex @dfn{debugger} @subentry interazione con lo spazio-dei-nomi
+L'interazione con il dfn{debugger} (@pxref{Debugging}) non @`e cambiata
 (almeno fino al momento in cui questo libro @`e stato scritto).
 Alcuni campi interni sono stati modificati per tener conto
-degli spazi-dei-nomi, e il comando @code{dump} del debugger
+degli spazi-dei-nomi, e il comando @code{dump} del dfn{debugger} 
 @`e stato modificato per lo stesso motivo.
 
 @cindex spazio-dei-nomi @subentry interazione con l'estensione API
@@ -39693,7 +39771,7 @@ Accedere alla "tabella dei simboli": procurarsi il valore di una variabile
 globale, crearne una nuova o modificarne una gi@`a esistente.
 
 @item
-Creare ed eliminare valori nascosti; ci@`o rende possibile usare un
+Creare ed eliminare valori oscurati; ci@`o rende possibile usare un
 particolare valore per pi@`u di una variabile, e pu@`o migliorare parecchio
 le prestazioni.
 
@@ -46256,7 +46334,7 @@ Modifiche delle opzioni da riga di comando
 
 @itemize @value{MINUS}
 @item
-L'opzione @option{-D} attiva il debugger.
+L'opzione @option{-D} attiva il dfn{debugger}.
 
 @item
 Le opzioni @option{-i} e @option{--include}
@@ -46316,7 +46394,7 @@ Supporto per continuare dopo errori di I/O non fatali
 @xref{Continuazione dopo errori}.
 
 @item
-Il comando @code{where} @`e stato aggiunto al debugger
+Il comando @code{where} @`e stato aggiunto al dfn{debugger} 
 (@pxref{Stack di esecuzione}).
 
 @item
@@ -47004,7 +47082,7 @@ John Haque @`e autore dei seguenti contributi:
 @itemize @value{MINUS}
 @item
 Le modifiche per convertire @command{gawk}
-in un interprete di codice a livello di byte, compreso il debugger
+in un interprete di codice a livello di byte, compreso il dfn{debugger} 
 
 @item
 L'aggiunta di veri vettori di vettori
@@ -47038,6 +47116,10 @@ Panos Papadopoulos ha scritto il testo originale per
 @item
 @cindex Yawitz, Efraim
 Efraim Yawitz ha scritto il testo originale per il @ref{Debugger}.
+
+@item
+@cindex Naman, John
+John Naman ha preparato il testo originale di @ref{Variabili oscurate}.
 
 @item
 @cindex Schorr, Andrew
