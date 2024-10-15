@@ -596,7 +596,6 @@ particular records in a file and perform operations upon them.
 * Allowing trailing data::              Capturing optional trailing data.
 * Fields with fixed data::              Field values with fixed-width data.
 * Splitting By Content::                Defining Fields By Content
-* More CSV::                            More on CSV files.
 * FS versus FPAT::                      A subtle difference.
 * Testing field creation::              Checking how @command{gawk} is
                                         splitting records.
@@ -8282,13 +8281,10 @@ four, and @code{$4} has the value @code{"ddd"}.
 @node Splitting By Content
 @section Defining Fields by Content
 
-@quotation NOTE
-This whole section needs rewriting now
-that @command{gawk} has built-in CSV parsing. Sigh.
-@end quotation
+@c September 2024. This section rewritten, and a sub-section removed,
+@c by Stuart Ferguson <stuart.fergs@gmail.com>.
 
 @menu
-* More CSV::                    More on CSV files.
 * FS versus FPAT::              A subtle difference.
 @end menu
 
@@ -8298,22 +8294,35 @@ feature of @command{gawk}.  If you are a novice @command{awk} user,
 you might want to skip it on the first reading.
 
 @cindex advanced features @subentry specifying field content
-Normally, when using @code{FS}, @command{gawk} defines the fields as the
-parts of the record that occur in between each field separator. In other
-words, @code{FS} defines what a field @emph{is not}, instead of what a field
-@emph{is}.
-However, there are times when you really want to define the fields by
-what they are, and not by what they are not.
+Normally, when using @code{FS}, @command{gawk} defines the fields as the parts
+of the record that occur in between each field separator. In other words,
+@code{FS} defines what a field @emph{is not}, instead of what a field
+@emph{is}.  However, there are times when we really want to define the fields
+by what they are, and not by what they are not.
+
+@cindex @command{gawk} @subentry @code{FPAT} variable in
+@cindex @code{FPAT} variable
+The @code{FPAT} variable offers a solution for cases like this. The value
+of @code{FPAT} should be a string that provides a regular expression. This
+regular expression describes the contents of each field.
 
 @cindex CSV (comma separated values) data @subentry parsing with @code{FPAT}
 @cindex Comma separated values (CSV) data @subentry parsing with @code{FPAT}
-The most notorious such case
-is comma-separated values (CSV) data. Many spreadsheet programs,
-for example, can export their data into text files, where each record is
-terminated with a newline, and fields are separated by commas. If
-commas only separated the data, there wouldn't be an issue. The problem comes when
-one of the fields contains an @emph{embedded} comma.
-In such cases, most programs embed the field in double quotes.@footnote{The
+We can explore the strengths, and some limitations, of
+@code{FPAT} using the case of comma-separated values (CSV)
+data. This case is somewhat obsolete as @command{gawk} now has
+built-in CSV parsing
+(@pxref{Comma Separated Fields}).
+Nonetheless, it remains useful as an example of what @code{FPAT}-based field
+parsing can do.  It is also useful for versions of
+@command{gawk} prior to version 5.3.
+
+Many spreadsheet programs, for example, can export their data into text
+files, where each record is terminated with a newline, and fields are
+separated by commas. If commas only separated the data, there wouldn’t
+be an issue with using @samp{FS = ","} to split the data into fields. The
+problem comes when one of the fields contains an @emph{embedded} comma. In
+such cases, most programs embed the field in double quotes.@footnote{The
 CSV format lacked a formal standard definition for many years.
 @uref{http://www.ietf.org/rfc/rfc4180.txt, RFC 4180}
 standardizes the most common practices.}
@@ -8321,27 +8330,19 @@ So, we might have data like this:
 
 @example
 @c file eg/misc/addresses.csv
-Robbins,Arnold,"1234 A Pretty Street, NE",MyTown,MyState,12345-6789,USA
+Robbins,Arnold,,"1234 A Pretty Street, NE",MyTown,MyState,12345-6789,USA
 @c endfile
 @end example
 
-@cindex @command{gawk} @subentry @code{FPAT} variable in
-@cindex @code{FPAT} variable
-The @code{FPAT} variable offers a solution for cases like this.
-The value of @code{FPAT} should be a string that provides a regular expression.
-This regular expression describes the contents of each field.
-
 In the case of CSV data as presented here, each field is either ``anything that
-is not a comma,'' or ``a double quote, anything that is not a double quote, and a
-closing double quote.''  (There are more complicated definitions of CSV data,
-treated shortly.)
-If written as a regular expression constant
-(@pxref{Regexp}),
-we would have @code{/([^,]+)|("[^"]+")/}.
+is not a comma,'' or ``a double quote, anything that is not a double quote, and
+a closing double quote.'' We also need to bear in mind that some fields may be
+empty. If written as a regular expression constant (@pxref{Regexp}),
+we would have @code{/([^,]*)|("[^"]+")/}.
 Writing this as a string requires us to escape the double quotes, leading to:
 
 @example
-FPAT = "([^,]+)|(\"[^\"]+\")"
+FPAT = "([^,]*)|(\"[^\"]+\")"
 @end example
 
 Putting this to use, here is a simple program to parse the data:
@@ -8356,7 +8357,7 @@ BEGIN @{
 
 @group
 @{
-    print "NF = ", NF
+    print "NF =", NF
     for (i = 1; i <= NF; i++) @{
         printf("$%d = <%s>\n", i, $i)
     @}
@@ -8369,44 +8370,20 @@ When run, we get the following:
 
 @example
 $ @kbd{gawk -f simple-csv.awk addresses.csv}
-NF =  7
-$1 = <Robbins>
-$2 = <Arnold>
-$3 = <"1234 A Pretty Street, NE">
-$4 = <MyTown>
-$5 = <MyState>
-$6 = <12345-6789>
-$7 = <USA>
+@print{} NF = 8
+@print{} $1 = <Robbins>
+@print{} $2 = <Arnold>
+@print{} $3 = <>
+@print{} $4 = <"1234 A Pretty Street, NE">
+@print{} $5 = <MyTown>
+@print{} $6 = <MyState>
+@print{} $7 = <12345-6789>
+@print{} $8 = <USA>
 @end example
 
-Note the embedded comma in the value of @code{$3}.
-
-A straightforward improvement when processing CSV data of this sort
-would be to remove the double quotes when they occur, with something like this:
-
-@example
-if (substr($i, 1, 1) == "\"") @{
-    len = length($i)
-    $i = substr($i, 2, len - 2)    # Get text within the two double quotes
-@}
-@end example
-
-@quotation NOTE
-Some programs export CSV data that contains embedded newlines between
-the double quotes.  @command{gawk} provides no way to deal with this.
-Even though a formal specification for CSV data exists, there isn't much
-more to be done;
-the @code{FPAT} mechanism provides an elegant solution for the majority
-of cases, and the @command{gawk} developers are satisfied with that.
-@end quotation
-
-As written, the regexp used for @code{FPAT} requires that each field
-contain at least one character.  A straightforward modification
-(changing the first @samp{+} to @samp{*}) allows fields to be empty:
-
-@example
-FPAT = "([^,]*)|(\"[^\"]+\")"
-@end example
+Note the empty data field in the value of @code{$3} and the embedded comma in 
+the value of @code{$4}, in which the data remains wrapped in its enclosing 
+double quotes. 
 
 @c 4/2015:
 @c Consider use of FPAT = "([^,]*)|(\"[^\"]*\")"
@@ -8417,38 +8394,14 @@ FPAT = "([^,]*)|(\"[^\"]+\")"
 @c This is too much work. FPAT and CSV files are very flaky and
 @c fragile. Doing something like this is merely inviting trouble.
 
-As with @code{FS}, the @code{IGNORECASE} variable (@pxref{User-modified})
-affects field splitting with @code{FPAT}.
-
-Assigning a value to @code{FPAT} overrides field splitting
-with @code{FS} and with @code{FIELDWIDTHS}.
-
-Finally, the @code{patsplit()} function makes the same functionality
-available for splitting regular strings (@pxref{String Functions}).
-
-@quotation NOTE
-Given that @command{gawk} now has built-in CSV parsing
-(@pxref{Comma Separated Fields}), the examples presented here are obsolete,
-since you can use the @option{--csv} option (in which case
-@code{FPAT} field parsing doesn't take effect).
-Nonetheless, it remains useful as an example of what @code{FPAT}-based
-field parsing can do, or if you must use a version of @command{gawk}
-prior to 5.3.
-@end quotation
-
-@node More CSV
-@subsection More on CSV Files
-
-@cindex Collado, Manuel
-Manuel Collado notes that in addition to commas, a CSV field can also
-contain double quotes, that have to be escaped by doubling them. The previously
-described regexps fail to accept quoted fields with both commas and
-double quotes inside. He suggests that the simplest @code{FPAT} expression that
-recognizes this kind of fields is @code{/([^,]*)|("([^"]|"")+")/}. He
-provides the following input data to test these variants:
+The use of enclosing double quotes has a consequence for fields that contain
+double quotes as part of the data itself. For those fields, a double quote
+appearing inside a field must be escaped by preceding it with another double
+quote, as shown in the third and fourth lines of the following example:
 
 @example
 @c file eg/misc/sample.csv
+1,2,3
 p,"q,r",s
 p,"q""r",s
 p,"q,""r",s
@@ -8457,57 +8410,75 @@ p,,s
 @c endfile
 @end example
 
-@noindent
-And here is his test program:
+@cindex Collado, Manuel
+Manuel Collado suggests that the simplest @code{FPAT} expression that
+recognizes this kind of CSV field is @code{/([^,]*)|("([^"]|"")+")/}.
+
+The following program uses this improved @code{FPAT} expression to split the
+example CSV fields above, extracts the underlying data from any double-quoted
+fields, and finally prints the data as tab-separated values.
+The latter is accomplished by setting @code{OFS} to a TAB character.
 
 @example
-@c file eg/misc/test-csv.awk
+@c file eg/misc/quoted-csv.awk
 @group
 BEGIN @{
-     fp[0] = "([^,]+)|(\"[^\"]+\")"
-     fp[1] = "([^,]*)|(\"[^\"]+\")"
-     fp[2] = "([^,]*)|(\"([^\"]|\"\")+\")"
-     FPAT = fp[fpat+0]
+    FPAT = "([^,]*)|(\"([^\"]|\"\")+\")"
+    OFS = "\t"    # Print tab-separated values
 @}
 @end group
 
 @group
 @{
-     print "<" $0 ">"
-     printf("NF = %s ", NF)
-     for (i = 1; i <= NF; i++) @{
-         printf("<%s>", $i)
-     @}
-     print ""
+    for (i = 1; i <= NF; i++) @{
+        # Extract data from double-quoted fields
+        if (substr($i, 1, 1) == "\"") @{
+            gsub(/^"|"$/, "", $i)    # Remove enclosing quotes
+            gsub(/""/, "\"", $i)    # Convert "" to "
+        @}
+    @}
+    $1 = $1	# force rebuild of the record
+    print
 @}
 @end group
 @c endfile
 @end example
 
-When run on the third variant, it produces:
+When run, it produces:
 
 @example
-$ @kbd{gawk -v fpat=2 -f test-csv.awk sample.csv}
-@print{} <p,"q,r",s>
-@print{} NF = 3 <p><"q,r"><s>
-@print{} <p,"q""r",s>
-@print{} NF = 3 <p><"q""r"><s>
-@print{} <p,"q,""r",s>
-@print{} NF = 3 <p><"q,""r"><s>
-@print{} <p,"",s>
-@print{} NF = 3 <p><""><s>
-@print{} <p,,s>
-@print{} NF = 3 <p><><s>
+$ @kbd{gawk -f quoted-csv.awk sample.csv}
+@print{} 1	2	3
+@print{} p	q,r	s
+@print{} p	q"r	s
+@print{} p	q,"r	s
+@print{} p		s
+@print{} p		s
 @end example
+
+Some programs export CSV data that contain @emph{embedded newlines} between
+the double quotes, and here we run into a limitation of @code{FPAT}: it
+provides no way to deal with this. Hence, using @code{FPAT} to do your own CSV
+parsing is an elegant approach for the majority of cases, but not all.
 
 @cindex Collado, Manuel
 @cindex @code{CSVMODE} library for @command{gawk}
 @cindex CSV (comma separated values) data @subentry parsing with @code{CSVMODE} library
 @cindex Comma separated values (CSV) data @subentry parsing with @code{FPAT} library
-In general, using @code{FPAT} to do your own CSV parsing is like having
-a bed with a blanket that's not quite big enough. There's always a corner
-that isn't covered. We recommend, instead, that you use Manuel Collado's
-@uref{http://mcollado.z15.es/xgawk/, @code{CSVMODE} library for @command{gawk}}.
+For a more general solution to working with CSV data, see
+@ref{Comma Separated Fields}.  If your version of @command{gawk}
+is prior to version 5.3, we recommend that you use Manuel Collado's
+@uref{http://mcollado.z15.es/xgawk/, @code{CSVMODE} library for
+@command{gawk}}.
+
+As with @code{FS}, the @code{IGNORECASE} variable (@pxref{User-modified})
+affects field splitting with @code{FPAT}.
+
+Assigning a value to @code{FPAT} overrides field splitting
+with @code{FS} and with @code{FIELDWIDTHS}.
+
+Finally, the @code{patsplit()} function makes the same functionality
+available for splitting regular strings (@pxref{String Functions}).
 
 @node FS versus FPAT
 @subsection @code{FS} Versus @code{FPAT}: A Subtle Difference
@@ -19155,6 +19126,21 @@ the generated text with a single @samp{&}.  Any other @samp{\} within
 the @var{replacement} string that did not precede an @samp{&} was passed
 through unchanged.  This is illustrated in @ref{table-sub-escapes}.
 
+@float Table,table-sub-escapes
+@caption{Historical escape sequence processing for @code{sub()} and @code{gsub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{@ @ @ @ @ \&} @tab @code{@ @ @ &} @tab The matched text
+@item @code{@ @ @ @ \\&}  @tab @code{@ @ \&}  @tab A literal @samp{&}
+@item @code{@ @ @ \\\&}   @tab @code{@ @ \&}  @tab A literal @samp{&}
+@item @code{@ @ \\\\&}    @tab @code{@ \\&}   @tab A literal @samp{\&}
+@item @code{@ \\\\\&}     @tab @code{@ \\&}   @tab A literal @samp{\&}
+@item @code{\\\\\\&}      @tab @code{\\\&}    @tab A literal @samp{\\&}
+@item @code{@ @ @ @ \\q}  @tab @code{@ @ \q}  @tab A literal @samp{\q}
+@end multitable
+@end float
+
+@ignore
 @c Thank to Karl Berry for help with the TeX stuff.
 @float Table,table-sub-escapes
 @caption{Historical escape sequence processing for @code{sub()} and @code{gsub()}}
@@ -19206,6 +19192,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 @noindent
 This table shows the lexical-level processing, where
@@ -19228,6 +19215,19 @@ to produce a @samp{\} preceding the matched text.
 This is shown in
 @ref{table-sub-proposed}.
 
+@float Table,table-sub-proposed
+@caption{@command{gawk} rules for @code{sub()} and backslash}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, followed by the matched text
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{\q}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\\}
+@end multitable
+@end float
+
+@ignore
 @float Table,table-sub-proposed
 @caption{@command{gawk} rules for @code{sub()} and backslash}
 @tex
@@ -19272,6 +19272,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 In a nutshell, at the runtime level, there are now three special sequences
 of characters (@samp{\\\&}, @samp{\\&}, and @samp{\&}) whereas historically
@@ -19291,6 +19292,19 @@ a literal @samp{&}, @samp{\\} produces a literal @samp{\}, and @samp{\} followed
 by anything else is not special; the @samp{\} is placed straight into the output.
 These rules are presented in @ref{table-posix-sub}.
 
+@float Table,table-posix-sub
+@caption{POSIX rules for @code{sub()} and @code{gsub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, followed by the matched te@ t
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{\q}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\}
+@end multitable
+@end float
+
+@ignore
 @float Table,table-posix-sub
 @caption{POSIX rules for @code{sub()} and @code{gsub()}}
 @tex
@@ -19335,6 +19349,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 The only case where the difference is noticeable is the last one: @samp{\\\\}
 is seen as @samp{\\} and produces @samp{\} instead of @samp{\\}.
@@ -19360,6 +19375,20 @@ no matter what character follows the @samp{\}, it
 appears in the generated text and the @samp{\} does not,
 as shown in @ref{table-gensub-escapes}.
 
+@float Table,table-gensub-escapes
+@caption{Escape sequence processing for @code{gensub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{gensub()} sees @tab @code{gensub()} generates
+@item @code{@ @ @ @ @ @ &} @tab @code{@ @ @ &} @tab The matched text
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab A literal @samp{\}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, then the matched text
+@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{q}
+@end multitable
+@end float
+
+@ignore
 @float Table,table-gensub-escapes
 @caption{Escape sequence processing for @code{gensub()}}
 @tex
@@ -19407,6 +19436,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 Because of the complexity of the lexical- and runtime-level processing
 and the special cases for @code{sub()} and @code{gsub()},
@@ -36232,7 +36262,6 @@ make_malloced_string(message, strlen(message), & result);
 @end group
 @end example
 
-@sp 2
 @item #define ezalloc(pointer, type, size, message) @dots{}
 This is like @code{emalloc()}, but it calls @code{gawk_calloc()}
 instead of @code{gawk_malloc()}.
@@ -42339,6 +42368,11 @@ Efraim Yawitz contributed the original text for @ref{Debugger}.
 @item
 @cindex Naman, John
 John Naman contributed the original text for @ref{Shadowed Variables}.
+
+@cindex Ferguson, Stuar
+@item
+
+Stuart Ferguson reworked the text in @ref{Splitting By Content}.
 
 @item
 @cindex Schorr, Andrew
