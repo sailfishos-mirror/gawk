@@ -19145,6 +19145,21 @@ the generated text with a single @samp{&}.  Any other @samp{\} within
 the @var{replacement} string that did not precede an @samp{&} was passed
 through unchanged.  This is illustrated in @ref{table-sub-escapes}.
 
+@float Table,table-sub-escapes
+@caption{Historical escape sequence processing for @code{sub()} and @code{gsub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{@ @ @ @ @ \&} @tab @code{@ @ @ &} @tab The matched text
+@item @code{@ @ @ @ \\&}  @tab @code{@ @ \&}  @tab A literal @samp{&}
+@item @code{@ @ @ \\\&}   @tab @code{@ @ \&}  @tab A literal @samp{&}
+@item @code{@ @ \\\\&}    @tab @code{@ \\&}   @tab A literal @samp{\&}
+@item @code{@ \\\\\&}     @tab @code{@ \\&}   @tab A literal @samp{\&}
+@item @code{\\\\\\&}      @tab @code{\\\&}    @tab A literal @samp{\\&}
+@item @code{@ @ @ @ \\q}  @tab @code{@ @ \q}  @tab A literal @samp{\q}
+@end multitable
+@end float
+
+@ignore
 @c Thank to Karl Berry for help with the TeX stuff.
 @float Table,table-sub-escapes
 @caption{Historical escape sequence processing for @code{sub()} and @code{gsub()}}
@@ -19196,6 +19211,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 @noindent
 This table shows the lexical-level processing, where
@@ -19218,6 +19234,19 @@ to produce a @samp{\} preceding the matched text.
 This is shown in
 @ref{table-sub-proposed}.
 
+@float Table,table-sub-proposed
+@caption{@command{gawk} rules for @code{sub()} and backslash}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, followed by the matched text
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{\q}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\\}
+@end multitable
+@end float
+
+@ignore
 @float Table,table-sub-proposed
 @caption{@command{gawk} rules for @code{sub()} and backslash}
 @tex
@@ -19262,6 +19291,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 In a nutshell, at the runtime level, there are now three special sequences
 of characters (@samp{\\\&}, @samp{\\&}, and @samp{\&}) whereas historically
@@ -19281,6 +19311,19 @@ a literal @samp{&}, @samp{\\} produces a literal @samp{\}, and @samp{\} followed
 by anything else is not special; the @samp{\} is placed straight into the output.
 These rules are presented in @ref{table-posix-sub}.
 
+@float Table,table-posix-sub
+@caption{POSIX rules for @code{sub()} and @code{gsub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, followed by the matched te@ t
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{\q}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\}
+@end multitable
+@end float
+
+@ignore
 @float Table,table-posix-sub
 @caption{POSIX rules for @code{sub()} and @code{gsub()}}
 @tex
@@ -19325,6 +19368,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 The only case where the difference is noticeable is the last one: @samp{\\\\}
 is seen as @samp{\\} and produces @samp{\} instead of @samp{\\}.
@@ -19350,6 +19394,20 @@ no matter what character follows the @samp{\}, it
 appears in the generated text and the @samp{\} does not,
 as shown in @ref{table-gensub-escapes}.
 
+@float Table,table-gensub-escapes
+@caption{Escape sequence processing for @code{gensub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem You type @tab @code{gensub()} sees @tab @code{gensub()} generates
+@item @code{@ @ @ @ @ @ &} @tab @code{@ @ @ &} @tab The matched text
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab A literal @samp{\}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, then the matched text
+@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{q}
+@end multitable
+@end float
+
+@ignore
 @float Table,table-gensub-escapes
 @caption{Escape sequence processing for @code{gensub()}}
 @tex
@@ -19397,6 +19455,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 Because of the complexity of the lexical- and runtime-level processing
 and the special cases for @code{sub()} and @code{gsub()},
@@ -36110,7 +36169,6 @@ make_malloced_string(message, strlen(message), & result);
 @end group
 @end example
 
-@sp 2
 @item #define ezalloc(pointer, type, size, message) @dots{}
 This is like @code{emalloc()}, but it calls @code{gawk_calloc()}
 instead of @code{gawk_malloc()}.
