@@ -695,7 +695,6 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Campi con dati a larghezza fissa::    Valore di campi con dati a larghezza
                                         fissa.
 * Separazione in base al contenuto::    Definire campi dal loro contenuto.
-* Ancora CSV::                          Ancora sui file CSV.
 * FS rispetto a FPAT::                  Una differenza sottile.
 * Controllare la creazione di campi::   Controllare come @command{gawk} sta
                                         suddividendo i record.
@@ -8669,7 +8668,7 @@ il primo carattere dopo la virgola [che segna l'inizio del campo].
 La tabella
 @ref{table-csv-examples} mostra alcuni esempi.
 
-@float Table,table-csv-examples
+@float Tabella,table-csv-examples
 @caption{Esempi di dati in file CSV}
 @multitable @columnfractions .3 .3
 @headitem Input @tab Contenuto del campo
@@ -9247,14 +9246,10 @@ per un esempio di tale funzione).
 @node Separazione in base al contenuto
 @section Definire i campi in base al contenuto
 
-@quotation NOTA
-Quest'intera sezione dev'essere riscritta
-dopo che in @command{gawk} @`e stata introdotta la capacit@`a di analizzare
-file di tipo CSV. Ahim@`e.
-@end quotation
+@c September 2024. This section rewritten, and a sub-section removed,
+@c by Stuart Ferguson <stuart.fergs@gmail.com>.
 
 @menu
-* Ancora CSV::                  Ancora sui file CSV.
 * FS rispetto a FPAT::          Una differenza sottile.
 @end menu
 
@@ -9278,18 +9273,34 @@ parole, @code{FS} definisce cosa un campo @emph{non @`e}, invece di cosa
 Tuttavia, ci sono casi in cui effettivamente si ha bisogno di definire i campi
 in base a cosa essi sono, e non in base a cosa non sono.
 
+@cindex @command{gawk} @subentry variabile @subentry @code{FPAT} in
+@cindex @code{FPAT} (variabile)
+
+La variabile @code{FPAT} offre una soluzione per casi come questo.
+Il valore di @code{FPAT} dovrebbe essere una stringa che sia un’espressione
+regolare.  L’espressione regolare descrive il contenuto di ciascun campo.
+
 @cindex CSV (campi separati da virgola) come dati @subentry analizzare con @code{FPAT}
 @cindex dati CSV (campi separati da virgola) @subentry analizzare con @code{FPAT}
 @cindex campi separati da virgola (CSV) come dati @subentry analizzare con @code{FPAT}
-Il caso pi@`u emblematico
-@`e quello dei dati di tipo CSV (campi separati da virgola).
-Molti fogli elettronici, per esempio, possono esportare i dati
-in file di testo, dove ogni record termina con un ritorno a capo e i campi
-sono separati tra loro da virgole. Se le virgole facessero solo da separatore
-fra i dati non ci sarebbero problemi.  Il problema sorge se uno dei campi
-contiene una virgola @emph{al suo interno}.
-In queste situazioni, la maggioranza dei programmi include il campo fra
-doppi apici.@footnote{Il formato CSV non ha avuto, per molti anni, una
+Possiamo valutare le funzionalit@`a, e alcune limitazioni, di @code{FPAT}
+usando il caso dei file costituiti da campi delimitati da virgola (CSV).
+Questo caso @`e, in un certo senso, obsoleto, in quanto @command{gawk} @`e ora
+in grado di processare direttamente file di questo tipo
+(@pxref{Lavorare con file CSV}).
+Tuttavia, rimane utile come esempio del tipo di scansione che pu@`o essere
+fatto quando si separino i campi usando @code{FPAT}.
+@`E anche utile se si stanno usando versioni di @command{gawk} anteriori alla
+versione 5.3.
+
+Molti fogli elettronici, per esempio, possono esportare i dati in
+file di testo, nei quali ogni record termina con un ritorno a capo
+e i campi sono separati tra loro da virgole.  Se le virgole facessero solo
+da separatore fra i dati non ci sarebbero problemi usando semplicemente
+@samp{FS = ","} per dividere un record in campi.  Il problema sorge
+se uno dei campi contiene una virgola al suo interno.
+Se @`e questo il caso, la maggioranza dei programmi include il campo
+fra doppi apici.@footnote{Il formato CSV non ha avuto, per molti anni, una
 definizione standard formale.
 @uref{http://www.ietf.org/rfc/rfc4180.txt, RFC 4180}
 standardizza le pratiche pi@`u comuni.}
@@ -9297,50 +9308,44 @@ Cos@`{@dotless{i}}, potremmo avere dei dati di questo tipo:
 
 @example
 @c file eg/misc/addresses.csv
-Robbins,Arnold,"1234 A Pretty Street, NE",MyTown,MyState,12345-6789,USA
+Robbins,Arnold,,"1234 A Pretty Street, NE",MyTown,MyState,12345-6789,USA
 @c endfile
 @end example
 
-@cindex @command{gawk} @subentry variabile @subentry @code{FPAT} in
-@cindex @code{FPAT} (variabile)
-La variabile @code{FPAT} offre una soluzione per casi come questo.
-Il valore di @code{FPAT} dovrebbe essere una stringa formata da un'espressione
-regolare.  L'espressione regolare descrive il contenuto di ciascun campo.
-
-Nel caso dei dati CSV visti prima, ogni campo @`e ``qualsiasi cosa che non
+Nel caso dei dati CSV presentati qui, ogni campo @`e ``qualsiasi cosa che non
 sia una virgola,'' oppure ``doppi apici, seguiti da qualsiasi cosa che non
-siano doppi apici, e doppi apici di chiusura''.  (Ci sono definizioni di
-dati CSV pi@`u complicate, vedere pi@`u sotto.)
-Se fosse scritta come una
-costante @dfn{regexp}
+siano doppi apici, e doppi apici di chiusura''.
+Dobbiamo anche tener presente che qualche campo pu@`o essere vuoto.
+Se scritte sotto forma di una costante @dfn{regexp}
 @iftex
 (@pxrefil{Espressioni regolari}),
 @end iftex
 @ifnottex
 (@pxref{Espressioni regolari}),
 @end ifnottex
-sarebbe @code{/([^,]+)|("[^"]+")/}.
-Dovendola scrivere come stringa si devono proteggere i doppi apici,
+le condizioni descritte qui sopra divengono
+@code{/([^,]*)|("[^"]+")/}.
+Volendole scrivere come stringa si devono proteggere i doppi apici,
 e quindi si deve scrivere:
 
 @example
-FPAT = "([^,]+)|(\"[^\"]+\")"
+FPAT = "([^,]*)|(\"[^\"]+\")"
 @end example
 
-Come esempio pratico, si pu@`o vedere questo semplice programma che analizza
-e divide i dati:
+Come esempio pratico, si pu@`o vedere questo semplice programma che
+analizza e divide i dati:
 
 @example
 @c file eg/misc/simple-csv.awk
 @group
 BEGIN @{
-    FPAT = "([^,]+)|(\"[^\"]+\")"
+    FPAT = "([^,]*)|(\"[^\"]+\")"
 @}
 @end group
 
 @group
 @{
-    print "NF = ", NF
+    print "NF =", NF
     for (i = 1; i <= NF; i++) @{
         printf("$%d = <%s>\n", i, $i)
     @}
@@ -9353,46 +9358,20 @@ Eseguendolo, avendo in input la riga vista sopra, si ottiene:
 
 @example
 $ @kbd{gawk -f simple-csv.awk addresses.csv}
-NF =  7
-$1 = <Robbins>
-$2 = <Arnold>
-$3 = <"1234 A Pretty Street, NE">
-$4 = <MyTown>
-$5 = <MyState>
-$6 = <12345-6789>
-$7 = <USA>
+@print{} NF = 8
+@print{} $1 = <Robbins>
+@print{} $2 = <Arnold>
+@print{} $3 = <>
+@print{} $4 = <"1234 A Pretty Street, NE">
+@print{} $5 = <MyTown>
+@print{} $6 = <MyState>
+@print{} $7 = <12345-6789>
+@print{} $8 = <USA>
 @end example
 
-Si noti la virgola contenuta nel valore del campo @code{$3}.
-
-Un semplice miglioramento se si elaborano dati CSV di questo tipo potrebbe
-essere quello di rimuovere i doppi apici, se presenti, con del codice di
-questo tipo:
-
-@example
-if (substr($i, 1, 1) == "\"") @{
-    len = length($i)
-    $i = substr($i, 2, len - 2) # Ottiene testo tra i due doppi apici
-@}
-@end example
-
-@quotation NOTA
-Alcuni programmi esportano dei dati CSV che contengono dei ritorni a capo al
-loro interno in campi rinchiusi tra doppi apici.  @command{gawk} non @`e in
-grado di trattare questi dati.  Malgrado esista una specifica ufficiale
-per i dati CSV, non c'@`e molto da fare; il meccanismo  di @code{FPAT} fornisce
-una soluzione elegante per la maggioranza dei casi, e per gli sviluppatori di
-@command{gawk} ci@`o pu@`o bastare.
-@end quotation
-
-Come visto, l'espressione regolare usata per @code{FPAT} richiede
-che ogni campo contenga almeno un carattere.  Una semplice modifica
-(cambiare il primo @samp{+} con @samp{*}) permette che siano presenti dei
-campi vuoti:
-
-@example
-FPAT = "([^,]*)|(\"[^\"]+\")"
-@end example
+Si noti il campo @code{$3}, che ha come valore la stringa nulla,
+e la virgola contenuta nel valore del campo @code{$4},
+che per questo motivo @`e stato incluso tra doppi apici.
 
 @c 4/2015
 @c Consider use of FPAT = "([^,]*)|(\"[^\"]*\")"
@@ -9403,42 +9382,16 @@ FPAT = "([^,]*)|(\"[^\"]+\")"
 @c This is too much work. FPAT and CSV files are very flaky and
 @c fragile. Doing something like this is merely inviting trouble.
 
+La pratica di racchiudere un campo tra doppi apici ha delle implicazioni
+per dei campi i quali abbiano dei doppi apici al loro interno.
+Se questo @`e il caso, un doppio apice che compare all’interno di un campo
+deve essere protetto facendolo precedere da un altro doppio apice,
+come si pu@`o vedere nella terza e quarta riga dell’esempio seguente:
 Come per @code{FS}, la variabile @code{IGNORECASE}
-(@pxref{Variabili modificabili dall'utente}) ha effetto sulla separazione dei
-campi con @code{FPAT}.
-
-Se si assegna un valore a @code{FPAT} la divisione in campi non viene
-effettuata utilizzando @code{FS} o @code{FIELDWIDTHS}.
-
-Infine, la funzione @code{patsplit()} rende la stessa funzionalit@`a disponibile
-per suddividere normali stringhe (@pxref{Funzioni per stringhe}).
-
-@quotation NOTA
-Poich@'e @command{gawk} consente ora un trattamento diretto dei
-file di tipo CSV (@pxref{Campi separati da virgola}), gli esempi
-presentati qui sono obsoleti, dato che @`e possibile usare
-l'opzione @option{--csv}, (in tal caso la suddivisione in
-campi viene fatta senza utilizzare la variabile @code{FPAT}).
-Nonostante ci@`o, rimangono utili come esempio di ci@`o che
-un'analisi dei campi utilizzando la variabile @code{FPAT}
-permette di fare, o se si sta usando una versione di
-@command{gawk} precedente la versione 5.3.
-@end quotation
-
-@node Ancora CSV
-@subsection Ancora sui file CSV
-
-@cindex Collado, Manuel
-Manuel Collado fa notare che, oltre alle virgole, un campo CSV pu@`o anche
-contenere doppi apici, che devono essere protetti raddoppiandoli.
-Le espressione regolari descritte sopra non sono in grado di accettare
-campi fra apici che contengano al loro interno sia virgole che doppi apici.
-Egli suggerisce che l'espressione pi@`u semplice di @code{FPAT} in grado
-di riconoscere tale tipo di campi @`e @code{/([^,]*)|("([^"]|"")+")/}.
-Egli ha preparato questo input come test per riconoscere queste varianti:
 
 @example
 @c file eg/misc/sample.csv
+1,2,3
 p,"q,r",s
 p,"q""r",s
 p,"q,""r",s
@@ -9447,49 +9400,63 @@ p,,s
 @c endfile
 @end example
 
-@noindent
-E questo @`e il suo programma di test:
+@cindex Collado, Manuel
+Manuel Collado suggerisce che la l’espressione regolare pi@`u semplice
+da usare come @code{FPAT} per riconoscere questo tipo di campi CSV
+sia @code{/([^,]*)|("([^"]|"")+")/}.
+
+Il programma che segue usa come @code{FPAT} quest’espressione migliorata,
+per determinare i campi nel file di dati CSV visto sopra,
+estrarre i dati contenuti in ogni campo delimitato da doppi apici,
+e stampare poi i dati stessi come valori separati dal carattere di
+tabulazione.
+Quest’ultima cosa @`e ottenuta impostando @code{OFS} al carattere di
+tabulazione (TAB).
 
 @example
-@c file eg/misc/test-csv.awk
+@c file eg/misc/quoted-csv.awk
 @group
 BEGIN @{
-     fp[0] = "([^,]+)|(\"[^\"]+\")"
-     fp[1] = "([^,]*)|(\"[^\"]+\")"
-     fp[2] = "([^,]*)|(\"([^\"]|\"\")+\")"
-     FPAT = fp[fpat+0]
+    FPAT = "([^,]*)|(\"([^\"]|\"\")+\")"
+    OFS = "\t"    # Stampa valori separati da una tabulazione
 @}
 @end group
 
 @group
 @{
-     print "<" $0 ">"
-     printf("NF = %s ", NF)
-     for (i = 1; i <= NF; i++) @{
-         printf("<%s>", $i)
-     @}
-     print ""
+    for (i = 1; i <= NF; i++) @{
+	# Estrae dati da campi racchiusi da doppi apici
+        if (substr($i, 1, 1) == "\"") @{
+	    gsub(/^"|"$/, "", $i)   # Toglie il doppio apice
+                                    # iniziale e finale
+            gsub(/""/, "\"", $i)    # Converte "" a "
+        @}
+    @}
+    $1 = $1     # forza ricostruzione del record
+    print
 @}
 @end group
 @c endfile
 @end example
 
-Se eseguito usando la terza variante di @code{FPAT},
-il programma produce in output:
+Il programma eseguito produce in output:
 
 @example
-$ @kbd{gawk -v fpat=2 -f test-csv.awk sample.csv}
-@print{} <p,"q,r",s>
-@print{} NF = 3 <p><"q,r"><s>
-@print{} <p,"q""r",s>
-@print{} NF = 3 <p><"q""r"><s>
-@print{} <p,"q,""r",s>
-@print{} NF = 3 <p><"q,""r"><s>
-@print{} <p,"",s>
-@print{} NF = 3 <p><""><s>
-@print{} <p,,s>
-@print{} NF = 3 <p><><s>
+$ @kbd{gawk -f quoted-csv.awk sample.csv}
+@print{} 1	2	3
+@print{} p	q,r	s
+@print{} p	q"r	s
+@print{} p	q,"r	s
+@print{} p		s
+@print{} p		s
 @end example
+
+Alcuni programmi trattano dati CVS che contengono nei campi dei
+@emph{caratteri di ritorno a capo}, racchiusi tra doppi apici,
+e qui ci si scontra con uno dei limiti di @code{FPAT}: non c’@`e modo
+per gestire questa situazione. Per questo motivo, usare #code{FPAT}
+per fare la scansione di file CVS @`e un approccio che funziona
+per la maggior parte dei casi, ma non per tutti.
 
 @cindex Collado, Manuel
 @cindex @code{CSVMODE}, libreria per @command{gawk}
@@ -9497,11 +9464,24 @@ $ @kbd{gawk -v fpat=2 -f test-csv.awk sample.csv}
 @cindex dati CSV (campi separati da virgola) @subentry analizzare con libreria @code{CSVMODE}
 @cindex CSV (campi separati da virgola) come dati @subentry analizzare con libreria @code{CSVMODE}
 @cindex campi separati da virgola (CSV) come dati @subentry analizzare con libreria @code{CSVMODE}
-In generale, usare @code{FPAT} per effettuare l'analisi di dati in formato CSV
-@`e come utilizzare un lenzuolo troppo corto.  Rimane sempre un angolo che non
-@`e coperto.  Si raccomanda, in alternativa, di usare la libreria @code{CSVMODE}
-messa a disposizione da Manuel Collado.  Vedere:
-@uref{http://mcollado.z15.es/xgawk/, @code{CSVMODE} libreria per @command{gawk}}.
+
+Per una soluzione pi@`u generale che consenta di lavorare con dati CVS,
+vedere @ref{Lavorare con file CSV}.
+Se la versione di gawk in uso @`e anteriore alla versione 5.3,
+si raccomanda di utilizzare, nella pagina web dedicata da Manuel Collado
+a #command{gawk}, la libreria
+@uref{http://mcollado.z15.es/gawkextras/, @code{CSVMODE} per @command{gawk}}.
+
+Come @`e il caso per @code{FS}, anche la variabile @code{IGNORECASE}
+(@pxref{Variabili modificabili dall'utente})
+influenza la determinazione dei campi effettuata usando @code{FPAT}.
+
+Se si assegna un valore a @code{FPAT}, questo prevale sugli altri modi
+per dividere i campi, basati su @code{FS} e @code{FIELDWIDTHS}.
+
+Infine, la funzione @code{patsplit()} rende disponibile la stessa
+funzionalit@`a per suddividere dalle stringhe di caratteri
+(@pxref{Funzioni per stringhe}).
 
 @node FS rispetto a FPAT
 @subsection @code{FS} rispetto a @code{FPAT}: Una differenza sottile
@@ -21326,6 +21306,21 @@ in
 @end ifnottex
 @ref{table-sub-escapes}.
 
+@float Tabella,table-sub-escapes
+@caption{Elaborazione storica delle sequenze di protezione per @code{sub()} e @code{gsub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem Immissione @tab @code{sub()} vede @tab @code{sub()} genera
+@item @code{@ @ @ @ @ \&} @tab @code{@ @ @ &} @tab Il testo individuato
+@item @code{@ @ @ @ \\&}  @tab @code{@ @ \&}  @tab Il carattere @samp{&}
+@item @code{@ @ @ \\\&}   @tab @code{@ @ \&}  @tab Il carattere @samp{&}
+@item @code{@ @ \\\\&}    @tab @code{@ \\&}   @tab I caratteri @samp{\&}
+@item @code{@ \\\\\&}     @tab @code{@ \\&}   @tab I caratteri @samp{\&}
+@item @code{\\\\\\&}      @tab @code{\\\&}    @tab I caratteri @samp{\\&}
+@item @code{@ @ @ @ \\q}  @tab @code{@ @ \q}  @tab I caratteri @samp{\q}
+@end multitable
+@end float
+
+@ignore
 @c Thank to Karl Berry for help with the TeX stuff.
 @float Tabella,table-sub-escapes
 @caption{Elaborazione storica delle sequenze di protezione per @code{sub()} e @code{gsub()}}
@@ -21377,6 +21372,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 @noindent
 Questa tabella mostra l'elaborazione a livello lessicale, in cui
@@ -21406,6 +21402,19 @@ in
 @end ifnottex
 @ref{table-sub-proposed}.
 
+@float Tabella,table-sub-proposed
+@caption{Regole @command{gawk} per @code{sub()} e barra inversa}
+@multitable @columnfractions .20 .20 .60
+@headitem Immissione @tab @code{sub()} vede @tab @code{sub()} genera
+@item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab Il carattere @samp{\}, seguito dal testo individuato
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab Il carattere @samp{&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab I caratteri @samp{\q}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\\}
+@end multitable
+@end float
+
+@ignore
 @float Tabella,table-sub-proposed
 @caption{Regole @command{gawk} per @code{sub()} e barra inversa}
 @tex
@@ -21450,6 +21459,7 @@ Immissione              @code{sub()} vede         @code{sub()} genera
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 In breve, al momento dell'esecuzione, ci sono ora tre sequenze speciali
 di caratteri (@samp{\\\&}, @samp{\\&}, e @samp{\&}) mentre tradizionalmente
@@ -21478,6 +21488,19 @@ in
 @end ifnottex
 @ref{table-posix-sub}.
 
+@float Tabella,table-posix-sub
+@caption{Regole POSIX per @code{sub()} e @code{gsub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem Immissione @tab @code{sub()} vede @tab @code{sub()} genera
+@item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab Il carattere @samp{\}, seguito dal testo individuato
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab Il carattere @samp{&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab I caratteri @samp{\q}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\}
+@end multitable
+@end float
+
+@ignore
 @float Tabella,table-posix-sub
 @caption{Regole POSIX per @code{sub()} e @code{gsub()}}
 @tex
@@ -21522,6 +21545,7 @@ Immissione         @code{sub()} vede         @code{sub()} genera
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 Il solo caso in cui la differenza @`e rilevante @`e l'ultimo: @samp{\\\\}
 @`e visto come @samp{\\} e produce @samp{\} invece che @samp{\\}.
@@ -21558,6 +21582,20 @@ in
 @end ifnottex
 @ref{table-gensub-escapes}.
 
+@float Tabella,table-gensub-escapes
+@caption{Elaborazione sequenze di protezione in @code{gensub()}}
+@multitable @columnfractions .20 .20 .60
+@headitem Immissione @tab @code{gensub()} vede @tab @code{gensub()} genera
+@item @code{@ @ @ @ @ @ &} @tab @code{@ @ @ &} @tab Il testo individuato
+@item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab Il carattere @samp{&}
+@item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab Il carattere @samp{\}
+@item @code{@ @ \\\\&} @tab @code{@ \\&} @tab Il carattere @samp{\}, seguito dal testo individuato
+@item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
+@item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab Il carattere @samp{q}
+@end multitable
+@end float
+
+@ignore
 @float Tabella,table-gensub-escapes
 @caption{Elaborazione sequenze di protezione in @code{gensub()}}
 @tex
@@ -21605,6 +21643,7 @@ _bigskip}
 @end ifnotdocbook
 @end ifnottex
 @end float
+@end ignore
 
 A causa della complessit@`a dell'elaborazione a livello lessicale e in fase
 di esecuzione, e dei casi speciali di @code{sub()} e @code{gsub()},
@@ -23972,28 +24011,28 @@ Questo
 @end ifinfo
 @value{SECTION}
 tratta di alcuni aspetti delle variabili oscurate.
-Può essere saltato durante una prima lettura.
+Pu@`o essere saltato durante una prima lettura.
 
-È importante tenere presente il concetto di ``shadowing''
-[``oscuramento''] per più di un motivo.
+@`E importante tenere presente il concetto di ``shadowing''
+[``oscuramento''] per pi@`u di un motivo.
 
 @table @emph
 @item Confusione di nomi
-Usare identificativi (nomi) globali a livello locale può rendere molto
-difficile il @dfn{debugging}, aumenta la complessità dello scrivere,
-leggere e manutenere codice sorgente e diminuisce la portabilità
-(possibilità di condividere e riutilizzare) di una libreria di
+Usare identificativi (nomi) globali a livello locale pu@`o rendere molto
+difficile il @dfn{debugging}, aumenta la complessit@`a dello scrivere,
+leggere e manutenere codice sorgente e diminuisce la portabilit@`a
+(possibilit@`a di condividere e riutilizzare) di una libreria di
 funzioni @command{awk}.
 
 @item Prevenire l'oscuramento nelle funzioni
-È una buona pratica usare in maniera consistente una convenzione
+@`E una buona pratica usare in maniera consistente una convenzione
 per i nomi, del tipo ``i nomi delle variabili e delle funzioni globali
 iniziano con una lettera maiuscola, mentre i nomi locali iniziano
-con una lettera minuscola.''  Ciò migliora anche la leggibilità
+con una lettera minuscola.''  Ci@`o migliora anche la leggibilit@`a
 dei programmi (@pxref{Nomi di variabili di libreria}).
 
 @item Superare restrizioni di oscuramento nelle funzioni
-Il vettore @code{SYMTAB}, che è un'estensione di @command{gawk},
+Il vettore @code{SYMTAB}, che @`e un'estensione di @command{gawk},
 fornisce un accesso indiretto alle variabili globali che
 possono essere o sono effettivamente oscurate (vedere @code{SYMTAB}
 in @ref{Variabili auto-assegnate}).  Per esempio:
@@ -24029,7 +24068,7 @@ a variabili e vettori @emph{globali}, e non a variabili e vettori
 Se una funzione @code{A(argomentoA, localeA)} chiama un'altra funzione
 @code{B()}, le due variabili locali alla funzione @code{A()} @emph{non}
 sono utilizzabili dalla funzione @code{B()} e da nessun'altra funzione.
-È anche importante tener presente la distinzione globale/locale 
+@`E anche importante tener presente la distinzione globale/locale
 quando si passano argomenti a una funzione chiamata in maniera indiretta
 (@pxref{Chiamate indirette}).
 
@@ -35572,7 +35611,7 @@ La seguente lista definisce i termini usati nel resto di
 questo @value{CHAPTER}:
 
 @table @dfn
-@cindex @dfn{stack} (pila) delle chiamate @subentry nel dfn{debugger} 
+@cindex @dfn{stack} (pila) delle chiamate @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry @dfn{stack} di chiamata
 @cindex @dfn{debugger} @subentry pila di chiamata
 @cindex @dfn{stack frame} (debugger)
@@ -35650,7 +35689,7 @@ conciso, @`e facile perdere di vista tutto ci@`o che avviene ``dentro''
 ogni riga di codice @command{awk}.  Il dfn{debugger} d@`a l'opportunit@`a di
 guardare le singole istruzioni primitive la cui esecuzione @`e innescata
 dai comandi di alto livello di @command{awk}.@footnote{Le ``istruzioni
-primitive'' sono quelle dallo stesso @command{gawk}; il dfn{debugger} 
+primitive'' sono quelle dallo stesso @command{gawk}; il dfn{debugger}
 non permette di arrivare al livello delle istruzioni hardware della
 macchina.}
 
@@ -35671,8 +35710,8 @@ uniq}).
 @end menu
 
 @node Invocazione del debugger
-@subsection Come avviare il dfn{debugger} 
-@cindex avviare il dfn{debugger} 
+@subsection Come avviare il dfn{debugger}
+@cindex avviare il dfn{debugger}
 @cindex @dfn{debugger} @subentry come avviarlo
 @cindex @dfn{debugger} @subentry comandi del @seeentry{comando del debugger}
 
@@ -35706,7 +35745,7 @@ ma lo diviente se un'opzione destinata al programma @command{awk}
 L'opzione @option{-1} @`e un'opzione per @file{uniq.awk}.
 
 @cindex @dfn{debugger} @subentry prompt
-@cindex prompt del dfn{debugger} 
+@cindex prompt del dfn{debugger}
 Invece di eseguire direttamente il programma sul @file{file_di_input}, come
 @command{gawk} farebbe normalmente, il dfn{debugger} semplicemente carica
 i file sorgenti del programma, li compila internamente, e poi mostra
@@ -35814,7 +35853,7 @@ essere la chiave per trovare l'origine del problema.)
 Ora che siamo in @code{se_sono_uguali()}, possiamo iniziare a guardare i valori di
 alcune variabili.  Immaginiamo di battere @samp{p n}
 (@code{p} sta per @dfn{print} [stampa]).  Ci aspetteremo di vedere il valore di
-@code{n}, un parametro di @code{se_sono_uguali()}.  In realt@`a, il dfn{debugger} 
+@code{n}, un parametro di @code{se_sono_uguali()}.  In realt@`a, il dfn{debugger}
 ci d@`a:
 
 @cindex comando del dfn{debugger} @subentry @code{print}
@@ -35924,7 +35963,7 @@ del vettore.
 Una prima possibilit@`a @`e quella di usare degli indici:
 
 @cindex @dfn{debugger} @subentry stampare singoli elementi di un vettore
-@cindex stampare @subentry singoli elementi di un vettore @subentry nel dfn{debugger} 
+@cindex stampare @subentry singoli elementi di un vettore @subentry nel dfn{debugger}
 @example
 gawk> @kbd{p vettore_ultima[0]}
 @print{} "0" non presente nel vettore `vettore_ultima'
@@ -35943,7 +35982,7 @@ Questo metodo sarebbe piuttosto lento per un vettore con 100 elementi, per cui
 linguaggio che non nominiamo):
 
 @cindex @dfn{debugger} @subentry stampare tutti gli elementi di un vettore
-@cindex stampare @subentry tutti gli elementi di un vettore @subentry nel dfn{debugger} 
+@cindex stampare @subentry tutti gli elementi di un vettore @subentry nel dfn{debugger}
 @example
 gawk> @kbd{p @@vettore_ultima}
 @print{} vettore_ultima["1"] = "awk,"
@@ -36026,7 +36065,7 @@ Comandi vari
 @end itemize
 
 @cindex @dfn{debugger} @subentry ripetere dei comandi
-@cindex ripetere dei comandi @subentry nel dfn{debugger} 
+@cindex ripetere dei comandi @subentry nel dfn{debugger}
 Ciascuna di esse @`e trattata
 @ifnotinfo
 nelle seguenti
@@ -36098,7 +36137,7 @@ cancellarlo dalla lista dei punti d'interruzione usando il comando
 
 Specificando un punto d'interruzione, si pu@`o fornire anche una condizione.
 Questa @`e
-un'espressione @command{awk} (racchiusa tra doppi apici) che il dfn{debugger} 
+un'espressione @command{awk} (racchiusa tra doppi apici) che il dfn{debugger}
 valuta ogni volta che viene raggiunto quel punto d'interruzione. Se la
 condizione @`e vera, il dfn{debugger} ferma l'esecuzione e rimane in attesa di un
 comando. Altrimenti, continua l'esecuzione del programma.
@@ -36252,7 +36291,7 @@ gawk>
 
 @cindex comando del dfn{debugger} @subentry @code{c} (alias per @code{continue})
 @cindex comando del dfn{debugger} @subentry @code{continue}
-@cindex continuazione @subentry esecuzione programma nel dfn{debugger} 
+@cindex continuazione @subentry esecuzione programma nel dfn{debugger}
 @cindex @dfn{debugger} @subentry continuare esecuzione programma
 @cindex @code{continue} (comando del debugger)
 @item @code{continue} [@var{contatore}]
@@ -36272,7 +36311,7 @@ Stampa il valore restituito.
 @cindex comando del dfn{debugger} @subentry @code{next}
 @cindex @code{next} (comando del debugger)
 @cindex @code{n} (comando del debugger) @subentry (alias per @code{next})
-@cindex esecuzione di un solo passo @subentry nel dfn{debugger} 
+@cindex esecuzione di un solo passo @subentry nel dfn{debugger}
 @item @code{next} [@var{contatore}]
 @itemx @code{n} [@var{contatore}]
 Continua l'esecuzione alla successiva riga sorgente, saltando le chiamate di
@@ -36380,7 +36419,7 @@ lista.
 
 @cindex comando del dfn{debugger} @subentry @code{eval}
 @cindex @code{eval} (comando del debugger)
-@cindex valutare espressioni @subentry nel dfn{debugger} 
+@cindex valutare espressioni @subentry nel dfn{debugger}
 @item @code{eval "@var{istruzioni awk}"}
 Valuta @var{istruzioni awk} nel contesto del programma in esecuzione.
 Si pu@`o fare qualsiasi cosa che un programma @command{awk} farebbe: assegnare
@@ -36409,7 +36448,7 @@ invece di usare variabili o parametri di funzione gi@`a definiti nel programma.
 @cindex comando del dfn{debugger} @subentry @code{print}
 @cindex @code{print} (comando del debugger)
 @cindex @code{p} (comando del debugger) @subentry (alias per @code{print})
-@cindex stampare @subentry variabili @subentry nel dfn{debugger} 
+@cindex stampare @subentry variabili @subentry nel dfn{debugger}
 @item @code{print} @var{var1}[@code{,} @var{var2} @dots{}]
 @itemx @code{p} @var{var1}[@code{,} @var{var2} @dots{}]
 Stampa i valori di una o pi@`u variabili o campi di @command{gawk}.
@@ -36446,7 +36485,7 @@ esplicitamente.
 
 @cindex comando del dfn{debugger} @subentry @code{set}
 @cindex @code{set} (comando del debugger)
-@cindex assegnamento @subentry di valori a variabili, nel dfn{debugger} 
+@cindex assegnamento @subentry di valori a variabili, nel dfn{debugger}
 @item @code{set} @var{var}@code{=}@var{valore}
 Assegna un valore costante (numero o stringa) a una variabile o a un campo di
 @command{awk}.
@@ -36477,7 +36516,7 @@ Altrimenti, @command{gawk} prosegue nell'esecuzione del programma.
 
 @cindex comando del dfn{debugger} @subentry @code{undisplay}
 @cindex @code{undisplay} (comando del debugger)
-@cindex interruzione visualizzazioni automatiche @subentry nel dfn{debugger} 
+@cindex interruzione visualizzazioni automatiche @subentry nel dfn{debugger}
 @item @code{undisplay} [@var{n}]
 Rimuove l'elemento numero @var{n} (o tutti gli elementi, se non vi sono
 argomenti) dalla lista delle visualizzazioni automatiche.
@@ -36508,10 +36547,10 @@ che hanno chiamato quella in cui ci si trova.  I comandi per far questo sono:
 @cindex @code{backtrace} (comando del debugger)
 @cindex @code{bt} (comando del debugger) @subentry (alias per @code{backtrace})
 @cindex @code{where} (comando del debugger) @subentry (alias per @code{backtrace})
-@cindex descrizione di @subentry @dfn{stack}, pila delle @subentry nel dfn{debugger} 
-@cindex @dfn{stack} (pila) delle chiamate @subentry visualizzare nel dfn{debugger} 
-@cindex pila (@dfn{stack}) delle chiamate @subentry visualizzare nel dfn{debugger} 
-@cindex tracciatura @subentry a ritroso @subentry mostrare nel dfn{debugger} 
+@cindex descrizione di @subentry @dfn{stack}, pila delle @subentry nel dfn{debugger}
+@cindex @dfn{stack} (pila) delle chiamate @subentry visualizzare nel dfn{debugger}
+@cindex pila (@dfn{stack}) delle chiamate @subentry visualizzare nel dfn{debugger}
+@cindex tracciatura @subentry a ritroso @subentry mostrare nel dfn{debugger}
 @item @code{backtrace} [@var{contatore}]
 @itemx @code{bt} [@var{contatore}]
 @itemx @code{where} [@var{contatore}]
@@ -36550,7 +36589,7 @@ esterno.  Poi seleziona e stampa il frame.
 @end table
 
 @node Informazioni sul debugger
-@subsection Ottenere informazioni sullo stato del programma e del dfn{debugger} 
+@subsection Ottenere informazioni sullo stato del programma e del dfn{debugger}
 
 Oltre che vedere i valori delle variabili, spesso si ha necessit@`a di ottenere
 informazioni di altro tipo sullo stato del programma e dello stesso ambiente di
@@ -36581,17 +36620,17 @@ Elenca gli argomenti del frame selezionato.
 Elenca tutti i punti d'interruzione attualmente impostati.
 
 @item display
-@cindex visualizzazioni automatiche @subentry nel dfn{debugger} 
+@cindex visualizzazioni automatiche @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry visualizzazioni automatiche
 Elenca tutti gli elementi della lista delle visualizzazioni automatiche.
 
 @item frame
-@cindex descrizione di @subentry @dfn{stack frame} delle chiamate @subentry nel dfn{debugger} 
+@cindex descrizione di @subentry @dfn{stack frame} delle chiamate @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry descrizione degli @dfn{stack frame} delle chiamate
 D@`a una descrizione degli @dfn{stack frame} selezionati.
 
 @item functions
-@cindex elencare @subentry definizioni delle funzioni @subentry nel dfn{debugger} 
+@cindex elencare @subentry definizioni delle funzioni @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry elencare definizioni delle funzioni
 Elenca tutte le definizioni delle funzioni compresi i @value{FNS} e
 i numeri di riga.
@@ -36604,7 +36643,7 @@ Elenca le variabili locali dei frame selezionati.
 @item source
 @cindex mostrare nel dfn{debugger} @subentry nome del file sorgente corrente
 @cindex @dfn{debugger} @subentry mostrare il nome del file sorgente corrente
-@cindex file @subentry sorgente corrente, mostrare nel dfn{debugger} 
+@cindex file @subentry sorgente corrente, mostrare nel dfn{debugger}
 Stampa il nome del file sorgente corrente.  Ogni volta che il programma si
 interrompe, il file sorgente corrente @`e il file che contiene l'istruzione
 corrente.  Quando il dfn{debugger} viene avviato per la prima volta, il file
@@ -36618,7 +36657,7 @@ qualsiasi momento per cambiare il sorgente corrente.
 Elenca tutti i file sorgente del programma.
 
 @item variables
-@cindex elencare @subentry tutte le variabili locali @subentry nel dfn{debugger} 
+@cindex elencare @subentry tutte le variabili locali @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry elencare tutte le variabili locali
 Elenca tutte le variabili locali.
 
@@ -36630,7 +36669,7 @@ Elenca tutti gli elementi della lista dei punti d'osservazione.
 @end table
 
 Ulteriori comandi permettono di avere il controllo sul debugger, la capacit@`a di
-salvare lo stato del dfn{debugger} e la capacit@`a di eseguire comandi del dfn{debugger} 
+salvare lo stato del dfn{debugger} e la capacit@`a di eseguire comandi del dfn{debugger}
 da un file.  I comandi sono:
 
 @table @asis
@@ -36638,7 +36677,7 @@ da un file.  I comandi sono:
 @cindex comando del dfn{debugger} @subentry @code{option}
 @cindex @code{option} (comando del debugger)
 @cindex @code{o} (comando del debugger) @subentry (alias per @code{option})
-@cindex visualizzare le opzioni del dfn{debugger} 
+@cindex visualizzare le opzioni del dfn{debugger}
 @cindex @dfn{debugger} @subentry opzioni del
 @item @code{option} [@var{nome}[@code{=}@var{valore}]]
 @itemx @code{o} [@var{nome}[@code{=}@var{valore}]]
@@ -36662,7 +36701,7 @@ Specifica il numero di righe che @code{list} deve stampare. Il valore di
 default @`e 15.
 
 @item @code{outfile}
-@cindex ridirezionare l'output di @command{gawk} @subentry nel dfn{debugger} 
+@cindex ridirezionare l'output di @command{gawk} @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry ridirezionare l'output di @command{gawk}
 Invia l'output di @command{gawk} in un file; l'output del dfn{debugger} @`e
 visualizzato comunque anche
@@ -36671,7 +36710,7 @@ reimposta l'output solo allo standard output.
 
 @item @code{prompt}
 @cindex @dfn{debugger} @subentry prompt
-@cindex prompt del dfn{debugger} 
+@cindex prompt del dfn{debugger}
 Cambia la riga per l'immissione dei comandi del debugger.  Il valore di
 default @`e @samp{@w{gawk> }}.
 
@@ -36681,28 +36720,28 @@ Salva la cronologia dei comandi nel file @file{./.gawk_history}.
 L'impostazione di default @`e @code{on}.
 
 @item @code{save_options} [@code{on} | @code{off}]
-@cindex salvataggio opzioni @subentry nel dfn{debugger} 
+@cindex salvataggio opzioni @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry salvataggio opzioni
 Salva le opzioni correnti nel file @file{./.gawkrc} all'uscita.
 L'impostazione di default @`e @code{on}.
 Le opzioni sono lette di nuovo all'avvio della sessione successiva.
 
 @item @code{trace} [@code{on} | @code{off}]
-@cindex istruzioni @subentry tener traccia delle @subentry nel dfn{debugger} 
+@cindex istruzioni @subentry tener traccia delle @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry tener traccia delle istruzioni
 Attiva o disattiva il tracciamento delle istruzioni. L'impostazione di default
 @`e @code{off}.
 @end table
 
 @cindex @dfn{debugger} @subentry salvare dei comandi su un file
-@cindex salvare dei comandi su un file @subentry nel dfn{debugger} 
+@cindex salvare dei comandi su un file @subentry nel dfn{debugger}
 @item @code{save} @var{nome-file}
 Salva i comandi eseguiti nella sessione corrente nel @value{FN} indicato,
 in modo da poterli ripetere in seguito usando il comando @command{source}.
 
 @item @code{source} @var{nome-file}
 @cindex @dfn{debugger} @subentry leggere comandi da un file
-@cindex leggere @subentry comandi da un file nel dfn{debugger} 
+@cindex leggere @subentry comandi da un file nel dfn{debugger}
 Esegue comandi contenuti in un file; un errore in un comando non impedisce
 l'esecuzione dei comandi successivi.  In un file di comandi sono consentiti
 i commenti (righe che iniziano con @samp{#}).
@@ -36720,7 +36759,7 @@ per eseguire comandi da un file in maniera non interattiva
 @end table
 
 @node Comandi vari del debugger
-@subsection Comandi vari del dfn{debugger} 
+@subsection Comandi vari del dfn{debugger}
 
 Ci sono alcuni altri comandi che non rientrano nelle precedenti categorie,
 come i seguenti:
@@ -36791,7 +36830,7 @@ gawk>
 
 @cindex comando del dfn{debugger} @subentry @code{exit}
 @cindex @code{exit} (comando del debugger)
-@cindex uscire dal dfn{debugger} 
+@cindex uscire dal dfn{debugger}
 @cindex @dfn{debugger} @subentry uscire dal
 @item @code{exit}
 Esce dal dfn{debugger}.
@@ -36845,7 +36884,7 @@ Questo comando pu@`o cambiare il file sorgente corrente.
 @cindex comando del dfn{debugger} @subentry @code{quit}
 @cindex @code{quit} (comando del debugger)
 @cindex @code{q} (comando del debugger) @subentry (alias per @code{quit})
-@cindex uscire dal dfn{debugger} 
+@cindex uscire dal dfn{debugger}
 @cindex @dfn{debugger} @subentry uscire dal
 @item @code{quit}
 @itemx @code{q}
@@ -36872,9 +36911,9 @@ familiari.
 
 @node Supporto per Readline
 @section Supporto per Readline
-@cindex completamento dei comandi @subentry nel dfn{debugger} 
+@cindex completamento dei comandi @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry completamento dei comandi nel
-@cindex espansione della cronologia @subentry nel dfn{debugger} 
+@cindex espansione della cronologia @subentry nel dfn{debugger}
 @cindex @dfn{debugger} @subentry espansione della cronologia
 
 Se @command{gawk} @`e compilato con
@@ -36916,7 +36955,7 @@ e
 @section Limitazioni
 
 @cindex @dfn{debugger} @subentry limitazioni
-@cindex limitazioni @subentry del dfn{debugger} 
+@cindex limitazioni @subentry del dfn{debugger}
 Si spera che il lettore trovi il dfn{debugger} di @command{gawk} utile e piacevole
 da usare, ma come accade per ogni programma, specialmente nelle sue prime
 versioni, ha ancora delle limitazioni.  Quelle di cui @`e bene essere al corrente sono:
@@ -37702,12 +37741,12 @@ In questo modo i nomi dei componenti sono degli
 identificativi semplici, senza dover usare dappertutto degli
 identificativi qualificati.
 
-@cindex spazio-dei-nomi @subentry interazione con il dfn{debugger} 
+@cindex spazio-dei-nomi @subentry interazione con il dfn{debugger}
 @cindex @dfn{debugger} @subentry interazione con lo spazio-dei-nomi
 L'interazione con il dfn{debugger} (@pxref{Debugging}) non @`e cambiata
 (almeno fino al momento in cui questo libro @`e stato scritto).
 Alcuni campi interni sono stati modificati per tener conto
-degli spazi-dei-nomi, e il comando @code{dump} del dfn{debugger} 
+degli spazi-dei-nomi, e il comando @code{dump} del dfn{debugger}
 @`e stato modificato per lo stesso motivo.
 
 @cindex spazio-dei-nomi @subentry interazione con l'estensione API
@@ -40312,7 +40351,6 @@ make_malloced_string(message, strlen(message), & risultato);
 @end group
 @end example
 
-@sp 2
 @item #define ezalloc(pointer, type, size, message) @dots{}
 Questo @`e simile a @code{emalloc()}, ma chiama @code{gawk_calloc()}
 invece che @code{gawk_malloc()}.
@@ -46394,7 +46432,7 @@ Supporto per continuare dopo errori di I/O non fatali
 @xref{Continuazione dopo errori}.
 
 @item
-Il comando @code{where} @`e stato aggiunto al dfn{debugger} 
+Il comando @code{where} @`e stato aggiunto al dfn{debugger}
 (@pxref{Stack di esecuzione}).
 
 @item
@@ -47082,7 +47120,7 @@ John Haque @`e autore dei seguenti contributi:
 @itemize @value{MINUS}
 @item
 Le modifiche per convertire @command{gawk}
-in un interprete di codice a livello di byte, compreso il dfn{debugger} 
+in un interprete di codice a livello di byte, compreso il dfn{debugger}
 
 @item
 L'aggiunta di veri vettori di vettori
@@ -47120,6 +47158,10 @@ Efraim Yawitz ha scritto il testo originale per il @ref{Debugger}.
 @item
 @cindex Naman, John
 John Naman ha preparato il testo originale di @ref{Variabili oscurate}.
+
+@cindex Ferguson, Stuart
+@item
+Stuart Ferguson reworked the text in @ref{Splitting By Content}.
 
 @item
 @cindex Schorr, Andrew
