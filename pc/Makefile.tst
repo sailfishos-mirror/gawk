@@ -4005,7 +4005,7 @@ diffout:
 		diff -u "$(srcdir)"/$${base}.ok  $$i ; \
 		fi ; \
 		fi ; \
-	done | more
+	done | $${PAGER:-more}
 
 # make things easier for z/OS
 zos-diffout:
