@@ -20306,6 +20306,12 @@ Beginning with @command{gawk} version 4.2, negative
 operands are not allowed for any of these functions. A negative
 operand produces a fatal error.  See the sidebar
 ``Beware The Smoke and Mirrors!'' for more information as to why.
+
+Beginning with @command{gawk} version 5.4, if not in MPFR mode
+(@pxref{Arbitrary Precision Arithmetic}), shifting with @code{lsfhit()}
+or @code{rshift()} by as many or more bits than are available in the
+largest unsigned integer returns zero, instead of whatever the underlying
+C compiler might do.
 @end quotation
 
 Here is a user-defined function (@pxref{User-defined})
@@ -20416,7 +20422,7 @@ results of the @code{compl()}, @code{lshift()}, and @code{rshift()} functions.
 @cindex sidebar @subentry Beware The Smoke and Mirrors!
 @cartouche Beware The Smoke and Mirrors!
 
-It other languages, bitwise operations are performed on integer values,
+In other languages, bitwise operations are performed on integer values,
 not floating-point values.  As a general statement, such operations work
 best when performed on unsigned integers.
 

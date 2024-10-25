@@ -2424,20 +2424,25 @@ do_lshift(int nargs)
 	if (val < 0 || shift < 0)
 		fatal(_("lshift(%f, %f): negative values are not allowed"), val, shift);
 
-	if (do_lint) {
-		if (double_to_int(val) != val || double_to_int(shift) != shift)
-			lintwarn(_("lshift(%f, %f): fractional values will be truncated"), val, shift);
-		if (shift >= sizeof(uintmax_t) * CHAR_BIT)
-			lintwarn(_("lshift(%f, %f): too large shift value will give strange results"), val, shift);
+	if (do_lint && (double_to_int(val) != val || double_to_int(shift) != shift))
+		lintwarn(_("lshift(%f, %f): fractional values will be truncated"), val, shift);
+
+	if (shift < sizeof(uintmax_t) * CHAR_BIT) {
+		// within range
+		uval = (uintmax_t) val;
+		ushift = (uintmax_t) shift;
+
+		res = uval << ushift;
+	} else {
+		// out of range
+		if (do_lint)
+			lintwarn(_("lshift(%f, %f): too large shift value returns zero"), val, shift);
+		res = 0;
 	}
 
 	DEREF(s1);
 	DEREF(s2);
 
-	uval = (uintmax_t) val;
-	ushift = (uintmax_t) shift;
-
-	res = uval << ushift;
 	return make_integer(res);
 }
 
@@ -2465,20 +2470,25 @@ do_rshift(int nargs)
 	if (val < 0 || shift < 0)
 		fatal(_("rshift(%f, %f): negative values are not allowed"), val, shift);
 
-	if (do_lint) {
-		if (double_to_int(val) != val || double_to_int(shift) != shift)
-			lintwarn(_("rshift(%f, %f): fractional values will be truncated"), val, shift);
-		if (shift >= sizeof(uintmax_t) * CHAR_BIT)
-			lintwarn(_("rshift(%f, %f): too large shift value will give strange results"), val, shift);
+	if (do_lint && (double_to_int(val) != val || double_to_int(shift) != shift))
+		lintwarn(_("rshift(%f, %f): fractional values will be truncated"), val, shift);
+
+	if (shift < sizeof(uintmax_t) * CHAR_BIT) {
+		// within range
+		uval = (uintmax_t) val;
+		ushift = (uintmax_t) shift;
+
+		res = uval >> ushift;
+	} else {
+		// out of range
+		if (do_lint)
+			lintwarn(_("rshift(%f, %f): too large shift value returns zero"), val, shift);
+		res = 0;
 	}
 
 	DEREF(s1);
 	DEREF(s2);
 
-	uval = (uintmax_t) val;
-	ushift = (uintmax_t) shift;
-
-	res = uval >> ushift;
 	return make_integer(res);
 }
 
