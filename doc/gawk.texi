@@ -6115,7 +6115,7 @@ escape sequences inside bracket expressions are taken to represent
 only single-byte characters (characters whose values fit within
 the range 0--256).  To match a range of characters where the endpoints
 of the range are larger than 256, enter the multibyte encodings of
-the characters directly.
+the characters directly, or use the @code{\u} escape sequence.
 
 @cindex @code{\} (backslash) @subentry in bracket expressions
 @cindex backslash (@code{\}) @subentry in bracket expressions
@@ -6142,7 +6142,12 @@ characters to be matched.
 @cindex @command{egrep} utility
 The treatment of @samp{\} in bracket expressions
 is compatible with other @command{awk}
-implementations and is also mandated by POSIX.
+implementations and is also mandated by POSIX.@footnote{See
+@uref{https://pubs.opengroup.org/onlinepubs/9799919799/utilities/awk.html#tag_20_06_13_04,
+the POSIX standard for @command{awk}}.
+The standard doesn't relate to the case
+of @samp{\]}, but it does explicitly relate to @samp{\}
+before a regular expression metacharacter.}
 The regular expressions in @command{awk} are a superset
 of the POSIX specification for Extended Regular Expressions (EREs).
 POSIX EREs are based on the regular expressions accepted by the
@@ -6191,28 +6196,6 @@ match them.
 With the POSIX character classes, you can write
 @code{/[[:alnum:]]/} to match the alphabetic
 and numeric characters in your character set.
-
-@ignore
-From eliz@gnu.org  Fri Feb 15 03:38:41 2019
-Date: Fri, 15 Feb 2019 12:38:23 +0200
-From: Eli Zaretskii <eliz@gnu.org>
-To: arnold@skeeve.com
-CC: pengyu.ut@gmail.com, bug-gawk@gnu.org
-Subject: Re: [bug-gawk] Does gawk character classes follow this?
-
-> From: arnold@skeeve.com
-> Date: Fri, 15 Feb 2019 03:01:34 -0700
-> Cc: pengyu.ut@gmail.com, bug-gawk@gnu.org
->
-> I get the feeling that there's something really bothering you, but
-> I don't understand what.
->
-> Can you clarify, please?
-
-I thought I already did: we cannot be expected to provide a definitive
-description of what the named classes stand for, because the answer
-depends on various factors out of our control.
-@end ignore
 
 @c Thanks to
 @c Date: Tue, 01 Jul 2014 07:39:51 +0200
