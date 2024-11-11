@@ -4618,8 +4618,8 @@ nell'output.
 @cindex opzione @subentry @option{--csv}
 @cindex campi separati da virgola (CSV) come dati @subentry opzione @option{-k}
 @cindex campi separati da virgola (CSV) come dati @subentry opzione @option{--csv}
-@cindex CSV (dati con valori separati da virgola) @subentry opzione @option{-k}
-@cindex CSV (dati con valori separati da virgola) @subentry opzione @option{--csv}
+@cindex CSV (campi separati da virgola) @subentry opzione @option{-k}
+@cindex CSV (campi separati da virgola) @subentry opzione @option{--csv}
 @cindex dati CSV (campi separati da virgola) @subentry @option{-k}
 @cindex dati CSV (campi separati da virgola) @subentry @option{--csv}
 Richiede un trattamento speciale per file CSV [valori separati da virgola].
@@ -6859,9 +6859,10 @@ valori all'interno di espressioni tra parentesi quadre
 sono considerate contenere solo caratteri
 che occupano un unico byte (caratteri il cui valore stia
 nell'intervallo 0--256).  Per individuare un intervallo di
-caratteri in cui i punti di inizio e fine dell'intervello
+caratteri in cui i punti di inizio e fine dell'intervallo
 abbiano valori maggiori di 256, occorre immettere direttamente
-le codifiche multibyte dei caratteri in questione.
+le codifiche multibyte dei caratteri in questione, o utilizzare
+la sequenza di protezione @code{\u}.
 
 @cindex @code{\} (barra inversa) @subentry in espressioni tra parentesi quadre
 @cindex barra inversa (@code{\}) @subentry in espressioni tra parentesi quadre
@@ -6890,7 +6891,12 @@ caratteri da individuare.
 @cindex programma di utilit@`a @subentry @command{egrep}
 L'utilizzo di @samp{\} nelle espressioni tra parentesi quadre
 @`e compatibile con altre implementazioni di @command{awk} ed @`e anche richiesto
-da POSIX.
+da POSIX.@footnote{Si veda
+@uref{https://pubs.opengroup.org/onlinepubs/9799919799/utilities/awk.html#tag_20_06_13_04,
+lo standard POSIX per @command{awk}}.
+Lo standard non fa riferimenti al caso
+@samp{\]}, ma menziona esplicitamente la sequenza di protezione @samp{\}
+prima di un metacarattere in un'espressione regolare.}
 Le espressioni regolari in @command{awk} sono un insieme pi@`u esteso delle
 specificazioni POSIX per le espressioni regolari estese (ERE).
 Le ERE POSIX sono basate sulle espressioni regolari accettate dal
@@ -6943,28 +6949,6 @@ non li avrebbe individuati.
 Con le classi di caratteri POSIX si pu@`o scrivere
 @code{/[[:alnum:]]/} per designare i caratteri alfabetici e numerici
 dell'insieme di caratteri in uso.
-
-@ignore
-From eliz@gnu.org  Fri Feb 15 03:38:41 2019
-Date: Fri, 15 Feb 2019 12:38:23 +0200
-From: Eli Zaretskii <eliz@gnu.org>
-To: arnold@skeeve.com
-CC: pengyu.ut@gmail.com, bug-gawk@gnu.org
-Subject: Re: [bug-gawk] Does gawk character classes follow this?
-
-> From: arnold@skeeve.com
-> Date: Fri, 15 Feb 2019 03:01:34 -0700
-> Cc: pengyu.ut@gmail.com, bug-gawk@gnu.org
->
-> I get the feeling that there's something really bothering you, but
-> I don't understand what.
->
-> Can you clarify, please?
-
-I thought I already did: we cannot be expected to provide a definitive
-description of what the named classes stand for, because the answer
-depends on various factors out of our control.
-@end ignore
 
 @c Thanks to
 @c Date: Tue, 01 Jul 2014 07:39:51 +0200
@@ -8631,8 +8615,8 @@ si comporta in questo modo.
 @node Campi separati da virgola
 @subsection Lavorare con file CSV
 
-@cindex CSV (dati con valori separati da virgola) @subentry record e campi
-@cindex dati CSV (dati con valori separati da virgola) @subentry record e campi
+@cindex CSV (campi separati da virgola) @subentry record e campi
+@cindex dati CSV (campi separati da virgola) @subentry record e campi
 @cindex campi separati da virgola (CSV) come dati @subentry record e campi
 Molti programmi di uso frequente si servono della virgola come separatore
 di campo, invece di usare lo spazio. [Normalmente i file in input
@@ -9285,7 +9269,7 @@ Possiamo valutare le funzionalit@`a, e alcune limitazioni, di @code{FPAT}
 usando il caso dei file costituiti da campi delimitati da virgola (CSV).
 Questo caso @`e, in un certo senso, obsoleto, in quanto @command{gawk} @`e ora
 in grado di processare direttamente file di questo tipo
-(@pxref{Lavorare con file CSV}).
+(@pxref{Campi separati da virgola}).
 Tuttavia, rimane utile come esempio del tipo di scansione che pu@`o essere
 fatto quando si separino i campi usando @code{FPAT}.
 @`E anche utile se si stanno usando versioni di @command{gawk} anteriori alla
@@ -9464,7 +9448,7 @@ per la maggior parte dei casi, ma non per tutti.
 @cindex campi separati da virgola (CSV) come dati @subentry analizzare con libreria @code{CSVMODE}
 
 Per una soluzione pi@`u generale che consenta di lavorare con dati CVS,
-vedere @ref{Lavorare con file CSV}.
+vedere @ref{Campi separati da virgola}.
 Se la versione di gawk in uso @`e anteriore alla versione 5.3,
 si raccomanda di utilizzare, nella pagina web dedicata da Manuel Collado
 a #command{gawk}, la libreria
@@ -22640,7 +22624,7 @@ negativo produce un errore fatale.  Si veda la nota a lato
 ``Attenzione. Non @`e tutto oro quel che luccica!'' per maggiori informazioni sul perch@'e.
 
 A partire dalla versione 5.4 di @command{gawk}, quando non si sta
-usando la modalità MPFR
+usando la modalit@`a MPFR
 @iftex
 (@pxrefil{Calcolo con precisione arbitraria}),
 @end iftex
@@ -22649,7 +22633,7 @@ usando la modalità MPFR
 @end ifnottex
 gli spostamenti, richiesti utilizzando le funzioni @code{lshift()} o
 @code{rshift()}, di un numero di bit maggiore o uguale a quelli presenti
-nel numero intero senza segno più grande rappresentabile, restituiscono
+nel numero intero senza segno pi@`u grande rappresentabile, restituiscono
 zero, a prescindere da quello che potrebbe essere il risultato prodotto
 dal compilatore C utilizzato.
 @end quotation
@@ -25829,7 +25813,7 @@ Tuttavia, per farlo, utilizza la funzione @code{typeof()}
 @subsection Produrre output in formato CSV
 
 @cindex campi separati da virgola (CSV) come dati @subentry generare output in formato CSV
-@cindex CSV (dati con valori separati da virgola) @subentry generare output in formato CSV
+@cindex CSV (campi separati da virgola) @subentry generare output in formato CSV
 @cindex dati CSV (campi separati da virgola) @subentry generati da @command{gawk}
 L'opzione @option{--csv} di @command{gawk} permette di gestire dati di input in formato
 CSV (@pxref{Campi separati da virgola}).
@@ -47173,7 +47157,7 @@ John Naman ha preparato il testo originale di @ref{Variabili oscurate}.
 
 @cindex Ferguson, Stuart
 @item
-Stuart Ferguson reworked the text in @ref{Splitting By Content}.
+Stuart Ferguson ha aggiornato il testo in @ref{Separazione in base al contenuto}.
 
 @item
 @cindex Schorr, Andrew
