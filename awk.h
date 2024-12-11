@@ -30,21 +30,9 @@
  * any system headers.  Otherwise, extreme death, destruction
  * and loss of life results.
  */
-#if defined(_TANDEM_SOURCE)
-/*
- * config.h forces this even on non-tandem systems but it
- * causes problems elsewhere if used in the check below.
- * so workaround it. bleah.
- */
-#define tandem_for_real	1
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
-
-#if defined(tandem_for_real) && ! defined(_SCO_DS)
-#define _XOPEN_SOURCE_EXTENDED 1
 #endif
 
 #include <stdio.h>
