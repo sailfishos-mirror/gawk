@@ -112,7 +112,7 @@ make_builtin(const char *name_space, const awk_ext_func_t *funcinfo)
 
 		size_t len = strlen(name_space) + 2 + strlen(name) + 1;
 		char *buf;
-		emalloc(buf, char *, len, "make_builtin");
+		emalloc(buf, char *, len);
 		sprintf(buf, "%s::%s", name_space, name);
 		install_name = buf;
 

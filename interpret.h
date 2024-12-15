@@ -843,7 +843,7 @@ mod:
 			if (t1 != t2 && t1->valref == 1 && (t1->flags & (MALLOC|MPFN|MPZN)) == MALLOC) {
 				size_t nlen = t1->stlen + t2->stlen;
 
-				erealloc(t1->stptr, char *, nlen + 1, "r_interpret");
+				erealloc(t1->stptr, char *, nlen + 1);
 				memcpy(t1->stptr + t1->stlen, t2->stptr, t2->stlen);
 				t1->stlen = nlen;
 				t1->stptr[nlen] = '\0';
@@ -859,8 +859,7 @@ mod:
 				if ((t1->flags & WSTRCUR) != 0 && (t2->flags & WSTRCUR) != 0) {
 					size_t wlen = t1->wstlen + t2->wstlen;
 
-					erealloc(t1->wstptr, wchar_t *,
-							sizeof(wchar_t) * (wlen + 1), "r_interpret");
+					erealloc(t1->wstptr, wchar_t *, sizeof(wchar_t) * (wlen + 1));
 					memcpy(t1->wstptr + t1->wstlen, t2->wstptr, t2->wstlen * sizeof(wchar_t));
 					t1->wstlen = wlen;
 					t1->wstptr[wlen] = L'\0';
@@ -870,7 +869,7 @@ mod:
 				size_t nlen = t1->stlen + t2->stlen;
 				char *p;
 
-				emalloc(p, char *, nlen + 1, "r_interpret");
+				emalloc(p, char *, nlen + 1);
 				memcpy(p, t1->stptr, t1->stlen);
 				memcpy(p + t1->stlen, t2->stptr, t2->stlen);
 				/* N.B. No NUL-termination required, since make_str_node will do it. */

@@ -458,7 +458,7 @@ int_copy(NODE *symbol, NODE *newsymb)
 	cursize = symbol->array_size;
 
 	/* allocate new table */
-	ezalloc(newtab, BUCKET **, cursize * sizeof(BUCKET *), "int_copy");
+	ezalloc(newtab, BUCKET **, cursize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 
@@ -549,10 +549,10 @@ int_list(NODE *symbol, NODE *t)
 		assert(list != NULL);
 		if (num_elems == 1 || num_elems == xn->table_size)
 			return list;
-		erealloc(list, NODE **, list_size * sizeof(NODE *), "int_list");
+		erealloc(list, NODE **, list_size * sizeof(NODE *));
 		k = elem_size * xn->table_size;
 	} else
-		emalloc(list, NODE **, list_size * sizeof(NODE *), "int_list");
+		emalloc(list, NODE **, list_size * sizeof(NODE *));
 
 	/* populate it */
 
@@ -843,7 +843,7 @@ grow_int_table(NODE *symbol)
 	}
 
 	/* allocate new table */
-	ezalloc(newtab, BUCKET **, newsize * sizeof(BUCKET *), "grow_int_table");
+	ezalloc(newtab, BUCKET **, newsize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 	symbol->buckets = newtab;

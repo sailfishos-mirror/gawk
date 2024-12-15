@@ -903,8 +903,8 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			rp = save_rp;
 			efree(rp->value);
 		} else
-			emalloc(rp, struct redirect *, sizeof(struct redirect), "redirect");
-		emalloc(newstr, char *, explen + 1, "redirect");
+			emalloc(rp, struct redirect *, sizeof(struct redirect));
+		emalloc(newstr, char *, explen + 1);
 		memcpy(newstr, str, explen);
 		newstr[explen] = '\0';
 		str = newstr;
@@ -2980,7 +2980,7 @@ init_awkpath(path_info *pi)
 			max_path++;
 
 	// +3 --> 2 for null entries at front and end of path, 1 for NULL end of list
-	ezalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *), "init_awkpath");
+	ezalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *));
 
 	start = path;
 	i = 0;
@@ -3010,7 +3010,7 @@ init_awkpath(path_info *pi)
 
 			len = end - start;
 			if (len > 0) {
-				emalloc(p, char *, len + 2, "init_awkpath");
+				emalloc(p, char *, len + 2);
 				memcpy(p, start, len);
 
 				/* add directory punctuation if necessary */
@@ -3042,7 +3042,7 @@ do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)
 
 	/* some kind of path name, no search */
 	if (ispath(src)) {
-		emalloc(path, char *, strlen(src) + 1, "do_find_source");
+		emalloc(path, char *, strlen(src) + 1);
 		strcpy(path, src);
 		if (stat(path, stb) == 0)
 			return path;
@@ -3054,7 +3054,7 @@ do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)
 	if (pi->awkpath == NULL)
 		init_awkpath(pi);
 
-	emalloc(path, char *, pi->max_pathlen + strlen(src) + 1, "do_find_source");
+	emalloc(path, char *, pi->max_pathlen + strlen(src) + 1);
 	for (i = 0; pi->awkpath[i] != NULL; i++) {
 		if (strcmp(pi->awkpath[i], "./") == 0 || strcmp(pi->awkpath[i], ".") == 0)
 			*path = '\0';
@@ -3100,7 +3100,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 
 		/* append EXTLIB_SUFFIX and try again */
 		save_errno = errno;
-		emalloc(file_ext, char *, src_len + suffix_len + 1, "find_source");
+		emalloc(file_ext, char *, src_len + suffix_len + 1);
 		sprintf(file_ext, "%s%s", src, EXTLIB_SUFFIX);
 		path = do_find_source(file_ext, stb, errcode, pi);
 		efree(file_ext);
@@ -3127,8 +3127,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 #endif
 
 		/* append ".awk" and try again */
-		emalloc(file_awk, char *, strlen(src) +
-			sizeof(DEFAULT_FILETYPE) + 1, "find_source");
+		emalloc(file_awk, char *, strlen(src) + sizeof(DEFAULT_FILETYPE) + 1);
 		sprintf(file_awk, "%s%s", src, DEFAULT_FILETYPE);
 		path = do_find_source(file_awk, stb, errcode, pi);
 		efree(file_awk);
@@ -3387,7 +3386,7 @@ iop_alloc(int fd, const char *name, int errno_val)
 {
 	IOBUF *iop;
 
-	ezalloc(iop, IOBUF *, sizeof(IOBUF), "iop_alloc");
+	ezalloc(iop, IOBUF *, sizeof(IOBUF));
 
 	iop->public_.fd = fd;
 	iop->public_.name = name;
@@ -3462,7 +3461,7 @@ iop_finish(IOBUF *iop)
 		lintwarn(_("data file `%s' is empty"), iop->public_.name);
 	iop->errcode = errno = 0;
 	iop->count = iop->scanoff = 0;
-	emalloc(iop->buf, char *, iop->size += 1, "iop_finish");
+	emalloc(iop->buf, char *, iop->size += 1);
 	iop->off = iop->buf;
 	iop->dataend = NULL;
 	iop->end = iop->buf + iop->size;
@@ -3512,7 +3511,7 @@ grow_iop_buffer(IOBUF *iop)
 		fatal(_("could not allocate more input memory"));
 
 	iop->size = newsize;
-	erealloc(iop->buf, char *, iop->size, "grow_iop_buffer");
+	erealloc(iop->buf, char *, iop->size);
 	iop->off = iop->buf + off;
 	iop->dataend = iop->off + valid;
 	iop->end = iop->buf + iop->size;
@@ -4400,7 +4399,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 		str_len = strlen(pidx1) + subsep->stlen	+ strlen(pidx2);
 
 	if (sub == NULL) {
-		emalloc(str, char *, str_len + 1, "in_PROCINFO");
+		emalloc(str, char *, str_len + 1);
 		sub = make_str_node(str, str_len, ALREADY_MALLOCED);
 		if (full_idx)
 			*full_idx = sub;
@@ -4408,7 +4407,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 		/* *full_idx != NULL */
 
 		assert(sub->valref == 1);
-		erealloc(sub->stptr, char *, str_len + 1, "in_PROCINFO");
+		erealloc(sub->stptr, char *, str_len + 1);
 		sub->stlen = str_len;
 	}
 
@@ -4633,8 +4632,7 @@ gawk_popen_write(const char *cmd)
 	if (open_pipes == NULL) {
 		int count = getdtablesize();
 
-		emalloc(open_pipes, write_pipe *, sizeof(write_pipe) * count,
-				"gawk_popen_write");
+		emalloc(open_pipes, write_pipe *, sizeof(write_pipe) * count);
 		memset(open_pipes, 0, sizeof(write_pipe) * count);
 	}
 
