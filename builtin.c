@@ -810,7 +810,7 @@ do_substr(int nargs)
 		 * way to do things.
 		 */
 		memset(& mbs, 0, sizeof(mbs));
-		emalloc(substr, char *, (length * gawk_mb_cur_max) + 1, "do_substr");
+		emalloc(substr, char *, (length * gawk_mb_cur_max) + 1);
 		wp = t1->wstptr + indx;
 		for (cp = substr; length > 0; length--) {
 			result = wcrtomb(cp, *wp, & mbs);
@@ -951,9 +951,9 @@ do_strftime(int nargs)
 			break;
 		bufsize *= 2;
 		if (bufp == buf)
-			emalloc(bufp, char *, bufsize, "do_strftime");
+			emalloc(bufp, char *, bufsize);
 		else
-			erealloc(bufp, char *, bufsize, "do_strftime");
+			erealloc(bufp, char *, bufsize);
 	}
 	ret = make_string(bufp, buflen);
 	if (bufp != buf)
@@ -1646,9 +1646,9 @@ do_match(int nargs)
 					amt = ilen + subseplen + strlen("length") + 1;
 
 					if (oldamt == 0) {
-						emalloc(buf, char *, amt, "do_match");
+						emalloc(buf, char *, amt);
 					} else if (amt > oldamt) {
-						erealloc(buf, char *, amt, "do_match");
+						erealloc(buf, char *, amt);
 					}
 					oldamt = amt;
 					memcpy(buf, buff, ilen);
@@ -1901,7 +1901,7 @@ do_sub(int nargs, unsigned int flags)
 	 * for example.
 	 */
 	if (gawk_mb_cur_max > 1 && repllen > 0) {
-		emalloc(mb_indices, char *, repllen * sizeof(char), "do_sub");
+		emalloc(mb_indices, char *, repllen * sizeof(char));
 		index_multibyte_buffer(repl, mb_indices, repllen);
 	}
 
@@ -1954,7 +1954,7 @@ do_sub(int nargs, unsigned int flags)
 
 	/* guesstimate how much room to allocate; +1 forces > 0 */
 	buflen = textlen + (ampersands + 1) * repllen + 1;
-	emalloc(buf, char *, buflen + 1, "do_sub");
+	emalloc(buf, char *, buflen + 1);
 	buf[buflen] = '\0';
 
 	bp = buf;
@@ -1981,7 +1981,7 @@ do_sub(int nargs, unsigned int flags)
 		sofar = bp - buf;
 		while (buflen < (sofar + len + 1)) {
 			buflen *= 2;
-			erealloc(buf, char *, buflen, "sub_common");
+			erealloc(buf, char *, buflen);
 			bp = buf + sofar;
 		}
 		for (scan = text; scan < matchstart; scan++)
@@ -2114,7 +2114,7 @@ do_sub(int nargs, unsigned int flags)
 	sofar = bp - buf;
 	if (buflen < (sofar + textlen + 1)) {
 		buflen = sofar + textlen + 1;
-		erealloc(buf, char *, buflen, "do_sub");
+		erealloc(buf, char *, buflen);
 		bp = buf + sofar;
 	}
 	/*
@@ -3156,7 +3156,7 @@ do_typeof(int nargs)
 
 #define SETVAL(X, V) {	\
 	size_t l = nl + sizeof(#X);	\
-	emalloc(p, char *, l+1, "do_typeof");	\
+	emalloc(p, char *, l+1);	\
 	sprintf(p, "%s_" #X, nextfree[i].name);	\
 	assoc_set(dbg, make_str_node(p, l, ALREADY_MALLOCED), make_number((AWKNUM) (V)));	\
 }

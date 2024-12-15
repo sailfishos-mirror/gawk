@@ -294,7 +294,7 @@ r_format_val(const char *format, int index, NODE *s)
 	}
 	if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 		efree(s->stptr);
-	emalloc(s->stptr, char *, s->stlen + 1, "format_val");
+	emalloc(s->stptr, char *, s->stlen + 1);
 	memcpy(s->stptr, sp, s->stlen + 1);
 no_malloc:
 	s->flags |= STRCUR;
@@ -343,13 +343,13 @@ r_dupnode(NODE *n)
 	r->wstlen = 0;
 
 	if ((n->flags & STRCUR) != 0) {
-		emalloc(r->stptr, char *, n->stlen + 1, "r_dupnode");
+		emalloc(r->stptr, char *, n->stlen + 1);
 		memcpy(r->stptr, n->stptr, n->stlen);
 		r->stptr[n->stlen] = '\0';
 		r->stlen = n->stlen;
 		if ((n->flags & WSTRCUR) != 0) {
 			r->wstlen = n->wstlen;
-			emalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1), "r_dupnode");
+			emalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1));
 			memcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(wchar_t));
 			r->wstptr[n->wstlen] = L'\0';
 			r->flags |= WSTRCUR;
@@ -416,7 +416,7 @@ make_str_node(const char *s, size_t len, int flags)
 	if ((flags & ALREADY_MALLOCED) != 0)
 		r->stptr = (char *) s;
 	else {
-		emalloc(r->stptr, char *, len + 1, "make_str_node");
+		emalloc(r->stptr, char *, len + 1);
 		memcpy(r->stptr, s, len);
 	}
 	r->stptr[len] = '\0';
@@ -488,7 +488,7 @@ make_str_node(const char *s, size_t len, int flags)
 				*ptm++ = c;
 		}
 		len = ptm - r->stptr;
-		erealloc(r->stptr, char *, len + 1, "make_str_node");
+		erealloc(r->stptr, char *, len + 1);
 		r->stptr[len] = '\0';
 	}
 	r->stlen = len;
@@ -826,7 +826,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * Create the array.
 	 */
 	if (ptr != NULL) {
-		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1), "str2wstr");
+		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1));
 	}
 
 	/*
@@ -859,7 +859,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * realloc the wide string down in size.
 	 */
 
-	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 1), "str2wstr");
+	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 1));
 	wsp = n->wstptr;
 
 	sp = n->stptr;
@@ -941,7 +941,7 @@ str2wstr(NODE *n, size_t **ptr)
 	n->flags |= WSTRCUR;
 #define ARBITRARY_AMOUNT_TO_GIVE_BACK 100
 	if (n->stlen - n->wstlen > ARBITRARY_AMOUNT_TO_GIVE_BACK)
-		erealloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1), "str2wstr");
+		erealloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1));
 
 	return n;
 }
@@ -968,7 +968,7 @@ wstr2str(NODE *n)
 	memset(& mbs, 0, sizeof(mbs));
 
 	length = n->wstlen;
-	emalloc(newval, char *, (length * gawk_mb_cur_max) + 1, "wstr2str");
+	emalloc(newval, char *, (length * gawk_mb_cur_max) + 1);
 
 	wp = n->wstptr;
 	for (cp = newval; length > 0; length--) {
@@ -1149,7 +1149,7 @@ void *
 r_getblock(int id)
 {
 	void *res;
-	emalloc(res, void *, nextfree[id].size, "getblock");
+	emalloc(res, void *, nextfree[id].size);
 	nextfree[id].active++;
 	if (nextfree[id].highwater < nextfree[id].active)
 		nextfree[id].highwater = nextfree[id].active;
@@ -1179,7 +1179,7 @@ more_blocks(int id)
 	size = nextfree[id].size;
 
 	assert(size >= sizeof(struct block_item));
-	emalloc(freep, struct block_item *, BLOCKCHUNK * size, "more_blocks");
+	emalloc(freep, struct block_item *, BLOCKCHUNK * size);
 	p = (char *) freep;
 	endp = p + BLOCKCHUNK * size;
 

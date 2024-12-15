@@ -1380,13 +1380,13 @@ extern void r_freeblock(void *, int id);
 				__FILE__, __LINE__, __VA_ARGS__)
 
 #ifdef USE_REAL_MALLOC
-#define	emalloc(var,ty,x,str)	(void) (var = (ty) malloc((size_t)(x)))
-#define	ezalloc(var,ty,x,str)	(void) (var = (ty) calloc((size_t)(x), 1))
-#define	erealloc(var,ty,x,str)	(void) (var = (ty) realloc((void *) var, (size_t)(x)))
+#define	emalloc(var,ty,x)	(void) (var = (ty) malloc((size_t)(x)))
+#define	ezalloc(var,ty,x)	(void) (var = (ty) calloc((size_t)(x), 1))
+#define	erealloc(var,ty,x)	(void) (var = (ty) realloc((void *) var, (size_t)(x)))
 #else
-#define	emalloc(var,ty,x,str)	(void) (var = (ty) emalloc_real((size_t)(x), str, #var, __FILE__, __LINE__))
-#define	ezalloc(var,ty,x,str)	(void) (var = (ty) ezalloc_real((size_t)(x), str, #var, __FILE__, __LINE__))
-#define	erealloc(var,ty,x,str)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), str, #var, __FILE__, __LINE__))
+#define	emalloc(var,ty,x)	(void) (var = (ty) emalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
+#define	ezalloc(var,ty,x)	(void) (var = (ty) ezalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
+#define	erealloc(var,ty,x)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), __func__, #var, __FILE__, __LINE__))
 #endif
 
 #define efree(p)	free(p)

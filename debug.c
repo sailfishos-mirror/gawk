@@ -387,7 +387,7 @@ g_readline(const char *prompt)
 	if (input_from_tty && prompt && *prompt)
 		fprintf(out_fp, "%s", prompt);
 
-	emalloc(line, char *, line_size + 1, "g_readline");
+	emalloc(line, char *, line_size + 1);
 	p = line;
 	end = line + line_size;
 	while ((n = read(input_fd, buf, 1)) > 0) {
@@ -397,7 +397,7 @@ g_readline(const char *prompt)
 			break;
 		}
 		if (p == end) {
-			erealloc(line, char *, 2 * line_size + 1, "g_readline");
+			erealloc(line, char *, 2 * line_size + 1);
 			p = line + line_size;
 			line_size *= 2;
 			end = line + line_size;
@@ -440,9 +440,9 @@ find_lines(SRCFILE *s)
 	int numlines = 0;
 	char lastchar = '\0';
 
-	emalloc(buf, char *, s->bufsize, "find_lines");
+	emalloc(buf, char *, s->bufsize);
 	pos_size = s->srclines;
-	emalloc(s->line_offset, int *, (pos_size + 2) * sizeof(int), "find_lines");
+	emalloc(s->line_offset, int *, (pos_size + 2) * sizeof(int));
 	pos = s->line_offset;
 	pos[0] = 0;
 
@@ -453,7 +453,7 @@ find_lines(SRCFILE *s)
 		while (p < end) {
 			if (*p++ == '\n') {
 				if (++numlines > pos_size) {
-					erealloc(s->line_offset, int *, (2 * pos_size + 2) * sizeof(int), "find_lines");
+					erealloc(s->line_offset, int *, (2 * pos_size + 2) * sizeof(int));
 					pos = s->line_offset + pos_size;
 					pos_size *= 2;
 				}
@@ -586,10 +586,10 @@ print_lines(char *src, int start_line, int nlines)
 	}
 
 	if (linebuf == NULL) {
-		emalloc(linebuf, char *, s->maxlen + 20, "print_lines"); /* 19 for line # */
+		emalloc(linebuf, char *, s->maxlen + 20); /* 19 for line # */
 		linebuf_len = s->maxlen;
 	} else if (linebuf_len < s->maxlen) {
-		erealloc(linebuf, char *, s->maxlen + 20, "print_lines");
+		erealloc(linebuf, char *, s->maxlen + 20);
 		linebuf_len = s->maxlen;
 	}
 
@@ -1116,7 +1116,7 @@ print_array(volatile NODE *arr, char *arr_name)
 #define INITIAL_NAME_COUNT	10
 
 	if (names == NULL) {
-		emalloc(names, const char **, INITIAL_NAME_COUNT * sizeof(char *), "print_array");
+		emalloc(names, const char **, INITIAL_NAME_COUNT * sizeof(char *));
 		memset(names, 0, INITIAL_NAME_COUNT * sizeof(char *));
 		num_names = INITIAL_NAME_COUNT;
 	}
@@ -1136,7 +1136,7 @@ print_array(volatile NODE *arr, char *arr_name)
 		// push name onto stack
 		if (cur_name >= num_names) {
 			num_names *= 2;
-			erealloc(names, const char **, num_names * sizeof(char *), "print_array");
+			erealloc(names, const char **, num_names * sizeof(char *));
 		}
 		names[cur_name++] = arr_name;
 
@@ -1440,7 +1440,7 @@ add_item(struct list_item *list, int type, NODE *symbol, char *pname)
 {
 	struct list_item *d;
 
-	ezalloc(d, struct list_item *, sizeof(struct list_item), "add_item");
+	ezalloc(d, struct list_item *, sizeof(struct list_item));
 	d->commands.next = d->commands.prev = &d->commands;
 
 	d->number = ++list->number;
@@ -1503,7 +1503,7 @@ do_add_item(struct list_item *list, CMDARG *arg)
 			int i;
 
 			assert(count > 0);
-			emalloc(subs, NODE **, count * sizeof(NODE *), "do_add_item");
+			emalloc(subs, NODE **, count * sizeof(NODE *));
 			for (i = 0; i < count; i++) {
 				arg = arg->next;
 				subs[i] = dupnode(arg->a_node);
@@ -2175,7 +2175,7 @@ mk_breakpoint(char *src, int srcline)
 	BREAKPOINT *b;
 
 	bp = bcalloc(Op_breakpoint, 1, srcline);
-	emalloc(b, BREAKPOINT *, sizeof(BREAKPOINT), "mk_breakpoint");
+	emalloc(b, BREAKPOINT *, sizeof(BREAKPOINT));
 	memset(&b->cndn, 0, sizeof(struct condition));
 	b->commands.next = b->commands.prev = &b->commands;
 	b->silent = false;
@@ -4406,10 +4406,10 @@ gprintf(FILE *fp, const char *format, ...)
 #define GPRINTF_BUFSIZ 512
 	if (buf == NULL) {
 		buflen = GPRINTF_BUFSIZ;
-		emalloc(buf, char *, buflen * sizeof(char), "gprintf");
+		emalloc(buf, char *, buflen * sizeof(char));
 	} else if (buflen - bl < GPRINTF_BUFSIZ/2) {
 		buflen += GPRINTF_BUFSIZ;
-		erealloc(buf, char *, buflen * sizeof(char), "gprintf");
+		erealloc(buf, char *, buflen * sizeof(char));
 	}
 #undef GPRINTF_BUFSIZ
 
@@ -4428,7 +4428,7 @@ gprintf(FILE *fp, const char *format, ...)
 
 		/* enlarge buffer, and try again */
 		buflen *= 2;
-		erealloc(buf, char *, buflen * sizeof(char), "gprintf");
+		erealloc(buf, char *, buflen * sizeof(char));
 	}
 
 	bl = 0;
@@ -4558,7 +4558,7 @@ serialize_list(int type)
 
 	if (buf == NULL) {	/* first time */
 		buflen = SERIALIZE_BUFSIZ;
-		emalloc(buf, char *, buflen + 1, "serialize");
+		emalloc(buf, char *, buflen + 1);
 	}
 	bl = 0;
 
@@ -4567,7 +4567,7 @@ serialize_list(int type)
 		if (buflen - bl < SERIALIZE_BUFSIZ/2) {
 enlarge_buffer:
 			buflen *= 2;
-			erealloc(buf, char *, buflen + 1, "serialize");
+			erealloc(buf, char *, buflen + 1);
 		}
 
 #undef SERIALIZE_BUFSIZ
@@ -4671,7 +4671,7 @@ enlarge_buffer:
 				nchar += (strlen("commands ") + 20 /*cnum*/ + 1 /*CSEP*/ + strlen("end") + 1 /*FSEP*/);
 				if (nchar >= buflen - bl) {
 					buflen = bl + nchar + 1 /*RSEP*/;
-					erealloc(buf, char *, buflen + 1, "serialize_list");
+					erealloc(buf, char *, buflen + 1);
 				}
 				nchar = sprintf(buf + bl, "commands %d", cnum);
 				bl += nchar;
@@ -4708,7 +4708,7 @@ enlarge_buffer:
 				nchar = strlen(cndn->expr);
 				if (nchar + 1 /*FSEP*/ >= buflen - bl) {
 					buflen = bl + nchar + 1 /*FSEP*/ + 1 /*RSEP*/;
-					erealloc(buf, char *, buflen + 1, "serialize_list");
+					erealloc(buf, char *, buflen + 1);
 				}
 				memcpy(buf + bl, cndn->expr, nchar);
 				bl += nchar;
@@ -4787,7 +4787,7 @@ unserialize_list_item(struct list_item *list, char **pstr, int *pstr_len, int fi
 		if (type == D_subscript) {
 			int sub_len;
 			sub_cnt = strtol(pstr[3], NULL, 0);
-			emalloc(subs, NODE **, sub_cnt * sizeof(NODE *), "unserialize_list_item");
+			emalloc(subs, NODE **, sub_cnt * sizeof(NODE *));
 			cnt++;
 			for (i = 0; i < sub_cnt; i++) {
 				sub_len = strtol(pstr[cnt], NULL, 0);
@@ -5096,7 +5096,7 @@ do_commands(CMDARG *arg, int cmd)
 
 	assert(commands != NULL);
 
-	emalloc(c, struct commands_item *, sizeof(struct commands_item), "do_commands");
+	emalloc(c, struct commands_item *, sizeof(struct commands_item));
 	c->next = NULL;
 	c->cmd = cmd;
 
@@ -5152,7 +5152,7 @@ do_print_f(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 	/* count maximum required size for tmp */
 	for (a = arg; a != NULL ; a = a->next)
 		count++;
-	emalloc(tmp, NODE **, count * sizeof(NODE *), "do_print_f");
+	emalloc(tmp, NODE **, count * sizeof(NODE *));
 
 	for (i = 0, a = arg; a != NULL ; i++, a = a->next) {
 		switch (a->type) {
@@ -5721,9 +5721,9 @@ do_eval(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 
 		if (ecount > 0) {
 			if (pcount == 0)
-				emalloc(this_frame->stack, NODE **, ecount * sizeof(NODE *), "do_eval");
+				emalloc(this_frame->stack, NODE **, ecount * sizeof(NODE *));
 			else
-				erealloc(this_frame->stack, NODE **, (pcount + ecount) * sizeof(NODE *), "do_eval");
+				erealloc(this_frame->stack, NODE **, (pcount + ecount) * sizeof(NODE *));
 
 			sp = this_frame->stack + pcount;
 			for (i = 0; i < ecount; i++) {
@@ -5965,7 +5965,7 @@ push_cmd_src(
 	int eofstatus)
 {
 	struct command_source *cs;
-	emalloc(cs, struct command_source *, sizeof(struct command_source), "push_cmd_src");
+	emalloc(cs, struct command_source *, sizeof(struct command_source));
 	cs->fd = fd;
 	cs->is_tty = istty;
 	cs->read_func = readfunc;

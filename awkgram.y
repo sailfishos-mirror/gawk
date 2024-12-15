@@ -709,10 +709,10 @@ statement
 					}
 
 					if (case_values == NULL)
-						emalloc(case_values, const char **, sizeof(char *) * maxcount, "statement");
+						emalloc(case_values, const char **, sizeof(char *) * maxcount);
 					else if (case_count >= maxcount) {
 						maxcount += 128;
-						erealloc(case_values, const char **, sizeof(char*) * maxcount, "statement");
+						erealloc(case_values, const char **, sizeof(char*) * maxcount);
 					}
 					case_values[case_count++] = caseval;
 				} else {
@@ -1785,7 +1785,7 @@ common_exp
 			n1 = force_string(n1);
 			n2 = force_string(n2);
 			nlen = n1->stlen + n2->stlen;
-			erealloc(n1->stptr, char *, nlen + 1, "constant fold");
+			erealloc(n1->stptr, char *, nlen + 1);
 			memcpy(n1->stptr + n1->stlen, n2->stptr, n2->stlen);
 			n1->stlen = nlen;
 			n1->stptr[nlen] = '\0';
@@ -2619,7 +2619,7 @@ yyerror(const char *m, ...)
 	count = strlen(mesg) + 1;
 	if (lexptr != NULL)
 		count += (lexeme - thisline) + 2;
-	ezalloc(buf, char *, count+1, "yyerror");
+	ezalloc(buf, char *, count+1);
 
 	bp = buf;
 
@@ -2830,9 +2830,9 @@ parse_program(INSTRUCTION **pcode, bool from_eval)
 		errcount++;
 
 	if (args_array == NULL)
-		emalloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *), "parse_program");
+		emalloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *));
 	else
-		erealloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *), "parse_program");
+		erealloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *));
 
 	return (ret || errcount);
 }
@@ -2853,7 +2853,7 @@ do_add_srcfile(enum srctype stype, char *src, char *path, SRCFILE *thisfile)
 {
 	SRCFILE *s;
 
-	ezalloc(s, SRCFILE *, sizeof(SRCFILE), "do_add_srcfile");
+	ezalloc(s, SRCFILE *, sizeof(SRCFILE));
 	s->src = estrdup(src, strlen(src));
 	s->fullpath = path;
 	s->stype = stype;
@@ -3181,7 +3181,7 @@ get_src_buf()
 					break;
 				}
 			savelen = lexptr - scan;
-			emalloc(buf, char *, savelen + 1, "get_src_buf");
+			emalloc(buf, char *, savelen + 1);
 			memcpy(buf, scan, savelen);
 			thisline = buf;
 			lexptr = buf + savelen;
@@ -3229,7 +3229,7 @@ get_src_buf()
 #undef A_DECENT_BUFFER_SIZE
 		sourcefile->bufsize = l;
 		newfile = true;
-		emalloc(sourcefile->buf, char *, sourcefile->bufsize, "get_src_buf");
+		emalloc(sourcefile->buf, char *, sourcefile->bufsize);
 		memset(sourcefile->buf, '\0', sourcefile->bufsize);	// keep valgrind happy
 		lexptr = lexptr_begin = lexeme = sourcefile->buf;
 		savelen = 0;
@@ -3259,7 +3259,7 @@ get_src_buf()
 
 			if (savelen > sourcefile->bufsize / 2) { /* long line or token  */
 				sourcefile->bufsize *= 2;
-				erealloc(sourcefile->buf, char *, sourcefile->bufsize, "get_src_buf");
+				erealloc(sourcefile->buf, char *, sourcefile->bufsize);
 				scan = sourcefile->buf + (scan - lexptr_begin);
 				lexptr_begin = sourcefile->buf;
 			}
@@ -3311,11 +3311,11 @@ tokexpand()
 	if (tokstart != NULL) {
 		tokoffset = tok - tokstart;
 		toksize *= 2;
-		erealloc(tokstart, char *, toksize, "tokexpand");
+		erealloc(tokstart, char *, toksize);
 		tok = tokstart + tokoffset;
 	} else {
 		toksize = 60;
-		emalloc(tokstart, char *, toksize, "tokexpand");
+		emalloc(tokstart, char *, toksize);
 		tok = tokstart;
 	}
 	tokend = tokstart + toksize;
@@ -4459,7 +4459,7 @@ retry:
 		case LEX_EVAL:
 			if (in_main_context())
 				goto out;
-			emalloc(tokkey, char *, tok - tokstart + 1, "yylex");
+			emalloc(tokkey, char *, tok - tokstart + 1);
 			tokkey[0] = '@';
 			memcpy(tokkey + 1, tokstart, tok - tokstart);
 			yylval = GET_INSTRUCTION(Op_token);
@@ -5134,7 +5134,7 @@ check_params(char *fname, int pcount, INSTRUCTION *list)
 
 	assert(pcount > 0);
 
-	emalloc(pnames, char **, pcount * sizeof(char *), "check_params");
+	emalloc(pnames, char **, pcount * sizeof(char *));
 
 	for (i = 0, p = list->nexti; p != NULL; i++, p = np) {
 		np = p->nexti;
@@ -5203,8 +5203,8 @@ func_use(const char *name, enum defref how)
 
 	/* not in the table, fall through to allocate a new one */
 
-	ezalloc(fp, struct fdesc *, sizeof(struct fdesc), "func_use");
-	emalloc(fp->name, char *, len + 1, "func_use");
+	ezalloc(fp, struct fdesc *, sizeof(struct fdesc));
+	emalloc(fp->name, char *, len + 1);
 	strcpy(fp->name, name);
 	fp->next = ftable[ind];
 	ftable[ind] = fp;
@@ -6680,7 +6680,7 @@ set_profile_text(NODE *n, const char *str, size_t len)
 	if (do_pretty_print) {
 		// two extra bytes: one for NUL termination, and another in
 		// case we need to add a leading minus sign in add_sign_to_num
-		emalloc(n->stptr, char *, len + 2, "set_profile_text");
+		emalloc(n->stptr, char *, len + 2);
 		memcpy(n->stptr, str, len);
 		n->stptr[len] = '\0';
 		n->stlen = len;
@@ -6724,7 +6724,7 @@ merge_comments(INSTRUCTION *c1, INSTRUCTION *c2)
 	}
 
 	char *buffer;
-	emalloc(buffer, char *, total + 1, "merge_comments");
+	emalloc(buffer, char *, total + 1);
 
 	strcpy(buffer, c1->memory->stptr);
 	if (c1->comment != NULL) {
@@ -6982,7 +6982,7 @@ qualify_name(const char *name, size_t len)
 		size_t length = strlen(current_namespace) + 2 + len + 1;
 		char *buf;
 
-		emalloc(buf, char *, length, "qualify_name");
+		emalloc(buf, char *, length);
 		sprintf(buf, "%s::%s", current_namespace, name);
 
 		return buf;

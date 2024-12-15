@@ -980,7 +980,7 @@ get_intval(NODE *t1, int argnum, const char *op)
                                 	op, argnum, left)
 				);
 
-			emalloc(pz, mpz_ptr, sizeof (mpz_t), "get_intval");
+			emalloc(pz, mpz_ptr, sizeof (mpz_t));
 			mpz_init(pz);
 			return pz;	/* should be freed */
 		}
@@ -999,7 +999,7 @@ get_intval(NODE *t1, int argnum, const char *op)
 				);
 		}
 
-		emalloc(pz, mpz_ptr, sizeof (mpz_t), "get_intval");
+		emalloc(pz, mpz_ptr, sizeof (mpz_t));
 		mpz_init(pz);
 		mpfr_get_z(pz, left, MPFR_RNDZ);	/* float to integer conversion */
 		return pz;	/* should be freed */
