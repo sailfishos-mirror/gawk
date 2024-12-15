@@ -100,7 +100,7 @@ NODE *Null_field = NULL;
 void
 init_fields()
 {
-	emalloc(fields_arr, NODE **, sizeof(NODE *), "init_fields");
+	emalloc(fields_arr, NODE **, sizeof(NODE *));
 
 	fields_arr[0] = make_string("", 0);
 	fields_arr[0]->flags |= NULL_FIELD;
@@ -131,7 +131,7 @@ grow_fields_arr(long num)
 	int t;
 	NODE *n;
 
-	erealloc(fields_arr, NODE **, (num + 1) * sizeof(NODE *), "grow_fields_arr");
+	erealloc(fields_arr, NODE **, (num + 1) * sizeof(NODE *));
 	for (t = nf_high_water + 1; t <= num; t++) {
 		getnode(n);
 		*n = *Null_field;
@@ -207,7 +207,7 @@ rebuild_record()
 	tlen += (NF - 1) * OFSlen;
 	if ((long) tlen < 0)
 		tlen = 0;
-	emalloc(ops, char *, tlen + 1, "rebuild_record");
+	emalloc(ops, char *, tlen + 1);
 	cops = ops;
 	ops[0] = '\0';
 	for (i = 1;  i <= NF; i++) {
@@ -256,7 +256,7 @@ rebuild_record()
 				 * we can't leave r's stptr pointing into the
 				 * old $0 buffer that we are about to unref.
 				 */
-				emalloc(r->stptr, char *, r->stlen + 1, "rebuild_record");
+				emalloc(r->stptr, char *, r->stlen + 1);
 				memcpy(r->stptr, cops, r->stlen);
 				r->stptr[r->stlen] = '\0';
 				r->flags |= MALLOC;
@@ -306,7 +306,7 @@ set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *fw)
 
 	/* buffer management: */
 	if (databuf_size == 0) {	/* first time */
-		ezalloc(databuf, char *, INITIAL_SIZE, "set_record");
+		ezalloc(databuf, char *, INITIAL_SIZE);
 		databuf_size = INITIAL_SIZE;
 	}
 	/*
@@ -320,7 +320,7 @@ set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *fw)
 				fatal(_("input record too large"));
 			databuf_size *= 2;
 		} while (cnt >= databuf_size);
-		erealloc(databuf, char *, databuf_size, "set_record");
+		erealloc(databuf, char *, databuf_size);
 		memset(databuf, '\0', databuf_size);
 	}
 	/* copy the data */
@@ -400,7 +400,7 @@ purge_record()
 		if ((r->flags & MALLOC) == 0 && r->valref > 1) {
 			/* This can and does happen. We must copy the string! */
 			const char *save = r->stptr;
-			emalloc(r->stptr, char *, r->stlen + 1, "purge_record");
+			emalloc(r->stptr, char *, r->stlen + 1);
 			memcpy(r->stptr, save, r->stlen);
 			r->stptr[r->stlen] = '\0';
 			r->flags |= MALLOC;
@@ -801,7 +801,7 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 	static size_t buflen = 0;
 
 	if (newfield == NULL) {
-		emalloc(newfield, char *, BUFSIZ, "comma_parse_field");
+		emalloc(newfield, char *, BUFSIZ);
 		buflen = BUFSIZ;
 	}
 
@@ -830,7 +830,7 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 						size_t offset = buflen;
 
 						buflen *= 2;
-						erealloc(newfield, char *, buflen, "comma_parse_field");
+						erealloc(newfield, char *, buflen);
 						new_end = newfield + offset;
 					}
 
@@ -853,7 +853,7 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 						size_t offset = buflen;
 
 						buflen *= 2;
-						erealloc(newfield, char *, buflen, "comma_parse_field");
+						erealloc(newfield, char *, buflen);
 						new_end = newfield + offset;
 					}
 					*new_end++ = *scan++;
@@ -1348,7 +1348,7 @@ set_FIELDWIDTHS()
 	scan = tmp->stptr;
 
 	if (FIELDWIDTHS == NULL) {
-		emalloc(FIELDWIDTHS, awk_fieldwidth_info_t *, awk_fieldwidth_info_size(fw_alloc), "set_FIELDWIDTHS");
+		emalloc(FIELDWIDTHS, awk_fieldwidth_info_t *, awk_fieldwidth_info_size(fw_alloc));
 		FIELDWIDTHS->use_chars = awk_true;
 	}
 	FIELDWIDTHS->nf = 0;
@@ -1356,7 +1356,7 @@ set_FIELDWIDTHS()
 		unsigned long int tmp;
 		if (i >= fw_alloc) {
 			fw_alloc *= 2;
-			erealloc(FIELDWIDTHS, awk_fieldwidth_info_t *, awk_fieldwidth_info_size(fw_alloc), "set_FIELDWIDTHS");
+			erealloc(FIELDWIDTHS, awk_fieldwidth_info_t *, awk_fieldwidth_info_size(fw_alloc));
 		}
 		/* Ensure that there is no leading `-' sign.  Otherwise,
 		   strtoul would accept it and return a bogus result.  */

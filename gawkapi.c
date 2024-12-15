@@ -433,7 +433,7 @@ api_awk_atexit(awk_ext_id_t id,
 		return;
 
 	/* allocate memory */
-	emalloc(p, struct ext_exit_handler *, sizeof(struct ext_exit_handler), "api_awk_atexit");
+	emalloc(p, struct ext_exit_handler *, sizeof(struct ext_exit_handler));
 
 	/* fill it in */
 	p->funcp = funcp;
@@ -481,9 +481,9 @@ assign_string(NODE *node, awk_value_t *val, awk_valtype_t val_type)
 				scopy.size = 8;	/* initial size */
 			else
 				scopy.size *= 2;
-			erealloc(scopy.strings, char **, scopy.size * sizeof(char *), "assign_string");
+			erealloc(scopy.strings, char **, scopy.size * sizeof(char *));
 		}
-		emalloc(s, char *, node->stlen + 1, "assign_string");
+		emalloc(s, char *, node->stlen + 1);
 		memcpy(s, node->stptr, node->stlen);
 		s[node->stlen] = '\0';
 		val->str_value.str = scopy.strings[scopy.i++] = s;
@@ -1248,8 +1248,7 @@ api_flatten_array_typed(awk_ext_id_t id,
 	alloc_size = sizeof(awk_flat_array_t) +
 			(array->table_size - 1) * sizeof(awk_element_t);
 
-	ezalloc(*data, awk_flat_array_t *, alloc_size,
-			"api_flatten_array_typed");
+	ezalloc(*data, awk_flat_array_t *, alloc_size);
 
 	list = assoc_list(array, "@unsorted", ASORTI);
 
@@ -1363,7 +1362,7 @@ api_get_mpfr(awk_ext_id_t id)
 {
 #ifdef HAVE_MPFR
 	mpfr_ptr p;
-	emalloc(p, mpfr_ptr, sizeof(mpfr_t), "api_get_mpfr");
+	emalloc(p, mpfr_ptr, sizeof(mpfr_t));
 	mpfr_init(p);
 	return p;
 #else
@@ -1379,7 +1378,7 @@ api_get_mpz(awk_ext_id_t id)
 {
 #ifdef HAVE_MPFR
 	mpz_ptr p;
-	emalloc(p, mpz_ptr, sizeof (mpz_t), "api_get_mpz");
+	emalloc(p, mpz_ptr, sizeof (mpz_t));
 
 	mpz_init(p);
 	return p;
@@ -1505,7 +1504,7 @@ api_register_ext_version(awk_ext_id_t id, const char *version)
 
 	(void) id;
 
-	emalloc(info, struct version_info *, sizeof(struct version_info), "register_ext_version");
+	emalloc(info, struct version_info *, sizeof(struct version_info));
 	info->version = version;
 	info->next = vi_head;
 	vi_head = info;
@@ -1665,7 +1664,7 @@ ns_lookup(const char *name_space, const char *name, char **fullname)
 
 	size_t len = strlen(name_space) + 2 + strlen(name) + 1;
 	char *buf;
-	emalloc(buf, char *, len, "ns_lookup");
+	emalloc(buf, char *, len);
 	sprintf(buf, "%s::%s", name_space, name);
 
 	NODE *f = lookup(buf);

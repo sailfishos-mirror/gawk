@@ -82,10 +82,10 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	 * from that.
 	 */
 	if (buf == NULL) {
-		emalloc(buf, char *, len + 1, "make_regexp");
+		emalloc(buf, char *, len + 1);
 		buflen = len;
 	} else if (len > buflen) {
-		erealloc(buf, char *, len + 1, "make_regexp");
+		erealloc(buf, char *, len + 1);
 		buflen = len;
 	}
 	dest = buf;
@@ -261,9 +261,9 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	*dest = '\0';
 	len = dest - buf;
 
-	ezalloc(rp, Regexp *, sizeof(*rp), "make_regexp");
+	ezalloc(rp, Regexp *, sizeof(*rp));
 	rp->pat.allocated = 0;	/* regex will allocate the buffer */
-	emalloc(rp->pat.fastmap, char *, 256, "make_regexp");
+	emalloc(rp->pat.fastmap, char *, 256);
 
 	/*
 	 * Lo these many years ago, had I known what a P.I.T.A. IGNORECASE

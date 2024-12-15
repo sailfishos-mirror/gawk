@@ -339,7 +339,7 @@ str_copy(NODE *symbol, NODE *newsymb)
 	cursize = symbol->array_size;
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *), "str_copy");
+	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 
@@ -412,7 +412,7 @@ str_list(NODE *symbol, NODE *t)
 		num_elems = 1;
 	list_size =  elem_size * num_elems;
 
-	emalloc(list, NODE **, list_size * sizeof(NODE *), "str_list");
+	emalloc(list, NODE **, list_size * sizeof(NODE *));
 
 	/* populate it */
 
@@ -679,7 +679,7 @@ grow_table(NODE *symbol)
 	}
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *), "grow_table");
+	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 	symbol->buckets = new;

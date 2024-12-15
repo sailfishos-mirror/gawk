@@ -453,7 +453,7 @@ cleanup:
 						+ indent_level + 1				// indent
 						+ pc->comment->memory->stlen + 3;		// tab comment
 
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str, "%s%s%s%.*s %s", t1->pp_str, op2str(pc->opcode),
 						pc->comment->memory->stptr,
 						(int) (indent_level + 1), tabs, t2->pp_str);
@@ -1174,7 +1174,7 @@ cleanup:
 			len = f->pp_len + t->pp_len + cond->pp_len + 12;
 			if (qm_comment == NULL && colon_comment == NULL) {
 				// easy case
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str, "%s ? %s : %s", cond->pp_str, t->pp_str, f->pp_str);
 			} else if (qm_comment != NULL && colon_comment != NULL) {
 				check_indent_level();
@@ -1182,7 +1182,7 @@ cleanup:
 					colon_comment->memory->stlen +
 					2 * (indent_level + 1) + 3 +		// indentation
 					t->pp_len + 6;
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str,
 					"%s ? %s"	// cond ? comment
 					"%.*s   %s"	// indent true-part
@@ -1201,7 +1201,7 @@ cleanup:
 				len += qm_comment->memory->stlen +	// comment
 					1 * (indent_level + 1) + 3 +	// indentation
 					t->pp_len + 3;
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str,
 					"%s ? %s"	// cond ? comment
 					"%.*s   %s"	// indent true-part
@@ -1217,7 +1217,7 @@ cleanup:
 				len += colon_comment->memory->stlen +		// comment
 					1 * (indent_level + 1) + 3 +		// indentation
 					t->pp_len + 3;
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str,
 					"%s ? %s"	// cond ? true-part
 					" : %s"		// : comment
@@ -1645,7 +1645,7 @@ pp_parenthesize(NODE *sp)
 	if (p[0] == '(')	// already parenthesized
 		return;
 
-	emalloc(p, char *, len + 3, "pp_parenthesize");
+	emalloc(p, char *, len + 3);
 	*p = '(';
 	memcpy(p + 1, sp->pp_str, len);
 	p[len + 1] = ')';
@@ -1718,7 +1718,7 @@ pp_string_or_typed_regex(const char *in_str, size_t len, int delim, bool typed_r
 /* make space for something l big in the buffer */
 #define chksize(l)  if ((l) > ofre) { \
 		long olen = obufout - obuf; \
-		erealloc(obuf, char *, osiz * 2, "pp_string"); \
+		erealloc(obuf, char *, osiz * 2); \
 		obufout = obuf + olen; \
 		ofre += osiz; \
 		osiz *= 2; \
@@ -1726,7 +1726,7 @@ pp_string_or_typed_regex(const char *in_str, size_t len, int delim, bool typed_r
 
 	/* initial size; 3 for delim + terminating null, 1 for @ */
 	osiz = len + 3 + 1 + (typed_regex == true);
-	emalloc(obuf, char *, osiz, "pp_string");
+	emalloc(obuf, char *, osiz);
 	obufout = obuf;
 	ofre = osiz - 1;
 
@@ -1779,7 +1779,7 @@ pp_number(NODE *n)
 	char *str;
 
 	assert((n->flags & NUMCONSTSTR) != 0);
-	emalloc(str, char *, n->stlen + 1, "pp_number");
+	emalloc(str, char *, n->stlen + 1);
 	strcpy(str, n->stptr);
 	return str;
 }
@@ -1811,10 +1811,10 @@ pp_list(int nargs, const char *paren, const char *delim)
 
 	if (pp_args == NULL) {
 		npp_args = nargs;
-		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_list");
+		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	} else if (nargs > npp_args) {
 		npp_args = nargs;
-		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_list");
+		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	}
 
 	delimlen = strlen(delim);
@@ -1837,7 +1837,7 @@ pp_list(int nargs, const char *paren, const char *delim)
 	}
 	comment = NULL;
 
-	emalloc(str, char *, len + 1, "pp_list");
+	emalloc(str, char *, len + 1);
 	s = str;
 	if (paren != NULL)
 		*s++ = paren[0];
@@ -1894,10 +1894,10 @@ pp_concat(int nargs)
 
 	if (pp_args == NULL) {
 		npp_args = nargs;
-		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_concat");
+		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	} else if (nargs > npp_args) {
 		npp_args = nargs;
-		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_concat");
+		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	}
 
 	/*
@@ -1911,7 +1911,7 @@ pp_concat(int nargs)
 		len += r->pp_len + delimlen + 2;
 	}
 
-	emalloc(str, char *, len + 1, "pp_concat");
+	emalloc(str, char *, len + 1);
 	s = str;
 
 	/* now copy in */
@@ -1985,7 +1985,7 @@ pp_group3(const char *s1, const char *s2, const char *s3)
 	len2 = strlen(s2);
 	len3 = strlen(s3);
 	l = len1 + len2 + len3 + 1;
-	emalloc(str, char *, l, "pp_group3");
+	emalloc(str, char *, l);
 	s = str;
 	if (len1 > 0) {
 		memcpy(s, s1, len1);
@@ -2145,7 +2145,7 @@ adjust_namespace(char *name, bool *malloced)
 		char *buf;
 		size_t len = 5 + strlen(name) + 1;
 
-		emalloc(buf, char *, len, "adjust_namespace");
+		emalloc(buf, char *, len);
 		sprintf(buf, "awk::%s", name);
 		*malloced = true;
 

@@ -59,7 +59,7 @@ vms_strdup( const char *str )
     char *result;
     int len = strlen(str);
 
-    emalloc(result, char *, len+1, "strdup");
+    emalloc(result, char *, len+1);
     return strcpy(result, str);
 }
 

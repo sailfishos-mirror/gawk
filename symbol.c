@@ -97,7 +97,7 @@ init_symbol_table()
 		init_the_tables();
 
 		// save the pointers for the next time.
-		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers), "init_symbol_table");
+		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers));
 		memset(root_pointers, 0, sizeof(struct root_pointers));
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
@@ -215,7 +215,7 @@ make_params(char **pnames, int pcount)
 	if (pcount <= 0 || pnames == NULL)
 		return NULL;
 
-	ezalloc(parms, NODE *, pcount * sizeof(NODE), "make_params");
+	ezalloc(parms, NODE *, pcount * sizeof(NODE));
 
 	for (i = 0, p = parms; i < pcount; i++, p++) {
 		p->type = Node_param_list;
@@ -480,7 +480,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		max = the_table->table_size * 2;
 
 		list = assoc_list(the_table, "@unsorted", ASORTI);
-		emalloc(table, NODE **, (the_table->table_size + 1) * sizeof(NODE *), "get_symbols");
+		emalloc(table, NODE **, (the_table->table_size + 1) * sizeof(NODE *));
 
 		for (i = count = 0; i < max; i += 2) {
 			r = list[i+1];
@@ -497,7 +497,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 
 		list = assoc_list(the_table, "@unsorted", ASORTI);
 		/* add three: one for FUNCTAB, one for SYMTAB, and one for a final NULL */
-		emalloc(table, NODE **, (the_table->table_size + 1 + 1 + 1) * sizeof(NODE *), "get_symbols");
+		emalloc(table, NODE **, (the_table->table_size + 1 + 1 + 1) * sizeof(NODE *));
 
 		for (i = count = 0; i < max; i += 2) {
 			r = list[i+1];
@@ -834,7 +834,7 @@ bcalloc(OPCODE op, int size, int srcline)
 		pool->free_space += size;
 	} else {
 		struct instruction_block *block;
-		emalloc(block, struct instruction_block *, sizeof(struct instruction_block), "bcalloc");
+		emalloc(block, struct instruction_block *, sizeof(struct instruction_block));
 		block->next = pool->block_list;
 		pool->block_list = block;
 		cp = &block->i[0];
@@ -855,7 +855,7 @@ new_context()
 {
 	AWK_CONTEXT *ctxt;
 
-	ezalloc(ctxt, AWK_CONTEXT *, sizeof(AWK_CONTEXT), "new_context");
+	ezalloc(ctxt, AWK_CONTEXT *, sizeof(AWK_CONTEXT));
 	ctxt->srcfiles.next = ctxt->srcfiles.prev = & ctxt->srcfiles;
 	ctxt->rule_list.opcode = Op_list;
 	ctxt->rule_list.lasti = & ctxt->rule_list;

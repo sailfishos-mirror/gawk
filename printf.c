@@ -126,7 +126,7 @@ format_args(
 #define bchunk(s, l) if (l) { \
 	while ((l) > ofre) { \
 		size_t olen = obufout - obuf; \
-		erealloc(obuf, char *, osiz * 2, "format_args"); \
+		erealloc(obuf, char *, osiz * 2); \
 		ofre += osiz; \
 		osiz *= 2; \
 		obufout = obuf + olen; \
@@ -140,7 +140,7 @@ format_args(
 #define bchunk_one(s) { \
 	if (ofre < 1) { \
 		size_t olen = obufout - obuf; \
-		erealloc(obuf, char *, osiz * 2, "format_args"); \
+		erealloc(obuf, char *, osiz * 2); \
 		ofre += osiz; \
 		osiz *= 2; \
 		obufout = obuf + olen; \
@@ -153,7 +153,7 @@ format_args(
 #define chksize(l)  if ((l) >= ofre) { \
 	size_t olen = obufout - obuf; \
 	size_t delta = osiz+l-ofre; \
-	erealloc(obuf, char *, osiz + delta, "format_args"); \
+	erealloc(obuf, char *, osiz + delta); \
 	obufout = obuf + olen; \
 	ofre += delta; \
 	osiz += delta; \
@@ -201,7 +201,7 @@ format_args(
 	const char *formatted = NULL;
 
 #define INITIAL_OUT_SIZE	64
-	emalloc(obuf, char *, INITIAL_OUT_SIZE, "format_args");
+	emalloc(obuf, char *, INITIAL_OUT_SIZE);
 	obufout = obuf;
 	osiz = INITIAL_OUT_SIZE;
 	ofre = osiz - 1;
@@ -752,7 +752,7 @@ out0:
 	olen_final = obufout - obuf;
 #define GIVE_BACK_SIZE (INITIAL_OUT_SIZE * 2)
 	if (ofre > GIVE_BACK_SIZE)
-		erealloc(obuf, char *, olen_final + 1, "format_args");
+		erealloc(obuf, char *, olen_final + 1);
 	r = make_str_node(obuf, olen_final, ALREADY_MALLOCED);
 	obuf = NULL;
 out:
@@ -901,7 +901,7 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 	double tmpval;
 
 #define growbuffer(buf, buflen, cp) { \
-		erealloc(buf, char *, buflen * 2, "format_integer_xxx"); \
+		erealloc(buf, char *, buflen * 2); \
 		cp = buf + buflen; \
 		buflen *= 2; \
 	}
@@ -909,7 +909,7 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 #if defined(HAVE_LOCALE_H)
 	quote_flag = (flags->quote && loc.thousands_sep[0] != '\0');
 #endif
-	emalloc(buf, char *, VALUE_SIZE, "format_integer_digits");
+	emalloc(buf, char *, VALUE_SIZE);
 	buflen = VALUE_SIZE;
 	cp = buf;
 
@@ -930,7 +930,7 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 			else
 				buflen *= 2;
 			assert(buflen > 0);
-			erealloc(buf, char *, buflen, "format_args");
+			erealloc(buf, char *, buflen);
 		}
 	} else {
 		// octal or hex or unsigned decimal
@@ -1049,7 +1049,7 @@ format_signed_integer(NODE *arg, struct flags *flags)
 		
 		fw -= (flags->negative || flags->space || flags->plus);
 
-		emalloc(buf1, char *, buflen, "format_signed_integer");
+		emalloc(buf1, char *, buflen);
 		strcpy(buf1, number_value);
 		free((void *) number_value);
 		cp = buf1 + val_len;
@@ -1071,7 +1071,7 @@ format_signed_integer(NODE *arg, struct flags *flags)
 
 		return fill_to_field_width(buf1, flags, ' ');
 	} else if ((flags->plus || flags->space) && ! flags->negative) {
-		emalloc(buf1, char *, val_len + 2, "format_signed_integer");
+		emalloc(buf1, char *, val_len + 2);
 		if (flags->plus) {
 			sprintf(buf1, "+%s", number_value);
 		} else {
@@ -1299,7 +1299,7 @@ mpf1:
 	}
 fmt0:
 	buflen = flags->field_width + flags->precision + 11;	/* 11 == slop */
-	emalloc(buf, char *, buflen, "format_mpg_integer");
+	emalloc(buf, char *, buflen);
 
 
 #if defined(LC_NUMERIC)
@@ -1310,7 +1310,7 @@ fmt0:
 	sprintf(cpbuf, "%%Z%c", flags->format);
 	while ((nc = mpfr_snprintf(buf, buflen, cpbuf, zi)) >= (int) buflen) {
 		buflen *= 2;
-		erealloc(buf, char *, buflen, "format_mpg_integer");
+		erealloc(buf, char *, buflen);
 	}
 
 #if defined(LC_NUMERIC)
@@ -1446,7 +1446,7 @@ format_float(NODE *arg, struct flags *flags)
 
 
 	buflen = flags->field_width + flags->precision + 11;	/* 11 == slop */
-	emalloc(buf, char *, buflen, "format_float");
+	emalloc(buf, char *, buflen);
 
 	int signchar = '\0';
 	if (flags->plus)
@@ -1477,7 +1477,7 @@ format_float(NODE *arg, struct flags *flags)
 		sprintf(cp, "*.*R*%c", flags->format);
 		while ((nc = mpfr_snprintf(buf, buflen, cpbuf,
 			     flags->field_width, flags->precision, ROUND_MODE, mf)) >= (int) buflen) {
-			erealloc(buf, char *, buflen * 2, "format_float");
+			erealloc(buf, char *, buflen * 2);
 			buflen *= 2;
 		}
 #else
@@ -1489,7 +1489,7 @@ format_float(NODE *arg, struct flags *flags)
 			while ((nc = snprintf(buf, buflen, cpbuf,
 				     flags->field_width, flags->precision,
 				     (double) tmpval)) >= (int) buflen) {
-				erealloc(buf, char *, buflen * 2, "format_float");
+				erealloc(buf, char *, buflen * 2);
 				buflen *= 2;
 			}
 		} else {
@@ -1499,7 +1499,7 @@ format_float(NODE *arg, struct flags *flags)
 			while ((nc = snprintf(buf, buflen, cpbuf,
 				     flags->field_width,
 				     (double) tmpval)) >= (int) buflen) {
-				erealloc(buf, char *, buflen * 2, "format_float");
+				erealloc(buf, char *, buflen * 2);
 				buflen *= 2;
 			}
 		}
@@ -1665,12 +1665,12 @@ add_thousands(const char *original)
 	const char *src;
 	char *dest;
 
-	emalloc(newbuf, char *, new_len, "add_thousands");
+	emalloc(newbuf, char *, new_len);
 	memset(newbuf, '\0', new_len);
 
 #if defined(HAVE_LOCALE_H)
 	new_len = orig_len + (orig_len * strlen(loc.thousands_sep)) + 1; 	// worst case
-	erealloc(newbuf, char *, new_len, "add_thousands");
+	erealloc(newbuf, char *, new_len);
 	memset(newbuf, '\0', new_len);
 
 	src = original + strlen(original) - 1;
@@ -1734,7 +1734,7 @@ fill_to_field_width(char *startval, struct flags *flags, int fill)
 	if (l >= fw)	// nothing to do
 		return startval;
 
-	emalloc(buf, char *, fw + 1, "fill_to_field_width");
+	emalloc(buf, char *, fw + 1);
 	cp = buf;
 
 	if (flags->left_just) {
@@ -1768,7 +1768,7 @@ add_plus_or_space_and_fill(char *number_value, struct flags *flags)
 	buflen = flags->field_width + strlen(number_value) +
 		(flags->space || flags->plus || flags->negative) + 1;
 
-	emalloc(buf1, char *, buflen, "add_plus_or_space_and_fill");
+	emalloc(buf1, char *, buflen);
 	cp = buf1;
 
 	if (flags->left_just) {
@@ -1821,7 +1821,7 @@ zero_fill_to_precision(char *number_value, struct flags *flags)
 	buflen = (flags->negative || flags->plus || flags->space) +
 			flags->precision + 1;	// we know val_len < precision
 
-	emalloc(buf1, char *, buflen, "zero_fill_to_precision");
+	emalloc(buf1, char *, buflen);
 	cp = buf1;
 	src = number_value;
 
@@ -1865,7 +1865,7 @@ add_alt_format(char *number_value, struct flags *flags)
 		buflen = val_len;
 	buflen += 3;
 
-	emalloc(buf, char *, buflen, "add_alt_format");
+	emalloc(buf, char *, buflen);
 	cp = buf;
 
 	fw = flags->field_width;
