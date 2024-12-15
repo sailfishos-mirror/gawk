@@ -651,10 +651,10 @@ push_frame(NODE *f)
 	fcall_count++;
 	if (fcall_list == NULL) {
 		max_fcall = 10;
-		emalloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *), "push_frame");
+		emalloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *));
 	} else if (fcall_count == max_fcall) {
 		max_fcall *= 2;
-		erealloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *), "push_frame");
+		erealloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *));
 	}
 
 	if (fcall_count > 1)
@@ -826,9 +826,9 @@ set_OFS()
 	new_ofs_len = OFS_node->var_value->stlen;
 
 	if (OFS == NULL)
-		emalloc(OFS, char *, new_ofs_len + 1, "set_OFS");
+		emalloc(OFS, char *, new_ofs_len + 1);
 	else if (OFSlen < new_ofs_len)
-		erealloc(OFS, char *, new_ofs_len + 1, "set_OFS");
+		erealloc(OFS, char *, new_ofs_len + 1);
 
 	memcpy(OFS, OFS_node->var_value->stptr, OFS_node->var_value->stlen);
 	OFSlen = new_ofs_len;
@@ -900,7 +900,7 @@ fmt_index(NODE *n)
 	char save;
 
 	if (fmt_list == NULL)
-		emalloc(fmt_list, NODE **, fmt_num*sizeof(*fmt_list), "fmt_index");
+		emalloc(fmt_list, NODE **, fmt_num*sizeof(*fmt_list));
 	n = force_string(n);
 
 	save = n->stptr[n->stlen];
@@ -923,7 +923,7 @@ fmt_index(NODE *n)
 
 	if (fmt_hiwater >= fmt_num) {
 		fmt_num *= 2;
-		erealloc(fmt_list, NODE **, fmt_num * sizeof(*fmt_list), "fmt_index");
+		erealloc(fmt_list, NODE **, fmt_num * sizeof(*fmt_list));
 	}
 	fmt_list[fmt_hiwater] = dupnode(n);
 	return fmt_hiwater++;
@@ -1129,7 +1129,7 @@ STACK_ITEM *
 grow_stack()
 {
 	STACK_SIZE *= 2;
-	erealloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM), "grow_stack");
+	erealloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM));
 	stack_top = stack_bottom + STACK_SIZE - 1;
 	stack_ptr = stack_bottom + STACK_SIZE / 2;
 	return stack_ptr;
@@ -1283,7 +1283,7 @@ setup_frame(INSTRUCTION *pc)
 	arg_count = (pc + 1)->expr_count;
 
 	if (pcount > 0) {
-		ezalloc(sp, NODE **, pcount * sizeof(NODE *), "setup_frame");
+		ezalloc(sp, NODE **, pcount * sizeof(NODE *));
 	}
 
 	/* check for extra args */
@@ -1775,7 +1775,7 @@ push_exec_state(INSTRUCTION *cp, int rule, char *src, STACK_ITEM *sp)
 {
 	EXEC_STATE *es;
 
-	emalloc(es, EXEC_STATE *, sizeof(EXEC_STATE), "push_exec_state");
+	emalloc(es, EXEC_STATE *, sizeof(EXEC_STATE));
 	es->rule = rule;
 	es->cptr = cp;
 	es->stack_size = (sp - stack_bottom) + 1;
@@ -1866,7 +1866,7 @@ init_interpret()
 	if ((newval = getenv_long("GAWK_STACKSIZE")) > 0)
 		STACK_SIZE = newval;
 
-	emalloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM), "grow_stack");
+	emalloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM));
 	stack_ptr = stack_bottom - 1;
 	stack_top = stack_bottom + STACK_SIZE - 1;
 

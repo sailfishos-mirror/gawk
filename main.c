@@ -576,13 +576,11 @@ add_preassign(enum assign_type type, char *val)
 	++numassigns;
 
 	if (preassigns == NULL) {
-		emalloc(preassigns, struct pre_assign *,
-			INIT_SRC * sizeof(struct pre_assign), "add_preassign");
+		emalloc(preassigns, struct pre_assign *, INIT_SRC * sizeof(struct pre_assign));
 		alloc_assigns = INIT_SRC;
 	} else if (numassigns >= alloc_assigns) {
 		alloc_assigns *= 2;
-		erealloc(preassigns, struct pre_assign *,
-			alloc_assigns * sizeof(struct pre_assign), "add_preassigns");
+		erealloc(preassigns, struct pre_assign *, alloc_assigns * sizeof(struct pre_assign));
 	}
 	preassigns[numassigns].type = type;
 	preassigns[numassigns].val = estrdup(val, strlen(val));
@@ -1249,7 +1247,7 @@ arg_assign(char *arg, bool initing)
 		// typed regex
 		size_t len = strlen(cp) - 3;
 
-		ezalloc(cp2, char *, len + 1, "arg_assign");
+		ezalloc(cp2, char *, len + 1);
 		memcpy(cp2, cp + 2, len);
 
 		it = make_typed_regex(cp2, len);
@@ -1449,7 +1447,7 @@ init_groupset()
 		return;
 
 	/* fill in groups */
-	emalloc(groupset, GETGROUPS_T *, ngroups * sizeof(GETGROUPS_T), "init_groupset");
+	emalloc(groupset, GETGROUPS_T *, ngroups * sizeof(GETGROUPS_T));
 
 	ngroups = getgroups(ngroups, groupset);
 	/* same thing here, give up but keep going */
@@ -1467,7 +1465,7 @@ char *
 estrdup(const char *str, size_t len)
 {
 	char *s;
-	emalloc(s, char *, len + 1, "estrdup");
+	emalloc(s, char *, len + 1);
 	memcpy(s, str, len);
 	s[len] = '\0';
 	return s;
@@ -1512,7 +1510,7 @@ save_argv(int argc, char **argv)
 {
 	int i;
 
-	emalloc(d_argv, char **, (argc + 1) * sizeof(char *), "save_argv");
+	emalloc(d_argv, char **, (argc + 1) * sizeof(char *));
 	for (i = 0; i < argc; i++)
 		d_argv[i] = estrdup(argv[i], strlen(argv[i]));
 	d_argv[argc] = NULL;

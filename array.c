@@ -210,17 +210,17 @@ make_aname(const NODE *symbol)
 		slen = strlen(symbol->vname);	/* subscript in parent array */
 		if (alen + slen + 4 > max_alen) {		/* sizeof("[\"\"]") = 4 */
 			max_alen = alen + slen + 4 + SLEN;
-			erealloc(aname, char *, (max_alen + 1) * sizeof(char *), "make_aname");
+			erealloc(aname, char *, (max_alen + 1) * sizeof(char *));
 		}
 		alen += sprintf(aname + alen, "[\"%s\"]", symbol->vname);
 	} else {
 		alen = strlen(symbol->vname);
 		if (aname == NULL) {
 			max_alen = alen + SLEN;
-			emalloc(aname, char *, (max_alen + 1) * sizeof(char *), "make_aname");
+			emalloc(aname, char *, (max_alen + 1) * sizeof(char *));
 		} else if (alen > max_alen) {
 			max_alen = alen + SLEN;
-			erealloc(aname, char *, (max_alen + 1) * sizeof(char *), "make_aname");
+			erealloc(aname, char *, (max_alen + 1) * sizeof(char *));
 		}
 		memcpy(aname, symbol->vname, alen + 1);
 	}
@@ -282,10 +282,10 @@ array_vname(const NODE *symbol)
 
 	/* (Re)allocate memory: */
 	if (message == NULL) {
-		emalloc(message, char *, len, "array_vname");
+		emalloc(message, char *, len);
 		msglen = len;
 	} else if (len > msglen) {
-		erealloc(message, char *, len, "array_vname");
+		erealloc(message, char *, len);
 		msglen = len;
 	} /* else
 		current buffer can hold new name */
@@ -412,7 +412,7 @@ concat_exp(int nargs, bool do_subsep)
 	}
 	len += (nargs - 1) * subseplen;
 
-	emalloc(str, char *, len + 1, "concat_exp");
+	emalloc(str, char *, len + 1);
 
 	r = args_array[nargs];
 	memcpy(str, r->stptr, r->stlen);
@@ -1455,7 +1455,7 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 
 			/* give back extra memory */
 
-			erealloc(list, NODE **, num_elems * sizeof(NODE *), "assoc_list");
+			erealloc(list, NODE **, num_elems * sizeof(NODE *));
 		}
 	}
 
@@ -1477,7 +1477,7 @@ new_array_element(void)
 	NODE *n = make_number(0.0);
 	char *sp;
 
-	emalloc(sp, char *, 2, "new_array_element");
+	emalloc(sp, char *, 2);
 	sp[0] = sp[1] = '\0';
 
 	n->stptr = sp;
