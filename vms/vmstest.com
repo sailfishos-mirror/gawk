@@ -753,10 +753,21 @@ $	return
 $
 $colonwarn:	echo "''test'"
 $	test_class = "gawk_ext"
+$   if f$search("sys$disk:[]_''test'*.tmp;*") .nes. ""
+$   then
+$       rm _'test'*.tmp;*
+$   endif
+$   if f$search("sys$disk:[]_''test'*.err;*") .nes. ""
+$   then
+$       rm _'test'*.err;*
+$   endif
+$   define/user sys$error _'test'.err
 $	gawk -f 'test'.awk 1 < 'test'.in > _'test'.tmp
+$   define/user sys$error _'test'_2.err
 $	gawk -f 'test'.awk 2 < 'test'.in > _'test'_2.tmp
+$   define/user sys$error _'test'_3.err
 $	gawk -f 'test'.awk 3 < 'test'.in > _'test'_3.tmp
-$	if f$search("sys$disk:[]_''test'_%.tmp;2") .nes. ""
+$	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'_%.tmp;2
 $	endif
@@ -764,11 +775,16 @@ $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'.tmp;2
 $	endif
-$	append _'test'_2.tmp,_'test'_3.tmp _'test'.tmp
-$	cmp 'test'.ok sys$disk:[]_'test'.tmp;1
+$	append -
+       sys$disk:[]_'test'.tmp,sys$disk:[]_'test'.err,-
+	   sys$disk:[]_'test'_2.tmp,sys$disk:[]_'test'_2.err,-
+	   sys$disk:[]_'test'_3.tmp -
+	   _'test'_3.err
+$	cmp 'test'.ok sys$disk:[]_'test'.err;1
 $	if $status
 $	then
 $	    rm _'test'*.tmp;*
+$	    rm _'test'*.err;*
 $	    gosub junit_report_pass
 $	else
 $	    gosub junit_report_fail_diff
@@ -3770,6 +3786,10 @@ $profile2:  echo "''test'"
 $	test_class = "gawk_ext"
 $	gawk --profile -v "sortcmd=SORT sys$input: sys$output:" -
 			-f xref.awk dtdgport.awk > _NL:
+$!  Test passes, but verification failing.
+$   skip_reason = "Verification bug in VMS 9.2-2 edit/sum access violation
+$   gosub junit_report_skip
+$   return
 $	! sed <awkprof.out 1,2d >_profile2.tmp
 $	sumslp awkprof.out /update=sys$input: /output=_'test'.tmp
 -1,2
