@@ -165,6 +165,9 @@ tty_fwrite( const void *buf, size_t size, size_t number, FILE *file )
 	    result = result * number / size;	/*(same as 'result = number')*/
 	} else {
 #ifdef NO_ALLOCA
+#ifdef alloca
+#undef alloca
+#endif
 # define alloca(n) ((n) <= abuf_siz ? abuf : \
 		    ((abuf_siz > 0 ? (free(abuf),0) : 0), \
 		     (abuf = malloc(abuf_siz = (n)+20))))
