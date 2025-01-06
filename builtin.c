@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2024,
+ * Copyright (C) 1986, 1988, 1989, 1991-2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -3123,6 +3123,10 @@ do_typeof(int nargs)
 	else
 		dbg = NULL;
 	arg = POP();
+
+	if (arg->type == Node_param_list)
+		arg = GET_PARAM(arg->param_cnt);
+
 	switch (arg->type) {
 	case Node_var_array:
 		/* Node_var_array is never UPREF'ed */
