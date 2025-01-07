@@ -559,6 +559,14 @@ do_isarray(int nargs)
 	check_exact_args(nargs, "isarray", 1);
 
 	tmp = POP();
+
+	if (tmp->type == Node_param_list) {
+		tmp = GET_PARAM(tmp->param_cnt);
+		if (tmp->type == Node_array_ref) {
+			tmp = tmp->orig_array;
+		}
+	}
+
 	if (tmp->type != Node_var_array) {
 		ret = 0;
 		// could be Node_var_new
