@@ -3122,8 +3122,12 @@ do_typeof(int nargs)
 		dbg = NULL;
 	arg = POP();
 
-	if (arg->type == Node_param_list)
+	if (arg->type == Node_param_list) {
 		arg = GET_PARAM(arg->param_cnt);
+		if (arg->type == Node_array_ref) {
+			arg = arg->orig_array;
+		}
+	}
 
 	switch (arg->type) {
 	case Node_var_array:
