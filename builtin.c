@@ -559,6 +559,14 @@ do_isarray(int nargs)
 	check_exact_args(nargs, "isarray", 1);
 
 	tmp = POP();
+
+	if (tmp->type == Node_param_list) {
+		tmp = GET_PARAM(tmp->param_cnt);
+		if (tmp->type == Node_array_ref) {
+			tmp = tmp->orig_array;
+		}
+	}
+
 	if (tmp->type != Node_var_array) {
 		ret = 0;
 		// could be Node_var_new
@@ -3124,8 +3132,12 @@ do_typeof(int nargs)
 		dbg = NULL;
 	arg = POP();
 
-	if (arg->type == Node_param_list)
+	if (arg->type == Node_param_list) {
 		arg = GET_PARAM(arg->param_cnt);
+		if (arg->type == Node_array_ref) {
+			arg = arg->orig_array;
+		}
+	}
 
 	switch (arg->type) {
 	case Node_var_array:
