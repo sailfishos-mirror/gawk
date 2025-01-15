@@ -1347,6 +1347,13 @@ setup_frame(INSTRUCTION *pc)
 			r->var_value = dupnode(Nnull_string);
 			break;
 
+		case Node_regex:
+		case Node_dynregex:
+			// 1/2025:
+			// These are weird; they can happen through
+			// indirect calls to some of the builtins, so
+			// handle them if we get them by ....
+			// ... falling through! Yay!
 		case Node_val:
 			r->type = Node_var;
 			r->var_value = m;
