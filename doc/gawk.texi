@@ -30673,7 +30673,7 @@ code, it will appear that way in the output.
 @cindex persistent memory
 @cindex PMA memory allocator
 Starting with version 5.2, @command{gawk} supports
-@dfn{persistent memory}.  This experimental feature stores the values of
+@dfn{persistent memory}.  This @emph{experimental} feature stores the values of
 all of @command{gawk}'s variables, arrays and user-defined functions
 in a persistent heap, which resides in a file in
 the filesystem.  When persistent memory is not in use (the normal case),
@@ -30822,6 +30822,16 @@ a fatal error message.
 The GNU/Linux CIFS filesystem is known to not
 work well with the PMA allocator.
 Don't use a backing file on a CIFS filesystem.
+
+@item
+Some GNU/Linux distributions enable Address Space Layout Randomization
+(ASLR) by default.  This breaks @command{gawk}'s use of the PMA allocator.
+You can work around this using @samp{setarch -R gawk @dots{}} to run
+@command{gawk}; this disables ASLR for the particular execution of
+@command{gawk}. If ASLR is the default on your system, and you want to use
+persistent memory, you may wish to set up a shell alias, shell function,
+or shell script to run @command{gawk} by way of the @command{setarch}
+command.
 
 @item
 If @command{gawk} is run by the @command{root} user, then
