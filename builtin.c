@@ -2212,9 +2212,13 @@ call_sub(const char *name, int nargs)
 	NODE **lhs, *rhs;
 	NODE *zero = make_number(0.0);
 	NODE *result;
+	const char *fname = name;
 
-	if (name[0] == 'g') {
-		if (name[1] == 'e')
+	if (fname[0] == 'a')	// awk::...
+		fname += 5;
+
+	if (fname[0] == 'g') {
+		if (fname[1] == 'e')
 			flags = GENSUB;
 		else
 			flags = GSUB;
@@ -2350,11 +2354,15 @@ call_split_func(const char *name, int nargs)
 {
 	NODE *regex, *seps;
 	NODE *result;
+	const char *fname = name;
 
 	regex = seps = NULL;
 	if (nargs < 2 || nargs > 4)
 		fatal(_("indirect call to %s requires two to four arguments"),
 				name);
+
+	if (fname[0] == 'a')	// awk::...
+		fname += 5;
 
 	if (nargs == 4)
 		seps = POP();
@@ -2369,7 +2377,7 @@ call_split_func(const char *name, int nargs)
 			need_free = true;
 		}
 	} else {
-		if (name[0] == 's') {
+		if (fname[0] == 's') {
 			regex = make_regnode(Node_regex, FS_node->var_value);
 			regex->re_flags |= FS_DFLT;
 		} else
@@ -2386,7 +2394,7 @@ call_split_func(const char *name, int nargs)
 	if (seps)
 		PUSH(seps);
 
-	result = (name[0] == 's') ? do_split(nargs) : do_patsplit(nargs);
+	result = (fname[0] == 's') ? do_split(nargs) : do_patsplit(nargs);
 
 	if (need_free) {
 		refree(regex->re_reg[0]);

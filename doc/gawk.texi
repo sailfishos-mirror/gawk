@@ -5689,7 +5689,10 @@ characters @samp{a+b}.
 @cindex @code{\} (backslash) @subentry in escape sequences
 @cindex portability
 For complete portability, do not use a backslash before any character not
-shown in the previous list or that is not an operator.
+shown in the previous list or that is not a regular expression operator.
+(The 2024 POSIX standard explictly lists the operators that can be
+escaped, leaving it undefined as to what happens for any other
+escaped character. But the bottom line is as described previously.)
 
 @c 11/2014: Moved so as to not stack sidebars
 @cindex sidebar @subentry Backslash Before Regular Characters
@@ -6134,8 +6137,11 @@ bracket expression, put a @samp{\} in front of it.  For example:
 @noindent
 matches either @samp{d} or @samp{]}.
 Additionally, if you place @samp{]} right after the opening
-@samp{[}, the closing bracket is treated as one of the
+@samp{[} (@samp{[]d]}), the closing bracket is treated as one of the
 characters to be matched.
+Inside bracket expressions, it's not necessary to escape
+the other regular expression operators, and for full portability
+you should not.
 
 @cindex POSIX @command{awk} @subentry bracket expressions and
 @cindex Extended Regular Expressions (EREs)
@@ -7261,7 +7267,12 @@ order of decreasing precedence, in
 @ref{Precedence}.)
 
 If the field number you compute is zero, you get the entire record.
-Thus, @samp{$(2-2)} has the same value as @code{$0}.  Negative field
+Thus, @samp{$(2-2)} has the same value as @code{$0}.
+Similarly, string expressions that evaluate to zero also yield the entire
+record. For example, @samp{$"answer"}, @samp{$"0foo"}, or even
+@samp{$("foo" "bar")}.
+
+Negative field
 numbers are not allowed; trying to reference one usually terminates
 the program.  (The POSIX standard does not define
 what happens when you reference a negative field number.  @command{gawk}
@@ -30689,7 +30700,7 @@ code, it will appear that way in the output.
 @cindex persistent memory
 @cindex PMA memory allocator
 Starting with version 5.2, @command{gawk} supports
-@dfn{persistent memory}.  This experimental feature stores the values of
+@dfn{persistent memory}.  This feature stores the values of
 all of @command{gawk}'s variables, arrays and user-defined functions
 in a persistent heap, which resides in a file in
 the filesystem.  When persistent memory is not in use (the normal case),
@@ -30840,6 +30851,16 @@ work well with the PMA allocator.
 Don't use a backing file on a CIFS filesystem.
 
 @item
+Some GNU/Linux distributions enable Address Space Layout Randomization
+(ASLR) by default.  This breaks @command{gawk}'s use of the PMA allocator.
+You can work around this using @samp{setarch -R gawk @dots{}} to run
+@command{gawk}; this disables ASLR for the particular execution of
+@command{gawk}. If ASLR is the default on your system, and you want to use
+persistent memory, you may wish to set up a shell alias, shell function,
+or shell script to run @command{gawk} by way of the @command{setarch}
+command.
+
+@item
 If @command{gawk} is run by the @command{root} user, then
 persistent memory is not allowed. This is to avoid the possibility
 of private data ``leaking'' into the backing file and being
@@ -30935,10 +30956,12 @@ paragraph, that option is otherwise undocumented.
 The prototype only supported persistent data; it did not
 support persistent functions.
 
-As noted earlier, support for persistent memory is @emph{experimental}.
-If it becomes burdensome,@footnote{Meaning, there are too many
-bug reports, or too many strange differences in behavior from when
-@command{gawk} is run normally.} then the feature will be removed.
+@quotation NOTE
+The maintainer reserves the right to remove the persistent memory
+feature should it become burdensome.@footnote{Meaning, there are too
+many bug reports, or too many strange differences in behavior from when
+@command{gawk} is run normally.}
+@end quotation
 
 @node Extension Philosophy
 @section Builtin Features versus Extensions

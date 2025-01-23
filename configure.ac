@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 1995-2024 the Free Software Foundation, Inc.
+dnl Copyright (C) 1995-2025 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -509,9 +509,16 @@ w
 EOF
 		done
 	fi
-	for i in . support
+	for i in . support extension
 	do
 		sed -e '/-O2/s///' -e '/^CFLAGS = /s//&${DEBUG} /' $i/Makefile > foo
+		mv foo $i/Makefile
+	done
+elif test "$GCC" = yes
+then
+	for i in . support extension
+	do
+		sed -e '/-O2/s//-O3/g'  $i/Makefile > foo
 		mv foo $i/Makefile
 	done
 fi
