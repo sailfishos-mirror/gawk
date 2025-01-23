@@ -631,6 +631,8 @@ EXTRA_DIST = \
 	indirectbuiltin2.ok \
 	indirectbuiltin3.awk \
 	indirectbuiltin3.ok \
+	indirectbuiltin4.awk \
+	indirectbuiltin4.ok \
 	indirectcall2.awk \
 	indirectcall2.ok \
 	indirectcall3.awk \
@@ -801,6 +803,8 @@ EXTRA_DIST = \
 	membug1.ok \
 	memleak.awk \
 	memleak.ok \
+	memleak2.awk \
+	memleak2.ok \
 	messages.awk \
 	minusstr.awk \
 	minusstr.ok \
@@ -1605,7 +1609,7 @@ GAWK_EXT_TESTS = \
 	symtab3 symtab4 symtab5 symtab6 symtab7 symtab8 symtab9 symtab10 \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
-	delmessy indirectbuiltin3 \
+	delmessy indirectbuiltin3 indirectbuiltin4 memleak2 \
 	typeof4 typeof5 typeof6 typeof7 typeof8 typeof9 unicode1 watchpoint1
 
 ARRAYDEBUG_TESTS = arrdbg
