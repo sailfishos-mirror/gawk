@@ -784,6 +784,15 @@ mod:
 			 */
 
 			lhs = get_lhs(pc->memory, false);
+
+			if (((*lhs)->flags & REGEX) != 0) {
+				refree((*lhs)->typed_re->re_reg[0]);
+				if ((*lhs)->typed_re->re_reg[1] != NULL)
+					refree((*lhs)->typed_re->re_reg[1]);
+				unref((*lhs)->typed_re->re_exp);
+				freenode((*lhs)->typed_re);
+			}
+
 			unref(*lhs);
 			r = pc->initval;	/* constant initializer */
 			if (r != NULL) {
