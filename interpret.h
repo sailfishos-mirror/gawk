@@ -785,7 +785,7 @@ mod:
 
 			lhs = get_lhs(pc->memory, false);
 
-			if (((*lhs)->flags & REGEX) != 0) {
+			if ((*lhs)->valref == 1 && ((*lhs)->flags & REGEX) != 0) {
 				refree((*lhs)->typed_re->re_reg[0]);
 				if ((*lhs)->typed_re->re_reg[1] != NULL)
 					refree((*lhs)->typed_re->re_reg[1]);
