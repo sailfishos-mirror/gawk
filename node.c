@@ -538,6 +538,14 @@ r_unref(NODE *tmp)
 	if ((tmp->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 		efree(tmp->stptr);
 
+	if ((tmp->flags & REGEX) != 0) {
+		refree(tmp->typed_re->re_reg[0]);
+		if (tmp->typed_re->re_reg[1] != NULL)
+			refree(tmp->typed_re->re_reg[1]);
+		unref(tmp->typed_re->re_exp);
+		freenode(tmp->typed_re);
+	}
+
 	mpfr_unset(tmp);
 
 	free_wstr(tmp);

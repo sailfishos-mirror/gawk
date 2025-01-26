@@ -2979,7 +2979,7 @@ degli argomenti contiene opzioni per  @command{awk}, oppure @value{DF}, o
 entrambi.  (Si noti che in molti sistemi @command{awk} si trova in
 @file{/usr/bin} invece che in @file{/bin}.)
 
-Alcuni sistemi limitano la lunghezza del nome del programma interpretarore a
+Alcuni sistemi limitano la lunghezza del nome del programma interpretatore a
 32 caratteri.  Spesso, si pu@`o rimediare utilizzando un collegamento simbolico.
 
 Non si dovrebbero mettere altri argomenti oltre al primo nella riga @samp{#!}
@@ -3181,7 +3181,7 @@ Shell differenti possono fare ulteriori tipi di elaborazione
 sul testo racchiuso tra doppi apici.
 
 Poich@'e alcuni caratteri all'interno di un testo racchiuso tra doppi apici
-sono interpretati dalla shell, essi devono essere @dfn{protetti} all'interno
+sono interpretati dalla shell, essi devono essere protetti all'interno
 del testo stesso.  Sono da tener presenti i caratteri
 @samp{$}, @samp{`}, @samp{\}, e @samp{"}, tutti i quali devono essere
 preceduti da una barra inversa quando ricorrono all'interno di un testo
@@ -6383,7 +6383,12 @@ anche se normalmente sarebbe un operatore di @dfn{regexp}.  Per esempio,
 @cindex @code{\} (barra inversa) @subentry in sequenze di protezione
 @cindex portabilit@`a
 Per una completa portabilit@`a, non usare una barra inversa prima di qualsiasi
-carattere non incluso nella lista precedente, o che non sia un operatore.
+carattere non incluso nella lista precedente, o che non sia un operatore di
+un'espressione regolare.
+(La versione 2024 dello standard POSIX contiene una lista completa degli
+operatori che possono essere protetti, lasciando non specificato cosa
+succede se si protegge qualsiasi altro operatore.  Ma nella sostanza vale
+quando specificato pi@`u sopra.)
 
 @c 11/2014: Moved so as to not stack sidebars
 @cartouche Barra inversa prima di un carattere normale
@@ -6882,8 +6887,11 @@ carattere stesso.  Per esempio:
 @noindent
 individua sia @samp{d} che @samp{]}.
 Inoltre, se si mette una @samp{]} subito dopo la
-@samp{[} aperta, la parentesi quadra chiusa @`e considerata come uno dei
-caratteri da individuare.
+@samp{[} aperta (@samp{[]d]}), la parentesi quadra chiusa @`e considerata
+come uno dei caratteri da individuare.
+All'interno di espressioni fra parentesi quadre non @`e necessario
+proteggere altri operatori di espressioni regolari, e per una
+completa portabilit@`a, non si dovrebbe farlo.
 
 @cindex POSIX @command{awk} @subentry espressioni tra parentesi quadre
 @cindex espressioni regolari @subentry estese (ERE)
@@ -8106,10 +8114,14 @@ in
 @ref{Precedenza}.)
 
 Se il numero di campo calcolato @`e zero, si ottiene l'intero record.
-Quindi, @samp{$(2-2)} ha lo stesso valore di @code{$0}.  Numeri di campo
-negativi non sono consentiti; tentare di far riferimento a uno di essi
-normalmente fa terminare il programma.  (Lo standard POSIX non chiarisce
-cosa succede quando si fa riferimento a un numero di campo negativo.
+Quindi, @samp{$(2-2)} ha lo stesso valore di @code{$0}.
+Analogamente un'espressione contenuta in una stringa che abbia valore
+numerico zero indica l'intero record.  Per esempio, @samp{$"risposta"},
+@samp{$"0pippo"}, e persino @samp{$("pippo" "pluto")}.
+
+Numeri di campo negativi non sono consentiti; tentare di far riferimento a uno
+di essi normalmente fa terminare il programma.  (Lo standard POSIX non
+chiarisce cosa succede quando si fa riferimento a un numero di campo negativo.
 @command{gawk} avvisa di questo e fa terminare il programma.  Altre
 implementazioni di @command{awk} possono comportarsi in modo diverso.)
 
@@ -34068,14 +34080,12 @@ formato con cui sono stati inseriti.
 
 A partire dalle versione versione 5.2, @command{gawk} supporta
 la @dfn{memoria persistente} [@dfn{persistent memory}].
-
-Questa funzionalit@`a sperimentale preserva
-i valori di tutte le variabili e di tutti i vettori di @command{gawk}
-immagazzinandoli in un "deposito" che risiede in un file del
-filesystem.  Quando la memoria persistente non viene utilizzata
-(@`e questo il caso normale), tali dati del programma @command{gawk}
-risiedono nella memoria del computer (e vanno persi alla fine
-dell'esecuzione di @command{gawk}).
+Questa funzionalit@`a preserva i valori di tutte le variabili e di tutti i
+vettori di @command{gawk} immagazzinandoli in un "deposito" che risiede in un
+file del filesystem.  Quando la memoria persistente non viene utilizzata (@`e
+questo il caso normale), tali dati del programma @command{gawk} risiedono
+nella memoria del computer (e vanno persi alla fine dell'esecuzione di
+@command{gawk}).
 
 La funzionalit@`a della memoria persistente @`e disponibile solo nei
 sistemi a 64-bit che prevedono le chiamate a sistema @code{mmap()} e
@@ -34250,6 +34260,18 @@ Quindi, non va usato un file di appoggio per la memoria persistente
 residente su un filesystem CIFS.
 
 @item
+Alcune distribuzioni di GNU/Linux abilitano per default la funzionalit@`a
+Address Space Layout Randomization (ASLR --- Casualizzazione dello spazio
+degli indirizzi).  Ci@`o impedisce il funzionamento dell'allocatore di
+PMA.  Si pu@`o evitare questo problema specificando
+@samp{setarch -R gawk @dots{}} per chiamare @command{gawk}; ci@`o
+disabilita la funzionalit@`a ASLR per quell'esecuzione di @command{gawk}.
+Se la funzionalit@`a ASLR @`e abilitata per default nel sistema in uso,
+e se si vuole usare la memoria persistente, si pu@`o definire un alias,
+una funzione della shell o uno script di shell per eseguire sempre
+@command{gawk} preceduto dal comando @command{setarch}.
+
+@item
 Se @command{gawk} @`e eseguito dall'utente @command{root}, l'uso
 della memoria persistente non @`e consentito.
 Ci@`o al fine di evitare la possibilit@`a che dati "privati"
@@ -34362,12 +34384,14 @@ all'utente di usare in alternativa la variabile
 Il prototipo supportava solo la persistenza dei dati; non supportava
 la persistenza delle funzioni definite dall'utente.
 
-Come notato pi@`u sopra, il supporto per la memoria persistente
-@`e @emph{sperimentale}.
-Se diventa troppo impegnativo,@footnote{Nel senso di generare troppe
-segnalazioni di errore o troppe differenze marcate nel comportamento
-rispetto a quando @command{gawk} @`e eseguito normalmente.} allora il
-supporto per la funzionalit@`a verr@`a rimossso.
+@quotation NOTA
+Il manutentore si riserva il diritto di togliere la funzionalit@`a
+della memoria persistente, se divenisse troppo pesante da
+manutenere.@footnote{Il che avverrebbe se la funzionalit@`a
+generasse troppe segnalazioni di errore, o troppe strane
+differenze nel comportamento rispetto a quando @command{gawk}
+viene eseguito normalmente.}
+@end quotation
 
 @node Filosofia delle estensioni
 @section Funzionalit@`a incluse @dfn{versus} estensioni
@@ -40948,7 +40972,7 @@ possono essere riempiti da @code{@var{XXX}_take_control_of()}:
 
 @table @code
 @item void *opaque;
-Questo campo @`e usato per contenere qualiasi informazione di stato sia
+Questo campo @`e usato per contenere qualsiasi informazione di stato sia
 necessaria per l'analizzatore di input
 riguardo a questo file.  Il campo @`e ``opaco'' per @command{gawk}.
 L'analizzatore di input non @`e obbligato a usare questo puntatore.
