@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2024,
+ * Copyright (C) 1986, 1988, 1989, 1991-2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -32,6 +32,10 @@
 
 #ifdef HAVE_MCHECK_H
 #include <mcheck.h>
+#endif
+
+#ifdef HAVE_SYS_PERSONALITY_H
+#include <sys/personality.h>
 #endif
 
 #define DEFAULT_PROFILE		"awkprof.out"	/* where to put profile */
@@ -143,6 +147,7 @@ static const char *locale_dir = LOCALEDIR;	/* default locale dir */
 #ifdef USE_PERSISTENT_MALLOC
 const char *get_pma_version(void);
 #endif
+static bool enable_pma(int argc, char **argv);
 
 int use_lc_numeric = false;	/* obey locale for decimal point */
 
@@ -213,28 +218,13 @@ main(int argc, char **argv)
 	bool have_srcfile = false;
 	SRCFILE *s;
 	char *cp;
-	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 #if defined(LOCALEDEBUG)
 	const char *initial_locale;
 #endif
 
 	myname = gawk_name(argv[0]);
 
-	check_pma_security(persist_file);
-
-	int pma_result = pma_init(1, persist_file);
-	if (pma_result != 0) {
-		// don't use 'fatal' routine, memory can't be allocated
-		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
-				myname, pma_result, pma_errno);
-		exit(EXIT_FATAL);
-	}
-
-	using_persistent_malloc = (persist_file != NULL);
-#ifndef USE_PERSISTENT_MALLOC
-	if (using_persistent_malloc)
-		warning(_("persistent memory is not supported"));
-#endif
+	using_persistent_malloc = enable_pma(argc, argv);
 #ifdef HAVE_MPFR
 	mp_set_memory_functions(mpfr_mem_alloc, mpfr_mem_realloc, mpfr_mem_free);
 #endif
@@ -1924,4 +1914,61 @@ check_pma_security(const char *pma_file)
 				myname, pma_file, euid);
 	}
 #endif /* USE_PERSISTENT_MALLOC */
+}
+
+
+/* enable_pma --- do the PMA flow, handle ASLR on Linux */
+
+static bool
+enable_pma(int argc, char **argv)
+{
+	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
+
+#ifndef USE_PERSISTENT_MALLOC
+	if (persist_file != NULL) {
+		warning(_("persistent memory is not supported"));
+		return false;
+	}
+#else
+#ifdef HAVE_PERSONALITY
+	// This code is Linux specific, both the reliance on /proc/self/exe
+	// and the personality system call.
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			char fullpath[BUFSIZ];
+			int n;
+
+			if ((n = readlink("/proc/self/exe", fullpath, sizeof(fullpath)-1)) < 0) {
+				fprintf(stderr, _("warning: /proc/self/exe: readlink: %s\n"),
+							strerror(errno));
+				goto init;
+			}
+			fullpath[n] = '\0';
+			putenv("GAWK_PMA_REINCARNATION=true");
+			if (personality(PER_LINUX | ADDR_NO_RANDOMIZE) < 0) {
+				fprintf(stderr, _("warning: personality: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				// do the exec anyway...
+			}
+			execv(fullpath, argv);
+		}
+	}
+init:
+#endif /* HAVE_PERSONALITY */
+
+	check_pma_security(persist_file);
+	int pma_result = pma_init(1, persist_file);
+	if (pma_result != 0) {
+		// don't use 'fatal' routine, memory can't be allocated
+		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
+				myname, pma_result, pma_errno);
+		exit(EXIT_FATAL);
+	}
+
+
+	return (persist_file != NULL);
+#endif
 }
