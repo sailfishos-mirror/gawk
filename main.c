@@ -147,7 +147,7 @@ static const char *locale_dir = LOCALEDIR;	/* default locale dir */
 #ifdef USE_PERSISTENT_MALLOC
 const char *get_pma_version(void);
 #endif
-static bool enable_pma(int argc, char **argv);
+static bool enable_pma(char **argv);
 
 int use_lc_numeric = false;	/* obey locale for decimal point */
 
@@ -224,7 +224,7 @@ main(int argc, char **argv)
 
 	myname = gawk_name(argv[0]);
 
-	using_persistent_malloc = enable_pma(argc, argv);
+	using_persistent_malloc = enable_pma(argv);
 #ifdef HAVE_MPFR
 	mp_set_memory_functions(mpfr_mem_alloc, mpfr_mem_realloc, mpfr_mem_free);
 #endif
@@ -1920,7 +1920,7 @@ check_pma_security(const char *pma_file)
 /* enable_pma --- do the PMA flow, handle ASLR on Linux */
 
 static bool
-enable_pma(int argc, char **argv)
+enable_pma(char **argv)
 {
 	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 
@@ -1954,7 +1954,8 @@ enable_pma(int argc, char **argv)
 				// do the exec anyway...
 			}
 			execv(fullpath, argv);
-		}
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
 	}
 init:
 #endif /* HAVE_PERSONALITY */
