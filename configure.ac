@@ -187,6 +187,7 @@ gt_LC_MESSAGES
 dnl checks for header files
 AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
 	netdb.h netinet/in.h stddef.h string.h \
+	spawn.h \
 	sys/ioctl.h sys/param.h sys/personality.h sys/select.h sys/socket.h sys/time.h \
 	unistd.h termios.h stropts.h wchar.h wctype.h)
 
@@ -317,6 +318,7 @@ AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
 	gettimeofday clock_gettime lstat \
 	getdtablesize \
 	mbrlen memcmp memcpy memmove memset \
+	_NSGetExecutablePath \
 	mkstemp mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
 	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
 	strsignal strtod strtoul system timegm tmpfile towlower towupper \
