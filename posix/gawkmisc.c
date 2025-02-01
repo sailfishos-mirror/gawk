@@ -370,7 +370,7 @@ os_disable_aslr(const char *persist_file, char **argv)
 					exit(EXIT_FATAL);
 				}
 			} else {
-				fprintf(stderr, _("fatal: posix_spawn: %s\n"), sterror(errno));
+				fprintf(stderr, _("fatal: posix_spawn: %s\n"), strerror(errno));
 				exit(EXIT_FATAL);
 			}
 		} else
