@@ -1912,9 +1912,6 @@ check_pma_security(const char *pma_file)
 #endif /* USE_PERSISTENT_MALLOC */
 }
 
-//#include <libproc.h>
-#include <spawn.h>
-
 /* enable_pma --- do the PMA flow, handle ASLR on Linux */
 
 static bool

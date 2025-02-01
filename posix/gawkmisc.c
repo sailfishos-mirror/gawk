@@ -308,6 +308,8 @@ os_maybe_set_errno(void)
 
 /* os_disable_aslr --- disable Address Space Layout Randomization */
 
+// This for Linux and MacOS. It's not needed on other *nix systems.
+
 void
 os_disable_aslr(const char *persist_file, char **argv)
 {
@@ -378,8 +380,6 @@ os_disable_aslr(const char *persist_file, char **argv)
 	}
 #endif
 }
-
-// This for Linux and MacOS. It's not needed on other *nix systems.
 
 // For MSYS, restore behavior of working in text mode.
 #ifdef __MSYS__
