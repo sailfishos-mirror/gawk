@@ -22,17 +22,7 @@ then
 			true	# On Linux we no longer need -no-pie
 			;;
  		*darwin*)
-			# 27 November 2022: PMA only works on Intel.
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# disable on all other macOS systems
-				use_persistent_malloc=no
-				;;
-			esac
+			true	# On macos we no longer need -no-pie
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
 			true	# nothing to do, exes on these systems are not PIE

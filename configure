@@ -10307,6 +10307,12 @@ then :
   printf "%s\n" "#define HAVE_STRING_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "spawn.h" "ac_cv_header_spawn_h" "$ac_includes_default"
+if test "x$ac_cv_header_spawn_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SPAWN_H 1" >>confdefs.h
+
+fi
 ac_fn_c_check_header_compile "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes
 then :
@@ -11721,6 +11727,12 @@ then :
   printf "%s\n" "#define HAVE_MEMSET 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "_NSGetExecutablePath" "ac_cv_func__NSGetExecutablePath"
+if test "x$ac_cv_func__NSGetExecutablePath" = xyes
+then :
+  printf "%s\n" "#define HAVE__NSGETEXECUTABLEPATH 1" >>confdefs.h
+
+fi
 ac_fn_c_check_func "$LINENO" "mkstemp" "ac_cv_func_mkstemp"
 if test "x$ac_cv_func_mkstemp" = xyes
 then :
@@ -12032,17 +12044,7 @@ fi
 			true	# On Linux we no longer need -no-pie
 			;;
  		*darwin*)
-			# 27 November 2022: PMA only works on Intel.
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# disable on all other macOS systems
-				use_persistent_malloc=no
-				;;
-			esac
+			true	# On macos we no longer need -no-pie
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
 			true	# nothing to do, exes on these systems are not PIE

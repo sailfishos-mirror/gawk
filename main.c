@@ -34,10 +34,6 @@
 #include <mcheck.h>
 #endif
 
-#ifdef HAVE_SYS_PERSONALITY_H
-#include <sys/personality.h>
-#endif
-
 #define DEFAULT_PROFILE		"awkprof.out"	/* where to put profile */
 #define DEFAULT_VARFILE		"awkvars.out"	/* where to put vars */
 #define DEFAULT_PREC		53
@@ -1916,6 +1912,8 @@ check_pma_security(const char *pma_file)
 #endif /* USE_PERSISTENT_MALLOC */
 }
 
+//#include <libproc.h>
+#include <spawn.h>
 
 /* enable_pma --- do the PMA flow, handle ASLR on Linux */
 
@@ -1930,35 +1928,7 @@ enable_pma(char **argv)
 		return false;
 	}
 #else
-#ifdef HAVE_PERSONALITY
-	// This code is Linux specific, both the reliance on /proc/self/exe
-	// and the personality system call.
-	if (persist_file != NULL) {
-		const char *cp = getenv("GAWK_PMA_REINCARNATION");
-
-		if (cp == NULL) {
-			char fullpath[BUFSIZ];
-			int n;
-
-			if ((n = readlink("/proc/self/exe", fullpath, sizeof(fullpath)-1)) < 0) {
-				fprintf(stderr, _("warning: /proc/self/exe: readlink: %s\n"),
-							strerror(errno));
-				goto init;
-			}
-			fullpath[n] = '\0';
-			putenv("GAWK_PMA_REINCARNATION=true");
-			if (personality(PER_LINUX | ADDR_NO_RANDOMIZE) < 0) {
-				fprintf(stderr, _("warning: personality: %s\n"),
-							strerror(errno));
-				fflush(stderr);
-				// do the exec anyway...
-			}
-			execv(fullpath, argv);
-		} else
-			(void) unsetenv("GAWK_PMA_REINCARNATION");
-	}
-init:
-#endif /* HAVE_PERSONALITY */
+	os_disable_aslr(persist_file, argv);
 
 	check_pma_security(persist_file);
 	int pma_result = pma_init(1, persist_file);
