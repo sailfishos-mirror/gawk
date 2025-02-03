@@ -61,6 +61,7 @@ r_force_number(NODE *n)
 	char *ptr;
 
 	if (n->type == Node_elem_new) {
+		elem_new_reset(n);
 		n->type = Node_val;
 
 		return n;
@@ -548,6 +549,8 @@ r_unref(NODE *tmp)
 
 	mpfr_unset(tmp);
 
+	if (tmp->type == Node_elem_new && tmp->eln_vn != NULL)
+		efree(tmp->eln_vn);
 	free_wstr(tmp);
 	freenode(tmp);
 }

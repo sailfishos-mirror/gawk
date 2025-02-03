@@ -1,3 +1,38 @@
+2025-02-03         Cristian Ioneci       <mekanofox@astropostale.com>
+
+	Fix issues triggered by using in certain ways array elements passed to
+	a function; issues include crash dumps, reads-after-free, internal errors,
+	incorrect results.
+	See test cases in test/ar2fn_*.awk.
+
+	* awk.h: Add an union around `wsp', `wslen', part of NODE's `sub.val', in
+	order to overlap a char* over `wsp'; adjust/add #defines to access the
+	moved/added members.
+	(force_string_fmt, force_number): Clear Node_elem_new specific members
+	when the type is changed.
+	* interpret.h (r_interpret): Make a newborn Node_elem_new remember its
+	parent and a string representation of the index in the parent; for that
+	use `typre' and the added char* mentioned above (in awk.h)
+	(r_interpret): Clear Node_elem_new specific members when the type is
+	changed.
+	* array.c (force_array): The node will become a Node_var_array: if
+	present, use the values stashed in the previously mentioned fields to
+	properly set its `parent_array' and `vname'.
+	(adjust_param_node): New function.
+	(adjust_fcall_stack): Extra handling of Node_elem_new nodes.
+	* eval.c (elem_new_reset): New function.
+	(elem_new_to_scalar): Clear Node_elem_new specific members using the newly
+	introduced function above.
+	* ext.c (get_actual_argument): Clear Node_elem_new specific members when
+	the type is changed.
+	* gawkapi.c (api_sym_update): Clear Node_elem_new specific members when
+	the type is changed.
+	* mpfr.c (mpg_force_number): Clear Node_elem_new specific members when
+	the type is changed.
+	* node.c (r_force_number): Clear Node_elem_new specific members when
+	the type is changed.
+	(r_unref):  Add code to free the eln_vn member of a Node_elem_new.
+
 2025-01-26         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* interpret.h (r_interpret): Case Op_store_var; move REGEX

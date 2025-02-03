@@ -1897,6 +1897,20 @@ init_interpret()
 		interpret = r_interpret;
 }
 
+/* elem_new_reset --- clear the eln_pa and eln_vn fields of a Node_elem_new  */
+
+void
+elem_new_reset(NODE *n)
+{
+	assert(n->type == Node_elem_new);
+
+	if (n->eln_vn != NULL) {
+		efree(n->eln_vn);
+		n->eln_vn = NULL;
+	}
+	n->eln_pa = NULL;
+}
+
 /* elem_new_to_scalar --- convert Node_elem_new to untyped scalar */
 
 NODE *
@@ -1904,6 +1918,8 @@ elem_new_to_scalar(NODE *n)
 {
 	if (n->type != Node_elem_new)
 		return n;
+
+	elem_new_reset(n);
 
 	if (n->valref > 1) {
 		unref(n);
