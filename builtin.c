@@ -2313,6 +2313,8 @@ call_match(int nargs)
 	if ((regex->flags & REGEX) != 0)
 		regex = regex->typed_re;
 	else if (regex->type == Node_var_new || regex->type == Node_elem_new) {
+		if (regex->type == Node_elem_new)
+			elem_new_reset(regex);
 		memset(regex, 0, sizeof(*regex));
 		regex->type = Node_dynregex;
 		regex->re_exp = dupnode(Nnull_string);
@@ -2321,8 +2323,11 @@ call_match(int nargs)
 		need_free = true;
 	}
 
-	if (text->type == Node_var_new || text->type == Node_elem_new)
+	if (text->type == Node_var_new || text->type == Node_elem_new) {
+		if (text->type == Node_elem_new)
+			elem_new_reset(text);
 		text = dupnode(Nnull_string);
+	}
 
 	PUSH(text);
 	PUSH(regex);
@@ -2363,12 +2368,11 @@ call_split_func(const char *name, int nargs)
 		seps = POP();
 
 	bool need_free = false;
-	bool use_split = false;
 	if (nargs >= 3) {
 		regex = POP_STRING();
-		if ((regex->flags & REGEX) != 0) {
+		if ((regex->flags & REGEX) != 0)
 			regex = regex->typed_re;
-		} else {
+		else {
 			regex = make_regnode(Node_regex, regex);
 			need_free = true;
 		}

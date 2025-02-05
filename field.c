@@ -1250,6 +1250,8 @@ do_patsplit(int nargs)
 		if (src->type == Node_array_ref)
 			src = src->orig_array;
 		if (src->type == Node_var_new || src->type == Node_elem_new) {
+			if (src->type == Node_elem_new)
+				elem_new_reset(src);
 			src->type = Node_var;
 			src->valref = 1;
 			src->var_value = dupnode(Nnull_string);

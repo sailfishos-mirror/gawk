@@ -1,5 +1,19 @@
 2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
 
+	Bug fixes for indirect calls of match and patsplit.
+	Thanks to Denis Shirokov <cosmogen@gmail.com> for the report
+	and test case.
+
+	 * builtin.c (call_match): Pop the text of the stack. Handle
+	 the case that the regex is Node_var_new or Node_elem_new.
+	 Same for the text. Push text onto the stack first, then
+	 everything else.
+	 * eval.c (setup_frame): Handle Node_regex and Node_dynregex.
+	 * field.c (do_patsplit): Handle the case of the source being
+	 Node_param_list, and then if Node_var_new or Node_elem_new.
+
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
 	* node.c (r_unref): For Node_var_new, free the vname.
 
 2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
