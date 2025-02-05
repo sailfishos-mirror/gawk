@@ -1244,7 +1244,19 @@ do_patsplit(int nargs)
 	check_symtab_functab(arr, "patsplit",
 			_("%s: cannot use %s as second argument"));
 
-	src = TOP_STRING();
+	src = POP_SCALAR();
+	if (src->type == Node_param_list) {
+		src = GET_PARAM(src->param_cnt);
+		if (src->type == Node_array_ref)
+			src = src->orig_array;
+		if (src->type == Node_var_new || src->type == Node_elem_new) {
+			if (src->type == Node_elem_new)
+				elem_new_reset(src);
+			src->type = Node_var;
+			src->valref = 1;
+			src->var_value = dupnode(Nnull_string);
+		}
+	}
 
 	if ((sep->flags & REGEX) != 0)
 		sep = sep->typed_re;
@@ -1272,7 +1284,7 @@ do_patsplit(int nargs)
 		/*
 		 * Skip the work if first arg is the null string.
 		 */
-		tmp =  make_number((AWKNUM) 0);
+		tmp = make_number((AWKNUM) 0);
 	} else {
 		rp = re_update(sep);
 		s = src->stptr;
@@ -1281,7 +1293,6 @@ do_patsplit(int nargs)
 				set_element, arr, sep_arr, false));
 	}
 
-	src = POP_SCALAR();	/* really pop off stack */
 	DEREF(src);
 	return tmp;
 }
