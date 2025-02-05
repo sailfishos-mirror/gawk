@@ -1347,6 +1347,13 @@ setup_frame(INSTRUCTION *pc)
 			r->var_value = dupnode(Nnull_string);
 			break;
 
+		case Node_regex:
+		case Node_dynregex:
+			// 1/2025:
+			// These are weird; they can happen through
+			// indirect calls to some of the builtins, so
+			// handle them if we get them by ....
+			// ... falling through! Yay!
 		case Node_val:
 			r->type = Node_var;
 			r->var_value = m;
@@ -1897,6 +1904,20 @@ init_interpret()
 		interpret = r_interpret;
 }
 
+/* elem_new_reset --- clear the elemnew_parent and elemnew_vname fields of a Node_elem_new. */
+
+void
+elem_new_reset(NODE *n)
+{
+	assert(n->type == Node_elem_new);
+
+	if (n->elemnew_vname != NULL) {
+		efree(n->elemnew_vname);
+		n->elemnew_vname = NULL;
+	}
+	n->elemnew_parent = NULL;
+}
+
 /* elem_new_to_scalar --- convert Node_elem_new to untyped scalar */
 
 NODE *
@@ -1904,6 +1925,8 @@ elem_new_to_scalar(NODE *n)
 {
 	if (n->type != Node_elem_new)
 		return n;
+
+	elem_new_reset(n);
 
 	if (n->valref > 1) {
 		unref(n);

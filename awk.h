@@ -375,7 +375,11 @@ typedef struct exp_node {
 			char *sp;
 			size_t slen;
 			int idx;
-			wchar_t *wsp;
+			union {	// this union is for convenience of space
+				// reuse; the elements aren't otherwise related
+				wchar_t *wsp;
+				char *vn;
+			} z;
 			size_t wslen;
 			struct exp_node *typre;
 			enum commenttype comtype;
@@ -499,8 +503,13 @@ typedef struct exp_node {
 #define stlen	sub.val.slen
 #define stfmt	sub.val.idx
 #define strndmode sub.val.rndmode
-#define wstptr	sub.val.wsp
+#define wstptr	sub.val.z.wsp
 #define wstlen	sub.val.wslen
+
+/* Node_elem_new */
+#define elemnew_vname	sub.val.z.vn
+#define elemnew_parent	sub.val.typre
+
 #ifdef HAVE_MPFR
 #define mpg_numbr	sub.val.nm.mpnum
 #define mpg_i		sub.val.nm.mpi
@@ -1562,6 +1571,7 @@ extern STACK_ITEM *grow_stack(void);
 extern void dump_fcall_stack(FILE *fp);
 extern int register_exec_hook(Func_pre_exec preh, Func_post_exec posth);
 extern NODE **r_get_field(NODE *n, Func_ptr *assign, bool reference);
+extern void elem_new_reset(NODE *n);
 extern NODE *elem_new_to_scalar(NODE *n);
 /* ext.c */
 extern NODE *do_ext(int nargs);
@@ -1964,6 +1974,7 @@ static inline NODE *
 force_string_fmt(NODE *s, const char *fmtstr, int fmtidx)
 {
 	if (s->type == Node_elem_new) {
+		elem_new_reset(s);
 		s->type = Node_val;
 
 		return s;
@@ -2005,6 +2016,7 @@ static inline NODE *
 force_number(NODE *n)
 {
 	if (n->type == Node_elem_new) {
+		elem_new_reset(n);
 		n->type = Node_val;
 
 		return n;
