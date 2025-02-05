@@ -1897,18 +1897,18 @@ init_interpret()
 		interpret = r_interpret;
 }
 
-/* elem_new_reset --- clear the eln_pa and eln_vn fields of a Node_elem_new. */
+/* elem_new_reset --- clear the elemnew_parent and elemnew_vname fields of a Node_elem_new. */
 
 void
 elem_new_reset(NODE *n)
 {
 	assert(n->type == Node_elem_new);
 
-	if (n->eln_vn != NULL) {
-		efree(n->eln_vn);
-		n->eln_vn = NULL;
+	if (n->elemnew_vname != NULL) {
+		efree(n->elemnew_vname);
+		n->elemnew_vname = NULL;
 	}
-	n->eln_pa = NULL;
+	n->elemnew_parent = NULL;
 }
 
 /* elem_new_to_scalar --- convert Node_elem_new to untyped scalar */

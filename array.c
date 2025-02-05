@@ -338,10 +338,10 @@ force_array(NODE *symbol, bool canfatal)
 
 	switch (symbol->type) {
 	case Node_elem_new:
-		elem_new_parent = symbol->eln_pa;
-		symbol->eln_pa = NULL;
-		elem_new_vname = symbol->eln_vn;
-		symbol->eln_vn = NULL;
+		elem_new_parent = symbol->elemnew_parent;
+		symbol->elemnew_parent = NULL;
+		elem_new_vname = symbol->elemnew_vname;
+		symbol->elemnew_vname = NULL;
 		efree(symbol->stptr);
 		symbol->stptr = NULL;
 		symbol->stlen = 0;
@@ -514,7 +514,7 @@ adjust_fcall_stack(NODE *symbol, int nsubs)
 				&& r->orig_array->type != Node_elem_new))
 			continue;
 		n = r->orig_array;
-#define PARENT_ARRAY(n) ((n->type == Node_elem_new) ? n->eln_pa : n->parent_array)
+#define PARENT_ARRAY(n) ((n->type == Node_elem_new) ? n->elemnew_parent : n->parent_array)
 
 		/* Case 1 */
 		if (n == symbol

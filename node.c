@@ -549,8 +549,8 @@ r_unref(NODE *tmp)
 
 	mpfr_unset(tmp);
 
-	if (tmp->type == Node_elem_new && tmp->eln_vn != NULL)
-		efree(tmp->eln_vn);
+	if (tmp->type == Node_elem_new && tmp->elemnew_vname != NULL)
+		efree(tmp->elemnew_vname);
 	free_wstr(tmp);
 	freenode(tmp);
 }

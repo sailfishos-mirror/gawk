@@ -345,11 +345,11 @@ uninitialized_scalar:
 				}
 			}
 
-			if (r->type == Node_elem_new && r->eln_pa == NULL) {
-				r->eln_pa = t1;
+			if (r->type == Node_elem_new && r->elemnew_parent == NULL) {
+				r->elemnew_parent = t1;
 				t2 = force_string(t2);
-				assert(r->eln_vn == NULL);
-				r->eln_vn = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
+				assert(r->elemnew_vname == NULL);
+				r->elemnew_vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
 			}
 
 			DEREF(t2);

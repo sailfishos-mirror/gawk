@@ -375,13 +375,12 @@ typedef struct exp_node {
 			char *sp;
 			size_t slen;
 			int idx;
-			union {
-				struct {
-					wchar_t *wsp;
-					size_t wslen;
-				} ws;
-				char * vn;
-			} worn;
+			union {	// this union is for convenience of space
+				// reuse; the elements aren't otherwise related
+				wchar_t *wsp;
+				char *vn;
+			} z;
+			size_t wslen;
 			struct exp_node *typre;
 			enum commenttype comtype;
 		} val;
@@ -504,12 +503,12 @@ typedef struct exp_node {
 #define stlen	sub.val.slen
 #define stfmt	sub.val.idx
 #define strndmode sub.val.rndmode
-#define wstptr	sub.val.worn.ws.wsp
-#define wstlen	sub.val.worn.ws.wslen
+#define wstptr	sub.val.z.wsp
+#define wstlen	sub.val.wslen
 
 /* Node_elem_new */
-#define eln_vn	sub.val.worn.vn
-#define eln_pa	sub.val.typre
+#define elemnew_vname	sub.val.z.vn
+#define elemnew_parent	sub.val.typre
 
 #ifdef HAVE_MPFR
 #define mpg_numbr	sub.val.nm.mpnum
