@@ -551,6 +551,10 @@ r_unref(NODE *tmp)
 
 	if (tmp->type == Node_elem_new && tmp->elemnew_vname != NULL)
 		efree(tmp->elemnew_vname);
+	else if ((tmp->type == Node_var || tmp->type == Node_var_new)
+			&& tmp->vname != NULL)
+		efree(tmp->vname);
+
 	free_wstr(tmp);
 	freenode(tmp);
 }
