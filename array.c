@@ -333,8 +333,8 @@ force_array(NODE *symbol, bool canfatal)
 			symbol = symbol->orig_array;
 	}
 
-	NODE * elem_new_parent = NULL;
-	char * elem_new_vname = NULL;
+	NODE *elem_new_parent = NULL;
+	char *elem_new_vname = NULL;
 
 	switch (symbol->type) {
 	case Node_elem_new:
@@ -510,17 +510,15 @@ adjust_fcall_stack(NODE *symbol, int nsubs)
 	for (; pcount > 0; pcount--) {
 		r = *sp++;
 		if (r->type != Node_array_ref
-				|| (   r->orig_array->type != Node_var_array
-					&& r->orig_array->type != Node_elem_new
-				   )
-				)
+			|| (r->orig_array->type != Node_var_array
+				&& r->orig_array->type != Node_elem_new))
 			continue;
 		n = r->orig_array;
-#define NPAR(n) ((n->type == Node_elem_new)?n->eln_pa:n->parent_array)
+#define PARENT_ARRAY(n) ((n->type == Node_elem_new) ? n->eln_pa : n->parent_array)
 
 		/* Case 1 */
 		if (n == symbol
-			&& NPAR(symbol) != NULL
+			&& PARENT_ARRAY(symbol) != NULL
 			&& nsubs > 0
 		) {
 			/*
@@ -540,7 +538,7 @@ adjust_fcall_stack(NODE *symbol, int nsubs)
 		}
 
 		/* Case 2 */
-		for (n = NPAR(n); n != NULL; n = NPAR(n)) {
+		for (n = PARENT_ARRAY(n); n != NULL; n = PARENT_ARRAY(n)) {
 			assert(n->type == Node_var_array);
 			if (n == symbol) {
 				/*
@@ -653,7 +651,8 @@ do_delete(NODE *symbol, int nsubs)
 
 		mpfr_unset(val);
 #ifdef MEMDEBUG
-		memset(val,0,sizeof(NODE)); val->type = 0xbaad;
+		memset(val, 0, sizeof(NODE));
+		val->type = 0xbaad;
 #endif
 		freenode(val);
 	} else {

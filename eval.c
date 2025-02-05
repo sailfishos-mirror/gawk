@@ -1897,7 +1897,7 @@ init_interpret()
 		interpret = r_interpret;
 }
 
-/* elem_new_reset --- clear the eln_pa and eln_vn fields of a Node_elem_new  */
+/* elem_new_reset --- clear the eln_pa and eln_vn fields of a Node_elem_new. */
 
 void
 elem_new_reset(NODE *n)

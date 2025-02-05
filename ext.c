@@ -206,7 +206,7 @@ get_actual_argument(NODE *t, int i, bool want_array)
 		else {
 			if (t->type == Node_elem_new) {
 				elem_new_reset(t);
-				if (t->valref > 1)
+				if (t->valref > 1)	// ADR: 2/2025: Can this happen?
 					unref(t);
 			}
 			t->type = Node_var;
