@@ -204,6 +204,11 @@ get_actual_argument(NODE *t, int i, bool want_array)
 		if (want_array)
 			return force_array(t, false);
 		else {
+			if (t->type == Node_elem_new) {
+				elem_new_reset(t);
+				if (t->valref > 1)	// ADR: 2/2025: Can this happen?
+					unref(t);
+			}
 			t->type = Node_var;
 			t->var_value = dupnode(Nnull_string);
 			return t->var_value;

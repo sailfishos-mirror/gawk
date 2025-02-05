@@ -910,9 +910,12 @@ api_sym_update(awk_ext_id_t id,
 		unref(node->var_value);
 		node->var_value = awk_value_to_node(value);
 		if ((node->type == Node_var_new || node->type == Node_elem_new)
-		    && value->val_type != AWK_UNDEFINED)
+		    && value->val_type != AWK_UNDEFINED) {
+			if (node->type == Node_elem_new) {
+				elem_new_reset(node);
+			}
 			node->type = Node_var;
-
+		}
 		return awk_true;
 	}
 

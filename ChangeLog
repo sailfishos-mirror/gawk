@@ -1,3 +1,68 @@
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Bug fixes for indirect calls of match and patsplit.
+	Thanks to Denis Shirokov <cosmogen@gmail.com> for the report
+	and test case.
+
+	 * builtin.c (call_match): Pop the text of the stack. Handle
+	 the case that the regex is Node_var_new or Node_elem_new.
+	 Same for the text. Push text onto the stack first, then
+	 everything else.
+	 Also, free the vname for the regex argument if it's a Node_var_new;
+	 same for the text argument.
+	 * eval.c (setup_frame): Handle Node_regex and Node_dynregex.
+	 * field.c (do_patsplit): Handle the case of the source being
+	 Node_param_list, and then if Node_var_new or Node_elem_new.
+
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* node.c (r_unref): For Node_var_new, free the vname.
+
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Stylistic cleanups and small code cleanups.
+
+	* array.c, eval.c, ext.c, interpret.h: Some stylistic cleanups.
+	* awk.h (eln_pa, eln_vn): Renamed to elemnew_parent and
+	elemnew_vname. All uses adjusted.
+	(union worn): Renamed to `z' and only needs the wsp and vn
+	pointers in it.
+
+2025-02-03         Cristian Ioneci       <mekanofox@astropostale.com>
+
+	Fix issues triggered by using in certain ways array elements passed to
+	a function; issues include crash dumps, reads-after-free, internal errors,
+	incorrect results.
+	See test cases in test/ar2fn_*.awk.
+
+	* awk.h: Add an union around `wsp', `wslen', part of NODE's `sub.val', in
+	order to overlap a char* over `wsp'; adjust/add #defines to access the
+	moved/added members.
+	(force_string_fmt, force_number): Clear Node_elem_new specific members
+	when the type is changed.
+	* interpret.h (r_interpret): Make a newborn Node_elem_new remember its
+	parent and a string representation of the index in the parent; for that
+	use `typre' and the added char* mentioned above (in awk.h)
+	(r_interpret): Clear Node_elem_new specific members when the type is
+	changed.
+	* array.c (force_array): The node will become a Node_var_array: if
+	present, use the values stashed in the previously mentioned fields to
+	properly set its `parent_array' and `vname'.
+	(adjust_param_node): New function.
+	(adjust_fcall_stack): Extra handling of Node_elem_new nodes.
+	* eval.c (elem_new_reset): New function.
+	(elem_new_to_scalar): Clear Node_elem_new specific members using the newly
+	introduced function above.
+	* ext.c (get_actual_argument): Clear Node_elem_new specific members when
+	the type is changed.
+	* gawkapi.c (api_sym_update): Clear Node_elem_new specific members when
+	the type is changed.
+	* mpfr.c (mpg_force_number): Clear Node_elem_new specific members when
+	the type is changed.
+	* node.c (r_force_number): Clear Node_elem_new specific members when
+	the type is changed.
+	(r_unref):  Add code to free the eln_vn member of a Node_elem_new.
+
 2025-01-26         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* interpret.h (r_interpret): Case Op_store_var; move REGEX

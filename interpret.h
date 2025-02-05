@@ -241,6 +241,7 @@ uninitialized_scalar:
 
 				if (op != Op_push_arg_untyped) {
 					// convert very original untyped to scalar
+					elem_new_reset(m);
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
 					m->flags &= ~(MPFN | MPZN);
@@ -326,7 +327,6 @@ uninitialized_scalar:
 
 				r = *assoc_lookup(t1, t2);
 			}
-			DEREF(t2);
 
 			/* for SYMTAB, step through to the actual variable */
 			if (t1 == symbol_table) {
@@ -344,6 +344,15 @@ uninitialized_scalar:
 					r = r->var_value;
 				}
 			}
+
+			if (r->type == Node_elem_new && r->elemnew_parent == NULL) {
+				r->elemnew_parent = t1;
+				t2 = force_string(t2);
+				assert(r->elemnew_vname == NULL);
+				r->elemnew_vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
+			}
+
+			DEREF(t2);
 
 			if (r->type == Node_val
 			    || r->type == Node_var
@@ -384,7 +393,8 @@ uninitialized_scalar:
 				r = force_array(r, false);
 				r->parent_array = t1;
 				t2 = force_string(t2);
-				r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
+				if (r->vname == NULL)
+					r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
 			} else if (r->type != Node_var_array) {
 				t2 = force_string(t2);
 				fatal(_("attempt to use scalar `%s[\"%.*s\"]' as an array"),

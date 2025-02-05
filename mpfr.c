@@ -350,6 +350,7 @@ mpg_force_number(NODE *n)
 	char *cp, *cpend;
 
 	if (n->type == Node_elem_new) {
+		elem_new_reset(n);
 		n->type = Node_val;
 
 		return n;

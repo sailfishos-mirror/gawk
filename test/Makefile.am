@@ -122,6 +122,16 @@ EXTRA_DIST = \
 	arysubnm.ok \
 	aryunasgn.awk \
 	aryunasgn.ok \
+	ar2fn_elnew_sc.awk \
+	ar2fn_elnew_sc.ok \
+	ar2fn_elnew_sc2.awk \
+	ar2fn_elnew_sc2.ok \
+	ar2fn_fmod.awk \
+	ar2fn_fmod.ok \
+	ar2fn_unxptyp_aref.awk \
+	ar2fn_unxptyp_aref.ok \
+	ar2fn_unxptyp_val.awk \
+	ar2fn_unxptyp_val.ok \
 	asgext.awk \
 	asgext.in \
 	asgext.ok \
@@ -633,6 +643,8 @@ EXTRA_DIST = \
 	indirectbuiltin3.ok \
 	indirectbuiltin4.awk \
 	indirectbuiltin4.ok \
+	indirectbuiltin5.awk \
+	indirectbuiltin5.ok \
 	indirectcall2.awk \
 	indirectcall2.ok \
 	indirectcall3.awk \
@@ -805,6 +817,8 @@ EXTRA_DIST = \
 	memleak.ok \
 	memleak2.awk \
 	memleak2.ok \
+	memleak3.awk \
+	memleak3.ok \
 	messages.awk \
 	minusstr.awk \
 	minusstr.ok \
@@ -1576,6 +1590,7 @@ UNIX_TESTS = \
 GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool asortsymtab backw badargs \
+	ar2fn_elnew_sc ar2fn_elnew_sc2 ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val \
 	beginfile1 beginfile2 binmode1 charasbytes clos1way clos1way2 \
 	clos1way3 clos1way4 clos1way5 clos1way6 colonwarn commas crlf \
 	csv1 csv2 csv3 csvodd dbugarray1 dbugarray2 dbugarray3 dbugarray4 \
@@ -1609,7 +1624,8 @@ GAWK_EXT_TESTS = \
 	symtab3 symtab4 symtab5 symtab6 symtab7 symtab8 symtab9 symtab10 \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
-	delmessy indirectbuiltin3 indirectbuiltin4 memleak2 \
+	delmessy indirectbuiltin3 indirectbuiltin4 indirectbuiltin5 memleak2 \
+	memleak3 \
 	typeof4 typeof5 typeof6 typeof7 typeof8 typeof9 unicode1 watchpoint1
 
 ARRAYDEBUG_TESTS = arrdbg

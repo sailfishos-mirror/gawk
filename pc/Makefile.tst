@@ -190,6 +190,7 @@ UNIX_TESTS = \
 GAWK_EXT_TESTS = \
 	aadelete1 aadelete2 aarray1 aasort aasorti argtest arraysort \
 	arraysort2 arraytype asortbool asortsymtab backw badargs \
+	ar2fn_elnew_sc ar2fn_elnew_sc2 ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val \
 	beginfile1 beginfile2 binmode1 charasbytes clos1way clos1way2 \
 	clos1way3 clos1way4 clos1way5 clos1way6 colonwarn commas crlf \
 	csv1 csv2 csv3 csvodd dbugarray1 dbugarray2 dbugarray3 dbugarray4 \
@@ -223,7 +224,8 @@ GAWK_EXT_TESTS = \
 	symtab3 symtab4 symtab5 symtab6 symtab7 symtab8 symtab9 symtab10 \
 	symtab11 symtab12 timeout typedregex1 typedregex2 typedregex3 \
 	typedregex4 typedregex5 typedregex6 typeof1 typeof2 typeof3 \
-	delmessy indirectbuiltin3 indirectbuiltin4 memleak2 \
+	delmessy indirectbuiltin3 indirectbuiltin4 indirectbuiltin5 memleak2 \
+	memleak3 \
 	typeof4 typeof5 typeof6 typeof7 typeof8 typeof9 unicode1 watchpoint1
 
 ARRAYDEBUG_TESTS = arrdbg
@@ -2737,6 +2739,31 @@ backw:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+ar2fn_elnew_sc:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+ar2fn_elnew_sc2:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+ar2fn_fmod:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+ar2fn_unxptyp_aref:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+ar2fn_unxptyp_val:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 clos1way:
 	@echo $@
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=C; export GAWKLOCALE; \
@@ -3684,7 +3711,17 @@ indirectbuiltin4:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+indirectbuiltin5:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 memleak2:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+memleak3:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
