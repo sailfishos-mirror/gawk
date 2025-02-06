@@ -8792,61 +8792,13 @@ fi
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -no-pie" >&5
-printf %s "checking whether C compiler accepts -no-pie... " >&6; }
-if test ${ax_cv_check_cflags___no_pie+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-  ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  -no-pie"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  ax_cv_check_cflags___no_pie=yes
-else $as_nop
-  ax_cv_check_cflags___no_pie=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-  CFLAGS=$ax_check_save_flags
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___no_pie" >&5
-printf "%s\n" "$ax_cv_check_cflags___no_pie" >&6; }
-if test "x$ax_cv_check_cflags___no_pie" = xyes
-then :
-  LDFLAGS="${LDFLAGS} -no-pie"
-				export LDFLAGS
-else $as_nop
-  :
-fi
-
+			true	# On Linux we no longer need -no-pie
 			;;
  		*darwin*)
-			# 27 November 2022: PMA only works on Intel.
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# disable on all other macOS systems
-				use_persistent_malloc=no
-				;;
-			esac
+			true	# On macos we no longer need -no-pie
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
-			true	# nothing do, exes on these systems are not PIE
+			true	# nothing to do, exes on these systems are not PIE
 			;;
 		# Other OS's go here...
 		*)

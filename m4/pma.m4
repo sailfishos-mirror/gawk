@@ -1,6 +1,6 @@
 dnl Decide whether or not to use the persistent memory allocator
 dnl
-dnl Copyright (C) 2022, 2023 Free Software Foundation, Inc.
+dnl Copyright (C) 2022, 2023, 2025 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -19,25 +19,13 @@ then
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			AX_CHECK_COMPILE_FLAG([-no-pie],
-				[LDFLAGS="${LDFLAGS} -no-pie"
-				export LDFLAGS])
+			true	# On Linux we no longer need -no-pie
 			;;
  		*darwin*)
-			# 27 November 2022: PMA only works on Intel.
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# disable on all other macOS systems
-				use_persistent_malloc=no
-				;;
-			esac
+			true	# On macos we no longer need -no-pie
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
-			true	# nothing do, exes on these systems are not PIE
+			true	# nothing to do, exes on these systems are not PIE
 			;;
 		# Other OS's go here...
 		*)

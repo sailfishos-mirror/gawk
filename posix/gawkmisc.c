@@ -1,6 +1,7 @@
 /* gawkmisc.c --- miscellaneous gawk routines that are OS specific.
 
-   Copyright (C) 1986, 1988, 1989, 1991 - 1998, 2001 - 2004, 2011, 2021, 2022, 2023,
+   Copyright (C) 1986, 1988, 1989, 1991 - 1998, 2001 - 2004, 2011,
+   2021, 2022, 2023, 2025,
    the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -24,6 +25,14 @@
 #include <sys/cygwin.h>
 #endif
 #include <io.h>		/* for declaration of setmode(). */
+#endif
+
+#ifdef HAVE_SYS_PERSONALITY_H	// for linux
+#include <sys/personality.h>
+#endif
+
+#ifdef HAVE_SPAWN_H
+#include <spawn.h>	// for macos
 #endif
 
 const char quote = '\'';
@@ -295,6 +304,81 @@ init_sockets(void)
 void
 os_maybe_set_errno(void)
 {
+}
+
+/* os_disable_aslr --- disable Address Space Layout Randomization */
+
+// This for Linux and MacOS. It's not needed on other *nix systems.
+
+void
+os_disable_aslr(const char *persist_file, char **argv)
+{
+#ifdef HAVE_PERSONALITY
+	// This code is Linux specific, both the reliance on /proc/self/exe
+	// and the personality system call.
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			char fullpath[BUFSIZ];
+			int n;
+
+			if ((n = readlink("/proc/self/exe", fullpath, sizeof(fullpath)-1)) < 0) {
+				fprintf(stderr, _("warning: /proc/self/exe: readlink: %s\n"),
+							strerror(errno));
+				return;
+			}
+			fullpath[n] = '\0';
+			putenv("GAWK_PMA_REINCARNATION=true");
+			if (personality(PER_LINUX | ADDR_NO_RANDOMIZE) < 0) {
+				fprintf(stderr, _("warning: personality: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				// do the exec anyway...
+			}
+			execv(fullpath, argv);
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
+	}
+#endif
+#ifdef HAVE__NSGETEXECUTABLEPATH
+	// This code is for macos
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			char fullpath[BUFSIZ];
+			int n;
+			posix_spawnattr_t p_attr;
+			int status;
+			pid_t pid;
+			extern char **environ;
+			size_t size = BUFSIZ;
+
+			memset(fullpath, 0, BUFSIZ);
+			n = _NSGetExecutablePath(fullpath, &size);
+
+			putenv("GAWK_PMA_REINCARNATION=true");
+
+			posix_spawnattr_init(&p_attr);
+			posix_spawnattr_setflags(&p_attr, 0x100);
+			status = posix_spawnp(&pid, fullpath, NULL, &p_attr, argv, environ);
+			if (status == 0) {
+				if (waitpid(pid, &status,  WUNTRACED) != -1) {
+					if (WIFEXITED(status))
+						exit WEXITSTATUS(status);	// use original exit code
+				} else {
+					fprintf(stderr, _("waitpid: got exit status %#o\n"), status);
+					exit(EXIT_FATAL);
+				}
+			} else {
+				fprintf(stderr, _("fatal: posix_spawn: %s\n"), strerror(errno));
+				exit(EXIT_FATAL);
+			}
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
+	}
+#endif
 }
 
 // For MSYS, restore behavior of working in text mode.

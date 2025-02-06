@@ -1641,6 +1641,7 @@ extern int os_is_setuid(void);
 extern int os_setbinmode(int fd, int mode);
 extern void os_restore_mode(int fd);
 extern void os_maybe_set_errno(void);
+extern void os_disable_aslr(const char *persist_file, char **argv);
 extern size_t optimal_bufsize(int fd, struct stat *sbuf);
 extern int ispath(const char *file);
 extern int isdirpunct(int c);
