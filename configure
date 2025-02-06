@@ -10307,6 +10307,12 @@ then :
   printf "%s\n" "#define HAVE_STRING_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "spawn.h" "ac_cv_header_spawn_h" "$ac_includes_default"
+if test "x$ac_cv_header_spawn_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SPAWN_H 1" >>confdefs.h
+
+fi
 ac_fn_c_check_header_compile "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes
 then :
@@ -10317,6 +10323,12 @@ ac_fn_c_check_header_compile "$LINENO" "sys/param.h" "ac_cv_header_sys_param_h" 
 if test "x$ac_cv_header_sys_param_h" = xyes
 then :
   printf "%s\n" "#define HAVE_SYS_PARAM_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "sys/personality.h" "ac_cv_header_sys_personality_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_personality_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYS_PERSONALITY_H 1" >>confdefs.h
 
 fi
 ac_fn_c_check_header_compile "$LINENO" "sys/select.h" "ac_cv_header_sys_select_h" "$ac_includes_default"
@@ -11715,6 +11727,12 @@ then :
   printf "%s\n" "#define HAVE_MEMSET 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "_NSGetExecutablePath" "ac_cv_func__NSGetExecutablePath"
+if test "x$ac_cv_func__NSGetExecutablePath" = xyes
+then :
+  printf "%s\n" "#define HAVE__NSGETEXECUTABLEPATH 1" >>confdefs.h
+
+fi
 ac_fn_c_check_func "$LINENO" "mkstemp" "ac_cv_func_mkstemp"
 if test "x$ac_cv_func_mkstemp" = xyes
 then :
@@ -11725,6 +11743,12 @@ ac_fn_c_check_func "$LINENO" "mtrace" "ac_cv_func_mtrace"
 if test "x$ac_cv_func_mtrace" = xyes
 then :
   printf "%s\n" "#define HAVE_MTRACE 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "personality" "ac_cv_func_personality"
+if test "x$ac_cv_func_personality" = xyes
+then :
+  printf "%s\n" "#define HAVE_PERSONALITY 1" >>confdefs.h
 
 fi
 ac_fn_c_check_func "$LINENO" "posix_openpt" "ac_cv_func_posix_openpt"
@@ -12017,61 +12041,13 @@ fi
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -no-pie" >&5
-printf %s "checking whether C compiler accepts -no-pie... " >&6; }
-if test ${ax_cv_check_cflags___no_pie+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-  ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  -no-pie"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  ax_cv_check_cflags___no_pie=yes
-else $as_nop
-  ax_cv_check_cflags___no_pie=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-  CFLAGS=$ax_check_save_flags
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___no_pie" >&5
-printf "%s\n" "$ax_cv_check_cflags___no_pie" >&6; }
-if test "x$ax_cv_check_cflags___no_pie" = xyes
-then :
-  LDFLAGS="${LDFLAGS} -no-pie"
-				export LDFLAGS
-else $as_nop
-  :
-fi
-
+			true	# On Linux we no longer need -no-pie
 			;;
  		*darwin*)
-			# 27 November 2022: PMA only works on Intel.
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# disable on all other macOS systems
-				use_persistent_malloc=no
-				;;
-			esac
+			true	# On macos we no longer need -no-pie
 			;;
 		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
-			true	# nothing do, exes on these systems are not PIE
+			true	# nothing to do, exes on these systems are not PIE
 			;;
 		# Other OS's go here...
 		*)
