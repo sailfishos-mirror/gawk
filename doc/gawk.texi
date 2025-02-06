@@ -30706,12 +30706,11 @@ in a persistent heap, which resides in a file in
 the filesystem.  When persistent memory is not in use (the normal case),
 @command{gawk}'s data resides in ephemeral system memory.
 
-Persistent memory is enabled on certain 64-bit systems supporting the @code{mmap()}
-and @code{munmap()} system calls.  @command{gawk} must be compiled as a
-non-PIE (Position Independent Executable) binary, since the persistent
+Persistent memory is enabled on certain 64-bit systems supporting the
+@code{mmap()} and @code{munmap()} system calls.  Since the persistent
 store ends up holding pointers to functions held within the @command{gawk}
-executable.  This also means that to use the persistent memory, you must
-use the same @command{gawk} executable from run to run.
+executable, in order to use persistent memory, you must use the same
+@command{gawk} executable from run to run.
 
 You can see if your version of @command{gawk} supports persistent
 memory like so:
@@ -30729,7 +30728,7 @@ If you see the @samp{PMA} with a version indicator, then it's supported.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} environment variable
 @cindex environment variables @subentry @env{REALLY_USE_PERSIST_MALLOC}
 As of this writing, persistent memory has only been tested on GNU/Linux,
-Cygwin, Solaris 2.11, Intel architecture macOS systems,
+Cygwin, Solaris 2.11, macOS,
 FreeBSD 13.1 and OpenBSD 7.1.
 On all others, persistent memory is disabled by default. You can force
 it to be enabled by exporting the shell variable
@@ -30784,13 +30783,12 @@ As shown, in subsequent runs using the same data file, the values of
 @command{gawk}'s variables are preserved.  However, @command{gawk}'s
 special variables, such as @code{NR}, are reset upon each run.
 Only the variables defined by the program are preserved across runs.
-
 @end enumerate
 
-Interestingly, the program that you execute need not be the same from
+Interestingly, the @command{awk} program that you execute need not be the same from
 run to run; the persistent store only maintains the values of variables,
 arrays, and user-defined functions, not the totality of @command{gawk}'s
-internal state.  This lets you share data between unrelated programs,
+internal state.  This lets you share data between unrelated @command{awk} programs,
 eliminating the need for scripts to communicate via text files.
 
 @cindex Kelly, Terence
@@ -30849,16 +30847,6 @@ a fatal error message.
 The GNU/Linux CIFS filesystem is known to not
 work well with the PMA allocator.
 Don't use a backing file on a CIFS filesystem.
-
-@item
-Some GNU/Linux distributions enable Address Space Layout Randomization
-(ASLR) by default.  This breaks @command{gawk}'s use of the PMA allocator.
-You can work around this using @samp{setarch -R gawk @dots{}} to run
-@command{gawk}; this disables ASLR for the particular execution of
-@command{gawk}. If ASLR is the default on your system, and you want to use
-persistent memory, you may wish to set up a shell alias, shell function,
-or shell script to run @command{gawk} by way of the @command{setarch}
-command.
 
 @item
 If @command{gawk} is run by the @command{root} user, then
