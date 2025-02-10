@@ -34087,16 +34087,12 @@ questo il caso normale), tali dati del programma @command{gawk} risiedono
 nella memoria del computer (e vanno persi alla fine dell'esecuzione di
 @command{gawk}).
 
-La funzionalit@`a della memoria persistente @`e disponibile solo nei
-sistemi a 64-bit che prevedono le chiamate a sistema @code{mmap()} e
-@code{munmap()}.  L'eseguibile di @command{gawk} dev'essere stato compilato
-in modalit@`a non-PIE (Position Independent Executable ==
-programma che funziona a prescindere da dove si trova nel computer),
-poich@'e i dati immagazzinati contengono puntatori a funzioni che si
-trovano all'interno del programma @command{gawk}.  Ci@`o implica
-anche che, per fare uso della memoria persistente, si deve fare uso
-del medesimo eseguibile di @command{gawk}, nelle successive chiamate
-al programma.
+La funzionalit@`a della memoria persistente @`e disponibile solo in quei
+sistemi a 64-bit che supportano le chiamate a sistema @code{mmap()} e
+@code{munmap()}.  Poich@'e i dati immagazzinati contengono puntatori a
+funzioni che si trovano all'interno del programma @command{gawk}, per
+usufruire della memoria persistente, si deve utilizzare lo stesso eseguibile
+di @command{gawk}, nelle successive chiamate al programma.
 
 Si pu@`o verificare se il supporto della memoria persistente @`e disponibile
 in @command{gawk} in questo modo:
@@ -34115,7 +34111,7 @@ la memoria persistente @`e supportata.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{REALLY_USE_PERSIST_MALLOC}
 Finora la memoria persistente @`e stata testata solo nei sistemi operativi
-GNU/Linux, Cygwin, Solaris 2.11, sistemi macOS su hardware Intel,
+GNU/Linux, Cygwin, Solaris 2.11, macOS,
 FreeBSD 13.1 e OpenBSD 7.1.
 Su tutti gli altri sistemi, la memoria persistente @`e disabilitata
 per default.  Si pu@`o chiedere di abilitarla esportando la
@@ -34123,7 +34119,7 @@ variabile d'ambiente @env{REALLY_USE_PERSIST_MALLOC} con un
 valore diverso dalla stringa nulla, prima di eseguire
 @command{configure}
 (@pxref{Installazione veloce}).
-Se lo fate, e tutti i test passano senza errori, siete pregati
+Se lo fate, e tutti i test vengono eseguiti senza errori, siete pregati
 di informare il manutentore di @command{gawk}.
 
 Per usare la memoria persistente, seguire questa procedura:
@@ -34181,14 +34177,14 @@ successive esecuzioni.
 
 @end enumerate
 
-@`E interessante notare che il programma @command{gawk} che viene
-eseguito non @`e necessariamente lo stesso da un'esecuzione alla
-successiva; i dati persistenti sono solo i valori delle variabili,
-dei vettori e delle funzioni definite dall'utente,
-non l'intera situazione interna del programma @command{gawk}.
-Ci@`o consente di condividere dei dati fra programmi indipendenti l'uno
-dall'altro, eliminando la necessit@`a dei diversi programmi di comunicare
-fra loro utilizzando dei file di testo.
+@`E interessante notare che il programma @command{gawk} che viene eseguito non
+deve necessariamente essere lo stesso da un'esecuzione alla successiva; i dati
+persistenti contengono solo i valori delle variabili, dei vettori e delle
+funzioni definite dall'utente, non l'intera situazione interna del programma
+@command{gawk}.
+Ci@`o consente di condividere dei dati fra programmi @command{gawk}
+indipendenti l'uno dall'altro, eliminando la necessit@`a per i diversi programmi
+di comunicare fra loro utilizzando dei file di testo.
 
 @cindex Kelly, Terence
 Terence Kelly, l'autore dell'allocatore di memoria persistente usato da
@@ -34258,18 +34254,6 @@ Il filesystem CIFS in ambiente GNU/Linux risulta non
 funzionare bene con l'allocatore PMA.
 Quindi, non va usato un file di appoggio per la memoria persistente
 residente su un filesystem CIFS.
-
-@item
-Alcune distribuzioni di GNU/Linux abilitano per default la funzionalit@`a
-Address Space Layout Randomization (ASLR --- Casualizzazione dello spazio
-degli indirizzi).  Ci@`o impedisce il funzionamento dell'allocatore di
-PMA.  Si pu@`o evitare questo problema specificando
-@samp{setarch -R gawk @dots{}} per chiamare @command{gawk}; ci@`o
-disabilita la funzionalit@`a ASLR per quell'esecuzione di @command{gawk}.
-Se la funzionalit@`a ASLR @`e abilitata per default nel sistema in uso,
-e se si vuole usare la memoria persistente, si pu@`o definire un alias,
-una funzione della shell o uno script di shell per eseguire sempre
-@command{gawk} preceduto dal comando @command{setarch}.
 
 @item
 Se @command{gawk} @`e eseguito dall'utente @command{root}, l'uso
