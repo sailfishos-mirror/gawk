@@ -19,7 +19,11 @@ then
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			true	# On Linux we no longer need -no-pie
+			AC_TRY_COMPILE([
+				#include <sys/personality.h>
+				int x = ADDR_NO_RANDOMIZE;
+				], ,
+				have_addr_no_randomize=yes, have_addr_no_randomize=no)
 			;;
  		*darwin*)
 			true	# On macos we no longer need -no-pie
@@ -45,9 +49,14 @@ then
 fi
 
 AM_CONDITIONAL([USE_PERSISTENT_MALLOC], [test "$use_persistent_malloc" = "yes"])
+AM_CONDITIONAL([HAVE_ADDR_NO_RANDOMIZE], [test "$have_addr_no_randomize" = "yes"])
 
 if test "$use_persistent_malloc" = "yes"
 then
 	AC_DEFINE(USE_PERSISTENT_MALLOC, 1, [Define to 1 if we can use the pma allocator])
+fi
+if test "$have_addr_no_randomize" = "yes"
+then
+	AC_DEFINE(HAVE_ADDR_NO_RANDOMIZE, 1, [Define to 1 if we have ADDR_NO_RANDOMIZE value])
 fi
 ])

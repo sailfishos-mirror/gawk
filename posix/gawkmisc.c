@@ -313,7 +313,7 @@ os_maybe_set_errno(void)
 void
 os_disable_aslr(const char *persist_file, char **argv)
 {
-#ifdef HAVE_PERSONALITY
+#if defined(HAVE_PERSONALITY) && defined(HAVE_ADDR_NO_RANDOMIZE)
 	// This code is Linux specific, both the reliance on /proc/self/exe
 	// and the personality system call.
 	if (persist_file != NULL) {

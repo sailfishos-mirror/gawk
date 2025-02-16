@@ -30,7 +30,7 @@ extern FILE *output_fp;
 extern void indent(int indent_level);
 extern NODE **is_integer(NODE *symbol, NODE *subs);
 
-static size_t INT_CHAIN_MAX = 2;
+static size_t INT_CHAIN_MAX = 10;
 
 static NODE **int_array_init(NODE *symbol, NODE *subs);
 static NODE **int_lookup(NODE *symbol, NODE *subs);
