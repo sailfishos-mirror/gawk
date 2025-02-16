@@ -43,7 +43,7 @@
  * 11/2002: Modern machines are bigger, cut this down from 10.
  */
 
-static size_t STR_CHAIN_MAX = 2;
+static size_t STR_CHAIN_MAX = 10;
 
 extern FILE *output_fp;
 extern void indent(int indent_level);
