@@ -2435,7 +2435,8 @@ inplace1::
 	@echo $@
 	@-cp "$(srcdir)"/inplace.1.in _$@.1
 	@-cp "$(srcdir)"/inplace.2.in _$@.2
-	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@->_$@
+	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(CMP) "$(srcdir)"/$@.1.ok _$@.1 && rm -f _$@.1
 	@-$(CMP) "$(srcdir)"/$@.2.ok _$@.2 && rm -f _$@.2
@@ -2444,7 +2445,8 @@ inplace2::
 	@echo $@
 	@-cp "$(srcdir)"/inplace.1.in _$@.1
 	@-cp "$(srcdir)"/inplace.2.in _$@.2
-	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v inplace::suffix=.bak 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@>_$@
+	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v inplace::suffix=.bak 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(CMP) "$(srcdir)"/$@.1.ok _$@.1 && rm -f _$@.1
 	@-$(CMP) "$(srcdir)"/$@.1.bak.ok _$@.1.bak && rm -f _$@.1.bak
@@ -2455,7 +2457,8 @@ inplace2bcomp::
 	@echo $@
 	@-cp "$(srcdir)"/inplace.1.in _$@.1
 	@-cp "$(srcdir)"/inplace.2.in _$@.2
-	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v INPLACE_SUFFIX=.orig 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@->_$@
+	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v INPLACE_SUFFIX=.orig 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(CMP) "$(srcdir)"/$@.1.ok _$@.1 && rm -f _$@.1
 	@-$(CMP) "$(srcdir)"/$@.1.orig.ok _$@.1.orig && rm -f _$@.1.orig
@@ -2466,7 +2469,8 @@ inplace3::
 	@echo $@
 	@-cp "$(srcdir)"/inplace.1.in _$@.1
 	@-cp "$(srcdir)"/inplace.2.in _$@.2
-	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v inplace::suffix=.bak 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@->_$@
+	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v inplace::suffix=.bak 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v inplace::suffix=.bak 'BEGIN {print "Before"} {gsub(/bar/, "foo"); print} END {print "After"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(CMP) "$(srcdir)"/$@.1.ok _$@.1 && rm -f _$@.1
@@ -2478,7 +2482,8 @@ inplace3bcomp::
 	@echo $@
 	@-cp "$(srcdir)"/inplace.1.in _$@.1
 	@-cp "$(srcdir)"/inplace.2.in _$@.2
-	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v INPLACE_SUFFIX=.orig 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@->_$@
+	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v INPLACE_SUFFIX=.orig 'BEGIN {print "before"} {gsub(/foo/, "bar"); print} END {print "after"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-AWKPATH="$(srcdir)"/../awklib/eg/lib $(AWK) -i inplace -v INPLACE_SUFFIX=.orig 'BEGIN {print "Before"} {gsub(/bar/, "foo"); print} END {print "After"}' _$@.1 - _$@.2 < "$(srcdir)"/inplace.in >>_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(CMP) "$(srcdir)"/$@.1.ok _$@.1 && rm -f _$@.1

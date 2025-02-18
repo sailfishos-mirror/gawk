@@ -1,3 +1,14 @@
+2025-02-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* main.c (main): Omit BSD hack that misbehaved by putting stderr
+	in O_APPEND mode, which can cause later stderr output to be put in
+	the wrong place, even after Gawk has exited and even if Gawk
+	never outputs anything.  For example, the shell command
+	"echo abcdefgh >foo; (gawk 'BEGIN{}'; echo ouch >&2) 2<>foo"
+	incorrectly appended "ouch" to the end of foo rather than
+	correctly overwriting the start of "foo" with "ouch".
+	The BSD issue can be addressed in the test case instead.
+
 2025-02-16         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* int_array.c (INT_CHAIN_MAX): Bump it up from 2 to 10.
