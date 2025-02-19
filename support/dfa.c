@@ -1,5 +1,5 @@
 /* dfa.c - deterministic extended regexp routines for GNU
-   Copyright (C) 1988, 1998, 2000, 2002, 2004-2005, 2007-2023 Free Software
+   Copyright (C) 1988, 1998, 2000, 2002, 2004-2005, 2007-2025 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -13,9 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,
-   51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written June, 1988 by Mike Haertel
    Modified July, 1988 by Arthur David Olson to assist BMG speedups  */
@@ -80,7 +78,7 @@ c_isdigit (char c)
 #ifndef FALLTHROUGH
 # if 201710L < __STDC_VERSION__
 #  define FALLTHROUGH [[__fallthrough__]]
-# elif ((__GNUC__ >= 7) \
+# elif ((__GNUC__ >= 7 && !defined __clang__) \
         || (defined __apple_build_version__ \
             ? __apple_build_version__ >= 12000000 \
             : __clang_major__ >= 10))
