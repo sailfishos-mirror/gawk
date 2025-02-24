@@ -25,7 +25,7 @@
  */
 
 /* FIX THIS BEFORE EVERY RELEASE: */
-#define UPDATE_YEAR	2024
+#define UPDATE_YEAR	2025
 
 #include "awk.h"
 #include "getopt.h"
