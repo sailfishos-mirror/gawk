@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 2012-2021, 2023, 2024 the Free Software Foundation, Inc.
+dnl Copyright (C) 2012-2021, 2023-2025 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -23,7 +23,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk Bundled Extensions],[5.3.1],[bug-gawk@gnu.org],[gawk-extensions])
+AC_INIT([GNU Awk Bundled Extensions],[5.3.2],[bug-gawk@gnu.org],[gawk-extensions])
 
 AC_PREREQ([2.71])
 
