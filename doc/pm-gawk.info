@@ -958,8 +958,8 @@ exercise of making Kernighan & Pike's "Markov" script persistent.  Volos
 provided and tested the advice on tuning OS parameters in *note Virtual
 Memory and Big Data::.  Stan Park provided insights about virtual
 memory, file systems, and utilities.  Antonio Giovanni Colombo
-translated an earlier edition of this manual into Italian in August
-2022; see file ‘doc/it/pm-gawk.texi’ in the ‘gawk’ distribution tarball.
+translated this manual into Italian; see file ‘doc/it/pm-gawk.texi’ in
+the ‘gawk’ distribution tarball.
 
 
 File: pm-gawk.info,  Node: Installation,  Next: Debugging,  Prev: Acknowledgments,  Up: Top
@@ -1041,6 +1041,16 @@ correctly built pm-‘gawk’ will eventually find its way into the default
 package-installed ‘gawk’ on major GNU/Linux distros.  Meanwhile, manual
 installation is a fairly easy way to get a working pm-‘gawk’.
 
+   As of version 5.3.2 of ‘gawk’, PIE vs. non-PIE builds are (or should
+be) a non-issue.  ‘gawk’ itself arranges to disable ASLR at runtime when
+using persistent memory.
+
+     NOTE: Apparently there are some systems where regular processes are
+     not allowed to disable ASLR. On such a system, the _second_ attempt
+     to run ‘gawk’ with a persistent backing store will fail.  In such a
+     case, you can try building ‘gawk’ yourself as a non-PIE executable,
+     or use a different system.
+
    *Manual Install*   Manually compiling ‘gawk’ from source code in the
 latest upstream release gives you the most recent stable version of
 ‘gawk’, built in accordance with with the maintainer's recipe, with no
@@ -1048,7 +1058,7 @@ meddling by intermediaries.  Therefore a manual install won't suffer
 from bugs such as the PIE bug discussed above.  Download the latest
 release here:
             <https://ftp.gnu.org/gnu/gawk/>
-            <https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.xz>
+            <https://ftp.gnu.org/gnu/gawk/gawk-5.3.2.tar.xz>
 
    Finally, for the ultimate in bleeding-edge upstream freshness,
 adventurous do-it-yourselfers can grab the ‘git’ master branch from
@@ -1058,8 +1068,8 @@ Unpack the tarball, run ‘./bootstrap.sh’, ‘./configure’, ‘make’, and
 
    As of February 2025, pm-‘gawk’ is supported on most, but not all,
 major Unix-like platforms.  The ‘gawk’ build system decides whether to
-include support for persistence; see the ‘gawk’ documentation and file
-‘./m4/pma.m4’ in the ‘gawk’ distribution.
+include support for persistence; see the ‘gawk’ documentation and the
+file ‘m4/pma.m4’ in the ‘gawk’ distribution.
 
 
 File: pm-gawk.info,  Node: Debugging,  Next: History,  Prev: Installation,  Up: Top
@@ -1220,9 +1230,9 @@ Ref: Data Integrity-Footnote-250104
 Ref: Data Integrity-Footnote-350256
 Ref: Data Integrity-Footnote-450350
 Node: Acknowledgments50729
-Node: Installation52098
-Node: Debugging57393
-Node: History59288
+Node: Installation52061
+Node: Debugging57870
+Node: History59765
 
 End Tag Table
 
