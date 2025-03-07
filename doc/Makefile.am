@@ -34,19 +34,23 @@ png_images = gawk_api-figure1.png gawk_api-figure2.png gawk_api-figure3.png \
 html_images = $(png_images) gawk_statist.jpg
 
 fig_images = $(png_images:%.png=%.fig)
-txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
 eps_images = $(txt_images:%.txt=%.eps) gawk_statist.eps
+jpg_images = $(txt_images:%.txt=%.jpg) gawk_statist.jpg
 pdf_images = $(txt_images:%.txt=%.pdf) gawk_statist.pdf
+svg_images = $(txt_images:%.txt=%.svg) gawk_statist.svg
+txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
 
 EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	README.card ad.block setter.outline \
 	awkcard.in awkforai.txt texinfo.tex cardfonts \
 	$(fig_images) $(txt_images) $(eps_images) $(pdf_images) \
-	$(html_images) \
+	$(html_images) $(jpg_images) $(svg_images) \
 	it \
 	macros colors no.colors $(man_MANS) \
 	lflashlight-small.xpic lflashlight.eps lflashlight.pdf \
+	lflashlight.jpg lflashlight.svg \
 	rflashlight-small.xpic rflashlight.eps rflashlight.pdf \
+	rflashlight.jpg rflashlight.svg \
 	wordlist wordlist2 wordlist3 wordlist4 wordlist5 wordlist6 \
 	bc_notes
 
