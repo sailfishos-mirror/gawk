@@ -1062,6 +1062,7 @@ mod:
 
 arrayfor:
 			getnode(r);
+			memset(r, '\0', sizeof(NODE));
 			r->type = Node_arrayfor;
 			r->for_list = list;
 			r->for_list_size = num_elems;		/* # of elements in list */
@@ -1309,6 +1310,8 @@ match_re:
 					fatal(_("function `%s' not defined"), pc->func_name);
 				pc->func_body = f;     /* save for next call */
 			}
+			if (do_itrace)
+				fprintf(stderr, "++\t%s\n", pc->func_name);
 
 			if (f->type == Node_ext_func) {
 				/* keep in sync with indirect call code */
