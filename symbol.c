@@ -600,6 +600,7 @@ append_symbol(NODE *r)
 	NODE *p;
 
 	getnode(p);
+	memset(p, '\0', sizeof(NODE));
 	p->lnode = r;
 	p->rnode = symbol_list->rnode;
 	symbol_list->rnode = p;
