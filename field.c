@@ -342,6 +342,7 @@ set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *fw)
 
 	unref(fields_arr[0]);
 	getnode(n);
+	memset(n, '\0', sizeof(NODE));
 	n->stptr = databuf;
 	n->stlen = cnt;
 	n->valref = 1;

@@ -1,3 +1,30 @@
+2025-03-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Bug fix:
+
+	* eval.c (elem_new_reset): Set vname to NULL. This is a bug fix that
+	only showed up when compiling for 32 bit.
+
+	Memory cleanup:
+
+	* eval.c (setup_frame, PUSH_CODE, init_interpret): After call to
+	getnode(), memset the new node to zero.
+	* field.c (set_record): Ditto.
+	* interpret.h (r_interpret): Case Op_array_for_init: Ditto.
+	* node.c (make_str_node): Ditto.
+	* profile.c (pp_push): Ditto.
+	* symbol.c (append_symbol): Ditto.
+
+	Compiler warning fix:
+
+	* main.c (enable_pma): Add a return true to silence compiler
+	warnings when USE_PERSISTENT_MALLOC is not defined.
+
+	General improvement:
+
+	* interpret.h (r_interpret): Case Op_func_call, if do_itrace,
+	print the function name.
+
 2025-02-24         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* NEWS: Updated.

@@ -1389,6 +1389,7 @@ setup_frame(INSTRUCTION *pc)
 
 	/* setup new frame */
 	getnode(frame_ptr);
+	memset(frame_ptr, '\0', sizeof(NODE));
 	frame_ptr->type = Node_frame;
 	frame_ptr->stack = sp;
 	frame_ptr->prev_frame_size = (stack_ptr - stack_bottom); /* size of the previous stack frame */
@@ -1727,6 +1728,7 @@ PUSH_CODE(INSTRUCTION *cp)
 {
 	NODE *r;
 	getnode(r);
+	memset(r, '\0', sizeof(NODE));
 	r->type = Node_instruction;
 	r->code_ptr = cp;
 	PUSH(r);
@@ -1879,6 +1881,7 @@ init_interpret()
 
 	/* initialize frame pointer */
 	getnode(frame_ptr);
+	memset(frame_ptr, '\0', sizeof(NODE));
 	frame_ptr->type = Node_frame;
 	frame_ptr->stack = NULL;
 	frame_ptr->func_node = NULL;	/* in main */
@@ -1916,6 +1919,7 @@ elem_new_reset(NODE *n)
 		n->elemnew_vname = NULL;
 	}
 	n->elemnew_parent = NULL;
+	n->vname = NULL;
 }
 
 /* elem_new_to_scalar --- convert Node_elem_new to untyped scalar */
