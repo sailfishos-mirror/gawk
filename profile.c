@@ -184,6 +184,7 @@ pp_push(int type, char *s, int flag, INSTRUCTION *comment)
 {
 	NODE *n;
 	getnode(n);
+	memset(n, '\0', sizeof(NODE));
 	n->pp_str = s;
 	n->pp_len = strlen(s);
 	n->flags = flag;
