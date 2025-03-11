@@ -598,6 +598,7 @@ reflags2str(int flagval)
 		{ RE_UNMATCHED_RIGHT_PAREN_ORD, "RE_UNMATCHED_RIGHT_PAREN_ORD" },
 		{ RE_NO_POSIX_BACKTRACKING, "RE_NO_POSIX_BACKTRACKING" },
 		{ RE_NO_GNU_OPS, "RE_NO_GNU_OPS" },
+		{ RE_DEBUG, "RE_DEBUG" },	// not actually used in the code anymore, :-(
 		{ RE_INVALID_INTERVAL_ORD, "RE_INVALID_INTERVAL_ORD" },
 		{ RE_ICASE, "RE_ICASE" },
 		{ RE_CARET_ANCHORS_HERE, "RE_CARET_ANCHORS_HERE" },
@@ -674,23 +675,26 @@ again:
 	if (sp == NULL)
 		goto done;
 
-	for (count++, sp++; *sp != '\0'; sp++) {
+	sp++;
+	count = 1;
+	/*
+	 * Skip over the following:
+	 * [^]...]
+	 * [\]...]
+	 * []...]
+	 */
+	if (*sp == '^')
+		sp++;
+	if (*sp == '\\')
+		sp += 2;
+	else if (*sp == ']')
+		sp++;
+
+	for (; sp < end && *sp != '\0'; sp++) {
 		if (*sp == '[')
 			count++;
-		/*
-		 * ] as first char after open [ is skipped
-		 * \] is skipped
-		 * [^]] is skipped
-		 */
-		if (*sp == ']' && sp > sp2) {
-			if (sp[-1] != '[' && sp[-1] != '\\')
-				count--;
-			else if ((sp - sp2) >= 2
-				&& sp[-1] == '^' && sp[-2] == '[')
-				;
-			else
-				count--;
-		}
+		else if (*sp == ']')
+			count--;
 
 		if (count == 0) {
 			sp++;	/* skip past ']' */
