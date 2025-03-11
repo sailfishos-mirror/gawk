@@ -1192,7 +1192,7 @@ reginttrad:
 
 colonwarn:
 	@echo $@
-	@-for i in 1 2 3 ; \
+	@-for i in 1 2 3 4 5 ; \
 	do AWKPATH="$(srcdir)" $(AWK) -f $@.awk $$i < "$(srcdir)"/$@.in 2>&1 ; \
 	done > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
