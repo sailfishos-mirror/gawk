@@ -645,6 +645,8 @@ EXTRA_DIST = \
 	indirectbuiltin4.ok \
 	indirectbuiltin5.awk \
 	indirectbuiltin5.ok \
+	indirectbuiltin6.awk \
+	indirectbuiltin6.ok \
 	indirectcall2.awk \
 	indirectcall2.ok \
 	indirectcall3.awk \
@@ -1613,8 +1615,8 @@ GAWK_EXT_TESTS = \
 	icasefs icasers id igncdym igncfs ignrcas2 ignrcas4 ignrcase \
 	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
 	include include2 indirectbuiltin indirectbuiltin3 indirectbuiltin4 \
-	indirectbuiltin5 indirectcall indirectcall2 indirectcall3 intarray \
-	iolint isarrayunset \
+	indirectbuiltin5 indirectbuiltin6 indirectcall indirectcall2 \
+	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintold lintplus \
 	lintplus2 lintplus3 lintset lintwarn manyfiles \
 	match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 mdim3 mdim4 mdim5 \
