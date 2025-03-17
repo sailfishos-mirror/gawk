@@ -1,3 +1,19 @@
+2025-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix problems calling functions indirectly with Node_var_new.
+	Thanks to Denis Shirokov <cosmogen@gmail.com> for the report
+	and test case.
+
+	* awk.h (POP_SCALAR): Handle Node_var_new.
+	(fixtype): Change assertion into a runtime test and failure.
+	That way it'll happen even if compiled with NDEBUG.
+
+	Unrelated cleanup:
+
+	* builtin.c (call_match): Remove redundant tests for
+	Node_var_new inside a test for either Node_var_new or
+	Node_elem_new.
+
 2025-03-11         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* re.c (check_bracket_exp): Rewrite the routine to correctly handle
