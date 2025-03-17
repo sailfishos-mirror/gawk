@@ -1904,6 +1904,15 @@ POP_SCALAR()
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t));
 	else if (t->type == Node_elem_new)
 		t = elem_new_to_scalar(t);
+	else if (t->type == Node_var_new) {
+		t->type = Node_var;
+		// this should be a call to dupnode(), but there are
+		// ordering problems since we're in awk.h. Just
+		// do it manually, since it's the null string
+		t->var_value = Nnull_string;
+		t->var_value->valref++;
+		t = t->var_value;
+	}
 
 	return t;
 }
@@ -2043,7 +2052,9 @@ force_number(NODE *n)
 static inline NODE *
 fixtype(NODE *n)
 {
-	assert(n->type == Node_val);
+	if (n->type != Node_val)
+		cant_happen("%s: expected Node_val: got %s",
+				__func__, nodetype2str(n->type));
 	if ((n->flags & (NUMCUR|USER_INPUT)) == USER_INPUT)
 		return force_number(n);
 	if ((n->flags & INTIND) != 0)
