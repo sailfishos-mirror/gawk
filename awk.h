@@ -1904,6 +1904,8 @@ POP_SCALAR()
 	else if (t->type == Node_elem_new)
 		t = elem_new_to_scalar(t);
 	else if (t->type == Node_var_new) {
+		NODE *n = t;
+
 		t->type = Node_var;
 		// this should be a call to dupnode(), but there are
 		// ordering problems since we're in awk.h. Just
@@ -1911,6 +1913,7 @@ POP_SCALAR()
 		t->var_value = Nnull_string;
 		t->var_value->valref++;
 		t = t->var_value;
+		DEREF(n);
 	}
 
 	return t;
