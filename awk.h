@@ -96,6 +96,12 @@ extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
 
 /* This section is the messiest one in the file, not a lot that can be done */
 
+/* AIX's <sys/cred.h> uses some names defined here in function prototypes.
+   Therefore, it must be included first or the build fails.  */
+#ifdef _AIX
+# include <sys/cred.h>
+#endif
+
 #ifndef VMS
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
