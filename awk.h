@@ -96,6 +96,12 @@ extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
 
 /* This section is the messiest one in the file, not a lot that can be done */
 
+/* AIX's <sys/cred.h> uses some names defined here in function prototypes.
+   Therefore, it must be included first or the build fails.  */
+#ifdef _AIX
+# include <sys/cred.h>
+#endif
+
 #ifndef VMS
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -1905,6 +1911,8 @@ POP_SCALAR()
 	else if (t->type == Node_elem_new)
 		t = elem_new_to_scalar(t);
 	else if (t->type == Node_var_new) {
+		NODE *n = t;
+
 		t->type = Node_var;
 		// this should be a call to dupnode(), but there are
 		// ordering problems since we're in awk.h. Just
@@ -1912,6 +1920,7 @@ POP_SCALAR()
 		t->var_value = Nnull_string;
 		t->var_value->valref++;
 		t = t->var_value;
+		DEREF(n);
 	}
 
 	return t;
