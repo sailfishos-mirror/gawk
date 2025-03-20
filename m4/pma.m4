@@ -19,11 +19,10 @@ then
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			AC_TRY_COMPILE([
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 				#include <sys/personality.h>
 				int x = ADDR_NO_RANDOMIZE;
-				], ,
-				have_addr_no_randomize=yes, have_addr_no_randomize=no)
+				]], [[]])],[have_addr_no_randomize=yes],[have_addr_no_randomize=no])
 			;;
  		*darwin*)
 			true	# On macos we no longer need -no-pie
