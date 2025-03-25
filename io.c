@@ -3116,7 +3116,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 #endif
 
 #ifdef DEFAULT_FILETYPE
-	if (! do_traditional && path == NULL) {
+	if (path == NULL) {
 		char *file_awk;
 		int save_errno = errno;
 #ifdef VMS
