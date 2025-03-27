@@ -1198,8 +1198,8 @@ do_split(int nargs)
 				warned = true;
 				lintwarn(_("split: null string for third arg is a non-standard extension"));
 			}
-		} else if (fs->stlen == 1 && (sep->re_flags & CONSTANT) == 0) {
-			if (fs->stptr[0] == ' ') {
+		} else if (fs->stlen == 1) {
+			if ((sep->re_flags & CONSTANT) == 0 && fs->stptr[0] == ' ') {
 				parseit = def_parse_field;
 			} else
 				parseit = sc_parse_field;

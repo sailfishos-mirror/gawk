@@ -1346,6 +1346,8 @@ EXTRA_DIST = \
 	splitvar.ok \
 	splitwht.awk \
 	splitwht.ok \
+	splitwht2.awk \
+	splitwht2.ok \
 	sprintfc.awk \
 	sprintfc.in \
 	sprintfc.ok \
@@ -1584,7 +1586,7 @@ BASIC_TESTS = \
 	rsnul1nl rsnulbig rsnulbig2 rsnullre rsnulw rstest1 rstest2 \
 	rstest3 rstest4 rstest5 rswhite \
 	scalar sclforin sclifin setrec0 setrec1 sigpipe1 sortempty \
-	sortglos spacere splitargv splitarr splitdef splitvar splitwht \
+	sortglos spacere splitargv splitarr splitdef splitvar splitwht splitwht2 \
 	status-close strcat1 strfieldnum strnum1 strnum2 strsubscript \
 	strtod subamp subback subi18n subsepnm subslash substr swaplns \
 	synerr1 synerr2 synerr3 \

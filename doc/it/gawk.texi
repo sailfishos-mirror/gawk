@@ -5269,8 +5269,9 @@ contenute nelle librerie di file di @command{awk}
 @ifnottex
 (@pxref{Funzioni di libreria}).
 @end ifnottex
-La ricerca del percorso non viene eseguita se @command{gawk} @`e in modalit@`a di
-compatibilit@`a, sia con l'opzione @option{--traditional} che con l'opzione
+La ricerca del percorso viene sempre eseguita, anche se se @command{gawk}
+@`e in modalit@`a di compatibilit@`a.
+Ci@`o vale, quindi, anche per l'opzione @option{--traditional} e per l'opzione
 @option{--posix}.
 @xref{Opzioni}.
 
@@ -9969,14 +9970,14 @@ Si usa @samp{getline < @var{file}} per leggere il record successivo da
 specifica il @value{FN}.  @samp{< @var{file}} @`e una cosidetta
 @dfn{ridirezione} perch@'e richiede che l'input provenga da un posto
 differente.  Per esempio, il seguente programma
-legge il suo record in input dal file @file{secondary.input} quando
+legge il suo record in input dal file @file{input.secondario} quando
 trova un primo campo con un valore uguale a 10 nel file in input
 corrente:
 
 @example
 @{
     if ($1 == 10) @{
-         getline < "secondary.input"
+         getline < "input.secondario"
          print
     @} else
          print
