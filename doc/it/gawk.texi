@@ -6891,8 +6891,19 @@ Inoltre, se si mette una @samp{]} subito dopo la
 @samp{[} aperta (@samp{[]d]}), la parentesi quadra chiusa @`e considerata
 come uno dei caratteri da individuare.
 All'interno di espressioni fra parentesi quadre non @`e necessario
-proteggere altri operatori di espressioni regolari, e per una
-completa portabilit@`a, non si dovrebbe farlo.
+proteggere altri operatori di espressioni regolari,
+come, p.es, @samp{*} e @samp{?},
+e per una completa portabilit@`a, non si dovrebbe farlo.
+
+@quotation NOTA
+Si noti che gli ulteriori operatori di espressione regolare che
+iniziano con una barra inversa (\) come, p.es., @samp{\<} o @samp{\w},
+non hanno significato quando sono usati all'interno di un'espressione
+racchiusa tra parentesi quadre.  In quel caso, la barra inversa
+@`e intesa come protezione del carattere successivo, quindi scrivere
+@samp{[\w]} equivale a scrivere @samp{[w]}, e @samp{[\<]} equivale
+a @samp{[<]}.
+@end quotation
 
 @cindex POSIX @command{awk} @subentry espressioni tra parentesi quadre
 @cindex espressioni regolari @subentry estese (ERE)
@@ -13009,7 +13020,7 @@ espressione booleana @`e valida, ma non fa quel che probabilmente l'autore
 si aspettava:
 
 @example
-# Notare che /pippo/ @`e alla @emph{sinistra} della ~
+# Si noti che /pippo/ @`e alla @emph{sinistra} della ~
 if (/pippo/ ~ $1) print "trovato pippo"
 @end example
 
