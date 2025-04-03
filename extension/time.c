@@ -153,7 +153,7 @@ do_gettimeofday(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 		if (get_system_time_precise_as_filetime)
 			get_system_time_precise_as_filetime (&ft.ft_val);
 		else
-		GetSystemTimeAsFileTime(&ft.ft_val);
+			GetSystemTimeAsFileTime(&ft.ft_val);
 #ifdef __GNUC__
 #define Const64(x) x##LL
 #else
