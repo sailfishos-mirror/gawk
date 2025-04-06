@@ -391,7 +391,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.3.1c"
+#define PACKAGE_STRING "GNU Awk 5.3.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
