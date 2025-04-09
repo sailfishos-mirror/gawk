@@ -341,7 +341,7 @@ os_disable_aslr(const char *persist_file, char **argv)
 			(void) unsetenv("GAWK_PMA_REINCARNATION");
 	}
 #endif
-#ifdef HAVE__NSGETEXECUTABLEPATH
+#if defined(HAVE__NSGETEXECUTABLEPATH) && defined(HAVE_POSIX_SPAWNP)
 	// This code is for macos
 	if (persist_file != NULL) {
 		const char *cp = getenv("GAWK_PMA_REINCARNATION");
