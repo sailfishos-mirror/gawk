@@ -318,7 +318,7 @@ AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
 	gettimeofday clock_gettime lstat \
 	getdtablesize \
 	mbrlen memcmp memcpy memmove memset \
-	_NSGetExecutablePath \
+	_NSGetExecutablePath posix_spawnp \
 	mkstemp mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
 	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
 	strsignal strtod strtoul system timegm tmpfile towlower towupper \
