@@ -320,15 +320,8 @@ os_disable_aslr(const char *persist_file, char **argv)
 		const char *cp = getenv("GAWK_PMA_REINCARNATION");
 
 		if (cp == NULL) {
-			char fullpath[BUFSIZ];
-			int n;
+			static const char exe[] = "/proc/self/exe";
 
-			if ((n = readlink("/proc/self/exe", fullpath, sizeof(fullpath)-1)) < 0) {
-				fprintf(stderr, _("warning: /proc/self/exe: readlink: %s\n"),
-							strerror(errno));
-				return;
-			}
-			fullpath[n] = '\0';
 			putenv("GAWK_PMA_REINCARNATION=true");
 			if (personality(PER_LINUX | ADDR_NO_RANDOMIZE) < 0) {
 				fprintf(stderr, _("warning: personality: %s\n"),
@@ -336,7 +329,7 @@ os_disable_aslr(const char *persist_file, char **argv)
 				fflush(stderr);
 				// do the exec anyway...
 			}
-			execv(fullpath, argv);
+			execv(exe, argv);
 		} else
 			(void) unsetenv("GAWK_PMA_REINCARNATION");
 	}
@@ -366,13 +359,13 @@ os_disable_aslr(const char *persist_file, char **argv)
 			if (status == 0) {
 				if (waitpid(pid, &status,  WUNTRACED) != -1) {
 					if (WIFEXITED(status))
-						exit WEXITSTATUS(status);	// use original exit code
+						exit(WEXITSTATUS(status));	// use original exit code
 				} else {
 					fprintf(stderr, _("waitpid: got exit status %#o\n"), status);
 					exit(EXIT_FATAL);
 				}
 			} else {
-				fprintf(stderr, _("fatal: posix_spawn: %s\n"), strerror(errno));
+				fprintf(stderr, _("fatal: posix_spawnp: %s\n"), strerror(errno));
 				exit(EXIT_FATAL);
 			}
 		} else
