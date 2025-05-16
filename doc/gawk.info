@@ -27305,8 +27305,8 @@ as follows:
 
      If ‘gawk’ was not able to get the file information, then ‘sbuf’
      will be zeroed out.  In particular, extension code can check if
-     ‘sbuf.st_ctime == 0’.  If that's true, then there is no information
-     in ‘sbuf’.
+     ‘sbuf.st_mode == 0’.  If that's true, then there is no information
+     in ‘sbuf’.(1)
 
    The ‘XXX_can_take_file()’ function should examine these fields and
 decide if the input parser should be used for the file.  The decision
@@ -27485,6 +27485,14 @@ example.
 
 ‘void register_input_parser(awk_input_parser_t *input_parser);’
      Register the input parser pointed to by ‘input_parser’ with ‘gawk’.
+
+   ---------- Footnotes ----------
+
+   (1) The ‘st_mode’ field indicates both the type of the file and the
+permissions on the file.  Even if the permissions are all zero (such as
+with ‘chmod 000 FILE’), the file type information is still there and
+will be nonzero.  So, if ‘sbuf.st_mode == 0’ is true, then you know that
+it really wasn't possible to get the file's information.
 
 
 File: gawk.info,  Node: Output Wrappers,  Next: Two-way processors,  Prev: Input Parsers,  Up: Registration Functions
@@ -40531,141 +40539,142 @@ Node: Extension Functions1134380
 Node: Exit Callback Functions1139954
 Node: Extension Version String1141268
 Node: Input Parsers1141963
-Node: Output Wrappers1156583
-Node: Two-way processors1161425
-Node: Printing Messages1163778
-Ref: Printing Messages-Footnote-11164989
-Node: Updating ERRNO1165142
-Node: Requesting Values1165941
-Ref: table-value-types-returned1166694
-Node: Accessing Parameters1168753
-Node: Symbol Table Access1170034
-Node: Symbol table by name1170546
-Ref: Symbol table by name-Footnote-11173747
-Node: Symbol table by cookie1173879
-Ref: Symbol table by cookie-Footnote-11178148
-Node: Cached values1178212
-Ref: Cached values-Footnote-11181844
-Node: Array Manipulation1182001
-Ref: Array Manipulation-Footnote-11183100
-Node: Array Data Types1183137
-Ref: Array Data Types-Footnote-11185955
-Node: Array Functions1186051
-Node: Flattening Arrays1191080
-Node: Creating Arrays1198128
-Node: Redirection API1202970
-Node: Extension API Variables1205987
-Node: Extension Versioning1206710
-Ref: gawk-api-version1207139
-Node: Extension GMP/MPFR Versioning1208926
-Node: Extension API Informational Variables1210630
-Node: Extension API Boilerplate1211883
-Node: Changes from API V11216013
-Node: Finding Extensions1217645
-Node: Extension Example1218220
-Node: Internal File Description1219042
-Node: Internal File Ops1223334
-Ref: Internal File Ops-Footnote-11234884
-Node: Using Internal File Ops1235032
-Ref: Using Internal File Ops-Footnote-11237465
-Node: Extension Samples1237743
-Node: Extension Sample File Functions1239312
-Node: Extension Sample Fnmatch1247437
-Node: Extension Sample Fork1249032
-Node: Extension Sample Inplace1250308
-Node: Extension Sample Ord1254410
-Node: Extension Sample Readdir1255286
-Ref: table-readdir-file-types1256075
-Node: Extension Sample Revout1257431
-Node: Extension Sample Rev2way1258028
-Node: Extension Sample Read write array1258780
-Node: Extension Sample Readfile1262054
-Node: Extension Sample Time1263185
-Node: Extension Sample API Tests1265185
-Node: gawkextlib1265693
-Node: Extension summary1268898
-Node: Extension Exercises1272746
-Node: Language History1274016
-Node: V7/SVR3.11275728
-Node: SVR41278078
-Node: POSIX1279610
-Node: BTL1281035
-Node: POSIX/GNU1281802
-Ref: Gawk Extension Functions1285192
-Node: Feature History1288616
-Node: Common Extensions1308518
-Node: Ranges and Locales1309993
-Ref: Ranges and Locales-Footnote-11314778
-Ref: Ranges and Locales-Footnote-21314805
-Ref: Ranges and Locales-Footnote-31315040
-Node: Contributors1315263
-Node: History summary1321615
-Node: Installation1323057
-Node: Gawk Distribution1324021
-Node: Getting1324513
-Node: Extracting1325512
-Node: Distribution contents1327218
-Node: Unix Installation1335108
-Node: Quick Installation1335928
-Node: Compiling with MPFR1338468
-Node: Shell Startup Files1339174
-Node: Additional Configuration Options1340331
-Node: Configuration Philosophy1342714
-Node: Compiling from Git1345214
-Node: Building the Documentation1345775
-Node: Non-Unix Installation1347187
-Node: PC Installation1347663
-Node: PC Binary Installation1348532
-Node: PC Compiling1349425
-Node: PC Using1350603
-Node: Cygwin1354319
-Node: MSYS1355572
-Node: OpenVMS Installation1356198
-Node: OpenVMS Compilation1356879
-Ref: OpenVMS Compilation-Footnote-11358429
-Node: OpenVMS Dynamic Extensions1358487
-Node: OpenVMS Installation Details1360132
-Node: OpenVMS Running1362563
-Node: OpenVMS GNV1366700
-Node: Bugs1367455
-Node: Bug definition1368375
-Node: Bug address1371977
-Node: Usenet1375546
-Node: Performance bugs1376759
-Node: Asking for help1379763
-Node: Maintainers1381750
-Node: Other Versions1382777
-Node: Installation summary1392845
-Node: Notes1394227
-Node: Compatibility Mode1395037
-Node: Additions1395859
-Node: Accessing The Source1396804
-Node: Adding Code1398337
-Node: New Ports1405448
-Node: Derived Files1409951
-Ref: Derived Files-Footnote-11415762
-Ref: Derived Files-Footnote-21415797
-Ref: Derived Files-Footnote-31416408
-Node: Future Extensions1416522
-Node: Implementation Limitations1417192
-Node: Extension Design1418434
-Node: Old Extension Problems1419594
-Ref: Old Extension Problems-Footnote-11421166
-Node: Extension New Mechanism Goals1421227
-Ref: Extension New Mechanism Goals-Footnote-11424697
-Node: Extension Other Design Decisions1424898
-Node: Extension Future Growth1427095
-Node: Notes summary1427715
-Node: Basic Concepts1428925
-Node: Basic High Level1429610
-Ref: figure-general-flow1429892
-Ref: figure-process-flow1430594
-Ref: Basic High Level-Footnote-11433964
-Node: Basic Data Typing1434153
-Node: Glossary1437561
-Node: Copying1470443
-Node: GNU Free Documentation License1508001
-Node: Index1533124
+Ref: Input Parsers-Footnote-11156621
+Node: Output Wrappers1156976
+Node: Two-way processors1161818
+Node: Printing Messages1164171
+Ref: Printing Messages-Footnote-11165382
+Node: Updating ERRNO1165535
+Node: Requesting Values1166334
+Ref: table-value-types-returned1167087
+Node: Accessing Parameters1169146
+Node: Symbol Table Access1170427
+Node: Symbol table by name1170939
+Ref: Symbol table by name-Footnote-11174140
+Node: Symbol table by cookie1174272
+Ref: Symbol table by cookie-Footnote-11178541
+Node: Cached values1178605
+Ref: Cached values-Footnote-11182237
+Node: Array Manipulation1182394
+Ref: Array Manipulation-Footnote-11183493
+Node: Array Data Types1183530
+Ref: Array Data Types-Footnote-11186348
+Node: Array Functions1186444
+Node: Flattening Arrays1191473
+Node: Creating Arrays1198521
+Node: Redirection API1203363
+Node: Extension API Variables1206380
+Node: Extension Versioning1207103
+Ref: gawk-api-version1207532
+Node: Extension GMP/MPFR Versioning1209319
+Node: Extension API Informational Variables1211023
+Node: Extension API Boilerplate1212276
+Node: Changes from API V11216406
+Node: Finding Extensions1218038
+Node: Extension Example1218613
+Node: Internal File Description1219435
+Node: Internal File Ops1223727
+Ref: Internal File Ops-Footnote-11235277
+Node: Using Internal File Ops1235425
+Ref: Using Internal File Ops-Footnote-11237858
+Node: Extension Samples1238136
+Node: Extension Sample File Functions1239705
+Node: Extension Sample Fnmatch1247830
+Node: Extension Sample Fork1249425
+Node: Extension Sample Inplace1250701
+Node: Extension Sample Ord1254803
+Node: Extension Sample Readdir1255679
+Ref: table-readdir-file-types1256468
+Node: Extension Sample Revout1257824
+Node: Extension Sample Rev2way1258421
+Node: Extension Sample Read write array1259173
+Node: Extension Sample Readfile1262447
+Node: Extension Sample Time1263578
+Node: Extension Sample API Tests1265578
+Node: gawkextlib1266086
+Node: Extension summary1269291
+Node: Extension Exercises1273139
+Node: Language History1274409
+Node: V7/SVR3.11276121
+Node: SVR41278471
+Node: POSIX1280003
+Node: BTL1281428
+Node: POSIX/GNU1282195
+Ref: Gawk Extension Functions1285585
+Node: Feature History1289009
+Node: Common Extensions1308911
+Node: Ranges and Locales1310386
+Ref: Ranges and Locales-Footnote-11315171
+Ref: Ranges and Locales-Footnote-21315198
+Ref: Ranges and Locales-Footnote-31315433
+Node: Contributors1315656
+Node: History summary1322008
+Node: Installation1323450
+Node: Gawk Distribution1324414
+Node: Getting1324906
+Node: Extracting1325905
+Node: Distribution contents1327611
+Node: Unix Installation1335501
+Node: Quick Installation1336321
+Node: Compiling with MPFR1338861
+Node: Shell Startup Files1339567
+Node: Additional Configuration Options1340724
+Node: Configuration Philosophy1343107
+Node: Compiling from Git1345607
+Node: Building the Documentation1346168
+Node: Non-Unix Installation1347580
+Node: PC Installation1348056
+Node: PC Binary Installation1348925
+Node: PC Compiling1349818
+Node: PC Using1350996
+Node: Cygwin1354712
+Node: MSYS1355965
+Node: OpenVMS Installation1356591
+Node: OpenVMS Compilation1357272
+Ref: OpenVMS Compilation-Footnote-11358822
+Node: OpenVMS Dynamic Extensions1358880
+Node: OpenVMS Installation Details1360525
+Node: OpenVMS Running1362956
+Node: OpenVMS GNV1367093
+Node: Bugs1367848
+Node: Bug definition1368768
+Node: Bug address1372370
+Node: Usenet1375939
+Node: Performance bugs1377152
+Node: Asking for help1380156
+Node: Maintainers1382143
+Node: Other Versions1383170
+Node: Installation summary1393238
+Node: Notes1394620
+Node: Compatibility Mode1395430
+Node: Additions1396252
+Node: Accessing The Source1397197
+Node: Adding Code1398730
+Node: New Ports1405841
+Node: Derived Files1410344
+Ref: Derived Files-Footnote-11416155
+Ref: Derived Files-Footnote-21416190
+Ref: Derived Files-Footnote-31416801
+Node: Future Extensions1416915
+Node: Implementation Limitations1417585
+Node: Extension Design1418827
+Node: Old Extension Problems1419987
+Ref: Old Extension Problems-Footnote-11421559
+Node: Extension New Mechanism Goals1421620
+Ref: Extension New Mechanism Goals-Footnote-11425090
+Node: Extension Other Design Decisions1425291
+Node: Extension Future Growth1427488
+Node: Notes summary1428108
+Node: Basic Concepts1429318
+Node: Basic High Level1430003
+Ref: figure-general-flow1430285
+Ref: figure-process-flow1430987
+Ref: Basic High Level-Footnote-11434357
+Node: Basic Data Typing1434546
+Node: Glossary1437954
+Node: Copying1470836
+Node: GNU Free Documentation License1508394
+Node: Index1533517
 
 End Tag Table
 
