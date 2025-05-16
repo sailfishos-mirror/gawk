@@ -37035,8 +37035,14 @@ on Windows systems when trying to use @code{open()} on a directory.
 
 If @command{gawk} was not able to get the file information, then
 @code{sbuf} will be zeroed out. In particular, extension code
-can check if @samp{sbuf.st_ctime == 0}. If that's true, then there
-is no information in @code{sbuf}.
+can check if @samp{sbuf.st_mode == 0}. If that's true, then there
+is no information in @code{sbuf}.@footnote{The @code{st_mode}
+field indicates both the type of the file and the permissions
+on the file. Even if the permissions are all zero (such as with
+@samp{chmod 000 @var{file}}), the file type information is still
+there and will be nonzero. So, if @samp{sbuf.st_mode == 0} is
+true, then you know that it really wasn't possible to get
+the file's information.}
 @end table
 
 The @code{@var{XXX}_can_take_file()} function should examine these

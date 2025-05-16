@@ -852,7 +852,8 @@ init_vars()
 	NODE *n;
 
 	for (vp = varinit; vp->name != NULL; vp++) {
-		if ((vp->flags & NO_INSTALL) != 0)
+		if (((vp->flags & NO_INSTALL) != 0) ||
+		    (do_traditional && ((vp->flags & NON_STANDARD) != 0)))
 			continue;
 		n = *(vp->spec) = install_symbol(estrdup(vp->name, strlen(vp->name)), Node_var);
 		if (vp->strval != NULL)
