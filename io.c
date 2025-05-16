@@ -4082,7 +4082,8 @@ get_a_record(char **out,        /* pointer to pointer to data */
 	 * but Bitter Experience teaches us not to make ``that'll never
 	 * happen'' kinds of assumptions.
 	 */
-	rtval = RT_node->var_value;
+	if (! do_traditional)
+		rtval = RT_node->var_value;
 
 	if (recm.rt_len == 0) {
 		set_RT_to_null();
@@ -4106,12 +4107,12 @@ get_a_record(char **out,        /* pointer to pointer to data */
 			lastmatchrec = matchrec;
 			set_RT(recm.rt_start, recm.rt_len);
 		} else if (matchrec == rs1scan) {
-			if (rtval->stlen != 1 || rtval->stptr[0] != recm.rt_start[0])
+			if (! do_traditional && (rtval->stlen != 1 || rtval->stptr[0] != recm.rt_start[0]))
 				set_RT(recm.rt_start, recm.rt_len);
 			/* else
 				leave it alone */
 		} else if (matchrec == rsnullscan) {
-			if (rtval->stlen >= recm.rt_len) {
+			if (! do_traditional && (rtval->stlen >= recm.rt_len)) {
 				rtval->stlen = recm.rt_len;
 				free_wstr(rtval);
 			} else
