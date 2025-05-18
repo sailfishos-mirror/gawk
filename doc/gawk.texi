@@ -23469,6 +23469,14 @@ END @{ endfile(_filename_) @}
 shows how this library function can be used and
 how it simplifies writing the main program.
 
+There is one small catch to how this program works.
+It relies on the action being executed for the first
+record in the file.  If you happen to process a zero-length
+file, @code{FNR} is never set, and @command{awk} just
+moves on to the next file in the argument list.
+If you're worried about this, you'll have to find a
+workaround.
+
 @cindex sidebar @subentry So Why Does @command{gawk} Have @code{BEGINFILE} and @code{ENDFILE}?
 @cartouche So Why Does @command{gawk} Have @code{BEGINFILE} and @code{ENDFILE}?
 
@@ -23484,6 +23492,11 @@ the main reason for @code{BEGINFILE} is to give you a ``hook'' to catch
 files that cannot be processed.  @code{ENDFILE} exists for symmetry,
 and because it provides an easy way to do per-file cleanup processing.
 For more information, refer to @ref{BEGINFILE/ENDFILE}.
+
+One might next ask, so what's the value in @file{ftrans.awk}?
+The answer is that it provides a @emph{portable} way to implement
+beginning-of-file and end-of-file handling.  This code should 
+work with any POSIX-compliant version of @command{awk}.
 @end cartouche
 
 @node Rewind Function
@@ -23703,6 +23716,27 @@ Finally, the @code{END} rule catches the case of any empty files at
 the end of the command-line arguments.  Note that the test in the
 condition of the @code{for} loop uses the @samp{<=} operator,
 not @samp{<}.
+
+What if you're not using @command{gawk}?  You can write a separate
+@code{BEGIN} rule that loops over the files named in @code{ARGV}
+and attempts to read a record with @code{getline}.  If @code{getline}
+immediately returns zero (end of file), the file exists but is empty.
+You can then delete it from @code{ARGV}, issue a warning, or do
+anything else you think is appropriate.
+
+Also, we note that this library routine was written when @command{gawk}
+(like its maintainer) was considerably younger.  In modern versions,
+you could instead write it like this:
+
+@example
+ENDFILE @{
+    if (FNR == 0)
+            zerofile(FILENAME, ARGIND)
+@}
+@end example
+
+@noindent
+(With thanks to Andrew Schorr.)
 
 @node Ignoring Assigns
 @subsection Treating Assignments as @value{FFN}s

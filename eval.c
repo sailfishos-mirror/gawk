@@ -1013,6 +1013,9 @@ update_ERRNO_int(int errcode)
 {
 	const char *cp;
 
+	if (do_traditional)
+		return;
+
 	update_PROCINFO_num("errno", errcode);
 	if (errcode) {
 		cp = strerror(errcode);
@@ -1028,6 +1031,9 @@ update_ERRNO_int(int errcode)
 void
 update_ERRNO_string(const char *string)
 {
+	if (do_traditional)
+		return;
+
 	update_PROCINFO_num("errno", 0);
 	unref(ERRNO_node->var_value);
 	size_t len = strlen(string);
@@ -1054,6 +1060,9 @@ update_ERRNO_string(const char *string)
 void
 unset_ERRNO(void)
 {
+	if (do_traditional)
+		return;
+
 	update_PROCINFO_num("errno", 0);
 	unref(ERRNO_node->var_value);
 	ERRNO_node->var_value = dupnode(Nnull_string);

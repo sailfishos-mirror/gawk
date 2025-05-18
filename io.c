@@ -492,8 +492,7 @@ nextfile(IOBUF **curfile, bool skipping)
 				fd = devopen(fname, binmode("r"));
 			}
 			errcode = errno;
-			if (! do_traditional)
-				update_ERRNO_int(errno);
+			update_ERRNO_int(errno);
 			iop = iop_alloc(fd, fname, errcode);
 			*curfile = iop_finish(iop);
 			if (iop->public.fd == INVALID_HANDLE)
@@ -501,7 +500,7 @@ nextfile(IOBUF **curfile, bool skipping)
 			else if (iop->valid)
 				iop->errcode = 0;
 
-			if (! do_traditional && iop->errcode != 0)
+			if (iop->errcode != 0)
 				update_ERRNO_int(iop->errcode);
 
 			return ++i;	/* run beginfile block */
@@ -513,8 +512,7 @@ nextfile(IOBUF **curfile, bool skipping)
 		/* no args. -- use stdin */
 		/* FNR is init'ed to 0 */
 		errno = 0;
-		if (! do_traditional)
-			update_ERRNO_int(errno);
+		update_ERRNO_int(errno);
 
 		unref(FILENAME_node->var_value);
 		FILENAME_node->var_value = make_string("-", 1);
@@ -990,7 +988,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 					/* do not free rp, saving it for reuse (save_rp = rp) */
 					return NULL;
 				}
-				if (! do_traditional && rp->iop->errcode != 0)
+				if (rp->iop->errcode != 0)
 					update_ERRNO_int(rp->iop->errcode);
 				iop_close(rp->iop);
 				rp->iop = NULL;
@@ -1404,10 +1402,8 @@ close_redir(struct redirect *rp, bool exitwarn, two_way_close_type how)
 					 status, rp->value, s);
 		}
 
-		if (! do_traditional) {
-			/* set ERRNO too so that program can get at it */
-			update_ERRNO_int(save_errno);
-		}
+		/* set ERRNO too so that program can get at it */
+		update_ERRNO_int(save_errno);
 	}
 
 checkwarn:
@@ -2197,7 +2193,7 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		find_input_parser(rp->iop);
 		iop_finish(rp->iop);
 		if (! rp->iop->valid) {
-			if (! do_traditional && rp->iop->errcode != 0)
+			if (rp->iop->errcode != 0)
 				update_ERRNO_int(rp->iop->errcode);
 			iop_close(rp->iop);
 			rp->iop = NULL;
@@ -2321,7 +2317,7 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		find_input_parser(rp->iop);
 		iop_finish(rp->iop);
 		if (! rp->iop->valid) {
-			if (! do_traditional && rp->iop->errcode != 0)
+			if (rp->iop->errcode != 0)
 				update_ERRNO_int(rp->iop->errcode);
 			iop_close(rp->iop);
 			rp->iop = NULL;
@@ -2490,7 +2486,7 @@ use_pipes:
 	find_input_parser(rp->iop);
 	iop_finish(rp->iop);
 	if (! rp->iop->valid) {
-		if (! do_traditional && rp->iop->errcode != 0)
+		if (rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		iop_close(rp->iop);
 		rp->iop = NULL;
@@ -2729,7 +2725,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	find_input_parser(rp->iop);
 	iop_finish(rp->iop);
 	if (! rp->iop->valid) {
-		if (! do_traditional && rp->iop->errcode != 0)
+		if (rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		iop_close(rp->iop);
 		rp->iop = NULL;
@@ -2785,7 +2781,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	find_input_parser(rp->iop);
 	iop_finish(rp->iop);
 	if (! rp->iop->valid) {
-		if (! do_traditional && rp->iop->errcode != 0)
+		if (rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		(void) pclose(current);
 		rp->iop->public.fd = INVALID_HANDLE;
@@ -2842,8 +2838,7 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 	decr_sp();
 	if (rp == NULL) {
 		if (redir_error) { /* failed redirect */
-			if (! do_traditional)
-				update_ERRNO_int(redir_error);
+			update_ERRNO_int(redir_error);
 		}
 		return make_number((AWKNUM) -1.0);
 	} else if ((rp->flag & RED_TWOWAY) != 0 && rp->iop == NULL) {
@@ -2861,7 +2856,7 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 	errcode = 0;
 	retval = get_a_record(& s, & cnt, iop, & errcode, (lhs ? NULL : & field_width));
 	if (errcode != 0) {
-		if (! do_traditional && (errcode != -1))
+		if (errcode != -1)
 			update_ERRNO_int(errcode);
 		return make_number((AWKNUM) retval);
 	}
@@ -2913,7 +2908,7 @@ do_getline(int into_variable, IOBUF *iop)
 	errcode = 0;
 	retval = get_a_record(& s, & cnt, iop, & errcode, (into_variable ? NULL : & field_width));
 	if (errcode != 0) {
-		if (! do_traditional && (errcode != -1))
+		if (errcode != -1)
 			update_ERRNO_int(errcode);
 		if (into_variable)
 			(void) POP_ADDRESS();
