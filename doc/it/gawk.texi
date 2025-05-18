@@ -41210,8 +41210,14 @@ usare @code{open()} su una directory.
 Se @command{gawk} non sar@`a riuscito a ottenere le informazioni
 relative al file, allora @code{sbuf} conterr@`a zeri binari.
 In particolare, il codice dell'estensione pu@`o testare se il campo
-@samp{sbuf.st_ctime == 0}.  Se @`e questo il caso, allora in
-@code{sbuf} non @`e contenuta alcuna informazione.
+@samp{sbuf.st_mode == 0}.  Se @`e questo il caso, allora in
+@code{sbuf} non @`e contenuta alcuna informazione.@footnote{
+Il campo @code{st_mode} indica sia il tipo di file che i permessi di
+accesso al file.  Anche se i bit del permesso sono tutti a zero (come
+sarebbe dopo aver dato il comando @samp{chmod 000 @var{file}}),
+l'informazione sul tipo di file sar@`a ancora presente, e diversa da
+zero.  Quindi, se @samp{sbuf.st_mode == 0} @`e verificato, ci@`o vuol
+dire che non @`e stato possibile ottenere informazioni riguardo al file.}
 @end table
 
 La funzione @code{@var{XXX}_can_take_file()} dovrebbe esaminare i campi di
