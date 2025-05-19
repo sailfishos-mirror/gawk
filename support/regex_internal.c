@@ -936,6 +936,11 @@ re_node_set_alloc (re_node_set *set, Idx size)
 {
   set->alloc = size;
   set->nelem = 0;
+#if GAWK && USE_PERSISTENT_MALLOC
+  // PMA returns NULL for malloc of zero bytes...
+  if (size == 0)
+    size = 1;	// fudge it
+#endif
   set->elems = re_malloc (Idx, size);
   if (__glibc_unlikely (set->elems == NULL))
     return REG_ESPACE;
