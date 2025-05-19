@@ -3723,7 +3723,7 @@ e @ref{Istruzione Nextfile}.)
 @ifnotdocbook
 e anche @pxref{Istruzione nextfile}.)
 @end ifnotdocbook
-Si prosegue cos@`{@dotless{i}} finch@'e il programma raggiunge la fine del file.
+Si prosegue cos@`{@dotless{i}} finch@'e il programma raggiunge la fine-file.
 Per esempio, il seguente programma @command{awk} contiene due regole:
 
 @example
@@ -4976,7 +4976,7 @@ i nomi di funzione devono essere univoci).
 Con @command{awk} standard, le funzioni di libreria si possono ancora usare,
 anche se il  programma @`e immesso dalla tastiera,
 specificando @samp{-f /dev/tty}.  Dopo aver scritto il programma,
-premere @kbd{Ctrl-d} (il carattere di fine file) per terminarlo.
+premere @kbd{Ctrl-d} (il carattere di fine-file) per terminarlo.
 (Si potrebbe anche usare @samp{-f -} per leggere il sorgente del programma
 dallo standard input, ma poi non si potr@`a usare lo standard input come sorgente
 di dati).
@@ -8868,6 +8868,7 @@ Occasionalmente, @`e utile trattare l'intera riga in input come un solo campo.
 Questo si pu@`o fare facilmente e in modo portabile semplicemente impostando
 @code{FS} a @code{"\n"} (un ritorno a capo).@footnote{Grazie ad
 Andrew Schorr per questo suggerimento.}
+@cindex Schorr, Andrew
 
 @example
 awk -F'\n' '@var{programma}' @var{file @dots{}}
@@ -9752,8 +9753,7 @@ I record sono separati da una o pi@`u righe vuote.
 Quando @code{FS} @`e un carattere singolo,
 il carattere di ritorno a capo
 serve sempre come separatore di campo, in aggiunta a qualunque valore possa
-avere @code{FS}.  I ritorni a capo all'inizio e alla fine del file sono
-ignorati.
+avere @code{FS}.  Le righe vuote a inizio-file e a fine-file sono ignorate.
 
 @item RS == @var{regexp}
 I record sono separati da ricorrenze di caratteri corrispondenti a
@@ -9812,7 +9812,7 @@ e avere acquisito una buona conoscenza di come funziona @command{awk}.
 @cindex opzione @subentry @option{--sandbox} @subentry ridirezione dell'input con @code{getline}
 
 La funzione @code{getline} restituisce 1 se trova un record e 0 se
-trova la fine del file.  Se si verifica qualche errore cercando di leggere
+trova la fine-file.  Se si verifica qualche errore cercando di leggere
 un record, come un file che non pu@`o essere aperto, @code{getline}
 restituisce @minus{}1.  In questo caso, @command{gawk} imposta la variabile
 @code{ERRNO} a una stringa che descrive l'errore in questione.
@@ -10392,7 +10392,7 @@ while ((getline line < "file.txt") > 0)
 @cindex Moore, Duncan
 Se la variabile assegnata @`e un'espressione con effetti collaterali, versioni
 differenti di @command{awk} si comportano in modo diverso quando trovano la
-fine-del-file [EOF].  Alcune versioni non valutano l'espressione; molte
+fine-file [EOF].  Alcune versioni non valutano l'espressione; molte
 versioni (compreso @command{gawk}) lo fanno.  Si veda un esempio, gentilmente
 fornito da Duncan Moore:
 
@@ -10410,7 +10410,7 @@ BEGIN @{
 @end example
 
 @noindent
-Qui l'effetto secondario @`e @samp{++c}.  Se viene trovata la fine del file
+Qui l'effetto secondario @`e @samp{++c}.  Se viene trovata la fine-file
 @emph{prima} di assegnare l'elemento @code{a}, @code{c} @`e incrementato o no?
 
 Nonostante l'assenza di parentesi, quando si chiama @code{getline} @command{gawk}
@@ -16063,7 +16063,7 @@ per parecchie utili funzioni di libreria.
 Se un programma @command{awk} ha solo regole @code{BEGIN} e nessun'altra
 regola, il programma esce dopo aver eseguito le regole
 @code{BEGIN}.@footnote{La versione originale di @command{awk} continuava a
-leggere e ignorare i record in input fino alla fine del file.}  Tuttavia, se
+leggere e ignorare i record in input fino alla fine-file.}  Tuttavia, se
 una regola @code{END} esiste, l'intero input @`e letto, anche se non sono
 presenti altre regole nel programma.  Ci@`o viene fatto necessariamente
 per permettere che
@@ -17073,7 +17073,7 @@ Il messaggio @`e ridiretto al flusso in output
 Per maggiori dettagli, si veda
 @ref{File speciali}.
 
-Se l'istruzione @code{next} provoca il raggiungimento della fine del file
+Se l'istruzione @code{next} provoca il raggiungimento della fine-file
 in input, vengono eseguite le eventuali regole @code{END} presenti.
 @xref{BEGIN/END}.
 
@@ -26190,6 +26190,14 @@ La
 mostra come utilizzare questa funzione di libreria e come ci@`o
 semplifichi la scrittura del programma principale.
 
+C'è una piccola avvertenza riguardo al funzionamento di questo programma.
+Esso dipende dall'azione che viene eseguita a fronte del primo record
+del file.  Se il file in questione ha lunghezza zero, alla variabile
+@code{FNR} non viene mai assegnato un valore, e @command{awk} procede
+leggendo il file che segue nella lista degli argomenti.
+Se la cosa può avere importanza nel vostro caso, occorre trovare una
+soluzione alternativa.
+
 @cindex riquadro @subentry Allora perch@'e @command{gawk} ha @code{BEGINFILE} ed @code{ENDFILE}?
 @cartouche Allora perch@'e @command{gawk} ha @code{BEGINFILE} ed @code{ENDFILE}?
 
@@ -26209,6 +26217,12 @@ Quindi, la ragione principale di @code{BEGINFILE} @`e quella di dare un
 @code{ENDFILE} esiste per simmetria, e perch@'e consente facilmente
 una pulizia "file per file".  Per maggiori informazioni si faccia
 riferimento alla @ref{BEGINFILE/ENDFILE}.
+
+Ci si potrebbe inoltre chiedere a cosa serve il programma @file{ftrans.awk}.
+La risposta è che rende disponibile una maniera @emph{portabile}
+di gestire le azioni da compiere a inizio-file e a fine-file.
+@file{ftrans.awk} dovrebbe funzionare con qualsiasi versione di
+@command{awk} che soddisfi allo standard POSIX.
 @end cartouche
 
 @node Funzione rewind
@@ -26445,6 +26459,31 @@ Infine, la regola @code{END} prende in considerazione il caso di un qualsiasi
 file vuoto alla fine degli argomenti nella riga di comando.  Si noti che nella
 condizione del ciclo @code{for}, la verifica  usa l'operatore @samp{<=}, non
 @samp{<}.
+
+Che dire nel caso non si stia usando @command{gawk}?
+Si può scrivere una regola @code{BEGIN} apposita
+che scandisca i nomi di file presenti nel vettore @code{ARGV}
+e che tenti di leggere un record da ognuno di essi usando @code{getline}.
+Se @code{getline} restituisce immediatamente il codice di ritorno zero
+(che segnala la fine-file), il file in esame esiste, ma è un file vuoto.
+A quel punto si può toglierlo dal vettore @code{ARGV}, mandare un
+messaggio di avviso, o fare qualsiasi cosa si ritenga utile fare.
+
+Incidentalmente, questa libreria di programmi è stata scritta quando
+@command{gawk} (e il suo manutentore) erano molto più giovani.
+Nelle versioni moderne di @command{gawk}, è possibile invece scriverla
+in questo modo:
+
+@example
+ENDFILE @{
+    if (FNR == 0)
+            zerofile(FILENAME, ARGIND)
+@}
+@end example
+
+@noindent
+(Con ringraziamenti ad Andrew Schorr.)
+@cindex Schorr, Andrew
 
 @node Ignorare assegnamenti di variabili
 @subsection Trattare assegnamenti di variabile come @value{FNS}
@@ -33761,6 +33800,7 @@ programmazione attenta, insieme alla conoscenza del comportamento del
 coprocesso.
 @end quotation
 
+@cindex Schorr, Andrew
 @c From email send January 4, 2018.
 L'esempio seguente, preparato da Andrew Schorr, dimostra come
 l'utilizzo delle @dfn{pty} pu@`o servire a evitare situazioni
@@ -37739,6 +37779,7 @@ in
 @ref{Funzioni Passwd};
 l@`{@dotless{i}} si pu@`o trovare la descrizione del funzionamento del codice.
 
+@cindex Schorr, Andrew
 Questa riformulazione, opera principalmente di Andrew Schorr,
 @`e piuttosto elegante.
 Tutte le funzioni e le variabili di implementazione
@@ -39520,6 +39561,7 @@ Si veda
 Occasionalmente, potrebbe essere utile controllare se @command{gawk} sia stato
 chiamato specificando l'opzione @option{-M}, che consente di effettuare
 calcoli aritmetici di precisione arbitraria.
+@cindex Schorr, Andrew
 Lo si pu@`o fare con la funzione seguente, messa a disposizione da
 Andrew Schorr:
 
@@ -41325,7 +41367,7 @@ La struttura dati @code{awk_fieldwidth_info_t} @`e descritta qui di seguito.
 @end table
 
 Il codice di ritorno @`e la lunghezza del buffer puntato da
-@code{*out} oppure @code{EOF}, se @`e stata raggiunta la fine del file o se
+@code{*out} oppure @code{EOF}, se @`e stata raggiunta la fine-file o se
 si @`e verificato un errore.
 
 Poich@'e @code{errcode} @`e sicuramente un puntatore valido, non c'@`e
@@ -42973,7 +43015,7 @@ dovrebbe avere uno di questi valori:
 Un file aperto in output.
 
 @item ">>"
-Un file aperto in output, record aggiunti a fine file,
+Un file aperto in output, record aggiunti a fine-file,
 dopo quelli gi@`a esistenti [@dfn{append}].
 
 @item "<"
