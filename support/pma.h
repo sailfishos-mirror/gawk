@@ -26,6 +26,10 @@
 #define PMA_H_VERSION "2022.10Oct.30.1667172241 (Avon 8-g1)"
 extern const char pma_version[];
 
+// PMA flags
+#define PMA_NO_FLAGS			0
+#define PMA_TERRIBLE_MALLOC_ZERO	1	// malloc(0) returns non-NULL
+
 /* May contain line number in pma.c where something went wrong if one
    of the other interfaces fails.  "Use the Source, Luke." */
 extern int pma_errno;
@@ -56,7 +60,7 @@ extern int pma_errno;
    check may be slow depending on the complexity of the heap.  Any
    non-zero return value indicates trouble; inspect both the value
    returned and also pma_errno. */
-extern int pma_init(int verbose, const char *file);
+extern int pma_init(int verbose, const char *file, int flags);
 
 /* The following four functions may be used like their standard
    counterparts.  See notes on pma_init for fallback to standard

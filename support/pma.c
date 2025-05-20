@@ -129,6 +129,7 @@ static struct {
       vrb;            // verbsity level
   const char * file;  // name of backing file
   pma_hdr_t * hdr;    // addr where backing file is mapped
+  int flags;          // behavior changing bits
 } state;
 
 // #define ASI assert(1 == state.init || 2 == state.init)  // assert state initialization
@@ -379,13 +380,14 @@ static void * addrgap(off_t n) {  // find big gap in address space to map n byte
 #undef MUNMAP
 
 #define MM(a,s,f) mmap((a), (size_t)(s), PROT_READ | PROT_WRITE, MAP_SHARED, (f), 0)
-int pma_init(int verbose, const char *file) {
+int pma_init(int verbose, const char *file, int flags) {
   int fd, pwr2flag = 0;  long ps, pwr2;  void *a1, *a2;  char *ev;
   size_t as = sizeof(a1);  struct stat s;
   pma_hdr_t *h;
   if (! (0 <= verbose && 3 >= verbose)) { SE; assert(0); RL; }  // ERR macro wouldn't work here
   state.vrb = verbose;
-  FYI("pma_init(%d,\"%s\")\n", verbose, file);
+  state.flags = flags;
+  FYI("pma_init(%d,\"%s\", %#x)\n", verbose, file, flags);
   if (NULL != (ev = getenv("PMA_VERBOSITY"))) {
     int newvrb;
     if (1 != sscanf(ev, "%1d", &newvrb)) { ERR("parsing envar verbosity \"%s\"\n", ev); SERL; }
@@ -531,7 +533,7 @@ void * pma_malloc(size_t size) {
   ASI(NULL);
   if (2 == state.init) return malloc(size);
   assert(!IC);
-  if (0 >= size) {
+  if (0 >= size && 0 == (state.flags & PMA_TERRIBLE_MALLOC_ZERO)) {
     WRN("malloc(%zu) argument <= zero\n", size);  SERN;  }
   for (int c = sc(size); c < NFL; c++) {
     ao_t *h = &(state.hdr->free[c]);

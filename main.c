@@ -1919,7 +1919,9 @@ enable_pma(char **argv)
 	os_disable_aslr(persist_file, argv);
 
 	check_pma_security(persist_file);
-	int pma_result = pma_init(1, persist_file);
+	// Gnulib routines expect malloc(0) to return non-NULL except
+	// where there really is no memory. Sigh.
+	int pma_result = pma_init(1, persist_file, PMA_TERRIBLE_MALLOC_ZERO);
 	if (pma_result != 0) {
 		// don't use 'fatal' routine, memory can't be allocated
 		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
