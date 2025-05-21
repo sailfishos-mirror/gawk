@@ -44,7 +44,7 @@
 #include "pma.h"
 
 // Software version; not the same as backing file format version.
-const char pma_version[] = "2022.10Oct.30.1667172241 (Avon 8-g1)";
+const char pma_version[] = "2022.10Oct.30.1667172241 (Avon 8-g2)";
 
 #define S(s) #s
 #define S2(s) S(s)

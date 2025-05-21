@@ -23,7 +23,7 @@
 #define PMA_H_INCLUDED
 
 // version strings of interface and implementation should match
-#define PMA_H_VERSION "2022.10Oct.30.1667172241 (Avon 8-g1)"
+#define PMA_H_VERSION "2022.10Oct.30.1667172241 (Avon 8-g2)"
 extern const char pma_version[];
 
 // PMA flags
