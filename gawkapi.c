@@ -1104,8 +1104,9 @@ api_set_array_element(awk_ext_id_t id, awk_array_t a_cookie,
 	elem = awk_value_to_node(value);
 	if (elem->type == Node_var_array) {
 		elem->parent_array = array;
-		elem->vname = estrdup(index->str_value.str,
-					index->str_value.len);
+		// array indices are strings, ensure that this is the case
+		(void) force_string(tmp);
+		elem->vname = estrdup(tmp->stptr, tmp->stlen);
 	}
 	assoc_set(array, tmp, elem);
 
