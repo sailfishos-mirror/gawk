@@ -15084,6 +15084,7 @@ for more information on this version of the @code{for} loop.
 @cindex @code{switch} statement
 @cindex @code{case} keyword
 @cindex @code{default} keyword
+@cindex @code{break} keyword
 
 This @value{SECTION} describes a @command{gawk}-specific feature.
 If @command{gawk} is in compatibility mode (@pxref{Options}),
@@ -15158,7 +15159,12 @@ described in @ref{Getopt Function}.)
 @cindex loops @subentry exiting
 @cindex loops @subentry @code{break} statement and
 
-The @code{break} statement jumps out of the innermost @code{for},
+The @code{break} statement serves two purposes.
+One purpose is to break out of the
+@code{switch} statement.
+This was discussed in @ref{Switch Statement}.
+
+The other purpose is that it jumps out of the innermost @code{for},
 @code{while}, or @code{do} loop that encloses it.  The following example
 finds the smallest divisor of any integer, and also identifies prime
 numbers:
@@ -15210,9 +15216,9 @@ an @code{if}:
 @}
 @end example
 
-The @code{break} statement is also used to break out of the
-@code{switch} statement.
-This is discussed in @ref{Switch Statement}.
+Note that @code{break} breaks out of only the innermost
+enclosing statement. Thus a @code{break} inside a @code{switch} statement 
+inside a loop only breaks out of the @code{switch}.
 
 @c @cindex @code{break}, outside of loops
 @c @cindex historical features

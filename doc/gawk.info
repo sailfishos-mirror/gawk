@@ -11043,9 +11043,13 @@ File: gawk.info,  Node: Break Statement,  Next: Continue Statement,  Prev: Switc
 7.4.6 The ‘break’ Statement
 ---------------------------
 
-The ‘break’ statement jumps out of the innermost ‘for’, ‘while’, or ‘do’
-loop that encloses it.  The following example finds the smallest divisor
-of any integer, and also identifies prime numbers:
+The ‘break’ statement serves two purposes.  One purpose is to break out
+of the ‘switch’ statement.  This was discussed in *note Switch
+Statement::.
+
+   The other purpose is that it jumps out of the innermost ‘for’,
+‘while’, or ‘do’ loop that encloses it.  The following example finds the
+smallest divisor of any integer, and also identifies prime numbers:
 
      # find smallest divisor of num
      {
@@ -11085,8 +11089,9 @@ Statement::.)
          }
      }
 
-   The ‘break’ statement is also used to break out of the ‘switch’
-statement.  This is discussed in *note Switch Statement::.
+   Note that ‘break’ breaks out of only the innermost enclosing
+statement.  Thus a ‘break’ inside a ‘switch’ statement inside a loop
+only breaks out of the ‘switch’.
 
    The ‘break’ statement has no meaning when used outside the body of a
 loop or ‘switch’.  However, although it was never documented, historical
@@ -37100,6 +37105,7 @@ Index
 * bracket expressions, range expressions: Bracket Expressions.
                                                               (line   6)
 * break debugger command:                Breakpoint Control.  (line  11)
+* break keyword:                         Switch Statement.    (line   6)
 * break statement:                       Break Statement.     (line   6)
 * breakpoint:                            Debugging Terms.     (line  33)
 * breakpoint, at location, how to delete: Breakpoint Control. (line  36)
@@ -37127,7 +37133,7 @@ Index
 * Brian Kernighan's awk <5>:             Getline/Pipe.        (line  62)
 * Brian Kernighan's awk <6>:             Concatenation.       (line  36)
 * Brian Kernighan's awk <7>:             I/O And BEGIN/END.   (line  15)
-* Brian Kernighan's awk <8>:             Break Statement.     (line  51)
+* Brian Kernighan's awk <8>:             Break Statement.     (line  56)
 * Brian Kernighan's awk <9>:             Continue Statement.  (line  44)
 * Brian Kernighan's awk <10>:            Nextfile Statement.  (line  47)
 * Brian Kernighan's awk <11>:            Delete.              (line  51)
@@ -37411,7 +37417,7 @@ Index
                                                               (line  43)
 * dark corner, backslash continuation on command line: Statements/Lines.
                                                               (line  92)
-* dark corner, break statement:          Break Statement.     (line  51)
+* dark corner, break statement:          Break Statement.     (line  56)
 * dark corner, close() function:         Close Return Value.  (line   6)
 * dark corner, command line, backslash continuation on: Statements/Lines.
                                                               (line  92)
@@ -38249,7 +38255,7 @@ Index
 * gawk, awk and:                         Preface.             (line  21)
 * gawk, awk and <1>:                     This Manual.         (line  14)
 * gawk, bitwise operations in:           Bitwise Functions.   (line  40)
-* gawk, break statement in:              Break Statement.     (line  51)
+* gawk, break statement in:              Break Statement.     (line  56)
 * gawk, character classes and:           Bracket Expressions. (line 120)
 * gawk, coding style in:                 Adding Code.         (line  42)
 * gawk, command-line options, regular expressions and: GNU Regexp Operators.
@@ -39143,7 +39149,7 @@ Index
                                                               (line  48)
 * POSIX awk, bracket expressions and, character classes <1>: Bracket Expressions.
                                                               (line 120)
-* POSIX awk, break statement and:        Break Statement.     (line  51)
+* POSIX awk, break statement and:        Break Statement.     (line  56)
 * POSIX awk, changes in awk versions:    POSIX.               (line   6)
 * POSIX awk, continue statement and:     Continue Statement.  (line  44)
 * POSIX awk, CONVFMT variable and:       User-modified.       (line  30)
@@ -40305,414 +40311,414 @@ Node: Do Statement484323
 Node: For Statement485507
 Node: Switch Statement488862
 Node: Break Statement491411
-Node: Continue Statement493603
-Node: Next Statement495534
-Node: Nextfile Statement498013
-Node: Exit Statement500867
-Node: Built-in Variables503394
-Node: User-modified504571
-Node: Auto-set512778
-Ref: Auto-set-Footnote-1530862
-Ref: Auto-set-Footnote-2531080
-Node: ARGC and ARGV531136
-Node: Pattern Action Summary535565
-Node: Arrays538171
-Node: Array Basics539544
-Node: Array Intro540392
-Ref: figure-array-elements542403
-Ref: Array Intro-Footnote-1545256
-Node: Reference to Elements545388
-Node: Assigning Elements547908
-Node: Array Example548403
-Node: Scanning an Array550365
-Node: Controlling Scanning553460
-Ref: Controlling Scanning-Footnote-1560095
-Node: Numeric Array Subscripts560419
-Node: Uninitialized Subscripts562687
-Node: Delete564360
-Ref: Delete-Footnote-1567173
-Node: Multidimensional567230
-Node: Multiscanning570433
-Node: Arrays of Arrays572100
-Node: Arrays Summary576404
-Node: Functions578591
-Node: Built-in579793
-Node: Calling Built-in580982
-Node: Boolean Functions583022
-Node: Numeric Functions583584
-Ref: Numeric Functions-Footnote-1587769
-Ref: Numeric Functions-Footnote-2588452
-Ref: Numeric Functions-Footnote-3588504
-Node: String Functions588780
-Ref: String Functions-Footnote-1615231
-Ref: String Functions-Footnote-2615363
-Ref: String Functions-Footnote-3615619
-Node: Gory Details615706
-Ref: table-sub-escapes617715
-Ref: table-sub-proposed619267
-Ref: table-posix-sub620741
-Ref: table-gensub-escapes622393
-Ref: Gory Details-Footnote-1623221
-Node: I/O Functions623375
-Ref: table-system-return-values630052
-Ref: I/O Functions-Footnote-1632214
-Ref: I/O Functions-Footnote-2632362
-Node: Time Functions632482
-Ref: Time Functions-Footnote-1644194
-Ref: Time Functions-Footnote-2644262
-Ref: Time Functions-Footnote-3644424
-Ref: Time Functions-Footnote-4644535
-Ref: Time Functions-Footnote-5644651
-Ref: Time Functions-Footnote-6644878
-Node: Bitwise Functions645156
-Ref: table-bitwise-ops645754
-Ref: Bitwise Functions-Footnote-1651996
-Ref: Bitwise Functions-Footnote-2652173
-Node: Type Functions652368
-Node: I18N Functions654539
-Node: User-defined656274
-Node: Definition Syntax657020
-Ref: Definition Syntax-Footnote-1662875
-Node: Function Example662950
-Ref: Function Example-Footnote-1665929
-Node: Function Calling665951
-Node: Calling A Function666543
-Node: Variable Scope667513
-Node: Pass By Value/Reference670567
-Node: Function Caveats673295
-Ref: Function Caveats-Footnote-1675386
-Node: Return Statement675506
-Node: Dynamic Typing678538
-Node: Dynamic Typing Awk679120
-Node: Dynamic Typing Gawk681258
-Node: Shadowed Variables684628
-Node: Indirect Calls686976
-Node: Functions Summary698117
-Node: Library Functions701083
-Ref: Library Functions-Footnote-1704631
-Ref: Library Functions-Footnote-2704776
-Node: Library Names704951
-Ref: Library Names-Footnote-1708722
-Ref: Library Names-Footnote-2708949
-Node: General Functions709043
-Node: Strtonum Function710313
-Node: Assert Function713395
-Node: Round Function716950
-Node: Cliff Random Function718522
-Node: Ordinal Functions719547
-Ref: Ordinal Functions-Footnote-1722650
-Ref: Ordinal Functions-Footnote-2722902
-Node: Join Function723116
-Ref: Join Function-Footnote-1724914
-Node: Getlocaltime Function725118
-Node: Readfile Function728892
-Node: Shell Quoting730921
-Node: Isnumeric Function732377
-Node: To CSV Function733813
-Node: Data File Management735905
-Node: Filetrans Function736537
-Node: Rewind Function741386
-Node: File Checking743357
-Ref: File Checking-Footnote-1744723
-Node: Empty Files744928
-Node: Ignoring Assigns747713
-Node: Getopt Function749287
-Ref: Getopt Function-Footnote-1765105
-Node: Passwd Functions765317
-Ref: Passwd Functions-Footnote-1774452
-Node: Group Functions774540
-Ref: Group Functions-Footnote-1782664
-Node: Walking Arrays782875
-Node: Library Functions Summary785921
-Node: Library Exercises787341
-Node: Sample Programs787826
-Node: Running Examples788608
-Node: Clones789360
-Node: Cut Program790628
-Node: Egrep Program801052
-Node: Id Program810345
-Node: Split Program820438
-Ref: Split Program-Footnote-1830651
-Node: Tee Program830836
-Node: Uniq Program833736
-Node: Wc Program841596
-Node: Bytes vs. Characters841991
-Node: Using extensions843591
-Node: wc program844369
-Node: Miscellaneous Programs849362
-Node: Dupword Program850587
-Node: Alarm Program852637
-Node: Translate Program857541
-Ref: Translate Program-Footnote-1862251
-Node: Labels Program862529
-Ref: Labels Program-Footnote-1865964
-Node: Word Sorting866048
-Node: History Sorting870222
-Node: Extract Program872495
-Node: Simple Sed880748
-Node: Igawk Program883958
-Ref: Igawk Program-Footnote-1899168
-Ref: Igawk Program-Footnote-2899374
-Ref: Igawk Program-Footnote-3899504
-Node: Anagram Program899631
-Node: Signature Program902772
-Node: Programs Summary904023
-Node: Programs Exercises905277
-Ref: Programs Exercises-Footnote-1910106
-Node: Advanced Features910192
-Node: Nondecimal Data912673
-Node: Boolean Typed Values914303
-Node: Array Sorting916260
-Node: Controlling Array Traversal916989
-Ref: Controlling Array Traversal-Footnote-1925492
-Node: Array Sorting Functions925614
-Ref: Array Sorting Functions-Footnote-1931711
-Node: Two-way I/O931919
-Ref: Two-way I/O-Footnote-1939890
-Ref: Two-way I/O-Footnote-2940081
-Node: TCP/IP Networking940163
-Node: Profiling943331
-Node: Persistent Memory953001
-Ref: Persistent Memory-Footnote-1962704
-Node: Extension Philosophy962835
-Node: Advanced Features Summary964362
-Node: Internationalization966628
-Node: I18N and L10N968330
-Node: Explaining gettext969025
-Ref: Explaining gettext-Footnote-1975161
-Ref: Explaining gettext-Footnote-2975354
-Node: Programmer i18n975519
-Ref: Programmer i18n-Footnote-1980631
-Node: Translator i18n980680
-Node: String Extraction981510
-Ref: String Extraction-Footnote-1982686
-Node: Printf Ordering982784
-Ref: Printf Ordering-Footnote-1985642
-Node: I18N Portability985710
-Ref: I18N Portability-Footnote-1988270
-Node: I18N Example988337
-Ref: I18N Example-Footnote-1991731
-Ref: I18N Example-Footnote-2991804
-Node: Gawk I18N991921
-Node: I18N Summary992575
-Node: Debugger993972
-Node: Debugging994992
-Node: Debugging Concepts995441
-Node: Debugging Terms997258
-Node: Awk Debugging999861
-Ref: Awk Debugging-Footnote-11000834
-Node: Sample Debugging Session1000970
-Node: Debugger Invocation1001520
-Node: Finding The Bug1003145
-Node: List of Debugger Commands1009777
-Node: Breakpoint Control1011154
-Node: Debugger Execution Control1014976
-Node: Viewing And Changing Data1018450
-Node: Execution Stack1022184
-Node: Debugger Info1023865
-Node: Miscellaneous Debugger Commands1028160
-Node: Readline Support1033401
-Node: Limitations1034339
-Node: Debugging Summary1036963
-Node: Namespaces1038262
-Node: Global Namespace1039389
-Node: Qualified Names1040823
-Node: Default Namespace1041858
-Node: Changing The Namespace1042631
-Node: Naming Rules1044313
-Node: Internal Name Management1046268
-Node: Namespace Example1047338
-Node: Namespace And Features1049915
-Node: Namespace Summary1051370
-Node: Arbitrary Precision Arithmetic1052881
-Node: Computer Arithmetic1054400
-Ref: table-numeric-ranges1058325
-Ref: table-floating-point-ranges1058822
-Ref: Computer Arithmetic-Footnote-11059480
-Node: Math Definitions1059537
-Ref: table-ieee-formats1062569
-Node: MPFR features1063142
-Node: MPFR On Parole1063595
-Ref: MPFR On Parole-Footnote-11064436
-Node: MPFR Intro1064595
-Node: FP Math Caution1066280
-Ref: FP Math Caution-Footnote-11067352
-Node: Inexactness of computations1067726
-Node: Inexact representation1068757
-Node: Comparing FP Values1070138
-Node: Errors accumulate1071396
-Node: Strange values1072861
-Ref: Strange values-Footnote-11075515
-Node: Getting Accuracy1075620
-Node: Try To Round1078357
-Node: Setting precision1079264
-Ref: table-predefined-precision-strings1079969
-Node: Setting the rounding mode1081853
-Ref: table-gawk-rounding-modes1082235
-Ref: Setting the rounding mode-Footnote-11086287
-Node: Arbitrary Precision Integers1086472
-Ref: Arbitrary Precision Integers-Footnote-11089682
-Node: Checking for MPFR1089836
-Node: POSIX Floating Point Problems1091326
-Ref: POSIX Floating Point Problems-Footnote-11096146
-Node: Floating point summary1096184
-Node: Dynamic Extensions1098440
-Node: Extension Intro1100037
-Node: Plugin License1101339
-Node: Extension Mechanism Outline1102152
-Ref: figure-load-extension1102603
-Ref: figure-register-new-function1104181
-Ref: figure-call-new-function1105290
-Node: Extension API Description1107405
-Node: Extension API Functions Introduction1109134
-Ref: table-api-std-headers1111028
-Node: General Data Types1115469
-Ref: General Data Types-Footnote-11124615
-Node: Memory Allocation Functions1124918
-Ref: Memory Allocation Functions-Footnote-11129633
-Node: Constructor Functions1129732
-Node: API Ownership of MPFR and GMP Values1133633
-Node: Registration Functions1135186
-Node: Extension Functions1135890
-Node: Exit Callback Functions1141464
-Node: Extension Version String1142778
-Node: Input Parsers1143473
-Ref: Input Parsers-Footnote-11158131
-Node: Output Wrappers1158486
-Node: Two-way processors1163328
-Node: Printing Messages1165681
-Ref: Printing Messages-Footnote-11166892
-Node: Updating ERRNO1167045
-Node: Requesting Values1167844
-Ref: table-value-types-returned1168597
-Node: Accessing Parameters1170656
-Node: Symbol Table Access1171937
-Node: Symbol table by name1172449
-Ref: Symbol table by name-Footnote-11175650
-Node: Symbol table by cookie1175782
-Ref: Symbol table by cookie-Footnote-11180051
-Node: Cached values1180115
-Ref: Cached values-Footnote-11183747
-Node: Array Manipulation1183904
-Ref: Array Manipulation-Footnote-11185003
-Node: Array Data Types1185040
-Ref: Array Data Types-Footnote-11187858
-Node: Array Functions1187954
-Node: Flattening Arrays1192983
-Node: Creating Arrays1200031
-Node: Redirection API1204873
-Node: Extension API Variables1207890
-Node: Extension Versioning1208613
-Ref: gawk-api-version1209042
-Node: Extension GMP/MPFR Versioning1210829
-Node: Extension API Informational Variables1212533
-Node: Extension API Boilerplate1213786
-Node: Changes from API V11217916
-Node: Finding Extensions1219548
-Node: Extension Example1220123
-Node: Internal File Description1220945
-Node: Internal File Ops1225237
-Ref: Internal File Ops-Footnote-11236787
-Node: Using Internal File Ops1236935
-Ref: Using Internal File Ops-Footnote-11239368
-Node: Extension Samples1239646
-Node: Extension Sample File Functions1241215
-Node: Extension Sample Fnmatch1249340
-Node: Extension Sample Fork1250935
-Node: Extension Sample Inplace1252211
-Node: Extension Sample Ord1256313
-Node: Extension Sample Readdir1257189
-Ref: table-readdir-file-types1257978
-Node: Extension Sample Revout1259334
-Node: Extension Sample Rev2way1259931
-Node: Extension Sample Read write array1260683
-Node: Extension Sample Readfile1263957
-Node: Extension Sample Time1265088
-Node: Extension Sample API Tests1267088
-Node: gawkextlib1267596
-Node: Extension summary1270801
-Node: Extension Exercises1274649
-Node: Language History1275919
-Node: V7/SVR3.11277631
-Node: SVR41279981
-Node: POSIX1281513
-Node: BTL1282938
-Node: POSIX/GNU1283705
-Ref: Gawk Extension Functions1287095
-Node: Feature History1290519
-Node: Common Extensions1310421
-Node: Ranges and Locales1311896
-Ref: Ranges and Locales-Footnote-11316681
-Ref: Ranges and Locales-Footnote-21316708
-Ref: Ranges and Locales-Footnote-31316943
-Node: Contributors1317166
-Node: History summary1323518
-Node: Installation1324960
-Node: Gawk Distribution1325924
-Node: Getting1326416
-Node: Extracting1327415
-Node: Distribution contents1329121
-Node: Unix Installation1337011
-Node: Quick Installation1337831
-Node: Compiling with MPFR1340371
-Node: Shell Startup Files1341077
-Node: Additional Configuration Options1342234
-Node: Configuration Philosophy1344617
-Node: Compiling from Git1347117
-Node: Building the Documentation1347678
-Node: Non-Unix Installation1349090
-Node: PC Installation1349566
-Node: PC Binary Installation1350435
-Node: PC Compiling1351328
-Node: PC Using1352506
-Node: Cygwin1356222
-Node: MSYS1357475
-Node: OpenVMS Installation1358101
-Node: OpenVMS Compilation1358782
-Ref: OpenVMS Compilation-Footnote-11360332
-Node: OpenVMS Dynamic Extensions1360390
-Node: OpenVMS Installation Details1362035
-Node: OpenVMS Running1364466
-Node: OpenVMS GNV1368603
-Node: Bugs1369358
-Node: Bug definition1370278
-Node: Bug address1373880
-Node: Usenet1377449
-Node: Performance bugs1378662
-Node: Asking for help1381666
-Node: Maintainers1383653
-Node: Other Versions1384680
-Node: Installation summary1394748
-Node: Notes1396130
-Node: Compatibility Mode1396940
-Node: Additions1397762
-Node: Accessing The Source1398707
-Node: Adding Code1400240
-Node: New Ports1407351
-Node: Derived Files1411854
-Ref: Derived Files-Footnote-11417665
-Ref: Derived Files-Footnote-21417700
-Ref: Derived Files-Footnote-31418311
-Node: Future Extensions1418425
-Node: Implementation Limitations1419095
-Node: Extension Design1420337
-Node: Old Extension Problems1421497
-Ref: Old Extension Problems-Footnote-11423069
-Node: Extension New Mechanism Goals1423130
-Ref: Extension New Mechanism Goals-Footnote-11426600
-Node: Extension Other Design Decisions1426801
-Node: Extension Future Growth1428998
-Node: Notes summary1429618
-Node: Basic Concepts1430828
-Node: Basic High Level1431513
-Ref: figure-general-flow1431795
-Ref: figure-process-flow1432497
-Ref: Basic High Level-Footnote-11435867
-Node: Basic Data Typing1436056
-Node: Glossary1439464
-Node: Copying1472346
-Node: GNU Free Documentation License1509904
-Node: Index1535027
+Node: Continue Statement493814
+Node: Next Statement495745
+Node: Nextfile Statement498224
+Node: Exit Statement501078
+Node: Built-in Variables503605
+Node: User-modified504782
+Node: Auto-set512989
+Ref: Auto-set-Footnote-1531073
+Ref: Auto-set-Footnote-2531291
+Node: ARGC and ARGV531347
+Node: Pattern Action Summary535776
+Node: Arrays538382
+Node: Array Basics539755
+Node: Array Intro540603
+Ref: figure-array-elements542614
+Ref: Array Intro-Footnote-1545467
+Node: Reference to Elements545599
+Node: Assigning Elements548119
+Node: Array Example548614
+Node: Scanning an Array550576
+Node: Controlling Scanning553671
+Ref: Controlling Scanning-Footnote-1560306
+Node: Numeric Array Subscripts560630
+Node: Uninitialized Subscripts562898
+Node: Delete564571
+Ref: Delete-Footnote-1567384
+Node: Multidimensional567441
+Node: Multiscanning570644
+Node: Arrays of Arrays572311
+Node: Arrays Summary576615
+Node: Functions578802
+Node: Built-in580004
+Node: Calling Built-in581193
+Node: Boolean Functions583233
+Node: Numeric Functions583795
+Ref: Numeric Functions-Footnote-1587980
+Ref: Numeric Functions-Footnote-2588663
+Ref: Numeric Functions-Footnote-3588715
+Node: String Functions588991
+Ref: String Functions-Footnote-1615442
+Ref: String Functions-Footnote-2615574
+Ref: String Functions-Footnote-3615830
+Node: Gory Details615917
+Ref: table-sub-escapes617926
+Ref: table-sub-proposed619478
+Ref: table-posix-sub620952
+Ref: table-gensub-escapes622604
+Ref: Gory Details-Footnote-1623432
+Node: I/O Functions623586
+Ref: table-system-return-values630263
+Ref: I/O Functions-Footnote-1632425
+Ref: I/O Functions-Footnote-2632573
+Node: Time Functions632693
+Ref: Time Functions-Footnote-1644405
+Ref: Time Functions-Footnote-2644473
+Ref: Time Functions-Footnote-3644635
+Ref: Time Functions-Footnote-4644746
+Ref: Time Functions-Footnote-5644862
+Ref: Time Functions-Footnote-6645089
+Node: Bitwise Functions645367
+Ref: table-bitwise-ops645965
+Ref: Bitwise Functions-Footnote-1652207
+Ref: Bitwise Functions-Footnote-2652384
+Node: Type Functions652579
+Node: I18N Functions654750
+Node: User-defined656485
+Node: Definition Syntax657231
+Ref: Definition Syntax-Footnote-1663086
+Node: Function Example663161
+Ref: Function Example-Footnote-1666140
+Node: Function Calling666162
+Node: Calling A Function666754
+Node: Variable Scope667724
+Node: Pass By Value/Reference670778
+Node: Function Caveats673506
+Ref: Function Caveats-Footnote-1675597
+Node: Return Statement675717
+Node: Dynamic Typing678749
+Node: Dynamic Typing Awk679331
+Node: Dynamic Typing Gawk681469
+Node: Shadowed Variables684839
+Node: Indirect Calls687187
+Node: Functions Summary698328
+Node: Library Functions701294
+Ref: Library Functions-Footnote-1704842
+Ref: Library Functions-Footnote-2704987
+Node: Library Names705162
+Ref: Library Names-Footnote-1708933
+Ref: Library Names-Footnote-2709160
+Node: General Functions709254
+Node: Strtonum Function710524
+Node: Assert Function713606
+Node: Round Function717161
+Node: Cliff Random Function718733
+Node: Ordinal Functions719758
+Ref: Ordinal Functions-Footnote-1722861
+Ref: Ordinal Functions-Footnote-2723113
+Node: Join Function723327
+Ref: Join Function-Footnote-1725125
+Node: Getlocaltime Function725329
+Node: Readfile Function729103
+Node: Shell Quoting731132
+Node: Isnumeric Function732588
+Node: To CSV Function734024
+Node: Data File Management736116
+Node: Filetrans Function736748
+Node: Rewind Function741597
+Node: File Checking743568
+Ref: File Checking-Footnote-1744934
+Node: Empty Files745139
+Node: Ignoring Assigns747924
+Node: Getopt Function749498
+Ref: Getopt Function-Footnote-1765316
+Node: Passwd Functions765528
+Ref: Passwd Functions-Footnote-1774663
+Node: Group Functions774751
+Ref: Group Functions-Footnote-1782875
+Node: Walking Arrays783086
+Node: Library Functions Summary786132
+Node: Library Exercises787552
+Node: Sample Programs788037
+Node: Running Examples788819
+Node: Clones789571
+Node: Cut Program790839
+Node: Egrep Program801263
+Node: Id Program810556
+Node: Split Program820649
+Ref: Split Program-Footnote-1830862
+Node: Tee Program831047
+Node: Uniq Program833947
+Node: Wc Program841807
+Node: Bytes vs. Characters842202
+Node: Using extensions843802
+Node: wc program844580
+Node: Miscellaneous Programs849573
+Node: Dupword Program850798
+Node: Alarm Program852848
+Node: Translate Program857752
+Ref: Translate Program-Footnote-1862462
+Node: Labels Program862740
+Ref: Labels Program-Footnote-1866175
+Node: Word Sorting866259
+Node: History Sorting870433
+Node: Extract Program872706
+Node: Simple Sed880959
+Node: Igawk Program884169
+Ref: Igawk Program-Footnote-1899379
+Ref: Igawk Program-Footnote-2899585
+Ref: Igawk Program-Footnote-3899715
+Node: Anagram Program899842
+Node: Signature Program902983
+Node: Programs Summary904234
+Node: Programs Exercises905488
+Ref: Programs Exercises-Footnote-1910317
+Node: Advanced Features910403
+Node: Nondecimal Data912884
+Node: Boolean Typed Values914514
+Node: Array Sorting916471
+Node: Controlling Array Traversal917200
+Ref: Controlling Array Traversal-Footnote-1925703
+Node: Array Sorting Functions925825
+Ref: Array Sorting Functions-Footnote-1931922
+Node: Two-way I/O932130
+Ref: Two-way I/O-Footnote-1940101
+Ref: Two-way I/O-Footnote-2940292
+Node: TCP/IP Networking940374
+Node: Profiling943542
+Node: Persistent Memory953212
+Ref: Persistent Memory-Footnote-1962915
+Node: Extension Philosophy963046
+Node: Advanced Features Summary964573
+Node: Internationalization966839
+Node: I18N and L10N968541
+Node: Explaining gettext969236
+Ref: Explaining gettext-Footnote-1975372
+Ref: Explaining gettext-Footnote-2975565
+Node: Programmer i18n975730
+Ref: Programmer i18n-Footnote-1980842
+Node: Translator i18n980891
+Node: String Extraction981721
+Ref: String Extraction-Footnote-1982897
+Node: Printf Ordering982995
+Ref: Printf Ordering-Footnote-1985853
+Node: I18N Portability985921
+Ref: I18N Portability-Footnote-1988481
+Node: I18N Example988548
+Ref: I18N Example-Footnote-1991942
+Ref: I18N Example-Footnote-2992015
+Node: Gawk I18N992132
+Node: I18N Summary992786
+Node: Debugger994183
+Node: Debugging995203
+Node: Debugging Concepts995652
+Node: Debugging Terms997469
+Node: Awk Debugging1000072
+Ref: Awk Debugging-Footnote-11001045
+Node: Sample Debugging Session1001181
+Node: Debugger Invocation1001731
+Node: Finding The Bug1003356
+Node: List of Debugger Commands1009988
+Node: Breakpoint Control1011365
+Node: Debugger Execution Control1015187
+Node: Viewing And Changing Data1018661
+Node: Execution Stack1022395
+Node: Debugger Info1024076
+Node: Miscellaneous Debugger Commands1028371
+Node: Readline Support1033612
+Node: Limitations1034550
+Node: Debugging Summary1037174
+Node: Namespaces1038473
+Node: Global Namespace1039600
+Node: Qualified Names1041034
+Node: Default Namespace1042069
+Node: Changing The Namespace1042842
+Node: Naming Rules1044524
+Node: Internal Name Management1046479
+Node: Namespace Example1047549
+Node: Namespace And Features1050126
+Node: Namespace Summary1051581
+Node: Arbitrary Precision Arithmetic1053092
+Node: Computer Arithmetic1054611
+Ref: table-numeric-ranges1058536
+Ref: table-floating-point-ranges1059033
+Ref: Computer Arithmetic-Footnote-11059691
+Node: Math Definitions1059748
+Ref: table-ieee-formats1062780
+Node: MPFR features1063353
+Node: MPFR On Parole1063806
+Ref: MPFR On Parole-Footnote-11064647
+Node: MPFR Intro1064806
+Node: FP Math Caution1066491
+Ref: FP Math Caution-Footnote-11067563
+Node: Inexactness of computations1067937
+Node: Inexact representation1068968
+Node: Comparing FP Values1070349
+Node: Errors accumulate1071607
+Node: Strange values1073072
+Ref: Strange values-Footnote-11075726
+Node: Getting Accuracy1075831
+Node: Try To Round1078568
+Node: Setting precision1079475
+Ref: table-predefined-precision-strings1080180
+Node: Setting the rounding mode1082064
+Ref: table-gawk-rounding-modes1082446
+Ref: Setting the rounding mode-Footnote-11086498
+Node: Arbitrary Precision Integers1086683
+Ref: Arbitrary Precision Integers-Footnote-11089893
+Node: Checking for MPFR1090047
+Node: POSIX Floating Point Problems1091537
+Ref: POSIX Floating Point Problems-Footnote-11096357
+Node: Floating point summary1096395
+Node: Dynamic Extensions1098651
+Node: Extension Intro1100248
+Node: Plugin License1101550
+Node: Extension Mechanism Outline1102363
+Ref: figure-load-extension1102814
+Ref: figure-register-new-function1104392
+Ref: figure-call-new-function1105501
+Node: Extension API Description1107616
+Node: Extension API Functions Introduction1109345
+Ref: table-api-std-headers1111239
+Node: General Data Types1115680
+Ref: General Data Types-Footnote-11124826
+Node: Memory Allocation Functions1125129
+Ref: Memory Allocation Functions-Footnote-11129844
+Node: Constructor Functions1129943
+Node: API Ownership of MPFR and GMP Values1133844
+Node: Registration Functions1135397
+Node: Extension Functions1136101
+Node: Exit Callback Functions1141675
+Node: Extension Version String1142989
+Node: Input Parsers1143684
+Ref: Input Parsers-Footnote-11158342
+Node: Output Wrappers1158697
+Node: Two-way processors1163539
+Node: Printing Messages1165892
+Ref: Printing Messages-Footnote-11167103
+Node: Updating ERRNO1167256
+Node: Requesting Values1168055
+Ref: table-value-types-returned1168808
+Node: Accessing Parameters1170867
+Node: Symbol Table Access1172148
+Node: Symbol table by name1172660
+Ref: Symbol table by name-Footnote-11175861
+Node: Symbol table by cookie1175993
+Ref: Symbol table by cookie-Footnote-11180262
+Node: Cached values1180326
+Ref: Cached values-Footnote-11183958
+Node: Array Manipulation1184115
+Ref: Array Manipulation-Footnote-11185214
+Node: Array Data Types1185251
+Ref: Array Data Types-Footnote-11188069
+Node: Array Functions1188165
+Node: Flattening Arrays1193194
+Node: Creating Arrays1200242
+Node: Redirection API1205084
+Node: Extension API Variables1208101
+Node: Extension Versioning1208824
+Ref: gawk-api-version1209253
+Node: Extension GMP/MPFR Versioning1211040
+Node: Extension API Informational Variables1212744
+Node: Extension API Boilerplate1213997
+Node: Changes from API V11218127
+Node: Finding Extensions1219759
+Node: Extension Example1220334
+Node: Internal File Description1221156
+Node: Internal File Ops1225448
+Ref: Internal File Ops-Footnote-11236998
+Node: Using Internal File Ops1237146
+Ref: Using Internal File Ops-Footnote-11239579
+Node: Extension Samples1239857
+Node: Extension Sample File Functions1241426
+Node: Extension Sample Fnmatch1249551
+Node: Extension Sample Fork1251146
+Node: Extension Sample Inplace1252422
+Node: Extension Sample Ord1256524
+Node: Extension Sample Readdir1257400
+Ref: table-readdir-file-types1258189
+Node: Extension Sample Revout1259545
+Node: Extension Sample Rev2way1260142
+Node: Extension Sample Read write array1260894
+Node: Extension Sample Readfile1264168
+Node: Extension Sample Time1265299
+Node: Extension Sample API Tests1267299
+Node: gawkextlib1267807
+Node: Extension summary1271012
+Node: Extension Exercises1274860
+Node: Language History1276130
+Node: V7/SVR3.11277842
+Node: SVR41280192
+Node: POSIX1281724
+Node: BTL1283149
+Node: POSIX/GNU1283916
+Ref: Gawk Extension Functions1287306
+Node: Feature History1290730
+Node: Common Extensions1310632
+Node: Ranges and Locales1312107
+Ref: Ranges and Locales-Footnote-11316892
+Ref: Ranges and Locales-Footnote-21316919
+Ref: Ranges and Locales-Footnote-31317154
+Node: Contributors1317377
+Node: History summary1323729
+Node: Installation1325171
+Node: Gawk Distribution1326135
+Node: Getting1326627
+Node: Extracting1327626
+Node: Distribution contents1329332
+Node: Unix Installation1337222
+Node: Quick Installation1338042
+Node: Compiling with MPFR1340582
+Node: Shell Startup Files1341288
+Node: Additional Configuration Options1342445
+Node: Configuration Philosophy1344828
+Node: Compiling from Git1347328
+Node: Building the Documentation1347889
+Node: Non-Unix Installation1349301
+Node: PC Installation1349777
+Node: PC Binary Installation1350646
+Node: PC Compiling1351539
+Node: PC Using1352717
+Node: Cygwin1356433
+Node: MSYS1357686
+Node: OpenVMS Installation1358312
+Node: OpenVMS Compilation1358993
+Ref: OpenVMS Compilation-Footnote-11360543
+Node: OpenVMS Dynamic Extensions1360601
+Node: OpenVMS Installation Details1362246
+Node: OpenVMS Running1364677
+Node: OpenVMS GNV1368814
+Node: Bugs1369569
+Node: Bug definition1370489
+Node: Bug address1374091
+Node: Usenet1377660
+Node: Performance bugs1378873
+Node: Asking for help1381877
+Node: Maintainers1383864
+Node: Other Versions1384891
+Node: Installation summary1394959
+Node: Notes1396341
+Node: Compatibility Mode1397151
+Node: Additions1397973
+Node: Accessing The Source1398918
+Node: Adding Code1400451
+Node: New Ports1407562
+Node: Derived Files1412065
+Ref: Derived Files-Footnote-11417876
+Ref: Derived Files-Footnote-21417911
+Ref: Derived Files-Footnote-31418522
+Node: Future Extensions1418636
+Node: Implementation Limitations1419306
+Node: Extension Design1420548
+Node: Old Extension Problems1421708
+Ref: Old Extension Problems-Footnote-11423280
+Node: Extension New Mechanism Goals1423341
+Ref: Extension New Mechanism Goals-Footnote-11426811
+Node: Extension Other Design Decisions1427012
+Node: Extension Future Growth1429209
+Node: Notes summary1429829
+Node: Basic Concepts1431039
+Node: Basic High Level1431724
+Ref: figure-general-flow1432006
+Ref: figure-process-flow1432708
+Ref: Basic High Level-Footnote-11436078
+Node: Basic Data Typing1436267
+Node: Glossary1439675
+Node: Copying1472557
+Node: GNU Free Documentation License1510115
+Node: Index1535238
 
 End Tag Table
 
