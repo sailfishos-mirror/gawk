@@ -1,3 +1,20 @@
+2025-05-22         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* gawkapi.c (api_set_array_element): Ensure that the new index
+	is indeed a string.  Thanks to SBP <seirios@ik.me> for the report.
+
+2025-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Persistent memory and extension functions don't mix. Make
+	it a fatal error that gawk catches instead of weird errors
+	and core dumps.  Issue reported by "Stan Marsh" (sic)
+	<gazelle@xmission.com>.
+
+	* awk.h (using_pma): New variable, add extern declaration.
+	* ext.c (load_ext): If using_pma, fatal message.
+	* main.c (using_pma): New variable, add definition.
+	(enable_pma): Set it.
+
 2025-05-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* eval.c (update_ERRNO_int, update_ERRNO_string, unset_ERRNO):

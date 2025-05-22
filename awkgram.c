@@ -5530,7 +5530,6 @@ load_library(INSTRUCTION *file, void **srcfile_p)
 		return false;
 	}
 
-
 	if (strlen(src) == 0) {
 		if (do_lint)
 			lintwarn_ln(file->source_line, _("empty filename after @load"));
