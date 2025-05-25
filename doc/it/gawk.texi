@@ -56,7 +56,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Febbraio 2025
+@set UPDATE-MONTH Maggio 2025
 @set VERSION 5.3
 @set PATCHLEVEL 2
 
@@ -16776,6 +16776,9 @@ per maggiori informazioni su questa versione del ciclo @code{for}.
 @cindex @code{default} @subentry parola chiave
 @cindex @code{default} @seealso{@code{switch} (istruzione)}
 @cindex parola @subentry chiave @code{default}
+@cindex @code{break} @subentry parola chiave
+@cindex @code{break} @seealso{@code{switch} (istruzione)}
+@cindex parola @subentry chiave @code{break}
 
 @ifnotinfo
 Questa
@@ -16871,7 +16874,19 @@ in
 @cindex cicli @subentry uscita
 @cindex cicli @subentry istruzione @code{break} e
 
-L'istruzione @code{break} esce dal ciclo pi@`u interno @code{for},
+L'istruzione @code{break} ha due scopi.
+Il primo scopo @`e di uscire da un'istruzione @code{switch}.
+Questo @`e stato trattato
+@iftex
+nella
+@end iftex
+@ifnottex
+in
+@end ifnottex
+@ref{Istruzione switch}.
+
+Il secondo scopo @code{break} @`e quello di uscire
+dal ciclo pi@`u interno @code{for},
 @code{while} o @code{do} dentro al quale si trova.  L'esempio seguente
 trova, se esiste, il divisore pi@`u piccolo di un dato numero intero, oppure
 dichiara che si tratta di un numero primo:
@@ -16925,16 +16940,11 @@ Il seguente programma mostra come la @var{condizione} di un'istruzione
 @}
 @end example
 
-L'istruzione @code{break} @`e usata anche per terminare l'esecuzione di
-un'istruzione @code{switch}.
-Questo argomento @`e trattato
-@iftex
-nella
-@end iftex
-@ifnottex
-in
-@end ifnottex
-@ref{Istruzione switch}.
+Si noti che l'istruzione @code{break} esce solo dal ciclo pi@`u
+interno dentro il quale si trova.  Quindi un'istruzione
+@code{break} all'interno di un'istruzione @code{switch}, la quale
+sia a sua volta all'interno di un ciclo, esce solo dall'istruzione
+@code{switch}.
 
 @c @cindex @code{break}, outside of loops
 @c @cindex historical features
@@ -26191,12 +26201,12 @@ La
 mostra come utilizzare questa funzione di libreria e come ci@`o
 semplifichi la scrittura del programma principale.
 
-C'è una piccola avvertenza riguardo al funzionamento di questo programma.
+C'@`e una piccola avvertenza riguardo al funzionamento di questo programma.
 Esso dipende dall'azione che viene eseguita a fronte del primo record
 del file.  Se il file in questione ha lunghezza zero, alla variabile
 @code{FNR} non viene mai assegnato un valore, e @command{awk} procede
 leggendo il file che segue nella lista degli argomenti.
-Se la cosa può avere importanza nel vostro caso, occorre trovare una
+Se la cosa pu@`o avere importanza nel vostro caso, occorre trovare una
 soluzione alternativa.
 
 @cindex riquadro @subentry Allora perch@'e @command{gawk} ha @code{BEGINFILE} ed @code{ENDFILE}?
@@ -26220,7 +26230,7 @@ una pulizia "file per file".  Per maggiori informazioni si faccia
 riferimento alla @ref{BEGINFILE/ENDFILE}.
 
 Ci si potrebbe inoltre chiedere a cosa serve il programma @file{ftrans.awk}.
-La risposta è che rende disponibile una maniera @emph{portabile}
+La risposta @`e che rende disponibile una maniera @emph{portabile}
 di gestire le azioni da compiere a inizio-file e a fine-file.
 @file{ftrans.awk} dovrebbe funzionare con qualsiasi versione di
 @command{awk} che soddisfi allo standard POSIX.
@@ -26462,17 +26472,17 @@ condizione del ciclo @code{for}, la verifica  usa l'operatore @samp{<=}, non
 @samp{<}.
 
 Che dire nel caso non si stia usando @command{gawk}?
-Si può scrivere una regola @code{BEGIN} apposita
+Si pu@`o scrivere una regola @code{BEGIN} apposita
 che scandisca i nomi di file presenti nel vettore @code{ARGV}
 e che tenti di leggere un record da ognuno di essi usando @code{getline}.
 Se @code{getline} restituisce immediatamente il codice di ritorno zero
-(che segnala la fine-file), il file in esame esiste, ma è un file vuoto.
-A quel punto si può toglierlo dal vettore @code{ARGV}, mandare un
+(che segnala la fine-file), il file in esame esiste, ma @`e un file vuoto.
+A quel punto si pu@`o toglierlo dal vettore @code{ARGV}, mandare un
 messaggio di avviso, o fare qualsiasi cosa si ritenga utile fare.
 
-Incidentalmente, questa libreria di programmi è stata scritta quando
-@command{gawk} (e il suo manutentore) erano molto più giovani.
-Nelle versioni moderne di @command{gawk}, è possibile invece scriverla
+Incidentalmente, questa libreria di programmi @`e stata scritta quando
+@command{gawk} (e il suo manutentore) erano molto pi@`u giovani.
+Nelle versioni moderne di @command{gawk}, @`e possibile invece scriverla
 in questo modo:
 
 @example
@@ -34560,6 +34570,19 @@ Rimane a carico dell'utente usare di tanto in tanto il comando
 del file, e per eventualmente scaricare da esso i dati di cui si
 pu@`o aver bisogno, prima che il file di appoggio si riempia
 completamente.
+
+@item
+Non @`e permesso usare estensioni caricate dinamicamente
+@iftex
+(@pxrefil{Estensioni dinamiche})
+@end iftex
+@ifnottex
+(@pxref{Estensioni dinamiche})
+@end ifnottex
+se si sta usando la memoria persistente.  Se si tenta di
+farlo, @command{gawk} emette un messaggio di errore fatale
+ed esce.  @`E poco probabile che si riesca a rimuovere in futuro
+questa limitazione.
 @end itemize
 
 Terence Kelly ha preparato un documento a parte, dedicato alla
@@ -42499,6 +42522,9 @@ Nel vettore rappresentato da @code{a_cookie}, crea o modifica
 l'elemento il cui indice @`e contenuto in @code{index}.
 I vettori @code{ARGV} ed @code{ENVIRON} non possono essere modificati,
 mentre il vettore @code{PROCINFO} @`e modificabile.
+Si noti che @code{index} dev'essere una variabile di tipo stringa.
+Tuttavia, se necessario, @command{gawk} effettuer@`a una conversione
+[da numero] a stringa.
 
 @item awk_bool_t set_array_element_by_elem(awk_array_t a_cookie,
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_element_t element);
