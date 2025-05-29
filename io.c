@@ -2516,7 +2516,7 @@ use_pipes:
 
 #if !defined(__MINGW32__)
 	os_close_on_exec(ctop[0], str, "pipe", "from");
-	os_close_on_exec(ptoc[1], str, "pipe", "from");
+	os_close_on_exec(ptoc[1], str, "pipe", "to");
 
 	(void) close(ptoc[0]);
 	(void) close(ctop[1]);
