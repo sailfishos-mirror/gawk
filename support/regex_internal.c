@@ -936,10 +936,12 @@ re_node_set_alloc (re_node_set *set, Idx size)
 {
   set->alloc = size;
   set->nelem = 0;
-#if GAWK && USE_PERSISTENT_MALLOC
-  // PMA returns NULL for malloc of zero bytes...
+#if GAWK
+  // PMA returns NULL for malloc() of zero bytes.
+  // In general, fudge it, in case of non-GLIBC malloc()
+  // that also doesn't like a size of zero. Sheesh.
   if (size == 0)
-    size = 1;	// fudge it
+    size = 1;
 #endif
   set->elems = re_malloc (Idx, size);
   if (__glibc_unlikely (set->elems == NULL))
