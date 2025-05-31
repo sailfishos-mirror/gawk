@@ -53,6 +53,7 @@ struct root_pointers {
 	NODE *global_table;
 	NODE *func_table;
 	NODE *symbol_table;
+	struct extension *ext_list;
 	struct block_header nextfree[BLOCK_MAX];
 	int mpfr;
 	bool first;
@@ -95,6 +96,7 @@ init_symbol_table()
 
 		// set up the tables
 		init_the_tables();
+		init_extension_list();
 
 		// save the pointers for the next time.
 		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers));
@@ -104,12 +106,14 @@ init_symbol_table()
 		root_pointers->symbol_table = symbol_table;
 		root_pointers->first = true;
 		root_pointers->mpfr = 0;
+		root_pointers->ext_list = extension_list;
 		pma_set_root(root_pointers);
 	} else {
 		// this is the next time, get the saved pointers and put them back in place
 		global_table = root_pointers->global_table;
 		func_table = root_pointers->func_table;
 		symbol_table = root_pointers->symbol_table;
+		extension_list = root_pointers->ext_list;
 		memcpy(nextfree, root_pointers->nextfree, sizeof(nextfree));
 
 		// still need to set this one up as usual
