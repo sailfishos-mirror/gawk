@@ -50,7 +50,7 @@ load_ext(const char *lib_name)
 	if (do_sandbox)
 		fatal(_("extensions are not allowed in sandbox mode"));
 
-	if (using_pma)
+	if (using_persistent_malloc)
 		fatal(_("dynamic extensions cannot be used with persistent memory"));
 
 	if (do_traditional || do_posix)
