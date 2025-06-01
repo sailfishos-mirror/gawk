@@ -51,7 +51,7 @@ search_ext_list(const char *name, const char *lib_name)
 		if (strcmp(p->name, name) == 0) {
 			if (strcmp(p->path, lib_name) != 0)
 				fatal(_("extension `%s': trying to load %s, was previously loaded from %s"),
-						p->name, p->path, lib_name);
+						p->name, lib_name, p->path);
 			else
 				return;
 		}

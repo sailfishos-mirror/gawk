@@ -54,6 +54,7 @@ struct root_pointers {
 	NODE *func_table;
 	NODE *symbol_table;
 	struct extension *ext_list;
+	const char *version_string;
 	struct block_header nextfree[BLOCK_MAX];
 	int mpfr;
 	bool first;
@@ -83,6 +84,9 @@ init_the_tables(void)
 void
 init_symbol_table()
 {
+	extern const char *version_string;
+	extern const char *persist_file;
+
 	if (! using_persistent_malloc) {
 		// normal case, initialize regularly, return
 		init_the_tables();
@@ -104,9 +108,10 @@ init_symbol_table()
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
 		root_pointers->symbol_table = symbol_table;
+		root_pointers->ext_list = extension_list;
+		root_pointers->version_string = estrdup(version_string, strlen(version_string));
 		root_pointers->first = true;
 		root_pointers->mpfr = 0;
-		root_pointers->ext_list = extension_list;
 		pma_set_root(root_pointers);
 	} else {
 		// this is the next time, get the saved pointers and put them back in place
@@ -120,6 +125,11 @@ init_symbol_table()
 		getnode(param_table);
 		memset(param_table, '\0', sizeof(NODE));
 		null_array(param_table);
+		if (strcmp(root_pointers->version_string, version_string) != 0)
+			warning(_("%s was created by version %s, but the current version is %s"),
+					persist_file,
+					root_pointers->version_string,
+					version_string);
 	}
 }
 

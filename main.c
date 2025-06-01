@@ -1903,11 +1903,12 @@ check_pma_security(const char *pma_file)
 }
 
 /* enable_pma --- do the PMA flow, handle ASLR on Linux */
+const char *persist_file;
 
 static bool
 enable_pma(char **argv)
 {
-	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
+	persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 
 #ifndef USE_PERSISTENT_MALLOC
 	if (persist_file != NULL) {
