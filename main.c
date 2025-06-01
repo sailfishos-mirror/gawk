@@ -152,8 +152,6 @@ int gawk_mb_cur_max;		/* MB_CUR_MAX value, see comment in main() */
 FILE *output_fp;		/* default gawk output, can be redirected in the debugger */
 bool output_is_tty = false;	/* control flushing of output */
 
-bool using_pma = false;
-
 /* default format for strftime(), available via PROCINFO */
 const char def_strftime_format[] = "%a %b %e %H:%M:%S %Z %Y";
 
@@ -1930,7 +1928,6 @@ enable_pma(char **argv)
 	}
 
 
-	using_pma = (persist_file != NULL);
-	return using_pma;
+	return (persist_file != NULL);
 #endif
 }

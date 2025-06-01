@@ -1165,8 +1165,6 @@ extern NODE *success_node;
 extern struct block_header nextfree[BLOCK_MAX];
 extern bool field0_valid;
 
-extern bool using_pma;
-
 extern bool do_itrace;	/* separate so can poke from a debugger */
 
 extern SRCFILE *srcfiles; /* source files */
