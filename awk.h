@@ -1148,6 +1148,8 @@ extern NODE **fields_arr;
 extern int sourceline;
 extern char *source;
 extern int errcount;
+extern const char *version_string;
+extern const char *persist_file;
 extern int (*interpret)(INSTRUCTION *);	/* interpreter routine */
 extern NODE *(*make_number)(double);	/* double instead of AWKNUM on purpose */
 extern NODE *(*str2number)(NODE *);

@@ -133,6 +133,7 @@ static void set_locale_stuff(void);
 static bool stopped_early = false;
 
 bool using_persistent_malloc = false;
+const char *persist_file;
 enum do_flag_values do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
@@ -1903,7 +1904,6 @@ check_pma_security(const char *pma_file)
 }
 
 /* enable_pma --- do the PMA flow, handle ASLR on Linux */
-const char *persist_file;
 
 static bool
 enable_pma(char **argv)
