@@ -1562,12 +1562,12 @@ do_srand(int nargs)
 	check_args_min_max(nargs, "srand", 0, 1);
 
 	if (nargs == 0)
-		srandom((unsigned int) (save_seed = (long) time((time_t *) 0)));
+		srandom((unsigned int) (save_seed = (unsigned long) time((time_t *) 0)));
 	else {
 		tmp = POP_SCALAR();
 		if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 			lintwarn(_("%s: received non-numeric argument"), "srand");
-		srandom((unsigned int) (save_seed = (long) force_number(tmp)->numbr));
+		srandom((unsigned int) (save_seed = (unsigned long) force_number(tmp)->numbr));
 		DEREF(tmp);
 	}
 	return make_number((AWKNUM) ret);
