@@ -27,8 +27,6 @@
 #include "awk.h"
 #include <math.h>
 
-#include <math.h>
-
 NODE **fcall_list = NULL;
 long fcall_count = 0;
 int currule = 0;
