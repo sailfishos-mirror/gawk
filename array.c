@@ -652,7 +652,7 @@ do_delete(NODE *symbol, int nsubs)
 		mpfr_unset(val);
 #ifdef MEMDEBUG
 		memset(val, 0, sizeof(NODE));
-		val->type = 0xbaad;
+		val->type = (NODETYPE) 0xbaad;
 #endif
 		freenode(val);
 	} else {
