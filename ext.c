@@ -31,7 +31,54 @@
 #include "awk.h"
 extern SRCFILE *srcfiles;
 
+struct extension {
+	const char *name;
+	const char *path;
+	struct extension *next;
+} *extension_list = NULL;
+static struct extension *last_ext = NULL;
+
 #ifdef DYNAMIC
+
+/* search_ext_list --- validate that extension still comes from the same place */
+
+static void
+search_ext_list(const char *name, const char *lib_name)
+{
+	struct extension *p;
+
+	for (p = extension_list; p != NULL; p = p->next) {
+		if (strcmp(p->name, name) == 0) {
+			if (strcmp(p->path, lib_name) != 0)
+				fatal(_("extension `%s': trying to load %s, was previously loaded from %s"),
+						p->name, lib_name, p->path);
+			else
+				return;
+		}
+	}
+
+	// append to list, since the front of the list is what's saved in the backing store. ugh.
+	if (p == NULL) {
+		emalloc(p, struct extension *, sizeof(struct extension));
+		p->name = estrdup(name, strlen(name));
+		p->path = estrdup(lib_name, strlen(lib_name));
+		last_ext->next = p;
+		last_ext = p;
+	}
+}
+
+/* init_extension_list --- put a dummy object on the list for PMA */
+
+void
+init_extension_list(void)
+{
+	struct extension *p;
+	emalloc(p, struct extension *, sizeof(struct extension));
+	p->name = estrdup("@dummy@", strlen("@dummy@"));
+	p->path = estrdup("/no/such/path", strlen("/no/such/path"));
+	p->next = NULL;
+	last_ext = extension_list = p;
+}
 
 #include <dlfcn.h>
 
@@ -40,7 +87,7 @@ extern SRCFILE *srcfiles;
 /* load_ext --- load an external library */
 
 void
-load_ext(const char *lib_name)
+load_ext(const char *name, const char *lib_name)
 {
 	int (*install_func)(const gawk_api_t *const, awk_ext_id_t);
 	void *dl;
@@ -51,7 +98,7 @@ load_ext(const char *lib_name)
 		fatal(_("extensions are not allowed in sandbox mode"));
 
 	if (using_persistent_malloc)
-		fatal(_("dynamic extensions cannot be used with persistent memory"));
+		search_ext_list(name, lib_name);	// fatal out if problem
 
 	if (do_traditional || do_posix)
 		fatal(_("-l / @load are gawk extensions"));
@@ -129,9 +176,13 @@ make_builtin(const char *name_space, const awk_ext_func_t *funcinfo)
 			fatal(_("make_builtin: cannot redefine function `%s'"), name);
 		} else if (f->type == Node_ext_func) {
 			/* multiple extension() calls etc. */
-			if (do_lint)
+			if (do_lint && ! using_persistent_malloc)
 				lintwarn(_("make_builtin: function `%s' already defined"), name);
 			free((void *) install_name);
+			if (using_persistent_malloc) {
+				f->code_ptr->extfunc = funcinfo->function;
+				return awk_true;
+			}
 			return awk_false;
 		} else
 			/* variable name etc. */

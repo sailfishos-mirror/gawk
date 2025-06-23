@@ -3040,7 +3040,7 @@ load_library(INSTRUCTION *file, void **srcfile_p)
 			return false;
 		}
 
-		load_ext(s->fullpath);
+		load_ext(s->src, s->fullpath);
 	}
 
 	*srcfile_p = (void *) s;

@@ -3,6 +3,32 @@
 	* buitin.c (do_srand): Change casts of seed values to
 	unsigned long. Avoids some overflow problems.
 
+2025-06-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated w.r.t. PMA usage changes.
+	* awk.h (load_ext): Change declaration, new additional parameter.
+	(init_extension_list): Add declaration.
+	(extension_list): Add declaration.
+	(version_string, persist_file): Add declarations.
+	* awkgram.y (load_library): Add s->src in call to load_ext().
+	* ext.c (extension_list): Maintain a list of loaded extensions
+	when using PMA so can check if an extension is loaded from
+	a different path.
+	(search_ext_list, init_extension_list): New functions.
+	(extension_list): Add definition.
+	(load_ext): Add addtional argument `name'.  Search the extension
+	list if PMA.
+	(make_builtin): If PMA and found the function already installed,
+	update its function pointer and return true. Returning true
+	avoids a warning.
+	* main.c (main): Update call to load_ext().
+	(persist_file): New global variable.
+	* symbol.c (struct root_pointers): Add ext_list and version_string
+	members.
+	(init_symbol_table): For first time, call init_extension_list,
+	save it and the version_string.  Restore on second time and
+	check version.
+
 2025-06-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* awk.h (using_pma): Removed. We already have

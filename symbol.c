@@ -56,6 +56,8 @@ struct root_pointers {
 	struct block_header nextfree[BLOCK_MAX];
 	int mpfr;
 	bool first;
+	struct extension *ext_list;
+	const char *version_string;
 } *root_pointers = NULL;
 
 /* init_the_tables --- deal with the tables for in memory use */
@@ -95,6 +97,7 @@ init_symbol_table()
 
 		// set up the tables
 		init_the_tables();
+		init_extension_list();
 
 		// save the pointers for the next time.
 		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers));
@@ -102,6 +105,8 @@ init_symbol_table()
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
 		root_pointers->symbol_table = symbol_table;
+		root_pointers->ext_list = extension_list;
+		root_pointers->version_string = estrdup(version_string, strlen(version_string));
 		root_pointers->first = true;
 		root_pointers->mpfr = 0;
 		pma_set_root(root_pointers);
@@ -110,12 +115,18 @@ init_symbol_table()
 		global_table = root_pointers->global_table;
 		func_table = root_pointers->func_table;
 		symbol_table = root_pointers->symbol_table;
+		extension_list = root_pointers->ext_list;
 		memcpy(nextfree, root_pointers->nextfree, sizeof(nextfree));
 
 		// still need to set this one up as usual
 		getnode(param_table);
 		memset(param_table, '\0', sizeof(NODE));
 		null_array(param_table);
+		if (strcmp(root_pointers->version_string, version_string) != 0)
+			warning(_("%s was created by version `%s', but the current version is `%s'"),
+					persist_file,
+					root_pointers->version_string,
+					version_string);
 	}
 }
 

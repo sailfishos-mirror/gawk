@@ -133,6 +133,7 @@ static void set_locale_stuff(void);
 static bool stopped_early = false;
 
 bool using_persistent_malloc = false;
+const char *persist_file;
 enum do_flag_values do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
@@ -433,7 +434,7 @@ main(int argc, char **argv)
 	/* load extension libs */
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
 		if (s->stype == SRC_EXTLIB)
-			load_ext(s->fullpath);
+			load_ext(s->src, s->fullpath);
 		else if (s->stype != SRC_INC && s->stype != SRC_NSINC)
 			have_srcfile = true;
 	}
@@ -1907,7 +1908,7 @@ check_pma_security(const char *pma_file)
 static bool
 enable_pma(char **argv)
 {
-	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
+	persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 
 #ifndef USE_PERSISTENT_MALLOC
 	if (persist_file != NULL) {
