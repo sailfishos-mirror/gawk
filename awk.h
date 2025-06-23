@@ -1166,6 +1166,8 @@ extern NODE **fields_arr;
 extern int sourceline;
 extern char *source;
 extern int errcount;
+extern const char *version_string;
+extern const char *persist_file;
 extern int (*interpret)(INSTRUCTION *);	/* interpreter routine */
 extern NODE *(*make_number)(double);	/* double instead of AWKNUM on purpose */
 extern NODE *(*str2number)(NODE *);
@@ -1600,7 +1602,8 @@ extern void elem_new_reset(NODE *n);
 extern NODE *elem_new_to_scalar(NODE *n);
 /* ext.c */
 extern NODE *do_ext(int nargs);
-void load_ext(const char *lib_name);	/* temporary */
+void load_ext(const char *name, const char *lib_name);
+extern void init_extension_list(void);
 extern void close_extensions(void);
 extern bool is_valid_identifier(const char *name);
 #ifdef DYNAMIC
@@ -1610,6 +1613,7 @@ extern NODE *get_actual_argument(NODE *, int, bool);
 #define get_scalar_argument(n, i)  get_actual_argument((n), (i), false)
 #define get_array_argument(n, i)   get_actual_argument((n), (i), true)
 #endif
+extern struct extension *extension_list;
 /* field.c */
 extern void init_fields(void);
 extern void init_csv_fields(void);
