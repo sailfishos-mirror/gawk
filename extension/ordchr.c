@@ -73,15 +73,19 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	memset(& mbs, 0, sizeof(mbs));
 
 	if (get_argument(0, AWK_STRING, & str)) {
-		wchar_t wc[2];
-		size_t res;
+		if (MB_CUR_MAX == 1) {
+			ret = str.str_value.str[0] & 0xff;
+		} else {
+			wchar_t wc[2];
+			size_t res;
 
-		src = str.str_value.str;
-		res = mbsrtowcs(wc, & src, 1, & mbs);
-		if (res == 0 || res == (size_t) -1 || res == (size_t) -2)
-			ret = -1;
-		else
-			ret = wc[0];
+			src = str.str_value.str;
+			res = mbsrtowcs(wc, & src, 1, & mbs);
+			if (res == 0 || res == (size_t) -1 || res == (size_t) -2)
+				ret = -1;
+			else
+				ret = wc[0];
+		}
 	} else if (do_lint)
 		lintwarn(ext_id, _("ord: first argument is not a string"));
 
@@ -98,7 +102,12 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	unsigned int ret = 0;
 	double val = 0.0;
 	wchar_t str[2];
-	char buf[20];
+	char buf[20] = { '\0', '\0' };
+
+	str[0] = str[1] = L'\0';
+
+	assert(result != NULL);
+;
 
 	str[0] = str[1] = L'\0';
 
@@ -107,8 +116,24 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	if (get_argument(0, AWK_NUMBER, & num)) {
 		val = num.num_value;
 		ret = val;	/* convert to int */
-		str[0] = ret;
-		str[1] = '\0';
+		if (MB_CUR_MAX == 1) {
+			buf[0] = ret & 0xff;
+			goto done;
+		} else {
+			str[0] = ret;
+		}
+	} else if (do_lint)
+		lintwarn(ext_id, _("chr: first argument is not a number"));
+
+	if (get_argument(0, AWK_NUMBER, & num)) {
+		val = num.num_value;
+		ret = val;	/* convert to int */
+		if (MB_CUR_MAX == 1) {
+			buf[0] = ret & 0xff;
+			goto done;
+		} else {
+			str[0] = ret;
+		}
 	} else if (do_lint)
 		lintwarn(ext_id, _("chr: first argument is not a number"));
 
@@ -121,6 +146,7 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	if (res == 0 || res == (size_t)-1 || res == (size_t) -2)
 		buf[0] = buf[1] = '\0';
 
+done:
 	/* Set the return value */
 	return make_const_string(buf, strlen(buf), result);
 }
