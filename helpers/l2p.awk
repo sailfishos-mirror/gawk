@@ -85,18 +85,28 @@ function parse_and_build_format(start, lastpos,		i, resultstpos)
 		for (i = start; Chars[i] != "'"; i++) {
 			result = result Chars[i]
 		}
-		lastpos[1] =  i
+		lastpos[1] = i
 		result = result "'"
 	} else {
 		result = "%" Format_count++ "$"
 		for (i = ++start; ! (Chars[i] in Conversions); i++) {
 			result = result Chars[i]
 		}
-		lastpos[1] =  i
+		lastpos[1] = i
 		result = result Chars[i]
 	}
 
 	return result
+}
+
+# insert_text --- add new text to the correct part of the result
+
+function insert_text(new_text)
+{
+	if (Direction == "R2L")
+		Right = new_text Right
+	else
+		Left = Left new_text
 }
 
 # build_output --- build the output line
@@ -108,38 +118,26 @@ function build_output(		i, new_format, lastpos)
 		if (Chars[i] == "`" && Chars[i+1] == "%") {
 			new_format = parse_and_build_format(i, lastpos)
 			i = lastpos[1]
-			if (Direction == "R2L")
-				Right = new_format Right
-			else
-				Left = Left new_format
+			insert_text(new_format)
 			continue
 		} else if (Chars[i] == "%") {
 			if (Chars[i+1] == " " || Chars[i+1] == "%") {	# pass through
-				if (Direction == "R2L")
-					Right = Chars[i] Chars[i+1] Right
-				else
-					Left = Left Chars[i] Chars[i+1]
+				insert_text(Chars[i] Chars[i+1])
 				i++
 			} else {
 				new_format = parse_and_build_format(i, lastpos)
 				i = lastpos[1]
-				if (Direction == "R2L")
-					Right = new_format Right
-				else
-					Left = Left new_format
+				insert_text(new_format)
 			}
 			continue
 		} else if (is_hebrew(Chars[i]) || ord(Chars[i]) > 127) {
 			Direction = "R2L"
-			Right = Chars[i] Right
+			insert_text(Chars[i])
 		} else if (is_space(Chars[i]) || is_punct(Chars[i])) {
-			if (Direction == "R2L")
-				Right = Chars[i] Right
-			else
-				Left = Left Chars[i]
+			insert_text(Chars[i])
 		} else {
 			Direction = "L2R"
-			Left = Left Chars[i]
+			insert_text(Chars[i])
 		}
 	}
 }
