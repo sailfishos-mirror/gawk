@@ -10,6 +10,9 @@
 # arnold@skeeve.com
 # June 2025
 
+# There are lots of global variables here. Since it's a small script, that's
+# OK, but things might be cleaner if functions could do pass by reference.
+
 @load "ordchr"
 
 BEGIN {
@@ -51,6 +54,9 @@ function reset_output()
 	Direction = "L2R"	# initial direction, left to right
 	Left = ""		# left side of output
 	Right = ""		# right side of output
+	Format_count = 1	# for use in %<n>$xyz<format>
+	delete Chars		# Input line after splitting
+	Len = 0			# Length of input line
 }
 
 # is_space --- check if a character is white space
@@ -67,24 +73,73 @@ function is_punct(char)
 	return char ~ /[[:punct:]]/
 }
 
+# parse_and_build_format --- parse a printf format and revise it as needed
+
+function parse_and_build_format(start, lastpos,		i, resultstpos)
+{
+	# input is something like  %...s or `%...s'
+
+	if (Chars[start] == "`") {
+		result = "`%" Format_count++ "$"
+		start += 2
+		for (i = start; Chars[i] != "'"; i++) {
+			result = result Chars[i]
+		}
+		lastpos[1] =  i
+		result = result "'"
+	} else {
+		result = "%" Format_count++ "$"
+		for (i = ++start; ! (Chars[i] in Conversions); i++) {
+			result = result Chars[i]
+		}
+		lastpos[1] =  i
+		result = result Chars[i]
+	}
+
+	return result
+}
+
 # build_output --- build the output line
 
-function build_output(chars, len,	i)
+function build_output(		i, new_format, lastpos)
 {
-	for (i = 1; i <= len; i++) {
-		# if (chars[i] == "%") {
-		# } else
-		if (is_hebrew(chars[i]) || ord(chars[i]) > 127) {
-			Direction = "R2L"
-			Right = chars[i] Right
-		} else if (is_space(chars[i]) || is_punct(chars[i])) {
+	for (i = 1; i <= Len; i++) {
+		delete lastpos
+		if (Chars[i] == "`" && Chars[i+1] == "%") {
+			new_format = parse_and_build_format(i, lastpos)
+			i = lastpos[1]
 			if (Direction == "R2L")
-				Right = chars[i] Right
+				Right = new_format Right
 			else
-				Left = Left chars[i]
+				Left = Left new_format
+			continue
+		} else if (Chars[i] == "%") {
+			if (Chars[i+1] == " " || Chars[i+1] == "%") {	# pass through
+				if (Direction == "R2L")
+					Right = Chars[i] Chars[i+1] Right
+				else
+					Left = Left Chars[i] Chars[i+1]
+				i++
+			} else {
+				new_format = parse_and_build_format(i, lastpos)
+				i = lastpos[1]
+				if (Direction == "R2L")
+					Right = new_format Right
+				else
+					Left = Left new_format
+			}
+			continue
+		} else if (is_hebrew(Chars[i]) || ord(Chars[i]) > 127) {
+			Direction = "R2L"
+			Right = Chars[i] Right
+		} else if (is_space(Chars[i]) || is_punct(Chars[i])) {
+			if (Direction == "R2L")
+				Right = Chars[i] Right
+			else
+				Left = Left Chars[i]
 		} else {
 			Direction = "L2R"
-			Left = Left chars[i]
+			Left = Left Chars[i]
 		}
 	}
 }
@@ -107,13 +162,13 @@ Processing == TRUE {
 	} else
 		key = ""
 
-	len = length($0)
+	Len = length($0)
 	if (substr($0, 1, 1) == "\"")
-		$0 = substr($0, 2, len-2)
+		$0 = substr($0, 2, Len-2)
 
-	len = split($0, chars, "")	# get indvidual characters
+	Len = split($0, Chars, "")	# get indvidual characters
 
-	build_output(chars, len)
+	build_output()
 
 	if (key)
 		printf("%s ", key)
