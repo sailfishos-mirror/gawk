@@ -1,6 +1,6 @@
 #! /usr/bin/gawk -f
 
-# l2p.awk --- convert logical ordering for right-to-left text to physical
+# l2v.awk --- convert logical ordering for right-to-left text to visual.
 #
 # This program is intended for use with Hebrew Unicode text,
 # in particular for processing the po/he.po file in the gawk distribution.
@@ -8,7 +8,7 @@
 #
 # Arnold Robbins
 # arnold@skeeve.com
-# June 2025
+# June-July 2025
 
 # There are lots of global variables here. Since it's a small script, that's
 # OK, but things might be cleaner if functions could do pass by reference.
@@ -47,7 +47,7 @@ function is_conversion(char)
 	return char in Conversions
 }
 
-# reset_output --- reset the indices for each line and the output array
+# reset_output --- reset the global variables for each line
 
 function reset_output()
 {
@@ -85,16 +85,16 @@ function parse_and_build_format(start, lastpos,		i, resultstpos)
 		for (i = start; Chars[i] != "'"; i++) {
 			result = result Chars[i]
 		}
-		lastpos[1] = i
 		result = result "'"
 	} else {
 		result = "%" Format_count++ "$"
 		for (i = ++start; ! (Chars[i] in Conversions); i++) {
 			result = result Chars[i]
 		}
-		lastpos[1] = i
 		result = result Chars[i]
 	}
+
+	lastpos[1] = i
 
 	return result
 }
@@ -148,12 +148,12 @@ function build_output(		i, new_format, lastpos)
 /msgstr/ { Processing = TRUE }
 
 # default
-Processing == FALSE { print ; next }
+! Processing { print ; next }
 
-Processing == TRUE {
+Processing {
 	reset_output()
 
-	if ($1 ~ /msgid|msgstr/) {
+	if ($1 ~ /msgstr/) {
 		key = $1
 		sub("^" key, "")
 		sub(/^[[:space:]]+/, "")
