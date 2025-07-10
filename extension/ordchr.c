@@ -41,6 +41,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <wchar.h>
+#include <langinfo.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -64,7 +65,7 @@ static awk_value_t *
 do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 {
 	awk_value_t str;
-	double ret = -1;
+	double ret = 0xFFFD;	// unicode bad char
 	mbstate_t mbs;
 	const char *src;
 
@@ -81,9 +82,13 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 			src = str.str_value.str;
 			res = mbsrtowcs(wc, & src, 1, & mbs);
-			if (res == 0 || res == (size_t) -1 || res == (size_t) -2)
-				ret = -1;
-			else
+			if (res == 0 || res == (size_t) -1 || res == (size_t) -2) {
+				// mimic gawk's behavior
+				if (strcmp(nl_langinfo(CODESET), "UTF-8") == 0)
+					ret = 0xFFFD;	// unicode bad char
+				else
+					ret = src[0] & 0xFF; 
+			} else
 				ret = wc[0];
 		}
 	} else if (do_lint)
