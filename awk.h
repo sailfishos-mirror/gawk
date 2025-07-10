@@ -2065,6 +2065,10 @@ force_number(NODE *n)
 static inline NODE *
 fixtype(NODE *n)
 {
+	int flags = STRING|STRCUR|NUMBER|NUMCUR;
+	if (n->type == Node_var && (n->flags & flags) == flags)
+		n = n->var_value;	// converted from Node_elem_new
+
 	if (n->type != Node_val)
 		cant_happen("%s: expected Node_val: got %s",
 				__func__, nodetype2str(n->type));
