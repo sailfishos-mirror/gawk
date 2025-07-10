@@ -93,6 +93,7 @@ load_ext(const char *name, const char *lib_name)
 	void *dl;
 	int flags = RTLD_LAZY;
 	int *gpl_compat;
+	bool override = (getenv("MAGIC_XYZZY") != NULL);
 
 	if (do_sandbox)
 		fatal(_("extensions are not allowed in sandbox mode"));
@@ -100,7 +101,7 @@ load_ext(const char *name, const char *lib_name)
 	if (using_persistent_malloc)
 		search_ext_list(name, lib_name);	// fatal out if problem
 
-	if (do_traditional || do_posix)
+	if ((do_traditional || do_posix) && ! override)
 		fatal(_("-l / @load are gawk extensions"));
 
 	if (lib_name == NULL)

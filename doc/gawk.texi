@@ -40229,8 +40229,12 @@ printf("The numeric value of 'A' is %d\n", ord("A"))
 printf("The string value of 65 is %s\n", chr(65))
 @end example
 
-As of release 5.4 of @command{gawk}, the extension can handle
-multibyte / wide character sets.
+As of release 5.4 of @command{gawk}, the extension can handle multibyte /
+wide character sets.  If given an invalid multibyte string, in a UTF-8
+locale, @code{ord()} returns the Unicode ``invalid character'' value,
+@code{0xFFFD}. Otherwise, it returns the numeric value of the first byte
+in the string.  In a single-byte locale, @code{ord()} always returns the
+numeric value of the first byte in the string.
 
 @node Extension Sample Readdir
 @subsection Reading Directories
