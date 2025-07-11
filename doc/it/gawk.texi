@@ -44737,7 +44737,12 @@ printf("Il valore come stringa di 65 @`e %s\n", chr(65))
 @end example
 
 A partire dalla versione 5.4 di @command{gawk}, l'estensione può gestire
-caratteri multibyte / estesi.
+caratteri multibyte / estesi.  Quando incontra una stringa multibyte
+non valida, in un contesto locale UTF-8, @code{ord()} restituisce
+il valore Unicode ``carattere non valido'', @code{0xFFFD}.
+Altrimenti viene restituito il valore numerico del primo byte della
+stringa.  In un contesto locale che usa un solo byte, @code{ord()}
+restituisce sempre il valore numerico del primo byte della stringa.
 
 @node Esempio di estensione Readdir
 @subsection Leggere directory
