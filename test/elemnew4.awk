@@ -14,11 +14,8 @@ BEGIN {
    print ""
    assign(array, a, "")
 ##  reference(array[a], a);
-   stopme()
    reference(array[b], b);
    dump_array(array)
-
-   stopme()
 
    print ""
    compare("Try 2", array, a, b)
