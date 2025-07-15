@@ -20698,30 +20698,19 @@ Se @option{--lint} @`e
 stato specificato sulla riga di comando, @command{gawk} emette un
 avvertimento a questo riguardo.
 
-@cindex estensioni comuni @subentry @code{length()} applicato a un vettore
-@cindex comuni @subentry estensioni @subentry @code{length()} applicato a un vettore
-@cindex differenze tra @command{awk} e @command{gawk} @subentry funzione @code{length()}
 @cindex numero @subentry di elementi in un vettore
 @cindex vettori @subentry determinare il numero degli elementi
 In @command{gawk} e in parecchie altre implementazioni @command{awk},
 se l'argomento @`e un vettore, la funzione @code{length()} restituisce il numero
-di elementi nel vettore. @value{COMMONEXT}
+di elementi nel vettore.
 Ci@`o @`e meno utile di quel che sembra a prima vista, in quanto
 non @`e affatto detto che il vettore abbia come indici i numeri da 1 al
 numero di elementi che contiene.
-Se @option{--lint} @`e
-stato specificato sulla riga di comando,
-(@pxref{Opzioni}),
-@command{gawk} avvisa che l'uso di un vettore come argomento non
-@`e portabile.
-Se si specifica l'opzione @option{--posix}, l'uso di un vettore come
-argomento genera un errore fatale
-@iftex
-(@pxrefil{Vettori}).
-@end iftex
-@ifnottex
-(@pxref{Vettori}).
-@end ifnottex
+
+Usare la funzione @code{length()} avendo come operando un vettore
+fa parte dello standard POSIX dal 2024.
+Quindi questo utilizzo dovrebbe divenire pi@`u portabile con il
+passare del tempo.
 
 @item @code{match(@var{stringa}, @var{regexp}} [@code{, @var{vettore}}]@code{)}
 @cindexawkfunc{match}
@@ -44736,7 +44725,7 @@ printf("Il valore numerico di 'A' @`e %d\n", ord("A"))
 printf("Il valore come stringa di 65 @`e %s\n", chr(65))
 @end example
 
-A partire dalla versione 5.4 di @command{gawk}, l'estensione può gestire
+A partire dalla versione 5.4 di @command{gawk}, l'estensione pu@`o gestire
 caratteri multibyte / estesi.  Quando incontra una stringa multibyte
 non valida, in un contesto locale UTF-8, @code{ord()} restituisce
 il valore Unicode ``carattere non valido'', @code{0xFFFD}.
@@ -48568,7 +48557,7 @@ usando gli strumenti MinGW, scrivere @samp{make mingw32}.
 
 Se si sta compilando @command{gawk} in ambiente MinGW usando un Makefile
 diverso da @file{pc/Makefile}, occorre assicurarsi di passare al compilatore
-GCC l'opzione da riga-di-comando @option{-D__USE_MINGW_ANSI_STDIO}. Ciò è
+GCC l'opzione da riga-di-comando @option{-D__USE_MINGW_ANSI_STDIO}. Ci@`o @`e
 necessario per il corretto funzionamento di Gawk in ambiente Windows, in
 particolare per visualizzare le traduzioni dei messaggi.
 

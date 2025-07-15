@@ -587,16 +587,10 @@ do_length(int nargs)
 	check_exact_args(nargs, "length", 1);
 
 	tmp = POP();
-	if (tmp->type == Node_var_array) {
-		static bool warned = false;
-		unsigned long size;
 
-		if (do_posix)
-			fatal(_("length: received array argument"));
-   		if (do_lint_extensions && ! warned) {
-			warned = true;
-			lintwarn(_("`length(array)' is a gawk extension"));
-		}
+	// As of the 2024 POSIX standard, length(array) is standardized. Yay!
+	if (tmp->type == Node_var_array) {
+		unsigned long size;
 
 		/*
 		 * Support for deferred loading of array elements requires that
