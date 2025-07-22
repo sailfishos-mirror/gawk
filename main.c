@@ -55,7 +55,9 @@ static void init_fds(void);
 static void init_groupset(void);
 static void save_argv(int, char **);
 static const char *platform_name();
+#ifdef USE_PERSISTENT_MALLOC
 static void check_pma_security(const char *pma_file);
+#endif /* USE_PERSISTENT_MALLOC */
 
 /* These nodes store all the special variables AWK uses */
 NODE *ARGC_node, *ARGIND_node, *ARGV_node, *BINMODE_node, *CONVFMT_node;
@@ -1874,12 +1876,12 @@ set_current_namespace(const char *new_namespace)
 	current_namespace = new_namespace;
 }
 
+#ifdef USE_PERSISTENT_MALLOC
 /* check_pma_security --- make some minimal security checks */
 
 static void
 check_pma_security(const char *pma_file)
 {
-#ifdef USE_PERSISTENT_MALLOC
 	struct stat sbuf;
 	int euid = geteuid();
 
@@ -1899,8 +1901,8 @@ check_pma_security(const char *pma_file)
 		fprintf(stderr, _("%s: warning: %s is not owned by euid %d.\n"),
 				myname, pma_file, euid);
 	}
-#endif /* USE_PERSISTENT_MALLOC */
 }
+#endif /* USE_PERSISTENT_MALLOC */
 
 /* enable_pma --- do the PMA flow, handle ASLR on Linux */
 
@@ -1910,11 +1912,10 @@ enable_pma(char **argv)
 	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 
 #ifndef USE_PERSISTENT_MALLOC
-	if (persist_file != NULL) {
+	if (persist_file != NULL)
 		warning(_("persistent memory is not supported"));
-		return false;
-	}
-	return true;	// silence compiler warnings
+
+	return false;
 #else
 	os_disable_aslr(persist_file, argv);
 
