@@ -201,7 +201,7 @@ lookup(const char *name)
 		if (assoc_empty(tables[i]))
 			continue;
 
-		if ((do_posix || do_traditional) && tables[i] == global_table)
+		if (do_traditional && tables[i] == global_table)
 			continue;
 
 		n = in_array(tables[i], tmp);

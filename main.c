@@ -1099,7 +1099,7 @@ is_std_var(const char *var)
 
 	for (vp = varinit; vp->name != NULL; vp++) {
 		if (strcmp(vp->name, var) == 0) {
-			if ((do_traditional || do_posix) && (vp->flags & NON_STANDARD) != 0)
+			if (do_traditional && (vp->flags & NON_STANDARD) != 0)
 				return false;
 
 			return true;

@@ -1097,20 +1097,14 @@ do_system(int nargs)
 		 * divides the result by 256.  That normally gives the
 		 * exit status but gives a weird result for death-by-signal.
 		 * So we compromise as follows:
+		 *
+		 * 7/2025. BWK awk now does what we do to sanitize the
+		 * status.  I removed the MinGW code for do_traditional
+		 * since we no longer care about that option here.
 		 */
 		ret = status;
-		if (status != -1) {
-			if (do_posix)
-				;	/* leave it alone, full 16 bits */
-			else if (do_traditional)
-#ifdef __MINGW32__
-				ret = (((unsigned)status) & ~0xC0000000);
-#else
-				ret = (status / 256.0);
-#endif
-			else
-				ret = sanitize_exit_status(status);
-		}
+		if (status != -1 && ! do_posix)
+			ret = sanitize_exit_status(status);
 
 		if ((BINMODE & BINMODE_INPUT) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);

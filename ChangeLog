@@ -1,3 +1,22 @@
+2025-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Rationalize do_traditional throughout the code base:
+
+	1. Bring things into sync with curreent BWK awk.
+	2. Change `do_posix || do_tradtional' tests to just `do_traditional'
+	since --posix automatically also turns on do_traditional.
+
+	* builtin.c (do_system): Remove old code that divided the
+	exit status by 256 if do_traditional. BWK awk no longer
+	does that.
+	* ext.c (load_ext): Simplify check for do_traditional.
+	* field.c (do_split): Ditto.
+	* main.c (is_std_var): Ditto.
+	* re.c (make_regexp): Ditto.
+	* symbol.c (lookup): Ditto.
+	* io.c (set_RS): Change check from do_traditional to do_posix
+	in case where RS->stlen > 1.
+
 2025-07-24         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
 	* io.c (redirect): Don't issue a lint complaint if the
