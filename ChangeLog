@@ -1,3 +1,54 @@
+2025-07-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Make gawk's system() function smarter. It has to ignore SIGINT
+	and SIGQUIT and block SIGCHLD (per POSIX for the C system()
+	function.) Thanks to Finn Magnusson <finnmag@yahoo.com> for
+	the report.  The test case was:
+
+		gawk 'BEGIN { system("cat"); print "\n1" }'
+
+	Then immediately interrupt the "cat" with a Control-C.
+	Older versions of gawk that used the C library system() would
+	still print the "1".  Gawk 5.3.1 would not. These changes
+	restore the old behavior.
+
+	Note that different versions of awk do different things
+	in this test case. BWK awk does print the "1", mawk does not.
+
+	* io.c (wait_any): Now has just the code to do the wait and
+	update the status.
+	* io.c (wait_any_block_signals): This was originally wait_any().
+	Simplified it by having just the signal handling here and making
+	a call to wait_any().
+	* builtin.c (gawk_system): Added signal handling code to
+	ignore/block signals in the parent before the fork, restore
+	things in the child before the exec, and restore them in
+	the parent after calling wait_any().
+
+2025-07-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (emalloc_real, ezalloc_real, erealloc_real): Use %zu
+	in the error message instead of %ld and casting to long.
+
+2025-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Rationalize do_traditional throughout the code base:
+
+	1. Bring things into sync with curreent BWK awk.
+	2. Change `do_posix || do_tradtional' tests to just `do_traditional'
+	since --posix automatically also turns on do_traditional.
+
+	* builtin.c (do_system): Remove old code that divided the
+	exit status by 256 if do_traditional. BWK awk no longer
+	does that.
+	* ext.c (load_ext): Simplify check for do_traditional.
+	* field.c (do_split): Ditto.
+	* main.c (is_std_var): Ditto.
+	* re.c (make_regexp): Ditto.
+	* symbol.c (lookup): Ditto.
+	* io.c (set_RS): Change check from do_traditional to do_posix
+	in case where RS->stlen > 1.
+
 2025-07-24         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
 	* io.c (redirect): Don't issue a lint complaint if the

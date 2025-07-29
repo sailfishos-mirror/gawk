@@ -233,10 +233,11 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 			/*
 			 * The posix and traditional flags do not change
 			 * once the awk program is running. Therefore,
-			 * neither does ok_to_escape.
+			 * neither does ok_to_escape. --posix implies
+			 * --traditional, so only need to check do_traditional.
 			 */
 			if (ok_to_escape == NULL) {
-				if (do_posix || do_traditional)
+				if (do_traditional)
 					ok_to_escape = "{}()|*+?.^$\\[]/-";
 				else
 					ok_to_escape = "<>`'BywWsS{}()|*+?.^$\\[]/-";
