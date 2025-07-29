@@ -3327,6 +3327,13 @@ do_mkbool(int nargs)
 
 /* gawk_system --- specialized version for gawk */
 
+/*
+ * 7/2025: This got messier because we need to ignore SIGINT and SIGQUIT
+ * and block SIGCHLD while running (see the POSIX description of system()).
+ * Blocking is only possible with the POSIX sigaction/sigprocmask APIs.
+ * We do our best here, but it ain't pretty.
+ */
+
 int
 gawk_system(const char *command)
 {
@@ -3336,18 +3343,59 @@ gawk_system(const char *command)
 	pid_t childpid;
 	int status;
 
+	// In the parent, before the fork
+#ifdef HAVE_SIGPROCMASK
+	sigset_t set, oldset;
+
+	sigemptyset(& set);
+	sigaddset(& set, SIGCHLD);
+	sigprocmask(SIG_BLOCK, & set, & oldset);
+
+	struct sigaction action, old_int_action, old_quit_action;
+
+	sigemptyset(& action.sa_mask);
+	action.sa_flags = 0;
+	action.sa_handler = SIG_IGN;
+	sigaction(SIGINT, & action, & old_int_action);
+	sigaction(SIGQUIT, & action, & old_quit_action);
+#else
+	void (*istat)(int), (*qstat)(int);
+
+	istat = signal(SIGINT, SIG_IGN);
+	qstat = signal(SIGQUIT, SIG_IGN);
+#endif
+
 	if ((childpid = fork()) == 0) {
 		// child
 		set_sigpipe_to_default();
+		// in the child, restore defaults
+#ifdef HAVE_SIGPROCMASK
+		sigprocmask(SIG_SETMASK, & oldset, NULL);
+		sigaction(SIGINT, & old_int_action, NULL);
+		sigaction(SIGQUIT, & old_quit_action, NULL);
+#else
+		istat = signal(SIGINT, istat);
+		qstat = signal(SIGQUIT, qstat);
+#endif
 		execl("/bin/sh", "sh", "-c", command, NULL);
 		_exit(errno == ENOENT ? 127 : 126);
 	} else {
 		// parent
 		status = wait_any(childpid);
 
+		// in the parent, restore stuff after getting the status
+#ifdef HAVE_SIGPROCMASK
+		sigprocmask(SIG_SETMASK, & oldset, NULL);
+		sigaction(SIGINT, & old_int_action, NULL);
+		sigaction(SIGQUIT, & old_quit_action, NULL);
+#else
+		istat = signal(SIGINT, istat);
+		qstat = signal(SIGQUIT, qstat);
+#endif
+
 		return status;
 	}
-#endif /* defined(VMS) || defined(__MINGW32__) */
+#endif /* ! (defined(VMS) || defined(__MINGW32__)) */
 }
 
 #if 0

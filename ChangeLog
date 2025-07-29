@@ -1,5 +1,32 @@
 2025-07-29         Arnold D. Robbins     <arnold@skeeve.com>
 
+	Make gawk's system() function smarter. It has to ignore SIGINT
+	and SIGQUIT and block SIGCHLD (per POSIX for the C system()
+	function.) Thanks to Finn Magnusson <finnmag@yahoo.com> for
+	the report.  The test case was:
+
+		gawk 'BEGIN { system("cat"); print "\n1" }'
+
+	Then immediately interrupt the "cat" with a Control-C.
+	Older versions of gawk that used the C library system() would
+	still print the "1".  Gawk 5.3.1 would not. These changes
+	restore the old behavior.
+
+	Note that different versions of awk do different things
+	in this test case. BWK awk does print the "1", mawk does not.
+
+	* io.c (wait_any): Now has just the code to do the wait and
+	update the status.
+	* io.c (wait_any_block_signals): This was originally wait_any().
+	Simplified it by having just the signal handling here and making
+	a call to wait_any().
+	* builtin.c (gawk_system): Added signal handling code to
+	ignore/block signals in the parent before the fork, restore
+	things in the child before the exec, and restore them in
+	the parent after calling wait_any().
+
+2025-07-29         Arnold D. Robbins     <arnold@skeeve.com>
+
 	* awk.h (emalloc_real, ezalloc_real, erealloc_real): Use %zu
 	in the error message instead of %ld and casting to long.
 
