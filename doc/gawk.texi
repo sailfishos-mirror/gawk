@@ -5292,6 +5292,10 @@ $ @kbd{gawk -v LINENO=10 'BEGIN @{ print("hi" @}'}
 @error{} gawk: cmd. line:11:                    ^ syntax error
 @end example
 
+If the environment variable @env{MAGIC_XYZZY} exists, then it's
+possible to load extensions, even with @option{--posix}
+or @option{--traditional}.
+
 @end ignore
 
 @node Invoking Summary
@@ -19668,7 +19672,7 @@ value passed to the C @code{exit()} function is held in the high-order
 eight bits. The low-order bits indicate if the process was killed by a
 signal (bit 7) and if so, the guilty signal number (bits 0--6).
 
-Traditionally, @command{awk}'s @code{system()} function has simply
+In the past, @command{awk}'s @code{system()} function simply
 returned the exit status value divided by 256. In the normal case this
 gives the exit status but in the case of death-by-signal it yields
 a fractional floating-point value.@footnote{In private correspondence,
@@ -19683,7 +19687,6 @@ The return values are summarized in @ref{table-system-return-values}.
 @caption{Return values from @code{system()}}
 @multitable @columnfractions .40 .60
 @headitem Situation @tab Return value from @code{system()}
-@item @option{--traditional} @tab C @code{system()}'s value divided by 256
 @item @option{--posix} @tab C @code{system()}'s value
 @item Normal exit of command @tab Command's exit status
 @item Death by signal of command @tab 256 + number of murderous signal

@@ -259,6 +259,7 @@ static bool find_output_wrapper(awk_output_buf_t *outbuf);
 static void init_output_wrapper(awk_output_buf_t *outbuf);
 static bool find_two_way_processor(const char *name, struct redirect *rp);
 static bool avoid_flush(const char *name);
+static int wait_any_block_signals(int interesting);
 
 static RECVALUE rs1scan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 static RECVALUE rsnullscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
@@ -868,9 +869,9 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			if (rp->pid != -1)
 #ifdef __MINGW32__
 				/* MinGW cannot wait for any process.  */
-				wait_any(rp->pid);
+				wait_any_block_signals(rp->pid);
 #else
-				wait_any(0);
+				wait_any_block_signals(0);
 #endif
 		}
 #endif /* PIPES_SIMULATED */
@@ -2537,11 +2538,11 @@ use_pipes:
 #ifndef PIPES_SIMULATED		/* real pipes */
 
 /*
- * wait_any --- if the argument pid is 0, wait for all child processes that
- * have exited.  We loop to make sure to reap all children that have exited to
- * minimize the risk of running out of process slots.  Since we don't process
- * SIGCHLD, we do not immediately reap exited children.  So when we get here,
- * we want to reap any that have piled up.
+ * wait_any_block_signals --- if the argument pid is 0, wait for all child
+ * processes that have exited.  We loop to make sure to reap all children
+ * that have exited to minimize the risk of running out of process slots.
+ * Since we don't process SIGCHLD, we do not immediately reap exited
+ * children.  So when we get here, we want to reap any that have piled up.
  *
  * Note: on platforms that do not support waitpid with WNOHANG, when called with
  * a zero argument, this function will hang until all children have exited.
@@ -2551,18 +2552,20 @@ use_pipes:
  * I don't see why that should interfere with any signal handlers.  But I am
  * reluctant to remove this protection.  So I changed to use sigprocmask to
  * block signals instead to avoid interfering with installed signal handlers.
+ *
+ * ADR, 2025-07-29: I think this is so that a signal can interrupt a
+ * subprocess without killing gawk itself.  The code for handling process
+ * waiting and status updating is factored out to wait_any() so that
+ * do_system() in builtin.c can do its own signal management.
  */
 
-int
-wait_any(int interesting)	/* pid of interest, if any */
+static int
+wait_any_block_signals(int interesting)	/* pid of interest, if any */
 {
-	int pid;
 	int status = 0;
-	struct redirect *redp;
 #ifdef HAVE_SIGPROCMASK
 	sigset_t set, oldset;
 
-	/* I have no idea why we are blocking signals during this function... */
 	sigemptyset(& set);
 	sigaddset(& set, SIGINT);
 	sigaddset(& set, SIGHUP);
@@ -2572,7 +2575,31 @@ wait_any(int interesting)	/* pid of interest, if any */
 	void (*hstat)(int), (*istat)(int), (*qstat)(int);
 
 	istat = signal(SIGINT, SIG_IGN);
+	hstat = signal(SIGHUP, SIG_IGN);
+	qstat = signal(SIGQUIT, SIG_IGN);
 #endif
+
+	status = wait_any(interesting);
+
+#ifdef HAVE_SIGPROCMASK
+	sigprocmask(SIG_SETMASK, & oldset, NULL);
+#else
+	signal(SIGINT, istat);
+	signal(SIGHUP, hstat);
+	signal(SIGQUIT, qstat);
+#endif
+	return status;
+}
+
+/* wait_any --- wait for a child to die */
+
+int
+wait_any(int interesting)	/* pid of interest, if any */
+{
+	int pid;
+	int status = 0;
+	struct redirect *redp;
+
 #ifdef __MINGW32__
 	if (interesting < 0) {
 		status = -1;
@@ -2589,10 +2616,6 @@ wait_any(int interesting)	/* pid of interest, if any */
 			}
 	}
 #else /* ! __MINGW32__ */
-#ifndef HAVE_SIGPROCMASK
-	hstat = signal(SIGHUP, SIG_IGN);
-	qstat = signal(SIGQUIT, SIG_IGN);
-#endif
 	for (;;) {
 # if defined(HAVE_WAITPID) && defined(WNOHANG)
 		/*
@@ -2621,16 +2644,7 @@ wait_any(int interesting)	/* pid of interest, if any */
 		if (pid == -1 && errno == ECHILD)
 			break;
 	}
-#ifndef HAVE_SIGPROCMASK
-	signal(SIGHUP, hstat);
-	signal(SIGQUIT, qstat);
-#endif
 #endif /* ! __MINGW32__ */
-#ifndef HAVE_SIGPROCMASK
-	signal(SIGINT, istat);
-#else
-	sigprocmask(SIG_SETMASK, & oldset, NULL);
-#endif
 	return status;
 }
 
@@ -2651,7 +2665,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	 * but this could cause gawk to hang when it is started in a pipeline
 	 * and thus has a child process feeding it input (shell dependent).
 	 *
-	 * (void) wait_any(0);	// wait for outstanding processes
+	 * (void) wait_any_block_signals(0);	// wait for outstanding processes
 	 */
 
 	if (pipe(p) < 0)
@@ -2746,7 +2760,7 @@ gawk_pclose(struct redirect *rp)
 	/* process previously found, return stored status */
 	if (rp->pid == -1)
 		return rp->status;
-	rp->status = sanitize_exit_status(wait_any(rp->pid));
+	rp->status = sanitize_exit_status(wait_any_block_signals(rp->pid));
 	rp->pid = -1;
 	return rp->status;
 }
@@ -4187,7 +4201,7 @@ set_RS()
 		RS_is_null = true;
 		if (first_time || ! do_csv)
 			matchrec = rsnullscan;
-	} else if ((RS->stlen > 1 || (RS->flags & REGEX) != 0) && ! do_traditional) {
+	} else if ((RS->stlen > 1 || (RS->flags & REGEX) != 0) && ! do_posix) {
 		static bool warned = false;
 
 		RS_re[0] = make_regexp(RS->stptr, RS->stlen, false, true, true);
@@ -4680,7 +4694,7 @@ gawk_popen_write_close(FILE *fp)
 	if (open_pipes[index].fp == fp) {
 		(void) fflush(fp);
 		(void) fclose(fp);
-		status = wait_any(open_pipes[index].pid);
+		status = wait_any_block_signals(open_pipes[index].pid);
 
 		open_pipes[index].fp = NULL;
 		open_pipes[index].pid = 0;

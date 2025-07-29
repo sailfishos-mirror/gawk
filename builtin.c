@@ -1097,20 +1097,14 @@ do_system(int nargs)
 		 * divides the result by 256.  That normally gives the
 		 * exit status but gives a weird result for death-by-signal.
 		 * So we compromise as follows:
+		 *
+		 * 7/2025. BWK awk now does what we do to sanitize the
+		 * status.  I removed the MinGW code for do_traditional
+		 * since we no longer care about that option here.
 		 */
 		ret = status;
-		if (status != -1) {
-			if (do_posix)
-				;	/* leave it alone, full 16 bits */
-			else if (do_traditional)
-#ifdef __MINGW32__
-				ret = (((unsigned)status) & ~0xC0000000);
-#else
-				ret = (status / 256.0);
-#endif
-			else
-				ret = sanitize_exit_status(status);
-		}
+		if (status != -1 && ! do_posix)
+			ret = sanitize_exit_status(status);
 
 		if ((BINMODE & BINMODE_INPUT) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
@@ -3333,6 +3327,13 @@ do_mkbool(int nargs)
 
 /* gawk_system --- specialized version for gawk */
 
+/*
+ * 7/2025: This got messier because we need to ignore SIGINT and SIGQUIT
+ * and block SIGCHLD while running (see the POSIX description of system()).
+ * Blocking is only possible with the POSIX sigaction/sigprocmask APIs.
+ * We do our best here, but it ain't pretty.
+ */
+
 int
 gawk_system(const char *command)
 {
@@ -3342,18 +3343,59 @@ gawk_system(const char *command)
 	pid_t childpid;
 	int status;
 
+	// In the parent, before the fork
+#ifdef HAVE_SIGPROCMASK
+	sigset_t set, oldset;
+
+	sigemptyset(& set);
+	sigaddset(& set, SIGCHLD);
+	sigprocmask(SIG_BLOCK, & set, & oldset);
+
+	struct sigaction action, old_int_action, old_quit_action;
+
+	sigemptyset(& action.sa_mask);
+	action.sa_flags = 0;
+	action.sa_handler = SIG_IGN;
+	sigaction(SIGINT, & action, & old_int_action);
+	sigaction(SIGQUIT, & action, & old_quit_action);
+#else
+	void (*istat)(int), (*qstat)(int);
+
+	istat = signal(SIGINT, SIG_IGN);
+	qstat = signal(SIGQUIT, SIG_IGN);
+#endif
+
 	if ((childpid = fork()) == 0) {
 		// child
 		set_sigpipe_to_default();
+		// in the child, restore defaults
+#ifdef HAVE_SIGPROCMASK
+		sigprocmask(SIG_SETMASK, & oldset, NULL);
+		sigaction(SIGINT, & old_int_action, NULL);
+		sigaction(SIGQUIT, & old_quit_action, NULL);
+#else
+		istat = signal(SIGINT, istat);
+		qstat = signal(SIGQUIT, qstat);
+#endif
 		execl("/bin/sh", "sh", "-c", command, NULL);
 		_exit(errno == ENOENT ? 127 : 126);
 	} else {
 		// parent
 		status = wait_any(childpid);
 
+		// in the parent, restore stuff after getting the status
+#ifdef HAVE_SIGPROCMASK
+		sigprocmask(SIG_SETMASK, & oldset, NULL);
+		sigaction(SIGINT, & old_int_action, NULL);
+		sigaction(SIGQUIT, & old_quit_action, NULL);
+#else
+		istat = signal(SIGINT, istat);
+		qstat = signal(SIGQUIT, qstat);
+#endif
+
 		return status;
 	}
-#endif /* defined(VMS) || defined(__MINGW32__) */
+#endif /* ! (defined(VMS) || defined(__MINGW32__)) */
 }
 
 #if 0

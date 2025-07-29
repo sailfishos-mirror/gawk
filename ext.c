@@ -101,7 +101,7 @@ load_ext(const char *name, const char *lib_name)
 	if (using_persistent_malloc)
 		search_ext_list(name, lib_name);	// fatal out if problem
 
-	if ((do_traditional || do_posix) && ! override)
+	if (do_traditional && ! override)
 		fatal(_("-l / @load are gawk extensions"));
 
 	if (lib_name == NULL)

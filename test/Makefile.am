@@ -1694,7 +1694,8 @@ NEED_MPFR = \
 NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
 
 # List of tests that need --posix
-NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 muldimposix posix_compare
+NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 \
+	     muldimposix posix_compare rscompat
 
 # List of tests that need --pretty-print
 NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
@@ -1708,7 +1709,7 @@ NEED_RE_INTERVAL = gsubtst3 reint reint2
 NEED_SANDBOX = sandbox1
 
 # List of tests that need --traditional
-NEED_TRADITIONAL = litoct tradanch rscompat
+NEED_TRADITIONAL = litoct tradanch
 
 # List of tests that need the PMA allocator and a backing file
 NEED_PMA = pma

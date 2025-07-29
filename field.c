@@ -1128,7 +1128,7 @@ do_split(int nargs)
 	if (nargs == 4) {
 		static bool warned = false;
 
-		if (do_traditional || do_posix) {
+		if (do_traditional) {
 			fatal(_("split: fourth argument is a gawk extension"));
 		}
 		sep_arr = POP_PARAM();
