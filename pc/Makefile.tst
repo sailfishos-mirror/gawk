@@ -288,7 +288,9 @@ NEED_MPFR = \
 NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
 
 # List of tests that need --posix
-NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 muldimposix posix_compare rscompat
+NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 \
+	     muldimposix posix_compare rscompat
+
 
 # List of tests that need --pretty-print
 NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
