@@ -1,3 +1,17 @@
+2025-07-30         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	Add #ifdef'ed out patch to io.c to use a hashtable to store pipe
+	pids to fix a problem with a docker container that defaulted to
+	a ulimit of a billion open fds.
+	* io.c (write_pipe): If hashing, add a next field.
+	(save_pipe): New function to add a pipe to the hash table.
+	(gawk_popen_write): If hashing, allocate index of PIPE_HASH_SIZE
+	instead of getdtablesize(), and use save_pipe to store the pipe info
+	instead of sticking it directly into the open_pipes array.
+	(gawk_popen_write_close): If hashing, search the bucket list
+	for a matching process. If the match is not at the head of the
+	linked list, remove it from the list and free it.
+
 2025-07-29         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Make gawk's system() function smarter. It has to ignore SIGINT

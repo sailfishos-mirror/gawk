@@ -4615,12 +4615,47 @@ avoid_flush(const char *name)
  * to be able to reset SIGPIPE. Bleah.
  */
 
+/* N.B. On 2025-07-29, we had a bug report related to a docker container
+ * that was configured with default 'ulimit -n' of 1073741816 files,
+ * so keeping an array of all fds was unworkable without overriding
+ * the default ulimit. We can solve this problem by using a hash table
+ * instead of an array of getdtablesize() fds. */
+/* #define PIPE_HASH_SIZE	127 */
+
 typedef struct write_pipe {
 	FILE *fp;
 	pid_t pid;
+#ifdef PIPE_HASH_SIZE
+	struct write_pipe *next;
+#endif /* PIPE_HASH_SIZE */
 } write_pipe;
 
 static write_pipe *open_pipes = NULL;
+
+
+#ifdef PIPE_HASH_SIZE
+
+/* save_pipe: save a pipe to the hash table */
+
+static void
+save_pipe(int fd, FILE *fp, pid_t pid)
+{
+	write_pipe *bucket = &open_pipes[fd % PIPE_HASH_SIZE];
+	write_pipe *wp;
+
+	if (bucket->fp == NULL)
+		wp = bucket;
+	else {
+		emalloc(wp, write_pipe *, sizeof(write_pipe));
+		wp->next = bucket->next;
+		bucket->next = wp;
+	}
+	wp->fp = fp;
+	wp->pid = pid;
+}
+
+#endif /* PIPE_HASH_SIZE */
+
 
 /* gawk_popen_write --- open a pipe for writing, set up a FILE * return value. */
 
@@ -4637,7 +4672,11 @@ gawk_popen_write(const char *cmd)
 		return NULL;
 
 	if (open_pipes == NULL) {
+#ifdef PIPE_HASH_SIZE
+		int count = PIPE_HASH_SIZE;
+#else
 		int count = getdtablesize();
+#endif
 
 		emalloc(open_pipes, write_pipe *, sizeof(write_pipe) * count);
 		memset(open_pipes, 0, sizeof(write_pipe) * count);
@@ -4667,9 +4706,13 @@ gawk_popen_write(const char *cmd)
 		return NULL;
 	}
 
+#ifdef PIPE_HASH_SIZE
+	save_pipe(pipefds[1], fp, childpid);
+#else
 	int index = pipefds[1];	// use the write file desciptor.
 	open_pipes[index].pid = childpid;
 	open_pipes[index].fp = fp;
+#endif /* PIPE_HASH_SIZE */
 
 	return fp;
 #endif
@@ -4683,24 +4726,44 @@ gawk_popen_write_close(FILE *fp)
 #if defined(VMS) || defined(__MINGW32__)
 	return pclose(fp);
 #else
-	int status, index;
+	write_pipe *wp;
+#ifdef PIPE_HASH_SIZE
+	write_pipe *parent;
+#endif
 
 	if (open_pipes == NULL || fp == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	index = fileno(fp);
-	if (open_pipes[index].fp == fp) {
+#ifdef PIPE_HASH_SIZE
+	parent = NULL;
+	for (wp = &open_pipes[fileno(fp) % PIPE_HASH_SIZE]; wp != NULL;
+	     wp = wp->next) {
+#else
+	wp = &open_pipes[fileno(fp)];
+#endif
+	if (wp->fp == fp) {
+		int status;
+
 		(void) fflush(fp);
 		(void) fclose(fp);
-		status = wait_any_block_signals(open_pipes[index].pid);
+		status = wait_any_block_signals(wp->pid);
 
-		open_pipes[index].fp = NULL;
-		open_pipes[index].pid = 0;
-
+		wp->fp = NULL;
+		wp->pid = 0;
+#ifdef PIPE_HASH_SIZE
+		if (parent != NULL) {
+			parent->next = wp->next;
+			efree(wp);
+		}
+#endif
 		return status;
 	}
+#ifdef PIPE_HASH_SIZE
+	parent = wp;
+	}
+#endif
 
 	errno = EBADF;
 	return -1;
