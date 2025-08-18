@@ -321,8 +321,9 @@ os_disable_aslr(const char *persist_file, char **argv)
 
 		if (cp == NULL) {
 			static const char exe[] = "/proc/self/exe";
+			static char temp_env[] = "GAWK_PMA_REINCARNATION=true";
 
-			putenv("GAWK_PMA_REINCARNATION=true");
+			putenv(temp_env);
 			if (personality(PER_LINUX | ADDR_NO_RANDOMIZE) < 0) {
 				fprintf(stderr, _("warning: personality: %s\n"),
 							strerror(errno));
