@@ -29,6 +29,9 @@ BEGIN {
 	for (i in c2)
 		Conversions[c2[i]] = 1	# conversion chars are now indices
 
+	LRM = "\u200e"			# left-to-right mark
+	RLM = "\u200f"			# right-to-left mark
+
 	reset_output()
 	Processing = FALSE
 }
@@ -82,13 +85,13 @@ function parse_and_build_format(start, lastpos,		i, resultstpos)
 	if (Chars[start] == "`") {
 		result = "`%" Format_count++ "$"
 		start += 2
-		for (i = start; Chars[i] != "'"; i++) {
+		for (i = start; i in Chars && Chars[i] != "'"; i++) {
 			result = result Chars[i]
 		}
 		result = result "'"
 	} else {
 		result = "%" Format_count++ "$"
-		for (i = ++start; ! (Chars[i] in Conversions); i++) {
+		for (i = ++start; i in Chars && ! (Chars[i] in Conversions); i++) {
 			result = result Chars[i]
 		}
 		result = result Chars[i]
@@ -115,7 +118,19 @@ function build_output(		i, new_format, lastpos)
 {
 	for (i = 1; i <= Len; i++) {
 		delete lastpos
-		if (Chars[i] == "`" && Chars[i+1] == "%") {
+		if (Chars[i] == RLM) {
+			if (Chars[i+1] == "%" || (Chars[i+1] == "`" && Chars[i+2] == "%"))
+				continue
+			if (Direction != "R2L")
+				Direction = "R2L"
+			continue
+		} else if (Chars[i] == LRM) {
+			if (Chars[i+1] == "%" || (Chars[i+1] == "`" && Chars[i+2] == "%"))
+				continue
+			if (Direction != "L2R")
+				Direction = "L2R"
+			continue
+		} else if (Chars[i] == "`" && Chars[i+1] == "%") {
 			new_format = parse_and_build_format(i, lastpos)
 			i = lastpos[1]
 			insert_text(new_format)
