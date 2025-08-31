@@ -35,6 +35,10 @@
 #include <spawn.h>	// for macos
 #endif
 
+#ifdef HAVE__NSGETEXECUTABLEPATH
+#include <mach-o/dyld.h>
+#endif
+
 const char quote = '\'';
 const char *defpath = DEFPATH;
 const char *deflibpath = DEFLIBPATH;
@@ -347,7 +351,7 @@ os_disable_aslr(const char *persist_file, char **argv)
 			int status;
 			pid_t pid;
 			extern char **environ;
-			size_t size = BUFSIZ;
+			uint32_t size = BUFSIZ;
 
 			memset(fullpath, 0, BUFSIZ);
 			n = _NSGetExecutablePath(fullpath, &size);
