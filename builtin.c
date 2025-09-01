@@ -3240,9 +3240,10 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_var_new:
+		deref = false;
+		// fall through
 	case Node_elem_new:
 		res = "untyped";
-		deref = false;
 		break;
 	case Node_array_ref:
 		/*
