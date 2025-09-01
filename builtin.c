@@ -3240,9 +3240,10 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_var_new:
+		deref = false;
+		// fall through
 	case Node_elem_new:
 		res = "untyped";
-		deref = false;
 		break;
 	case Node_array_ref:
 		/*
@@ -3397,25 +3398,3 @@ gawk_system(const char *command)
 	}
 #endif /* ! (defined(VMS) || defined(__MINGW32__)) */
 }
-
-#if 0
-// test program
-
-int main(int argc, char **argv)
-{
-	struct lconv *l;
-
-	setlocale(LC_ALL, "");
-	l = localeconv();
-
-	const char *new = add_thousands("12345678901234567890.54321", l);
-	printf("%s\n", new);
-	free((void*) new);
-
-	new = add_thousands("12345678901234567890", l);
-	printf("%s\n", new);
-	free((void*) new);
-
-	return 0;
-}
-#endif
