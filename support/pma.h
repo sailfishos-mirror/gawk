@@ -24,7 +24,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif
 
 // version strings of interface and implementation should match
 #define PMA_H_VERSION "2022.10Oct.30.1667172241 (Avon 8-g1)"
@@ -90,6 +90,6 @@ extern void pma_set_avail_mem(const unsigned long v);
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif
 
 #endif // PMA_H_INCLUDED
