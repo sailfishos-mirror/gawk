@@ -284,11 +284,17 @@ get_actual_argument(NODE *t, int i, bool want_array)
 }
 
 #else
+/* init_extension --- dummy version if extensions not available */
+
+void
+init_extension_list(void)
+{
+}
 
 /* load_ext --- dummy version if extensions not available */
 
 void
-load_ext(const char *lib_name)
+load_ext(const char *name, const char *lib_name)
 {
 	fatal(_("dynamic loading of libraries is not supported"));
 }
