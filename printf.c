@@ -390,7 +390,7 @@ check_pos:
 			if (cur == NULL)
 				break;
 			if (! do_traditional && used_dollar && ! isdigit((unsigned char) *s1)) {
-				fatal(_("fatal: must use `count$' on all formats or none"));
+				fatal(_("must use `count$' on all formats or none"));
 				break;	/* silence warnings */
 			} else if (! do_traditional && isdigit((unsigned char) *s1)) {
 				int val = 0;
