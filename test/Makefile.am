@@ -788,6 +788,9 @@ EXTRA_DIST = \
 	match3.ok \
 	match4.awk \
 	match4.ok \
+	matchbadarg1.awk \
+	matchbadarg1.in \
+	matchbadarg1.ok \
 	matchuninitialized.awk \
 	matchuninitialized.ok \
 	math.awk \
@@ -1571,6 +1574,7 @@ BASIC_TESTS = \
 	inpref inputred intest intprec iobug1 \
 	leaddig leadnl litoct longsub longwrds \
 	manglprm match4 matchuninitialized math membug1 memleak messages \
+	matchbadarg1 \
 	minusstr mmap8k \
 	nasty nasty2 negexp negrange nested nfldstr nfloop nfneg nfset \
 	nlfldsep nlinstr nlstrina noeffect nofile nofmtch noloop1 \
