@@ -1615,15 +1615,15 @@ mpg_mod(NODE *t1, NODE *t2)
 		 * So instead we use mpz_tdiv_qr() to get the correct result
 		 * and just throw away the quotient. We could not find any
 		 * reason why mpz_mod() wasn't working correctly.
+		 *
+		 * 10/2025: Using mpz_tdiv_r() generates just the remainder,
+		 * making things easier.
 		 */
-		NODE *dummy_quotient;
 
 		if (mpz_sgn(t2->mpg_i) == 0)
 			fatal(_("division by zero attempted"));
 		r = mpg_integer();
-		dummy_quotient = mpg_integer();
-		mpz_tdiv_qr(dummy_quotient->mpg_i, r->mpg_i, t1->mpg_i, t2->mpg_i);
-		unref(dummy_quotient);
+		mpz_tdiv_r(r->mpg_i, t1->mpg_i, t2->mpg_i);
 	} else {
 		mpfr_ptr p1, p2;
 		p1 = MP_FLOAT(t1);
