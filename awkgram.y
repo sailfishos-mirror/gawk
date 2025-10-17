@@ -4743,6 +4743,14 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 #endif /* SUPPLY_INTDIV */
 	} else if (r->builtin == do_match) {
 		static bool warned = false;
+		static bool param_warned = false;
+
+		ip = subn->nexti->lasti;
+		if (! param_warned
+		    && (ip->opcode == Op_match_rec || ip->opcode == Op_push_re)) {
+			param_warned = true;
+			warning_ln(subn->source_line, _("match: regexp constant as first argument is probably not what you want"));
+		}
 
 		arg = subn->nexti->lasti->nexti;	/* 2nd arg list */
 		(void) mk_rexp(arg);
