@@ -1,3 +1,22 @@
+2025-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix a bug when match() is called with $0 as the second argument.
+	The bug only showed up with assertions enabled.  At the same time,
+	add a warning if a regexp constant is used as the first argument.
+	Thanks to Daniel David Goren <danieldavidgoren@gmail.com> for
+	the report.
+
+	* awkgram.y (snode): For do_match, add a warning if the first
+	argument is a regexp constant.
+	* re.c (re_update): Unref the original text of the regexp
+	if the copy is different from it.
+
+	Unrelated:
+
+	* mpfr.c (mpg_mod): Use mpz_tdiv_r() instead of mpz_tdiv_qr()
+	to simplify the code. Suggested by Jason C. Kwan on the
+	help-gawk list.
+
 2025-10-04         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* printf.c (format_args): Fix call to fatal() to not have "fatal:"
