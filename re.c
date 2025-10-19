@@ -478,8 +478,6 @@ re_update(NODE *t)
 	}
 	/* get fresh copy of the text of the regexp */
 	t->re_text = dupnode(t1);
-	if (t->re_text != t1)
-		unref(t1);
 
 	/* text changed */
 
