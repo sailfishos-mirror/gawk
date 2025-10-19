@@ -98,7 +98,6 @@ then
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
-	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
 AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
