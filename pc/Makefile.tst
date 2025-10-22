@@ -165,7 +165,7 @@ BASIC_TESTS = \
 	inpref inputred intest intprec iobug1 \
 	leaddig leadnl litoct longsub longwrds \
 	manglprm match4 matchuninitialized math membug1 memleak messages \
-	matchbadarg1 \
+	matchbadarg1 matchbadarg2 \
 	minusstr mmap8k \
 	nasty nasty2 negexp negrange nested nfldstr nfloop nfneg nfset \
 	nlfldsep nlinstr nlstrina noeffect nofile nofmtch noloop1 \
@@ -1960,6 +1960,11 @@ memleak:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 matchbadarg1:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+matchbadarg2:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
