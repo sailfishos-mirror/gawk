@@ -165,7 +165,7 @@ BASIC_TESTS = \
 	inpref inputred intest intprec iobug1 \
 	leaddig leadnl litoct longsub longwrds \
 	manglprm match4 matchuninitialized math membug1 memleak messages \
-	matchbadarg1 \
+	matchbadarg1 matchbadarg2 \
 	minusstr mmap8k \
 	nasty nasty2 negexp negrange nested nfldstr nfloop nfneg nfset \
 	nlfldsep nlinstr nlstrina noeffect nofile nofmtch noloop1 \
@@ -218,6 +218,7 @@ GAWK_EXT_TESTS = \
 	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintold lintplus \
 	lintplus2 lintplus3 lintset lintwarn manyfiles \
+	lintsubarray \
 	match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 mdim3 mdim4 mdim5 \
 	mdim6 mdim7 mdim8 memleak2 memleak3 mixed1 mktime modifiers \
 	muldimposix \
@@ -271,6 +272,7 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4 \
 NEED_LINT = \
 	defref fmtspcl lintexp lintindex lintint lintlength lintplus \
 	lintplus2 lintplus3 lintwarn noeffect nofmtch nonl shadow uninit2 \
+	lintsubarray \
 	uninit3 uninit4 uninit5 uninitialized
 
 
@@ -674,15 +676,15 @@ nors::
 	@-echo A B C D E | tr -d '\12\15' | $(AWK) '{ print $$NF }' - "$(srcdir)"/nors.in > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
-# fmtspcl.ok: fmtspcl.tok Makefile fix-fmtspcl.awk
-# 	@$(AWK) -v "sd=$(srcdir)" -f "$(srcdir)/fix-fmtspcl.awk" < "$(srcdir)"/fmtspcl.tok > $@ 2>/dev/null
-# 
-# fmtspcl: fmtspcl.ok
-# 	@echo $@
-# 	@$(AWK) $(AWKFLAGS) -f "$(srcdir)"/fmtspcl.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-# 	@-if test -z "$$AWKFLAGS" ; then $(CMP) $@.ok _$@ && rm -f _$@ ; else \
-# 	$(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-# 	fi
+fmtspcl.ok: fmtspcl.tok Makefile fix-fmtspcl.awk
+	@$(AWK) -v "sd=$(srcdir)" -f "$(srcdir)/fix-fmtspcl.awk" < "$(srcdir)"/fmtspcl.tok > $@ 2>/dev/null
+
+fmtspcl: fmtspcl.ok
+	@echo $@
+	@$(AWK) $(AWKFLAGS) -f "$(srcdir)"/fmtspcl.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if test -z "$$AWKFLAGS" ; then $(CMP) $@.ok _$@ && rm -f _$@ ; else \
+	$(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
+	fi
 
 rebuf::
 	@echo $@
@@ -1958,6 +1960,11 @@ memleak:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 matchbadarg1:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+matchbadarg2:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3268,6 +3275,11 @@ lintset:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 lintwarn:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+lintsubarray:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
