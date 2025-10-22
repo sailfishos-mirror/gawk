@@ -376,8 +376,16 @@ uninitialized_scalar:
 					fatal(_("reference to uninitialized element `%s[\"%.*s\"] is not allowed'"),
 						"SYMTAB", (int) t2->stlen, t2->stptr);
 				} else if (do_lint) {
-					lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
-						array_vname(t1), (int) t2->stlen, t2->stptr);
+					/*
+					 * 10/2025: We used to do this (copy/pasted from elsewhere):
+					 *
+					 * lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
+					 *	array_vname(t1), (int) t2->stlen, t2->stptr);
+					 *
+					 * But that's not really right, as this is Op_sub_array, something like
+					 * 	a[1][2] = "foo"
+					 * and there's no easy way to make a[1] be an array.
+					 */
 					if (t2->stlen == 0)
 						lintwarn(_("subscript of array `%s' is null string"), array_vname(t1));
 				}
