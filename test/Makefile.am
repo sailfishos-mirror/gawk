@@ -739,6 +739,8 @@ EXTRA_DIST = \
 	lintplus3.ok \
 	lintset.awk \
 	lintset.ok \
+	lintsubarray.awk \
+	lintsubarray.ok \
 	lintwarn.awk \
 	lintwarn.ok \
 	litoct.awk \
@@ -1627,6 +1629,7 @@ GAWK_EXT_TESTS = \
 	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintold lintplus \
 	lintplus2 lintplus3 lintset lintwarn manyfiles \
+	lintsubarray \
 	match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 mdim3 mdim4 mdim5 \
 	mdim6 mdim7 mdim8 memleak2 memleak3 mixed1 mktime modifiers \
 	muldimposix \
@@ -1682,6 +1685,7 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4 \
 NEED_LINT = \
 	defref fmtspcl lintexp lintindex lintint lintlength lintplus \
 	lintplus2 lintplus3 lintwarn noeffect nofmtch nonl shadow uninit2 \
+	lintsubarray \
 	uninit3 uninit4 uninit5 uninitialized
 
 # List of the tests which should be run with --lint-old option:
