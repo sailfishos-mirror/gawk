@@ -27,8 +27,11 @@ then
  		*darwin*)
 			true	# On macos we no longer need -no-pie
 			;;
-		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
+		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* )
 			true	# nothing to do, exes on these systems are not PIE
+			;;
+		openbsd7.* )
+			LDFLAGS="${LDFLAGS} -no-pie"
 			;;
 		# Other OS's go here...
 		*)
