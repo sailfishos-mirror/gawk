@@ -1149,6 +1149,14 @@ do_split(int nargs)
 	check_symtab_functab(arr, "split",
 			_("%s: cannot use %s as second argument"));
 
+	// Someone passed an array element to be turned into
+	// a subarray, so let's warn about it.
+	static bool warned = false;
+	if (do_lint && ! warned && arr->parent_array != NULL) {
+		warned = true;
+		lintwarn(_("multidimensional arrays are a gawk extension"));
+	}
+
 	if (sep_arr != NULL) {
 		if (sep_arr == arr)
 			fatal(_("split: cannot use the same array for second and fourth args"));
@@ -1245,6 +1253,14 @@ do_patsplit(int nargs)
 		fatal(_("patsplit: second argument is not an array"));
 	check_symtab_functab(arr, "patsplit",
 			_("%s: cannot use %s as second argument"));
+
+	// Someone passed an array element to be turned into
+	// a subarray, so let's warn about it.
+	static bool warned = false;
+	if (do_lint && ! warned && arr->parent_array != NULL) {
+		warned = true;
+		lintwarn(_("multidimensional arrays are a gawk extension"));
+	}
 
 	src = POP_SCALAR();
 	if (src->type == Node_param_list) {
