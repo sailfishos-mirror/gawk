@@ -1152,7 +1152,7 @@ do_split(int nargs)
 	// Someone passed an array element to be turned into
 	// a subarray, so let's warn about it.
 	static bool warned = false;
-	if (do_lint && ! warned && arr->parent_array != NULL) {
+	if (do_lint_extensions && ! warned && arr->parent_array != NULL) {
 		warned = true;
 		lintwarn(_("multidimensional arrays are a gawk extension"));
 	}
@@ -1257,7 +1257,7 @@ do_patsplit(int nargs)
 	// Someone passed an array element to be turned into
 	// a subarray, so let's warn about it.
 	static bool warned = false;
-	if (do_lint && ! warned && arr->parent_array != NULL) {
+	if (do_lint_extensions && ! warned && arr->parent_array != NULL) {
 		warned = true;
 		lintwarn(_("multidimensional arrays are a gawk extension"));
 	}
@@ -1654,7 +1654,7 @@ set_FPAT()
 
 	if (do_lint_extensions && ! warned) {
 		warned = true;
-		lintwarn(_("`FPAT' is a gawk extension"));
+		lintwarn(_("FPAT is a gawk extension"));
 	}
 	if (do_traditional)	/* quick and dirty, does the trick */
 		return;
