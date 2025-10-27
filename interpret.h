@@ -212,13 +212,13 @@ top:
 
 			case Node_var_new:
 uninitialized_scalar:
-				if (do_lint)
-					lintwarn(isparam ?
-						_("reference to uninitialized argument `%s'") :
-						_("reference to uninitialized variable `%s'"),
+				if (op != Op_push_arg_untyped) {	// not isarray() or typeof()
+					if (do_lint)
+						lintwarn(isparam ?
+							_("reference to uninitialized argument `%s'") :
+							_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
 
-				if (op != Op_push_arg_untyped) {
 					// convert very original untyped to scalar
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
