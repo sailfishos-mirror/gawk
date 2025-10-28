@@ -1289,36 +1289,6 @@ regular_print:
 			$$ = list_append(list_append($4, $2), $1);
 		}
 	  }
-	| LEX_DELETE '(' NAME ')'
-		  /*
-		   * this is for tawk compatibility. maybe the warnings
-		   * should always be done.
-		   */
-	  {
-		static bool warned = false;
-		char *arr = $3->lextok;
-
-		if (do_lint && ! warned) {
-			warned = true;
-			lintwarn_ln($1->source_line,
-				_("`delete(array)' is a non-portable tawk extension"));
-		}
-		if (do_traditional) {
-			error_ln($1->source_line,
-				_("`delete(array)' is a non-portable tawk extension"));
-		}
-		$3->memory = variable($3->source_line, arr, Node_var_new);
-		$3->opcode = Op_push_array;
-		$1->expr_count = 0;
-		$$ = list_append(list_create($3), $1);
-
-		if (! do_posix && ! do_traditional) {
-			if ($3->memory == symbol_table)
-				fatal(_("`delete' is not allowed with SYMTAB"));
-			else if ($3->memory == func_table)
-				fatal(_("`delete' is not allowed with FUNCTAB"));
-		}
-	  }
 	| exp
 	  {
 		$$ = optimize_assignment($1);
@@ -3704,21 +3674,6 @@ collect_regexp:
 end_regexp:
 				yylval = GET_INSTRUCTION(Op_token);
 				yylval->lextok = estrdup(tokstart, tok - tokstart);
-				if (do_lint) {
-					int peek = nextc(true);
-
-					pushback();
-					if (peek == 'i' || peek == 's') {
-						if (source)
-							lintwarn(
-						_("%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"),
-								source, sourceline, peek);
-						else
-							lintwarn(
-						_("tawk regex modifier `/.../%c' doesn't work in gawk"),
-								peek);
-					}
-				}
 				if (collecting_typed_regexp) {
 					collecting_typed_regexp = false;
 					lasttok = TYPED_REGEXP;
