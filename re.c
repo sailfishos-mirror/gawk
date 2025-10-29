@@ -37,7 +37,7 @@ static struct localeinfo localeinfo;
 /* make_regexp --- generate compiled regular expressions */
 
 Regexp *
-make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
+make_regexp(char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 {
 	static char metas[] = ".*+(){}[]|?^$\\";
 	Regexp *rp;
@@ -53,8 +53,22 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	int i;
 	static struct dfa* dfaregs[2] = { NULL, NULL };
 	static bool nul_warned = false;
+	char save;
+	size_t savelen;
 
-	assert(s[len] == '\0');
+	/*
+	 * 10/2025: We used to have:
+	 *
+	 *	assert(s[len] == '\0');
+	 *
+	 * here, but data can come in, by way of re_update(), that is from $0 or
+	 * elsewhere where there is no final '\0'. So we save and restore
+	 * the character at s[len] and force a '\0' into position there.
+	 * It needs to be a C string for use in error messages.
+	 */
+	savelen = len;
+	save = s[len];
+	s[len] = '\0';
 
 	if (do_lint && ! nul_warned && memchr(s, '\0', len) != NULL) {
 		nul_warned = true;
@@ -275,7 +289,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 	 * character sets only.
 	 *
 	 * On the other hand, if we do have a single-byte character set,
-	 * using the casetable should give  a performance improvement, since
+	 * using the casetable should give a performance improvement, since
 	 * it's computed only once, not each time a regex is compiled.  We
 	 * also think it's probably better for portability.  See the
 	 * discussion by the definition of casetable[] in eval.c.
@@ -311,6 +325,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 		if (! canfatal) {
 			/* rerr already gettextized inside regex routines */
 			error("%s: /%s/", rerr, s);
+			s[savelen] = save;
  			return NULL;
 		}
 		fatal("invalid regexp: %s: /%s/", rerr, s);
@@ -340,6 +355,7 @@ make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 		}
 	}
 
+	s[savelen] = save;
 	return rp;
 }
 
