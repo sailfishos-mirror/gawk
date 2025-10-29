@@ -1789,7 +1789,7 @@ extern bool out_of_range(NODE *n);
 extern char *format_nan_inf(NODE *n, char format);
 extern bool is_ieee_magic_val(const char *val);
 /* re.c */
-extern Regexp *make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal);
+extern Regexp *make_regexp(char *s, size_t len, bool ignorecase, bool dfa, bool canfatal);
 extern int research(Regexp *rp, char *str, int start, size_t len, int flags);
 extern void refree(Regexp *rp);
 extern void reg_error(const char *s);
