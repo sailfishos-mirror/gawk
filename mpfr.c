@@ -307,6 +307,9 @@ force_mpnum(NODE *n, int do_nondec, int use_locale)
 	if (do_nondec)
 		base = get_numbase(cp1, cpend - cp1, use_locale);
 
+	if (base == 16 && (strchr(cp, 'p') != NULL || strchr(cp, 'P') != NULL))
+		goto isfloat;
+
 	if (base != 10 || ! mpg_maybe_float(cp1, use_locale)) {
 		mpg_zero(n);
 		errno = 0;
@@ -316,6 +319,7 @@ force_mpnum(NODE *n, int do_nondec, int use_locale)
 		goto done;
 	}
 
+isfloat:
 	if (is_mpg_integer(n)) {
 		mpz_clear(n->mpg_i);
 		n->flags &= ~MPZN;

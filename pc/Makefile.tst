@@ -162,6 +162,7 @@ BASIC_TESTS = \
 	getnr2tb getnr2tm gsubasgn gsubnulli18n gsubtest gsubtst2 gsubtst3 \
 	gsubtst4 gsubtst5 gsubtst6 gsubtst7 gsubtst8 \
 	hex hex2 hsprint \
+	hex3 \
 	inpref inputred intest intprec iobug1 \
 	leaddig leadnl litoct longsub longwrds \
 	manglprm match4 matchuninitialized math membug1 memleak messages \
@@ -1883,6 +1884,11 @@ hsprint:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+hex3:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 inpref:
 	@echo $@
