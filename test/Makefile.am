@@ -601,6 +601,8 @@ EXTRA_DIST = \
 	hex2.awk \
 	hex2.in \
 	hex2.ok \
+	hex3.awk \
+	hex3.ok \
 	hsprint.awk \
 	hsprint.ok \
 	icasefs.awk \
@@ -1581,6 +1583,7 @@ BASIC_TESTS = \
 	getnr2tb getnr2tm gsubasgn gsubnulli18n gsubtest gsubtst2 gsubtst3 \
 	gsubtst4 gsubtst5 gsubtst6 gsubtst7 gsubtst8 \
 	hex hex2 hsprint \
+	hex3 \
 	inpref inputred intest intprec iobug1 \
 	leaddig leadnl litoct longsub longwrds \
 	manglprm match4 matchuninitialized math membug1 memleak messages \
