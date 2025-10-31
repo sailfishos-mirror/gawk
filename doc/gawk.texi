@@ -54,7 +54,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH June, 2025
+@set UPDATE-MONTH October, 2025
 @set VERSION 5.3
 @set PATCHLEVEL 2
 
@@ -4193,8 +4193,7 @@ values in input data
 (@pxref{Nondecimal Data}).
 
 @quotation CAUTION
-This option can severely break old programs.  Use with care.  Also note
-that this option may disappear in a future version of @command{gawk}.
+This option can severely break old programs.  Use with care.
 @end quotation
 
 @item @option{-N}
@@ -11497,7 +11496,6 @@ hexadecimal is 1 times 16 plus 1, which equals 17 in decimal.
 
 Just by looking at plain @samp{11}, you can't tell what base it's in.
 So, in C, C++, and other languages derived from C,
-@c such as PERL, but we won't mention that....
 there is a special notation to signify the base.
 Octal numbers start with a leading @samp{0},
 and hexadecimal numbers start with a leading @samp{0x} or @samp{0X}:
@@ -29631,8 +29629,28 @@ $ @kbd{echo 0123 123 0x123 | gawk --non-decimal-data '}
 @print{} 83 123 291
 @end example
 
+In @xref{Nondecimal-numbers}, we described how octal and hexadecimal values
+may be used in program source code to represent numeric values.  Octal and
+plain hexadecimal constants as described in that section can only be used for
+integer values.
+
+The 1999 standard for the C language introduced a notation for hexadecimal
+floating-point values.  Similar the use of @code{e} followed by an
+exponent in decimal floating-point values (such as @code{12.34e5}),
+a hexadecimal floating-point value has an exponent proceeded by either
+@code{p} or @code{P}. For example, @code{0x1p-3}.
+
+As of version 5.4 of @command{gawk}, the @option{--non-decimal-data} option and
+the @code{strtonum()} function accept such values and convert them correctly.
+For example:
+
+@example
+$ @kbd{echo 0x1p-3 | ./gawk -n '@{ print $1 + 0 @}'}
+@print{} 0.125
+@end example
+
 Because it is common to have decimal data with leading zeros, and because
-using this facility could lead to surprising results, the default is to leave it
+allowing nondecimal data could lead to surprising results, the default is to leave it
 disabled.  If you want it, you must explicitly request it.
 
 @cindex programming conventions @subentry @option{--non-decimal-data} option
@@ -29645,8 +29663,6 @@ Instead, use the @code{strtonum()} function to convert your data
 (@pxref{String Functions}).
 This makes your programs easier to write and easier to read, and
 leads to less surprising results.
-
-This option may disappear in a future version of @command{gawk}.
 @end quotation
 
 @node Boolean Typed Values
@@ -30957,8 +30973,14 @@ If you see the @samp{PMA} with a version indicator, then it's supported.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} environment variable
 @cindex environment variables @subentry @env{REALLY_USE_PERSIST_MALLOC}
 As of this writing, persistent memory has only been tested on GNU/Linux,
-Cygwin, Solaris 2.11, macOS,
-FreeBSD 13.1 and OpenBSD 7.1.
+@c sort this list
+Cygwin,
+FreeBSD 13.1
+NetBSD 11,
+OpenBSD 7.1,
+Solaris 2.11,
+and
+macOS.
 On all others, persistent memory is disabled by default. You can force
 it to be enabled by exporting the shell variable
 @env{REALLY_USE_PERSIST_MALLOC} with a nonempty value before
@@ -35744,14 +35766,6 @@ just described: @samp{+inf}, @samp{-inf}, @samp{+nan}, or @samp{-nan}.
 Similarly, in POSIX mode, @command{gawk} prints the result of
 the system's C @code{printf()} function using the @code{%g} format string
 for the value, whatever that may be.
-
-@quotation NOTE
-The sign used for NaN values can vary!  The result depends upon both
-the underlying system architecture and the underlying library used to
-format NaN values. In particular, it's possible to get different results
-for the same function call depending upon whether or not @command{gawk}
-is running in MPFR mode (@option{-M}) or not. Caveat Emptor!
-@end quotation
 
 @node Floating point summary
 @section Summary
@@ -42294,6 +42308,20 @@ Version 5.4 added the following features:
 The @code{@@nsinclude} directive for including files without
 resetting the namespace to @samp{awk}
 (@pxref{Inclusion For Namespaces}).
+
+@item
+The ability to call @code{length()} on an array is no longer
+an extension, as it became part of POSIX in 2004
+(@pxref{String Functions}).
+
+@item
+Persistent memory was enabled on NetBSD and OpenBSD
+(@pxref{Persistent Memory}).
+
+@item
+Hexadecimal floating-point values may be used with the @code{strtonum()}
+function and with the @option{--non-decimal-data} option
+(@pxref{Nondecimal Data}.
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -42323,7 +42351,6 @@ the three most widely used freely available versions of @command{awk}
 @item @code{delete} without subscript @tab X @tab X @tab X @tab X
 @item @code{fflush()} function @tab X @tab X @tab X @tab X
 @item @code{func} keyword @tab X @tab @tab X @tab
-@item @code{length()} of an array @tab X @tab X @tab X @tab
 @item @code{nextfile} statement @tab X @tab X @tab X @tab X
 @item @code{RS} as regexp @tab X @tab X @tab X @tab
 @item Time-related functions @tab @tab X @tab X @tab
