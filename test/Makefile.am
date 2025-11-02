@@ -1624,7 +1624,7 @@ GAWK_EXT_TESTS = \
 	argtest arraysort arraysort2 arraytype asortbool asortsymtab \
 	backw badargs beginfile1 beginfile2 binmode1 \
 	charasbytes clos1way clos1way2 clos1way3 clos1way4 clos1way5 \
-	clos1way6 colonwarn commas crlf csv1 csv2 csv3 csvodd \
+	clos1way6 colonwarn crlf csv1 csv2 csv3 csvodd \
 	dbugarray1 dbugarray2 dbugarray3 dbugarray4 dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delmessy delsub \
 	devfd devfd1 devfd2 dfacheck1 dumpvars elemnew1 \
@@ -1641,7 +1641,7 @@ GAWK_EXT_TESTS = \
 	lint lintexp lintindex lintint lintlength lintold lintplus \
 	lintplus2 lintplus3 lintset lintwarn manyfiles \
 	lintsubarray linttypeof \
-	match1 match2 match3 mbstr1 mbstr2 mdim1 mdim2 mdim3 mdim4 mdim5 \
+	match1 match2 match3 mdim1 mdim2 mdim3 mdim4 mdim5 \
 	mdim6 mdim7 mdim8 memleak2 memleak3 mixed1 mktime modifiers \
 	muldimposix \
 	nastyparm negtime next nondec nondec2 nonfatal1 nonfatal2 \
@@ -1679,6 +1679,7 @@ LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 fmttest fnarydel \
 	fnparydl jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
 	mbprintf4 mbprintf5 mtchi18n mtchi18n2 nlstringtest rebt8b2 \
+	commas mbstr1 mbstr2 \
 	rtlenmb sort1 sprintfc
 
 SHLIB_TESTS = \
