@@ -56,7 +56,7 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH Giugno 2025
+@set UPDATE-MONTH Ottobre 2025
 @set VERSION 5.3
 @set PATCHLEVEL 2
 
@@ -4638,9 +4638,7 @@ nei dati di input
 
 @quotation ATTENZIONE
 Quest'opzione pu@`o generare gravi malfunzionamenti nei vecchi programmi.
-Usare con cautela.  Si noti anche che
-quest'opzione potrebbe non essere pi@`u disponibile in una futura versione di
-@command{gawk}.
+Usare con cautela.
 @end quotation
 
 @item @option{-N}
@@ -12653,7 +12651,6 @@ il che equivale a 17 decimale.
 
 Guardando solamente un @samp{11} puro e semplice, non si capisce in quale base
 sia.  Cos@`{@dotless{i}}, in C, C++, e in altri linguaggi derivati da C,
-@c such as PERL, but we won't mention that....
 c'@`e una speciale notazione per esprimere la base.
 I numeri ottali iniziano con uno @samp{0},
 e i numeri esadecimali iniziano con uno @samp{0x} o @samp{0X}:
@@ -32573,8 +32570,30 @@ $ @kbd{echo 0123 123 0x123 | gawk --non-decimal-data '}
 @print{} 83 123 291
 @end example
 
+In @xref{Numeri non-decimali}, si @`e spiegato come usare valori ottali ed
+esadecimali nel codice sorgente di un programma per rappresentare valori
+numerici.  Le costanti ottali ed esadecimali descritte in quella sezione
+possono essere usate solo per rappresentare numeri interi.
+
+Lo standard 1999 per il linguaggio C ha introdotto una notazione per
+esprimere il valore di numeri in virgola mobile esadecimali.
+Analogamente a come si usa per il numero @code{e}, seguito da un
+esponente espresso da un numero in virgola mobile (come
+@code{12.34e5}), un valore esadecimale in virgola mobile ha un esponente
+preceduto o da @code{p} o da @code{P}.  Per esempio, @code{0x1p-3}.
+
+A partire dalla versione 5.4 di @command{gawk}, l'opzione
+@option{--non-decimal-data} e la funzione @code{strtonum()} accettano
+tali valori e li convertono correttamente.
+Per esempio:
+
+@example
+$ @kbd{echo 0x1p-3 | ./gawk -n '@{ print $1 + 0 @}'}
+@print{} 0.125
+@end example
+
 Poich@'e capita comunemente di avere dati di tipo decimale con degli zeri iniziali,
-e poich@'e l'uso di questa funzionalit@`a pu@`o portare a risultati inattesi, il
+e poich@'e consentendo dati non-decimali si pu@`o arrivare a risultati inattesi, il
 comportamento di default @`e quello lasciarla disabilitata.  Se si vuole, la si
 deve richiedere esplicitamente.
 
@@ -32590,7 +32609,6 @@ Al suo posto @`e meglio usare la funzione @code{strtonum()} per convertire i dat
 Questo rende i programmi pi@`u facili da scrivere e pi@`u facili da leggere, e
 porta a risultati meno inattesi.
 
-Quest'opzione potrebbe sparire dalle versioni future di @command{gawk}.
 @end quotation
 
 @node Valori di tipo booleano
@@ -33993,8 +34011,14 @@ la memoria persistente @`e supportata.
 @cindex @env{REALLY_USE_PERSIST_MALLOC} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{REALLY_USE_PERSIST_MALLOC}
 Finora la memoria persistente @`e stata testata solo nei sistemi operativi
-GNU/Linux, Cygwin, Solaris 2.11, macOS,
-FreeBSD 13.1 e OpenBSD 7.1.
+@c sort this list
+Cygwin,
+FreeBSD 13.1
+NetBSD 11,
+OpenBSD 7.1,
+Solaris 2.11,
+e
+macOS.
 Su tutti gli altri sistemi, la memoria persistente @`e disabilitata
 per default.  Si pu@`o chiedere di abilitarla esportando la
 variabile d'ambiente @env{REALLY_USE_PERSIST_MALLOC} con un
@@ -46565,6 +46589,22 @@ La Versione 5.4 ha aggiunto le seguenti funzionalit@`a:
 La direttiva @code{@@nsinclude} per includere file senza forzare il
 cambio dello spazio-dei-nomi a @samp{awk}
 (@pxref{Inclusione per spazio-dei-nomi}).
+
+@item
+La possibilit@`a di richiedere la funzione @code{length()} per un vettore
+non @`e pi@`u un'estensione, poich@'e @`e stata incorporata nella
+versione 2004 dello standard POSIX
+(@pxref{Funzioni per stringhe}).
+
+@item
+La memoria persistente @`e stata resa disponibile nei
+sistemi NetBSD e OpenBSD
+(@xref{Memoria persistente}).
+
+@item
+I valori esadecimali in virgola mobile possono essere usati
+con la funzione @code{strtonum()} e con l'opzione
+@option{--non-decimal-data} (@pxref{Dati non decimali}).
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -46594,7 +46634,6 @@ le tre versioni liberamente disponibili pi@`u usate di @command{awk}
 @item @code{delete} senza indici @tab X @tab X @tab X @tab X
 @item Funzione @code{fflush()} @tab X @tab X @tab X @tab X
 @item Parola chiave @code{func} @tab X @tab @tab X @tab
-@item @code{length()} di un vettore @tab X @tab X @tab X @tab
 @item Istruzione @code{nextfile} @tab X @tab X @tab X @tab X
 @item @code{RS} come @dfn{regexp} @tab X @tab X @tab X @tab
 @item Funzioni gestione data/ora @tab @tab X @tab X @tab
