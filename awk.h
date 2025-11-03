@@ -123,8 +123,6 @@ typedef int off_t;
 # endif
 #endif	/* VMS */
 
-#include "protos.h"
-
 #ifdef HAVE_STRING_H
 #include <string.h>
 #ifdef NEED_MEMORY_H
@@ -201,12 +199,6 @@ typedef struct Regexp {
 #include "gawkapi.h"
 
 #include "floatmagic.h"
-
-/* Stuff for losing systems. */
-#if !defined(HAVE_STRTOD)
-extern double gawk_strtod();
-#define strtod gawk_strtod
-#endif
 
 #if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
 # define __attribute__(arg)

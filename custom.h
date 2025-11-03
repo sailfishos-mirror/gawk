@@ -88,18 +88,6 @@ typedef unsigned long long uint_fast64_t;
 #define GETPGRP_VOID	1
 #endif
 
-/* For MacOS X, which is almost BSD Unix */
-#ifdef __APPLE__
-#define HAVE_MKTIME	1
-#endif
-
-/* For HP/UX with gcc */
-#if defined(hpux) || defined(_HPUX_SOURCE)
-#undef HAVE_TZSET
-#define HAVE_TZSET 1
-#define _TZSET 1
-#endif
-
 #if defined(_AIX)
 #define _XOPEN_SOURCE_EXTENDED 1
 #endif
