@@ -29,11 +29,6 @@
  */
 #include "awk.h"	/* includes config.h for us */
 
-
-#ifndef HAVE_SYSTEM
-#include "missing_d/system.c"
-#endif /* HAVE_SYSTEM */
-
 #if !defined(HAVE_STRNCASECMP) || !defined(HAVE_STRCASECMP)
 #include "missing_d/strncasecmp.c"
 #endif	/* HAVE_STRCASE */
