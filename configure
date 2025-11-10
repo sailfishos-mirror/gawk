@@ -649,11 +649,11 @@ ac_includes_default="\
 
 ac_header_c_list=
 gt_needs=
-ac_func_c_list=
 enable_option_checking=no
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+LIBOBJS
 subdirs
 GAWKLIBEXT
 LIBMPFR
@@ -665,7 +665,6 @@ HAVE_ADDR_NO_RANDOMIZE_FALSE
 HAVE_ADDR_NO_RANDOMIZE_TRUE
 USE_PERSISTENT_MALLOC_FALSE
 USE_PERSISTENT_MALLOC_TRUE
-LIBOBJS
 TEST_CROSS_COMPILE_FALSE
 TEST_CROSS_COMPILE_TRUE
 POSUB
@@ -2815,7 +2814,6 @@ as_fn_append ac_header_c_list " minix/config.h minix_config_h HAVE_MINIX_CONFIG_
 gt_needs="$gt_needs "
 as_fn_append ac_header_c_list " stdbool.h stdbool_h HAVE_STDBOOL_H"
 as_fn_append ac_header_c_list " sys/time.h sys_time_h HAVE_SYS_TIME_H"
-as_fn_append ac_func_c_list " alarm HAVE_ALARM"
 
 # Auxiliary files required by this configure script.
 ac_aux_files="config.rpath ar-lib compile config.guess config.sub missing install-sh"
@@ -11058,248 +11056,6 @@ fi
 
 
 
-ac_func=
-for ac_item in $ac_func_c_list
-do
-  if test $ac_func; then
-    ac_fn_c_check_func "$LINENO" $ac_func ac_cv_func_$ac_func
-    if eval test \"x\$ac_cv_func_$ac_func\" = xyes; then
-      echo "#define $ac_item 1" >> confdefs.h
-    fi
-    ac_func=
-  else
-    ac_func=$ac_item
-  fi
-done
-
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for working mktime" >&5
-printf %s "checking for working mktime... " >&6; }
-if test ${ac_cv_func_working_mktime+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  if test "$cross_compiling" = yes
-then :
-  ac_cv_func_working_mktime=no
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-/* Test program from Paul Eggert and Tony Leneis.  */
-#include <time.h>
-#ifdef HAVE_SYS_TIME_H
-# include <sys/time.h>
-#endif
-
-#include <limits.h>
-#include <stdlib.h>
-
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-
-#ifndef HAVE_ALARM
-# define alarm(X) /* empty */
-#endif
-
-/* Work around redefinition to rpl_putenv by other config tests.  */
-#undef putenv
-
-static time_t time_t_max;
-static time_t time_t_min;
-
-/* Values we'll use to set the TZ environment variable.  */
-static const char *tz_strings[] = {
-  (const char *) 0, "TZ=GMT0", "TZ=JST-9",
-  "TZ=EST+3EDT+2,M10.1.0/00:00:00,M2.3.0/00:00:00"
-};
-#define N_STRINGS (sizeof (tz_strings) / sizeof (tz_strings[0]))
-
-/* Return 0 if mktime fails to convert a date in the spring-forward gap.
-   Based on a problem report from Andreas Jaeger.  */
-static int
-spring_forward_gap ()
-{
-  /* glibc (up to about 1998-10-07) failed this test. */
-  struct tm tm;
-
-  /* Use the portable POSIX.1 specification "TZ=PST8PDT,M4.1.0,M10.5.0"
-     instead of "TZ=America/Vancouver" in order to detect the bug even
-     on systems that don't support the Olson extension, or don't have the
-     full zoneinfo tables installed.  */
-  putenv ((char*) "TZ=PST8PDT,M4.1.0,M10.5.0");
-
-  tm.tm_year = 98;
-  tm.tm_mon = 3;
-  tm.tm_mday = 5;
-  tm.tm_hour = 2;
-  tm.tm_min = 0;
-  tm.tm_sec = 0;
-  tm.tm_isdst = -1;
-  return mktime (&tm) != (time_t) -1;
-}
-
-static int
-mktime_test1 (time_t now)
-{
-  struct tm *lt;
-  return ! (lt = localtime (&now)) || mktime (lt) == now;
-}
-
-static int
-mktime_test (time_t now)
-{
-  return (mktime_test1 (now)
-	  && mktime_test1 ((time_t) (time_t_max - now))
-	  && mktime_test1 ((time_t) (time_t_min + now)));
-}
-
-static int
-irix_6_4_bug ()
-{
-  /* Based on code from Ariel Faigon.  */
-  struct tm tm;
-  tm.tm_year = 96;
-  tm.tm_mon = 3;
-  tm.tm_mday = 0;
-  tm.tm_hour = 0;
-  tm.tm_min = 0;
-  tm.tm_sec = 0;
-  tm.tm_isdst = -1;
-  mktime (&tm);
-  return tm.tm_mon == 2 && tm.tm_mday == 31;
-}
-
-static int
-bigtime_test (int j)
-{
-  struct tm tm;
-  time_t now;
-  tm.tm_year = tm.tm_mon = tm.tm_mday = tm.tm_hour = tm.tm_min = tm.tm_sec = j;
-  now = mktime (&tm);
-  if (now != (time_t) -1)
-    {
-      struct tm *lt = localtime (&now);
-      if (! (lt
-	     && lt->tm_year == tm.tm_year
-	     && lt->tm_mon == tm.tm_mon
-	     && lt->tm_mday == tm.tm_mday
-	     && lt->tm_hour == tm.tm_hour
-	     && lt->tm_min == tm.tm_min
-	     && lt->tm_sec == tm.tm_sec
-	     && lt->tm_yday == tm.tm_yday
-	     && lt->tm_wday == tm.tm_wday
-	     && ((lt->tm_isdst < 0 ? -1 : 0 < lt->tm_isdst)
-		  == (tm.tm_isdst < 0 ? -1 : 0 < tm.tm_isdst))))
-	return 0;
-    }
-  return 1;
-}
-
-static int
-year_2050_test ()
-{
-  /* The correct answer for 2050-02-01 00:00:00 in Pacific time,
-     ignoring leap seconds.  */
-  unsigned long int answer = 2527315200UL;
-
-  struct tm tm;
-  time_t t;
-  tm.tm_year = 2050 - 1900;
-  tm.tm_mon = 2 - 1;
-  tm.tm_mday = 1;
-  tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
-  tm.tm_isdst = -1;
-
-  /* Use the portable POSIX.1 specification "TZ=PST8PDT,M4.1.0,M10.5.0"
-     instead of "TZ=America/Vancouver" in order to detect the bug even
-     on systems that don't support the Olson extension, or don't have the
-     full zoneinfo tables installed.  */
-  putenv ((char*) "TZ=PST8PDT,M4.1.0,M10.5.0");
-
-  t = mktime (&tm);
-
-  /* Check that the result is either a failure, or close enough
-     to the correct answer that we can assume the discrepancy is
-     due to leap seconds.  */
-  return (t == (time_t) -1
-	  || (0 < t && answer - 120 <= t && t <= answer + 120));
-}
-
-int
-main (void)
-{
-  time_t t, delta;
-  int i, j;
-
-  /* This test makes some buggy mktime implementations loop.
-     Give up after 60 seconds; a mktime slower than that
-     isn't worth using anyway.  */
-  alarm (60);
-
-  for (;;)
-    {
-      t = (time_t_max << 1) + 1;
-      if (t <= time_t_max)
-	break;
-      time_t_max = t;
-    }
-  time_t_min = - ((time_t) ~ (time_t) 0 == (time_t) -1) - time_t_max;
-
-  delta = time_t_max / 997; /* a suitable prime number */
-  for (i = 0; i < N_STRINGS; i++)
-    {
-      if (tz_strings[i])
-	putenv ((char*) tz_strings[i]);
-
-      for (t = 0; t <= time_t_max - delta; t += delta)
-	if (! mktime_test (t))
-	  return 1;
-      if (! (mktime_test ((time_t) 1)
-	     && mktime_test ((time_t) (60 * 60))
-	     && mktime_test ((time_t) (60 * 60 * 24))))
-	return 1;
-
-      for (j = 1; ; j <<= 1)
-	if (! bigtime_test (j))
-	  return 1;
-	else if (INT_MAX / 2 < j)
-	  break;
-      if (! bigtime_test (INT_MAX))
-	return 1;
-    }
-  return ! (irix_6_4_bug () && spring_forward_gap () && year_2050_test ());
-}
-_ACEOF
-if ac_fn_c_try_run "$LINENO"
-then :
-  ac_cv_func_working_mktime=yes
-else $as_nop
-  ac_cv_func_working_mktime=no
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_working_mktime" >&5
-printf "%s\n" "$ac_cv_func_working_mktime" >&6; }
-if test $ac_cv_func_working_mktime = no; then
-  case " $LIBOBJS " in
-  *" mktime.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS mktime.$ac_objext"
- ;;
-esac
-
-fi
-
-case "$ac_cv_func_working_mktime" in
-yes)
-printf "%s\n" "#define HAVE_MKTIME 1" >>confdefs.h
-
-	;;
-esac
-
 ac_fn_c_check_func "$LINENO" "getaddrinfo" "ac_cv_func_getaddrinfo"
 if test "x$ac_cv_func_getaddrinfo" = xyes
 then :
@@ -11589,7 +11345,6 @@ then :
 fi
 
 
-# Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
 ac_fn_c_check_func "$LINENO" "__etoa_l" "ac_cv_func___etoa_l"
 if test "x$ac_cv_func___etoa_l" = xyes
 then :
@@ -11656,24 +11411,6 @@ then :
   printf "%s\n" "#define HAVE_ISBLANK 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "iswctype" "ac_cv_func_iswctype"
-if test "x$ac_cv_func_iswctype" = xyes
-then :
-  printf "%s\n" "#define HAVE_ISWCTYPE 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "iswlower" "ac_cv_func_iswlower"
-if test "x$ac_cv_func_iswlower" = xyes
-then :
-  printf "%s\n" "#define HAVE_ISWLOWER 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "iswupper" "ac_cv_func_iswupper"
-if test "x$ac_cv_func_iswupper" = xyes
-then :
-  printf "%s\n" "#define HAVE_ISWUPPER 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "gettimeofday" "ac_cv_func_gettimeofday"
 if test "x$ac_cv_func_gettimeofday" = xyes
 then :
@@ -11698,36 +11435,6 @@ then :
   printf "%s\n" "#define HAVE_GETDTABLESIZE 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "mbrlen" "ac_cv_func_mbrlen"
-if test "x$ac_cv_func_mbrlen" = xyes
-then :
-  printf "%s\n" "#define HAVE_MBRLEN 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "memcmp" "ac_cv_func_memcmp"
-if test "x$ac_cv_func_memcmp" = xyes
-then :
-  printf "%s\n" "#define HAVE_MEMCMP 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "memcpy" "ac_cv_func_memcpy"
-if test "x$ac_cv_func_memcpy" = xyes
-then :
-  printf "%s\n" "#define HAVE_MEMCPY 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "memmove" "ac_cv_func_memmove"
-if test "x$ac_cv_func_memmove" = xyes
-then :
-  printf "%s\n" "#define HAVE_MEMMOVE 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "memset" "ac_cv_func_memset"
-if test "x$ac_cv_func_memset" = xyes
-then :
-  printf "%s\n" "#define HAVE_MEMSET 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "_NSGetExecutablePath" "ac_cv_func__NSGetExecutablePath"
 if test "x$ac_cv_func__NSGetExecutablePath" = xyes
 then :
@@ -11738,12 +11445,6 @@ ac_fn_c_check_func "$LINENO" "posix_spawnp" "ac_cv_func_posix_spawnp"
 if test "x$ac_cv_func_posix_spawnp" = xyes
 then :
   printf "%s\n" "#define HAVE_POSIX_SPAWNP 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "mkstemp" "ac_cv_func_mkstemp"
-if test "x$ac_cv_func_mkstemp" = xyes
-then :
-  printf "%s\n" "#define HAVE_MKSTEMP 1" >>confdefs.h
 
 fi
 ac_fn_c_check_func "$LINENO" "mtrace" "ac_cv_func_mtrace"
@@ -11788,40 +11489,16 @@ then :
   printf "%s\n" "#define HAVE_SIGPROCMASK 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "snprintf" "ac_cv_func_snprintf"
-if test "x$ac_cv_func_snprintf" = xyes
-then :
-  printf "%s\n" "#define HAVE_SNPRINTF 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "strcasecmp" "ac_cv_func_strcasecmp"
 if test "x$ac_cv_func_strcasecmp" = xyes
 then :
   printf "%s\n" "#define HAVE_STRCASECMP 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "strchr" "ac_cv_func_strchr"
-if test "x$ac_cv_func_strchr" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRCHR 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "strcoll" "ac_cv_func_strcoll"
 if test "x$ac_cv_func_strcoll" = xyes
 then :
   printf "%s\n" "#define HAVE_STRCOLL 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "strerror" "ac_cv_func_strerror"
-if test "x$ac_cv_func_strerror" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRERROR 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "strftime" "ac_cv_func_strftime"
-if test "x$ac_cv_func_strftime" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRFTIME 1" >>confdefs.h
 
 fi
 ac_fn_c_check_func "$LINENO" "strncasecmp" "ac_cv_func_strncasecmp"
@@ -11836,76 +11513,16 @@ then :
   printf "%s\n" "#define HAVE_STRSIGNAL 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "strtod" "ac_cv_func_strtod"
-if test "x$ac_cv_func_strtod" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRTOD 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "strtoul" "ac_cv_func_strtoul"
-if test "x$ac_cv_func_strtoul" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRTOUL 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "system" "ac_cv_func_system"
-if test "x$ac_cv_func_system" = xyes
-then :
-  printf "%s\n" "#define HAVE_SYSTEM 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "timegm" "ac_cv_func_timegm"
 if test "x$ac_cv_func_timegm" = xyes
 then :
   printf "%s\n" "#define HAVE_TIMEGM 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "tmpfile" "ac_cv_func_tmpfile"
-if test "x$ac_cv_func_tmpfile" = xyes
-then :
-  printf "%s\n" "#define HAVE_TMPFILE 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "towlower" "ac_cv_func_towlower"
-if test "x$ac_cv_func_towlower" = xyes
-then :
-  printf "%s\n" "#define HAVE_TOWLOWER 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "towupper" "ac_cv_func_towupper"
-if test "x$ac_cv_func_towupper" = xyes
-then :
-  printf "%s\n" "#define HAVE_TOWUPPER 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "tzset" "ac_cv_func_tzset"
-if test "x$ac_cv_func_tzset" = xyes
-then :
-  printf "%s\n" "#define HAVE_TZSET 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "usleep" "ac_cv_func_usleep"
-if test "x$ac_cv_func_usleep" = xyes
-then :
-  printf "%s\n" "#define HAVE_USLEEP 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "waitpid" "ac_cv_func_waitpid"
 if test "x$ac_cv_func_waitpid" = xyes
 then :
   printf "%s\n" "#define HAVE_WAITPID 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "wcrtomb" "ac_cv_func_wcrtomb"
-if test "x$ac_cv_func_wcrtomb" = xyes
-then :
-  printf "%s\n" "#define HAVE_WCRTOMB 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "wcscoll" "ac_cv_func_wcscoll"
-if test "x$ac_cv_func_wcscoll" = xyes
-then :
-  printf "%s\n" "#define HAVE_WCSCOLL 1" >>confdefs.h
 
 fi
 ac_fn_c_check_func "$LINENO" "wctype" "ac_cv_func_wctype"

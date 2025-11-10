@@ -1,3 +1,28 @@
+2025-11-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Continue the cleanup:
+
+	* configure.ac: Don't look for system().
+	* replace.c: Don't include missing_d/system.c.  It was for DJGPP
+	which is not supported anymore.
+	* custom.h: Remove the bit for QNX. Improve the declaration of
+	strsignal().
+
+2025-11-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Considerably simplify use of replacement functions. Many of the
+	replacement functions are for routines that now widely standard,
+	so we assume they're available.
+
+	* Makefile.am (base_sources): Remove protos.h.
+	* protos.h: Remove this file.
+	* awk.h: Don't include protos.h. Don't do gawk_strtod() stuff.
+	* configure.ac: Remove checks for a whole bunch of standard functions.
+	Remove AC_FUNC_MKTIME check.
+	* custom.h: Remove old checks for HP/UX and macOS.
+	* replace.c: Remove checks and includes of files that are no
+	longer needed.
+
 2025-10-31         Arnold D. Robbins     <arnold@skeeve.com>
 
 	After discussion with Nelson Beebe, allow hexadecimal

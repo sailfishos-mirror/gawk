@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2023,
+ * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2023, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -82,24 +82,6 @@ typedef unsigned long long uint_fast64_t;
 #endif
 #endif /* __VMS */
 
-
-/* For QNX, based on submission from Michael Hunter, mphunter@qnx.com */
-#ifdef __QNX__
-#define GETPGRP_VOID	1
-#endif
-
-/* For MacOS X, which is almost BSD Unix */
-#ifdef __APPLE__
-#define HAVE_MKTIME	1
-#endif
-
-/* For HP/UX with gcc */
-#if defined(hpux) || defined(_HPUX_SOURCE)
-#undef HAVE_TZSET
-#define HAVE_TZSET 1
-#define _TZSET 1
-#endif
-
 #if defined(_AIX)
 #define _XOPEN_SOURCE_EXTENDED 1
 #endif
@@ -139,5 +121,5 @@ typedef unsigned long long uint_fast64_t;
 #endif /* ! USE_PERSISTENT_MALLOC */
 
 #ifndef HAVE_STRSIGNAL
-char * strsignal(int signal);
+extern char *strsignal(int signal);
 #endif /* ! HAVE_STRSIGNAL */

@@ -104,7 +104,6 @@ base_sources = \
 	nonposix.h \
 	printf.c \
 	profile.c \
-	protos.h \
 	re.c \
 	replace.c \
 	str_array.c \

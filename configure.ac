@@ -294,13 +294,6 @@ TYPE_SOCKLEN_T
 dnl Check for C11 _Noreturn
 GAWK_AC_NORETURN
 
-dnl checks for functions
-AC_FUNC_MKTIME
-case "$ac_cv_func_working_mktime" in
-yes)	AC_DEFINE(HAVE_MKTIME, 1, [we have the mktime function])
-	;;
-esac
-
 AC_CHECK_FUNC(getaddrinfo, [AC_DEFINE(HAVE_GETADDRINFO, 1, [have getaddrinfo])],
 	      [AC_CHECK_LIB(socket, getaddrinfo,
 			    [AC_DEFINE(HAVE_GETADDRINFO, 1,
@@ -311,17 +304,15 @@ AC_SEARCH_LIBS(isinf, m)
 AC_SEARCH_LIBS(ismod, m)
 AC_SEARCH_LIBS(isnan, m)
 
-# Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
 AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
-	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper \
+	getgrent getgroups grantpt isascii isblank \
 	gettimeofday clock_gettime lstat \
 	getdtablesize \
-	mbrlen memcmp memcpy memmove memset \
 	_NSGetExecutablePath posix_spawnp \
-	mkstemp mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
-	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
-	strsignal strtod strtoul system timegm tmpfile towlower towupper \
-	tzset usleep waitpid wcrtomb wcscoll wctype)
+	mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
+	strcasecmp strcoll strncasecmp \
+	strsignal timegm \
+	waitpid wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
 AC_FUNC_MBRTOWC
 

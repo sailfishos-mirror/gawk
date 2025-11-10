@@ -29,86 +29,16 @@
  */
 #include "awk.h"	/* includes config.h for us */
 
-
-#ifndef HAVE_SYSTEM
-#include "missing_d/system.c"
-#endif /* HAVE_SYSTEM */
-
-#ifndef HAVE_MEMCMP
-#include "missing_d/memcmp.c"
-#endif	/* HAVE_MEMCMP */
-
-#ifndef HAVE_MEMCPY
-#include "missing_d/memcpy.c"
-#endif	/* HAVE_MEMCPY */
-
-#ifndef HAVE_MEMSET
-#include "missing_d/memset.c"
-#endif	/* HAVE_MEMSET */
-
-#ifndef HAVE_MEMMOVE
-#include "missing_d/memmove.c"
-#endif	/* HAVE_MEMMOVE */
-
 #if !defined(HAVE_STRNCASECMP) || !defined(HAVE_STRCASECMP)
 #include "missing_d/strncasecmp.c"
 #endif	/* HAVE_STRCASE */
-
-#ifndef HAVE_STRERROR
-#include "missing_d/strerror.c"
-#endif	/* HAVE_STRERROR */
-
-#ifndef HAVE_STRFTIME
-# ifdef __MINGW32__
-/* Need to use underlying_strftime in replacement strftime.  */
-#  define HAVE_STRFTIME 1
-# endif
-#include "missing_d/strftime.c"
-# ifdef __MINGW32__
-#  undef HAVE_STRFTIME
-# endif
-#endif	/* HAVE_STRFTIME */
-
-#ifndef HAVE_STRCHR
-#include "missing_d/strchr.c"
-#endif	/* HAVE_STRCHR */
-
-#if !defined(HAVE_STRTOD)
-#include "missing_d/strtod.c"
-#endif	/* HAVE_STRTOD */
-
-#ifndef HAVE_STRTOUL
-#include "missing_d/strtoul.c"
-#endif	/* HAVE_STRTOUL */
-
-#ifndef HAVE_TZSET
-#include "missing_d/tzset.c"
-#endif /* HAVE_TZSET */
-
-#ifndef HAVE_MKTIME
-/* mktime.c defines main() if DEBUG is set */
-#undef DEBUG
-#include "missing_d/mktime.c"
-#endif /* HAVE_MKTIME */
 
 #ifndef HAVE_TIMEGM
 #include "missing_d/timegm.c"
 #endif /* HAVE_TIMEGM */
 
-#ifndef HAVE_SNPRINTF
-#include "missing_d/snprintf.c"
-#endif
-
 #if defined(HAVE_SOCKETS) && ! defined(HAVE_GETADDRINFO)
 #include "missing_d/getaddrinfo.c"
-#endif
-
-#ifndef HAVE_USLEEP
-#include "missing_d/usleep.c"
-#endif
-
-#ifndef HAVE_SETENV
-#include "missing_d/setenv.c"
 #endif
 
 #ifndef HAVE_STRCOLL
