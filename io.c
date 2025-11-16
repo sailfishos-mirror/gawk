@@ -4321,9 +4321,15 @@ inetfile(const char *str, size_t len, struct inet_socket_info *isi)
 		return false;
 	if (memcmp(cp, "tcp/", 4) == 0)
 		isi->protocol = SOCK_STREAM;
-	else if (memcmp(cp, "udp/", 4) == 0)
+	else if (memcmp(cp, "udp/", 4) == 0) {
+		static bool warned = false;
+
+		if (! warned) {
+			warned = true;
+			warning(_("support for the UDP protocol is obsolete and will eventually be removed"));
+		}
 		isi->protocol = SOCK_DGRAM;
-	else
+	} else
 		return false;
 	cp += 4;
 
