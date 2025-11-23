@@ -1,3 +1,13 @@
+2025-11-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Improve raw I/O speed by not checking for a timeout
+	when there's no need.  Issue noticed during profiling
+	of something unrelated.
+
+	* io.c (file_can_timeout): New routine. Returns true if an
+	input file is one that can timeout. Regular files cannot.
+	(get_a_record): Use it.
+
 2025-11-16         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* io.c (inetfile): Issue a warning if udp is used. It's

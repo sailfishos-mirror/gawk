@@ -3933,6 +3933,26 @@ errno_io_retry(void)
 	}
 }
 
+/* file_can_timeout --- return true if file i/o might could timeout */
+
+static inline bool
+file_can_timeout(IOBUF *iop)
+{
+	switch (iop->public.sbuf.st_mode & S_IFMT) {
+	case S_IFIFO:
+	case S_IFSOCK:
+		return true;
+	case S_IFCHR:
+		return isatty(iop->public.fd);
+	case S_IFBLK:
+	case S_IFDIR:
+	case S_IFLNK:
+	case S_IFREG:
+	default:
+	       return false;
+	}
+}
+
 /*
  * get_a_record --- read a record from IOP into out,
  * its length into len, and set RT.
@@ -3957,7 +3977,7 @@ get_a_record(char **out,        /* pointer to pointer to data */
 	if (at_eof(iop) && no_data_left(iop))
 		return EOF;
 
-	if (read_can_timeout)
+	if (file_can_timeout(iop) && read_can_timeout)
 		read_timeout = get_read_timeout(iop);
 
 	if (iop->public.get_record != NULL) {
