@@ -3941,12 +3941,12 @@ errno_io_retry(void)
 static inline bool
 file_can_timeout(IOBUF *iop)
 {
-	switch (iop->public.sbuf.st_mode & S_IFMT) {
+	switch (iop->public_.sbuf.st_mode & S_IFMT) {
 	case S_IFIFO:
 	case S_IFSOCK:
 		return true;
 	case S_IFCHR:
-		return isatty(iop->public.fd);
+		return isatty(iop->public_.fd);
 	case S_IFBLK:
 	case S_IFDIR:
 	case S_IFLNK:
