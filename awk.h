@@ -958,6 +958,7 @@ typedef struct iobuf {
 				   to regrow/refill */
 	bool valid;
 	int errcode;
+	bool can_timeout;	/* true if I/O can timeout */
 
 	enum iobuf_flags {
 		IOP_IS_TTY	= 1,

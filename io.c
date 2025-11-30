@@ -3344,6 +3344,26 @@ find_two_way_processor(const char *name, struct redirect *rp)
 	return false;
 }
 
+/* file_can_timeout --- return true if file i/o might could timeout */
+
+static inline bool
+file_can_timeout(int fd, mode_t st_mode)
+{
+	switch (st_mode & S_IFMT) {
+	case S_IFIFO:
+	case S_IFSOCK:
+		return true;
+	case S_IFCHR:
+		return isatty(fd);
+	case S_IFBLK:
+	case S_IFDIR:
+	case S_IFLNK:
+	case S_IFREG:
+	default:
+	       return false;
+	}
+}
+
 /*
  * IOBUF management is somewhat complicated.  In particular,
  * it is possible and OK for an IOBUF to be allocated with
@@ -3399,6 +3419,7 @@ iop_alloc(int fd, const char *name, int errno_val)
 	iop->public.read_func = ( ssize_t(*)(int, void *, size_t) ) read;
 	iop->valid = false;
 	iop->errcode = errno_val;
+	iop->can_timeout = false;
 
 	if (fd != INVALID_HANDLE)
 		fstat(fd, & iop->public.sbuf);
@@ -3415,6 +3436,8 @@ iop_alloc(int fd, const char *name, int errno_val)
 		if (statf(name, & iop->public.sbuf) < 0)
 			memset(& iop->public.sbuf, 0, sizeof(struct stat));
 	}
+	if (iop->public.sbuf.st_mode != 0)
+		iop->can_timeout = file_can_timeout(fd, iop->public.sbuf.st_mode);
 
 	return iop;
 }
@@ -3933,26 +3956,6 @@ errno_io_retry(void)
 	}
 }
 
-/* file_can_timeout --- return true if file i/o might could timeout */
-
-static inline bool
-file_can_timeout(IOBUF *iop)
-{
-	switch (iop->public.sbuf.st_mode & S_IFMT) {
-	case S_IFIFO:
-	case S_IFSOCK:
-		return true;
-	case S_IFCHR:
-		return isatty(iop->public.fd);
-	case S_IFBLK:
-	case S_IFDIR:
-	case S_IFLNK:
-	case S_IFREG:
-	default:
-	       return false;
-	}
-}
-
 /*
  * get_a_record --- read a record from IOP into out,
  * its length into len, and set RT.
@@ -3977,7 +3980,7 @@ get_a_record(char **out,        /* pointer to pointer to data */
 	if (at_eof(iop) && no_data_left(iop))
 		return EOF;
 
-	if (file_can_timeout(iop) && read_can_timeout)
+	if (iop->can_timeout && read_can_timeout)
 		read_timeout = get_read_timeout(iop);
 
 	if (iop->public.get_record != NULL) {
