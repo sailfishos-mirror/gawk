@@ -1,3 +1,13 @@
+2025-11-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Improve the timeout check to be made when the IOP is created
+	instead of on every record read.
+
+	* awk.h (IOBUF): Add a can_timeout member.
+	* io.c (get_a_record): Use it instead of calling file_can_timeout().
+	(file_can_timeout): Adjust to take fd and mode arguments.
+	(iop_alloc): Set the can_timeout member by calling file_can_timeout.
+
 2025-11-24         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* README: Updated some more.
