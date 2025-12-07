@@ -61,6 +61,9 @@
 #include <stdarg.h>
 #include <signal.h>
 #include <time.h>
+#if defined(HAVE_GETTIMEOFDAY)
+#include <sys/time.h>	// get the declaration
+#endif
 #include <errno.h>
 #if ! defined(errno)
 extern int errno;
