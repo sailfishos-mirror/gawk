@@ -3064,9 +3064,9 @@ do_bindtextdomain(int nargs)
 /*
  * We define the semantics as:
  * 	numerator = int(numerator)
- *	denominator = int(denonmator)
- *	quotient = int(numerator / denomator)
- *	remainder = int(numerator % denomator)
+ *	denominator = int(denominator)
+ *	quotient = int(numerator / denominator)
+ *	remainder = int(numerator % denominator)
  */
 
 NODE *
