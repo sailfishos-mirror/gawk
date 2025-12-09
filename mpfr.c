@@ -1319,9 +1319,9 @@ do_mpfr_srand(int nargs)
 /*
  * We define the semantics as:
  * 	numerator = int(numerator)
- *	denominator = int(denonmator)
- *	quotient = int(numerator / denomator)
- *	remainder = int(numerator % denomator)
+ *	denominator = int(denominator)
+ *	quotient = int(numerator / denominator)
+ *	remainder = int(numerator % denominator)
  */
 
 NODE *
@@ -1596,7 +1596,10 @@ mpg_div(NODE *t1, NODE *t2)
 	return r;
 }
 
-/* mpg_mod --- modulus operation with arbitrary-precision numbers */
+/*
+ * mpg_mod --- modulus operation with arbitrary-precision numbers.
+ *	See test/mpfrrem.awk.
+ */
 
 static NODE *
 mpg_mod(NODE *t1, NODE *t2)
@@ -1605,28 +1608,17 @@ mpg_mod(NODE *t1, NODE *t2)
 	int tval;
 
 	if (is_mpg_integer(t1) && is_mpg_integer(t2)) {
-		/*
-		 * 8/2014: Originally, this was just
-		 *
-		 * r = mpg_integer();
-		 * mpz_mod(r->mpg_i, t1->mpg_i, t2->mpg_i);
-		 *
-		 * But that gave very strange results with negative numerator:
-		 *
-		 *	$ ./gawk -M 'BEGIN { print -15 % 7 }'
-		 *	6
-		 *
-		 * So instead we use mpz_tdiv_qr() to get the correct result
-		 * and just throw away the quotient. We could not find any
-		 * reason why mpz_mod() wasn't working correctly.
-		 *
-		 * 10/2025: Using mpz_tdiv_r() generates just the remainder,
-		 * making things easier.
-		 */
-
 		if (mpz_sgn(t2->mpg_i) == 0)
 			fatal(_("division by zero attempted"));
 		r = mpg_integer();
+		/*
+		 * Before 2014-08, this called mpz_mod(), which is inconsistent
+		 * with mpfr_fmod() when the numerator is negative. It gave:
+		 *   $ gawk -M 'BEGIN { print 15 % 7, 15 % -7, -15 % 7, -15 % -7 }'
+		 *   1 1 6 6
+		 *   $ gawk -M 'BEGIN { print 15.0 % 7, 15.0 % -7, -15.0 % 7, -15.0 % -7 }'
+		 *   1 1 -1 -1
+		 */
 		mpz_tdiv_r(r->mpg_i, t1->mpg_i, t2->mpg_i);
 	} else {
 		mpfr_ptr p1, p2;
