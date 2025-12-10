@@ -4784,6 +4784,7 @@ static const struct token tokentab[] = {
 {"BEGINFILE",	Op_rule,	 LEX_BEGINFILE,	GAWKX,		0,	0},
 {"END",		Op_rule,	 LEX_END,	0,		0,	0},
 {"ENDFILE",	Op_rule,	 LEX_ENDFILE,	GAWKX,		0,	0},
+{"_dump_node",	Op_builtin,      LEX_BUILTIN,	GAWKX|A(0)|DEBUG_USE,	do_dump_node,	0},
 #ifdef ARRAYDEBUG
 {"adump",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(1)|A(2)|DEBUG_USE,	do_adump,	0},
 #endif
