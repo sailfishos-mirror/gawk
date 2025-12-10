@@ -898,7 +898,7 @@ prec:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 printf-corners:
-	@echo $@
+	@echo $@ $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
 	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
@@ -1542,7 +1542,7 @@ dbugarray3:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 dbugarray4:
-	@echo $@
+	@echo $@ $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --debug < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
@@ -1602,7 +1602,7 @@ elemnew3:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 elemnew4:
-	@echo $@
+	@echo $@ $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
