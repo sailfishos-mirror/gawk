@@ -3394,6 +3394,8 @@ gawk_system(const char *command)
 #endif
 		execl("/bin/sh", "sh", "-c", command, NULL);
 		_exit(errno == ENOENT ? 127 : 126);
+
+		return 0;	// silence compiler warnings
 	} else {
 		// parent
 		status = wait_any(childpid);
@@ -3411,4 +3413,72 @@ gawk_system(const char *command)
 		return status;
 	}
 #endif /* ! (defined(VMS) || defined(__MINGW32__)) */
+}
+
+/* do_dump_node --- dump the offsets of the NODE struct */
+
+NODE *
+do_dump_node(int nargs)
+{
+	FILE *fp = popen("sort -n", "w");
+	if (fp == NULL)
+		return Nnull_string;
+
+	fprintf(fp, "%zd\tarray_base\n", offsetof(NODE, array_base));
+	fprintf(fp, "%zd\tarray_capacity\n", offsetof(NODE, array_capacity));
+	fprintf(fp, "%zd\tarray_funcs\n", offsetof(NODE, array_funcs));
+	fprintf(fp, "%zd\tarray_size\n", offsetof(NODE, array_size));
+	fprintf(fp, "%zd\tbuckets\n", offsetof(NODE, buckets));
+	fprintf(fp, "%zd\tcode_ptr\n", offsetof(NODE, code_ptr));
+	fprintf(fp, "%zd\tcomment_type\n", offsetof(NODE, comment_type));
+	fprintf(fp, "%zd\tcur_idx	\n", offsetof(NODE, cur_idx	));
+	fprintf(fp, "%zd\tdup_ent\n", offsetof(NODE, dup_ent));
+	fprintf(fp, "%zd\telemnew_parent\n", offsetof(NODE, elemnew_parent));
+	fprintf(fp, "%zd\telemnew_vname\n", offsetof(NODE, elemnew_vname));
+	fprintf(fp, "%zd\tflags\n", offsetof(NODE, flags));
+	fprintf(fp, "%zd\tfor_array\n", offsetof(NODE, for_array));
+	fprintf(fp, "%zd\tfor_list\n", offsetof(NODE, for_list));
+	fprintf(fp, "%zd\tfor_list_size\n", offsetof(NODE, for_list_size));
+	fprintf(fp, "%zd\tfparms\n", offsetof(NODE, fparms));
+	fprintf(fp, "%zd\tfunc_node\n", offsetof(NODE, func_node));
+	fprintf(fp, "%zd\tlnode\n", offsetof(NODE, lnode));
+#ifdef HAVE_MPFR
+	fprintf(fp, "%zd\tmpg_i\n", offsetof(NODE, mpg_i));
+	fprintf(fp, "%zd\tmpg_numbr\n", offsetof(NODE, mpg_numbr));
+#endif
+	fprintf(fp, "%zd\tnodes\n", offsetof(NODE, nodes));
+	fprintf(fp, "%zd\tnumbr\n", offsetof(NODE, numbr));
+	fprintf(fp, "%zd\torig_array\n", offsetof(NODE, orig_array));
+	fprintf(fp, "%zd\tparam\n", offsetof(NODE, param));
+	fprintf(fp, "%zd\tparam\n", offsetof(NODE, param));
+	fprintf(fp, "%zd\tparent_array\n", offsetof(NODE, parent_array));
+	fprintf(fp, "%zd\tprev_array\n", offsetof(NODE, prev_array));
+	fprintf(fp, "%zd\tprev_frame_size\n", offsetof(NODE, prev_frame_size));
+	fprintf(fp, "%zd\tre_cnt\n", offsetof(NODE, re_cnt));
+	fprintf(fp, "%zd\tre_exp\n", offsetof(NODE, re_exp));
+	fprintf(fp, "%zd\tre_flags\n", offsetof(NODE, re_flags));
+	fprintf(fp, "%zd\tre_reg\n", offsetof(NODE, re_reg));
+	fprintf(fp, "%zd\tre_text\n", offsetof(NODE, re_text));
+	fprintf(fp, "%zd\treti\n", offsetof(NODE, reti));
+	fprintf(fp, "%zd\trnode\n", offsetof(NODE, rnode));
+	fprintf(fp, "%zd\tstack\n", offsetof(NODE, stack));
+	fprintf(fp, "%zd\tstfmt\n", offsetof(NODE, stfmt));
+	fprintf(fp, "%zd\tstlen\n", offsetof(NODE, stlen));
+	fprintf(fp, "%zd\tstptr\n", offsetof(NODE, stptr));
+	fprintf(fp, "%zd\tstrndmode\n", offsetof(NODE, strndmode));
+	fprintf(fp, "%zd\ttable_size\n", offsetof(NODE, table_size));
+	fprintf(fp, "%zd\ttype\n", offsetof(NODE, type));
+	fprintf(fp, "%zd\ttyped_re\n", offsetof(NODE, typed_re));
+	fprintf(fp, "%zd\tvalref\n", offsetof(NODE, valref));
+	fprintf(fp, "%zd\tvar_assign\n", offsetof(NODE, var_assign));
+	fprintf(fp, "%zd\tvar_update\n", offsetof(NODE, var_update));
+	fprintf(fp, "%zd\tvar_value\n", offsetof(NODE, var_value));
+	fprintf(fp, "%zd\tvname\n", offsetof(NODE, vname));
+	fprintf(fp, "%zd\twstlen\n", offsetof(NODE, wstlen));
+	fprintf(fp, "%zd\twstptr\n", offsetof(NODE, wstptr));
+	fprintf(fp, "%zd\txarray\n", offsetof(NODE, xarray));
+
+	pclose(fp);
+	
+	return Nnull_string;
 }

@@ -1551,6 +1551,7 @@ extern NODE *do_dcngettext(int nargs);
 extern NODE *do_bindtextdomain(int nargs);
 extern NODE *do_intdiv(int nargs);
 extern NODE *do_typeof(int nargs);
+extern NODE *do_dump_node(int nargs);
 extern int strncasecmpmbs(const unsigned char *,
 			  const unsigned char *, size_t);
 extern int sanitize_exit_status(int status);
