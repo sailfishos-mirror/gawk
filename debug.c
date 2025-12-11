@@ -355,7 +355,8 @@ if (--val) \
 #define CHECK_PROG_RUNNING() \
 	do { \
 		if (! prog_running) { \
-			d_error(_("program not running")); \
+			d_error(_("%s:%d:%s: program not running"), \
+				__FILE__, __LINE__, __func__); \
 			return false; \
 		} \
 	} while (false)
@@ -4507,8 +4508,6 @@ serialize_list(int type)
 	int bl;
 	BREAKPOINT *b = NULL;
 	struct list_item *wd = NULL;
-	HIST_ENTRY **hist_list = NULL;
-	int hist_index = 0;
 	struct dbg_option *opt = NULL;
 	struct commands_item *commands = NULL, *c;
 	int cnum = 0;
@@ -4516,6 +4515,8 @@ serialize_list(int type)
 	void *ptr, *end_ptr;
 #if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 	HIST_ENTRY *h = NULL;
+	HIST_ENTRY **hist_list = NULL;
+	int hist_index = 0;
 #endif
 
 	switch (type) {
@@ -4531,6 +4532,7 @@ serialize_list(int type)
 		end_ptr = (void *) &display_list;
 		ptr = (void *) display_list.prev;
 		break;
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 	case HISTORY:
 		hist_list = history_list();
 		if (hist_list == NULL) /* empty history list */
@@ -4538,6 +4540,7 @@ serialize_list(int type)
 		end_ptr = NULL;
 		ptr = (void *) hist_list[0];
 		break;
+#endif
 	case OPTION:
 	{
 		int n;
@@ -4722,9 +4725,11 @@ enlarge_buffer:
 		case DISPLAY:
 			ptr = (void *) wd->prev;
 			break;
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 		case HISTORY:
 			ptr = (void *) hist_list[++hist_index];
 			break;
+#endif
 		case OPTION:
 			ptr = (void *) (++opt);
 			break;
