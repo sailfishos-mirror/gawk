@@ -157,6 +157,10 @@ typedef int off_t;
 #define fwrite	fwrite_unlocked
 #endif /* HAVE_FWRITE_UNLOCKED */
 
+#ifndef HAVE_TIMEGM
+extern time_t timegm(struct tm *tm);
+#endif
+
 #if defined(__MINGW32__)
 #include "nonposix.h"
 #endif /* defined(__MINGW32__) */
