@@ -2578,8 +2578,10 @@ wait_any_block_signals(int interesting)	/* pid of interest, if any */
 	void (*hstat)(int), (*istat)(int), (*qstat)(int);
 
 	istat = signal(SIGINT, SIG_IGN);
+#ifndef __MINGW32__
 	hstat = signal(SIGHUP, SIG_IGN);
 	qstat = signal(SIGQUIT, SIG_IGN);
+#endif
 #endif
 
 	status = wait_any(interesting);
@@ -2588,8 +2590,10 @@ wait_any_block_signals(int interesting)	/* pid of interest, if any */
 	sigprocmask(SIG_SETMASK, & oldset, NULL);
 #else
 	signal(SIGINT, istat);
+#ifndef __MINGW32__
 	signal(SIGHUP, hstat);
 	signal(SIGQUIT, qstat);
+#endif
 #endif
 	return status;
 }
@@ -3354,13 +3358,17 @@ file_can_timeout(int fd, mode_t st_mode)
 {
 	switch (st_mode & S_IFMT) {
 	case S_IFIFO:
+#ifdef S_IFSOCK
 	case S_IFSOCK:
+#endif
 		return true;
 	case S_IFCHR:
 		return isatty(fd);
 	case S_IFBLK:
 	case S_IFDIR:
+#ifdef S_IFLNK
 	case S_IFLNK:
+#endif
 	case S_IFREG:
 	default:
 	       return false;

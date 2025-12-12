@@ -150,7 +150,10 @@ ALLOBJS = $(AWKOBJS) awkgram$O getid$O $(OBJ)
 DYNOBJS= dynarray_resize$O dynarray_emplace_enlarge$O dynarray_finalize$O \
          dynarray_at_failure$O dynarray_resize_clear$O
 
-LIBOBJS= getopt$O getopt1$O dfa$O random$O localeinfo$O regex$O $(DYNOBJS)
+MINRXOBJS= minrx$O
+
+LIBOBJS= getopt$O getopt1$O dfa$O random$O localeinfo$O regex$O $(DYNOBJS) \
+	$(MINRXOBJS)
 
 GAWKOBJS = $(ALLOBJS) $(LIBOBJS)
 
@@ -181,9 +184,11 @@ $(RSPFILE) : $(GAWKOBJS)
 #    included by awk.h.
 # 2. custom.h is not mentioned because pc ports don't use it.
 $(ALLOBJS) $(LIBOBJS) $(DYNOBJS): \
-  awk.h regex.h config.h gettext.h protos.h dfa.h getopt.h nonposix.h
+  awk.h regex.h config.h gettext.h dfa.h getopt.h nonposix.h
 
 $(DYNOBJS) regex$O:	dynarray.h libc-config.h malloc/dynarray.h malloc/dynarray-skeleton.c
+
+$(MINRXOBJS):	minrx.h charset.c charset.h
 
 builtin$O:	floatmagic.h random.h popen.h
 

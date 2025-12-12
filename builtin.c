@@ -3465,7 +3465,9 @@ do_dump_node(int nargs)
 	fprintf(fp, "%zd\tstfmt\n", offsetof(NODE, stfmt));
 	fprintf(fp, "%zd\tstlen\n", offsetof(NODE, stlen));
 	fprintf(fp, "%zd\tstptr\n", offsetof(NODE, stptr));
+#ifdef HAVE_MPFR
 	fprintf(fp, "%zd\tstrndmode\n", offsetof(NODE, strndmode));
+#endif
 	fprintf(fp, "%zd\ttable_size\n", offsetof(NODE, table_size));
 	fprintf(fp, "%zd\ttype\n", offsetof(NODE, type));
 	fprintf(fp, "%zd\ttyped_re\n", offsetof(NODE, typed_re));
