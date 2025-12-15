@@ -310,7 +310,7 @@ AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
 	getdtablesize \
 	_NSGetExecutablePath posix_spawnp \
 	mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
-	strcasecmp strcoll strncasecmp \
+	strcasecmp strcoll strftime strncasecmp \
 	strsignal timegm \
 	waitpid wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
