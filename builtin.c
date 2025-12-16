@@ -3420,6 +3420,14 @@ gawk_system(const char *command)
 NODE *
 do_dump_node(int nargs)
 {
+	printf("MB_CUR_MAX = %d\n", MB_CUR_MAX);
+	printf("sizeof(int) = %zd\n", sizeof(int));
+	printf("sizeof(long) = %zd\n", sizeof(long));
+	printf("sizeof(long long) = %zd\n", sizeof(long long));
+	printf("sizeof(void *) = %zd\n", sizeof(void *));
+	printf("\n");
+	fflush(stdout);
+
 	FILE *fp = popen("sort -n", "w");
 	if (fp == NULL)
 		return Nnull_string;
@@ -3450,7 +3458,7 @@ do_dump_node(int nargs)
 	fprintf(fp, "%zd\tnumbr\n", offsetof(NODE, numbr));
 	fprintf(fp, "%zd\torig_array\n", offsetof(NODE, orig_array));
 	fprintf(fp, "%zd\tparam\n", offsetof(NODE, param));
-	fprintf(fp, "%zd\tparam\n", offsetof(NODE, param));
+	fprintf(fp, "%zd\tparam_cnt\n", offsetof(NODE, param_cnt));
 	fprintf(fp, "%zd\tparent_array\n", offsetof(NODE, parent_array));
 	fprintf(fp, "%zd\tprev_array\n", offsetof(NODE, prev_array));
 	fprintf(fp, "%zd\tprev_frame_size\n", offsetof(NODE, prev_frame_size));
