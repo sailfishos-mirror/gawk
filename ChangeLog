@@ -1,3 +1,8 @@
+2025-12-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h, configure.ac, main.c, re.c, version.c: Minor edits
+	before merging into master.
+
 2025-12-15         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* builtin.c (do_dump_node): Add additional information, fix
@@ -40,6 +45,10 @@
 	* awk.h (do_dump_node): Declare the function.
 	* builtin.c (do_dump_node): New function.
 	* awkgram.y (tokentab): Add entry for _dump_node(). Note the "_".
+
+2025-12-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* NEWS: Updated with info about MinRX.
 
 2025-12-09         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -414,10 +423,35 @@
 	* main.c (init_vars): Don't install non-standard variables.
 	* NEWS: Updated.
 
+2025-05-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h [RE_NEED_SUB]: New flag for if need submatch info.
+	* builtin.c (do_sub, do_match): Use it when needed.
+	* re.c (research): For MinRX, adjust match_count value based
+	on RE_NEED_SUB and RE_NEED_START. Allows for eventual
+	optimizations within MinRX.
+
+2025-05-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (research): Undo previous change. MINRX_REG_NOSUB
+	is a flag for compiling the regex, not execing it. :-(
+	In gawk, we don't know at regex compile time if we will
+	need the subpatterns or not.  Oh well.
+
+2025-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (research): If not need_start, add MINRX_REG_NOSUB
+	to the flags.  In preparation for when MinRX implements
+	that flag.
+
 2025-04-08         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* configure.ac: Check for posix_spawnp() also, for older
 	macOS systems.
+
+2025-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (make_regexp): Add MINRX_REG_MINDISABLE for traditional awk.
 
 2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -522,6 +556,10 @@
 
 	* int_array.c (INT_CHAIN_MAX): Bump it up from 2 to 10.
 	* str_array.c (STR_CHAIN_MAX): Ditto.
+
+2025-02-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Update CXXFLAGS for debug also, not just CFLAGS.
 
 2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -642,6 +680,11 @@
 	the function name being preceded by awk::.
 	Thanks to Denis Shirokov <cosmogen@gmail.com> for the reports.
 
+2025-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Set CXXFLAGS correctly for MinRX: Use -O3
+	and -std=c++20.
+
 2025-01-20         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* TODO: Add item about variable line number and filename
@@ -664,6 +707,10 @@
 2025-01-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* NEWS: Updated. Copyright year updated, too.
+
+2024-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c: Finish the emalloc / erealloc changes.
 
 2024-12-15         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -738,6 +785,15 @@
 
 	* Checklist: Add two more items to do.
 
+2024-09-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (make_regexp): Add MINRX_REG_NATIVE1B flag.
+
+2024-08-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (CCLD): Set to $(CXX) so that builds with clang
+	can work too. Thanks to Nelson H.F. Beebe.
+
 2024-08-16         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* printf.c (zero_fill_to_precision): Fix calculation of buflen.
@@ -794,6 +850,10 @@
 	* printf.c (format_unsigned_integer, format_signed_integer):
 	Additional fixes. New added tests pass.
 
+2024-07-29         Mike Haertel		 <mike@ducky.net>
+
+	* re.c (re_numsubpats): For MinRX, return re_nsub + 1.
+
 2024-08-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Per Andy's suggestion, @ns_include --> @nsinclude.
@@ -830,6 +890,11 @@
 
 	* re.c (check_bracket_exp): Make the code actually work.
 
+2024-07-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* re.c (refree): Call minrx_regfree() on rp->mre_pat.
+	Thanks to valgrind and Mike Haertel.
+
 2024-07-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	Finish cleaning up the printf refactoring. All tests run, both
@@ -856,6 +921,10 @@
 2024-07-20         Tim Rice              <trice@posteo.net>
 
 	* io.c (csvscan): Set the sentinel if we found CR-LF.
+
+2024-07-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* version.c: Add "-minrx" to the version, for now.
 
 2024-07-20         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -996,6 +1065,37 @@
 	trying to compare them. Thanks to Ed Morton for the bug
 	report. See test/strsubscript.awk for the test case.
 
+2024-02-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Document all the changes needed for MinRX integration.
+	Some of these are temporary while MinRX is still in C++;
+	it should eventually be rewritten in C.
+
+	* Makefile.am (CCLD): Set to g++ in order to get gawk to link.
+	* awk.h: Include "minrx.h".
+	(struct Regexp): Add in minrx members.
+	(restart, re_end, resubpatstart, resubpatend, renumsubpats): Declare
+	new functions.
+	(RESTART, RE_END, RESUBPATSTART, RESUBPATEND, RENUMSUBPATS): Change
+	the macros to call the functions.
+	(use_gnu_matchers): Declare new variable.
+	* awkgram.y: Lint warning about /*...*/ comment is only true for
+	the GNU matchers.
+	* builtin.c (do_match): `s' is now ssize_t.
+	(do_sub): Fix value of len parameter in all to research depending upon
+	the matcher.
+	* configure.ac: Set CXXFLAGS if we have C++ versions of the files.
+	* main.c (use_gnu_matchers): Define, set to false.
+	(main): Check for GAWK_GNU_MATCHERS env var and set use_gnu_matchers
+	to true if it exists.
+	(parse_args): Temporarily add 'G' flag for using GNU matchers.
+	* re.c (get_minrx_regerror): New routine.
+	(make_regexp): Adjust for the fact that we can use either GNU matchers
+	or minrx.
+	(research): Ditto.
+	(restart, re_end, resubpatstart, resubpatend, renumsubpats): New functions.
+	Eventually these should be turned back into macros.
+	
 2024-02-29         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* re.c (do_sub): Fix arguments in call to SUBPATSTART().

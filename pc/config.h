@@ -18,9 +18,6 @@
 /* Define to 1 if we have ADDR_NO_RANDOMIZE value */
 #undef HAVE_ADDR_NO_RANDOMIZE
 
-/* Define to 1 if you have the `alarm' function. */
-#define HAVE_ALARM 1
-
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
@@ -106,15 +103,6 @@
 /* Define to 1 if you have the `isblank' function. */
 #undef HAVE_ISBLANK
 
-/* Define to 1 if you have the `iswctype' function. */
-#define HAVE_ISWCTYPE 1
-
-/* Define to 1 if you have the `iswlower' function. */
-#define HAVE_ISWLOWER 1
-
-/* Define to 1 if you have the `iswupper' function. */
-#define HAVE_ISWUPPER 1
-
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 #define HAVE_LANGINFO_CODESET 1
 
@@ -136,38 +124,17 @@
 /* Define to 1 if you have the `lstat' function. */
 #undef HAVE_LSTAT
 
-/* Define to 1 if you have the `mbrlen' function. */
-#define HAVE_MBRLEN 1
-
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #define HAVE_MBRTOWC 1
 
 /* Define to 1 if you have the <mcheck.h> header file. */
 #undef HAVE_MCHECK_H
 
-/* Define to 1 if you have the `memcmp' function. */
-#define HAVE_MEMCMP 1
-
-/* Define to 1 if you have the `memcpy' function. */
-#define HAVE_MEMCPY 1
-
-/* Define to 1 if you have the `memmove' function. */
-#define HAVE_MEMMOVE 1
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the `memset' function. */
-#define HAVE_MEMSET 1
-
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
-
-/* Define to 1 if you have the `mkstemp' function. */
-#undef HAVE_MKSTEMP
-
-/* we have the mktime function */
-#define HAVE_MKTIME 1
 
 /* Define to 1 if you have fully functional mpfr and gmp libraries. */
 /* #undef HAVE_MPFR */
@@ -187,6 +154,9 @@
 /* Define to 1 if you have the `posix_openpt' function. */
 #undef HAVE_POSIX_OPENPT
 
+/* Define to 1 if you have the `posix_spawnp' function. */
+#undef HAVE_POSIX_SPAWNP
+
 /* Define to 1 if you have the `setenv' function. */
 #define HAVE_SETENV 1
 
@@ -198,9 +168,6 @@
 
 /* Define to 1 if you have the `sigprocmask' function. */
 #undef HAVE_SIGPROCMASK
-
-/* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1
 
 /* newer systems define this type here */
 #define HAVE_SOCKADDR_STORAGE 1
@@ -231,14 +198,8 @@
 /* Define to 1 if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
 
-/* Define to 1 if you have the `strchr' function. */
-#define HAVE_STRCHR 1
-
 /* Define to 1 if you have the `strcoll' function. */
 #undef HAVE_STRCOLL
-
-/* Define to 1 if you have the `strerror' function. */
-#define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `strftime' function. */
 /* MinGW uses the replacement from missing_d, to support the %e specifier.  */
@@ -262,12 +223,6 @@
 /* Define to 1 if you have the `strsignal' function. */
 #define HAVE_STRSIGNAL 1
 
-/* Define to 1 if you have the `strtod' function. */
-#define HAVE_STRTOD 1
-
-/* Define to 1 if you have the `strtoul' function. */
-#define HAVE_STRTOUL 1
-
 /* Define to 1 if `gr_passwd' is a member of `struct group'. */
 #undef HAVE_STRUCT_GROUP_GR_PASSWD
 
@@ -279,9 +234,6 @@
 
 /* Define to 1 if `tm_zone' is a member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
-
-/* Define to 1 if you have the `system' function. */
-#define HAVE_SYSTEM 1
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
@@ -316,25 +268,13 @@
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
 
-/* Define to 1 if you have the `tmpfile' function. */
-#undef HAVE_TMPFILE
-
 /* Define to 1 if your `struct tm' has `tm_zone'. Deprecated, use
    `HAVE_STRUCT_TM_TM_ZONE' instead. */
 #undef HAVE_TM_ZONE
 
-/* Define to 1 if you have the `towlower' function. */
-#define HAVE_TOWLOWER 1
-
-/* Define to 1 if you have the `towupper' function. */
-#define HAVE_TOWUPPER 1
-
 /* Define to 1 if you don't have `tm_zone' but do have the external array
    `tzname'. */
 #define HAVE_TZNAME 1
-
-/* Define to 1 if you have the `tzset' function. */
-#define HAVE_TZSET 1
 
 /* Define to 1 if the system has the type `uintmax_t'. */
 #define HAVE_UINTMAX_T 1
@@ -345,20 +285,11 @@
 /* Define to 1 if the system has the type `unsigned long long int'. */
 #undef HAVE_UNSIGNED_LONG_LONG_INT
 
-/* Define to 1 if you have the `usleep' function. */
-#define HAVE_USLEEP 1
-
 /* Define to 1 if you have the `waitpid' function. */
 #undef HAVE_WAITPID
 
 /* Define to 1 if you have the <wchar.h> header file. */
 #define HAVE_WCHAR_H 1
-
-/* Define to 1 if you have the `wcrtomb' function. */
-#define HAVE_WCRTOMB 1
-
-/* Define to 1 if you have the `wcscoll' function. */
-#define HAVE_WCSCOLL 1
 
 /* Define to 1 if you have the `wctype' function. */
 #define HAVE_WCTYPE 1
@@ -391,7 +322,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.3.2"
+#define PACKAGE_STRING "GNU Awk 5.3.61"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -400,7 +331,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.3.60"
+#define PACKAGE_VERSION "5.3.61"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -528,7 +459,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.3.60"
+#define VERSION "5.3.61"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

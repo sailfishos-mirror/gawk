@@ -35,6 +35,8 @@ EXTRA_DIST = \
         ChangeLog.0 \
 	Makefile.am \
 	Makefile.in \
+	charset.c \
+	charset.h \
 	pma.h \
 	pma.c \
 	regcomp.c \
@@ -62,6 +64,8 @@ libsupport_a_SOURCES = \
 	libc-config.h \
 	localeinfo.c \
 	localeinfo.h \
+	minrx.c \
+	minrx.h \
 	random.c \
 	random.h \
 	regex.c \

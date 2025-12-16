@@ -514,11 +514,13 @@ particular records in a file and perform operations upon them.
 * Regexp Operators::                    Regular Expression Operators.
 * Regexp Operator Details::             The actual details.
 * Interval Expressions::                Notes on interval expressions.
+* Non-greedy operators::                The POSIX 2024 shortest match operators.
 * Bracket Expressions::                 What can go between @samp{[...]}.
 * Leftmost Longest::                    How much text matches.
 * Computed Regexps::                    Using Dynamic Regexps.
 * GNU Regexp Operators::                Operators specific to GNU software.
 * Case-sensitivity::                    How to do case-insensitive matching.
+* Choosing Matchers::                   Selecting the regexp matcher.
 * Regexp Summary::                      Regular expressions summary.
 * Records::                             Controlling how data is split into
                                         records.
@@ -840,6 +842,8 @@ particular records in a file and perform operations upon them.
 * Anagram Program::                     Finding anagrams from a dictionary.
 * Signature Program::                   People do amazing things with too much
                                         time on their hands.
+* Shortest match program::              Demonstrate shortest and longest match
+                                        operators.
 * Programs Summary::                    Summary of programs.
 * Programs Exercises::                  Exercises.
 * Nondecimal Data::                     Allowing nondecimal input data.
@@ -5374,6 +5378,7 @@ regular expressions work, we present more complicated instances.
 * Computed Regexps::            Using Dynamic Regexps.
 * GNU Regexp Operators::        Operators specific to GNU software.
 * Case-sensitivity::            How to do case-insensitive matching.
+* Choosing Matchers::           Selecting the regexp matcher.
 * Regexp Summary::              Regular expressions summary.
 @end menu
 
@@ -5740,6 +5745,7 @@ increase the power and versatility of regular expressions.
 @menu
 * Regexp Operator Details::     The actual details.
 * Interval Expressions::        Notes on interval expressions.
+* Non-greedy operators::        The POSIX 2024 shortest match operators.
 @end menu
 
 @node Regexp Operator Details
@@ -5891,6 +5897,13 @@ Second, @samp{*} finds as many repetitions as possible. If the text
 to be matched is @samp{phhhhhhhhhhhhhhooey}, @samp{ph*} matches all of
 the @samp{h}s.
 
+@cindex @code{*?} (asterisk) @subentry @code{*?} operator @subentry as regexp operator
+@cindex asterisk (@code{*?}) @subentry @code{*?} operator @subentry as regexp operator
+@item @code{*?}
+Shortest match or @dfn{non-greedy} version of the @samp{*} operator.
+This operator and the other non-greedy operators are discussed separately,
+shortly, in @ref{Non-greedy operators}.
+
 @cindex @code{+} (plus sign) @subentry regexp operator
 @cindex plus sign (@code{+}) @subentry regexp operator
 @item @code{+}
@@ -5899,12 +5912,22 @@ matched at least once.  This means that @samp{wh+y}
 would match @samp{why} and @samp{whhy}, but not @samp{wy}, whereas
 @samp{wh*y} would match all three.
 
+@cindex @code{+?} (plus sign) @subentry regexp operator
+@cindex plus sign (@code{+?}) @subentry regexp operator
+@item @code{+?}
+Shortest match or non-greedy version of the @samp{+} operator.
+
 @cindex @code{?} (question mark) @subentry regexp operator
 @cindex question mark (@code{?}) @subentry regexp operator
 @item @code{?}
 This symbol is similar to @samp{*}, except that the preceding expression can be
 matched either once or not at all.  For example, @samp{fe?d}
 matches @samp{fed} and @samp{fd}, but nothing else.
+
+@cindex @code{??} (plus sign) @subentry regexp operator
+@cindex plus sign (@code{??}) @subentry regexp operator
+@item @code{??}
+Shortest match or non-greedy version of the @samp{?} operator.
 
 @cindex @code{@{@}} (braces) @subentry regexp operator
 @cindex braces (@code{@{@}}) @subentry regexp operator
@@ -5930,6 +5953,13 @@ Matches @samp{whhhy}, @samp{whhhhy}, or @samp{whhhhhy} only.
 @item wh@{2,@}y
 Matches @samp{whhy}, @samp{whhhy}, and so on.
 @end table
+
+@cindex @code{@{@}?} (braces) @subentry regexp operator
+@cindex braces (@code{@{@}?}) @subentry regexp operator
+@item @code{@{}@var{n}@code{@}?}
+@itemx @code{@{}@var{n}@code{,@}?}
+@itemx @code{@{}@var{n}@code{,}@var{m}@code{@}?}
+Shortest match or non-greedy versions of the @samp{@{@}} operators.
 @end table
 
 @cindex precedence @subentry regexp operators
@@ -6049,6 +6079,158 @@ be used in portable programs anyway.
 
 @noindent
 This same caveat applies to @command{gawk}.
+
+@node Non-greedy operators
+@subsection Shortest Match, or ``Non-greedy'' Regexp Operators
+
+Traditionally, regexps have always matched the leftmost, longest
+sequence of characters.  For example, given the text @samp{abxxxcd},
+the regexp @samp{x+} could match one, two, or all three @samp{x} characters.
+By defining a regexp to match the longest possible sequence, we know that
+@samp{x+} will match all three @samp{x}s.  Such behavior may
+be termed @dfn{greedy}, since a regexp will match as many characters
+as possible.
+
+The Perl language introduced ``non-greedy,'' or shortest-match operators.
+In the above example, @samp{x+} would only match a single @samp{x}.
+
+The 2024 POSIX standard introduced shortest-match operators into POSIX
+EREs.  Syntactically, you create a shortest-match operator by appending
+a @samp{?} to one of the traditional regexp operators: @samp{*}, @samp{+},
+@samp{?}, or @samp{@{@}}.
+
+The shortest-match operators don't always match what you might think would
+be the smallest sequence of characters, since the general, leftmost-longest
+rule still applies to the overall regexp.
+
+To illustrate the differences, we use a program named @file{shortest-match.awk}.
+This program takes several strings, and replaces the text matching a given
+pattern with a single @samp{X}.  The program uses a number of @command{gawk}-specific
+features which haven't yet been described. We therefore delay presenting the
+code until @ref{Shortest match program}.
+
+For each string, the program prints the following:
+
+@itemize @bullet
+@item
+The original string, in quotes.
+
+@item
+The pattern used with a shortest match operator and the result, indented.
+
+@item
+Further indented is a list of the start and lengthes of the submatches.
+Submatch zero is the whole string, submatch one is the first
+parenthesized expression, and so on.
+
+@item
+The pattern used with a regular match operator and the result, indented.
+
+@item
+The same start plus length information for submatches of
+the long pattern.
+@end itemize
+
+Here is the output, with commentary:
+
+@example
+"aaaxxxzzz"
+    shortpat: /x+?/, result: "aaaXxxzzz"
+        0: (s: 4, l: 1) -> "x"
+    longpat: /x+/, result: "aaaXzzz"
+        0: (s: 4, l: 3) -> "xxx"
+@end example
+
+@noindent
+For the shortest match, only one @samp{x} is replaced.
+For the longest match, every @samp{x} is replaced.
+Ths is pretty straightforward.
+
+@example
+"aaaxxxyzzz"
+    shortpat: /x+?y/, result: "aaaXzzz"
+        0: (s: 4, l: 4) -> "xxxy"
+    longpat: /x+y/, result: "aaaXzzz"
+        0: (s: 4, l: 4) -> "xxxy"
+@end example
+
+@noindent
+In this case, the result is the same, since the longest
+possible string of characters is matched.
+
+@example
+"aaaxxxxxxxxxxxxxxxxzzz"
+    shortpat: /(x+?)(x+)(x+?)(x+)/, result: "aaaXzzz"
+        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
+        1: (s: 4, l: 1) -> "x"
+        2: (s: 5, l: 13) -> "xxxxxxxxxxxxx"
+        3: (s: 18, l: 1) -> "x"
+        4: (s: 19, l: 1) -> "x"
+    longpat: /(x+)(x+)(x+)(x+)/, result: "aaaXzzz"
+        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
+        1: (s: 4, l: 13) -> "xxxxxxxxxxxxx"
+        2: (s: 17, l: 1) -> "x"
+        3: (s: 18, l: 1) -> "x"
+        4: (s: 19, l: 1) -> "x"
+@end example
+
+@noindent
+This case is more interesting.
+The same total amount of text is matched for both patterns.
+However, the text matched by the subexpressions differs
+between the two cases. In the longest-match case, the 
+longest possible subexpressions match first.
+
+@example
+"aaaxyxxyxxyxzzz"
+    shortpat: /((x+)(y+?)(x+))+/, result: "aaaXyxxyxzzz"
+        0: (s: 4, l: 4) -> "xyxx"
+        1: (s: 4, l: 4) -> "xyxx"
+        2: (s: 4, l: 1) -> "x"
+        3: (s: 5, l: 1) -> "y"
+        4: (s: 6, l: 2) -> "xx"
+    longpat: /((x+)(y+)(x+))+/, result: "aaaXzzz"
+        0: (s: 4, l: 9) -> "xyxxyxxyx"
+        1: (s: 10, l: 3) -> "xyx"
+        2: (s: 10, l: 1) -> "x"
+        3: (s: 11, l: 1) -> "y"
+        4: (s: 12, l: 1) -> "x"
+@end example
+
+@noindent
+This case needs careful examination. There is a @samp{+} on the outside,
+meaning that the total inner expression may match multiple times.
+For the longest-match expression, that indeed happens. The subexpressions
+two through four have the start and length values for the last occasion
+where the inner expression matched.  The shortest-match expression
+only matched the inner expression once.
+
+@example
+"aaaxyxxyxxyxzzz"
+    shortpat: /((x+)(y+?)(x+))@{2@}/, result: "aaaXyxzzz"
+        0: (s: 4, l: 7) -> "xyxxyxx"
+        1: (s: 7, l: 4) -> "xyxx"
+        2: (s: 7, l: 1) -> "x"
+        3: (s: 8, l: 1) -> "y"
+        4: (s: 9, l: 2) -> "xx"
+    longpat: /((x+)(y+)(x+))@{2@}/, result: "aaaXyxzzz"
+        0: (s: 4, l: 7) -> "xyxxyxx"
+        1: (s: 7, l: 4) -> "xyxx"
+        2: (s: 7, l: 1) -> "x"
+        3: (s: 8, l: 1) -> "y"
+        4: (s: 9, l: 2) -> "xx"
+@end example
+
+@noindent
+Here, the results are identical; both the nature of the string
+to be matched and the POSIX longest-leftmost rule, cause this to happen.
+
+@c FIXME: Update this when the GNU matchers are finally gone.
+The MinRX regular expression matching engine, which is @command{gawk}'s
+default matcher (@pxref{Choosing Matchers}), supports the shortest-match
+operators.  The older GNU matchers do not.  Also, when invoked with the
+@option{--traditional} option, shortest-match operators are not supported,
+since traditional @command{awk} does not have these operators.
 
 @node Bracket Expressions
 @section Using Bracket Expressions
@@ -6673,6 +6855,45 @@ right thing.}
 The value of @code{IGNORECASE} has no effect if @command{gawk} is in
 compatibility mode (@pxref{Options}).
 Case is always significant in compatibility mode.
+
+@node Choosing Matchers
+@section Selecting the Regexp Matching Engine
+
+Release 5.4.0 of @command{gawk} introduced a new
+regular expression matching engine, named
+@uref{https://github.com/mikehaertel/minrx, MinRX}.
+
+MinRX is fully compliant with the POSIX standard for Extended
+Regular Expressions (EREs), including the additional features needed
+by @command{awk} and @command{gawk}.  It is also a little stricter
+in terms of accepting valid regular expression syntax when specifying
+a regexp.  (These restrictions apply to corner cases that should
+not come up in day-to-day use.)
+
+Previously, @command{gawk} used GNU @code{regex} and @code{dfa}
+from GNULIB. These matchers are fast and generally robust, albeit not
+fully POSIX compliant.  MinRX replaces both of them.
+
+Because regular expression matching is such a fundamental part of what
+@command{awk} programs do, introducing a new regular expression engine
+has some risk associated with it.  To alleviate the risk, for the
+term of one major release, @command{gawk} continues to provide access
+to the original regexp matchers should that be needed.
+
+@cindex environment variables @subentry @env{GAWK_GNU_MATCHERS}
+If the environment variable @env{GAWK_GNU_MATCHERS} exists, then
+@command{gawk} switches to using GNU @code{regex} and @code{dfa},
+as previously.  Otherwise, the MinRX matcher is the default and
+that is what it uses.
+
+Should you find a need to switch from MinRX to the original matchers,
+@emph{please} submit a bug report describing what did not work
+(@pxref{Bugs}).  Doing so is very important, as it will help the
+maintainers and the MinRX author fix any issues that are found.
+
+After one major release, the old matchers, and the use of the
+@env{GAWK_GNU_MATCHERS} environment variable, will be removed
+from @command{gawk}.
 
 @node Regexp Summary
 @section Summary
@@ -27400,6 +27621,8 @@ We hope you find them both interesting and enjoyable.
 * Anagram Program::             Finding anagrams from a dictionary.
 * Signature Program::           People do amazing things with too much time on
                                 their hands.
+* Shortest match program::      Demonstrate shortest and longest match
+                                operators.
 @end menu
 
 @node Dupword Program
@@ -29291,6 +29514,91 @@ BEGIN {
     x - O                                #  10 \n
 }
 @end ignore
+
+@node Shortest match program
+@subsection Demonstrating Shortest and Longest Match Operators
+
+In @ref{Non-greedy operators}, we described the
+POSIX 2024 shortest-match operators, and show the output
+of a program that demonstrated the differences.
+Here is the program, @file{shortest-match.awk}:
+
+@example
+@c file eg/prog/shortest-match.awk
+# shortest-match.awk --- Demonstrate shortest match operators
+@c endfile
+@ignore
+@c file eg/prog/shortest-match.awk
+#
+# Arnold Robbins, arnold@@skeeve.com, Public Domain
+# March, 2025
+@c endfile
+@end ignore
+
+@c file eg/prog/shortest-match.awk
+BEGIN @{
+    text[1] = "aaaxxxzzz";
+        shortpat[1] = @/x+?/
+        longpat[1] = @/x+/
+    text[2] = "aaaxxxyzzz";
+        shortpat[2] = @/x+?y/
+        longpat[2] = @/x+y/
+    text[3] = "aaaxxxxxxxxxxxxxxxxzzz";
+        shortpat[3] = @/(x+?)(x+)(x+?)(x+)/
+        longpat[3] = @/(x+)(x+)(x+)(x+)/
+    text[4] = "aaaxyxxyxxyxzzz"
+        shortpat[4] = @/((x+)(y+?)(x+))+/
+        longpat[4] = @/((x+)(y+)(x+))+/
+    text[5] = "aaaxyxxyxxyxzzz"
+        shortpat[5] = @/((x+)(y+?)(x+))@{2@}/
+        longpat[5] = @/((x+)(y+)(x+))@{2@}/
+
+    count = length(text)
+    for (i = 1; i <= count; i++) @{
+        show(text[i], shortpat[i], longpat[i])
+    @}
+@}
+
+# show --- show the results of using shortest- and longest-match operators
+
+function show(text, shortpat, longpat,
+          s_offsets, l_offsets, i, n)   # locals
+@{
+    printf("\"%s\"\n", text)
+
+    match(text, shortpat, s_offsets)
+    subresult = gensub(shortpat, "X", 1, text)
+    printf("\tshortpat: /%s/, result: \"%s\"\n", shortpat, subresult)
+    dump(text, s_offsets)
+
+    match(text, longpat, l_offsets)
+    subresult = gensub(longpat, "X", 1, text)
+    printf("\tlongpat: /%s/, result: \"%s\"\n", longpat, subresult)
+    dump(text, l_offsets)
+@}
+
+# dump --- dump out the start and length of subpattern matches
+
+function dump(text, offsets,    i, n, s, l)
+@{
+    n = length(offsets)
+    for (i = 0; i <= n; i++) @{
+        if ((i, "start") in offsets) @{
+            s = offsets[i, "start"]
+            l = offsets[i, "length"]
+            printf("\t\t%d: (s: %d, l: %d) -> \"%s\"\n", i,
+                s, l, substr(text, s, l))
+        @}
+    @}
+@}
+@c endfile
+@end example
+
+The program makes use of strongly typed
+regexp constants (@pxref{Strong Regexp Constants}),
+the optional fourth argument to the @code{match()}
+function, and the @code{gensub()} and @code{substr()}
+functions (@pxref{String Functions}).
 
 @node Programs Summary
 @section Summary
@@ -42302,6 +42610,13 @@ GNU/Linux distributions.
 Version 5.4 added the following features:
 
 @itemize
+
+@item
+Use of the new MinRX regular expression matcher as the default
+matching engine
+(@pxref{Choosing Matchers}).
+This brings full POSIX compliance to @command{gawk}'s
+regular expression matching.
 
 @cindex @code{@@} (at-sign) @subentry @code{@@nsinclude} directive
 @cindex at-sign (@code{@@}) @subentry @code{@@nsinclude} directive

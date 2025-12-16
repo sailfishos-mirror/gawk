@@ -26,7 +26,7 @@ BEGIN {
 	a
 	f(/pqr/)
 	//
-	/* */
+	# /* */		# not good with minrx
 }
 END {
 	getline
