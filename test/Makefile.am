@@ -338,6 +338,9 @@ EXTRA_DIST = \
 	elemnew3.ok \
 	elemnew4.awk \
 	elemnew4.ok \
+	equiv.awk \
+	equiv.in \
+	equiv.ok \
 	escapebrace.awk \
 	escapebrace.in \
 	escapebrace.ok \
@@ -1218,6 +1221,9 @@ EXTRA_DIST = \
 	regexpbrack2.ok \
 	regexprange.awk \
 	regexprange.ok \
+	regexpuparrow.awk \
+	regexpuparrow.in \
+	regexpuparrow.ok \
 	regexsub.awk \
 	regexsub.ok \
 	reginttrad.awk \
@@ -1324,6 +1330,8 @@ EXTRA_DIST = \
 	shadow.ok \
 	shadowbuiltin.awk \
 	shadowbuiltin.ok \
+	shortest-match.awk \
+	shortest-match.ok \
 	sigpipe1.awk \
 	sigpipe1.ok \
 	sort1.awk \
@@ -1563,6 +1571,7 @@ CLEANFILES = core core.* fmtspcl.ok
 
 # try to keep these sorted. each letter starts a new line
 BASIC_TESTS = \
+	regexpuparrow shortest-match \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 \
 	arryref2 arryref3 arryref4 arryref5 arynasty arynocls aryprm1 \
@@ -1619,6 +1628,7 @@ UNIX_TESTS = \
 	space strftlng
 
 GAWK_EXT_TESTS = \
+	equiv \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc \
 	ar2fn_elnew_sc2 ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val \
 	argtest arraysort arraysort2 arraytype asortbool asortsymtab \
