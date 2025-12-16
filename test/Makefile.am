@@ -1785,8 +1785,8 @@ EXPECTED_FAIL_ZOS = \
 	gsubnulli18n gsubtst5 ignrcas2 inf-nan-torture iolint lc_num1 \
 	mbfw1 mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
 	mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest nofile nonfatal2 \
-	numrange posix_compare printf-corners printhuge profile5 rebt8b2 \
-	regexpbad regrange reint2 rri1 sigpipe1 sort1 sortfor sortu \
+	numrange posix_compare printf-corners printhuge profile5 randtest \
+	rebt8b2 regexpbad regrange reint2 rri1 sigpipe1 sort1 sortfor sortu \
 	space sprintfc subamp subi18n symtab1 symtab11 symtab8 timeout \
 	unicode1 wideidx wideidx2 widesub widesub2 widesub3 widesub4
 
