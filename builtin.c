@@ -1679,8 +1679,10 @@ do_match(int nargs)
 	// it with extra TLC.
 	if (tre->type == Node_dynregex
 	    && tre->re_exp->valref > 1
-	    && (tre->re_exp->flags & MALLOC) == 0)
+	    && (tre->re_exp->flags & MALLOC) == 0) {
 		unref(tre->re_exp);
+		tre->re_exp = NULL;
+	}
 	unref(RSTART_node->var_value);
 	RSTART_node->var_value = make_number((AWKNUM) rstart);
 	unref(RLENGTH_node->var_value);

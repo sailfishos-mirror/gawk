@@ -1790,7 +1790,7 @@ EXPECTED_FAIL_MINGW = \
 EXPECTED_FAIL_ZOS = \
 	aasort aasorti arraysort asort asorti backbigs1 backsmalls1 \
 	backsmalls2 beginfile1 beginfile2 charasbytes clos1way6 \
-	cmdlinefsbacknl2 cmdlinefsbacknl2 commas concat4 dbugarray4 \
+	cmdlinefsbacknl2 commas concat4 dbugarray4 \
 	dfamb1 double1 double2 elemnew4 errno fmttest forcenum getlndir \
 	gsubnulli18n gsubtst5 ignrcas2 inf-nan-torture iolint lc_num1 \
 	mbfw1 mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
