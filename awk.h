@@ -240,6 +240,12 @@ extern int re_numsubpats(Regexp *rp, const char *s);
 
 #define AWKNUM	double
 
+/* On z/OS, the xlc compiler doesn't yield consistent enum sizes
+   unless specifically requested.  */
+#ifdef __MVS__
+#pragma enum(int)
+#endif
+
 enum defrule { BEGIN = 1, Rule, END, BEGINFILE, ENDFILE,
 	MAXRULE /* sentinel, not legal */ };
 extern const char *const ruletab[];
