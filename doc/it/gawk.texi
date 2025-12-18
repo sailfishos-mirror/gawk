@@ -592,12 +592,16 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Operatori di espressioni regolari::   Operatori di espressioni regolari.
 * Dettagli sugli operatori di @dfn{regexp}:: Descrizione dettagliata.
 * Espressioni di intervallo::           Note sulle espressioni di intervallo.
+* Operatori non-avidi::                 Operatori per trovare corrispondenza
+                                        minima di POSIX 2024.
 * Espressioni tra parentesi quadre::    Cosa possono contenere @samp{[...]}.
-* Pi@`u lungo da sinistra::               Quanto @`e lungo il testo individuato.
+* Pi@`u lungo da sinistra::             Quanto @`e lungo il testo individuato.
 * Espressioni regolari calcolate::      Usare @dfn{regexp} dinamiche.
 * Operatori di @dfn{regexp} GNU::       Operatori propri del software GNU.
 * Maiuscolo-Minuscolo::                 Fare confronti ignorando
                                         maiuscolo/minuscolo.
+* Scegliere il motore per @dfn{regexp}::   Scegliere come gestire le
+                                        espressioni regolari.
 * Sommario espressioni regolari::       Sommario delle espressioni regolari.
 * Record::                              Controllare come i dati sono suddivisi
                                         in record.
@@ -949,6 +953,8 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         parole.
 * Programma signature::                 La gente fa cose stupefacenti se ha
                                         troppo tempo libero.
+* Programma shortest-match::            Come usare operatori per trovare una
+                                        corrispondenza corta e lunga.
 * Sommario dei programmi::              Sommario dei programmi.
 * Esercizi sui programmi::              Esercizi.
 * Dati non decimali::                   Consentire dati di input in base
@@ -5971,11 +5977,13 @@ complesse.
 * Sequenze di protezione::              Come scrivere caratteri non stampabili.
 * Operatori di espressioni regolari::   Operatori di espressioni regolari.
 * Espressioni tra parentesi quadre::    Cosa possono contenere @samp{[...]}.
-* Pi@`u lungo da sinistra::               Quanto @`e lungo il testo individuato.
+* Pi@`u lungo da sinistra::             Quanto @`e lungo il testo individuato.
 * Espressioni regolari calcolate::      Usare @dfn{regexp} dinamiche.
 * Operatori di @dfn{regexp} GNU::       Operatori propri del software GNU.
 * Maiuscolo-Minuscolo::                 Fare confronti ignorando
                                         maiuscolo/minuscolo.
+* Scegliere il motore per @dfn{regexp}::   Scegliere come gestire le
+                                        espressioni regolari.
 * Sommario espressioni regolari::       Sommario delle espressioni regolari.
 @end menu
 
@@ -6365,6 +6373,8 @@ aumentarne il potere e la versatilit@`a.
 @menu
 * Dettagli sugli operatori di @dfn{regexp}::     Descrizione dettagliata.
 * Espressioni di intervallo::                    Note sulle espressioni di intervallo.
+* Operatori non-avidi::                          Operatori per trovare corrispondenza
+                                                 minima di POSIX 2024.
 @end menu
 
 @node Dettagli sugli operatori di @dfn{regexp}
@@ -6538,6 +6548,13 @@ Secondo, @samp{*} trova quante pi@`u ripetizioni siano possibili.  Se il testo
 da ricercare @`e @samp{phhhhhhhhhhhhhhooey}, @samp{ph*} individua tutte le
 @samp{h}.
 
+@cindex @code{*?} (asterisco) @subentry operatore @code{*?} @subentry come operatore @dfn{regexp}
+@cindex asterisco (@code{*?}) @subentry operatore @code{*?} @subentry come operatore @dfn{regexp}
+@item @code{*?}
+La corrispondenza pi@`u corta o @dfn{non-avida} dell'operatore @samp{*}.
+Questo operatore, e gli altri operatori @dfn{non-avidi} sono spiegati
+a parte, pi@`u avanti, in @ref{Operatori non-avidi}.
+
 @cindex @code{+} (pi@`u) @subentry operatore @dfn{regexp}
 @cindex pi@`u (@code{+}) @subentry operatore @dfn{regexp}
 @item @code{+}
@@ -6546,6 +6563,11 @@ precedente dev'essere trovata almeno una volta.  Questo significa che
 @samp{wh+y} individuerebbe @samp{why} e @samp{whhy}, ma non @samp{wy}, mentre
 @samp{wh*y} li troverebbe tutti e tre.
 
+@cindex @code{+?} (pi@`u) @subentry operatore @dfn{regexp}
+@cindex pi@`u (@code{+?}) @subentry operatore @dfn{regexp}
+@item @code{+?}
+La corrispondenza pi@`u corta o @dfn{non-avida} dell'operatore @samp{+}.
+
 @cindex @code{?} (punto interrogativo) @subentry operatore @dfn{regexp}
 @cindex punto interrogativo (@code{?}) @subentry operatore @dfn{regexp}
 @item @code{?}
@@ -6553,6 +6575,11 @@ Questo simbolo @`e simile a @samp{*}, tranne per il fatto che l'espressione che
 precede pu@`o essere trovata una volta sola oppure non trovata
 affatto.  Per esempio, @samp{fe?d}
 individua @samp{fed} e @samp{fd}, ma nient'altro.
+
+@cindex @code{??} (pi@`u) @subentry operatore @dfn{regexp}
+@cindex pi@`u (@code{??}) @subentry operatore @dfn{regexp}
+@item @code{??}
+La corrispondenza pi@`u corta o @dfn{non-avida} dell'operatore @samp{?}.
 
 @cindex @code{@{@}} (parentesi graffe) @subentry operatore @dfn{regexp}
 @cindex parentesi @subentry graffe (@code{@{@}}) @subentry operatore @dfn{regexp}
@@ -6579,6 +6606,13 @@ Riconosce soltanto @samp{whhhy}, @samp{whhhhy}, o @samp{whhhhhy}.
 @item wh@{2,@}y
 Riconosce @samp{whhy}, @samp{whhhy} e cos@`{@dotless{i}} via.
 @end table
+
+@cindex @code{@{@}?} (parentesi graffe) @subentry operatore @dfn{regexp}
+@cindex parentesi graffe (@code{@{@}?}) @subentry operatore @dfn{regexp}
+@item @code{@{}@var{n}@code{@}?}
+@itemx @code{@{}@var{n}@code{,@}?}
+@itemx @code{@{}@var{n}@code{,}@var{m}@code{@}?}
+La corrispondenza pi@`u corta o @dfn{non-avida} degli operatori @samp{@{@}}.
 @end table
 
 @cindex precedenza @subentry operatori @dfn{regexp}
@@ -6712,6 +6746,175 @@ di @command{grep}].
 
 @noindent
 Lo stesso vale anche per @command{gawk}.
+
+@node Operatori non-avidi
+@subsection La corrispondenza pi@`u corta, operatori @dfn{regexp} ``non-avidi''
+
+Tradizionalmente, le espressioni regolari individuano la sequenza di
+caratteri corrispondenti pi@`u lunga, a partire da sinistra.
+Per esempio, data la stringa @samp{abxxxcd}, l'espressione regolare
+@samp{x+} individua uno, due, o tutti e tre i caratteri @samp{x}.
+Avendo definito un'espressione regolare che individua la sequenza pi@`u
+lunga possibile, sappiamo che @samp{x+} trover@`a tutte e tre le lettere
+@samp{x}.  Un tale comportamento pu@`o essere definito @dfn{avido},
+poich@'e un'espressione regolare individuer@`a quanti pi@`u caratteri
+possibile.
+
+Il linguaggio Perl ha introdotto operatori ``non-avidi,'' che
+individuano la corrispondenza pi@`u corta possibile.
+Nell'esempio visto sopra, @samp{x+} individuerebbe solo il primo
+@samp{x}.
+
+Lo standard POSIX 2024 ha introdotto gli operatori ``non-avidi'' nelle
+ERE (Espressioni Regolari Estese).  Sintatticamente, si pu@`o creare un
+operatore ``non-avido'' aggiungendo semplicemente un @samp{?} a uno
+di questi tradizionali operatori di espressione regolare:
+@samp{*}, @samp{+}, @samp{?} o @samp{@{@}}.
+
+Gli operatori ``non-avidi'' non sempre individuano quello che sarebbe
+la stringa di caratteri pi@`u corta, perch@'e nell'espressione in generale
+rimane sempre valida la regola "a partire da sinistra".
+
+Per mostrare le differenze, useremo un programma chiamato
+@file{shortest-match.awk}.
+Questo programma considera parecchie stringhe, e sostituisce il testo
+individuato in ciascun caso con una sola lettera, la @samp{X}.
+Il programma usa alcune funzionalit@`a proprie di @command{gawk} che non
+sono ancora state spiegate.  Il codice sorgente del programma verr@`a
+quindi descritto solo in @ref{Programma shortest-match}.
+
+Per ogni stringa, il programma stampa quanto segue:
+
+@itemize @bullet
+@item
+La stringa originale, fra apici.
+
+@item
+L'espressione regolare usata con un operatore ``non-avido''
+(shortpat), e il risultato, rientrato.
+
+@item
+Ulteriormente rientrata, c'@`e una lista che dice dove iniziano e quanto
+sono lunghe le sotto-corrispondenze.
+La sotto-corrispondenza numero 0 @`e la stringa di partenza, la
+sotto-corrispondenza 1 @`e la prima espressione tra parentesi, e
+cos@`{@dotless{i}} via.
+
+@item
+L'espressione usata con uno degli operatori tradizionali (longpat),
+e il risultato, rientrato.
+
+@item
+Le stesse informazioni che dicono dove iniziano e quanto
+sono lunghe le sotto-corrispondenze nel caso tradizionale.
+@end itemize
+
+Questo @`e l'output del programma, commentato:
+
+@example
+"aaaxxxzzz"
+    shortpat: /x+?/, result: "aaaXxxzzz"
+        0: (s: 4, l: 1) -> "x"
+    longpat: /x+/, result: "aaaXzzz"
+        0: (s: 4, l: 3) -> "xxx"
+@end example
+
+@noindent
+Nella corrispondenza pi@`u corta, solo la prima @samp{x} @`e rimpiazzata.
+Nella corrispondenza pi@`u lunga, ognuna delle tre @samp{x} @`e rimpiazzata.
+Questo caso @`e abbastanza semplice.
+
+@example
+"aaaxxxyzzz"
+    shortpat: /x+?y/, result: "aaaXzzz"
+        0: (s: 4, l: 4) -> "xxxy"
+    longpat: /x+y/, result: "aaaXzzz"
+        0: (s: 4, l: 4) -> "xxxy"
+@end example
+
+@noindent
+Qui, il risultato @`e uguale in entrambi i casi, poich@'e
+viene individuata la stringa di caratteri pi@`u lunga possibile.
+
+@example
+"aaaxxxxxxxxxxxxxxxxzzz"
+    shortpat: /(x+?)(x+)(x+?)(x+)/, result: "aaaXzzz"
+        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
+        1: (s: 4, l: 1) -> "x"
+        2: (s: 5, l: 13) -> "xxxxxxxxxxxxx"
+        3: (s: 18, l: 1) -> "x"
+        4: (s: 19, l: 1) -> "x"
+    longpat: /(x+)(x+)(x+)(x+)/, result: "aaaXzzz"
+        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
+        1: (s: 4, l: 13) -> "xxxxxxxxxxxxx"
+        2: (s: 17, l: 1) -> "x"
+        3: (s: 18, l: 1) -> "x"
+        4: (s: 19, l: 1) -> "x"
+@end example
+
+@noindent
+Questo caso @`e pi@`u interessante.
+La stessa quantit@`a totale di testo @`e individuata da entrambe
+le espressioni regolari.
+Tuttavia, il testo che corrisponde a ogni sottoespressione @`e
+differente.  Nel caso della corrispondenza pi@`u lunga, la
+sottoespressione pi@`u lunga corrisponde per prima.
+
+@example
+"aaaxyxxyxxyxzzz"
+    shortpat: /((x+)(y+?)(x+))+/, result: "aaaXyxxyxzzz"
+        0: (s: 4, l: 4) -> "xyxx"
+        1: (s: 4, l: 4) -> "xyxx"
+        2: (s: 4, l: 1) -> "x"
+        3: (s: 5, l: 1) -> "y"
+        4: (s: 6, l: 2) -> "xx"
+    longpat: /((x+)(y+)(x+))+/, result: "aaaXzzz"
+        0: (s: 4, l: 9) -> "xyxxyxxyx"
+        1: (s: 10, l: 3) -> "xyx"
+        2: (s: 10, l: 1) -> "x"
+        3: (s: 11, l: 1) -> "y"
+        4: (s: 12, l: 1) -> "x"
+@end example
+
+@noindent
+Qui occorre fare un esame attento.  C'@`e un @samp{+} all'esterno,
+il che vuol dire che l'espressione all'interno pu@`o trovare
+corrispondenza pi@`u di una volta.
+Nel caso dell'espressione ``avida'', ci@`o succede effettivamente.
+Le sottoespressioni da due a quattro riportano i valori dove iniziano
+e la lunghezza dell'ultimo caso in cui l'espressione interna ha trovato
+corrispondenza.  L'espressione ``non-avida'' ha trovato corrispondenza
+con l'espressione all'interno solo una volta.
+
+@example
+"aaaxyxxyxxyxzzz"
+    shortpat: /((x+)(y+?)(x+))@{2@}/, result: "aaaXyxzzz"
+        0: (s: 4, l: 7) -> "xyxxyxx"
+        1: (s: 7, l: 4) -> "xyxx"
+        2: (s: 7, l: 1) -> "x"
+        3: (s: 8, l: 1) -> "y"
+        4: (s: 9, l: 2) -> "xx"
+    longpat: /((x+)(y+)(x+))@{2@}/, result: "aaaXyxzzz"
+        0: (s: 4, l: 7) -> "xyxxyxx"
+        1: (s: 7, l: 4) -> "xyxx"
+        2: (s: 7, l: 1) -> "x"
+        3: (s: 8, l: 1) -> "y"
+        4: (s: 9, l: 2) -> "xx"
+@end example
+
+@noindent
+Qui, i risultati sono identici; sia la natura della stringa per la
+quale si cerca una corrispondenza che la regola POSIX "la pi@`u lunga
+a partire da sinistra", fanno s@`{@dotless{i}} che ci@`o accada.
+
+@c FIXME: Update this when the GNU matchers are finally gone.
+Il motore MinRX che esamina le espressioni regolari, che @`e quello usato
+per default da @command{gawk}, supporta gli operatori ``non-avidi''
+(@pxref{Scegliere il motore per @dfn{regexp}}).
+Il precedente motore GNU non li supporta.  Inoltre, quando si invoca
+@command{gawk} con l'opzione @option{--traditional}, gli operatori
+``non-avidi'' non sono supportati, poich@'e @command{awk} non prevede tali
+operatori.
 
 @node Espressioni tra parentesi quadre
 @section Usare espressioni tra parentesi quadre
@@ -7394,6 +7597,50 @@ Il valore di @code{IGNORECASE} non ha effetto se @command{gawk} @`e in
 modalit@`a compatibile (@pxref{Opzioni}).
 Il tipo di carattere (maiuscolo o minuscolo) @`e sempre rilevante in modalit@`a
 compatibile.
+
+@node Scegliere il motore per @dfn{regexp}
+@section Scegliere come gestire le espressioni regolari
+
+La versione 5.4.0 di @command{gawk} ha introdotto un
+nuovo motore per gestire le espressioni regolari, noto come
+@uref{https://github.com/mikehaertel/minrx, MinRX}.
+
+MinRX @`e pienamente conforme allo standard POSIX per le
+Espressioni Regolari Estese (ERE), comprese le ulteriori
+funzionalit@`a necessarie per @command{awk} e @command{gawk}.
+@`E anche un po' pi@`u rigido nell'accettare come valide alcune
+forme sintattiche nelle espressioni regolari.  (Tali restrizioni
+si applicano ad alcuni casi-limite che non dovrebbero ricorrere
+nell'uso normale.)
+
+In passato, @command{gawk} usava i software GNU @code{regex} e @code{dfa},
+da GNULIB.  Tali motori sono veloci e generalmente robusti, malgrado non
+siano pienamente conformi allo standard POSIX.  MinRX li sostituisce entrambi.
+
+Poich@'e l'individuazione di espressioni regolari @`e una parte fondamentale di
+ci@`o che i programmi @command{awk} fanno, l'introduzione di un nuovo motore
+per gestore le espressioni regolari comporta qualche rischio.
+Per alleviare tale rischio, per la durata di almeno una versione principale
+@command{gawk} continua a consentire l'utilizzo del motore precedente di
+gestione delle espressioni regolai, nel caso ci@`o sia necessario.
+
+@cindex @env{GAWK_GNU_MATCHERS} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_GNU_MATCHERS}
+Se esiste la variabile d'ambiente @env{GAWK_GNU_MATCHERS},
+@command{gawk} torna a usare i software GNU @code{regex} e @code{dfa},
+come fatto in precedenza.  Altrimenti, il motore MinRX @`e quello
+che viene usato per default.
+
+Se si riscontra la necessit@`a di passare da MinRX al precedente motore
+di gestione delle variabili d'ambiente @emph{per piacere} 
+inviate una segnalazione di errore descrivendo quello che risulta
+non funzionare (@pxref{Bug}).  @`E molto importante farlo, perch@'e
+sar@`a di aiuto ai manutentori e all'autore di MinRX nel correggere
+eventuali problemi trovati.
+
+Dopo una versione principale, i motori precedentemente in uso
+e l'utilizzo della variabile d'ambiente @env{GAWK_GNU_MATCHERS},
+saranno rimossi da @command{gawk}.
 
 @node Sommario espressioni regolari
 @section Sommario
@@ -29075,7 +29322,7 @@ ai nomi dei file in output, invece di usare @samp{x}.
 Per utilizzare l'opzione @option{-b} di @command{split},
 @command{gawk} dovrebbe essere chiamato specificando anche
 per @command{gawk} l'opzione @option{-b} (@pxref{Opzioni}),
-oppure con la variabile di ambiente @env{LC_ALL} impostata a @samp{C},
+oppure con la variabile d'ambiente @env{LC_ALL} impostata a @samp{C},
 in modo che ogni byte in input sia considerato come un carattere a s@'e
 stante.@footnote{Per usare l'opzione @option{-b} due volte occorre
 separare le opzioni di @command{gawk} da quelle del programma.
@@ -30139,6 +30386,8 @@ Si spera che siano interessanti e divertenti.
 * Programma anagram::             Trovare anagrammi da una lista di parole.
 * Programma signature::           La gente fa cose stupefacenti se ha troppo
                                   tempo libero.
+* Programma shortest-match::      Come usare operatori per trovare una
+                                  corrispondenza corta e lunga.
 @end menu
 
 @node Programma dupword
@@ -32174,6 +32423,92 @@ BEGIN {
 }
 @end ignore
 
+@node Programma shortest-match
+@subsection Come usare operatori per trovare una corrispondenza corta e lunga
+
+In @ref{Operatori non-avidi}, sono stati descritti gli operatori
+``non-avidi'' introdotti nello standard POSIX 2024, e mostrato l'output di un
+programma che evidenziava le differenze.
+Questo @`e il programma, @file{shortest-match.awk}:
+
+@example
+@c file eg/prog/shortest-match.awk
+# shortest-match.awk --- Funzionamento operatori non-avidi
+@c endfile
+@ignore
+@c file eg/prog/shortest-match.awk
+#
+# Arnold Robbins, arnold@@skeeve.com, Public Domain
+# March, 2025
+@c endfile
+@end ignore
+
+@c file eg/prog/shortest-match.awk
+BEGIN @{
+    text[1] = "aaaxxxzzz";
+        shortpat[1] = @/x+?/
+        longpat[1] = @/x+/
+    text[2] = "aaaxxxyzzz";
+        shortpat[2] = @/x+?y/
+        longpat[2] = @/x+y/
+    text[3] = "aaaxxxxxxxxxxxxxxxxzzz";
+        shortpat[3] = @/(x+?)(x+)(x+?)(x+)/
+        longpat[3] = @/(x+)(x+)(x+)(x+)/
+    text[4] = "aaaxyxxyxxyxzzz"
+        shortpat[4] = @/((x+)(y+?)(x+))+/
+        longpat[4] = @/((x+)(y+)(x+))+/
+    text[5] = "aaaxyxxyxxyxzzz"
+        shortpat[5] = @/((x+)(y+?)(x+))@{2@}/
+        longpat[5] = @/((x+)(y+)(x+))@{2@}/
+
+    count = length(text)
+    for (i = 1; i <= count; i++) @{
+        show(text[i], shortpat[i], longpat[i])
+    @}
+@}
+
+# show --- mostra i risultati usando operatori avidi e non-avidi
+
+function show(text, shortpat, longpat,
+          s_offsets, l_offsets, i, n)   # locals
+@{
+    printf("\"%s\"\n", text)
+
+    match(text, shortpat, s_offsets)
+    subresult = gensub(shortpat, "X", 1, text)
+    printf("\tshortpat: /%s/, result: \"%s\"\n", shortpat, subresult)
+    dump(text, s_offsets)
+
+    match(text, longpat, l_offsets)
+    subresult = gensub(longpat, "X", 1, text)
+    printf("\tlongpat: /%s/, result: \"%s\"\n", longpat, subresult)
+    dump(text, l_offsets)
+@}
+
+# dump --- scrivi la posizione iniziale e la lunghezza
+#          delle sotto-espressioni individuate
+
+function dump(text, offsets,    i, n, s, l)
+@{
+    n = length(offsets)
+    for (i = 0; i <= n; i++) @{
+        if ((i, "start") in offsets) @{
+            s = offsets[i, "start"]
+            l = offsets[i, "length"]
+            printf("\t\t%d: (s: %d, l: %d) -> \"%s\"\n", i,
+                s, l, substr(text, s, l))
+        @}
+    @}
+@}
+@c endfile
+@end example
+
+Il programma utilizza espressioni regolari fortemente tipizzate
+(@pxref{Costanti @dfn{regexp} forti}),
+il quarto argomento, opzionale, della funzione @code{match()},
+e le funzioni @code{gensub()} e @code{substr()}
+(@pxref{Funzioni per stringhe}).
+
 @node Sommario dei programmi
 @section Sommario
 
@@ -34060,7 +34395,7 @@ $ @kbd{chmod 0600 dati.pma}
 @item
 Assegnare il percorso del file dei dati alla variabile d'ambiente
 @env{GAWK_PERSIST_FILE}.  @`E consigliabile farlo specificando il
-valore della variabile di ambiente quando si chiama il programma
+valore della variabile d'ambiente quando si chiama il programma
 @command{gawk}, in questo modo:
 
 @example
@@ -46584,6 +46919,13 @@ innescava segnalazioni di errore, specie in alcune distribuzioni GNU/Linux.
 La Versione 5.4 ha aggiunto le seguenti funzionalit@`a:
 
 @itemize
+
+@item
+Utilizzo del nuovo motore di gestione delle espressioni regolari
+MinRX, come default
+(@pxref{Scegliere il motore per @dfn{regexp}}).
+In questo modo la gestione delle espressioni regolari in
+@command{gawk} @`e pienamente conforme allo standard POSIX.
 
 @cindex @code{@@} (chiocciola) @subentry @code{@@nsinclude} (direttiva)
 @cindex chiocciola (@code{@@}) @subentry @code{@@nsinclude} (direttiva)
