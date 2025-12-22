@@ -200,7 +200,7 @@ command$O debug$O:	cmd.h
 
 dfa$O:		xalloc.h
 
-gawkmisc$O:	pc/gawkmisc.pc socket.h
+gawkmisc$O:	pc/gawkmisc.pc pc/nl_langinfo.c socket.h
 
 getopt$O getopt1$O :	getopt_int.h
 
