@@ -23,6 +23,7 @@
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
 #else
+# define char32_t wchar_t
 # define c32tolower towlower
 # define c32toupper towupper
 #endif

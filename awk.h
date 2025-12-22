@@ -93,7 +93,7 @@ extern int c32scoll(const char32_t *left, const char32_t *right);
 #else
 #define char32_t wchar_t
 #define mbrtoc32 mbrtowc
-#define c32rtomb wcrtobm
+#define c32rtomb wcrtomb
 #define c32slen(s) wcslen(s)
 #define c32scoll(l, r)	wcscoll(l, r)
 #endif

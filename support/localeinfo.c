@@ -31,6 +31,9 @@
 #if HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
+#else
+# define mbrtoc32  mbrtowc
+# define c32rtomb  wcrtomb
 #endif
 #define c32tolower towlower
 #define c32toupper towupper

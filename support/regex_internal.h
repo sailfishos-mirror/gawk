@@ -147,8 +147,10 @@
 #include <uchar.h>
 # define __mbrtowc mbrtoc32
 # define __wcrtomb c32rtomb
-# define wchar_t char32_t
+# define mbrtoc32  mbrtowc
+# define c32rtomb  wcrtomb
 #else
+# define char32_t wchar_t
 # define __mbrtowc mbrtowc
 # define __wcrtomb wcrtomb
 #endif /* not HAVE_UCHAR_H */
