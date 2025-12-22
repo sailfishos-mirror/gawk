@@ -41,20 +41,15 @@
 #include "xalloc.h"
 #include "localeinfo.h"
 
-#if GAWK
-/* Use ISO C 99 API.  */
-# include <wctype.h>
-# define char32_t wchar_t
-# define mbrtoc32 mbrtowc
-# define c32rtomb wcrtomb
+#if HAVE_UCHAR_H
+/* Use ISO C 11 API.  */
+# include <uchar.h>
+#endif
+#include <wctype.h>
 # define c32tob wctob
 # define c32isprint iswprint
 # define c32isspace iswspace
 # define mbszero(p) memset ((p), 0, sizeof (mbstate_t))
-#else
-/* Use ISO C 11 + gnulib API.  */
-# include <uchar.h>
-#endif
 
 /* Pacify gcc -Wanalyzer-null-dereference in areas where GCC
    understandably cannot deduce that the input comes from a

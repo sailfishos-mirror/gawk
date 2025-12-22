@@ -43,6 +43,18 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#if defined(__MINGW32__)
+typedef int32_t char32_t;
+extern size_t mbrtoc32(char32_t *pc32, const char *s, size_t n, mbstate_t *mbs);
+extern size_t c32rtomb (char *s, char32_t c32, mbstate_t *mbs);
+#elif defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+#include <uchar.h>
+#else
+#define char32_t wchar_t
+#define mbrtoc32 mbrtowc
+#define c32rtomb wcrtobm
+#endif
+
 // GNU gettext
 #ifdef HAVE_GETTEXT_H
 #include <gettext.h>
@@ -670,9 +682,9 @@ wconv_nextbyte(WConv *wc)
 static WChar
 wconv_nextmbtowc(WConv *wc)
 {
-	wchar_t wct = L'\0';
+	char32_t wct = L'\0';
 	if (wc->cp != wc->ep) {
-		size_t n = mbrtowc(&wct, wc->cp, wc->ep - wc->cp, &wc->mbs);
+		size_t n = mbrtoc32(&wct, wc->cp, wc->ep - wc->cp, &wc->mbs);
 		if (n == 0 || n == (size_t) -1 || n == (size_t) -2) {
 			if (wct == L'\0')
 				wct = INT32_MIN + (unsigned char) *wc->cp++;

@@ -787,4 +787,44 @@ init_sockets(void)
 #endif
 }
 
+/* c32slen --- return length of wide char string in char32_t type */
+
+size_t
+c32slen(const char32_t *str)
+{
+	size_t count = 0;
+
+	for (; *str != 0; str++)
+		count++;
+
+	return count;
+}
+
+
+/* c32scoll --- like strcoll, but on char32_t type */
+
+int
+c32scoll(const char32_t *left, const char32_t *right)
+{
+	// DUMMY VERSION --- Eli, do your thing here. :-)
+
+	int result = 0;
+
+	for (; *left != 0 && *right != 0; left++, right++) {
+		if (*left < *right)
+			return -1;
+		else if (*left > *right)
+			return +1;
+		else
+			continue;
+	}
+
+	if (*left == 0 && *right == 0)
+		return 0;
+	else if (*left == 0 && *right != 0)
+		return -1;
+	else
+		return +1;
+}
+
 #endif	/* __MINGW32__ */

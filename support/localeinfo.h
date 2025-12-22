@@ -19,12 +19,12 @@
 
 #include <limits.h>
 #include <wchar.h>
-#if GAWK
-/* Use ISO C 99 API.  */
-# define char32_t wchar_t
-#else
+#if HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
+#else
+# define c32tolower towlower
+# define c32toupper towupper
 #endif
 
 #ifdef __cplusplus
