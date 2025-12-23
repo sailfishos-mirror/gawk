@@ -4,32 +4,32 @@
 
 function eq(left, right)
 {
-        return left == right
+	return left == right
 }
 
 function ne(left, right)
 {
-        return left != right
+	return left != right
 }
 
 function lt(left, right)
 {
-        return left <  right
+	return left <  right
 }
 
 function le(left, right)
 {
-        return left <= right
+	return left <= right
 }
 
 function gt(left, right)
 {
-        return left >  right
+	return left >  right
 }
 
 function ge(left, right)
 {
-        return left >= right
+	return left >= right
 }
 
 BEGIN {
