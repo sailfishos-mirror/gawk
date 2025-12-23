@@ -15,6 +15,6 @@ BEGIN {
             gsub(/""/, "\"", $i)    # Convert "" to "
         }
     }
-    $1 = $1	# force rebuild of the record
+    $1 = $1    # force rebuild of the record
     print
 }
