@@ -3,7 +3,7 @@
 # bootstrap.sh --- touch relevant files to avoid out-of-date issues in
 #		   Git sandboxes
 
-# Copyright (C) 2007, 2009-2014 the Free Software Foundation, Inc.
+# Copyright (C) 2007, 2009-2014, 2025 the Free Software Foundation, Inc.
 # 
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -36,7 +36,10 @@ touch test/Maketests
 find . -name Makefile.in -print | xargs touch
 touch doc/gawk.texi	# make later than gawktexi.in
 sleep 1
-touch doc/*.info
+for i in gawkinet.texi gawk.texi gawkworkflow.texi notes.texi pm-gawk.texi
+do
+	touch doc/${i%.texi}.info	# file may not be there, can't use *.info
+done
 touch po/*.gmo
 touch po/stamp-po
 touch awkgram.c
