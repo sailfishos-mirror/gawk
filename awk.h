@@ -79,24 +79,38 @@ extern int errno;
 #include <wctype.h>
 
 #if defined(__MINGW32__)
-typedef int32_t char32_t;
-extern size_t mbrtoc32(char32_t *pc32, const char *s, size_t n, mbstate_t *mbs);
-extern size_t c32rtomb (char *s, char32_t c32, mbstate_t *mbs);
 
-// gawk functions:
-extern size_t c32slen(const char32_t *str);
-extern int c32scoll(const char32_t *left, const char32_t *right);
+/* libc functions: */
+#ifdef _UCRT
+/* MinGW64 building with UCRT has uchar.h functions.  */
+#include <uchar.h>
+#else	/* !_UCRT */
+/* Emulations of missing or incomplete functions for MSVCRT: */
+#include <stdint.h>
+typedef uint_least32_t char32_t;
+extern size_t mbrtoc32(char32_t *, const char *, size_t, mbstate_t *);
+extern size_t c32rtomb (char *, char32_t, mbstate_t *);
+#endif	/* !_UCRT */
+
+/* Gawk functions: */
+extern size_t c32slen(const char32_t *);
+extern int c32scoll(const char32_t *, const char32_t *);
+
 #elif defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+
 #include <uchar.h>
 #define c32slen(s) wcslen((wchar_t *) s)
 #define c32scoll(l, r)	wcscoll((wchar_t *) l, (wchar_t *) r)
-#else
+
+#else	/* Posix without <uchar.h> */
+
 #define char32_t wchar_t
 #define mbrtoc32 mbrtowc
 #define c32rtomb wcrtomb
 #define c32slen(s) wcslen(s)
 #define c32scoll(l, r)	wcscoll(l, r)
-#endif
+
+#endif	/* Posix without <uchar.h> */
 
 #ifdef __CYGWIN__ /* Define helper function for large Unicode values */
 extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
