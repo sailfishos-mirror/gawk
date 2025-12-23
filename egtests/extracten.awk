@@ -1,5 +1,9 @@
 # extract.awk --- extract files and run programs from Texinfo files
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993
 # Revised September 2000
@@ -72,6 +76,10 @@ function unexpected_eof()
     exit 1
 }
 # join.awk --- join an array into a string
+#
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
 #
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993

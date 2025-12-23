@@ -28,15 +28,16 @@
 print_help() {
 	echo "*"
 	echo "Choose by number one or more tests to try"
-	echo "e.g.: 1-5,14,26-30"
-	echo "If a suffix is given, e.g.: 1e or: h"
+	echo "e.g., 1-5,14,26-30"
+	echo "If a suffix is given,"
 	echo "(alone or after a list of numbers)"
+	echo "e.g., 10,11e  or  h"
 	echo "h -- will just print this help text"
 	echo "d -- will invoke ${vim}diff for a test file in both languages"
 	echo "b -- will invoke ${vim} for a test file"
 	echo "e -- will invoke ${vim} for a test file"
 	echo "w -- will tell where a module is"
-	echo "q,Q,quit,x,ZZ,zz -- will exit from egtest"
+	echo "q,Q,quit,x,X,zz,ZZ -- will exit from egtest"
 	echo "Everything else just has no effect"
 }
 
@@ -212,8 +213,8 @@ do_gen_float_table() {
 	      gawk -f ../test-programs/gen-float-table.awk >$tmplib/Gawk.out
 	echo "*"
 	echo "* Python"
-	echo "$python ../test-programs/gen-float-table.py >$tmplib/Python.out" 
-	      $python ../test-programs/gen-float-table.py >$tmplib/Python.out 
+	echo "$python ../test-programs/gen-float-table.py >$tmplib/Python.out"
+	      $python ../test-programs/gen-float-table.py >$tmplib/Python.out
 	echo "*"
 	echo "...comparing the output from the three programs:"
 	echo "*"
@@ -266,7 +267,7 @@ do_guide() {
 	echo "* they are shown just to check the conversion"
 	echo "*"
 	echo "gawk --gen-pot -f guide.awk >$datadir/guide.pot"
-	      gawk --gen-pot -f guide.awk >$datadir/guide.pot 
+	      gawk --gen-pot -f guide.awk >$datadir/guide.pot
 	echo "*"
 	echo "$vim -o $datadir/guide.pot $datadir/$poname.po"
 	      wait_go_ahead
@@ -283,7 +284,7 @@ do_guide() {
 	echo "* Original messages:"
 	echo "*"
 	echo "gawk --posix -f guide.awk -f libintl.awk"
-	      gawk --posix -f guide.awk -f libintl.awk 
+	      gawk --posix -f guide.awk -f libintl.awk
 }
 
 do_guide_po() {
@@ -540,6 +541,15 @@ do_quicksort() {
 	return
 }
 
+do_quoted_csv() {
+	echo "*"
+	echo "cat $miscdir/sample.csv"
+	      cat $miscdir/sample.csv
+	echo "*"
+	echo "gawk -f quoted-csv.awk $miscdir/sample.csv"
+	      gawk -f quoted-csv.awk $miscdir/sample.csv
+}
+
 do_readable() {
 	echo "*"
 	echo "BEGIN{ for ( i=1; i<ARGC; i++ ) { print i,ARGV[i]; } }" >$testpgm
@@ -596,6 +606,15 @@ do_shellquote() {
 	echo "*"
 	echo "gawk -f shellquote.awk -f $testpgm $testdata"
 	      gawk -f shellquote.awk -f $testpgm $testdata
+}
+
+do_shortest_match() {
+	echo "*"
+	echo "gawk -f shortest-match.awk > $testdata"
+	      gawk -f shortest-match.awk > $testdata
+	echo "$vimdiff $testdata $b/short-match.txt"
+	      $vimdiff $testdata $b/short-match.txt
+
 }
 
 do_simple_csv() {
@@ -775,8 +794,8 @@ do_zerofile() {
 wait_go_ahead() {
 	echo "*"
 	echo "* Hit ENTER to proceed..."
-	read nothing
-	if [ "$nothing" = "q" -o "$nothing" = "Q" -o "$nothing" = "zz" -o "$nothing" = "ZZ" -o "$nothing" = "quit" -o "$nothing" = "x" ]
+	read what
+	if [ "$what" = "q" -o "$what" = "Q" -o "$what" = "zz" -o "$what" = "ZZ" -o "$what" = "quit" -o "$what" = "x" -o "$what" = "X" ]
 	then
 		rm -rf $s
 		exit
@@ -819,7 +838,7 @@ if [ ! -d "$docen" ]
 then
 	echo Current directory is $PWD
 	echo This script must be executed in a gawk distribution, in the directory egtests
-	echo Nothing done
+	echo Nothing done.
 	exit
 fi
 
@@ -830,7 +849,7 @@ if [ ! -s "$docen/gawk.texi" ]
 then
 	echo Current directory is $PWD
 	echo This script must be executed in a gawk distribution, in the directory egtests
-	echo Nothing done
+	echo Nothing done.
 	exit
 fi
 
@@ -841,7 +860,7 @@ if [ ! -d "$docit" ]
 then
 	echo Current directory is $PWD
 	echo This script must be executed in a gawk distribution, in the directory egtests
-	echo Nothing done
+	echo Nothing done.
 	exit
 fi
 
@@ -852,7 +871,7 @@ if [ ! -s "$docit/gawk.texi" ]
 then
 	echo Current directory is $PWD
 	echo This script must be executed in a gawk distribution, in the directory egtests
-	echo Nothing done
+	echo Nothing done.
 	exit
 fi
 

@@ -1,5 +1,9 @@
 # extract.awk --- estrae file ed esegue programmi dal file Texinfo
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993
 # Revised September 2000
@@ -93,6 +97,10 @@ function fine_file_inattesa()
     exit 1
 }
 # join.awk --- trasforma un vettore in una stringa
+#
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
 #
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993

@@ -1,7 +1,7 @@
 :
 #set -xv
 
-echo "* Extracting in $s/en from the English gawk.texi"
+echo "* Getting extract.awk in $s/en from the English gawk.texi"
 cd $s
 if [ ! -d "en" ]
 then
@@ -17,5 +17,6 @@ cat $s/en/eg/prog/extract.awk $s/en/eg/lib/join.awk >$s/extract.en
 diff    $b/extracten.awk $s/extract.en
 if [ "$?" -ne "0" ]
 then
+	echo vimdiff $b/extracten.awk $s/extract.en
 	echo Extracten: the extract.awk script is different from the one in the book
 fi
