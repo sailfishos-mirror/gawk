@@ -1,5 +1,7 @@
 /* Replacement for the missing nl_langinfo.  Only CODESET is currently
    supported.  */
+#include <locale.h>
+#include <windows.h>
 #include <langinfo.h>
 
 char *

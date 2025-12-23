@@ -60,7 +60,6 @@ static awk_bool_t (*init_func)(void) = NULL;
 int plugin_is_GPL_compatible;
 
 #ifdef __MINGW32__
-#include <windows.h>
 #include "../pc/nl_langinfo.c"
 #endif
 
