@@ -9546,12 +9546,13 @@ Il programma eseguito produce in output:
 
 @example
 $ @kbd{gawk -f quoted-csv.awk sample.csv}
-@print{} 1	2	3
-@print{} p	q,r	s
-@print{} p	q"r	s
-@print{} p	q,"r	s
-@print{} p		s
-@print{} p		s
+@print{} 1       2       3
+@print{} p       q,r     s
+@print{} p       q"r     s
+@print{} p       q,"r    s
+@print{} p               s
+@print{} p               s
+
 @end example
 
 Alcuni programmi trattano dati CVS che contengono nei campi dei
@@ -38757,32 +38758,32 @@ i valori di Infinity [Infinito] e quelli NaN [Non un Numero].
 
 function eq(left, right)
 @{
-        return left == right
+	return left == right
 @}
 
 function ne(left, right)
 @{
-        return left != right
+	return left != right
 @}
 
 function lt(left, right)
 @{
-        return left <  right
+	return left <  right
 @}
 
 function le(left, right)
 @{
-        return left <= right
+	return left <= right
 @}
 
 function gt(left, right)
 @{
-        return left >  right
+	return left >  right
 @}
 
 function ge(left, right)
 @{
-        return left >= right
+	return left >= right
 @}
 
 BEGIN @{
@@ -48087,7 +48088,6 @@ Aggiunge l'argomento alla fine della variabile d'ambiente
 
 @end table
 
-
 @node Ulteriori opzioni di configurazione
 @appendixsubsec Ulteriori opzioni di configurazione
 @cindex @command{gawk} @subentry configurazione @subentry opzioni di
@@ -48153,6 +48153,23 @@ il supporto MPFR non sia disponibile.
 Non attivare la traduzione automatica dei messaggi.
 Ci@`o normalmente non @`e consigliabile, ma pu@`o apportare qualche lieve
 miglioramento nei tempi di esecuzione di un programma.
+
+@cindex @option{--enable-builtin-intdiv0} (opzione di configurazione)
+@cindex opzioni di configurazione @subentry @option{--enable-builtin-intdiv0}
+@item --enable-builtin-intdiv0
+Aggiungere una nuova funzione predefinita, @code{intdiv0()}, che restituisce
+sia il risultato di una divisione a numeri interi che il
+resto della divisione stessa.  Ciò è spiegato più estesamente in
+@ref{Interi a precisione arbitraria}.
+
+@cindex @option{--enable-O3} (opzione di configurazione)
+@cindex opzioni di configurazione @subentry @option{--enable-O3}
+@item --enable-O3
+Usare l'opzione GCC @option{-O3} durante la compilazione di @command{gawk}
+invece dell'opzione GCC standard @option{-O2}.  L'ottimizzazione
+maggiore può migliorare le prestazioni di @command{gawk}.  Tuttavia, in
+altri progetti software, l'opzione @option{-O3} ha causato problemi, e
+quindi non è usata per default.
 
 @cindex @option{--enable-versioned-extension-dir} (opzione di configurazione)
 @cindex opzioni di configurazione @subentry @option{--enable-versioned-extension-dir}
