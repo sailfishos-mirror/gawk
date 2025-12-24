@@ -59,8 +59,8 @@ AC_ARG_ENABLE([builtin-intdiv0],
 	then
 		AC_DEFINE(SUPPLY_INTDIV, 1, [enable built-in intdiv0 function])
 		sed '/^@set PATCHLEVEL/a\
-@set INTDIV' < "$srcdir"/doc/gawktexi.in > foo
-		cp foo "$srcdir"/doc/gawktexi.in
+@set INTDIV' < "$srcdir"/doc/gawk.texi > foo
+		cp foo "$srcdir"/doc/gawk.texi
 		rm foo
 	fi
 )
@@ -93,6 +93,15 @@ AC_ARG_ENABLE([versioned-extension-dir],
 
 		# note leading slash on the value
 		export EXTENSIONDIR=/ext-$MAJOR.$MINOR
+	fi
+)
+
+OPT_O3=no
+AC_ARG_ENABLE([O3],
+	[AS_HELP_STRING([--enable-O3],[build gawk with -O3 instead of -O2])],
+	if test "$enableval" = yes
+	then
+		OPT_O3=yes
 	fi
 )
 
@@ -512,7 +521,7 @@ EOF
 			mv foo $i/Makefile
 		fi
 	done
-elif test "$GCC" = yes
+elif test "$GCC" = yes && test "$OPT_O3" = yes
 then
 	for i in . support extension
 	do

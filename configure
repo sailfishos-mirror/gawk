@@ -800,6 +800,7 @@ enable_builtin_intdiv0
 enable_mpfr
 enable_pma
 enable_versioned_extension_dir
+enable_O3
 enable_dependency_tracking
 enable_largefile
 enable_nls
@@ -1459,6 +1460,7 @@ Optional Features:
                           allocator
   --enable-versioned-extension-dir
                           use a versioned directory for extensions
+  --enable-O3             build gawk with -O3 instead of -O2
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -3640,8 +3642,8 @@ then :
 printf "%s\n" "#define SUPPLY_INTDIV 1" >>confdefs.h
 
 		sed '/^@set PATCHLEVEL/a\
-@set INTDIV' < "$srcdir"/doc/gawktexi.in > foo
-		cp foo "$srcdir"/doc/gawktexi.in
+@set INTDIV' < "$srcdir"/doc/gawk.texi > foo
+		cp foo "$srcdir"/doc/gawk.texi
 		rm foo
 	fi
 
@@ -3683,6 +3685,18 @@ then :
 
 		# note leading slash on the value
 		export EXTENSIONDIR=/ext-$MAJOR.$MINOR
+	fi
+
+fi
+
+
+OPT_O3=no
+# Check whether --enable-O3 was given.
+if test ${enable_O3+y}
+then :
+  enableval=$enable_O3; if test "$enableval" = yes
+	then
+		OPT_O3=yes
 	fi
 
 fi
@@ -14690,7 +14704,7 @@ EOF
 			mv foo $i/Makefile
 		fi
 	done
-elif test "$GCC" = yes
+elif test "$GCC" = yes && test "$OPT_O3" = yes
 then
 	for i in . support extension
 	do
