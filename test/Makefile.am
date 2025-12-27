@@ -601,6 +601,8 @@ EXTRA_DIST = \
 	hello.awk \
 	hex.awk \
 	hex.ok \
+	hexfloat.awk \
+	hexfloat.ok \
 	hex2.awk \
 	hex2.in \
 	hex2.ok \
