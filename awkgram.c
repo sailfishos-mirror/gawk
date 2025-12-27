@@ -6083,6 +6083,7 @@ yylex(void)
 {
 	int c;
 	bool seen_e = false;		/* These are for numbers */
+	bool seen_p = false;
 	bool seen_point = false;
 	bool esc_seen;		/* for literal strings */
 	int mid;
@@ -6621,7 +6622,7 @@ retry:
 	case '8':
 	case '9':
 		/* It's a number */
-		for (;;) {
+		for (;; c = nextc(true)) {
 			bool gotnumber = false;
 
 			tokadd(c);
@@ -6644,11 +6645,22 @@ retry:
 				break;
 			case '.':
 				/* period ends exponent part of floating point number */
-				if (seen_point || seen_e) {
+				if (seen_point || seen_e || seen_p) {
 					gotnumber = true;
 					break;
 				}
 				seen_point = true;
+				break;
+			case 'p':
+			case 'P':
+				if (inhex) {
+					if (seen_p)
+						gotnumber = true;
+					else {
+						seen_p = true;
+						goto collect_exponent;
+					}
+				}
 				break;
 			case 'e':
 			case 'E':
@@ -6659,6 +6671,7 @@ retry:
 					break;
 				}
 				seen_e = true;
+			collect_exponent:
 				if ((c = nextc(true)) == '-' || c == '+') {
 					int c2 = nextc(true);
 
@@ -6668,11 +6681,11 @@ retry:
 					} else {
 						pushback();	/* non-digit after + or - */
 						pushback();	/* + or - */
-						pushback();	/* e or E */
+						pushback();	/* e or E or p or P */
 					}
 				} else if (! isdigit(c)) {
-					pushback();	/* character after e or E */
-					pushback();	/* e or E */
+					pushback();	/* character after e or E or p or P */
+					pushback();	/* e or E or p or P */
 				} else {
 					pushback();	/* digit */
 				}
@@ -6707,7 +6720,6 @@ retry:
 			}
 			if (gotnumber)
 				break;
-			c = nextc(true);
 		}
 		pushback();
 

@@ -199,7 +199,7 @@ UNIX_TESTS = \
 	space strftlng
 
 GAWK_EXT_TESTS = \
-	equiv \
+	equiv hexfloat \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc \
 	ar2fn_elnew_sc2 ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val \
 	argtest arraysort arraysort2 arraytype asortbool asortsymtab \
@@ -2748,6 +2748,11 @@ rtlen01:
 equiv:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+hexfloat:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 aadelete1:
