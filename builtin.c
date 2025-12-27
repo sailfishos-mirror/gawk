@@ -2671,6 +2671,7 @@ nondec2awknum(char *str, size_t len, char **endptr)
 	short val;
 	char *start = str;
 	size_t savelen = len;
+	bool is_hex_float = false;
 
 	if (len >= 2 && *str == '0' && (str[1] == 'x' || str[1] == 'X')) {
 		/*
@@ -2715,9 +2716,11 @@ nondec2awknum(char *str, size_t len, char **endptr)
 				break;
 			case 'p':
 			case 'P':
+			case '.':
 				// restore the string
 				str = start;
 				len = savelen;
+				is_hex_float = true;
 				goto floating_point_hex;
 			default:
 				if (endptr)
@@ -2751,6 +2754,10 @@ decimal:
 floating_point_hex:
 		save = str[len];
 		str[len] = '\0';
+		if (is_hex_float
+		    && strchr(str, 'p') == NULL 
+		    && strchr(str, 'P') == NULL)
+			fatal(_("hexadecimal floating point constants require an exponent"));
 		retval = strtod(str, endptr);
 		str[len] = save;
 	}

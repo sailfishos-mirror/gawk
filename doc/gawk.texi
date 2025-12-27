@@ -11772,6 +11772,26 @@ $ @kbd{gawk 'BEGIN @{ print "021 is", 021 ; print 018 @}'}
 @print{} 18
 @end example
 
+Hexadecimal integer constants have been part of the C language
+since the beginning.  The C99 standard added support for
+hexadecimal floating-point values.  This is
+a floating point number of the form
+[@code{-}]@code{0x@var{h}}[@code{.@var{hhhh}}]@code{p+-@var{dd}}.
+The @samp{p} introduces the exponent, and is @emph{required}.
+The radix point and following digits are optional.
+As with integer hexadecimal constants, both @samp{0x} and @samp{0X}
+may be used, and case in the letters @samp{a} through @samp{f}
+does not matter.
+
+Beginning with version 5.4.0, @command{gawk} supports hexadecimal
+floating point values, as constants in @command{awk} program source
+code, with the @code{strtonum()} built-in function, and with the
+@option{--non-decimal-data} command-line option.
+
+For this to work correctly, the version of @code{strtod()} in the
+system's underlying C library must understand such constants.
+On modern systems this isn't a problem.
+
 @cindex compatibility mode (@command{gawk}) @subentry octal numbers
 @cindex compatibility mode (@command{gawk}) @subentry hexadecimal numbers
 Octal and hexadecimal source code constants are a @command{gawk} extension.
@@ -42613,6 +42633,10 @@ Version 5.4 added the following features:
 @itemize
 
 @item
+The @option{--enable-O3} option to @command{configure} was added
+(@pxref{Additional Configuration Options}).
+
+@item
 Use of the new MinRX regular expression matcher as the default
 matching engine
 (@pxref{Choosing Matchers}).
@@ -42639,8 +42663,9 @@ Persistent memory was enabled on NetBSD and OpenBSD
 (@pxref{Persistent Memory}).
 
 @item
-Hexadecimal floating-point values may be used with the @code{strtonum()}
-function and with the @option{--non-decimal-data} option
+Hexadecimal floating-point values may be used in program source
+code, with the @code{strtonum()}
+function, and with the @option{--non-decimal-data} option
 (@pxref{Nondecimal Data}).
 
 @item

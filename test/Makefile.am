@@ -601,6 +601,8 @@ EXTRA_DIST = \
 	hello.awk \
 	hex.awk \
 	hex.ok \
+	hexfloat.awk \
+	hexfloat.ok \
 	hex2.awk \
 	hex2.in \
 	hex2.ok \
@@ -1628,7 +1630,7 @@ UNIX_TESTS = \
 	space strftlng
 
 GAWK_EXT_TESTS = \
-	equiv \
+	equiv hexfloat \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc \
 	ar2fn_elnew_sc2 ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val \
 	argtest arraysort arraysort2 arraytype asortbool asortsymtab \
