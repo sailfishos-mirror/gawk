@@ -43,16 +43,14 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if defined(__MINGW32__)
-typedef int32_t char32_t;
-extern size_t mbrtoc32(char32_t *pc32, const char *s, size_t n, mbstate_t *mbs);
-extern size_t c32rtomb (char *s, char32_t c32, mbstate_t *mbs);
-#elif defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+#if !defined(__MINGW32__)
+#if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
 #include <uchar.h>
 #else
 #define char32_t wchar_t
 #define mbrtoc32 mbrtowc
 #define c32rtomb wcrtobm
+#endif
 #endif
 
 // GNU gettext

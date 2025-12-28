@@ -80,18 +80,6 @@ extern int errno;
 
 #if defined(__MINGW32__)
 
-/* libc functions: */
-#ifdef _UCRT
-/* MinGW64 building with UCRT has uchar.h functions.  */
-#include <uchar.h>
-#else	/* !_UCRT */
-/* Emulations of missing or incomplete functions for MSVCRT: */
-#include <stdint.h>
-typedef uint_least32_t char32_t;
-extern size_t mbrtoc32(char32_t *, const char *, size_t, mbstate_t *);
-extern size_t c32rtomb (char *, char32_t, mbstate_t *);
-#endif	/* !_UCRT */
-
 /* Gawk functions: */
 extern size_t c32slen(const char32_t *);
 extern int c32scoll(const char32_t *, const char32_t *);

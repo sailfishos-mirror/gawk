@@ -143,12 +143,15 @@
 # define __towupper towupper
 # define __btowc btowc
 # define __regfree regfree
-#ifdef HAVE_UCHAR_H
+#if defined HAVE_UCHAR_H
 #include <uchar.h>
 # define __mbrtowc mbrtoc32
 # define __wcrtomb c32rtomb
 # define mbrtoc32  mbrtowc
 # define c32rtomb  wcrtomb
+#elif defined __MINGW32__
+# define __mbrtowc mbrtoc32
+# define __wcrtomb c32rtomb
 #else
 # define char32_t wchar_t
 # define __mbrtowc mbrtowc

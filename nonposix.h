@@ -65,7 +65,7 @@ char *w32_setlocale (int, const char *);
 #endif
 #define setlocale(c,v) w32_setlocale(c,v)
 
-size_t w32_wc_to_lc (int, char *);
+bool mingw_using_utf8 (int);
 
 char *strsignal (int);
 

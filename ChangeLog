@@ -1,3 +1,23 @@
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* awk.h: Remove MinGW stuff that is no longer needed.
+	* custom.h [__MINGW32__]: Add redirections for char32_t functions
+	and their prototypes.  Override MB_CUR_MAX with a MinGW-specific
+	function.  Add prototypes and redirections for stdio functions to
+	work around a bug in MSVCRT.
+	* gawkmisc.c [__MINGW32__]: Include pc/mbc32.c.
+	* main.c (main) [__MINGW32__]: Adjust the value of gawk_mb_cur_max
+	when the locale changes.
+	* node.c: Remove MinGW-specific code, which is not longer needed.
+	* nonposix.h: Add prototype of 'mingw_using_utf8'.
+	* printf.c: Fix a typo: wcrtomb should not be called directly, but,
+	if needed, via c32rtomb.
+	* profile.c: Avoid compiler warnings about functions that are
+	unused when SIGHUP and SIGUSR1 are not defined.
+	* replace.c [__MINGW32__ && !_UCRT]: Include stdio-consolesafe.c
+	to work around MSVCRT bugs when writing multibyte characters to
+	the console.
+
 2025-12-28         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* TODO: Updated.

@@ -693,9 +693,7 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 	case 'u':
 	{
 		size_t n;
-#ifndef __MINGW32__
 		mbstate_t mbs;
-#endif
 
 		if (do_lint) {
 			static bool warned = false;
@@ -731,15 +729,13 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 				break;
 			}
 		}
-#ifdef __MINGW32__
-		n = w32_wc_to_lc (i, buf);
-#elif defined (__CYGWIN__)
+#if defined (__CYGWIN__)
 		memset(& mbs, 0, sizeof(mbs));
 		n = wcitomb(buf, i, & mbs);
 #else
 		memset(& mbs, 0, sizeof(mbs));
 		n = c32rtomb(buf, i, & mbs);
-#endif	/* !__MINGW32__ */
+#endif	/* !__CYGWIN__ */
 		if (n == (size_t) -1) {
 			warning(_("invalid `\\u' escape sequence"));
 			retval = ESCAPE_CONV_ERR;

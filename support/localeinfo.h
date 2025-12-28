@@ -19,11 +19,13 @@
 
 #include <limits.h>
 #include <wchar.h>
-#if HAVE_UCHAR_H
+#ifdef HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
 #else
-# define char32_t wchar_t
+# ifndef __MINGW32__
+#  define char32_t wchar_t
+# endif
 # define c32tolower towlower
 # define c32toupper towupper
 #endif

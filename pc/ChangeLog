@@ -1,3 +1,29 @@
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* GenMakefileTst.awk: Replace GAWKLOCALE with LC_ALL.
+	* Makefile: Compile minrx.c with -O3.  Fix dependencies due to new
+	files.
+	* Makefile.ext: Don't use -static-libgcc, as the binaries are now
+	distributed with libgcc DLL.  Compile nl_langinfo.c, mbc32.c and
+	stdio-consolesafe.c into each extension DLL.
+	* config.h: Undefine HAVE_STRUCT_STAT_ST_BLKSIZE, it gets in the
+	way when compiling filefuncs extension (MinGW doesn't have this
+	member in its 'struct stat').
+	* mbc32.h:
+	* mbc32.c: New files, with functions to convert between multibyte
+	strings and char32_t Unicode codepoints.
+	* gawkmisc.pc: Update w32_setlocale, add caching of the locale for
+	faster access.  Add c32is* functions to replace isw* wctype.h
+	functions when the argument is a 32-bit full Unicode codepoint.
+	Also add char32_t replacements for towlower, towupper, btowc,
+	wctob, and wcscoll.  Together with mbc32.c, his constitutes the
+	bulk of support for full Unicode range and for using UTF-8 in
+	strings.
+	* nl_langinfo.c: Add #includes to be able to compile this file
+	separately.  Add mingw_using_utf8 utility function.  Add
+	mingw_mb_cur_max to which MB_CUR_MAX is redirected.
+	* popen.c: Remove unused variables and avoid compiler warnings.
+
 2025-12-22         Eli Zaretskii  <eliz@gnu.org>
 
 	* nl_langinfo.c: Include <locale.h> and <windows.h>.

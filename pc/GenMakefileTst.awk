@@ -75,6 +75,7 @@ function substitutions(test, string)
 	gsub(/ja_JP.UTF-8/, "JPN_JPN.932", string)
 	gsub(/el_GR.iso88597/, "ell_GRC.1253", string)
 	gsub(/ru_RU.UTF-8/, "RUS_RUS.1251", string)
+	gsub(/GAWKLOCALE=/, "LC_ALL=", string)
 
 	# command for `ls'
 	gsub(/@-ls/, "@-$(LS)", string)

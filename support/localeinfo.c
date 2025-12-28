@@ -28,12 +28,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wctype.h>
+/* MinGW has this stuff defined in a file included by config.h above.  */
+#ifndef __MINGW32__
 #if HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
 #else
 # define mbrtoc32  mbrtowc
 # define c32rtomb  wcrtomb
+#endif
 #endif
 #define c32tolower towlower
 #define c32toupper towupper

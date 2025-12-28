@@ -520,7 +520,7 @@ check_pos:
 
 					wc = uval;
 
-					count = wcrtomb(buf, wc, & mbs);
+					count = c32rtomb(buf, wc, & mbs);
 					if (count == 0
 					    || count == (size_t) -1) {
 						if (do_lint)
