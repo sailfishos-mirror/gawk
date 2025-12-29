@@ -12958,8 +12958,8 @@ $ @kbd{gawk 'BEGIN @{ print "021 @`e", 021 ; print 018 @}'}
 
 Le costanti intere scritte con notazione esadecimale sono state
 supportate nel linguaggio C fin dall'inizio.  Lo standard C99
-ha aggiunto supporto per valori a virgola mobile espressi con
-notazione esadecimale.  Il numero a virgola mobile @`e espresso
+ha aggiunto supporto per valori in virgola mobile espressi con
+notazione esadecimale.  Il numero in virgola mobile @`e espresso
 come [@code{-}]@code{0x@var{h}}[@code{.@var{hhhh}}]@code{p+-@var{dd}}.
 La lettera @samp{p} precede l'esponente, ed @`e @emph{obbligatoria}.
 Il punto (equivalente alla "," in italiano) e le cifre che lo seguono
@@ -12969,10 +12969,16 @@ esadecimali da @samp{a} ad @samp{f} possono essere sia maiuscole
 che minuscole.
 
 A partire dalla versione 5.4.0, @command{gawk} supporta i valori
-a virgola mobile, espressi con notazione esadecimale, come costanti
+in virgola mobile, espressi con notazione esadecimale, come costanti
 nel codice sorgente, come operandi nella funzione predefinita
 @code{strtonum()} e quando si specifica l'opzione
 @option{--non-decimal-data} a livello di riga di comando.
+Ecco un esempio:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print 0xdeadbeefp-1 @}'}
+@print{} 1.86796e+09
+@end example
 
 Per il corretto funzionamento, la versione di @code{strtod()},
 nella libreria di funzioni C, invocata da @command{gawk},
@@ -21867,8 +21873,8 @@ limitava a restituire il valore del codice di ritorno,
 diviso per 256 (ossia la met@`a sinistra del numero a 16 bit, spostata
 a destra).  In una situazione normale questo equivale a utilizzare il
 codice di ritorno di @code{system()}, ma nel caso in cui il programma sia
-stato terminato da un segnale, il valore diventa un numero frazionale in
-virgola mobile.@footnote{In uno scambio di messaggi privato il Dr.@:
+stato terminato da un segnale, il valore diventa un numero frazionale
+in virgola mobile.@footnote{In uno scambio di messaggi privato il Dr.@:
 Kernighan mi ha comunicato che questo modo di procedere @`e probabilmente
 errato.}  POSIX stabilisce che la chiamata a @code{system()} dall'interno
 di @command{awk} dovrebbe restituire l'intero valore a 16 bit.
@@ -32938,15 +32944,8 @@ Nella
 @end iftex
 @ref{Numeri non-decimali}, si @`e spiegato come usare valori ottali ed
 esadecimali nel codice sorgente di un programma per rappresentare valori
-numerici.  Le costanti ottali ed esadecimali descritte in quella sezione
-possono essere usate solo per rappresentare numeri interi.
-
-Lo standard 1999 per il linguaggio C ha introdotto una notazione per
-esprimere il valore di numeri in virgola mobile esadecimali.
-Analogamente a come si usa per il numero @code{e}, seguito da un
-esponente espresso da un numero in virgola mobile (come
-@code{12.34e5}), un valore esadecimale in virgola mobile ha un esponente
-preceduto o da @code{p} o da @code{P}.  Per esempio, @code{0x1p-3}.
+numerici.  Quella sezione tratta anche dei valori esadecimali espressi
+con la notazione in virgola mobile.
 
 A partire dalla versione 5.4 di @command{gawk}, l'opzione
 @option{--non-decimal-data} e la funzione @code{strtonum()} accettano
@@ -38240,8 +38239,8 @@ rappresentare in modo esatto.
 
 I computer moderni possono eseguire calcoli su valori in virgola mobile
 nell'hardware dell'elaboratore, entro un intervallo di valori limitato.
-Ci sono inoltre librerie di programmi che consentono calcoli, usando numeri in
-virgola mobile, di precisione arbitraria.
+Ci sono inoltre librerie di programmi che consentono calcoli, usando numeri
+in virgola mobile, di precisione arbitraria.
 
 @cindex virgola mobile @subentry numeri in @subentry precisione singola
 @cindex virgola mobile @subentry numeri in @subentry precisione doppia
@@ -38533,8 +38532,8 @@ per maggiori informazioni.
 Questa sezione fornisce un quadro dettagliato dei problemi che
 si presentano quando si eseguono molti calcoli in virgola
 mobile.@footnote{C'@`e un saggio molto bello
-@uref{https://www.validlab.com/goldberg/paper.pdf, sul calcolo in
-virgola mobile} di David Goldberg, ``What Every Computer Scientist Should Know
+@uref{https://www.validlab.com/goldberg/paper.pdf, sul calcolo
+in virgola mobile} di David Goldberg, ``What Every Computer Scientist Should Know
 About Floating-Point Arithmetic,''
 @cite{ACM Computing Surveys} @strong{23}, 1 (1991-03): 5-48.  Vale la pena di
 leggerlo, se si @`e interessati a scendere nei dettagli, per@`o richiede delle
@@ -39008,8 +39007,8 @@ differenza tra di loro rientra in un delta accettabile.
 In applicazioni dove sono sufficienti fino a 15 cifre decimali,
 il calcolo in doppia precisione eseguito dall'hardware del computer
 pu@`o essere una buona soluzione,
-e in genere @`e pi@`u veloce.  Per@`o bisogna tener presente che ogni operazione in
-virgola mobile pu@`o subire un nuovo errore di arrotondamento con conseguenze
+e in genere @`e pi@`u veloce.  Per@`o bisogna tener presente che ogni operazione
+in virgola mobile pu@`o subire un nuovo errore di arrotondamento con conseguenze
 catastrofiche, come si @`e visto nel precedente tentativo di calcolare il valore
 di @value{PI}.
 In tali casi una precisione supplementare pu@`o aumentare la stabilit@`a e
@@ -40794,14 +40793,14 @@ p = NULL;                       @ii{adesso} q @ii{la ``possiede''}
 Gli oggetti MPFR e GMP sono in effetti allocati sullo @dfn{stack}
 oppure dinamicamente, ma le librerie MPFR e GMP trattano questi
 oggetti come valori, allo stesso modo in cui si passa normalmente
-un valore intero (@code{int}) o uno a virgola mobile a doppia
+un valore intero (@code{int}) o uno in virgola mobile a doppia
 precisione (@code{double}) per valore.  Non c'@`e modo di
 ``trasferire il possesso'' di oggetti MPFR e GMP.
 
 Il risultato finale di un calcolo effettuato tramite MPFR o GMP
 dovrebbe essere restituito a @command{gawk} per valore, come
 si farebbe se si trattasse di una stringa o di un numero
-a virgola mobile a doppia precisione (@code{double}).
+in virgola mobile a doppia precisione (@code{double}).
 @command{gawk} liberer@`a la memoria occupata dal numero stesso.
 
 Per questo motivo, il codice in un'estensione dovrebbe essere
