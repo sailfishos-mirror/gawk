@@ -2445,8 +2445,12 @@ minrx_regncomp(minrx_regex_t *rx, size_t ns, const char *s, int flags)
 	if ((strcmp(loc, "C") == 0 || strcmp(loc, "POSIX") == 0 ||
 		(flags & MINRX_REG_NATIVE1B) != 0) && MB_CUR_MAX == 1)
 		enc = Byte;
-	else if (strcmp(nl_langinfo(CODESET), "UTF-8") == 0)
-		enc = UTF8;
+	else {
+		char *codeset = nl_langinfo(CODESET);
+		if (strcmp(codeset, "UTF-8") == 0	/* Posix */
+		    || strcmp(codeset, "CP65001") == 0) /* Windows */
+			enc = UTF8;
+	}
 	Compile c;
 	c.flags = (minrx_regcomp_flags_t) flags;
 	c.enc = enc;
