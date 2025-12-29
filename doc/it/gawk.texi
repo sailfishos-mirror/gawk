@@ -12956,6 +12956,29 @@ $ @kbd{gawk 'BEGIN @{ print "021 @`e", 021 ; print 018 @}'}
 @print{} 18
 @end example
 
+Le costanti intere scritte con notazione esadecimale sono state
+supportate nel linguaggio C fin dall'inizio.  Lo standard C99
+ha aggiunto supporto per valori a virgola mobile espressi con
+notazione esadecimale.  Il numero a virgola mobile @`e espresso
+come [@code{-}]@code{0x@var{h}}[@code{.@var{hhhh}}]@code{p+-@var{dd}}.
+La lettera @samp{p} precede l'esponente, ed @`e @emph{obbligatoria}.
+Il punto (equivalente alla "," in italiano) e le cifre che lo seguono
+sono opzionali.  Come @`e il caso per le costanti esadecimali,
+sia @samp{0x} che @samp{0X} possono essere usati, e le cifre
+esadecimali da @samp{a} ad @samp{f} possono essere sia maiuscole
+che minuscole.
+
+A partire dalla versione 5.4.0, @command{gawk} supporta i valori
+a virgola mobile, espressi con notazione esadecimale, come costanti
+nel codice sorgente, come operandi nella funzione predefinita
+@code{strtonum()} e quando si specifica l'opzione
+@option{--non-decimal-data} a livello di riga di comando.
+
+Per il corretto funzionamento, la versione di @code{strtod()},
+nella libreria di funzioni C, invocata da @command{gawk},
+dev'essere in grado di gestire tali costanti.
+Nei sistemi recenti questo non @`e sicuramente un problema.
+
 @cindex modalit@`a compatibile di (@command{gawk}) @subentry numeri ottali
 @cindex numeri @subentry ottali @subentry nella modalit@`a compatibile di (@command{gawk})
 @cindex modalit@`a compatibile di (@command{gawk}) @subentry numeri esadecimali
@@ -22739,7 +22762,7 @@ di lunghezza multipla di 8, ossia contenenti un numero intero di byte.
 Questo @`e tipico dei computer moderni.
 
 Il codice principale nella regola @code{BEGIN} mostra la differenza tra
-i valori decimale e ottale dello stesso numero.
+i valori decimale e ottale dello stesso numero,
 (@pxref{Numeri non-decimali}),
 e poi mostra i risultati delle funzioni
 @code{compl()}, @code{lshift()} e @code{rshift()}.
@@ -32907,7 +32930,13 @@ $ @kbd{echo 0123 123 0x123 | gawk --non-decimal-data '}
 @print{} 83 123 291
 @end example
 
-In @xref{Numeri non-decimali}, si @`e spiegato come usare valori ottali ed
+@ifnottex
+In
+@end ifnottex
+@iftex
+Nella
+@end iftex
+@ref{Numeri non-decimali}, si @`e spiegato come usare valori ottali ed
 esadecimali nel codice sorgente di un programma per rappresentare valori
 numerici.  Le costanti ottali ed esadecimali descritte in quella sezione
 possono essere usate solo per rappresentare numeri interi.
@@ -45638,8 +45667,8 @@ La possibilit@`a che @code{RS} sia una @dfn{regexp}
 (@pxref{Record})
 
 @item
-La possibilit@`a di usare costanti ottali ed esadecimali nei programmi
-scritti in @command{awk}
+La possibilit@`a di usare costanti ottali ed esadecimali nel codice
+sorgente di programmi @command{awk}
 (@pxref{Numeri non-decimali})
 
 @item
@@ -46201,7 +46230,7 @@ un'applicazione
 
 @item
 La possibilit@`a di usare costanti ottali ed esadecimali nel codice
-sorgente di programmi @command{awk}.
+sorgente di programmi @command{awk}
 (@pxref{Numeri non-decimali}).
 
 @item
@@ -46922,6 +46951,10 @@ La Versione 5.4 ha aggiunto le seguenti funzionalit@`a:
 @itemize
 
 @item
+@`E stata aggiunta l'opzione @option{--enable-O3} al comando @command{configure}
+(@pxref{Ulteriori opzioni di configurazione}).
+
+@item
 Utilizzo del nuovo motore di gestione delle espressioni regolari
 MinRX, come default
 (@pxref{Scegliere il motore per @dfn{regexp}}).
@@ -46952,6 +46985,7 @@ sistemi NetBSD e OpenBSD
 
 @item
 I valori esadecimali in virgola mobile possono essere usati
+nel sorgente dei programmi @command{gawk},
 con la funzione @code{strtonum()} e con l'opzione
 @option{--non-decimal-data} (@pxref{Dati non decimali}).
 
@@ -48159,7 +48193,7 @@ miglioramento nei tempi di esecuzione di un programma.
 @item --enable-builtin-intdiv0
 Aggiungere una nuova funzione predefinita, @code{intdiv0()}, che restituisce
 sia il risultato di una divisione a numeri interi che il
-resto della divisione stessa.  Ciò è spiegato più estesamente in
+resto della divisione stessa.  Ci@`o @`e spiegato pi@`u estesamente in
 @ref{Interi a precisione arbitraria}.
 
 @cindex @option{--enable-O3} (opzione di configurazione)
@@ -48167,9 +48201,9 @@ resto della divisione stessa.  Ciò è spiegato più estesamente in
 @item --enable-O3
 Usare l'opzione GCC @option{-O3} durante la compilazione di @command{gawk}
 invece dell'opzione GCC standard @option{-O2}.  L'ottimizzazione
-maggiore può migliorare le prestazioni di @command{gawk}.  Tuttavia, in
+maggiore pu@`o migliorare le prestazioni di @command{gawk}.  Tuttavia, in
 altri progetti software, l'opzione @option{-O3} ha causato problemi, e
-quindi non è usata per default.
+quindi non @`e usata per default.
 
 @cindex @option{--enable-versioned-extension-dir} (opzione di configurazione)
 @cindex opzioni di configurazione @subentry @option{--enable-versioned-extension-dir}
@@ -48385,7 +48419,7 @@ usando gli strumenti MinGW, scrivere @samp{make mingw32}.
 
 Se si sta compilando @command{gawk} in ambiente MinGW usando un Makefile
 diverso da @file{pc/Makefile}, occorre assicurarsi di passare al compilatore
-GCC l'opzione da riga-di-comando @option{-D__USE_MINGW_ANSI_STDIO}. Ci@`o @`e
+GCC l'opzione da riga di comando @option{-D__USE_MINGW_ANSI_STDIO}. Ci@`o @`e
 necessario per il corretto funzionamento di Gawk in ambiente Windows, in
 particolare per visualizzare le traduzioni dei messaggi.
 
