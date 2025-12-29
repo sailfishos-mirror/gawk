@@ -11787,6 +11787,12 @@ Beginning with version 5.4.0, @command{gawk} supports hexadecimal
 floating point values, as constants in @command{awk} program source
 code, with the @code{strtonum()} built-in function, and with the
 @option{--non-decimal-data} command-line option.
+Here is an example:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print 0xdeadbeefp-1 @}'}
+@print{} 1.86796e+09
+@end example
 
 For this to work correctly, the version of @code{strtod()} in the
 system's underlying C library must understand such constants.
@@ -29958,16 +29964,9 @@ $ @kbd{echo 0123 123 0x123 | gawk --non-decimal-data '}
 @print{} 83 123 291
 @end example
 
-In @xref{Nondecimal-numbers}, we described how octal and hexadecimal values
-may be used in program source code to represent numeric values.  Octal and
-plain hexadecimal constants as described in that section can only be used for
-integer values.
-
-The 1999 standard for the C language introduced a notation for hexadecimal
-floating-point values.  Similar the use of @code{e} followed by an
-exponent in decimal floating-point values (such as @code{12.34e5}),
-a hexadecimal floating-point value has an exponent preceded by either
-@code{p} or @code{P}. For example, @code{0x1p-3}.
+In @ref{Nondecimal-numbers}, we described how octal and hexadecimal values
+may be used in program source code to represent numeric values.
+That section also discussed hexadecimal floating-point values.
 
 As of version 5.4 of @command{gawk}, the @option{--non-decimal-data} option and
 the @code{strtonum()} function accept such values and convert them correctly.
