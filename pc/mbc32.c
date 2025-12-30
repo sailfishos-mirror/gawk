@@ -65,6 +65,7 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
       else
 	{
 	  errno = EILSEQ;
+	  internal_state.rem = 0;
 	  return (size_t)-1;
 	}
       remaining = length - 1;
@@ -89,6 +90,7 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
 	    && (ch32 <= 0x43FF)))
 	{
 	  errno = EINVAL;
+	  internal_state.rem = 0;
 	  return (size_t)-1;
 	}
     }
@@ -99,6 +101,7 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
       if (!((cbyte & 0xC0) == 0x80))
 	{
 	  errno = EILSEQ;
+	  internal_state.rem = 0;
 	  return (size_t)-1;
 	}
       ch32 = (ch32 << 6) | (cbyte & 0x3F);
@@ -115,6 +118,7 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
 	&& (ch32 < 0xD800 || ch32 > 0xDFFF)))
     {
       errno = EILSEQ;
+      internal_state.rem = 0;
       return (size_t)-1;
     }
   switch (length)
@@ -123,6 +127,7 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
       if (ch32 < 0x800)
 	{
 	  errno = EILSEQ;
+	  internal_state.rem = 0;
 	  return (size_t)-1;
 	}
       break;
@@ -130,6 +135,7 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
       if (ch32 < 0x10000)
 	{
 	  errno = EILSEQ;
+	  internal_state.rem = 0;
 	  return (size_t)-1;
 	}
       break;
@@ -219,7 +225,12 @@ mbrlenc32 (const char *__restrict__ s, size_t n,
 	   mbstate32_t *__restrict__ ps)
 {
   mbstate32_t internal;
-  return mingw_mbrtoc32 (NULL, s, n, ps ? ps : &internal);
+  if (!ps)
+    {
+      ps = &internal;
+      memset (&internal, 0, sizeof(internal));
+    }
+  return mingw_mbrtoc32 (NULL, s, n, ps);
 }
 
 size_t
@@ -284,7 +295,12 @@ mbrlenc32 (const char *__restrict__ s, size_t n,
 	   mbstate_t *__restrict__ ps)
 {
   mbstate_t internal;
-  return mingw_mbrtoc32 (NULL, s, n, ps ? ps : &internal);
+  if (!ps)
+    {
+      ps = &internal;
+      memset (&internal, 0, sizeof(internal));
+    }
+  return mingw_mbrtoc32 (NULL, s, n, ps);
 }
 
 size_t
