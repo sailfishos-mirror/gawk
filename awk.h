@@ -90,7 +90,7 @@ extern int c32scoll(const char32_t *, const char32_t *);
 #define c32slen(s) wcslen((wchar_t *) s)
 #define c32scoll(l, r)	wcscoll((wchar_t *) l, (wchar_t *) r)
 
-#else	/* Posix without <uchar.h> */
+#else	/* POSIX without <uchar.h> */
 
 #define char32_t wchar_t
 #define mbrtoc32 mbrtowc
@@ -98,7 +98,7 @@ extern int c32scoll(const char32_t *, const char32_t *);
 #define c32slen(s) wcslen(s)
 #define c32scoll(l, r)	wcscoll(l, r)
 
-#endif	/* Posix without <uchar.h> */
+#endif	/* POSIX without <uchar.h> */
 
 #ifdef __CYGWIN__ /* Define helper function for large Unicode values */
 extern size_t wcitomb (char *s, int wc, mbstate_t *ps);

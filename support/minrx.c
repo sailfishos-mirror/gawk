@@ -2447,7 +2447,7 @@ minrx_regncomp(minrx_regex_t *rx, size_t ns, const char *s, int flags)
 		enc = Byte;
 	else {
 		char *codeset = nl_langinfo(CODESET);
-		if (strcmp(codeset, "UTF-8") == 0	/* Posix */
+		if (strcmp(codeset, "UTF-8") == 0	/* POSIX */
 		    || strcmp(codeset, "CP65001") == 0) /* Windows */
 			enc = UTF8;
 	}

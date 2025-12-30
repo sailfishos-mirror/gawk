@@ -729,11 +729,10 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 				break;
 			}
 		}
-#if defined (__CYGWIN__)
 		memset(& mbs, 0, sizeof(mbs));
+#if defined (__CYGWIN__)
 		n = wcitomb(buf, i, & mbs);
 #else
-		memset(& mbs, 0, sizeof(mbs));
 		n = c32rtomb(buf, i, & mbs);
 #endif	/* !__CYGWIN__ */
 		if (n == (size_t) -1) {

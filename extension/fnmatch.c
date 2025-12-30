@@ -77,7 +77,7 @@
 /* Prevent ../missing_d/fnmatch.c from using wchar_t stuff.  */
 #undef HAVE_WCHAR_H
 #undef HAVE_CONFIG_H
-#endif
+#endif /* __MINGW32__ */
 #include "../missing_d/fnmatch.c"	/* ditto */
 #endif
 #define HAVE_FNMATCH

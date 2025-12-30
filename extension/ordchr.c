@@ -61,7 +61,7 @@
 #define mbrtoc32 mbrtowc
 #define c32rtomb wcrtomb
 #endif
-#endif
+#endif /* __MINGW32__ */
 
 static const gawk_api_t *api;	/* for convenience macros to work */
 static awk_ext_id_t ext_id;
