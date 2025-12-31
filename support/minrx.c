@@ -1589,6 +1589,7 @@ chr(Compile *c, bool nested, NInt nstk)
 	NodeList lhs = empty();
 	size_t lhmaxstk;
 	bool lhasmin = false;
+	minrx_result_t err = MINRX_REG_SUCCESS;
 	switch (c->wc) {
 	default:
 	normal:
@@ -1601,6 +1602,10 @@ chr(Compile *c, bool nested, NInt nstk)
 			cset_set_ic(csets_back(&c->csets), c->wc);
 			if (!emplace_final(&c->np, &lhs, Cset, csets_size(&c->csets) - 1, 0, nstk))
 				return LITERAL(Subexp) {empty(), 0, false, MINRX_REG_ESPACE};
+		}
+		if (c->wc >= INT32_MIN && c->wc <= INT32_MIN + 255) {
+			err = MINRX_REG_BADPAT;		// invalid byte seen
+			goto done;
 		}
 		c->wc = wconv_nextchr(&c->wconv);
 		break;
@@ -1777,7 +1782,8 @@ chr(Compile *c, bool nested, NInt nstk)
 		lhmaxstk = nstk;
 		break;
 	}
-	return LITERAL(Subexp) {lhs, lhmaxstk, lhasmin, MINRX_REG_SUCCESS};
+done:
+	return LITERAL(Subexp) {lhs, lhmaxstk, lhasmin, err};
 }
 
 static void
