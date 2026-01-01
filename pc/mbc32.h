@@ -10,6 +10,28 @@
    that accept wchar_t arguments don't support codepoints beyond the
    BMP, which require two wchar_t values to represent them.  */
 
+/* 
+ * Copyright (C) 2025-2026,
+ * the Free Software Foundation, Inc.
+ * 
+ * This file is part of GAWK, the GNU implementation of the
+ * AWK Progamming Language.
+ * 
+ * GAWK is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * GAWK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ */
+
 #ifndef MBC32_H
 #define MBC32_H
 
@@ -70,5 +92,15 @@ extern size_t mingw_c32rtomb (char *__restrict__, char32_t,
 /* Gawk calls mbrlen, so we need to redirect that to our own version
    which supports characters beyond the BMP.  */
 #define mbrlen(s,n,ps)       mbrlenc32(s,n,ps)
+
+enum mingw_set_utf8
+{
+  UTF8_HARD_RESET = -2,
+  UTF8_RESET = -1,
+  UTF8_QUERY = 0,
+  UTF8_SET = 1
+};
+
+bool mingw_using_utf8 (enum mingw_set_utf8);
 
 #endif	/* MBC32_H */

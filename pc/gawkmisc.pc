@@ -121,7 +121,7 @@ struct stat *stb;
 	memset(stb, '\0', sizeof(struct stat));
 
 	if (fstat(fd, stb) == -1)
-		fatal("can't stat fd %d (%s)", fd, strerror(errno));
+		fatal(_("can't stat fd %d (%s)"), fd, strerror(errno));
 	if (S_ISREG(stb->st_mode)
 	    && 0 < stb->st_size && stb->st_size < DEFBLKSIZE) /* small file */
 		return stb->st_size;
@@ -401,9 +401,9 @@ cache_locale (const char *locale)
     free (current_locale);
   current_locale = strdup (locale);
   is_C_locale =
-    strncmp (locale, "C", 1) == 0 || strncmp (locale, "POSIX", 5) == 0;
+    strcmp (locale, "C") == 0 || strcmp (locale, "POSIX") == 0;
   if (is_C_locale)
-    mingw_using_utf8 (-2);
+    mingw_using_utf8 (UTF8_HARD_RESET);
   current_lcid = GetThreadLocale ();
 }
 
@@ -447,12 +447,12 @@ w32_setlocale (int category, const char *value)
   console_outputcp = GetConsoleOutputCP ();
   if (!new_locale
       && (strcmp (retval, "C") == 0 || strcmp (retval, "POSIX") == 0)
-      && mingw_using_utf8 (0))
+      && mingw_using_utf8 (UTF8_QUERY))
     retval = ""; /* pretend we are not in "C" locale when using UTF-8 */
   if (new_locale && retval && (category == LC_ALL || category == LC_CTYPE))
     {
       if (strcmp (retval, "C") == 0 || strcmp (retval, "POSIX") == 0)
-	mingw_using_utf8 (-1);
+	mingw_using_utf8 (UTF8_RESET);
       cache_locale (new_locale);
     }
 #ifndef _UCRT
@@ -534,7 +534,7 @@ c32isalnum (char32_t c32)
 
   if (c32 <= 127)
     return isalnum (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & (C1_ALPHA | C1_DIGIT)) != 0;
   ch = c32;
   return iswalnum (ch);
@@ -547,7 +547,7 @@ c32isalpha (char32_t c32)
 
   if (c32 <= 127)
     return isalpha (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_ALPHA) != 0;
   ch = c32;
   return iswalpha (ch);
@@ -560,7 +560,7 @@ c32islower (char32_t c32)
 
   if (c32 <= 127)
     return islower (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_LOWER) == C1_LOWER;
   ch = c32;
   return iswlower (ch);
@@ -573,7 +573,7 @@ c32isupper (char32_t c32)
 
   if (c32 <= 127)
     return isupper (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_UPPER) == C1_UPPER;
   ch = c32;
   return iswupper (ch);
@@ -586,7 +586,7 @@ c32iscntrl (char32_t c32)
 
   if (c32 <= 127)
     return iscntrl (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_CNTRL) == C1_CNTRL;
   ch = c32;
   return iswcntrl (ch);
@@ -599,7 +599,7 @@ c32isdigit (char32_t c32)
 
   if (c32 <= 127)
     return isdigit (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_DIGIT) == C1_DIGIT;
   ch = c32;
   return iswdigit (ch);
@@ -612,7 +612,7 @@ c32isgraph (char32_t c32)
 
   if (c32 <= 127)
     return isgraph (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & (C1_ALPHA | C1_DIGIT | C1_PUNCT)) != 0;
   ch = c32;
   return iswgraph (ch);
@@ -625,7 +625,7 @@ c32isprint (char32_t c32)
 
   if (c32 <= 127)
     return isprint (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & (C1_ALPHA | C1_DIGIT | C1_PUNCT | C1_BLANK)) != 0;
   ch = c32;
   return iswprint (ch);
@@ -638,7 +638,7 @@ c32ispunct (char32_t c32)
 
   if (c32 <= 127)
     return ispunct (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_PUNCT) == C1_PUNCT;
   ch = c32;
   return iswpunct (ch);
@@ -651,7 +651,7 @@ c32isspace (char32_t c32)
 
   if (c32 <= 127)
     return isspace (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_SPACE) == C1_SPACE;
   ch = c32;
   return iswspace (ch);
@@ -664,7 +664,7 @@ c32isxdigit (char32_t c32)
 
   if (c32 <= 127)
     return isxdigit (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_XDIGIT) == C1_XDIGIT;
   ch = c32;
   return iswxdigit (ch);
@@ -679,7 +679,7 @@ c32isblank (char32_t c32)
     return 1;
   else if (c32 <= 127)
     return isblank (c32);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & C1_BLANK) == C1_BLANK;
   ch = c32;
   return iswblank (ch);
@@ -692,7 +692,7 @@ c32istype (char32_t c32, wctype_t type)
 
   if (c32 <= 127)
     return _isctype (c32, type);
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return (c32_get_type (c32) & type) != 0;
   ch = c32;
   return iswctype (ch, type);
@@ -718,7 +718,7 @@ c32toupper (char32_t c32)
     return toupper (c32);
   else if (c32 > 0x10FFFF)
     return c32;	/* UB */
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     {
       wchar_t wc[2];
 
@@ -761,7 +761,7 @@ c32tolower (char32_t c32)
     return tolower (c32);
   else if (c32 > 0x10FFFF)
     return c32;	/* UB */
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     {
       wchar_t wc[2];
 
@@ -803,7 +803,7 @@ mingw_btowc (int ch)
     return WEOF;
   else if (ch <= 127)
     return ch;
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return WEOF;
   return btowc (ch);
 }
@@ -817,7 +817,7 @@ c32tob (char32_t c32)
     return EOF;
   else if (c32 <= 127)
     return c32;
-  else if (mingw_using_utf8 (0))
+  else if (mingw_using_utf8 (UTF8_QUERY))
     return EOF;
   ch16 = c32;
   return wctob (ch16);
@@ -845,7 +845,7 @@ c32scoll(const char32_t *left, const char32_t *right)
 
   if (!is_C_locale)
     {
-      const char *err_fmt = "cannot malloc %d char32_t's for c32scoll";
+      const char *err_fmt = _("cannot malloc %d char32_t's for c32scoll");
       static wchar_t *buf1 = NULL, *buf2 = NULL;
       static size_t len1 = 0, len2 = 0;
       size_t len_left = c32slen (left);
@@ -910,7 +910,7 @@ c32scoll(const char32_t *left, const char32_t *right)
       *p = 0;
 
       /* Compare.  */
-      if (mingw_using_utf8 (0))
+      if (mingw_using_utf8 (UTF8_QUERY))
 	result = CompareStringW (current_lcid, 0, buf1, count1, buf2, count2);
       else
 	result = wcscoll (buf1, buf2) + 2;

@@ -309,7 +309,7 @@ main(int argc, char **argv)
 	 */
 	gawk_mb_cur_max = MB_CUR_MAX;
 #ifdef __MINGW32__
-	if (mingw_using_utf8(1))
+	if (mingw_using_utf8(UTF8_SET))
 		gawk_mb_cur_max = 4;
 #endif
 
@@ -355,7 +355,7 @@ main(int argc, char **argv)
 			setlocale(LC_ALL, "C");
 #endif
 #ifdef __MINGW32__
-			mingw_using_utf8(-1);
+			mingw_using_utf8(UTF8_RESET);
 #endif
 		}
 	}
@@ -1866,7 +1866,7 @@ set_locale_stuff(void)
 	(void) textdomain(PACKAGE);
 
 #ifdef __MINGW32__
-	if (mingw_using_utf8(1))
+	if (mingw_using_utf8(UTF8_SET))
 		gawk_mb_cur_max = 4;
 #endif
 }

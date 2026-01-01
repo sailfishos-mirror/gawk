@@ -8,6 +8,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#include "mbc32.h"
+
 char *
 nl_langinfo (int item)
 {
@@ -72,7 +74,7 @@ nl_langinfo (int item)
 	  /* Impersonate UTF-8 locale for the benefit of Posix
              programs which know nothing about the Windows codepages
              in general and codepage 65001 in particular.  This is
-             what Gnulib's nl_langinfo does.  */
+             what Gnulibh's nl_langinfo does.  */
 	  if (strcmp (buf + 2, "65001") == 0
 	      /* Windows 10 and later returns ".utf8" as UTF-8 codeset.  */
 	      || strcmp (buf + 2, "utf8") == 0)
@@ -97,19 +99,20 @@ nl_langinfo (int item)
     0 -- to return the cached value, unless it is not yet set, in
 	 which case it works like 1.  */
 bool
-mingw_using_utf8 (int set)
+mingw_using_utf8 (enum mingw_set_utf8 set)
 {
-  static int is_utf8;
+ static int is_utf8;
 
-  if ((set || !is_utf8) && is_utf8 != -2)
+  if ((set != UTF8_QUERY || !is_utf8) && is_utf8 != -2)
     {
-      if (set == -2)
+      if (set == UTF8_HARD_RESET)
 	is_utf8 = -2;
       else
 	{
-	  if (strcmp (nl_langinfo (CODESET), "UTF-8") == 0 && set >= 0)
+	  if (strcmp (nl_langinfo (CODESET), "UTF-8") == 0
+	      && (set == UTF8_QUERY || set == UTF8_SET))
 	    is_utf8 = 1;
-	  else
+	  else	/* UTF8_RESET */
 	    is_utf8 = -1;
 	}
     }
@@ -119,7 +122,7 @@ mingw_using_utf8 (int set)
 int
 mingw_mb_cur_max (void)
 {
-  if (mingw_using_utf8 (0))
+  if (mingw_using_utf8 (UTF8_QUERY))
     return 4;
   /* __mb_cur_max is either a macro defined to call an internal CRT
      function, or an internal variable of CRT that is updated when

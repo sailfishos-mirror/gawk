@@ -1,5 +1,27 @@
 /* MinGW-specific implementation of wide-character functions.  */
 
+/* 
+ * Copyright (C) 2025-2026,
+ * the Free Software Foundation, Inc.
+ * 
+ * This file is part of GAWK, the GNU implementation of the
+ * AWK Progamming Language.
+ * 
+ * GAWK is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * GAWK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ */
+
 #include <stddef.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -204,7 +226,7 @@ size_t
 mingw_mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
 		size_t n, mbstate32_t *__restrict__ ps)
 {
-  if (mingw_using_utf8 (0))
+  if (mingw_using_utf8 (UTF8_QUERY))
     {
       mb32state_t *state32 = ps ? &ps->mbs32 : NULL;
       return mbrtoc32 (pc32, s, n, state32);
@@ -237,7 +259,7 @@ size_t
 mingw_c32rtomb (char *__restrict__ s, char32_t c32,
 		mbstate32_t *__restrict__ ps)
 {
-  if (mingw_using_utf8 (0))
+  if (mingw_using_utf8 (UTF8_QUERY))
     {
       mb32state_t *state32 = ps ? &ps->mbs32 : NULL;
       return c32rtomb (s, c32, state32);
@@ -260,7 +282,7 @@ mingw_mbsinit (const mbstate32_t *ps)
   if (!ps)
     return 1;
 
-  if (mingw_using_utf8 (0))
+  if (mingw_using_utf8 (UTF8_QUERY))
     {
       const mb32state_t *state32 = &ps->mbs32;
       return state32->rem == 0;
@@ -278,7 +300,7 @@ size_t
 mingw_mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
 		size_t n, mbstate_t *__restrict__ ps)
 {
-  if (mingw_using_utf8 (0))
+  if (mingw_using_utf8 (UTF8_QUERY))
     return mbrtoc32 (pc32, s, n, ps);
   else
     {
@@ -306,7 +328,7 @@ mbrlenc32 (const char *__restrict__ s, size_t n,
 size_t
 mingw_c32rtomb (char *__restrict__ s, char32_t c32, mbstate_t *__restrict__ ps)
 {
-  if (mingw_using_utf8 (0))
+  if (mingw_using_utf8 (UTF8_QUERY))
     return c32rtomb (s, c32, ps);
   else
     {
