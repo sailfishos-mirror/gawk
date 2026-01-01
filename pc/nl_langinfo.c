@@ -70,7 +70,7 @@ nl_langinfo (int item)
 		strcpy (buf + 2, "65001");
 	    }
 	  /* Impersonate UTF-8 locale for the benefit of Posix
-             programs which know nothing about the Widnows codepages
+             programs which know nothing about the Windows codepages
              in general and codepage 65001 in particular.  This is
              what Gnulib's nl_langinfo does.  */
 	  if (strcmp (buf + 2, "65001") == 0
