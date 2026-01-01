@@ -96,9 +96,7 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 			if (res == 0 || res == (size_t) -1 || res == (size_t) -2) {
 				// mimic gawk's behavior
 				char *codeset = nl_langinfo(CODESET);
-				if (strcmp(codeset, "UTF-8") == 0
-				    /* MS-Windows' UTF-8 codepage */
-				    || strcmp(codeset, "CP65001") == 0)
+				if (strcmp(codeset, "UTF-8") == 0)
 					ret = 0xFFFD;	// unicode bad char
 				else
 					ret = wc;
