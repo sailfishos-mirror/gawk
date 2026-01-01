@@ -69,6 +69,14 @@ nl_langinfo (int item)
 	      if (outcp == 65001)
 		strcpy (buf + 2, "65001");
 	    }
+	  /* Impersonate UTF-8 locale for the benefit of Posix
+             programs which know nothing about the Widnows codepages
+             in general and codepage 65001 in particular.  This is
+             what Gnulib's nl_langinfo does.  */
+	  if (strcmp (buf + 2, "65001") == 0
+	      /* Windows 10 and later returns ".utf8" as UTF-8 codeset.  */
+	      || strcmp (buf + 2, "utf8") == 0)
+	    return (char *) "UTF-8";
 	  return codeset;
 	}
       default:
@@ -99,7 +107,7 @@ mingw_using_utf8 (int set)
 	is_utf8 = -2;
       else
 	{
-	  if (strcmp (nl_langinfo (CODESET), "CP65001") == 0 && set >= 0)
+	  if (strcmp (nl_langinfo (CODESET), "UTF-8") == 0 && set >= 0)
 	    is_utf8 = 1;
 	  else
 	    is_utf8 = -1;
