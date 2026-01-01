@@ -1591,7 +1591,6 @@ chr(Compile *c, bool nested, NInt nstk)
 	NodeList lhs = empty();
 	size_t lhmaxstk;
 	bool lhasmin = false;
-	minrx_result_t err = MINRX_REG_SUCCESS;
 	switch (c->wc) {
 	default:
 	normal:
@@ -1604,10 +1603,6 @@ chr(Compile *c, bool nested, NInt nstk)
 			cset_set_ic(csets_back(&c->csets), c->wc);
 			if (!emplace_final(&c->np, &lhs, Cset, csets_size(&c->csets) - 1, 0, nstk))
 				return LITERAL(Subexp) {empty(), 0, false, MINRX_REG_ESPACE};
-		}
-		if (c->wc >= INT32_MIN && c->wc <= INT32_MIN + 255) {
-			err = MINRX_REG_BADPAT;         // invalid byte seen
-			goto done;
 		}
 		c->wc = wconv_nextchr(&c->wconv);
 		break;
@@ -1784,8 +1779,7 @@ chr(Compile *c, bool nested, NInt nstk)
 		lhmaxstk = nstk;
 		break;
 	}
-done:
-	return LITERAL(Subexp) {lhs, lhmaxstk, lhasmin, err};
+	return LITERAL(Subexp) {lhs, lhmaxstk, lhasmin, MINRX_REG_SUCCESS};
 }
 
 static void
@@ -1997,7 +1991,7 @@ inline static void
 execute_add(Execute *e, QVec *ncsv, NInt k, NInt nstk, const NState *nsp, WChar wcnext)
 {
 	const Node *np = &e->nodes[k];
-	if (np->type <= Cset) {
+	if ((WChar) np->type <= Cset) {
 		if (np->type == (NInt) wcnext || (np->type == Cset && cset_test(csets_aref(&e->r->csets, np->args[0]), wcnext))) {
 			QVecInsert qvi = qvec_insert(ncsv, k, nsp);
 			if (qvi.newly) {
@@ -2031,7 +2025,7 @@ inline static void
 execute_add_1(Execute *e, QVec *ncsv, NInt k, NInt nstk, const NState *nsp, WChar wcnext, NInt arg1)
 {
 	const Node *np = &e->nodes[k];
-	if (np->type <= Cset) {
+	if ((WChar) np->type <= Cset) {
 		if (np->type == (NInt) wcnext || (np->type == Cset && cset_test(csets_aref(&e->r->csets, np->args[0]), wcnext))) {
 			QVecInsert qvi = qvec_insert(ncsv, k, nsp);
 			if (qvi.newly) {
@@ -2067,7 +2061,7 @@ inline static void
 execute_add_2(Execute *e, QVec *ncsv, NInt k, NInt nstk, const NState *nsp, WChar wcnext, NInt arg1, NInt arg2)
 {
 	const Node *np = &e->nodes[k];
-	if (np->type <= Cset) {
+	if ((WChar) np->type <= Cset) {
 		if (np->type == (NInt) wcnext || (np->type == Cset && cset_test(csets_aref(&e->r->csets, np->args[0]), wcnext))) {
 			QVecInsert qvi = qvec_insert(ncsv, k, nsp);
 			if (qvi.newly) {
@@ -2105,7 +2099,7 @@ inline static void
 execute_add_3(Execute *e, QVec *ncsv, NInt k, NInt nstk, const NState *nsp, WChar wcnext, NInt arg1, NInt arg2, NInt arg3)
 {
 	const Node *np = &e->nodes[k];
-	if (np->type <= Cset) {
+	if ((WChar) np->type <= Cset) {
 		if (np->type == (NInt) wcnext || (np->type == Cset && cset_test(csets_aref(&e->r->csets, np->args[0]), wcnext))) {
 			QVecInsert qvi = qvec_insert(ncsv, k, nsp);
 			if (qvi.newly) {
@@ -2453,11 +2447,8 @@ minrx_regncomp(minrx_regex_t *rx, size_t ns, const char *s, int flags)
 	if ((strcmp(loc, "C") == 0 || strcmp(loc, "POSIX") == 0 ||
 		(flags & MINRX_REG_NATIVE1B) != 0) && MB_CUR_MAX == 1)
 		enc = Byte;
-	else {
-		char *codeset = nl_langinfo(CODESET);
-		if (strcmp(codeset, "UTF-8") == 0)
-			enc = UTF8;
-	}
+	else if (strcmp(nl_langinfo(CODESET), "UTF-8") == 0)
+		enc = UTF8;
 	Compile c;
 	c.flags = (minrx_regcomp_flags_t) flags;
 	c.enc = enc;
