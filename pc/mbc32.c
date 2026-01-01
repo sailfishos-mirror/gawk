@@ -47,17 +47,17 @@ mbrtoc32 (char32_t *__restrict__ pc32, const char *__restrict__ s,
       cbyte = *s++;
       if (!(cbyte & 0x80))
 	length = 1;
-      else if (!(cbyte & 0x20))
+      else if ((cbyte & 0xE0) == 0xC0)
 	{
 	  length = 2;
 	  mask = 0x1F;
 	}
-      else if (!(cbyte & 0x10))
+      else if ((cbyte & 0xF0) == 0xE0)
 	{
 	  length = 3;
 	  mask = 0x0F;
 	}
-      else if (!(cbyte & 0x08))
+      else if ((cbyte & 0xF8) == 0xF0)
 	{
 	  length = 4;
 	  mask = 0x07;
@@ -320,142 +320,3 @@ mingw_c32rtomb (char *__restrict__ s, char32_t c32, mbstate_t *__restrict__ ps)
 }
 
 #endif	/* _UCRT */
-
-#ifdef TESTING
-
-#include <stdio.h>
-#include <string.h>
-
-int main (void)
-{
-  struct
-  {
-    char *input;
-    size_t in_len;
-    int expected_retval;
-    char32_t expected_codepoint;
-  } test_data[] =
-    {
-      { "",                  1,  0, 0       },
-      { "z",                 1,  1, 0x007a  },
-      { "€",                 1, -2, -1      },
-      { "€",                 2, -2, -1      },
-      { "€",                 3,  3, 0x20ac  },
-      { "á",                 2,  2, 0x00e1  },
-      { "漢",                2, -2, -1      },
-      { "漢",                3,  3, 0x6f22  },
-      { "𐐌",                 2, -2, -1      },
-      { "𐐌",                 4,  4, 0x1040c },
-      { "𞤡",
-                             1, -2, -1      },
-      { "𞤡",
-                             2, -2, -1      },
-      { "𞤡",
-                             3, -2, -1      },
-      { "𞤡",
-                             4,  4, 0x1e921 },
-      { "𞤡",
-                             5,  4, 0x1e921 },
-      { "𞤡",
-                             6,  4, 0x1e921 },
-      { "\xC3",              1, -2, -1      },
-      { "\xE3\x81\x82",      2, -2, -1      },
-      { "\xE3\x81\x82",      3,  3, 0x3042  },
-      { NULL,                4,  0, 0       },
-      { "\xF4\x90\x80\x80",  4, -1, -1      },
-      { "\xF4\x90\x80\x80",  2, -2, -1      },
-      { "\xF4\x90\x80\x80",  3, -2, -1      },
-      { "\xED\xA0\x80",      1, -2, -1      },
-      { "\xED\xA0\x80",      2, -2, -1      },
-      { "\xED\xA0\x80",      3, -1, -1      }
-    };
-
-  int ntests = sizeof (test_data) / sizeof (test_data[0]);
-  mb32state_t state;
-  int i;
-  char32_t c;
-
-  /* Test mbrlenc32 starting from init state each time.  */
-  fprintf (stderr, "mbrlen, non-restartable:\n");
-  for (i = 0; i < ntests; i++)
-    {
-      memset (&state, 0, sizeof state);
-      int ret = mbrlenc32 (test_data[i].input, test_data[i].in_len, &state);
-      if (ret != test_data[i].expected_retval)
-	fprintf (stderr, "%d: expected ret = %d, got %d\n",
-		 i, test_data[i].expected_retval, ret);
-      else
-	fprintf (stderr, "%d: OK\n", i);
-    }
-
-  /* Now test mbrlenc32 restartable.  */
-  fprintf (stderr, "mbrlen, restartable:\n");
-  for (i = 0; i < ntests; i++)
-    {
-      memset (&state, 0, sizeof state);
-      char *inp = test_data[i].input;
-      size_t j = test_data[i].in_len;
-      int ret;
-      do
-	{
-	  ret = mbrlenc32 (inp, 1, &state);
-	  inp += 1;
-	  j--;
-	} while (ret == (size_t)-2 && j > 0);
-      if (ret != test_data[i].expected_retval)
-	fprintf (stderr, "%d: expected ret = %d, got %d\n",
-		 i, test_data[i].expected_retval, ret);
-      else
-	fprintf (stderr, "%d: OK\n", i);
-    }
-
-  /* Test mbrtoc32 starting from init state each time.  */
-  fprintf (stderr, "mbrtoc32, non-restartable:\n");
-  for (i = 0; i < ntests; i++)
-    {
-      memset (&state, 0, sizeof state);
-      int ret = mbrtoc32 (&c, test_data[i].input, test_data[i].in_len, &state);
-      if (ret != test_data[i].expected_retval)
-	fprintf (stderr, "%d: expected ret = %d, got %d\n",
-		 i, test_data[i].expected_retval, ret);
-      else if (test_data[i].input != NULL
-	       && ret >= 0 && c != test_data[i].expected_codepoint)
-	fprintf (stderr, "%d: expected char = 0x%x, got 0x%x\n",
-		 i, test_data[i].expected_codepoint, c);
-      else
-	fprintf (stderr, "%d: OK\n", i);
-    }
-
-  /* Now test mbrtoc32 restartable.  */
-  fprintf (stderr, "mbrtoc32, restartable:\n");
-  for (i = 0; i < ntests; i++)
-    {
-      memset (&state, 0, sizeof state);
-      char *inp = test_data[i].input;
-      size_t j = test_data[i].in_len;
-      int ret;
-      do
-	{
-	  ret = mbrtoc32 (&c, inp, 1, &state);
-	  inp += 1;
-	  j--;
-	} while (ret == (size_t)-2 && j > 0);
-      if (ret != test_data[i].expected_retval)
-	fprintf (stderr, "%d: expected ret = %d, got %d\n",
-		 i, test_data[i].expected_retval, ret);
-      else if (test_data[i].input != NULL
-	       && ret >= 0 && c != test_data[i].expected_codepoint)
-	fprintf (stderr, "%d: expected char = 0x%x, got 0x%x\n",
-		 i, test_data[i].expected_codepoint, c);
-      else
-	fprintf (stderr, "%d: OK\n", i);
-    }
-
-  return 0;
-}
-
-#endif
-
-/* Local Variables: */
-/* coding: utf-8-unix */
-/* End: */

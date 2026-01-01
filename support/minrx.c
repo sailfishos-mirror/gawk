@@ -43,7 +43,9 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if !defined(__MINGW32__)
+#ifdef __MINGW32__
+#include "nonposix.h"
+#else	/* !__MINGW32__ */
 #if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
 #include <uchar.h>
 #else
@@ -1604,7 +1606,7 @@ chr(Compile *c, bool nested, NInt nstk)
 				return LITERAL(Subexp) {empty(), 0, false, MINRX_REG_ESPACE};
 		}
 		if (c->wc >= INT32_MIN && c->wc <= INT32_MIN + 255) {
-			err = MINRX_REG_BADPAT;		// invalid byte seen
+			err = MINRX_REG_BADPAT;         // invalid byte seen
 			goto done;
 		}
 		c->wc = wconv_nextchr(&c->wconv);
