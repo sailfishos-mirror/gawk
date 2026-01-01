@@ -74,7 +74,7 @@ nl_langinfo (int item)
 	  /* Impersonate UTF-8 locale for the benefit of Posix
              programs which know nothing about the Windows codepages
              in general and codepage 65001 in particular.  This is
-             what Gnulibh's nl_langinfo does.  */
+             what Gnulib's nl_langinfo does.  */
 	  if (strcmp (buf + 2, "65001") == 0
 	      /* Windows 10 and later returns ".utf8" as UTF-8 codeset.  */
 	      || strcmp (buf + 2, "utf8") == 0)
