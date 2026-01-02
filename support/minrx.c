@@ -43,9 +43,9 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifdef __MINGW32__
+#if defined(GAWK) && defined(__MINGW32__)
 #include "nonposix.h"
-#else	/* !__MINGW32__ */
+#else	/* ! (GAWK && __MINGW32__) */
 #if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
 #include <uchar.h>
 #else
