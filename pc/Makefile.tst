@@ -369,12 +369,12 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	backbigs1 backsmalls1 clos1way6 close_status dbugeval4\
+	clos1way6 close_status debugeval4 \
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
-	getfile getlnhd gsubnulli18n ignrcas3 inetdayt inetecht \
-	inf-nan-torture iolint mbfw1 mbprintf1 mbprintf4 mbstr1 \
-	mbstr2 mtchi18n2 pid pipeio2 pty1 pty2 readdir rstest4 \
-	rstest5 status-close timeout unicode1
+	getfile getlnhd inetdayt inetecht \
+	inf-nan-torture iolint \
+	pid pipeio2 pty1 pty2 rstest4 \
+	rstest5 status-close timeout
 
 
 # List of tests that fail on z/OS
@@ -1142,7 +1142,6 @@ getfile:
 
 readdir:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@echo Expect $@ to fail with MinGW.
 	@-if [ "`uname`" = Linux ] && [ "`stat -f . 2>/dev/null | awk 'NR == 2 { print $$NF }'`" = nfs ];  then \
 	echo This test may fail on GNU/Linux systems when run on NFS or JFS filesystems.; \
 	echo If it does, try rerunning on an ext'[234]' filesystem. ; \
@@ -1275,7 +1274,6 @@ pty2:
 
 ignrcas3::
 	@echo $@; $(CHCP) $(ORIGCP)
-	@echo Expect $@ to fail with MinGW.
 	@-if locale -a | grep ELL_GRC > /dev/null ; then \
 	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC ; export GAWKLOCALE; $(CHCP) 1253; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ ; \
@@ -1859,7 +1857,6 @@ gsubasgn:
 
 gsubnulli18n:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -2949,7 +2946,6 @@ dbugeval3:
 
 dbugeval4:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@echo Expect $@ to fail with MinGW.
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --debug < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
@@ -3854,7 +3850,6 @@ typeof9:
 
 unicode1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3892,14 +3887,12 @@ asorti:
 
 backbigs1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 backsmalls1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3937,14 +3930,12 @@ lc_num1:
 
 mbfw1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 mbprintf1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3963,7 +3954,6 @@ mbprintf3:
 
 mbprintf4:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3976,7 +3966,6 @@ mtchi18n:
 
 mtchi18n2:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -3994,14 +3983,12 @@ commas:
 
 mbstr1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 mbstr2:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@echo Expect $@ to fail with MinGW.
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
