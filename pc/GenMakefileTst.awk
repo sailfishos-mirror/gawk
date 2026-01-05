@@ -70,13 +70,18 @@ process		{ print }
 function substitutions(test, string)
 {
 	# locales
-	match(string, /GAWKLOCALE=[a-zA-Z_]+\.([^ ;]+)/, codeset)
-	if (codeset[1] == "UTF-8")
-	    codepage = "65001"
-	else if (codeset[1] == "iso88597")
-	    codepage = "1253"
+	if (string ~ /GAWKLOCALE=[a-zA-Z_]+\.([^ ;]+)/) {
+	    n = split(string, codeset, /[.;]/)
+	    if (codeset[2] == "UTF-8")
+		codepage = "65001"
+	    else if (codeset[2] ~ /iso88597/)
+		codepage = "1253"
+	    else
+		codepage = ""
+	}
 	else
 	    codepage = ""
+
 	gsub(/en_US.UTF-8/, "ENU_USA", string)
 	gsub(/fr_FR.UTF-8/, "FRA_FRA", string)
 	gsub(/ja_JP.UTF-8/, "JPN_JPN", string)

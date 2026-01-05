@@ -1,7 +1,7 @@
 #
 # test/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1988-2025 the Free Software Foundation, Inc.
+# Copyright (C) 1988-2026 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -2084,8 +2084,7 @@ badargs::
 
 strftime::
 	@echo $@
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=C ; export GAWKLOCALE; \
-	TZ=GMT0; export TZ; \
+	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) strftime.ok _$@ && rm -f _$@ strftime.ok || exit 0
 
@@ -2730,7 +2729,7 @@ nonfatal1:
 # 4/2018: On first call to $(CMP), send to /dev/null even with -s for MinGW.
 nlstringtest::
 	@echo $@ $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=fr_FR.UTF-8 ; export GAWKLOCALE ; \
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=fr_FR.UTF-8; export GAWKLOCALE ; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if $(CMP) -s "$(srcdir)"/nlstringtest-nogettext.ok _$@ > /dev/null ; \
 	then \

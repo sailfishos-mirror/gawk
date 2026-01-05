@@ -656,8 +656,7 @@ badargs::
 
 strftime::
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=C ; export GAWKLOCALE; \
-	TZ=GMT0; export TZ; \
+	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) strftime.ok _$@ && rm -f _$@ strftime.ok || exit 0
 
@@ -1311,7 +1310,7 @@ nonfatal1:
 # 4/2018: On first call to $(CMP), send to /dev/null even with -s for MinGW.
 nlstringtest::
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=FRA_FRA ; export GAWKLOCALE ; $(CHCP) 65001; \
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=FRA_FRA; export GAWKLOCALE ; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if $(CMP) -s "$(srcdir)"/nlstringtest-nogettext.ok _$@ > /dev/null ; \
 	then \
