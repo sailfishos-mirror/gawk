@@ -296,7 +296,7 @@ re_compile_fastmap_iter (regex_t *bufp, const re_dfastate_t *init_state,
 	    {
 	      unsigned char buf[MB_LEN_MAX];
 	      unsigned char *p;
-	      wchar_t wc;
+	      char32_t wc;
 	      mbstate_t state;
 
 	      p = buf;
@@ -802,7 +802,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 #ifndef _LIBC
   const char *codeset_name;
 #endif
-  size_t max_i18n_object_size = MAX (sizeof (wchar_t), sizeof (wctype_t));
+  size_t max_i18n_object_size = MAX (sizeof (char32_t), sizeof (wctype_t));
   size_t max_object_size =
     MAX (sizeof (struct re_state_table_entry),
 	 MAX (sizeof (re_token_t),
@@ -2702,16 +2702,16 @@ build_range_exp (bitset_t sbcset, re_charset_t *mbcset, Idx *range_alloc,
       if (__glibc_unlikely (*range_alloc == mbcset->nranges))
         {
           /* There is not enough space, need realloc.  */
-          wchar_t *new_array_start, *new_array_end;
+          char32_t *new_array_start, *new_array_end;
           Idx new_nranges;
 
           /* +1 in case of mbcset->nranges is 0.  */
           new_nranges = 2 * mbcset->nranges + 1;
           /* Use realloc since mbcset->range_starts and mbcset->range_ends
              are NULL if *range_alloc == 0.  */
-          new_array_start = re_realloc (mbcset->range_starts, wchar_t,
+          new_array_start = re_realloc (mbcset->range_starts, char32_t,
                                         new_nranges);
-          new_array_end = re_realloc (mbcset->range_ends, wchar_t,
+          new_array_end = re_realloc (mbcset->range_ends, char32_t,
                                       new_nranges);
 
           if (__glibc_unlikely (new_array_start == NULL
@@ -2732,7 +2732,7 @@ build_range_exp (bitset_t sbcset, re_charset_t *mbcset, Idx *range_alloc,
     }
 
   /* Build the table for single byte characters.  */
-  for (wchar_t wc = 0; wc < SBC_MAX; ++wc)
+  for (char32_t wc = 0; wc < SBC_MAX; ++wc)
     {
       if (start_wc <= wc && wc <= end_wc)
         bitset_set (sbcset, wc);
@@ -3179,12 +3179,12 @@ parse_bracket_exp (re_string_t *regexp, re_dfa_t *dfa, re_token_t *token,
 	      /* Check whether the array has enough space.  */
 	      if (__glibc_unlikely (mbchar_alloc == mbcset->nmbchars))
 		{
-		  wchar_t *new_mbchars;
+		  char32_t *new_mbchars;
 		  /* Not enough, realloc it.  */
 		  /* +1 in case of mbcset->nmbchars is 0.  */
 		  mbchar_alloc = 2 * mbcset->nmbchars + 1;
 		  /* Use realloc since array is NULL if *alloc == 0.  */
-		  new_mbchars = re_realloc (mbcset->mbchars, wchar_t,
+		  new_mbchars = re_realloc (mbcset->mbchars, char32_t,
 					    mbchar_alloc);
 		  if (__glibc_unlikely (new_mbchars == NULL))
 		    goto parse_bracket_exp_espace;

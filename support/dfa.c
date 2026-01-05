@@ -41,20 +41,21 @@
 #include "xalloc.h"
 #include "localeinfo.h"
 
-#if GAWK
-/* Use ISO C 99 API.  */
+/* MinGW has this defined in a file included from config.h above.  */
+#ifndef __MINGW32__
+# if HAVE_UCHAR_H
+/* Use ISO C 11 API.  */
+#  include <uchar.h>
+# else
+#  define mbrtoc32  mbrtowc
+#  define c32rtomb  wcrtomb
+# endif
 # include <wctype.h>
-# define char32_t wchar_t
-# define mbrtoc32 mbrtowc
-# define c32rtomb wcrtomb
 # define c32tob wctob
 # define c32isprint iswprint
 # define c32isspace iswspace
-# define mbszero(p) memset ((p), 0, sizeof (mbstate_t))
-#else
-/* Use ISO C 11 + gnulib API.  */
-# include <uchar.h>
-#endif
+#endif	/* !__MINGW32__ */
+#define mbszero(p) memset ((p), 0, sizeof (mbstate_t))
 
 /* Pacify gcc -Wanalyzer-null-dereference in areas where GCC
    understandably cannot deduce that the input comes from a

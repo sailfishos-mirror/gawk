@@ -197,6 +197,7 @@ AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
 	netdb.h netinet/in.h stddef.h string.h \
 	spawn.h \
 	sys/ioctl.h sys/param.h sys/personality.h sys/select.h sys/socket.h sys/time.h \
+	uchar.h \
 	unistd.h termios.h stropts.h wchar.h wctype.h)
 
 gl_C_BOOL
@@ -222,7 +223,7 @@ AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_TYPE_INTMAX_T
 AC_TYPE_UINTMAX_T
-AC_CHECK_TYPE(ssize_t, int)
+AC_CHECK_TYPE(ssize_t, int)dnl This is the obsolete version of the macro
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
 dnl see if time_t is defined in <sys/types.h>
@@ -318,6 +319,7 @@ AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
 	gettimeofday clock_gettime lstat \
 	getdtablesize \
 	_NSGetExecutablePath posix_spawnp \
+	mbrtoc32 c32rtomb \
 	mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
 	strcasecmp strcoll strftime strncasecmp \
 	strsignal timegm \

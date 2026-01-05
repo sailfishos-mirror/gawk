@@ -549,7 +549,7 @@ posix_compare(NODE *s1, NODE *s2)
 	}
 	else {
 		/* Similar logic, using wide characters */
-		const wchar_t *p1, *p2;
+		const char32_t *p1, *p2;
 
 		(void) force_wstring(s1);
 		(void) force_wstring(s2);
@@ -560,11 +560,11 @@ posix_compare(NODE *s1, NODE *s2)
 		for (;;) {
 			size_t len;
 
-			ret = wcscoll(p1, p2);
+			ret = c32scoll(p1, p2);
 			if (ret != 0)
 				break;
 
-			len = wcslen(p1);
+			len = c32slen(p1);
 			p1 += len + 1;
 			p2 += len + 1;
 

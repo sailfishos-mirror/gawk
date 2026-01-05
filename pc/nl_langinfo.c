@@ -1,8 +1,14 @@
 /* Replacement for the missing nl_langinfo.  Only CODESET is currently
    supported.  */
+#include <stdio.h>
+#include <stdbool.h>
+#include <ctype.h>
 #include <locale.h>
-#include <windows.h>
 #include <langinfo.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include "mbc32.h"
 
 char *
 nl_langinfo (int item)
@@ -57,9 +63,69 @@ nl_langinfo (int item)
 	    sprintf (buf + 2, "%u", GetACP ());
 	  codeset = memcpy (buf, "CP", 2);
 
+	  /* Gawk is a console program, so allow the user to override
+             the locale's codeset by using the chcp shell command.  */
+	  if (strcmp (buf + 2, "65001") != 0)
+	    {
+	      UINT outcp = GetConsoleOutputCP ();
+	      if (outcp == 65001)
+		strcpy (buf + 2, "65001");
+	    }
+	  /* Impersonate UTF-8 locale for the benefit of Posix
+             programs which know nothing about the Windows codepages
+             in general and codepage 65001 in particular.  This is
+             what Gnulib's nl_langinfo does.  */
+	  if (strcmp (buf + 2, "65001") == 0
+	      /* Windows 10 and later returns ".utf8" as UTF-8 codeset.  */
+	      || strcmp (buf + 2, "utf8") == 0)
+	    return (char *) "UTF-8";
 	  return codeset;
 	}
       default:
 	return (char *) "";
     }
+}
+
+/* Whether the MinGW Gawk is using UTF-8.
+
+   The SET argument is:
+    1 -- to set the cached value according to whether the locale
+	 and/or the console are set to use UTF-8.  Used when the
+	 locale changes and setlocale is called.
+   -1 -- to reset the cached value to zero.  Used when the -b
+	 command-line option is specified.
+   -2 -- to reset the cached value in a way that set = 1 cannot
+	 override.  Used when we are forced to run in "C" locale.
+    0 -- to return the cached value, unless it is not yet set, in
+	 which case it works like 1.  */
+bool
+mingw_using_utf8 (enum mingw_set_utf8 set)
+{
+ static int is_utf8;
+
+  if ((set != UTF8_QUERY || !is_utf8) && is_utf8 != -2)
+    {
+      if (set == UTF8_HARD_RESET)
+	is_utf8 = -2;
+      else
+	{
+	  if (strcmp (nl_langinfo (CODESET), "UTF-8") == 0
+	      && (set == UTF8_QUERY || set == UTF8_SET))
+	    is_utf8 = 1;
+	  else	/* UTF8_RESET */
+	    is_utf8 = -1;
+	}
+    }
+  return is_utf8 == 1;
+}
+
+int
+mingw_mb_cur_max (void)
+{
+  if (mingw_using_utf8 (UTF8_QUERY))
+    return 4;
+  /* __mb_cur_max is either a macro defined to call an internal CRT
+     function, or an internal variable of CRT that is updated when
+     setlocale is called.  */
+  return __mb_cur_max;
 }

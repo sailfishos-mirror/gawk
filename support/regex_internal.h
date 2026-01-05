@@ -142,9 +142,21 @@
 # define __towlower towlower
 # define __towupper towupper
 # define __btowc btowc
+# define __regfree regfree
+#if defined HAVE_UCHAR_H
+#include <uchar.h>
+# define __mbrtowc mbrtoc32
+# define __wcrtomb c32rtomb
+# define mbrtoc32  mbrtowc
+# define c32rtomb  wcrtomb
+#elif defined __MINGW32__
+# define __mbrtowc mbrtoc32
+# define __wcrtomb c32rtomb
+#else
+# define char32_t wchar_t
 # define __mbrtowc mbrtowc
 # define __wcrtomb wcrtomb
-# define __regfree regfree
+#endif /* not HAVE_UCHAR_H */
 #endif /* not _LIBC */
 
 /* Types related to integers.  Unless protected by #ifdef _LIBC, the
@@ -290,7 +302,7 @@ typedef enum
 typedef struct
 {
   /* Multibyte characters.  */
-  wchar_t *mbchars;
+  char32_t *mbchars;
 
 #ifdef _LIBC
   /* Collating symbols.  */
@@ -307,8 +319,8 @@ typedef struct
   uint32_t *range_starts;
   uint32_t *range_ends;
 #else
-  wchar_t *range_starts;
-  wchar_t *range_ends;
+  char32_t *range_starts;
+  char32_t *range_ends;
 #endif
 
   /* Character classes. */
@@ -691,7 +703,7 @@ typedef struct
   {
     unsigned char ch;
     unsigned char *name;
-    wchar_t wch;
+    char32_t wch;
   } opr;
 } bracket_elem_t;
 

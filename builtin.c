@@ -327,7 +327,7 @@ int
 strncasecmpmbs(const unsigned char *s1, const unsigned char *s2, size_t n)
 {
 	size_t i1, i2, mbclen1, mbclen2, gap;
-	wchar_t wc1, wc2;
+	char32_t wc1, wc2;
 	mbstate_t mbs1, mbs2;
 
 	memset(& mbs1, 0, sizeof(mbs1));
@@ -338,7 +338,7 @@ strncasecmpmbs(const unsigned char *s1, const unsigned char *s2, size_t n)
 			mbclen1 = 1;
 			wc1 = btowc_cache(s1[i1]);
 		} else {
-			mbclen1 = mbrtowc(& wc1, (const char *)s1 + i1,
+			mbclen1 = mbrtoc32(& wc1, (const char *)s1 + i1,
 					  n - i1, & mbs1);
 			if (mbclen1 == (size_t) -1 || mbclen1 == (size_t) -2 || mbclen1 == 0) {
 				/* We treat it as a singlebyte character. */
@@ -350,7 +350,7 @@ strncasecmpmbs(const unsigned char *s1, const unsigned char *s2, size_t n)
 			mbclen2 = 1;
 			wc2 = btowc_cache(s2[i2]);
 		} else {
-			mbclen2 = mbrtowc(& wc2, (const char *)s2 + i2,
+			mbclen2 = mbrtoc32(& wc2, (const char *)s2 + i2,
 					  n - i2, & mbs2);
 			if (mbclen2 == (size_t) -1 || mbclen2 == (size_t) -2 || mbclen2 == 0) {
 				/* We treat it as a singlebyte character. */
@@ -465,7 +465,7 @@ do_index(int nargs)
 			if (l2 > l1)
 				break;
 			if (! do_single_byte && gawk_mb_cur_max > 1) {
-				const wchar_t *pos;
+				const char32_t *pos;
 
 				pos = wcasestrstr(s1->wstptr, s1->wstlen, s2->wstptr, s2->wstlen);
 				if (pos == NULL)
@@ -497,7 +497,7 @@ do_index(int nargs)
 				break;
 			}
 			if (! do_single_byte && gawk_mb_cur_max > 1) {
-				const wchar_t *pos;
+				const char32_t *pos;
 
 				pos = wstrstr(s1->wstptr, s1->wstlen, s2->wstptr, s2->wstlen);
 				if (pos == NULL)
@@ -802,7 +802,7 @@ do_substr(int nargs)
 	else {
 		/* multibyte case, more work */
 		size_t result;
-		wchar_t *wp;
+		char32_t *wp;
 		mbstate_t mbs;
 		char *substr, *cp;
 
@@ -815,7 +815,7 @@ do_substr(int nargs)
 		emalloc(substr, char *, (length * gawk_mb_cur_max) + 1);
 		wp = t1->wstptr + indx;
 		for (cp = substr; length > 0; length--) {
-			result = wcrtomb(cp, *wp, & mbs);
+			result = c32rtomb(cp, *wp, & mbs);
 			if (result == (size_t) -1)	/* what to do? break seems best */
 				break;
 			cp += result;
@@ -1254,7 +1254,7 @@ do_print_rec(int nargs, int redirtype)
 /* is_wupper --- function version of iswupper for passing function pointers */
 
 static int
-is_wupper(wchar_t c)
+is_wupper(char32_t c)
 {
 	return iswupper(c);
 }
@@ -1262,7 +1262,7 @@ is_wupper(wchar_t c)
 /* is_wlower --- function version of iswlower for passing function pointers */
 
 static int
-is_wlower(wchar_t c)
+is_wlower(char32_t c)
 {
 	return iswlower(c);
 }
@@ -1270,7 +1270,7 @@ is_wlower(wchar_t c)
 /* to_wupper --- function version of towupper for passing function pointers */
 
 static int
-to_wlower(wchar_t c)
+to_wlower(char32_t c)
 {
 	return towlower(c);
 }
@@ -1278,7 +1278,7 @@ to_wlower(wchar_t c)
 /* to_wlower --- function version of towlower for passing function pointers */
 
 static int
-to_wupper(wchar_t c)
+to_wupper(char32_t c)
 {
 	return towupper(c);
 }
@@ -1286,13 +1286,13 @@ to_wupper(wchar_t c)
 /* wide_change_case --- generic case converter for wide characters */
 
 static void
-wide_change_case(wchar_t *wstr,
+wide_change_case(char32_t *wstr,
 			size_t wlen,
-			int (*is_x)(wchar_t c),
-			int (*to_y)(wchar_t c))
+			int (*is_x)(char32_t c),
+			int (*to_y)(char32_t c))
 {
 	size_t i;
-	wchar_t *wcp;
+	char32_t *wcp;
 
 	for (i = 0, wcp = wstr; i < wlen; i++, wcp++)
 		if (is_x(*wcp))
@@ -1302,7 +1302,7 @@ wide_change_case(wchar_t *wstr,
 /* wide_toupper --- map a wide string to upper case */
 
 static void
-wide_toupper(wchar_t *wstr, size_t wlen)
+wide_toupper(char32_t *wstr, size_t wlen)
 {
 	wide_change_case(wstr, wlen, is_wlower, to_wupper);
 }
@@ -1310,7 +1310,7 @@ wide_toupper(wchar_t *wstr, size_t wlen)
 /* wide_tolower --- map a wide string to lower case */
 
 static void
-wide_tolower(wchar_t *wstr, size_t wlen)
+wide_tolower(char32_t *wstr, size_t wlen)
 {
 	wide_change_case(wstr, wlen, is_wupper, to_wlower);
 }

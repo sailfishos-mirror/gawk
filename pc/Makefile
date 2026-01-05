@@ -104,29 +104,33 @@ LMINGW32 = $(CC) $(LF) -o $@ $(GAWKOBJS) $(LF2)
 
 mingw32:
 	$(MAK) all \
-	CC=gcc O=.o CF="-D__USE_MINGW_ANSI_STDIO -O2 -gdwarf-2 -g3 -Wno-deprecated-declarations" \
+	CC=gcc O=.o CF="-D__USE_MINGW_ANSI_STDIO -gdwarf-2 -g3 -Wno-deprecated-declarations" \
+	OPT=-O2 \
 	OBJ=popen.o LNK=LMINGW32 LF="-gdwarf-2 -g3" \
         LF2="-lws2_32" RSP=
 
 mingw32-readline:
 	$(MAK) all \
 	CC=gcc O=.o \
-	CF="-D__USE_MINGW_ANSI_STDIO -DHAVE_LIBREADLINE -O2 -gdwarf-2 -g3 -Wno-deprecated-declarations" \
+	CF="-D__USE_MINGW_ANSI_STDIO -DHAVE_LIBREADLINE -gdwarf-2 -g3 -Wno-deprecated-declarations" \
+	OPT=-O2 \
 	OBJ=popen.o LNK=LMINGW32 LF="-gdwarf-2 -g3" \
 	LF2="-lreadline -lws2_32 -Wl,--enable-auto-import" RSP=
 
 mingw32-mpfr:
 	$(MAK) all \
 	CC=gcc O=.o \
-	CF="-D__USE_MINGW_ANSI_STDIO -DHAVE_MPFR -O2 -gdwarf-2 -g3 -Wno-deprecated-declarations" \
+	CF="-D__USE_MINGW_ANSI_STDIO -DHAVE_MPFR -gdwarf-2 -g3 -Wno-deprecated-declarations" \
+	OPT=-O2 \
 	OBJ=popen.o LNK=LMINGW32 LF="-gdwarf-2 -g3" \
 	LF2="-lmpfr -lgmp -lws2_32 -Wl,--enable-auto-import" RSP=
 
 mingw32-readline-mpfr:
 	$(MAK) all \
 	CC=gcc O=.o \
-	CF="-D__USE_MINGW_ANSI_STDIO -DHAVE_LIBREADLINE -DHAVE_MPFR -O2 -gdwarf-2 -g3 -Wno-deprecated-declarations" \
-	OBJ=popen.o LNK=LMINGW32 LF="-gdwarf-2 -g3" \
+	CF="-D__USE_MINGW_ANSI_STDIO -DHAVE_LIBREADLINE -DHAVE_MPFR -gdwarf-4 -g3 -Wno-deprecated-declarations" \
+	OPT=-O2 \
+	OBJ=popen.o LNK=LMINGW32 LF="-gdwarf-4 -g3" \
 	LF2="-lmpfr -lgmp -lreadline -lws2_32 -Wl,--enable-auto-import" RSP=
 
 # Define BIND for BINDless compiles, otherwise $($(BIND)) may break.
@@ -134,7 +138,7 @@ BIND = EMPTY
 PBIND = EMPTY
 EMPTY=
 
-CFLAGS = $(CF) -DGAWK -I. -I./support -DHAVE_CONFIG_H -DDEFPATH=$(DEFPATH) -DDEFLIBPATH=$(DEFLIBPATH) -DSHLIBEXT=$(SHLIBEXT) -DLOCALEDIR=$(LOCALEDIR)
+CFLAGS = $(CF) $(OPT) -DGAWK -I. -I./support -DHAVE_CONFIG_H -DDEFPATH=$(DEFPATH) -DDEFLIBPATH=$(DEFLIBPATH) -DSHLIBEXT=$(SHLIBEXT) -DLOCALEDIR=$(LOCALEDIR)
 
 # object files
 AWKOBJS1  = array$O builtin$O eval$O field$O floatcomp$O gawkmisc$O io$O main$O
@@ -182,12 +186,14 @@ $(RSPFILE) : $(GAWKOBJS)
 # 1. The dependency on getopt.h is because unistd.h includes it,
 #    and we have -I. on the compiler command line.  unistd.h is
 #    included by awk.h.
-# 2. custom.h is not mentioned because pc ports don't use it.
-$(ALLOBJS) $(LIBOBJS) $(DYNOBJS): \
-  awk.h regex.h config.h gettext.h dfa.h getopt.h nonposix.h
+# 2. pc/mbc32.h is mentioned because custom.h, included by config.h,
+#    includes it.
+$(ALLOBJS) $(LIBOBJS) $(DYNOBJS): awk.h regex.h config.h gettext.h dfa.h \
+  getopt.h nonposix.h custom.h pc/mbc32.h
 
 $(DYNOBJS) regex$O:	dynarray.h libc-config.h malloc/dynarray.h malloc/dynarray-skeleton.c
 
+$(MINRXOBJS):  CFLAGS = $(CF) -O3 -DGAWK -I. -I./support -DHAVE_CONFIG_H -DDEFPATH=$(DEFPATH) -DDEFLIBPATH=$(DEFLIBPATH) -DSHLIBEXT=$(SHLIBEXT) -DLOCALEDIR=$(LOCALEDIR)
 $(MINRXOBJS):	minrx.h charset.c charset.h
 
 builtin$O:	floatmagic.h random.h popen.h
@@ -200,7 +206,7 @@ command$O debug$O:	cmd.h
 
 dfa$O:		xalloc.h
 
-gawkmisc$O:	pc/gawkmisc.pc pc/nl_langinfo.c socket.h
+gawkmisc$O:	pc/gawkmisc.pc pc/nl_langinfo.c pc/mbc32.c socket.h
 
 getopt$O getopt1$O :	getopt_int.h
 

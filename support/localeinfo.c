@@ -27,17 +27,19 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
-#if GAWK
-/* Use ISO C 99 API.  */
-# include <wctype.h>
-# define char32_t wchar_t
-# define mbrtoc32 mbrtowc
-# define c32tolower towlower
-# define c32toupper towupper
-#else
+#include <wctype.h>
+/* MinGW has this stuff defined in a file included by config.h above.  */
+#ifndef __MINGW32__
+#if HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
+#else
+# define mbrtoc32  mbrtowc
+# define c32rtomb  wcrtomb
 #endif
+#endif
+#define c32tolower towlower
+#define c32toupper towupper
 
 /* The sbclen implementation relies on this.  */
 verify (MB_LEN_MAX <= SCHAR_MAX);

@@ -1,6 +1,70 @@
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Updated with latest changes from Mike Haertel.
+
+2026-01-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Conditionalize inclusion of nonposix.h for MinGW to
+	also depend on ifdef GAWK. This is to make it easier (we hope)
+	to get the changes back into Mike's repo.
+
+2026-01-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Fix from Mike for invalid bytes, reverts change of
+	2025-12-31. Also reset code checking codeset to match Mike's.
+
+2026-01-01         Eli Zaretskii  <eliz@gnu.org>
+
+	* minrx.c (minrx_regncomp): Remove Windows-specific codeset test.
+
+	* minrx.c [__MINGW32__]: Include nonposix.h to override setlocale
+	with MinGW-specific version.
+
+2025-12-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c (chr): If an invalid byte is seen, return an error.
+	This helps avoid core dumps when matching in a multibyte locale
+	if the pattern contained an invalid byte; now the pattern
+	will not compile. Thanks to Eli Zaretskii for the push to
+	track this down.
+
+2025-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Style edit: POSIX in all caps.
+
+2025-12-29         Eli Zaretskii  <eliz@gnu.org>
+
+	* minrx.c (minrx_regncomp): Support Windows-style UTF-8 codeset.
+	This fixes several tests in the test suite.
+
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* dfa.c [__MINGW32__]: Don't use the HAVE_UCHAR stuff and don't
+	redirect char32_t functions to wc* equivalents, as that is all
+	defined correctly in custom.h.
+	* localeinfo.c [__MINGW32__]: Likewise.
+	* localeinfo.h [__MINGW32__]: Likewise.
+	* minrx.c [__MINGW32__]: Likewise.
+	* regex_internal.h [__MINGW32__]: Likewise.
+
 2025-12-27         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* charset.c: Add Unicode version info.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, localinfo.h, localeinfo.c, regex_internal.h: Fixes for
+	systems without uchar.h.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Switch to using the char32_t and associated routines.
+
+	* dfa.c, localeinfo.c, localeinfo.h: Switch to uchar.h and add
+	appropriate defines.
+	* minrx.c: Add appropriate checks and defines to use char32_t.
+	* regcomp.c, regex_internal.c: Switch to char32_t from wchar_t.
+	* rexeg_internal.h: Ditto, also approprate includes and defines.
 
 2025-12-17         Arnold D. Robbins     <arnold@skeeve.com>
 

@@ -350,8 +350,8 @@ r_dupnode(NODE *n)
 		r->stlen = n->stlen;
 		if ((n->flags & WSTRCUR) != 0) {
 			r->wstlen = n->wstlen;
-			emalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1));
-			memcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(wchar_t));
+			emalloc(r->wstptr, char32_t *, sizeof(char32_t) * (n->wstlen + 1));
+			memcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(char32_t));
 			r->wstptr[n->wstlen] = L'\0';
 			r->flags |= WSTRCUR;
 		}
@@ -571,7 +571,7 @@ r_unref(NODE *tmp)
  *
  * Return values:
  *	ESCAPE_OK,		// nbytes == 1 to MB_CUR_MAX: the length of the translated escape sequence
- *	ESCAPE_CONV_ERR,	// wcrtomb conversion error
+ *	ESCAPE_CONV_ERR,	// c32rtomb conversion error
  *	ESCAPE_TERM_BACKSLASH,	// terminal backslash (to be preserved in cmdline strings)
  *	ESCAPE_LINE_CONTINUATION	// line continuation  (backslash-newline pair)
  *
@@ -693,9 +693,7 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 	case 'u':
 	{
 		size_t n;
-#ifndef __MINGW32__
 		mbstate_t mbs;
-#endif
 
 		if (do_lint) {
 			static bool warned = false;
@@ -731,15 +729,12 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 				break;
 			}
 		}
-#ifdef __MINGW32__
-		n = w32_wc_to_lc (i, buf);
-#elif defined (__CYGWIN__)
 		memset(& mbs, 0, sizeof(mbs));
+#if defined (__CYGWIN__)
 		n = wcitomb(buf, i, & mbs);
 #else
-		memset(& mbs, 0, sizeof(mbs));
-		n = wcrtomb(buf, i, & mbs);
-#endif	/* !__MINGW32__ */
+		n = c32rtomb(buf, i, & mbs);
+#endif	/* !__CYGWIN__ */
 		if (n == (size_t) -1) {
 			warning(_("invalid `\\u' escape sequence"));
 			retval = ESCAPE_CONV_ERR;
@@ -826,7 +821,7 @@ str2wstr(NODE *n, size_t **ptr)
 	size_t i, count, src_count;
 	char *sp;
 	mbstate_t mbs;
-	wchar_t wc, *wsp;
+	char32_t wc, *wsp;
 	static bool warned = false;
 
 	assert((n->flags & (STRING|STRCUR)) != 0);
@@ -834,7 +829,7 @@ str2wstr(NODE *n, size_t **ptr)
 	/*
 	 * For use by do_match, create and fill in an array.
 	 * For each byte `i' in n->stptr (the original string),
-	 * a[i] is equal to `j', where `j' is the corresponding wchar_t
+	 * a[i] is equal to `j', where `j' is the corresponding char32_t
 	 * in the converted wide string.
 	 *
 	 * This is needed even for Nnull_string or Null_field.
@@ -865,9 +860,9 @@ str2wstr(NODE *n, size_t **ptr)
 	/*
 	 * After consideration and consultation, this
 	 * code trades space for time. We allocate
-	 * an array of wchar_t that is n->stlen long.
+	 * an array of char32_t that is n->stlen long.
 	 * This is needed in the worst case anyway, where
-	 * each input byte maps to one wchar_t.  The
+	 * each input byte maps to one char32_t.  The
 	 * advantage is that we only have to convert the string
 	 * once, instead of twice, once to find out how many
 	 * wide characters, and then again to actually fill in
@@ -875,7 +870,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * realloc the wide string down in size.
 	 */
 
-	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 1));
+	emalloc(n->wstptr, char32_t *, sizeof(char32_t) * (n->stlen + 1));
 	wsp = n->wstptr;
 
 	sp = n->stptr;
@@ -892,7 +887,7 @@ str2wstr(NODE *n, size_t **ptr)
 			count = 1;
 			wc = btowc_cache(*sp);
 		} else
-			count = mbrtowc(& wc, sp, src_count, & mbs);
+			count = mbrtoc32(& wc, sp, src_count, & mbs);
 		switch (count) {
 		case (size_t) -2:
 		case (size_t) -1:
@@ -957,7 +952,7 @@ str2wstr(NODE *n, size_t **ptr)
 	n->flags |= WSTRCUR;
 #define ARBITRARY_AMOUNT_TO_GIVE_BACK 100
 	if (n->stlen - n->wstlen > ARBITRARY_AMOUNT_TO_GIVE_BACK)
-		erealloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1));
+		erealloc(n->wstptr, char32_t *, sizeof(char32_t) * (n->wstlen + 1));
 
 	return n;
 }
@@ -969,7 +964,7 @@ wstr2str(NODE *n)
 {
 	size_t result;
 	size_t length;
-	wchar_t *wp;
+	char32_t *wp;
 	mbstate_t mbs;
 	char *newval, *cp;
 
@@ -988,7 +983,7 @@ wstr2str(NODE *n)
 
 	wp = n->wstptr;
 	for (cp = newval; length > 0; length--) {
-		result = wcrtomb(cp, *wp, & mbs);
+		result = c32rtomb(cp, *wp, & mbs);
 		if (result == (size_t) -1)	/* what to do? break seems best */
 			break;
 		cp += result;
@@ -1021,7 +1016,7 @@ r_free_wstr(NODE *n)
 }
 
 static void __attribute__ ((unused))
-dump_wstr(FILE *fp, const wchar_t *str, size_t len)
+dump_wstr(FILE *fp, const char32_t *str, size_t len)
 {
 	if (str == NULL || len == 0)
 		return;
@@ -1032,9 +1027,9 @@ dump_wstr(FILE *fp, const wchar_t *str, size_t len)
 
 /* wstrstr --- walk haystack, looking for needle, wide char version */
 
-const wchar_t *
-wstrstr(const wchar_t *haystack, size_t hs_len,
-	const wchar_t *needle, size_t needle_len)
+const char32_t *
+wstrstr(const char32_t *haystack, size_t hs_len,
+	const char32_t *needle, size_t needle_len)
 {
 	size_t i;
 
@@ -1046,7 +1041,7 @@ wstrstr(const wchar_t *haystack, size_t hs_len,
 		    && i+needle_len-1 < hs_len
 		    && haystack[i+needle_len-1] == needle[needle_len-1]) {
 			/* first & last chars match, check string */
-			if (memcmp(haystack+i, needle, sizeof(wchar_t) * needle_len) == 0) {
+			if (memcmp(haystack+i, needle, sizeof(char32_t) * needle_len) == 0) {
 				return haystack + i;
 			}
 		}
@@ -1057,9 +1052,9 @@ wstrstr(const wchar_t *haystack, size_t hs_len,
 
 /* wcasestrstr --- walk haystack, nocase look for needle, wide char version */
 
-const wchar_t *
-wcasestrstr(const wchar_t *haystack, size_t hs_len,
-	const wchar_t *needle, size_t needle_len)
+const char32_t *
+wcasestrstr(const char32_t *haystack, size_t hs_len,
+	const char32_t *needle, size_t needle_len)
 {
 	size_t i, j;
 
@@ -1071,11 +1066,11 @@ wcasestrstr(const wchar_t *haystack, size_t hs_len,
 		    && i+needle_len-1 < hs_len
 		    && towlower(haystack[i+needle_len-1]) == towlower(needle[needle_len-1])) {
 			/* first & last chars match, check string */
-			const wchar_t *start;
+			const char32_t *start;
 
 			start = haystack+i;
 			for (j = 0; j < needle_len; j++, start++) {
-				wchar_t h, n;
+				char32_t h, n;
 
 				h = towlower(*start);
 				n = towlower(needle[j]);

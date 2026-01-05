@@ -42670,6 +42670,11 @@ function, and with the @option{--non-decimal-data} option
 @item
 Support for UDP in @command{gawk}'s networking was marked as obsolete
 (@pxref{TCP/IP Networking}).
+
+@item
+The MinGW port of @command{gawk} for MS-Windows gained support for
+UTF-8 encoding of non-ASCII text when codepage 65001 is used by the
+Windows terminal (@pxref{PC Using}).
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
@@ -43944,26 +43949,96 @@ displaying translated messages.
 @cindex operating systems @subentry PC, @command{gawk} on
 @cindex PC operating systems, @command{gawk} on
 
-Information in this section applies to the MinGW
-port of @command{gawk}. @xref{Cygwin} for information
-about the Cygwin port.
-
-Under MS-Windows, the MinGW environment supports
-both the @samp{|&} operator and TCP/IP networking
-(@pxref{TCP/IP Networking}).
+Information in this section applies to the MinGW port of
+@command{gawk} for MS-Windows.  @xref{Cygwin} for information about
+the Cygwin port.
 
 @cindex search paths
 @cindex search paths @subentry for source files
 @cindex @command{gawk} @subentry MS-Windows version of
 @cindex @code{;} (semicolon) @subentry @env{AWKPATH} variable and
 @cindex semicolon (@code{;}) @subentry @env{AWKPATH} variable and
-@cindex @env{AWKPATH} environment variable
-@cindex environment variables @subentry @env{AWKPATH}
+@cindex @env{AWKPATH} environment variable, on MS-Windows
+@cindex environment variables @subentry @env{AWKPATH}, on MS-Windows
 The MS-Windows version of @command{gawk} searches for
 program files as described in @ref{AWKPATH Variable}.  However,
 semicolons (rather than colons) separate elements in the @env{AWKPATH}
 variable.  If @env{AWKPATH} is not set or is empty, then the default
-search path is @samp{@w{.;c:/lib/awk;c:/gnu/lib/awk}}.
+search path is @samp{@w{.;d:/usr/lib/awk;c:/lib/awk;c:/gnu/lib/awk}}.
+
+@cindex @env{AWKLIBPATH} environment variable, on MS-Windows
+Similarly, the @env{AWKLIBPATH} environment variable, which tells
+@command{gawk} where to look for dynamic extensions (@pxref{Dynamic
+Extensions}), also uses semicolons to separate directories.  If not
+set in the environment, the default value hard-coded into
+@command{gawk} is @samp{@w{d:/usr/lib/gawk/ext-@var{api-version}}},
+where @var{api-version} is the version of gawk API version for which
+@command{gawk} was compiled (@pxref{Extension Versioning}).
+
+@cindex UTF-8, and @command{gawk} on MS-Windows
+@cindex multibyte text, and @command{gawk} on MS-Windows
+@cindex internationalization and localization on MS-Windows
+@cindex codepages on MS-Windows, and @command{gawk}
+@cindex codepage 65001
+MS-Windows traditionally supported internationalization and
+localization via @dfn{codepages}.  Each Windows locale specifies a
+system-wide codepage, which defines both the non-ASCII characters
+supported by Windows and their encoding into small integer values.
+Most Windows locales use a single-byte encoding; the notable exceptions
+are @acronym{CJK} (Chinese, Japanese, and Korean) codepages which use
+one or two bytes for each non-ASCII character.  Recent versions of
+MS-Windows also support Unicode and the UTF-8 encoding, but introduction of this
+support is slow: as of this writing, setting UTF-8 as the system-wide
+codepage on Windows is still considered an experimental feature, which by
+default is turned off.  The Windows designation of the UTF-8 encoding is
+known as @dfn{codepage 65001}.
+
+@cindex characters outside of BMP, and @command{gawk} on MS-Windows
+The MinGW build of @command{gawk} for MS-Windows supports multibyte
+characters according to the codepage defined by the current system
+locale, and it also includes (starting with version 5.4) reasonable
+support for text encoded in UTF-8.  When the system's codepage is
+anything other than 65001, @command{gawk} uses the functions from the
+MS-Windows C runtime library to convert between multibyte and
+wide-character representation of text, and for character
+classification and collation; this is in most cases limited to
+characters inside the Unicode Basic Multilingual Plane
+(@acronym{BMP}), due to the limitations of the Windows runtime.  By
+contrast, if the system's codepage is set to 65001, @command{gawk}
+attempts to support the full range of Unicode codepoints, including
+the @acronym{BMP} and all the 16 Supplementary Planes defined by
+Unicode, by using its own conversion and classification routines
+instead of those in the Windows C runtime.  (This might still fail to
+work as well as it does on modern POSIX systems, because these
+routines rely on the character database data included with your
+Windows installation.)
+
+When codepage 65001 is used, @command{gawk} uses UTF-8 to encode
+multibyte text, and converts between UTF-8 and 32-bit Unicode
+codepoints internally.  Thus on Windows, to make sure @command{awk} programs
+written for POSIX systems which handle multibyte non-ASCII text work
+correctly on MS-Windows, you should use codepage 65001.
+
+As a special feature, @command{gawk} version 5.4 and later will use
+UTF-8 internally even when the system-wide codepage is something other
+than 65001, if @command{gawk} detects that the Windows terminal window
+in which it runs uses codepage 65001 for console output.  (Unlike on
+POSIX systems, Windows users can change the console encoding
+independently of the system-wide locale's encoding.)  To switch the
+Windows terminal to using UTF-8 encoding, type @samp{chcp 65001} at the
+Windows shell's prompt.  This causes @command{gawk} on Windows to
+support the full range of Unicode characters even without changing the
+system-wide locale's codepage.  We recommend that you use codepage
+65001 on Windows 11 and later systems, where the Windows terminal
+supports UTF-8 quite well.
+
+Note that @command{gawk} on Windows will still treat all input data as
+single-byte characters when invoked with the @option{-b} command-line
+option (@pxref{Options}), or when running under
+the @code{"C"} locale (i.e., when the @env{LC_ALL} environment
+variable is set to the value @samp{C} by typing @samp{set LC_ALL=C} at
+the shell prompt before invoking @command{gawk}).  This overrides the
+codepage-defined encoding of text.
 
 @cindex common extensions @subentry @code{BINMODE} variable
 @cindex extensions @subentry common @subentry @code{BINMODE} variable
@@ -44060,6 +44135,10 @@ gawk -f binmode1.awk @dots{}
 @noindent
 With proper quoting, in the first example the setting of @code{RS} can be
 moved into the @code{BEGIN} rule.
+
+Under MS-Windows, the MinGW port of @command{gawk} supports
+both the @samp{|&} operator and TCP/IP networking
+(@pxref{TCP/IP Networking}).
 
 @node Cygwin
 @appendixsubsubsec Using @command{gawk} In The Cygwin Environment

@@ -3,9 +3,40 @@
 	* bootstrap.sh: No need to touch doc/gawk.texi. Add touch
 	of pc/Makefile.tst.
 
+2026-01-04         Eli Zaretskii  <eliz@gnu.org>
+
+	* NEWS: Updated with info about UTF-8 on Windows.
+
 2025-12-30         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* NEWS: Updated.
+
+2025-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h: Style edit: POSIX in all caps.
+	* main.c: Style edits: No space before parens in function calls.
+	* node.c (parse_escape): Move memset() of mbs to outside ifdefs.
+	Factors out duplicate code.
+
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* awk.h: Remove MinGW stuff that is no longer needed.
+	* custom.h [__MINGW32__]: Add redirections for char32_t functions
+	and their prototypes.  Override MB_CUR_MAX with a MinGW-specific
+	function.  Add prototypes and redirections for stdio functions to
+	work around a bug in MSVCRT.
+	* gawkmisc.c [__MINGW32__]: Include pc/mbc32.c.
+	* main.c (main) [__MINGW32__]: Adjust the value of gawk_mb_cur_max
+	when the locale changes.
+	* node.c: Remove MinGW-specific code, which is not longer needed.
+	* nonposix.h: Add prototype of 'mingw_using_utf8'.
+	* printf.c: Fix a typo: wcrtomb should not be called directly, but,
+	if needed, via c32rtomb.
+	* profile.c: Avoid compiler warnings about functions that are
+	unused when SIGHUP and SIGUSR1 are not defined.
+	* replace.c [__MINGW32__ && !_UCRT]: Include stdio-consolesafe.c
+	to work around MSVCRT bugs when writing multibyte characters to
+	the console.
 
 2025-12-28         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -26,9 +57,32 @@
 
 	* Checklist: Updated with more items.
 
+2025-12-23         Eli Zaretskii  <eliz@gnu.org>
+
+	* awk.h [_UCRT]: Use MinGW64-provided <uchar.h> when possible.
+	(char32_t): Use the same typedef as in uchar.h.  Include
+	<stdint.h> that's required for uint_least32_t.
+
 2025-12-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* bootstrap.sh: Be smarter about touching the doc/*.info files.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h: Fixes for systems without uchar.h.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Switch to using the char32_t and associated routines.
+
+	* configure.ac: Add checks for uchar.h, mbrtoc32(), c32rtomb().
+	* awk.h: Add declarations and macros, based on configuration.
+	(NODE, wstrstr, wcasestrstr): Switch to char32_t from wchar_t.
+	* builtin.c: Ditto, use mbrtoc32(), across the board.
+	* eval.c: Ditto, use c32slen(), c32scoll() in posix_compare().
+	* interpret.h: Use char32_t.
+	* node.c: Use char32_t and associated functions.
+	* printf.c: Ditto.
 
 2025-12-18         Arnold D. Robbins     <arnold@skeeve.com>
 

@@ -123,3 +123,81 @@ typedef unsigned long long uint_fast64_t;
 #ifndef HAVE_STRSIGNAL
 extern char *strsignal(int signal);
 #endif /* ! HAVE_STRSIGNAL */
+
+/* MinGW Gawk has its own implementation of some wide-character stuff.
+   Doing this here ensures all the other sources, including those in
+   support/, obey the redirection, because they all include
+   config.h.  */
+#ifdef __MINGW32__
+#undef HAVE_UCHAR_H
+#include "pc/mbc32.h"
+#include <wctype.h>
+#define towlower c32tolower
+#define towupper c32toupper
+#define iswupper c32isupper
+#define iswlower c32islower
+#define iswalnum c32isalnum
+#define iswctype c32istype
+#define iswalpha c32isalpha
+#define iswcntrl c32iscntrl
+#define iswdigit c32isdigit
+#define iswgraph c32isgraph
+#define iswprint c32isprint
+#define iswpunct c32ispunct
+#define iswspace c32isspace
+#define iswxdigit c32isxdigit
+int c32isalnum (char32_t);
+int c32islower (char32_t);
+int c32isupper (char32_t);
+int c32isalpha (char32_t);
+int c32iscntrl (char32_t);
+int c32isdigit (char32_t);
+int c32isgraph (char32_t);
+int c32isprint (char32_t);
+int c32ispunct (char32_t);
+int c32isspace (char32_t);
+int c32isxdigit (char32_t);
+int c32istype (char32_t, wctype_t);
+char32_t c32toupper (char32_t);
+char32_t c32tolower (char32_t);
+#ifndef _UCRT
+  /* MSVCRT doesn't support "blank".  */
+#define wctype   c32type
+wctype_t c32type (const char *);
+#endif
+#define btowc mingw_btowc
+wint_t mingw_btowc (int);
+#define wctob c32tob
+int c32tob (char32_t);
+
+/* We need to override MB_CUR_MAX, so that it takes the console's
+   output codepage into account, and allows us to use/support UTF-8 if
+   the console output codepage is 65001, even if the current system
+   locale is not something.UTF8.  */
+#include <ctype.h>
+#undef MB_CUR_MAX
+#define MB_CUR_MAX (mingw_mb_cur_max())
+int mingw_mb_cur_max (void);
+
+#ifndef _UCRT
+/* We need to replace stdio functions with console-safe versions from
+   Gnulib, to work around a bug in MSVCRT. */
+#include <stdarg.h>
+#include <stdio.h>
+#include <stddef.h>
+extern size_t gl_consolesafe_fwrite (const void *ptr, size_t size,
+				     size_t nmemb, FILE *fp);
+extern int gl_consolesafe_fprintf (FILE *restrict fp,
+				   const char *restrict format, ...);
+extern int gl_consolesafe_printf (const char *restrict format, ...);
+extern int gl_consolesafe_vfprintf (FILE *restrict fp,
+				    const char *restrict format, va_list args);
+extern int gl_consolesafe_vprintf (const char *restrict format, va_list args);
+
+#define fwrite gl_consolesafe_fwrite
+#define fprintf gl_consolesafe_fprintf
+#define printf gl_consolesafe_printf
+#define vfprintf gl_consolesafe_vfprintf
+#define vprintf gl_consolesafe_vprintf
+#endif	/*!_UCRT  */
+#endif

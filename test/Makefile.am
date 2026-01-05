@@ -1781,12 +1781,12 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	backbigs1 backsmalls1 clos1way6 close_status dbugeval4\
+	clos1way6 close_status debugeval4 \
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
-	getfile getlnhd gsubnulli18n ignrcas3 inetdayt inetecht \
-	inf-nan-torture iolint mbfw1 mbprintf1 mbprintf4 mbstr1 \
-	mbstr2 mtchi18n2 pid pipeio2 pty1 pty2 readdir rstest4 \
-	rstest5 status-close timeout unicode1
+	getfile getlnhd inetdayt inetecht \
+	inf-nan-torture iolint \
+	pid pipeio2 pty1 pty2 rstest4 \
+	rstest5 status-close timeout
 
 # List of tests that fail on z/OS
 EXPECTED_FAIL_ZOS = \
