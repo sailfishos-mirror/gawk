@@ -1,6 +1,6 @@
 /* locale information
 
-   Copyright 2016-2025 Free Software Foundation, Inc.
+   Copyright 2016-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,10 @@
 #define c32tolower towlower
 #define c32toupper towupper
 
+#ifdef GAWK
+#define mbszero(pstate) memset(pstate, 0, sizeof(*(pstate)))
+#endif
+
 /* The sbclen implementation relies on this.  */
 verify (MB_LEN_MAX <= SCHAR_MAX);
 
@@ -49,9 +53,9 @@ verify (MB_LEN_MAX <= SCHAR_MAX);
 static bool
 is_using_utf8 (void)
 {
+  mbstate_t state; mbszero (&state);
   char32_t wc;
-  mbstate_t mbs = {0};
-  return mbrtoc32 (&wc, "\xc4\x80", 2, &mbs) == 2 && wc == 0x100;
+  return mbrtoc32 (&wc, "\xc4\x80", 2, &state) == 2 && wc == 0x100;
 }
 
 /* Return true if the locale is compatible enough with the C locale so
@@ -106,9 +110,9 @@ init_localeinfo (struct localeinfo *localeinfo)
     {
       char c = i;
       unsigned char uc = i;
-      mbstate_t s = {0};
+      mbstate_t state; mbszero (&state);
       char32_t wc;
-      size_t len = mbrtoc32 (&wc, &c, 1, &s);
+      size_t len = mbrtoc32 (&wc, &c, 1, &state);
       localeinfo->sbclen[uc] = len <= 1 ? 1 : - (int) - len;
       localeinfo->sbctowc[uc] = len <= 1 ? wc : WEOF;
     }
@@ -143,7 +147,6 @@ verify (1 + 1 + sizeof lonesome_lower / sizeof *lonesome_lower
 int
 case_folded_counterparts (wint_t c, char32_t folded[CASE_FOLDED_BUFSIZE])
 {
-  int i;
   int n = 0;
   wint_t uc = c32toupper (c);
   wint_t lc = c32tolower (uc);
@@ -151,7 +154,7 @@ case_folded_counterparts (wint_t c, char32_t folded[CASE_FOLDED_BUFSIZE])
     folded[n++] = uc;
   if (lc != uc && lc != c && c32toupper (lc) == uc)
     folded[n++] = lc;
-  for (i = 0; i < sizeof lonesome_lower / sizeof *lonesome_lower; i++)
+  for (int i = 0; i < sizeof lonesome_lower / sizeof *lonesome_lower; i++)
     {
       wint_t li = lonesome_lower[i];
       if (li != lc && li != uc && li != c && c32toupper (li) == uc)
