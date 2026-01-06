@@ -28,7 +28,7 @@ then
 			true	# On macos we no longer need -no-pie
 			;;
 dnl		Use [[xx]] to get [xx] in the shell script.
-		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | netbsd1[[01]].*)
+		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd1[[34]].* | netbsd1[[01]].*)
 			true	# nothing to do, exes on these systems are not PIE
 			;;
 		openbsd7.* | freebsd1[[56]].*)
