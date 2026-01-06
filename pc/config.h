@@ -27,6 +27,9 @@
 /* Define to 1 if you have the `btowc' function. */
 #define HAVE_BTOWC 1
 
+/* Define to 1 if you have the `c32rtomb' function. */
+#undef HAVE_C32RTOMB
+
 /* Define to 1 if you have the Mac OS X function
    CFLocaleCopyPreferredLanguages in the CoreFoundation framework. */
 #undef HAVE_CFLOCALECOPYPREFERREDLANGUAGES
@@ -123,6 +126,9 @@
 
 /* Define to 1 if you have the `lstat' function. */
 #undef HAVE_LSTAT
+
+/* Define to 1 if you have the `mbrtoc32' function. */
+#undef HAVE_MBRTOC32
 
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #define HAVE_MBRTOWC 1
@@ -230,7 +236,7 @@
 #undef HAVE_STRUCT_PASSWD_PW_PASSWD
 
 /* Define to 1 if `st_blksize' is a member of `struct stat'. */
-#define HAVE_STRUCT_STAT_ST_BLKSIZE 1
+#undef HAVE_STRUCT_STAT_ST_BLKSIZE
 
 /* Define to 1 if `tm_zone' is a member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
@@ -275,6 +281,9 @@
 /* Define to 1 if you don't have `tm_zone' but do have the external array
    `tzname'. */
 #define HAVE_TZNAME 1
+
+/* Define to 1 if you have the <uchar.h> header file. */
+#undef HAVE_UCHAR_H
 
 /* Define to 1 if the system has the type `uintmax_t'. */
 #define HAVE_UINTMAX_T 1
@@ -322,7 +331,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.3.63"
+#define PACKAGE_STRING "GNU Awk 5.3.64"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -331,7 +340,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.3.63"
+#define PACKAGE_VERSION "5.3.64"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -459,7 +468,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.3.63"
+#define VERSION "5.3.64"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

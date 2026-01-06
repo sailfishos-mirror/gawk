@@ -53,8 +53,12 @@ static char *adjust_namespace(char *name, bool *malloced);
 #define DONT_FREE 1
 #define CAN_FREE  2
 
+#ifdef SIGHUP
 static void dump_and_exit(int signum) ATTRIBUTE_NORETURN;
+#endif
+#if defined(SIGHUP) || defined(SIGUSR1)
 static void just_dump(int signum);
+#endif
 
 /* pretty printing related functions and variables */
 
@@ -1307,7 +1311,7 @@ pp_string_fp(Func_print print_func, FILE *fp, const char *in_str,
 	efree(s);
 }
 
-
+#if defined(SIGHUP) || defined(SIGUSR1)
 /* just_dump --- dump the profile and function stack and keep going */
 
 static void
@@ -1321,7 +1325,9 @@ just_dump(int signum)
 	fflush(prof_fp);
 	signal(signum, just_dump);	/* for OLD Unix systems ... */
 }
+#endif	/* SIGUSR1 */
 
+#ifdef SIGHUP
 /* dump_and_exit --- dump the profile, the function stack, and exit */
 
 static void
@@ -1330,6 +1336,7 @@ dump_and_exit(int signum)
 	just_dump(signum);
 	final_exit(EXIT_FAILURE);
 }
+#endif	/* SIGHUP */
 
 /* print_lib_list --- print a list of all libraries loaded */
 

@@ -17,7 +17,7 @@
 #
 # test/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1988-2025 the Free Software Foundation, Inc.
+# Copyright (C) 1988-2026 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -2047,12 +2047,12 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	backbigs1 backsmalls1 clos1way6 close_status dbugeval4\
+	clos1way6 close_status debugeval4 \
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
-	getfile getlnhd gsubnulli18n ignrcas3 inetdayt inetecht \
-	inf-nan-torture iolint mbfw1 mbprintf1 mbprintf4 mbstr1 \
-	mbstr2 mtchi18n2 pid pipeio2 pty1 pty2 readdir rstest4 \
-	rstest5 status-close timeout unicode1
+	getfile getlnhd inetdayt inetecht \
+	inf-nan-torture iolint \
+	pid pipeio2 pty1 pty2 rstest4 \
+	rstest5 status-close timeout
 
 
 # List of tests that fail on z/OS
@@ -2061,10 +2061,10 @@ EXPECTED_FAIL_ZOS = \
 	backsmalls2 beginfile1 beginfile2 charasbytes clos1way6 \
 	cmdlinefsbacknl2 commas concat4 dbugarray4 \
 	dfamb1 double1 double2 elemnew4 errno fmttest forcenum getlndir \
-	gsubnulli18n gsubtst5 ignrcas2 inf-nan-torture iolint lc_num1 \
+	gsubnulli18n gsubtst5 hexfloat ignrcas2 inf-nan-torture iolint lc_num1 \
 	mbfw1 mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
 	mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest nofile nonfatal2 \
-	numrange posix_compare printf-corners printhuge profile5 randtest \
+	numrange posix_compare printf-corners printhuge profile5 \
 	rebt8b2 regexpbad regrange reint2 rri1 sigpipe1 sort1 sortfor sortu \
 	space sprintfc subamp subi18n symtab1 symtab11 symtab8 timeout \
 	unicode1 wideidx wideidx2 widesub widesub2 widesub3 widesub4
@@ -2535,8 +2535,7 @@ badargs::
 
 strftime::
 	@echo $@
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=C ; export GAWKLOCALE; \
-	TZ=GMT0; export TZ; \
+	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) strftime.ok _$@ && rm -f _$@ strftime.ok || exit 0
 
@@ -3178,7 +3177,7 @@ nonfatal1:
 # 4/2018: On first call to $(CMP), send to /dev/null even with -s for MinGW.
 nlstringtest::
 	@echo $@ $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=fr_FR.UTF-8 ; export GAWKLOCALE ; \
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=fr_FR.UTF-8; export GAWKLOCALE ; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if $(CMP) -s "$(srcdir)"/nlstringtest-nogettext.ok _$@ > /dev/null ; \
 	then \
@@ -4629,7 +4628,7 @@ equiv:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 hexfloat:
-	@echo $@
+	@echo $@ $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 

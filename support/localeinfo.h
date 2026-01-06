@@ -1,6 +1,6 @@
 /* locale information
 
-   Copyright 2016-2025 Free Software Foundation, Inc.
+   Copyright 2016-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,12 +19,15 @@
 
 #include <limits.h>
 #include <wchar.h>
-#if GAWK
-/* Use ISO C 99 API.  */
-# define char32_t wchar_t
-#else
+#ifdef HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
+#else
+# ifndef __MINGW32__
+#  define char32_t wchar_t
+# endif
+# define c32tolower towlower
+# define c32toupper towupper
 #endif
 
 #ifdef __cplusplus

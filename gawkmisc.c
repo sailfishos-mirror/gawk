@@ -31,6 +31,7 @@
 #endif
 
 #if defined(__MINGW32__)
+#include "pc/mbc32.c"
 #include "pc/gawkmisc.pc"
 #elif defined(VMS)
 #include "vms/gawkmisc.vms"
