@@ -101,7 +101,7 @@ else
 fi
 
 AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
-		sys/statvfs.h sys/sysmacros.h sys/time.h)
+		sys/statvfs.h sys/sysmacros.h sys/time.h uchar.h)
 
 AC_HEADER_DIRENT
 AC_CHECK_HEADERS_ONCE([sys/time.h])
@@ -117,6 +117,7 @@ AC_SEARCH_LIBS(fmod, m)
 AC_CHECK_FUNCS(fdopendir fmod fnmatch getdtablesize \
 		clock_gettime gettimeofday \
 		nanosleep select statvfs \
+		mbrtoc32 c32rtomb \
 		GetSystemTimeAsFileTime strptime)
 
 GAWK_FUNC_DIRFD

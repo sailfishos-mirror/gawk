@@ -512,25 +512,15 @@ check_pos:
 				uval = get_number_uj(arg);
 				if (gawk_mb_cur_max > 1) {
 					char buf[100];
-					wchar_t wc;
+					char32_t wc;
 					mbstate_t mbs;
 					size_t count;
 
 					memset(& mbs, 0, sizeof(mbs));
 
-					/* handle systems with too small wchar_t */
-					if (sizeof(wchar_t) < 4 && uval > 0xffff) {
-						if (do_lint)
-							lintwarn(
-						_("[s]printf: value %g is too big for %%c format"),
-									arg->numbr);
-
-						goto out0;
-					}
-
 					wc = uval;
 
-					count = wcrtomb(buf, wc, & mbs);
+					count = c32rtomb(buf, wc, & mbs);
 					if (count == 0
 					    || count == (size_t) -1) {
 						if (do_lint)

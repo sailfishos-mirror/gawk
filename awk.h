@@ -77,6 +77,29 @@ extern int errno;
 /* We can handle multibyte strings.  */
 #include <wchar.h>
 #include <wctype.h>
+
+#if defined(__MINGW32__)
+
+/* Gawk functions: */
+extern size_t c32slen(const char32_t *);
+extern int c32scoll(const char32_t *, const char32_t *);
+
+#elif defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+
+#include <uchar.h>
+#define c32slen(s) wcslen((wchar_t *) s)
+#define c32scoll(l, r)	wcscoll((wchar_t *) l, (wchar_t *) r)
+
+#else	/* POSIX without <uchar.h> */
+
+#define char32_t wchar_t
+#define mbrtoc32 mbrtowc
+#define c32rtomb wcrtomb
+#define c32slen(s) wcslen(s)
+#define c32scoll(l, r)	wcscoll(l, r)
+
+#endif	/* POSIX without <uchar.h> */
+
 #ifdef __CYGWIN__ /* Define helper function for large Unicode values */
 extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
 #endif
@@ -487,7 +510,7 @@ typedef struct exp_node {
 			int idx;
 			union {	// this union is for convenience of space
 				// reuse; the elements aren't otherwise related
-				wchar_t *wsp;
+				char32_t *wsp;
 				char *vn;
 			} z;
 			size_t wslen;
@@ -1817,10 +1840,10 @@ extern enum escape_results parse_escape(const char **string_ptr, const char **es
 extern NODE *str2wstr(NODE *n, size_t **ptr);
 extern NODE *wstr2str(NODE *n);
 #define force_wstring(n)	str2wstr(n, NULL)
-extern const wchar_t *wstrstr(const wchar_t *haystack, size_t hs_len,
-		const wchar_t *needle, size_t needle_len);
-extern const wchar_t *wcasestrstr(const wchar_t *haystack, size_t hs_len,
-		const wchar_t *needle, size_t needle_len);
+extern const char32_t *wstrstr(const char32_t *haystack, size_t hs_len,
+		const char32_t *needle, size_t needle_len);
+extern const char32_t *wcasestrstr(const char32_t *haystack, size_t hs_len,
+		const char32_t *needle, size_t needle_len);
 extern void r_free_wstr(NODE *n);
 #define free_wstr(n)	do { if ((n)->flags & WSTRCUR) r_free_wstr(n); } while(0)
 extern wint_t btowc_cache[];

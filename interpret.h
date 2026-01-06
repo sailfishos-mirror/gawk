@@ -878,8 +878,8 @@ mod:
 				if ((t1->flags & WSTRCUR) != 0 && (t2->flags & WSTRCUR) != 0) {
 					size_t wlen = t1->wstlen + t2->wstlen;
 
-					erealloc(t1->wstptr, wchar_t *, sizeof(wchar_t) * (wlen + 1));
-					memcpy(t1->wstptr + t1->wstlen, t2->wstptr, t2->wstlen * sizeof(wchar_t));
+					erealloc(t1->wstptr, char32_t *, sizeof(char32_t) * (wlen + 1));
+					memcpy(t1->wstptr + t1->wstlen, t2->wstptr, t2->wstlen * sizeof(char32_t));
 					t1->wstlen = wlen;
 					t1->wstptr[wlen] = L'\0';
 				} else

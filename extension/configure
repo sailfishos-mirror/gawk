@@ -8819,10 +8819,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
  		*darwin*)
 			true	# On macos we no longer need -no-pie
 			;;
-		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | netbsd10.* | netbsd11.*)
+		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd1[34].* | netbsd1[01].*)
 			true	# nothing to do, exes on these systems are not PIE
 			;;
-		openbsd7.* | freebsd15.* | freebsd16.*)
+		openbsd7.* | freebsd1[56].*)
 			LDFLAGS="${LDFLAGS} -no-pie"
 			;;
 		# Other OS's go here...
@@ -17189,6 +17189,12 @@ then :
   printf "%s\n" "#define HAVE_SYS_TIME_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "uchar.h" "ac_cv_header_uchar_h" "$ac_includes_default"
+if test "x$ac_cv_header_uchar_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_UCHAR_H 1" >>confdefs.h
+
+fi
 
 
 ac_header_dirent=no
@@ -17553,6 +17559,18 @@ ac_fn_c_check_func "$LINENO" "statvfs" "ac_cv_func_statvfs"
 if test "x$ac_cv_func_statvfs" = xyes
 then :
   printf "%s\n" "#define HAVE_STATVFS 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "mbrtoc32" "ac_cv_func_mbrtoc32"
+if test "x$ac_cv_func_mbrtoc32" = xyes
+then :
+  printf "%s\n" "#define HAVE_MBRTOC32 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "c32rtomb" "ac_cv_func_c32rtomb"
+if test "x$ac_cv_func_c32rtomb" = xyes
+then :
+  printf "%s\n" "#define HAVE_C32RTOMB 1" >>confdefs.h
 
 fi
 ac_fn_c_check_func "$LINENO" "GetSystemTimeAsFileTime" "ac_cv_func_GetSystemTimeAsFileTime"

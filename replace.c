@@ -37,7 +37,7 @@
 # ifdef __MINGW32__
 /* Need to use underlying_strftime in replacement strftime.  */
 #  define HAVE_STRFTIME 1
-#endif
+# endif
 #include "missing_d/strftime.c"
 # ifdef __MINGW32__
 #  undef HAVE_STRFTIME
@@ -58,4 +58,14 @@
 
 #ifndef HAVE_STRSIGNAL
 #include "missing_d/strsignal.c"
+#endif
+
+#if defined(__MINGW32__) && !defined(_UCRT)
+/* We need to work around the MSVCRT bug when writing multibyte
+   strings to the console.  */
+# if !defined(__MINGW32_MAJOR_VERSION) || __MINGW32_MAJOR_VERSION < 5
+   /* MinGW64 has vasprintf, mingw.org's MinGW doesn't. */
+#  define HAVE_VASPRINTF 1
+# endif
+#include "missing_d/stdio-consolesafe.c"
 #endif

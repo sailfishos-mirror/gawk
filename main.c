@@ -309,6 +309,10 @@ main(int argc, char **argv)
 	 * this value once makes a speed difference.
 	 */
 	gawk_mb_cur_max = MB_CUR_MAX;
+#ifdef __MINGW32__
+	if (mingw_using_utf8(UTF8_SET))
+		gawk_mb_cur_max = 4;
+#endif
 
 	/* init the cache for checking bytes if they're characters */
 	init_btowc_cache();
@@ -350,6 +354,9 @@ main(int argc, char **argv)
 			gawk_mb_cur_max = 1;	/* hands off my data! */
 #if defined(LC_ALL)
 			setlocale(LC_ALL, "C");
+#endif
+#ifdef __MINGW32__
+			mingw_using_utf8(UTF8_RESET);
 #endif
 		}
 	}
@@ -1858,6 +1865,11 @@ set_locale_stuff(void)
 	/* These must be done after calling setlocale */
 	(void) bindtextdomain(PACKAGE, locale_dir);
 	(void) textdomain(PACKAGE);
+
+#ifdef __MINGW32__
+	if (mingw_using_utf8(UTF8_SET))
+		gawk_mb_cur_max = 4;
+#endif
 }
 
 /* platform_name --- return the platform name */
