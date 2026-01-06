@@ -118,7 +118,7 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	awk_value_t num;
 	unsigned int ret = 0;
 	double val = 0.0;
-	char32_t wc;
+	char32_t wc = 0;
 	char buf[20] = { '\0', '\0' };
 
 	assert(result != NULL);

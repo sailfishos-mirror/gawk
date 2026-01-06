@@ -145,17 +145,13 @@
 # define __regfree regfree
 #if defined HAVE_UCHAR_H
 #include <uchar.h>
-# define __mbrtowc mbrtoc32
-# define __wcrtomb c32rtomb
-# define mbrtoc32  mbrtowc
-# define c32rtomb  wcrtomb
+# define __mbrtowc(pwc, s, n, mbs) mbrtoc32((char32_t *) pwc, s, n, mbs)
+# define __wcrtomb(s, wc, mbs) c32rtomb(s, (char32_t) wc, mbs)
 #elif defined __MINGW32__
 # define __mbrtowc mbrtoc32
 # define __wcrtomb c32rtomb
 #else
 # define char32_t wchar_t
-# define __mbrtowc mbrtowc
-# define __wcrtomb wcrtomb
 #endif /* not HAVE_UCHAR_H */
 #endif /* not _LIBC */
 
