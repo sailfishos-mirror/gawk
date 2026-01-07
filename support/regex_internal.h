@@ -143,6 +143,8 @@
 # define __wcrtomb c32rtomb
 #else
 # define char32_t wchar_t
+# define __mbrtowc mbrtowc
+# define __wcrtomb wcrtomb
 #endif /* not HAVE_UCHAR_H */
 #endif /* not _LIBC */
 
