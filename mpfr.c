@@ -265,7 +265,7 @@ mpg_zero(NODE *n)
 /* force_mpnum --- force a value to be a GMP integer or MPFR float */
 
 static int
-force_mpnum(NODE *n, int do_nondec, int use_locale)
+force_mpnum(NODE *n, bool do_nondec, bool use_locale)
 {
 	char *cp, *cpend, *ptr, *cp1;
 	char save;
@@ -362,6 +362,12 @@ mpg_force_number(NODE *n)
 
 	if ((n->flags & NUMCUR) != 0)
 		return n;
+
+	/*
+	 * We should always set NUMCUR. If USER_INPUT is set and it's a
+	 * numeric string, we clear STRING and enable NUMBER, but if it's not
+	 * numeric, we disable USER_INPUT.
+	 */
 	n->flags |= NUMCUR;
 
 	/* Trim leading white space, bailing out if there's nothing else */
@@ -399,7 +405,7 @@ mpg_force_number(NODE *n)
 	/* else POSIX, so
 		fall through */
 
-	if (force_mpnum(n, (do_non_decimal_data && ! do_traditional), true)) {
+	if (force_mpnum(n, (do_non_decimal_data || do_posix), true)) {
 		if ((n->flags & USER_INPUT) != 0) {
 			/* leave USER_INPUT set to indicate a strnum */
 			n->flags &= ~STRING;
