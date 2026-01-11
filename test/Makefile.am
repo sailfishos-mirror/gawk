@@ -1781,7 +1781,7 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	clos1way6 close_status debugeval4 \
+	clos1way6 close_status dbugeval4 \
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
 	getfile getlnhd inetdayt inetecht \
 	inf-nan-torture iolint \
