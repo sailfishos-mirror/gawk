@@ -402,7 +402,7 @@ GENTESTS_UNUSED = Makefile.in checknegtime.awk dtdgport.awk fix-fmtspcl.awk \
 
 # List of tests on MinGW that need a different cmp program
 NEED_TESTOUTCMP = \
-	beginfile2 double2 exit fmttest hsprint posix profile5 space printf-corners
+	beginfile2 double2 exit fmttest hsprint posix profile5 space printf-corners hexfloat
 
 
 
@@ -857,7 +857,7 @@ mixed1::
 mbprintf5::
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-case `uname` in \
-	CYGWIN* | MSYS* | MINGW32* | *MS-DOS*) echo this test fails on this system --- skipping $@ ;; \
+	CYGWIN* | MSYS* | *MS-DOS*) echo this test fails on this system --- skipping $@ ;; \
 	*) \
 	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE ; $(CHCP) 65001; \
 	$(AWK) -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >> _$@ ; \
@@ -2770,7 +2770,7 @@ equiv:
 hexfloat:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 aadelete1:
 	@echo $@; $(CHCP) $(ORIGCP)
