@@ -369,7 +369,7 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	clos1way6 close_status debugeval4 \
+	clos1way6 close_status dbugeval4 \
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
 	getfile getlnhd inetdayt inetecht \
 	inf-nan-torture iolint \
@@ -2945,6 +2945,7 @@ dbugeval3:
 
 dbugeval4:
 	@echo $@; $(CHCP) $(ORIGCP)
+	@echo Expect $@ to fail with MinGW.
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --debug < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
