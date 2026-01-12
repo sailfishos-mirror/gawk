@@ -726,12 +726,12 @@ do_substr(int nargs)
 			_("substr: non-integer length %g will be truncated"),
 					d_length);
 
-			if (d_length > SIZE_MAX)
+			if (d_length > (double) SIZE_MAX)
 				lintwarn(
 			_("substr: length %g too big for string indexing, truncating to %g"),
 					d_length, (double) SIZE_MAX);
 		}
-		if (d_length < SIZE_MAX)
+		if (d_length < (double) SIZE_MAX)
 			length = d_length;
 		else
 			length = SIZE_MAX;
@@ -749,7 +749,7 @@ do_substr(int nargs)
 			 d_index);
 
 	/* awk indices are from 1, C's are from 0 */
-	if (d_index <= SIZE_MAX)
+	if (d_index <= (double) SIZE_MAX)
 		indx = d_index - 1;
 	else
 		indx = SIZE_MAX;
@@ -1841,7 +1841,7 @@ do_sub(int nargs, unsigned int flags)
 			d = get_number_d(glob_flag);
 			if (d < 1)
 				how_many = 1;
-			else if (d < LONG_MAX)
+			else if (d < (double) LONG_MAX)
 				how_many = d;
 			else
 				how_many = LONG_MAX;
