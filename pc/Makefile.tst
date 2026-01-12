@@ -369,7 +369,7 @@ NEED_LOCALE_RU = mtchi18n
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
-	clos1way6 close_status debugeval4 \
+	clos1way6 close_status dbugeval4 \
 	devfd devfd1 devfd2 errno exitval2 fork fork2 fts functab5 \
 	getfile getlnhd inetdayt inetecht \
 	inf-nan-torture iolint \
@@ -430,7 +430,7 @@ gawk-extensions: $(GAWK_EXT_TESTS)
 
 charset-tests-all:
 	@-case `uname` in \
-	*MINGW* | *MS-DOS*) \
+	*MINGW*) \
 		$(MAKE) charset-msg-start charset-tests charset-msg-end ;; \
 	*) \
 		if locale -a | grep -i 'en_US.UTF.*8' > /dev/null && \
@@ -857,7 +857,7 @@ mixed1::
 mbprintf5::
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-case `uname` in \
-	CYGWIN* | MSYS* | *MS-DOS*) echo this test fails on this system --- skipping $@ ;; \
+	CYGWIN* | MSYS*) echo this test fails on this system --- skipping $@ ;; \
 	*) \
 	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE ; $(CHCP) 65001; \
 	$(AWK) -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >> _$@ ; \
@@ -2945,6 +2945,7 @@ dbugeval3:
 
 dbugeval4:
 	@echo $@; $(CHCP) $(ORIGCP)
+	@echo Expect $@ to fail with MinGW.
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --debug < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
