@@ -1035,8 +1035,8 @@ load_procinfo()
 	update_PROCINFO_str("mpfr_version", name);
 	sprintf(name, "GNU MP %s", gmp_version);
 	update_PROCINFO_str("gmp_version", name);
-	update_PROCINFO_num("prec_max", MPFR_PREC_MAX);
-	update_PROCINFO_num("prec_min", MPFR_PREC_MIN);
+	update_PROCINFO_num("prec_max", (AWKNUM) MPFR_PREC_MAX);
+	update_PROCINFO_num("prec_min", (AWKNUM) MPFR_PREC_MIN);
 #endif
 
 #ifdef DYNAMIC
@@ -1408,7 +1408,7 @@ init_fds()
 #endif
 			newfd = devopen("/dev/null", opposite_mode[fd]);
 			/* turn off some compiler warnings "set but not used" */
-			newfd += 0;
+			newfd = newfd + 0;
 #ifdef MAKE_A_HEROIC_EFFORT
 			if (do_lint && newfd < 0)
 				lintwarn(_("could not pre-open /dev/null for fd %d"), fd);
