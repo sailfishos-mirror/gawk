@@ -1629,7 +1629,7 @@ static Subexp
 chr(Compile *c, bool nested, NInt nstk)
 {
 	NodeList lhs = nodelist_empty();
-	size_t lhmaxstk;
+	size_t lhmaxstk = 0;	// init to avoid compiler warnings.
 	bool lhasmin = false;
 	switch (c->wc) {
 	default:

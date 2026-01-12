@@ -1105,7 +1105,7 @@ parse_bracket_exp (struct dfa *dfa)
               if (wc != wc2 || wc == WEOF)
                 {
                   if (dfa->localeinfo.simple
-                      || (c_isdigit (c) & c_isdigit (c2)))
+                      || (c_isdigit (c) && c_isdigit (c2)))
                     {
                       for (int ci = c; ci <= c2; ci++)
                         if (dfa->syntax.case_fold && isalpha (ci))

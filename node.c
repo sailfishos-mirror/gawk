@@ -232,7 +232,7 @@ r_format_val(const char *format, int index, NODE *s)
 		const char *result = format_nan_inf(s, 'g');
 		return make_string(result, strlen(result));
 	} else if ((val = double_to_int(s->numbr)) != s->numbr
-			|| val <= LONG_MIN || val >= LONG_MAX
+			|| val <= (double)LONG_MIN || val >= (double)LONG_MAX
 	) {
 		/* not an integral value, or out of integer range */
 		/*
