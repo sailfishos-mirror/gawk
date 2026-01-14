@@ -3433,7 +3433,7 @@ gawk_system(const char *command)
 NODE *
 do_dump_node(int nargs)
 {
-	printf("MB_CUR_MAX = %zu\n", MB_CUR_MAX);
+	printf("MB_CUR_MAX = %u\n", (int) MB_CUR_MAX);
 	printf("sizeof(int) = %zu\n", sizeof(int));
 	printf("sizeof(long) = %zu\n", sizeof(long));
 	printf("sizeof(long long) = %zu\n", sizeof(long long));
