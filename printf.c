@@ -522,7 +522,8 @@ check_pos:
 
 					count = c32rtomb(buf, wc, & mbs);
 					if (count == 0
-					    || count == (size_t) -1) {
+					    || count == (size_t) -1
+					    || count == (size_t) -2) {
 						if (do_lint)
 							lintwarn(
 						_("[s]printf: value %g is not a valid wide character"),
@@ -1519,10 +1520,23 @@ mbc_byte_count(const char *ptr, size_t numchars)
 	if (mb_len <= 0)
 		return numchars;	/* no valid m.b. char */
 
+	/* Since we're restarting the loop from the beginning anyway, make
+	   sure to reset mbstate to handle partial multibyte sequences on
+	   UTF-16 systems. */
+	memset(& cur_state, 0, sizeof(cur_state));
+
 	for (; numchars > 0; numchars--) {
 		mb_len = mbrlen(ptr, numchars * gawk_mb_cur_max, &cur_state);
 		if (mb_len <= 0)
 			break;
+#ifdef __CYGWIN__
+		/* Internal values used for UTF-8 or GB18030 input. */
+		if (cur_state.__count == 4 || cur_state.__count == 18030)
+		      /* Surrogate first half, the character has not been
+			 fully consumed yet.  Make sure to read the MB chars
+			 required to create the complete surrogate. */
+		      ++numchars;
+#endif
 		sum += mb_len;
 		ptr += mb_len;
 	}
@@ -1548,11 +1562,27 @@ mbc_char_count(const char *ptr, size_t numbytes)
 	if (mb_len <= 0)
 		return numbytes;	/* no valid m.b. char */
 
+	/* Since we're starting from the beginning anyway, make sure to
+	   reset mbstate to handle partial multibyte sequences on UTF-16
+	   systems. */
+	memset(& cur_state, 0, sizeof(cur_state));
+
 	while (numbytes > 0) {
 		mb_len = mbrlen(ptr, numbytes, &cur_state);
 		if (mb_len <= 0)
 			break;
+#ifdef __CYGWIN__
+		/* Internal values used for UTF-8 or GB18030 input. */
+		if (cur_state.__count == 4 || cur_state.__count == 18030)
+			/* Surrogate first half, the character has not been
+			   fully consumed yet.  Don't count the lone surrogate
+			   half as full character. */
+			;
+		else
+			sum++;
+#else
 		sum++;
+#endif
 		ptr += mb_len;
 		numbytes -= mb_len;
 	}

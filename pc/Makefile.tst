@@ -856,13 +856,9 @@ mixed1::
 
 mbprintf5::
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@-case `uname` in \
-	CYGWIN* | MSYS*) echo this test fails on this system --- skipping $@ ;; \
-	*) \
 	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE ; $(CHCP) 65001; \
 	$(AWK) -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >> _$@ ; \
-	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
-	esac
+	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 printfbad2: printfbad2.ok
 	@echo $@; $(CHCP) $(ORIGCP)

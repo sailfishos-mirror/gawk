@@ -1,3 +1,35 @@
+2026-01-15         Corinna Vinschen      <vinschen@redhat.com>
+
+	UTF-8 and GB18030 allow 4 byte multibyte sequences which
+	have to be converted to surrogate pairs on systems with
+	wchar_t == UTF-16.  That only affects Cygwin for now, given
+	AIX is ignored and native Windows is handled separately.
+
+	This affects the printf() functions because the character and byte
+	counting in mbc_char_count() and mbc_byte_count() can't handle
+	characters yet which have to be converted to surrogate pairs.
+
+	First of all, both functions do not expect the mbstate_t to be
+	in a shift state after it read the first character.  However, this
+	is essential to keep track of the full character during surrogate
+	handling.  When the code restarts reading the string from the
+	beginning for counting, it neglects to reset the shift state,
+	so the next read encounters an invalid character sequence.  So make
+	sure to reset the shift state when reading from the beginning.
+
+	For Cygwin:
+
+	Add code to mbc_char_count() to count a surrogate pair as a single
+	character, not as two characters.
+
+	Add code to mbc_byte_count() to handle only a full surrogate as a
+	full character.
+
+2026-01-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (format_args): For %c, check for -2 return value
+	from c32rtomb().
+
 2026-01-14         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* builtin.c (do_dump_node): Change %zd to %zu.
