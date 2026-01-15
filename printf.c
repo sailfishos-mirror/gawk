@@ -522,7 +522,8 @@ check_pos:
 
 					count = c32rtomb(buf, wc, & mbs);
 					if (count == 0
-					    || count == (size_t) -1) {
+					    || count == (size_t) -1
+					    || count == (size_t) -2) {
 						if (do_lint)
 							lintwarn(
 						_("[s]printf: value %g is not a valid wide character"),
