@@ -507,9 +507,14 @@ genflags2str(int flagval, const struct flagtab *tab)
 static int
 posix_compare(NODE *s1, NODE *s2)
 {
+#ifdef __CYGWIN__
+	static const bool using_cygwin = true;	
+#else
+	static const bool using_cygwin = false;	
+#endif
 	int ret;
 
-	if (gawk_mb_cur_max == 1) {
+	if (using_cygwin || gawk_mb_cur_max == 1) {
 		char save1, save2;
 		const char *p1, *p2;
 
