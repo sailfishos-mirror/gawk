@@ -504,17 +504,21 @@ genflags2str(int flagval, const struct flagtab *tab)
 
 /* posix_compare --- compare strings using strcoll */
 
+/*
+ * 1/2026:
+ * On systems except MingGW (even Cygwin), using strcoll() to do the
+ * work looks to be enough.  So that's the default. On MinGW, we do
+ * different tests based on gawk_mb_cur_max.
+ */
+
 static int
 posix_compare(NODE *s1, NODE *s2)
 {
-#ifdef __CYGWIN__
-	static const bool using_cygwin = true;	
-#else
-	static const bool using_cygwin = false;	
-#endif
-	int ret;
+	int ret = 0;
 
-	if (using_cygwin || gawk_mb_cur_max == 1) {
+#ifdef __MINGW32__
+	if (gawk_mb_cur_max == 1) {
+#endif
 		char save1, save2;
 		const char *p1, *p2;
 
@@ -551,8 +555,8 @@ posix_compare(NODE *s1, NODE *s2)
 
 		s1->stptr[s1->stlen] = save1;
 		s2->stptr[s2->stlen] = save2;
-	}
-	else {
+#ifdef __MINGW32__
+	} else {
 		/* Similar logic, using wide characters */
 		const char32_t *p1, *p2;
 
@@ -584,6 +588,7 @@ posix_compare(NODE *s1, NODE *s2)
 			}
 		}
 	}
+#endif /* __MINGW32__ */
 
 	return ret;
 }
