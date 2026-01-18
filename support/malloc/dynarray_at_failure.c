@@ -30,7 +30,7 @@ __libc_dynarray_at_failure (size_t size, size_t index)
 #ifdef _LIBC
   char buf[200];
   __snprintf (buf, sizeof (buf), "Fatal glibc error: "
-              "array index %zu not less than array length %zu\n",
+              "array index " PRINTF_ZU_FMT " not less than array length " PRINTF_ZU_FMT "\n",
               index, size);
   __libc_fatal (buf);
 #else

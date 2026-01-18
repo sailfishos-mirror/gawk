@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1991-2019, 2021-2025
+ * Copyright (C) 1991-2019, 2021-2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -214,7 +214,7 @@ make_regexp(char *s, size_t len, bool ignorecase, bool dfa, bool canfatal)
 				 *
 				 * This also catches unknown values.
 				 */
-				cant_happen("received bad result %d from parse_escape(), nbytes = %zu",
+				cant_happen("received bad result %d from parse_escape(), nbytes = " PRINTF_ZU_FMT,
 						(int) ret, nbytes);
 			}
 			break;
@@ -639,7 +639,7 @@ resetup()
 	 * wide-spread enough that people want it.
 	 *
 	 * 2/2022: BWK awk has supported interval expressions since
-	 * March 2019, with an important fix added in Januay 2020.
+	 * March 2019, with an important fix added in January 2020.
 	 * So we add that support even for --traditional. It's easier to
 	 * do it here than to try to get the GLIBC / GNULIB folks to change
 	 * the definition of RE_SYNTAX_AWK, which likely would cause
@@ -671,7 +671,7 @@ reisstring(const char *text, size_t len, Regexp *re, const char *buf)
 	if (re->has_meta)
 		return false;	/* give up early, can't be string match */
 
-	/* make accessable to gdb */
+	/* make accessible to gdb */
 	matched = &buf[RESTART(re, buf)];
 
 	res = (memcmp(text, matched, len) == 0);

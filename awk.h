@@ -810,6 +810,15 @@ typedef unsigned long long exec_count_t;	// for exec_count
 #define EXEC_COUNT_FMT	"%llu"
 #define EXEC_COUNT_PROFILE_FMT	"%6llu"
 #endif
+#if __DECC
+#define PRINTF_ZD_FMT "%ld"
+#define PRINTF_3ZD_FMT "%3ld"
+#define PRINTF_ZU_FMT "%lu"
+#else
+#define PRINTF_ZD_FMT "%zd"
+#define PRINTF_3ZD_FMT "%3zd"
+#define PRINTF_ZU_FMT "%zu"
+#endif
 
 typedef struct exp_instruction {
 	struct exp_instruction *nexti;
@@ -2152,7 +2161,7 @@ emalloc_real(size_t count, const char *where, const char *var, const char *file,
 
 	ret = (void *) malloc(count);
 	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
+		fatal(_("%s:%d:%s: %s: cannot allocate " PRINTF_ZU_FMT " bytes of memory: %s"),
 			file, line, where, var, count, strerror(errno));
 
 	return ret;
@@ -2170,7 +2179,7 @@ ezalloc_real(size_t count, const char *where, const char *var, const char *file,
 
 	ret = (void *) calloc(1, count);
 	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
+		fatal(_("%s:%d:%s: %s: cannot allocate " PRINTF_ZU_FMT " bytes of memory: %s"),
 			file, line, where, var, count, strerror(errno));
 
 	return ret;
@@ -2188,7 +2197,7 @@ erealloc_real(void *ptr, size_t count, const char *where, const char *var, const
 
 	ret = (void *) realloc(ptr, count);
 	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot reallocate %zu bytes of memory: %s"),
+		fatal(_("%s:%d:%s: %s: cannot reallocate " PRINTF_ZU_FMT " bytes of memory: %s"),
 			file, line, where, var, count, strerror(errno));
 
 	return ret;
