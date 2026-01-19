@@ -116,7 +116,6 @@ extern void vms_arg_fixup(int *,char ***);
 /* some things not in STDC_HEADERS */
 extern size_t gnu_strftime(char *,size_t,const char *,const struct tm *);
 extern int unlink(const char *);
-extern int getopt(int,char **,char *);
 extern int isatty(int);
 #ifndef fileno
 extern int fileno(FILE *);
