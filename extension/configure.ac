@@ -100,7 +100,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
+AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h
 		sys/statvfs.h sys/sysmacros.h sys/time.h uchar.h)
 
 AC_HEADER_DIRENT
@@ -114,10 +114,10 @@ no)	GNUPG_CHECK_MPFR
 esac
 
 AC_SEARCH_LIBS(fmod, m)
-AC_CHECK_FUNCS(fdopendir fmod fnmatch getdtablesize \
-		clock_gettime gettimeofday \
-		nanosleep select statvfs \
-		mbrtoc32 c32rtomb \
+AC_CHECK_FUNCS(fdopendir fmod fnmatch getdtablesize
+		clock_gettime gettimeofday
+		nanosleep select statvfs
+		mbrtoc32 c32rtomb
 		GetSystemTimeAsFileTime strptime)
 
 GAWK_FUNC_DIRFD
