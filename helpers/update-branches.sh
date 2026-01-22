@@ -18,7 +18,7 @@ doit () {
 doit git checkout master || exit
 
 features=$(git branch -a | grep /origin/feature/ | sed 's;.*/origin/;;')
-others="porting"
+others=""
 
 for i in $others $features
 do

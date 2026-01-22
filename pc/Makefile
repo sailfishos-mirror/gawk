@@ -275,8 +275,8 @@ check:
 	@echo "recommendation is to copy pc/Makefile.tst to test/Makefile.  Under"
 	@echo "DOS, it may be necessary to run make from the test directory."
 # The `-k' option to make should be unnecessary if using pc/Makefile.tst.
-	sh -c "cd test && $(MAK) -k AWK=../gawk.exe"
-#	sh -c "cd test && $(MAK) AWK=../gawk.exe bigtest extra"
+	sh -c "cd test && $(MAK) -k"
+#	sh -c "cd test && $(MAK) bigtest extra"
 
 test:	check
 
