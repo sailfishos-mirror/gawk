@@ -1,6 +1,6 @@
 //
 // MinRX: a minimal matcher for POSIX Extended Regular Expressions.
-// Copyright (C) 2023, 2024, 2025 Michael J. Haertel.
+// Copyright (C) 2023, 2024, 2025, 2026 Michael J. Haertel.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -47,12 +47,11 @@
 #if defined(GAWK) && defined(__MINGW32__)
 #include "nonposix.h"
 #else	/* ! (GAWK && __MINGW32__) */
-#if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+#if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32)
 #include <uchar.h>
 #else
 #define char32_t wchar_t
 #define mbrtoc32 mbrtowc
-#define c32rtomb wcrtobm
 #endif
 #endif
 
@@ -66,7 +65,7 @@
 #define N_(msgid) msgid
 
 #ifndef RE_DUP_MAX
-#define RE_DUP_MAX (0x7fff)
+#define RE_DUP_MAX 32767
 #endif
 
 #include "minrx.h"
@@ -1920,7 +1919,7 @@ compile(Compile *c)
 			cset_destruct(c->fc);
 			free((void *) c->fc);
 		}
-		r->err = err;
+		r->err = (minrx_result_t) err;
 		return vr;
 	}
 	Node *nodes = (Node *) NULL;
