@@ -85,11 +85,11 @@ extern int   gettimeofday(struct timeval *,void *);
 #ifndef HAVE_SNPRINTF
 #define snprintf gawk_snprintf	/* avoid %CC-I-INTRINSICDECL diagnostic */
 #define vsnprintf gawk_vsnprintf
+extern int snprintf(char *,size_t,const char *,...);
+extern int vsnprintf(char *restrict,size_t,const char *,va_list);
 #endif
 #endif
 /* supply missing or suppressed (due to defines in config.h) declarations */
-extern int snprintf(char *,size_t,const char *,...);
-extern int vsnprintf(char *restrict,size_t,const char *,va_list);
 extern int setenv(const char *,const char *,int);
 extern int unsetenv(const char *);
 #define strerror	vms_strerror
