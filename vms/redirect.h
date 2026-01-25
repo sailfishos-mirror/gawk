@@ -39,10 +39,7 @@
 #define optopt		gnu_optopt
 #define regcomp		gnu_regcomp
 #define regexec		gnu_regexec
-#define regfree		gnu_regfree
 #define regerror	gnu_regerror
-#define setenv		gawk_setenv
-#define unsetenv	gawk_unsetenv
 #ifndef VMS_POSIX
 #define strftime	gnu_strftime	/* always use missing/strftime.c */
 #define strcasecmp	gnu_strcasecmp
@@ -84,9 +81,11 @@ extern int   gettimeofday(struct timeval *,void *);
 #define open		vms_open
 #define popen		vms_popen
 #define pclose		vms_pclose
+#if __CRTL_VER < 90230000
 #ifndef HAVE_SNPRINTF
 #define snprintf gawk_snprintf	/* avoid %CC-I-INTRINSICDECL diagnostic */
 #define vsnprintf gawk_vsnprintf
+#endif
 #endif
 /* supply missing or suppressed (due to defines in config.h) declarations */
 extern int snprintf(char *,size_t,const char *,...);

@@ -14,7 +14,7 @@
 #
 # awkgram.c :
 #	If you don't have bison but do have VMS POSIX or DEC/Shell,
-#	change the PARSER and PASERINIT macros to use yacc.  If you don't
+#	change the PARSER and PARSERINIT macros to use yacc.  If you don't
 #	have either yacc or bison, you'll have to make sure that the
 #	distributed version of "awkgram.c" has its modification date later
 #	than the date of "awkgram.y", so that MMS won't try to build that
@@ -114,14 +114,17 @@ NOOP = continue
 # object files
 GAWKOBJ = eval.obj,profile.obj
 AWKOBJ1 = array.obj,awkgram.obj,builtin.obj,cint_array.obj,\
-	command.obj,debug.obj,dfa.obj,dynarrray_resize.obj,ext.obj,field.obj,\
+	command.obj,debug.obj,dfa.obj,ext.obj,field.obj,\
 	floatcomp.obj,gawkapi.obj,gawkmisc.obj,getopt.obj,getopt1.obj
 
 AWKOBJ2 = int_array.obj,io.obj,localeinfo.obj,main.obj,mpfr.obj,msg.obj,\
-	node.obj,random.obj,re.obj,regex.obj,replace.obj,\
+	node.obj,random.obj,re.obj,minrx.obj,regex.obj,replace.obj,\
 	str_array.obj,symbol.obj,version.obj,printf.obj
 
-AWKOBJS = $(AWKOBJ1),$(AWKOBJ2)
+AWKOBJ3 = dynarray_at_failure.obj,dynarrray_emplace_enlarge.obj,\
+      dynarrray_finalize.obj,dynarrray_resize.obj
+
+AWKOBJS = $(AWKOBJ1),$(AWKOBJ2),$(AWKOBJ3)
 
 # VMSOBJS
 #	VMS specific stuff
@@ -156,6 +159,7 @@ gawk.opt : $(MAKEFILE) config.h         # create linker options file
       @ write opt "$(GAWKOBJ)"
       @ write opt "$(AWKOBJ1)"
       @ write opt "$(AWKOBJ2)"
+      @ write opt "$(AWKOBJ3)"
       @ write opt "$(VMSOBJS)"
       @ write opt "psect_attr=environ,noshr	!extern [noshare] char **"
       @ write opt "stack=48	!preallocate more pages (default is 20)"
@@ -182,7 +186,23 @@ command.obj	: command.c cmd.h
 debug.obj	: debug.c cmd.h
 dfa.obj		: $(SUPPORT)dfa.c $(SUPPORT)dfa.h
 
-# MMS 4.O gets MMS$SOURCE wrong here
+# MMS 4.0 gets MMS$SOURCE wrong for the $(MALLOC) and $(SUPPORT) paths.
+dynarray_at_failure.obj : $(MALLOC)dynarray_at_failure.c $(MALLOC)dynarray.h
+    $define/user malloc $(MALLOC)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_at_failure.c
+
+dynarrray_emplace_enlarge.obj : $(MALLOC)dynarray_emplace_enlarge.c \
+       $(MALLOC)dynarray.h
+    $define/user malloc $(MALLOC)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_emplace_enlarge.c
+
+dynarrray_finalize.obj : $(MALLOC)dynarray_finalize.c $(MALLOC)dynarray.h
+    $define/user malloc $(MALLOC)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_finalize.c
+
 dynarrray_resize.obj : $(MALLOC)dynarray_resize.c $(MALLOC)dynarray.h
     $define/user malloc $(MALLOC)
     $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
@@ -199,7 +219,8 @@ getopt1.obj	: $(SUPPORT)getopt1.c
 int_array.obj	: int_array.c
 io.obj		: io.c
 localeinfo.obj  : $(SUPPORT)localeinfo.c
-main.obj	: main.c
+main.obj    : main.c
+minrx.obj   : minrx.c
 msg.obj		: msg.c
 mpfr.obj	: mpfr.c
 node.obj	: node.c
@@ -208,7 +229,7 @@ profile.obj	: profile.c
 random.obj	: $(SUPPORT)random.c $(SUPPORT)random.h
 re.obj		: re.c
 
-# MMS 4.O gets MMS$SOURCE wrong here
+# MMS 4.0 gets MMS$SOURCE wrong for the $(MALLOC) and $(SUPPORT) paths.
 regex.obj	: $(SUPPORT)regex.c $(SUPPORT)regcomp.c \
 		  $(SUPPORT)regex_internal.c $(SUPPORT)regexec.c \
 		  $(SUPPORT)regex.h $(SUPPORT)regex_internal.h \
@@ -217,6 +238,7 @@ regex.obj	: $(SUPPORT)regex.c $(SUPPORT)regcomp.c \
     $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
       $(SUPPORT)regex.c
 
+regexec.obj : $(SUPPORT)regexec.c
 str_array.obj	: str_array.c
 symbol.obj	: symbol.c
 version.obj	: version.c
@@ -227,14 +249,7 @@ vms_args.obj	: $(VMSDIR)vms_args.c
 vms_gawk.obj	: $(VMSDIR)vms_gawk.c
 vms_cli.obj	: $(VMSDIR)vms_cli.c
 vms_crtl_init.obj : $(VMSDIR)vms_crtl_init.c
-replace.obj	: replace.c $(MISSNGD)system.c $(MISSNGD)memcmp.c \
-		  $(MISSNGD)memcpy.c $(MISSNGD)memset.c $(MISSNGD)memmove.c \
-		  $(MISSNGD)strncasecmp.c $(MISSNGD)strerror.c \
-		  $(MISSNGD)strftime.c $(MISSNGD)strchr.c $(MISSNGD)strtod.c \
-		  $(MISSNGD)strtoul.c $(MISSNGD)tzset.c $(MISSNGD)mktime.c \
-		  $(MISSNGD)snprintf.c $(MISSNGD)getaddrinfo.c \
-		  $(MISSNGD)usleep.c \
-		  $(MISSNGD)setenv.c $(MISSNGD)strcoll.c $(MISSNGD)wcmisc.c
+replace.obj	: replace.c
 
 # bison or yacc have not been ported to current VMS versions
 # When that changes, this can be restored.
