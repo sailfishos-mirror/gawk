@@ -220,7 +220,7 @@ int_array.obj	: int_array.c
 io.obj		: io.c
 localeinfo.obj  : $(SUPPORT)localeinfo.c
 main.obj    : main.c
-minrx.obj   : minrx.c
+minrx.obj   : $(SUPPORT)minrx.c
 msg.obj		: msg.c
 mpfr.obj	: mpfr.c
 node.obj	: node.c
