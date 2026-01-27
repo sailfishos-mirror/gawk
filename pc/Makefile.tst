@@ -1146,7 +1146,8 @@ readdir:
 	@-$(LS) -lna "$(top_srcdir)" | sed 1d > _longlist
 	@-$(AWK) -f "$(srcdir)"/readdir0.awk -v extout=_$@  \
 		-v dirlist=_dirlist -v longlist=_longlist > $@.ok
-	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@ _dirlist _longlist
+	@-rm -f _dirlist _longlist
+	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
 
 readdir_test:
 	@echo $@; $(CHCP) $(ORIGCP)
