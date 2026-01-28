@@ -44741,6 +44741,19 @@ Please note: We ask that you follow the
 GNU Kind Communication Guidelines} in your correspondence on the
 list (as well as off of it).
 
+Additionally, just to be clear, on the list:
+
+@itemize @bullet
+@item
+Personal attacks (so called @dfn{ad hominem attacks}) are always inappropriate.
+If you make such attacks, you will be banned from the list.
+
+@item
+Discussion of proprietary software is strongly discouraged on GNU mailing lists.
+If you continue to discuss such software after being asked not to, you
+will also be banned.
+@end itemize
+
 @node Usenet
 @appendixsubsec Please Don't Post Bug Reports to USENET
 
@@ -44965,6 +44978,13 @@ report to the @EMAIL{bug-gawk@@gnu.org,bug dash gawk at gnu dot org} email list 
 @node Other Versions
 @appendixsec Other Freely Available @command{awk} Implementations
 @cindex @command{awk} @subentry implementations
+
+@cindex Deutsch, L.@: Peter
+@quotation
+@i{Implementation is the sincerest form of flattery.}
+@author L.@: Peter Deutsch
+@end quotation
+
 @ignore
 From: emory!amc.com!brennan (Michael Brennan)
 Subject: C++ comments in awk programs
@@ -44973,23 +44993,16 @@ Date: Wed, 4 Sep 1996 08:11:48 -0700 (PDT)
 
 @end ignore
 @cindex Brennan, Michael
-@ifnotdocbook
 @quotation
 @i{It's kind of fun to put comments like this in your awk code:}@*
 @ @ @ @ @ @ @code{// Do C++ comments work? answer: yes! of course}
 @author Michael Brennan
 @end quotation
-@end ifnotdocbook
-
-@docbook
-<blockquote><attribution>Michael Brennan</attribution>
-<literallayout><emphasis>It's kind of fun to put comments like this in your awk code.</emphasis>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<literal>// Do C++ comments work? answer: yes! of course</literal></literallayout>
-</blockquote>
-@end docbook
 
 There are a number of other freely available @command{awk} implementations.
-This section briefly describes where to get them:
+This section briefly describes where to get them.
+
+The following programs are all written in C:
 
 @table @asis
 @cindex Kernighan, Brian
@@ -45012,9 +45025,6 @@ This command creates a copy of the @uref{https://git-scm.com, Git}
 repository in a directory named @file{bwkawk}.  If you omit the last argument
 from the @command{git} command line, the repository copy is created in a
 directory named @file{awk}.
-
-This version requires an ISO C (1990 standard) compiler; the C compiler
-from GCC (the GNU Compiler Collection) works quite nicely.
 
 To build it, review the settings in the @file{makefile}, and then just run
 @command{make}.  Note that the result of compilation is named
@@ -45089,12 +45099,15 @@ To get @command{awka}, go to @url{https://sourceforge.net/projects/awka}.
 @c You can reach Andrew Sumner at @email{andrew@@zbcom.net}.
 @c andrewsumner@@yahoo.net
 
-The project seems to be frozen; no new code changes have been made
+The project is frozen; no new code changes have been made
 since approximately 2001.
 
 @item Revive Awka
 This project, available at @uref{https://github.com/noyesno/awka},
 intends to fix bugs in @command{awka} and add more features.
+
+This project also seems to be frozen; no new code changes have been made
+since approximately 2021.
 
 @cindex Beebe, Nelson H.F.@:
 @cindex @command{pawk} (profiling version of Brian Kernighan's @command{awk})
@@ -45140,16 +45153,74 @@ However, that project was ended and the website shut down.  Fortunately, the
 makes this implementation available.  You can view the files one at a time from
 @uref{https://github.com/joyent/illumos-joyent/blob/master/usr/src/cmd/awk_xpg4}.
 
-@cindex @command{frawk}
-@cindex source code @subentry @command{frawk}
-@item @command{frawk}
-This is a language for writing short programs.  ``To a first
-approximation, it is an implementation of the AWK language;
-many common @command{awk} programs produce equivalent output
-when passed to @command{frawk}.''  However, it has a number of
-important additional features.  The code is available at
-@uref{https://github.com/ezrosent/frawk}.
+@item Libmawk
+@cindex libmawk
+@cindex source code @subentry libmawk
+This is an embeddable @command{awk} interpreter derived from
+@command{mawk}. For more information, see
+@c 1/2025, still on http
+@uref{http://repo.hu/projects/libmawk/}.
 
+@cindex source code @subentry embeddable @command{awk} interpreter
+@cindex Neacsu, Mircea
+@item Mircea Neacsu's Embeddable @command{awk}
+Mircea Neacsu has created an embeddable @command{awk}
+interpreter, based on BWK awk. It's available
+at @uref{https://github.com/neacsum/awk}.
+A short overview of how to use it may be found at
+@uref{https://www.codeproject.com/Articles/5264205/Embedding-AWK-in-a-C-program}.
+
+@item @command{awkcc}
+@cindex source code @subentry @command{awkcc}
+@cindex @command{awkcc}, @command{awk} to C translator
+@cindex Ramming, J.@: Christopher
+This is an early adaptation of Unix @command{awk} that
+translates @command{awk} into C code. It was done by
+J.@: Christopher Ramming at Bell Labs, circa 1988.
+It's available at @uref{https://github.com/nokia/awkcc}.
+Bringing this up to date would be an interesting
+software engineering exercise.
+
+@item @w{QSE @command{awk}}
+@cindex QSE @command{awk}
+@cindex source code @subentry QSE @command{awk}
+This is an embeddable @command{awk} interpreter. For more information,
+see @uref{https://code.google.com/p/qse/}. The source can be found at
+@uref{https://code.google.com/archive/p/qse/source/default/source}.
+
+@c It's been gone for at least a year, no reason to document it
+@ignore
+@item @command{QTawk}
+@cindex QuikTrim Awk
+@cindex source code @subentry QuikTrim Awk
+This is an independent implementation of @command{awk} distributed
+under the GPL. It has a large number of extensions over standard
+@command{awk} and may not be 100% syntactically compatible with it.
+See @uref{http://www.quiktrim.org/QTawk.html} for more information,
+including the manual. The download link there is out of date; see
+@uref{http://www.quiktrim.org/#AdditionalResources} for the latest
+download link.
+
+The project may also be frozen; no new code changes have been made
+since approximately 2014.
+And, as of January, 2025, the QuikTrim websites were not reachable.
+@end ignore
+
+@cindex Gardner, Ray
+@cindex @command{wak} (@command{awk} implementation)
+@item @command{wak}
+@command{wak} (a permutation of the letters in @command{awk}) is a small,
+mostly POSIX compatible version of @command{awk} written in C by
+Ray Gardner.
+The source code is available from @uref{https://github.com/raygard/wak,
+its Github repository}.  Some nice articles about its development
+may be found in the author's @uref{https://www.raygard.net/awkdoc/,
+weblog}.
+@end table
+
+The following implementations are written in Go:
+
+@table @asis
 @cindex @command{goawk}
 @cindex Go implementation of @command{awk}
 @cindex source code @subentry @command{goawk}
@@ -45175,7 +45246,11 @@ available from
 @uref{https://github.com/benhoyt/goawk/tree/master/awkgo}.
 The author's article about it is at
 @uref{https://benhoyt.com/writings/awkgo/}.
+@end table
 
+The following implementations are written in Java:
+
+@table @asis
 @cindex @command{jawk}
 @cindex Java implementation of @command{awk}
 @cindex source code @subentry @command{jawk}
@@ -45190,24 +45265,11 @@ from POSIX @command{awk}.  More information is available on the
 This project, available at @uref{https://github.com/hoijui/Jawk},
 is another @command{awk} interpreter written in Java. It uses
 modern Java build tools.
+@end table
 
-@item Libmawk
-@cindex libmawk
-@cindex source code @subentry libmawk
-This is an embeddable @command{awk} interpreter derived from
-@command{mawk}. For more information, see
-@c 1/2025, still on http
-@uref{http://repo.hu/projects/libmawk/}.
+This version is written in Python:
 
-@cindex source code @subentry embeddable @command{awk} interpreter
-@cindex Neacsu, Mircea
-@item Mircea Neacsu's Embeddable @command{awk}
-Mircea Neacsu has created an embeddable @command{awk}
-interpreter, based on BWK awk. It's available
-at @uref{https://github.com/neacsum/awk}.
-A short overview of how to use it may be found at
-@uref{https://www.codeproject.com/Articles/5264205/Embedding-AWK-in-a-C-program}.
-
+@table @asis
 @item @code{pawk}
 @cindex source code @subentry @command{pawk} (Python version)
 @cindex @code{pawk}, @command{awk}-like facilities for Python
@@ -45215,45 +45277,68 @@ This is a Python module that claims to bring @command{awk}-like
 features to Python. See @uref{https://github.com/alecthomas/pawk}
 for more information. (This is not related to Nelson Beebe's
 modified version of BWK @command{awk}, described earlier.)
+@end table
 
+There are several versions written in Rust:
+
+@table @asis
+
+@cindex @command{rust-awk}
+@cindex source code @subentry @command{rust-awk}
+@item @command{rust-awk}
+This program implements a small subset of @command{awk} in Rust.
+Many features are missing.
+The code is available at
+@uref{https://github.com/wenley/rust-awk}.
+
+@cindex @command{frawk}
+@cindex source code @subentry @command{frawk}
+@item @command{frawk}
+This is a language for writing short programs.  ``To a first
+approximation, it is an implementation of the AWK language;
+many common @command{awk} programs produce equivalent output
+when passed to @command{frawk}.''  However, it has a number of
+important additional features.  The code is available at
+@uref{https://github.com/ezrosent/frawk}.
+
+@cindex @command{zawk}
+@cindex source code @subentry @command{zawk}
+@item @command{zawk}
+This program is based off of @command{frawk}.  The code is available at
+@uref{https://crates.io/crates/zawk}.
+
+@cindex @command{awk-rs} (older version)
+@cindex source code @subentry @command{awk-rs} (older version)
+@item @command{awk-rs}
+This program simply claims to be ``@code{awk} written in rust.''
+It seems to be frozen, with no updates since 2020.
+The code is available at
+@uref{https://github.com/conradludgate/awk-rs}.
+
+@cindex @command{awk-rs}
+@cindex source code @subentry @command{awk-rs}
+@item @command{awk-rs}
+This program seems to be the most complete and actively
+maintained of the versions written in Rust. It used to be
+named @command{rawk} but is now called @command{awk-rs}.
+It seems to be different from the other version with the same
+name. The code is available at
+@uref{https://github.com/pegasusheavy/rawk}.
+@end table
+
+This version is written in Zig:
+
+@table @asis
 @item @code{phos}
 @cindex phos
 @cindex source code @subentry phos
 An implementation of @command{awk} in the Zig programming
 language. See @uref{https://codeberg.org/triallax/phos}.
+@end table
 
-@item @command{awkcc}
-@cindex source code @subentry @command{awkcc}
-@cindex @command{awkcc}, @command{awk} to C translator
-@cindex Ramming, J.@: Christopher
-This is an early adaptation of Unix @command{awk} that
-translates @command{awk} into C code. It was done by
-J.@: Christopher Ramming at Bell Labs, circa 1988.
-It's available at @uref{https://github.com/nokia/awkcc}.
-Bringing this up to date would be an interesting
-software engineering exercise.
+And finally, this tool is written in shell:
 
-@item @w{QSE @command{awk}}
-@cindex QSE @command{awk}
-@cindex source code @subentry QSE @command{awk}
-This is an embeddable @command{awk} interpreter. For more information,
-see @uref{https://code.google.com/p/qse/}. @c and @uref{http://awk.info/?tools/qse}.
-
-@item @command{QTawk}
-@cindex QuikTrim Awk
-@cindex source code @subentry QuikTrim Awk
-This is an independent implementation of @command{awk} distributed
-under the GPL. It has a large number of extensions over standard
-@command{awk} and may not be 100% syntactically compatible with it.
-See @uref{http://www.quiktrim.org/QTawk.html} for more information,
-including the manual. The download link there is out of date; see
-@uref{http://www.quiktrim.org/#AdditionalResources} for the latest
-download link.
-
-The project may also be frozen; no new code changes have been made
-since approximately 2014.
-And, as of January, 2025, the QuikTrim websites were not reachable.
-
+@table @asis
 @item @command{cppawk}
 @cindex @command{cppawk}
 @cindex source code @subentry @command{cppawk}
@@ -45262,24 +45347,11 @@ used like @command{awk}. It invokes the C preprocessor (GNU @command{cpp}) on th
 code and calls Awk on the result.''  This program may be of use if
 the way @command{gawk}'s @code{@@include} facility works doesn't suit
 your needs.  For more information, see @uref{https://www.kylheku.com/cgit/cppawk/}.
+@end table
 
-@cindex Gardner, Ray
-@cindex @command{wak} (@command{awk} implementation)
-@item @command{wak}
-@command{wak} (a permutation of the letters in @command{awk}) is a small,
-mostly POSIX compatible version of @command{awk} written in C by
-Ray Gardner.
-The source code is available from @uref{https://github.com/raygard/wak,
-its Github repository}.  Some nice articles about its development
-may be found in the author's @uref{https://www.raygard.net/awkdoc/,
-weblog}.
-
-@item Other versions
 See also the ``Versions and implementations'' section of the
 @uref{https://en.wikipedia.org/wiki/Awk_language#Versions_and_implementations,
 Wikipedia article} on @command{awk} for information on additional versions.
-
-@end table
 
 An interesting collection of library functions is available
 at @uref{https://github.com/e36freak/awk-libs}.

@@ -856,7 +856,7 @@ mixed1::
 
 mbprintf5::
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE ; $(CHCP) 65001; \
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE ; $(CHCP) 65001; \
 	$(AWK) -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >> _$@ ; \
 	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
@@ -1146,7 +1146,8 @@ readdir:
 	@-$(LS) -lna "$(top_srcdir)" | sed 1d > _longlist
 	@-$(AWK) -f "$(srcdir)"/readdir0.awk -v extout=_$@  \
 		-v dirlist=_dirlist -v longlist=_longlist > $@.ok
-	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@ _dirlist _longlist
+	@-rm -f _dirlist _longlist
+	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
 
 readdir_test:
 	@echo $@; $(CHCP) $(ORIGCP)

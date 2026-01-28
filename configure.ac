@@ -23,7 +23,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk],[5.3.64],[bug-gawk@gnu.org],[gawk])
+AC_INIT([GNU Awk],[5.3.65],[bug-gawk@gnu.org],[gawk])
 
 # This is a hack. Different versions of install on different systems
 # are just too different. Chuck it and use install-sh.
@@ -193,11 +193,11 @@ AM_LANGINFO_CODESET
 gt_LC_MESSAGES
 
 dnl checks for header files
-AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
-	netdb.h netinet/in.h stddef.h string.h \
-	spawn.h \
-	sys/ioctl.h sys/param.h sys/personality.h sys/select.h sys/socket.h sys/time.h \
-	uchar.h \
+AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h
+	netdb.h netinet/in.h stddef.h string.h
+	spawn.h
+	sys/ioctl.h sys/param.h sys/personality.h sys/select.h sys/socket.h sys/time.h
+	uchar.h
 	unistd.h termios.h stropts.h wchar.h wctype.h)
 
 gl_C_BOOL
@@ -314,15 +314,15 @@ AC_SEARCH_LIBS(isinf, m)
 AC_SEARCH_LIBS(ismod, m)
 AC_SEARCH_LIBS(isnan, m)
 
-AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
-	getgrent getgroups grantpt isascii isblank \
-	gettimeofday clock_gettime lstat \
-	getdtablesize \
-	_NSGetExecutablePath posix_spawnp \
-	mbrtoc32 c32rtomb \
-	mtrace personality posix_openpt setenv setlocale setsid sigprocmask \
-	strcasecmp strcoll strftime strncasecmp \
-	strsignal timegm \
+AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror
+	getgrent getgroups grantpt isascii isblank
+	gettimeofday clock_gettime lstat
+	getdtablesize
+	_NSGetExecutablePath posix_spawnp
+	mbrtoc32 c32rtomb
+	mtrace personality posix_openpt setenv setlocale setsid sigprocmask
+	strcasecmp strcoll strftime strncasecmp
+	strsignal timegm
 	waitpid wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
 AC_FUNC_MBRTOWC

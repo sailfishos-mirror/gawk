@@ -1,4 +1,4 @@
-   Copyright (C) 2019, 2020, 2021, 2022, 2023, 2024, 2025
+   Copyright (C) 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026
    Free Software Foundation, Inc.
    
    Copying and distribution of this file, with or without modification,
@@ -13,72 +13,79 @@ Changes from 5.3.x to 5.4.0
    available. More detail is available in the manual, and in the file
    README_d/README.matchers. At the very least, read that file!
 
-2. There is now a new directive, @nsinclude, which works like @include
+2. The manual, in the Bugs section, now makes it explicit that
+   (a) Ad hominem attacks on the lists will not be tolerated, and
+   (b) Discussion of proprietary software is strongly discouraged.
+   Repeated offenses are grounds for being banned from the lists.
+
+3. There is now a new directive, @nsinclude, which works like @include
    but does not reset the namespace for the included file to "awk". See
    the manual for details.
 
-3. When using lshift() or rshift() and attempting to shift by as many
+4. When using lshift() or rshift() and attempting to shift by as many
    or more bits than in a uintmax_t, gawk returns zero, instead of
    whatever the C compiler and hardware might have done.
 
-4. Gawk's use of persistent memory has changed somewhat:
-   A. It's now possible to use persistent memory and dynamic extensions
-      without problems. Gawk notices if an extension is being loaded from
-      a different path than what was first used and produces a fatal error
-      in this case.
-   B. Gawk generates a warning if the version of gawk saved in the backing
-      file doesn't match that of the current running gawk.
-   C. Gawk now stores additional meta-information in the backing file.
+5. Gawk's use of persistent memory has changed somewhat:
+   A. Gawk now stores additional meta-information in the backing file.
       This means that if you have a backing file with important data
       in it, you should dump the data to a text file using the old version,
       create a new backing file, and then read your data back in with
       the new version.
+   B. Gawk generates a warning if the version of gawk saved in the backing
+      file doesn't match that of the current running gawk.
+   C. It's now possible to use persistent memory and dynamic extensions
+      without problems. Gawk notices if an extension is being loaded from
+      a different path than what was first used and produces a fatal error
+      in this case.
 
-5. The ordchr extension now supports multibyte / wide characters.
+6. The ordchr extension now supports multibyte / wide characters.
 
-6. Per the 2024 POSIX standard, `length(array)' is no longer an extension,
+7. Per the 2024 POSIX standard, `length(array)' is no longer an extension,
    but a regular feature.  Thus --posix no longer rejects it and --lint
    no longer warns about it.
 
-7. The --traditional option has been rationalized to bring gawk into
+8. The --traditional option has been rationalized to bring gawk into
    sync with BWK awk. It no longer affects the return code from system(),
    and it no longer prevents using a regexp for RS. Internally, the
    code was cleaned up some as well.
 
-8. Assertions in the C code are now enabled.  To disable them, manually
+9. Assertions in the C code are now enabled.  To disable them, manually
    edit the various Makefiles after running configure and before
    running make. You will need to add -DNDEBUG to the CFLAGS variable.
 
-9. PMA should now work on OpenBSD 7.*.
+10. PMA should now work on OpenBSD 7.*.
 
-10. Hexadecimal floating-point values may now be used in program source code,
+11. Hexadecimal floating-point values may now be used in program source code,
     with strtonum(), and with the -n/--non-decimal-data option.  See the
     manual for details.
 
-11. A large number of small "replacement" files for standard functions
+12. A large number of small "replacement" files for standard functions
     have been removed. These functions are now so standard that we
     simply expect them to always be available. This simplifies the
     distribution and the code maintenance.
 
-12. Support for UDP in gawk's networking support is now obsolete.
+13. Support for UDP in gawk's networking support is now obsolete.
     It never worked very well. It will be removed in version 6.0.
     Gawk issues a warning when attempting to use it.
 
-13. Reading regular disk input files should be somewhat faster now,
+14. Reading regular disk input files should be somewhat faster now,
     since gawk no longer checks for timeouts on such files.  On one
     very large file, gawk '{ print }' saw approximately a 9% speedup.
 
-14. The MinGW port of gawk for MS-Windows now supports UTF-8 encoded
+15. The MinGW port of gawk for MS-Windows now supports UTF-8 encoded
     non-ASCII text when the console window where gawk runs uses the
     Windows codepage 65001 for output, even if the system-wide locale
     specifies another codepage.
 
-15. There is a new option to configure: --enable-O3.  This causes gcc to
+    Similarly, the Cygwin port now also fully supports UTF-8.
+
+16. There is a new option to configure: --enable-O3.  This causes gcc to
     use -O3 instead of -O2 when compiling gawk.  This is not the default
     because experience in some projects has shown (sadly) that -O3 can cause
     bugs.
 
-16. As usual, a number of small bugs have been fixed; see the ChangeLog
+17. As usual, a number of small bugs have been fixed; see the ChangeLog
     for the details.
 
 Changes from 5.3.2 to 5.3.x
