@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2026,
+ * Copyright (C) 1986, 1988, 1989, 1991-2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -2108,7 +2108,7 @@ do_sub(int nargs, unsigned int flags)
 
 #if 0
 		if (bp - buf > sofar + len)
-			fprintf(stderr, "debug: len = " PRINTF_ZU_FMT ", but used %ld\n", len, (long)((bp - buf) - (long)sofar));
+			fprintf(stderr, "debug: len = %zu, but used %ld\n", len, (long)((bp - buf) - (long)sofar));
 #endif
 
 		if ((current >= how_many && ! global)
@@ -3434,10 +3434,10 @@ NODE *
 do_dump_node(int nargs)
 {
 	printf("MB_CUR_MAX = %u\n", (int) MB_CUR_MAX);
-	printf("sizeof(int) = " PRINTF_ZU_FMT "\n", sizeof(int));
-	printf("sizeof(long) = " PRINTF_ZU_FMT "\n", sizeof(long));
-	printf("sizeof(long long) = " PRINTF_ZU_FMT "\n", sizeof(long long));
-	printf("sizeof(void *) = " PRINTF_ZU_FMT "\n", sizeof(void *));
+	printf("sizeof(int) = %zu\n", sizeof(int));
+	printf("sizeof(long) = %zu\n", sizeof(long));
+	printf("sizeof(long long) = %zu\n", sizeof(long long));
+	printf("sizeof(void *) = %zu\n", sizeof(void *));
 	printf("\n");
 	fflush(stdout);
 
@@ -3445,61 +3445,61 @@ do_dump_node(int nargs)
 	if (fp == NULL)
 		return Nnull_string;
 
-	fprintf(fp, PRINTF_ZU_FMT "\tarray_base\n", offsetof(NODE, array_base));
-	fprintf(fp, PRINTF_ZU_FMT "\tarray_capacity\n", offsetof(NODE, array_capacity));
-	fprintf(fp, PRINTF_ZU_FMT "\tarray_funcs\n", offsetof(NODE, array_funcs));
-	fprintf(fp, PRINTF_ZU_FMT "\tarray_size\n", offsetof(NODE, array_size));
-	fprintf(fp, PRINTF_ZU_FMT "\tbuckets\n", offsetof(NODE, buckets));
-	fprintf(fp, PRINTF_ZU_FMT "\tcode_ptr\n", offsetof(NODE, code_ptr));
-	fprintf(fp, PRINTF_ZU_FMT "\tcomment_type\n", offsetof(NODE, comment_type));
-	fprintf(fp, PRINTF_ZU_FMT "\tcur_idx	\n", offsetof(NODE, cur_idx	));
-	fprintf(fp, PRINTF_ZU_FMT "\tdup_ent\n", offsetof(NODE, dup_ent));
-	fprintf(fp, PRINTF_ZU_FMT "\telemnew_parent\n", offsetof(NODE, elemnew_parent));
-	fprintf(fp, PRINTF_ZU_FMT "\telemnew_vname\n", offsetof(NODE, elemnew_vname));
-	fprintf(fp, PRINTF_ZU_FMT "\tflags\n", offsetof(NODE, flags));
-	fprintf(fp, PRINTF_ZU_FMT "\tfor_array\n", offsetof(NODE, for_array));
-	fprintf(fp, PRINTF_ZU_FMT "\tfor_list\n", offsetof(NODE, for_list));
-	fprintf(fp, PRINTF_ZU_FMT "\tfor_list_size\n", offsetof(NODE, for_list_size));
-	fprintf(fp, PRINTF_ZU_FMT "\tfparms\n", offsetof(NODE, fparms));
-	fprintf(fp, PRINTF_ZU_FMT "\tfunc_node\n", offsetof(NODE, func_node));
-	fprintf(fp, PRINTF_ZU_FMT "\tlnode\n", offsetof(NODE, lnode));
+	fprintf(fp, "%zu\tarray_base\n", offsetof(NODE, array_base));
+	fprintf(fp, "%zu\tarray_capacity\n", offsetof(NODE, array_capacity));
+	fprintf(fp, "%zu\tarray_funcs\n", offsetof(NODE, array_funcs));
+	fprintf(fp, "%zu\tarray_size\n", offsetof(NODE, array_size));
+	fprintf(fp, "%zu\tbuckets\n", offsetof(NODE, buckets));
+	fprintf(fp, "%zu\tcode_ptr\n", offsetof(NODE, code_ptr));
+	fprintf(fp, "%zu\tcomment_type\n", offsetof(NODE, comment_type));
+	fprintf(fp, "%zu\tcur_idx	\n", offsetof(NODE, cur_idx	));
+	fprintf(fp, "%zu\tdup_ent\n", offsetof(NODE, dup_ent));
+	fprintf(fp, "%zu\telemnew_parent\n", offsetof(NODE, elemnew_parent));
+	fprintf(fp, "%zu\telemnew_vname\n", offsetof(NODE, elemnew_vname));
+	fprintf(fp, "%zu\tflags\n", offsetof(NODE, flags));
+	fprintf(fp, "%zu\tfor_array\n", offsetof(NODE, for_array));
+	fprintf(fp, "%zu\tfor_list\n", offsetof(NODE, for_list));
+	fprintf(fp, "%zu\tfor_list_size\n", offsetof(NODE, for_list_size));
+	fprintf(fp, "%zu\tfparms\n", offsetof(NODE, fparms));
+	fprintf(fp, "%zu\tfunc_node\n", offsetof(NODE, func_node));
+	fprintf(fp, "%zu\tlnode\n", offsetof(NODE, lnode));
 #ifdef HAVE_MPFR
-	fprintf(fp, PRINTF_ZU_FMT "\tmpg_i\n", offsetof(NODE, mpg_i));
-	fprintf(fp, PRINTF_ZU_FMT "\tmpg_numbr\n", offsetof(NODE, mpg_numbr));
+	fprintf(fp, "%zu\tmpg_i\n", offsetof(NODE, mpg_i));
+	fprintf(fp, "%zu\tmpg_numbr\n", offsetof(NODE, mpg_numbr));
 #endif
-	fprintf(fp, PRINTF_ZU_FMT "\tnodes\n", offsetof(NODE, nodes));
-	fprintf(fp, PRINTF_ZU_FMT "\tnumbr\n", offsetof(NODE, numbr));
-	fprintf(fp, PRINTF_ZU_FMT "\torig_array\n", offsetof(NODE, orig_array));
-	fprintf(fp, PRINTF_ZU_FMT "\tparam\n", offsetof(NODE, param));
-	fprintf(fp, PRINTF_ZU_FMT "\tparam_cnt\n", offsetof(NODE, param_cnt));
-	fprintf(fp, PRINTF_ZU_FMT "\tparent_array\n", offsetof(NODE, parent_array));
-	fprintf(fp, PRINTF_ZU_FMT "\tprev_array\n", offsetof(NODE, prev_array));
-	fprintf(fp, PRINTF_ZU_FMT "\tprev_frame_size\n", offsetof(NODE, prev_frame_size));
-	fprintf(fp, PRINTF_ZU_FMT "\tre_cnt\n", offsetof(NODE, re_cnt));
-	fprintf(fp, PRINTF_ZU_FMT "\tre_exp\n", offsetof(NODE, re_exp));
-	fprintf(fp, PRINTF_ZU_FMT "\tre_flags\n", offsetof(NODE, re_flags));
-	fprintf(fp, PRINTF_ZU_FMT "\tre_reg\n", offsetof(NODE, re_reg));
-	fprintf(fp, PRINTF_ZU_FMT "\tre_text\n", offsetof(NODE, re_text));
-	fprintf(fp, PRINTF_ZU_FMT "\treti\n", offsetof(NODE, reti));
-	fprintf(fp, PRINTF_ZU_FMT "\trnode\n", offsetof(NODE, rnode));
-	fprintf(fp, PRINTF_ZU_FMT "\tstack\n", offsetof(NODE, stack));
-	fprintf(fp, PRINTF_ZU_FMT "\tstfmt\n", offsetof(NODE, stfmt));
-	fprintf(fp, PRINTF_ZU_FMT "\tstlen\n", offsetof(NODE, stlen));
-	fprintf(fp, PRINTF_ZU_FMT "\tstptr\n", offsetof(NODE, stptr));
+	fprintf(fp, "%zu\tnodes\n", offsetof(NODE, nodes));
+	fprintf(fp, "%zu\tnumbr\n", offsetof(NODE, numbr));
+	fprintf(fp, "%zu\torig_array\n", offsetof(NODE, orig_array));
+	fprintf(fp, "%zu\tparam\n", offsetof(NODE, param));
+	fprintf(fp, "%zu\tparam_cnt\n", offsetof(NODE, param_cnt));
+	fprintf(fp, "%zu\tparent_array\n", offsetof(NODE, parent_array));
+	fprintf(fp, "%zu\tprev_array\n", offsetof(NODE, prev_array));
+	fprintf(fp, "%zu\tprev_frame_size\n", offsetof(NODE, prev_frame_size));
+	fprintf(fp, "%zu\tre_cnt\n", offsetof(NODE, re_cnt));
+	fprintf(fp, "%zu\tre_exp\n", offsetof(NODE, re_exp));
+	fprintf(fp, "%zu\tre_flags\n", offsetof(NODE, re_flags));
+	fprintf(fp, "%zu\tre_reg\n", offsetof(NODE, re_reg));
+	fprintf(fp, "%zu\tre_text\n", offsetof(NODE, re_text));
+	fprintf(fp, "%zu\treti\n", offsetof(NODE, reti));
+	fprintf(fp, "%zu\trnode\n", offsetof(NODE, rnode));
+	fprintf(fp, "%zu\tstack\n", offsetof(NODE, stack));
+	fprintf(fp, "%zu\tstfmt\n", offsetof(NODE, stfmt));
+	fprintf(fp, "%zu\tstlen\n", offsetof(NODE, stlen));
+	fprintf(fp, "%zu\tstptr\n", offsetof(NODE, stptr));
 #ifdef HAVE_MPFR
-	fprintf(fp, PRINTF_ZU_FMT "\tstrndmode\n", offsetof(NODE, strndmode));
+	fprintf(fp, "%zu\tstrndmode\n", offsetof(NODE, strndmode));
 #endif
-	fprintf(fp, PRINTF_ZU_FMT "\ttable_size\n", offsetof(NODE, table_size));
-	fprintf(fp, PRINTF_ZU_FMT "\ttype\n", offsetof(NODE, type));
-	fprintf(fp, PRINTF_ZU_FMT "\ttyped_re\n", offsetof(NODE, typed_re));
-	fprintf(fp, PRINTF_ZU_FMT "\tvalref\n", offsetof(NODE, valref));
-	fprintf(fp, PRINTF_ZU_FMT "\tvar_assign\n", offsetof(NODE, var_assign));
-	fprintf(fp, PRINTF_ZU_FMT "\tvar_update\n", offsetof(NODE, var_update));
-	fprintf(fp, PRINTF_ZU_FMT "\tvar_value\n", offsetof(NODE, var_value));
-	fprintf(fp, PRINTF_ZU_FMT "\tvname\n", offsetof(NODE, vname));
-	fprintf(fp, PRINTF_ZU_FMT "\twstlen\n", offsetof(NODE, wstlen));
-	fprintf(fp, PRINTF_ZU_FMT "\twstptr\n", offsetof(NODE, wstptr));
-	fprintf(fp, PRINTF_ZU_FMT "txarray\n", offsetof(NODE, xarray));
+	fprintf(fp, "%zu\ttable_size\n", offsetof(NODE, table_size));
+	fprintf(fp, "%zu\ttype\n", offsetof(NODE, type));
+	fprintf(fp, "%zu\ttyped_re\n", offsetof(NODE, typed_re));
+	fprintf(fp, "%zu\tvalref\n", offsetof(NODE, valref));
+	fprintf(fp, "%zu\tvar_assign\n", offsetof(NODE, var_assign));
+	fprintf(fp, "%zu\tvar_update\n", offsetof(NODE, var_update));
+	fprintf(fp, "%zu\tvar_value\n", offsetof(NODE, var_value));
+	fprintf(fp, "%zu\tvname\n", offsetof(NODE, vname));
+	fprintf(fp, "%zu\twstlen\n", offsetof(NODE, wstlen));
+	fprintf(fp, "%zu\twstptr\n", offsetof(NODE, wstptr));
+	fprintf(fp, "%zu\txarray\n", offsetof(NODE, xarray));
 
 	pclose(fp);
 	

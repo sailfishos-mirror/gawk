@@ -9453,12 +9453,12 @@ charset_dump(const charset_t *set, FILE *fp, bool use_c_format)
 		fprintf(fp, "finalized = %s\n", boolval[!! set->finalized]);
 		fprintf(fp, "is_utf8 = %s\n", boolval[!! set->is_utf8]);
 		fprintf(fp, "mb_cur_max = %d\n", set->mb_cur_max);
-		fprintf(fp, "nchars_inuse = " PRINTF_ZU_FMT "\n", set->nchars_inuse);
-		fprintf(fp, "nelems = " PRINTF_ZU_FMT "\n", set->nelems);
-		fprintf(fp, "nelems8bit = " PRINTF_ZU_FMT "\n", set->nelems8bit);
+		fprintf(fp, "nchars_inuse = %zu\n", set->nchars_inuse);
+		fprintf(fp, "nelems = %zu\n", set->nelems);
+		fprintf(fp, "nelems8bit = %zu\n", set->nelems8bit);
 		
 		for (size_t i = 0; i < set->nelems; i++) {
-			fprintf(fp, PRINTF_3ZD_FMT ". RANGE: start = L'%lc' (%d), end = L'%lc' (%d)\n",
+			fprintf(fp, "%3zd. RANGE: start = L'%lc' (%d), end = L'%lc' (%d)\n",
 				i, items[i].start, items[i].start, items[i].end, items[i].end);
 		}
 	}

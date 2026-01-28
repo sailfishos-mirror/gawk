@@ -126,7 +126,7 @@ typedef struct {     // header of backing file; contains allocator metadata
 
 static struct {
   int init,           // has persistent heap been initialized?
-      vrb;            // verbosity level
+      vrb;            // verbsity level
   const char * file;  // name of backing file
   pma_hdr_t * hdr;    // addr where backing file is mapped
 } state;
@@ -354,8 +354,8 @@ static void flr(ao_t *p) {  // remove ao from free list
 static void * addrgap(off_t n) {  // find big gap in address space to map n bytes
   void *A, *Amax = NULL;  size_t L, U, Max = 0, N = (size_t)n;  char *r;
   FYI("addrgap(%jd)\n", (intmax_t)n);  // TODO: better way to handle off_t
-  if (N < sizeof(pma_hdr_t) + 40960) { ERR("file size " PRINTF_ZU_FMT " too small\n", N); SERN; }
-  // Binary search to find max length of successful mmap().
+  if (N < sizeof(pma_hdr_t) + 40960) { ERR("file size %zu too small\n", N); SERN; }
+  // Binary search to find max length of successfull mmap().
   // Invariants:
   //   Larger max might lie in range [L,U] inclusive.
   //   If a previous max has been found, it must lie in [1,L-1].
@@ -367,9 +367,9 @@ static void * addrgap(off_t n) {  // find big gap in address space to map n byte
     if (MAP_FAILED != (A = MMAP(M))) { assert(Max < M); Max = M; Amax = A; MUNMAP(A, M); if (UINT64_MAX == M) break; L = M + 1; }
     else                             { assert(0   < M);                                                              U = M - 1; }
   }
-  FYI("max gap: " PRINTF_ZU_FMT " bytes at %p\n", Max, Amax);
+  FYI("max gap: %zu bytes at %p\n", Max, Amax);
   if (Max < N + (size_t)ALGN * 2) {  // safety margin
-    ERR("max gap " PRINTF_ZU_FMT " too small for required " PRINTF_ZU_FMT "\n", Max, N);
+    ERR("max gap %zu too small for required %zu\n", Max, N);
     SERN;
   }
   r = (char *)Amax + (Max - N)/2;
@@ -504,7 +504,7 @@ static ao_t * split_ao(ao_t *p, size_t s) {
   assert(NULL == LOBH(p));  // lo bits of header (p->anext) might be set, but not lo bits of p
   assert(NULL == p->fprev && NULL == p->fnext);  // *p should already be spliced out of free lists
   assert(c >= s && 0 == c % WDSZ);
-  FYI("split_ao(%p," PRINTF_ZU_FMT ") AOCAP " PRINTF_ZU_FMT " words req " PRINTF_ZU_FMT " words cap " PRINTF_ZU_FMT "\n", VS p, s, c, Sw, Cw);
+  FYI("split_ao(%p,%zu) AOCAP %zu words req %zu words cap %zu\n", VS p, s, c, Sw, Cw);
   globh(p, &iu, &piu, &grown);
   if (4 <= Cw - Sw) {  // split ao if remainder is large enough to be allocatable
     ao_t  *rem = (ao_t *)(&(p->fprev) + Sw),   // remainder
@@ -531,17 +531,17 @@ static ao_t * split_ao(ao_t *p, size_t s) {
 
 void * pma_malloc(size_t size) {
   ao_t *r = NULL;
-  FYI("malloc(" PRINTF_ZU_FMT ")\n", size);
+  FYI("malloc(%zu)\n", size);
   ASI(NULL);
   if (2 == state.init) return malloc(size);
   assert(!IC);
   if (0 >= size) {
-    WRN("malloc(" PRINTF_ZU_FMT ") argument <= zero\n", size);  SERN;  }
+    WRN("malloc(%zu) argument <= zero\n", size);  SERN;  }
   for (int c = sc(size); c < NFL; c++) {
     ao_t *h = &(state.hdr->free[c]);
-    // FYI("check size class %d UB " PRINTF_ZU_FMT "\n", c, UB[c]);
+    // FYI("check size class %d UB %zu\n", c, UB[c]);
     for (ao_t *f = h->fnext; f != h; f = f->fnext) {
-      // FYI("free list contains ao with capacity " PRINTF_ZU_FMT "\n", AOCAP(f));
+      // FYI("free list contains ao with capacity %zu\n", AOCAP(f));
       if (AOCAP(f) >= size) {
         r = f;
         goto end;
@@ -558,21 +558,21 @@ void * pma_malloc(size_t size) {
     return &(r->fprev);
   }
   else {
-    WRN("malloc(" PRINTF_ZU_FMT ") cannot satisfy request at this time\n", size);
+    WRN("malloc(%zu) cannot satisfy request at this time\n", size);
     SERN;  // conflates ENOMEM / EAGAIN (request might succeed after frees)
   }
 }
 
 void * pma_calloc(size_t nmemb, size_t size) {
   void *p;
-  FYI("calloc(" PRINTF_ZU_FMT "," PRINTF_ZU_FMT ")\n", nmemb, size);
+  FYI("calloc(%zu,%zu)\n", nmemb, size);
   ASI(NULL);
   if (2 == state.init) return calloc(nmemb, size);
   if (0 >= nmemb || 0 >= size) {
-    WRN("calloc(" PRINTF_ZU_FMT "," PRINTF_ZU_FMT ") argument <= zero\n", nmemb, size);  SERN;  }
+    WRN("calloc(%zu,%zu) argument <= zero\n", nmemb, size);  SERN;  }
   // SSIZE_MAX exists but SIZE_MAX apparently doesn't; sheesh
   if (nmemb > UINT64_MAX / size) {
-    WRN("calloc(" PRINTF_ZU_FMT "," PRINTF_ZU_FMT ") arguments overflow\n", nmemb, size);  SERN;  }
+    WRN("calloc(%zu,%zu) arguments overflow\n", nmemb, size);  SERN;  }
   if (NULL != (p = pma_malloc(nmemb * size)))
     (void)memset(p, 0, nmemb * size);
   return p;
@@ -580,7 +580,7 @@ void * pma_calloc(size_t nmemb, size_t size) {
 
 void * pma_realloc(void *ptr, size_t size) {
   ao_t *p;  void *nu;  // "new" is a C++ keyword
-  FYI("realloc(%p," PRINTF_ZU_FMT ")\n", ptr, size);
+  FYI("realloc(%p,%zu)\n", ptr, size);
   ASI(NULL);
   if (2 == state.init) return realloc(ptr, size);
   if (NULL == ptr) return pma_malloc(size);
