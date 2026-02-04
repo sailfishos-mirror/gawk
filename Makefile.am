@@ -173,6 +173,12 @@ uninstall-recursive: uninstall-links
 # force there to be a gawk executable before running tests
 check-local: gawk$(EXEEXT)
 
+# on NetBSD 10, mark the exe as not using Address Space Layout Randomization
+if USE_PAXCTL
+all-local: gawk
+	paxctl +a gawk
+endif
+
 # A little extra clean up when making distributions.
 dist-hook:
 	cd "$(distdir)"/extension ; rm -f *.o *.so

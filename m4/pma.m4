@@ -10,6 +10,7 @@ AC_DEFUN([GAWK_USE_PERSISTENT_MALLOC],
 AC_REQUIRE([AX_CHECK_COMPILE_FLAG])
 AC_CHECK_SIZEOF([void *])
 use_persistent_malloc=no
+use_paxctl=no
 if test "$SKIP_PERSIST_MALLOC" = no && test $ac_cv_sizeof_void_p -eq 8
 then
 	AC_CHECK_FUNC([mmap])
@@ -23,6 +24,9 @@ then
 				#include <sys/personality.h>
 				int x = ADDR_NO_RANDOMIZE;
 				]], [[]])],[have_addr_no_randomize=yes],[have_addr_no_randomize=no])
+			;;
+		*netbsd10.*)
+			use_paxctl=yes
 			;;
  		*darwin*)
 			true	# On macos we no longer need -no-pie
@@ -52,6 +56,7 @@ fi
 
 AM_CONDITIONAL([USE_PERSISTENT_MALLOC], [test "$use_persistent_malloc" = "yes"])
 AM_CONDITIONAL([HAVE_ADDR_NO_RANDOMIZE], [test "$have_addr_no_randomize" = "yes"])
+AM_CONDITIONAL([USE_PAXCTL], [test "$use_paxctl" = "yes"])
 
 if test "$use_persistent_malloc" = "yes"
 then

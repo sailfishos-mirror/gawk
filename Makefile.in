@@ -1101,7 +1101,8 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-local
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-recursive
-all-am: Makefile $(PROGRAMS) $(SCRIPTS) $(HEADERS) config.h
+@USE_PAXCTL_FALSE@all-local:
+all-am: Makefile $(PROGRAMS) $(SCRIPTS) $(HEADERS) config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"; do \
@@ -1268,7 +1269,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 .MAKE: $(am__recursive_targets) all check check-am install install-am \
 	install-exec install-exec-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
 	am--depfiles am--refresh check check-am check-local clean \
 	clean-binPROGRAMS clean-cscope clean-generic cscope \
 	cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
@@ -1319,6 +1320,10 @@ uninstall-recursive: uninstall-links
 
 # force there to be a gawk executable before running tests
 check-local: gawk$(EXEEXT)
+
+# on NetBSD 10, mark the exe as not using Address Space Layout Randomization
+@USE_PAXCTL_TRUE@all-local: gawk
+@USE_PAXCTL_TRUE@	paxctl +a gawk
 
 # A little extra clean up when making distributions.
 dist-hook:
