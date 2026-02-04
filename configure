@@ -10328,6 +10328,18 @@ then :
   printf "%s\n" "#define HAVE_SPAWN_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "sys/procctl.h" "ac_cv_header_sys_procctl_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_procctl_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYS_PROCCTL_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "sys/sysctl.h" "ac_cv_header_sys_sysctl_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_sysctl_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYS_SYSCTL_H 1" >>confdefs.h
+
+fi
 ac_fn_c_check_header_compile "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes
 then :
@@ -11522,6 +11534,18 @@ then :
   printf "%s\n" "#define HAVE_SIGPROCMASK 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "procctl" "ac_cv_func_procctl"
+if test "x$ac_cv_func_procctl" = xyes
+then :
+  printf "%s\n" "#define HAVE_PROCCTL 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "sysctl" "ac_cv_func_sysctl"
+if test "x$ac_cv_func_sysctl" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYSCTL 1" >>confdefs.h
+
+fi
 ac_fn_c_check_func "$LINENO" "strcasecmp" "ac_cv_func_strcasecmp"
 if test "x$ac_cv_func_strcasecmp" = xyes
 then :
@@ -11729,6 +11753,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 			;;
 		*netbsd10.*)
 			use_paxctl=yes
+			;;
+ 		*freebsd16*)
+			true
 			;;
  		*darwin*)
 			true	# On macos we no longer need -no-pie

@@ -28,6 +28,9 @@ then
 		*netbsd10.*)
 			use_paxctl=yes
 			;;
+ 		*freebsd16*)
+			true
+			;;
  		*darwin*)
 			true	# On macos we no longer need -no-pie
 			;;
