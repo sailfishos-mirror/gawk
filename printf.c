@@ -1589,6 +1589,11 @@ mbc_char_count(const char *ptr, size_t numbytes)
 	return sum;
 }
 
+#ifdef __PCC__
+#undef isinf
+#define isinf __builtin_isinf
+#endif
+
 /* out_of_range --- return true if a value is out of range */
 
 bool

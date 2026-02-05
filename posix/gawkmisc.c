@@ -39,6 +39,14 @@
 #include <mach-o/dyld.h>
 #endif
 
+#ifdef HAVE_SYS_PROCCTL_H
+#include <sys/procctl.h>
+#endif
+
+#ifdef HAVE_SYS_SYSCTL_H
+#include <sys/sysctl.h>
+#endif
+
 const char quote = '\'';
 const char *defpath = DEFPATH;
 const char *deflibpath = DEFLIBPATH;
@@ -312,8 +320,6 @@ os_maybe_set_errno(void)
 
 /* os_disable_aslr --- disable Address Space Layout Randomization */
 
-// This for Linux and MacOS. It's not needed on other *nix systems.
-
 void
 os_disable_aslr(const char *persist_file, char **argv)
 {
@@ -338,6 +344,7 @@ os_disable_aslr(const char *persist_file, char **argv)
 			(void) unsetenv("GAWK_PMA_REINCARNATION");
 	}
 #endif
+
 #if defined(HAVE__NSGETEXECUTABLEPATH) && defined(HAVE_POSIX_SPAWNP)
 	// This code is for macos
 	if (persist_file != NULL) {
@@ -372,6 +379,43 @@ os_disable_aslr(const char *persist_file, char **argv)
 				fprintf(stderr, _("fatal: posix_spawnp: %s\n"), strerror(errno));
 				exit(EXIT_FATAL);
 			}
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
+	}
+#endif
+
+#if HAVE_SYS_PROCCTL_H && HAVE_SYS_SYSCTL_H && HAVE_PROCCTL && HAVE_SYSCTL
+	// This code is for FreeBSD.
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			// Retrieve the full path of this file
+			int request[4];
+			request[0] = CTL_KERN;
+			request[1] = KERN_PROC;
+			request[2] = KERN_PROC_PATHNAME;
+			request[3] = -1; // Special PID -1 for the current process
+
+			char exe[PATH_MAX];
+			size_t len = sizeof(exe);
+			if (sysctl(request, 4, exe, &len, NULL, 0) == -1) {
+				fprintf(stderr, _("warning: sysctl: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				return;
+			}
+			
+			int action = PROC_ASLR_FORCE_DISABLE;
+			// pid of 0 means getpid()
+			if (procctl(P_PID, 0, PROC_ASLR_CTL, & action) < 0) {
+				fprintf(stderr, _("warning: procctl: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				// do the exec anyway...
+			}
+			(void) setenv("GAWK_PMA_REINCARNATION", "true", true);
+			execv(exe, argv);
 		} else
 			(void) unsetenv("GAWK_PMA_REINCARNATION");
 	}

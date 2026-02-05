@@ -1817,6 +1817,8 @@ NEED_TESTOUTCMP = \
 	beginfile2 double2 exit fmttest hsprint posix profile5 space printf-corners hexfloat
 
 CMP = cmp
+# RM Needed for NetBSD standard make. Sigh.
+RM = rm
 AWKPROG = ../gawk$(EXEEXT)
 SORT = sort
 SORT2 = LC_ALL=C sort

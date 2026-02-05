@@ -661,6 +661,8 @@ LIBREADLINE
 SOCKET_LIBS
 ENABLE_EXTENSIONS_FALSE
 ENABLE_EXTENSIONS_TRUE
+USE_PAXCTL_FALSE
+USE_PAXCTL_TRUE
 HAVE_ADDR_NO_RANDOMIZE_FALSE
 HAVE_ADDR_NO_RANDOMIZE_TRUE
 USE_PERSISTENT_MALLOC_FALSE
@@ -10326,6 +10328,18 @@ then :
   printf "%s\n" "#define HAVE_SPAWN_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "sys/procctl.h" "ac_cv_header_sys_procctl_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_procctl_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYS_PROCCTL_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "sys/sysctl.h" "ac_cv_header_sys_sysctl_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_sysctl_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYS_SYSCTL_H 1" >>confdefs.h
+
+fi
 ac_fn_c_check_header_compile "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes
 then :
@@ -11520,6 +11534,18 @@ then :
   printf "%s\n" "#define HAVE_SIGPROCMASK 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "procctl" "ac_cv_func_procctl"
+if test "x$ac_cv_func_procctl" = xyes
+then :
+  printf "%s\n" "#define HAVE_PROCCTL 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "sysctl" "ac_cv_func_sysctl"
+if test "x$ac_cv_func_sysctl" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYSCTL 1" >>confdefs.h
+
+fi
 ac_fn_c_check_func "$LINENO" "strcasecmp" "ac_cv_func_strcasecmp"
 if test "x$ac_cv_func_strcasecmp" = xyes
 then :
@@ -11683,6 +11709,7 @@ printf "%s\n" "#define SIZEOF_VOID_P $ac_cv_sizeof_void_p" >>confdefs.h
 
 
 use_persistent_malloc=no
+use_paxctl=no
 if test "$SKIP_PERSIST_MALLOC" = no && test $ac_cv_sizeof_void_p -eq 8
 then
 	ac_fn_c_check_func "$LINENO" "mmap" "ac_cv_func_mmap"
@@ -11724,6 +11751,12 @@ else $as_nop
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 			;;
+		*netbsd10.*)
+			use_paxctl=yes
+			;;
+ 		*freebsd16*)
+			true
+			;;
  		*darwin*)
 			true	# On macos we no longer need -no-pie
 			;;
@@ -11764,6 +11797,14 @@ fi
 else
   HAVE_ADDR_NO_RANDOMIZE_TRUE='#'
   HAVE_ADDR_NO_RANDOMIZE_FALSE=
+fi
+
+ if test "$use_paxctl" = "yes"; then
+  USE_PAXCTL_TRUE=
+  USE_PAXCTL_FALSE='#'
+else
+  USE_PAXCTL_TRUE='#'
+  USE_PAXCTL_FALSE=
 fi
 
 
@@ -13097,6 +13138,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_ADDR_NO_RANDOMIZE_TRUE}" && test -z "${HAVE_ADDR_NO_RANDOMIZE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_ADDR_NO_RANDOMIZE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_PAXCTL_TRUE}" && test -z "${USE_PAXCTL_FALSE}"; then
+  as_fn_error $? "conditional \"USE_PAXCTL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_EXTENSIONS_TRUE}" && test -z "${ENABLE_EXTENSIONS_FALSE}"; then
