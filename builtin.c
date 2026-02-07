@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2025,
+ * Copyright (C) 1986, 1988, 1989, 1991-2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -2755,7 +2755,7 @@ floating_point_hex:
 		save = str[len];
 		str[len] = '\0';
 		if (is_hex_float
-		    && strchr(str, 'p') == NULL 
+		    && strchr(str, 'p') == NULL
 		    && strchr(str, 'P') == NULL)
 			fatal(_("hexadecimal floating point constants require an exponent"));
 		retval = strtod(str, endptr);
@@ -3436,7 +3436,9 @@ do_dump_node(int nargs)
 	printf("MB_CUR_MAX = %u\n", (int) MB_CUR_MAX);
 	printf("sizeof(int) = %zu\n", sizeof(int));
 	printf("sizeof(long) = %zu\n", sizeof(long));
+#ifdef HAVE_LONG_LONG_INT
 	printf("sizeof(long long) = %zu\n", sizeof(long long));
+#endif
 	printf("sizeof(void *) = %zu\n", sizeof(void *));
 	printf("\n");
 	fflush(stdout);
@@ -3502,6 +3504,6 @@ do_dump_node(int nargs)
 	fprintf(fp, "%zu\txarray\n", offsetof(NODE, xarray));
 
 	pclose(fp);
-	
+
 	return Nnull_string;
 }
