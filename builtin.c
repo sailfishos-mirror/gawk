@@ -1599,7 +1599,7 @@ do_match(int nargs)
 		lintwarn(_("%s: received non-string first argument"), "match");
 
 	rstart = research(rp, t1->stptr, 0, t1->stlen, RE_NEED_START|RE_NEED_SUB);
-	if (rstart >= 0) {	/* match succeded */
+	if (rstart >= 0) {	/* match succeeded */
 		size_t *wc_indices = NULL;
 
 		rlength = REEND(rp, t1->stptr) - RESTART(rp, t1->stptr);	/* byte length */
