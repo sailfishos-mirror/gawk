@@ -1131,6 +1131,7 @@ do_print(int nargs, int redirtype)
 
 	if (redirtype != 0) {
 		redir_exp = PEEK(nargs);
+		redir_exp = elem_new_to_scalar(redir_exp);
 		if (redir_exp->type != Node_val)
 			fatal(_("attempt to use array `%s' in a scalar context"), array_vname(redir_exp));
 		rp = redirect(redir_exp, redirtype, & errflg, true);

@@ -338,6 +338,10 @@ EXTRA_DIST = \
 	elemnew3.ok \
 	elemnew4.awk \
 	elemnew4.ok \
+	elemnew5.awk \
+	elemnew5.ok \
+	elemnew6.awk \
+	elemnew6.ok \
 	equiv.awk \
 	equiv.in \
 	equiv.ok \
@@ -1585,6 +1589,7 @@ BASIC_TESTS = \
 	concat3 concat4 concat5 convfmt \
 	datanonl defref delargv delarpm2 delarprm delfunc dfacheck2 \
 	dfamb1 dfastress divzero divzero2 dynlj \
+	elemnew5 elemnew6 \
 	eofsplit eofsrc1 escapebrace exit2 exitval1 exitval2 exitval3 \
 	fcall_exit fcall_exit2 fieldassign fldchg fldchgnf fldterm \
 	fnamedat fnarray fnarray2 fnaryscl fnasgnm fnmisc fordel forref \

@@ -2851,6 +2851,7 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 
 	assert(redirtype != redirect_none);
 	redir_exp = TOP();
+	redir_exp = elem_new_to_scalar(redir_exp);
 	rp = redirect(redir_exp, redirtype, & redir_error, false);
 	DEREF(redir_exp);
 	decr_sp();
