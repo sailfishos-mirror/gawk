@@ -1955,7 +1955,3 @@ enable_pma(char **argv)
 	return (persist_file != NULL);
 #endif
 }
-
-#ifdef __PCC__
-void __dso_handle(void) {}
-#endif

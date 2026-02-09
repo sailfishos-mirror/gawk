@@ -681,8 +681,4 @@ extern void regfree (regex_t *__preg);
 }
 #endif	/* C++ */
 
-#ifdef __PCC__
-#undef __USE_GNU
-#endif
-
 #endif /* regex.h */
