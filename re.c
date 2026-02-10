@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1991-2019, 2021-2025
+ * Copyright (C) 1991-2019, 2021-2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -30,7 +30,6 @@
 
 static reg_syntax_t syn;
 static void check_bracket_exp(char *s, size_t len);
-const char *regexflags2str(int flags);
 static const char *get_minrx_regerror(int errcode, Regexp *rp);
 
 static struct localeinfo localeinfo;
@@ -627,12 +626,6 @@ resetup()
 	 *	Aharon Robbins <arnold@skeeve.com>
 	 *	Sun, 21 Oct 2007 23:55:33 +0200
 	 */
-	if (do_posix)
-		syn = RE_SYNTAX_POSIX_AWK;	/* strict POSIX re's */
-	else if (do_traditional)
-		syn = RE_SYNTAX_AWK;		/* traditional Unix awk re's */
-	else
-		syn = RE_SYNTAX_GNU_AWK;	/* POSIX re's + GNU ops */
 
 	/*
 	 * Interval expressions are now on by default, as POSIX is
@@ -645,8 +638,13 @@ resetup()
 	 * the definition of RE_SYNTAX_AWK, which likely would cause
 	 * binary compatibility issues.
 	 */
-	if (do_traditional)
-		syn |= RE_INTERVALS | RE_INVALID_INTERVAL_ORD | RE_NO_BK_BRACES;
+	if (do_posix)
+		syn = RE_SYNTAX_POSIX_AWK;	/* strict POSIX re's */
+	else if (do_traditional)
+		syn = RE_SYNTAX_AWK |		/* traditional Unix awk re's */
+			RE_INTERVALS | RE_INVALID_INTERVAL_ORD | RE_NO_BK_BRACES;
+	else
+		syn = RE_SYNTAX_GNU_AWK;	/* POSIX re's + GNU ops */
 
 	(void) re_set_syntax(syn);
 }
@@ -893,4 +891,45 @@ re_numsubpats(Regexp *rp, const char *s)
 		return rp->regs.num_regs;
 	else
 		return rp->mre_pat.re_nsub + 1;
+}
+
+/* minrxcompflags2str --- convert minrx compilation flags to a string */
+
+const char *
+minrxcompflags2str(int flagval)
+{
+	static const struct flagtab values[] = {
+		{ MINRX_REG_EXTENDED, "MINRX_REG_EXTENDED" },
+		{ MINRX_REG_ICASE, "MINRX_REG_ICASE" },
+		{ MINRX_REG_MINIMAL, "MINRX_REG_MINIMAL" },
+		{ MINRX_REG_NEWLINE, "MINRX_REG_NEWLINE" },
+		{ MINRX_REG_NOSUB, "MINRX_REG_NOSUB" },
+		{ MINRX_REG_BRACE_COMPAT, "MINRX_REG_BRACE_COMPAT" },
+		{ MINRX_REG_BRACK_ESCAPE, "MINRX_REG_BRACK_ESCAPE" },
+		{ MINRX_REG_EXTENSIONS_BSD, "MINRX_REG_EXTENSIONS_BSD" },
+		{ MINRX_REG_EXTENSIONS_GNU, "MINRX_REG_EXTENSIONS_GNU" },
+		{ MINRX_REG_NATIVE1B, "MINRX_REG_NATIVE1B" },
+		{ MINRX_REG_MINDISABLE, "MINRX_REG_MINDISABLE" },
+		{ 0,	NULL },
+	};
+
+	return genflags2str(flagval, values);
+}
+
+/* minrxexecflags2str --- convert minrx execution flags to a string */
+
+const char *
+minrxexecflags2str(int flagval)
+{
+	static const struct flagtab values[] = {
+		{ MINRX_REG_NOTBOL, "MINRX_REG_NOTBOL" },
+		{ MINRX_REG_NOTEOL, "MINRX_REG_NOTEOL" },
+		{ MINRX_REG_FIRSTSUB, "MINRX_REG_FIRSTSUB" },
+		{ MINRX_REG_NOSUBRESET, "MINRX_REG_NOSUBRESET" },
+		{ MINRX_REG_RESUME, "MINRX_REG_RESUME" },
+		{ MINRX_REG_NOFIRSTBYTES, "MINRX_REG_NOFIRSTBYTES" },
+		{ 0,	NULL },
+	};
+
+	return genflags2str(flagval, values);
 }
