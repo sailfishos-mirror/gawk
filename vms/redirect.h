@@ -4,7 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-1993, 1996, 1997, 2007, 2010, 2011,
- * 2023 2026 the Free Software Foundation, Inc.
+ * 2023, 2026 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
