@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2023, 2025,
+ * Copyright (C) 1995-2004, 2008, 2009, 2011, 2016, 2018-2023, 2025, 2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -31,12 +31,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
-
-/* for VMS POSIX, from Pat Rankin, r.pat.rankin@gmail.com */
-#ifdef VMS_POSIX
-#undef VMS
-#include "vms/redirect.h"
-#endif
 
 /* OpenVMS has some definitions in fp.h that should be in math.h */
 /* From John Malmberg, wb8tyw@qsl.net */
