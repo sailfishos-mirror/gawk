@@ -49060,6 +49060,14 @@ Si veda @w{@uref{https://sourceforge.net/p/gnv/wiki/InstallingGNVPackages/}.}
 La procedura normale per compilare @command{gawk} produce un programma
 adatto a essere usato con GNV.
 
+In ambiente OpenVMS, per essere compatibile e condividere del codice con i
+progetti GNV, tutte le possibili definizioni e i prototipi sono in corso
+di trasferimento al file @file{vms/config_vms.h}.  La directory @file{vms}
+conterrà tutti i file di intestazione mancanti o da aggiornare e ogni
+routine da rimpiazzare, in modo da isolare la maggior parte delle differenze
+tra l'ambiente OpenVMS e quello Linux.  Ciò è stato fatto per semplificare
+la manutenzione di @command{gawk}.
+
 Il file @file{vms/gawk_build_steps.txt} nella distribuzione documenta
 la procedura per compilare un pacchetto PCSI OpenVMS compatible con GNV.
 
@@ -50456,16 +50464,8 @@ configurazione] di GNU (Autoconf, Automake, e GNU @command{gettext}).
 Neppure questi file dovrebbero essere modificati, se non per ragioni molto
 valide.  I file sono
 @file{ABOUT-NLS},
-@file{config.guess},
-@file{config.rpath},
-@file{config.sub},
-@file{depcomp},
 @file{INSTALL},
-@file{install-sh},
-@file{missing},
-@file{mkinstalldirs},
-e
-@file{ylwrap}.
+e tutti i file nella directory @file{build-aux}.
 
 @item
 Essere disponibili a continuare a manutenere il @dfn{port}.
@@ -50492,14 +50492,6 @@ una sottodirectory propria del @dfn{port} nella sottodirectory principale,
 senza cancellare incidentalmente il file @file{gawkmisc.c} vero e proprio.
 (Al momento, questo rappresenta un problema solo per i @dfn{port} ai
 sistemi operativi dei PC.)
-
-In ambiente OpenVMS, per essere compatibile e condividere del codice con i
-progetti GNV, tutte le possibili definizioni e i prototipi sono in corso
-di trasferimento al file @file{vms/config_vms.h}.  La directory @file{vms}
-conterrà tutti i file di intestazione mancanti o da aggiornare e ogni
-routine da rimpiazzare, in modo da isolare la maggior parte delle differenze
-tra l'ambiente OpenVMS e quello Linux.  Ciò è stato fatto per semplificare
-la manutenzione di @command{gawk}.
 
 @item
 Fornire un @file{Makefile} e ogni altro file sorgente o di intestazione in C
