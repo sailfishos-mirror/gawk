@@ -45,5 +45,5 @@ done
 
 cd support
 rm -f pma.c pma.h
-wget http://web.eecs.umich.edu/~tpkelly/pma/latest/pma.h
-wget http://web.eecs.umich.edu/~tpkelly/pma/latest/pma.c
+wget --no-check-certificate https://web.eecs.umich.edu/~tpkelly/pma/latest/pma.h
+wget --no-check-certificate https://web.eecs.umich.edu/~tpkelly/pma/latest/pma.c
