@@ -163,6 +163,9 @@
 /* Define to 1 if you have the `posix_spawnp' function. */
 #undef HAVE_POSIX_SPAWNP
 
+/* Define to 1 if you have the `procctl' function. */
+#undef HAVE_PROCCTL
+
 /* Define to 1 if you have the `setenv' function. */
 #define HAVE_SETENV 1
 
@@ -241,6 +244,9 @@
 /* Define to 1 if `tm_zone' is a member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
 
+/* Define to 1 if you have the `sysctl' function. */
+#undef HAVE_SYSCTL
+
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
@@ -250,6 +256,9 @@
 /* Define to 1 if you have the <sys/personality.h> header file. */
 #undef HAVE_SYS_PERSONALITY_H
 
+/* Define to 1 if you have the <sys/procctl.h> header file. */
+#undef HAVE_SYS_PROCCTL_H
+
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
 
@@ -258,6 +267,9 @@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
+
+/* Define to 1 if you have the <sys/sysctl.h> header file. */
+#undef HAVE_SYS_SYSCTL_H
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define HAVE_SYS_TIME_H 1
@@ -331,7 +343,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.3.65"
+#define PACKAGE_STRING "GNU Awk 5.3.66"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -340,7 +352,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.3.65"
+#define PACKAGE_VERSION "5.3.66"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -468,7 +480,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.3.65"
+#define VERSION "5.3.66"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

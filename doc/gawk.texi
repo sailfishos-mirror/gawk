@@ -44509,6 +44509,13 @@ See @w{@uref{https://sourceforge.net/p/gnv/wiki/InstallingGNVPackages/}.}
 The normal build procedure for @command{gawk} produces a program that
 is suitable for use with GNV.
 
+To be compatible and share common code with GNV projects, all
+OpenVMS-specific defines and prototypes for @command{gawk} are in the process of
+being moved to @file{vms/config_vms.h}.  The @file{vms} directory will have
+missing or updated system header files and any replacement routines that will
+hide most of the differences between OpenVMS and Linux.  This is intended to
+make @command{gawk} easier to maintain.
+
 The file @file{vms/gawk_build_steps.txt} in the distribution documents
 the procedure for building an OpenVMS PCSI kit that is compatible with GNV.
 
@@ -45758,16 +45765,8 @@ Autotools (Autoconf, Automake, and GNU @command{gettext}).
 You should not change them either, unless it is for a very
 good reason. The files are
 @file{ABOUT-NLS},
-@file{config.guess},
-@file{config.rpath},
-@file{config.sub},
-@file{depcomp},
 @file{INSTALL},
-@file{install-sh},
-@file{missing},
-@file{mkinstalldirs},
-and
-@file{ylwrap}.
+and all the files in the @file{build-aux} directory.
 
 @item
 Be willing to continue to maintain the port.
@@ -45792,13 +45791,6 @@ or operating system for the port---for example, @file{pc/gawkmisc.pc} and
 into the main subdirectory, without accidentally destroying the real
 @file{gawkmisc.c} file.  (Currently, this is only an issue for the
 PC operating system ports.)
-
-On OpenVMS, to be compatible and share common code with GNV projects, all
-OpenVMS-specific defines and prototypes possible are in the process of
-being moved to @file{vms/config_vms.h}.  The @file{vms} directory will have
-missing or updated system header files amd any replacement routines that will
-hide most of the differences between OpenVMS and Linux.  This is intended to
-make @command{gawk} easier to maintain.
 
 @item
 Supply a @file{Makefile} as well as any other C source and header files that are
