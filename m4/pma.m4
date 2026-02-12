@@ -25,7 +25,7 @@ then
 				int x = ADDR_NO_RANDOMIZE;
 				]], [[]])],[have_addr_no_randomize=yes],[have_addr_no_randomize=no])
 			;;
-		*netbsd10.*)
+		*netbsd1[[01]].*)
 			use_paxctl=yes
 			;;
  		*freebsd16*)
