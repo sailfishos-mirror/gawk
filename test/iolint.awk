@@ -50,10 +50,6 @@ BEGIN {
 	# Not doing |& due to race condition and signals. sigh
 	cat = "cat"
 	print "/bin/cat \"$@\"" > "cat"
-	system("chmod +x cat")
-	# force PATH to have current directory in the front
-	# in order to find the "cat" file we just created.
-	ENVIRON["PATH"] = ".:" ENVIRON["PATH"]
 	print "hello" | "cat"
 	print close("cat")
 	print close("cat")
