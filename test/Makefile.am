@@ -1899,7 +1899,7 @@ arraydebug-tests:
 
 shlib-tests:
 	@if $(AWK) --version | $(AWK) ' /API/ { exit 1 }' ; then \
-	echo shlib tests not supported on this system ; \
+	echo dynamic extension tests not supported on this system ; \
 	else $(MAKE) shlib-real-tests ; \
 	fi
 
@@ -1990,10 +1990,10 @@ charset-msg-end:
 	@echo "======== Done with tests that can vary based on character set or locale support ========"
 
 shlib-msg-start:
-	@echo "======== Starting shared library tests ========"
+	@echo "======== Starting dynamic extension tests ========"
 
 shlib-msg-end:
-	@echo "======== Done with shared library tests ========"
+	@echo "======== Done with dynamic extension tests ========"
 
 mpfr-msg-start:
 	@echo "======== Starting MPFR tests ========"
