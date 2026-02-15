@@ -28,14 +28,9 @@ then
 		*netbsd1[[01]].*)
 			use_paxctl=yes
 			;;
- 		*freebsd16*)
+ 		*freebsd1[[2-6]]* | *midnightbsd[[34]].* | \
+ 		*darwin* | *cygwin* | *CYGWIN* | *solaris2.11*)
 			true
-			;;
- 		*darwin*)
-			true	# On macos we no longer need -no-pie
-			;;
-		*cygwin* | *CYGWIN* | *solaris2.11*)
-			true	# nothing to do, exes on these systems are not PIE
 			;;
 		openbsd7.*)
 			LDFLAGS="${LDFLAGS} -no-pie"
