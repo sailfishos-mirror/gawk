@@ -1,0 +1,88 @@
+.TH FORK 3am "Feb 17 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.SH NAME
+isalpha, isdigit, etc. \- character type functions
+.SH SYNOPSIS
+.nf
+.ft CW
+@load "ctype"
+.sp
+result = isalnum(value)
+result = isalpha(value)
+result = isblank(value)
+result = iscntrl(value)
+result = isdigit(value)
+result = isgraph(value)
+result = islower(value)
+result = ispunct(value)
+result = isprint(value)
+result = isspace(value)
+result = isupper(value)
+result = isxdigit(value)
+.fi
+.ft R
+.SH DESCRIPTION
+The
+.I ctype
+extension adds twelve functions that perform the standard
+character type tests.  See
+.IR ctype (3)
+for more information.
+.PP
+These functions accept
+.I numeric
+values.  They test the result of the corresponding C
+function in the current locale on the given value.
+The functions use the corresponding
+.IR ctype (3)
+or
+.IR wctype (3)
+functions, depending upon if the current locale is
+eight-bit or multibyte; this is transparant to the
+AWK programmer.
+.SH RETURN VALUE
+All the functions return either one or zero for true or
+false, respectively.
+.\" .SH NOTES
+.SH BUGS
+These functions should also accept a string parameter
+and apply the test to the first character in the string.
+This may be fixed in a later version.
+.SH EXAMPLE
+.ft CW
+.nf
+@load "ctype"
+\&...
+print "65 is alphabetic:", isalpha(65) ? "true" : "false"
+.fi
+.ft R
+.SH "SEE ALSO"
+.IR "GAWK: Effective AWK Programming" ,
+.IR ctype (3),
+.IR wctype (3).
+.SH AUTHOR
+Arnold Robbins,
+.BR arnold@skeeve.com .
+.SH COPYING PERMISSIONS
+Copyright \(co 2026,
+Free Software Foundation, Inc.
+.PP
+Permission is granted to make and distribute verbatim copies of
+this manual page provided the copyright notice and this permission
+notice are preserved on all copies.
+.ig
+Permission is granted to process this file through troff and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual page).
+..
+.PP
+Permission is granted to copy and distribute modified versions of this
+manual page under the conditions for verbatim copying, provided that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+.PP
+Permission is granted to copy and distribute translations of this
+manual page into another language, under the above conditions for
+modified versions, except that this permission notice may be stated in
+a translation approved by the Foundation.
+.\" vim: set filetype=nroff :

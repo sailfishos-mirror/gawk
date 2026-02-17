@@ -34,6 +34,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 RM = rm -f
 
 pkgextension_LTLIBRARIES =	\
+	ctype.la	\
 	filefuncs.la	\
 	fnmatch.la	\
 	fork.la		\
@@ -53,6 +54,10 @@ noinst_LTLIBRARIES =	\
 MY_MODULE_FLAGS = -module -avoid-version -no-undefined
 # On Cygwin, gettext requires that we link with -lintl
 MY_LIBS = $(LTLIBINTL)
+
+ctype_la_SOURCES	= ctype.c
+ctype_la_LDFLAGS	= $(MY_MODULE_FLAGS)
+ctype_la_LIBADD		= $(MY_LIBS)
 
 filefuncs_la_SOURCES  = filefuncs.c stack.h stack.c gawkfts.h \
 			gawkfts.c gawkdirfd.h
@@ -137,9 +142,9 @@ EXTRA_DIST =  \
 	README.fts
 
 dist_man_MANS = \
-	filefuncs.3am fnmatch.3am fork.3am inplace.3am \
-	ordchr.3am readdir.3am readfile.3am revoutput.3am \
-	revtwoway.3am rwarray.3am time.3am
+	ctype.3am filefuncs.3am fnmatch.3am fork.3am inplace.3am \
+	ordchr.3am readdir.3am readfile.3am revoutput.3am revtwoway.3am \
+	rwarray.3am time.3am
 
 # gettext requires this
 SUBDIRS = po
