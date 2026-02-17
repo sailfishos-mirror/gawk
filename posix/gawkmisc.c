@@ -384,7 +384,8 @@ os_disable_aslr(const char *persist_file, char **argv)
 	}
 #endif
 
-#if HAVE_SYS_PROCCTL_H && HAVE_SYS_SYSCTL_H && HAVE_PROCCTL && HAVE_SYSCTL
+#if HAVE_SYS_PROCCTL_H && HAVE_SYS_SYSCTL_H && HAVE_PROCCTL && HAVE_SYSCTL && \
+	defined(PROC_ASLR_FORCE_DISABLE) && defined(PROC_ASLR_CTL)
 	// This code is for FreeBSD.
 	if (persist_file != NULL) {
 		const char *cp = getenv("GAWK_PMA_REINCARNATION");
