@@ -27,6 +27,7 @@
 */
 
 #define _DEFAULT_SOURCE  // for MAP_ANONYMOUS
+#define NDEBUG 1	// disable assertions, it kills performance
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
