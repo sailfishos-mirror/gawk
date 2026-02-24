@@ -214,6 +214,12 @@ intdiv_la_OBJECTS = $(am_intdiv_la_OBJECTS)
 intdiv_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(intdiv_la_LDFLAGS) $(LDFLAGS) -o $@
+locale_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_locale_la_OBJECTS = locale.lo
+locale_la_OBJECTS = $(am_locale_la_OBJECTS)
+locale_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(locale_la_LDFLAGS) $(LDFLAGS) -o $@
 ordchr_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_ordchr_la_OBJECTS = ordchr.lo
 ordchr_la_OBJECTS = $(am_ordchr_la_OBJECTS)
@@ -280,11 +286,12 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/ctype.Plo ./$(DEPDIR)/filefuncs.Plo \
 	./$(DEPDIR)/fnmatch.Plo ./$(DEPDIR)/fork.Plo \
 	./$(DEPDIR)/gawkfts.Plo ./$(DEPDIR)/inplace.Plo \
-	./$(DEPDIR)/intdiv.Plo ./$(DEPDIR)/ordchr.Plo \
-	./$(DEPDIR)/readdir.Plo ./$(DEPDIR)/readfile.Plo \
-	./$(DEPDIR)/revoutput.Plo ./$(DEPDIR)/revtwoway.Plo \
-	./$(DEPDIR)/rwarray.Plo ./$(DEPDIR)/stack.Plo \
-	./$(DEPDIR)/testext.Plo ./$(DEPDIR)/time.Plo
+	./$(DEPDIR)/intdiv.Plo ./$(DEPDIR)/locale.Plo \
+	./$(DEPDIR)/ordchr.Plo ./$(DEPDIR)/readdir.Plo \
+	./$(DEPDIR)/readfile.Plo ./$(DEPDIR)/revoutput.Plo \
+	./$(DEPDIR)/revtwoway.Plo ./$(DEPDIR)/rwarray.Plo \
+	./$(DEPDIR)/stack.Plo ./$(DEPDIR)/testext.Plo \
+	./$(DEPDIR)/time.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -306,13 +313,13 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(ctype_la_SOURCES) $(filefuncs_la_SOURCES) \
 	$(fnmatch_la_SOURCES) $(fork_la_SOURCES) $(inplace_la_SOURCES) \
-	$(intdiv_la_SOURCES) $(ordchr_la_SOURCES) \
+	$(intdiv_la_SOURCES) $(locale_la_SOURCES) $(ordchr_la_SOURCES) \
 	$(readdir_la_SOURCES) $(readfile_la_SOURCES) \
 	$(revoutput_la_SOURCES) $(revtwoway_la_SOURCES) \
 	$(rwarray_la_SOURCES) $(testext_la_SOURCES) $(time_la_SOURCES)
 DIST_SOURCES = $(ctype_la_SOURCES) $(filefuncs_la_SOURCES) \
 	$(fnmatch_la_SOURCES) $(fork_la_SOURCES) $(inplace_la_SOURCES) \
-	$(intdiv_la_SOURCES) $(ordchr_la_SOURCES) \
+	$(intdiv_la_SOURCES) $(locale_la_SOURCES) $(ordchr_la_SOURCES) \
 	$(readdir_la_SOURCES) $(readfile_la_SOURCES) \
 	$(revoutput_la_SOURCES) $(revtwoway_la_SOURCES) \
 	$(rwarray_la_SOURCES) $(testext_la_SOURCES) $(time_la_SOURCES)
@@ -575,6 +582,7 @@ pkgextension_LTLIBRARIES = \
 	fork.la		\
 	inplace.la	\
 	intdiv.la	\
+	locale.la	\
 	ordchr.la	\
 	readdir.la	\
 	readfile.la	\
@@ -612,6 +620,9 @@ inplace_la_LIBADD = $(MY_LIBS)
 intdiv_la_SOURCES = intdiv.c
 intdiv_la_LDFLAGS = $(MY_MODULE_FLAGS)
 intdiv_la_LIBADD = $(MY_LIBS) $(LIBMPFR) -lm
+locale_la_SOURCES = locale.c
+locale_la_LDFLAGS = $(MY_MODULE_FLAGS)
+locale_la_LIBADD = $(MY_LIBS)
 ordchr_la_SOURCES = ordchr.c
 ordchr_la_LDFLAGS = $(MY_MODULE_FLAGS)
 ordchr_la_LIBADD = $(MY_LIBS)
@@ -652,7 +663,7 @@ EXTRA_DIST = \
 	README.fts
 
 dist_man_MANS = \
-	ctype.3am filefuncs.3am fnmatch.3am fork.3am inplace.3am \
+	ctype.3am filefuncs.3am fnmatch.3am fork.3am inplace.3am locale.3am \
 	ordchr.3am readdir.3am readfile.3am revoutput.3am revtwoway.3am \
 	rwarray.3am time.3am
 
@@ -780,6 +791,9 @@ inplace.la: $(inplace_la_OBJECTS) $(inplace_la_DEPENDENCIES) $(EXTRA_inplace_la_
 intdiv.la: $(intdiv_la_OBJECTS) $(intdiv_la_DEPENDENCIES) $(EXTRA_intdiv_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(intdiv_la_LINK) -rpath $(pkgextensiondir) $(intdiv_la_OBJECTS) $(intdiv_la_LIBADD) $(LIBS)
 
+locale.la: $(locale_la_OBJECTS) $(locale_la_DEPENDENCIES) $(EXTRA_locale_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(locale_la_LINK) -rpath $(pkgextensiondir) $(locale_la_OBJECTS) $(locale_la_LIBADD) $(LIBS)
+
 ordchr.la: $(ordchr_la_OBJECTS) $(ordchr_la_DEPENDENCIES) $(EXTRA_ordchr_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(ordchr_la_LINK) -rpath $(pkgextensiondir) $(ordchr_la_OBJECTS) $(ordchr_la_LIBADD) $(LIBS)
 
@@ -817,6 +831,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gawkfts.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inplace.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/intdiv.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/locale.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ordchr.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readdir.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readfile.Plo@am__quote@ # am--include-marker
@@ -1263,6 +1278,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/gawkfts.Plo
 	-rm -f ./$(DEPDIR)/inplace.Plo
 	-rm -f ./$(DEPDIR)/intdiv.Plo
+	-rm -f ./$(DEPDIR)/locale.Plo
 	-rm -f ./$(DEPDIR)/ordchr.Plo
 	-rm -f ./$(DEPDIR)/readdir.Plo
 	-rm -f ./$(DEPDIR)/readfile.Plo
@@ -1327,6 +1343,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/gawkfts.Plo
 	-rm -f ./$(DEPDIR)/inplace.Plo
 	-rm -f ./$(DEPDIR)/intdiv.Plo
+	-rm -f ./$(DEPDIR)/locale.Plo
 	-rm -f ./$(DEPDIR)/ordchr.Plo
 	-rm -f ./$(DEPDIR)/readdir.Plo
 	-rm -f ./$(DEPDIR)/readfile.Plo

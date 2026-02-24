@@ -1,0 +1,108 @@
+.TH LOCALE 3am "Feb 24 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.SH NAME
+getlocale(), setlocale() \- query or set the locale
+.SH SYNOPSIS
+.nf
+.ft CW
+@load "locale"
+.sp
+result = getlocale(category)
+result = setlocale(category, new_locale)
+.fi
+.ft R
+.SH DESCRIPTION
+The
+.I locale
+extension adds two functions.
+.TP
+.BI getlocale(\fIcategory\fP\^)
+Return the current locale for the given
+.IR category .
+.TP
+.BI setlocale(\fIcategory\fP\^,\  \fInew_locale\fP)
+Set the locale for the given
+.I category
+to
+.IR new_locale .
+The old locale value is returned.
+Calling this function updates the
+.B MB_CUR_MAX
+predefined variable.
+.PP
+The following predefined variables hold the
+numeric values for the standard locale categories:
+.BR LC_ALL ,
+.BR LC_COLLATE ,
+.BR LC_CTYPE ,
+.BR LC_MONETARY ,
+.BR LC_NUMERIC ,
+and
+.BR LC_TIME .
+.PP
+The following predefined variables hold the numeric
+values for categories that are GNU extensions.
+.BR LC_MESSAGES ,
+.BR LC_ADDRESS ,
+.BR LC_IDENTIFICATION ,
+.BR LC_MEASUREMENT ,
+.BR LC_NAME ,
+.BR LC_PAPER ,
+and
+.BR LC_TELEPHONE .
+On non-GNU systems, these variables are initialized
+to \-1.
+.PP
+The variable
+.B MB_CUR_MAX
+is also defined; it tells how many bytes are
+needed to hold the encoding of wide characters.
+.SH RETURN VALUE
+Both functions return a string value with the
+requested data.
+.\" .SH NOTES
+.SH BUGS
+Changing the locale is likely to have adverse
+effects on the rest of
+.IR gawk 's
+operation; there is no way to notify it.
+Do so with caution!
+.SH EXAMPLE
+.ft CW
+.nf
+@load "locale"
+\&...
+print getlocale(LC_CTYPE)
+\&...
+setlocale(LC_TYPE, "en_CA.UTF-8)  # move to Canada
+.fi
+.ft R
+.SH "SEE ALSO"
+.IR "GAWK: Effective AWK Programming" ,
+.IR setlocale (3).
+.SH AUTHOR
+Arnold Robbins,
+.BR arnold@skeeve.com .
+.SH COPYING PERMISSIONS
+Copyright \(co 2026,
+Free Software Foundation, Inc.
+.PP
+Permission is granted to make and distribute verbatim copies of
+this manual page provided the copyright notice and this permission
+notice are preserved on all copies.
+.ig
+Permission is granted to process this file through troff and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual page).
+..
+.PP
+Permission is granted to copy and distribute modified versions of this
+manual page under the conditions for verbatim copying, provided that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+.PP
+Permission is granted to copy and distribute translations of this
+manual page into another language, under the above conditions for
+modified versions, except that this permission notice may be stated in
+a translation approved by the Foundation.
+.\" vim: set filetype=nroff :

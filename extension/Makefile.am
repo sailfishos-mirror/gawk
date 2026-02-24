@@ -40,6 +40,7 @@ pkgextension_LTLIBRARIES =	\
 	fork.la		\
 	inplace.la	\
 	intdiv.la	\
+	locale.la	\
 	ordchr.la	\
 	readdir.la	\
 	readfile.la	\
@@ -81,6 +82,10 @@ inplace_la_LIBADD     = $(MY_LIBS)
 intdiv_la_SOURCES     = intdiv.c
 intdiv_la_LDFLAGS     = $(MY_MODULE_FLAGS)
 intdiv_la_LIBADD      = $(MY_LIBS) $(LIBMPFR) -lm
+
+locale_la_SOURCES     = locale.c
+locale_la_LDFLAGS     = $(MY_MODULE_FLAGS)
+locale_la_LIBADD      = $(MY_LIBS)
 
 ordchr_la_SOURCES     = ordchr.c
 ordchr_la_LDFLAGS     = $(MY_MODULE_FLAGS)
@@ -142,7 +147,7 @@ EXTRA_DIST =  \
 	README.fts
 
 dist_man_MANS = \
-	ctype.3am filefuncs.3am fnmatch.3am fork.3am inplace.3am \
+	ctype.3am filefuncs.3am fnmatch.3am fork.3am inplace.3am locale.3am \
 	ordchr.3am readdir.3am readfile.3am revoutput.3am revtwoway.3am \
 	rwarray.3am time.3am
 
