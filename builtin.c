@@ -3435,6 +3435,7 @@ NODE *
 do_dump_node(int nargs)
 {
 	printf("MB_CUR_MAX = %u\n", (int) MB_CUR_MAX);
+	printf("gawk_mb_cur_max = %u\n", (int) gawk_mb_cur_max);
 	printf("sizeof(int) = %zu\n", sizeof(int));
 	printf("sizeof(long) = %zu\n", sizeof(long));
 #ifdef HAVE_LONG_LONG_INT
