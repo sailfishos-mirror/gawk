@@ -540,6 +540,9 @@ EXTRA_DIST = \
 	gensub3.ok \
 	gensub4.awk \
 	gensub4.ok \
+	gensub5.awk \
+	gensub5.in \
+	gensub5.ok \
 	getfile.awk \
 	getfile.ok \
 	getline.awk \
@@ -1630,6 +1633,7 @@ UNIX_TESTS = \
 	space strftlng
 
 GAWK_EXT_TESTS = \
+	gensub5 \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc ar2fn_elnew_sc2 \
 	ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val argtest arraysort \
 	arraysort2 arraytype asortbool asortsymtab backw badargs beginfile1 \
