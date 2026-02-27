@@ -2116,7 +2116,7 @@ do_sub(int nargs, unsigned int flags)
 		    || ((long) textlen <= 0 && matchstart == matchend)
 		    || research(rp, target->stptr, text - target->stptr,
 			    use_gnu_matchers ? textlen : target->stlen,
-			    RE_NEED_START) == -1)
+			    searchflags) == -1)
 			break;
 
 	}
