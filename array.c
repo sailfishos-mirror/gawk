@@ -210,17 +210,17 @@ make_aname(const NODE *symbol)
 		slen = strlen(symbol->vname);	/* subscript in parent array */
 		if (alen + slen + 4 > max_alen) {		/* sizeof("[\"\"]") = 4 */
 			max_alen = alen + slen + 4 + SLEN;
-			erealloc(aname, char *, (max_alen + 1) * sizeof(char *));
+			erealloc(aname, char *, (max_alen + 1) * sizeof(char));
 		}
 		alen += sprintf(aname + alen, "[\"%s\"]", symbol->vname);
 	} else {
 		alen = strlen(symbol->vname);
 		if (aname == NULL) {
 			max_alen = alen + SLEN;
-			emalloc(aname, char *, (max_alen + 1) * sizeof(char *));
+			emalloc(aname, char *, (max_alen + 1) * sizeof(char));
 		} else if (alen > max_alen) {
 			max_alen = alen + SLEN;
-			erealloc(aname, char *, (max_alen + 1) * sizeof(char *));
+			erealloc(aname, char *, (max_alen + 1) * sizeof(char));
 		}
 		memcpy(aname, symbol->vname, alen + 1);
 	}
