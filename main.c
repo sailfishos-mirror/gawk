@@ -185,7 +185,6 @@ static const struct option optab[] = {
 	{ "help",		no_argument,		NULL,	'h' },
 	{ "include",		required_argument,	NULL,	'i' },
 	{ "lint",		optional_argument,	NULL,	'L' },
-	{ "lint-old",		no_argument,		NULL,	't' },
 	{ "load",		required_argument,	NULL,	'l' },
 #if defined(LOCALEDEBUG)
 	{ "locale",		required_argument,	NULL,	'Z' },
@@ -632,7 +631,6 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-r\t\t\t--re-interval\n"), fp);
 	fputs(_("\t-s\t\t\t--no-optimize\n"), fp);
 	fputs(_("\t-S\t\t\t--sandbox\n"), fp);
-	fputs(_("\t-t\t\t\t--lint-old\n"), fp);
 	fputs(_("\t-V\t\t\t--version\n"), fp);
 #ifdef GAWKDEBUG
 	fputs(_("\t-Y\t\t\t--parsedebug\n"), fp);
@@ -1549,7 +1547,7 @@ parse_args(int argc, char **argv)
 	 * The + on the front tells GNU getopt not to rearrange argv.
 	 */
 	// FIXME: 'G' is temporary (and undocumented!)
-	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSstVYZ:G";
+	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSsVYZ:G";
 	int old_optind;
 	int c;
 	char *scan;
@@ -1676,12 +1674,8 @@ parse_args(int argc, char **argv)
 			}
 			break;
 
-		case 't':
-			do_flags |= DO_LINT_OLD;
-			break;
 #else
 		case 'L':
-		case 't':
 			break;
 #endif
 

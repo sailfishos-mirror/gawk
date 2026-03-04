@@ -590,16 +590,6 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 	const char *start;
 
 	*nbytes = 1;
-	if (do_lint_old) {
-		switch (c) {
-		case 'a':
-		case 'b':
-		case 'f':
-		case 'r':
-			lintwarn(_("old awk does not support the `\\%c' escape sequence"), c);
-			break;
-		}
-	}
 
 	switch (c) {
 	case 'a':

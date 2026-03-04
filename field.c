@@ -1136,7 +1136,7 @@ do_split(int nargs)
 			fatal(_("split: fourth argument is not an array"));
 		check_symtab_functab(sep_arr, "split",
 				_("%s: cannot use %s as fourth argument"));
-		if ((do_lint_extensions || do_lint_old) && ! warned) {
+		if (do_lint_extensions && ! warned) {
 			warned = true;
 			lintwarn(_("split: fourth argument is a gawk extension"));
 		}
@@ -1527,8 +1527,6 @@ choose_fs_function:
 			lintwarn(_("null string for `FS' is a gawk extension"));
 		}
 	} else if (fs->stlen > 1 || (fs->flags & REGEX) != 0) {
-		if (do_lint_old)
-			lintwarn(_("old awk does not support regexps as value of `FS'"));
 		set_parser(re_parse_field);
 	} else if (RS_is_null) {
 		/* we know that fs->stlen <= 1 */

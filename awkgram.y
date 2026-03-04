@@ -441,24 +441,12 @@ pattern
 	  }
 	| LEX_BEGIN
 	  {
-		static int begin_seen = 0;
-
-		if (do_lint_old && ++begin_seen == 2)
-			lintwarn_ln($1->source_line,
-				_("old awk does not support multiple `BEGIN' or `END' rules"));
-
 		$1->in_rule = rule = BEGIN;
 		$1->source_file = source;
 		$$ = $1;
 	  }
 	| LEX_END
 	  {
-		static int end_seen = 0;
-
-		if (do_lint_old && ++end_seen == 2)
-			lintwarn_ln($1->source_line,
-				_("old awk does not support multiple `BEGIN' or `END' rules"));
-
 		$1->in_rule = rule = END;
 		$1->source_file = source;
 		$$ = $1;
@@ -1668,9 +1656,6 @@ exp
 	  }
 	| exp LEX_IN simple_variable
 	  {
-		if (do_lint_old)
-			lintwarn_ln($2->source_line,
-				_("old awk does not support the keyword `in' except after `for'"));
 		$3->nexti->opcode = Op_push_array;
 		$2->opcode = Op_in_array;
 		$2->expr_count = 1;
@@ -1817,13 +1802,6 @@ simp_exp
 	  }
 	| '(' expression_list r_paren LEX_IN simple_variable
 	  {
-		if (do_lint_old) {
-		    /* first one is warning so that second one comes out if warnings are fatal */
-		    warning_ln($4->source_line,
-				_("old awk does not support the keyword `in' except after `for'"));
-		    lintwarn_ln($4->source_line,
-				_("old awk does not support multidimensional arrays"));
-		}
 		$5->nexti->opcode = Op_push_array;
 		$4->opcode = Op_in_array;
 		if ($2 == NULL) {	/* error */
@@ -2226,12 +2204,11 @@ struct token {
 #	define	ARGS	0xFF	/* 0, 1, 2, 3 args allowed (any combination */
 #	define	A(n)	(1<<(n))
 #	define	VERSION_MASK	0xFF00	/* old awk is zero */
-#	define	NOT_OLD		0x0100	/* feature not in old awk */
-#	define	NOT_POSIX	0x0200	/* feature not in POSIX */
-#	define	GAWKX		0x0400	/* gawk extension */
-#	define	BREAK		0x0800	/* break allowed inside */
-#	define	CONTINUE	0x1000	/* continue allowed inside */
-#	define	DEBUG_USE	0x2000	/* for use by developers */
+#	define	NOT_POSIX	0x0100	/* feature not in POSIX */
+#	define	GAWKX		0x0200	/* gawk extension */
+#	define	BREAK		0x0400	/* break allowed inside */
+#	define	CONTINUE	0x0800	/* continue allowed inside */
+#	define	DEBUG_USE	0x1000	/* for use by developers */
 
 	NODE *(*ptr)(int);	/* function that implements this keyword */
 	NODE *(*ptr2)(int);	/* alternate arbitrary-precision function */
@@ -2276,30 +2253,30 @@ static const struct token tokentab[] = {
 {"and",		Op_builtin,    LEX_BUILTIN,	GAWKX,		do_and,	MPF(and)},
 {"asort",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2)|A(3),	do_asort,	0},
 {"asorti",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2)|A(3),	do_asorti,	0},
-{"atan2",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(2),	do_atan2,	MPF(atan2)},
+{"atan2",	Op_builtin,	 LEX_BUILTIN,	A(2),	do_atan2,	MPF(atan2)},
 {"bindtextdomain",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2),	do_bindtextdomain,	0},
 {"break",	Op_K_break,	 LEX_BREAK,	0,		0,	0},
 {"case",	Op_K_case,	 LEX_CASE,	GAWKX,		0,	0},
-{"close",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1)|A(2),	do_close,	0},
+{"close",	Op_builtin,	 LEX_BUILTIN,	A(1)|A(2),	do_close,	0},
 {"compl",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(1),	do_compl,	MPF(compl)},
 {"continue",	Op_K_continue, LEX_CONTINUE,	0,		0,	0},
-{"cos",		Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_cos,	MPF(cos)},
+{"cos",		Op_builtin,	 LEX_BUILTIN,	A(1),	do_cos,	MPF(cos)},
 {"dcgettext",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2)|A(3),	do_dcgettext,	0},
 {"dcngettext",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2)|A(3)|A(4)|A(5),	do_dcngettext,	0},
 {"default",	Op_K_default,	 LEX_DEFAULT,	GAWKX,		0,	0},
-{"delete",	Op_K_delete,	 LEX_DELETE,	NOT_OLD,	0,	0},
-{"do",		Op_K_do,	 LEX_DO,	NOT_OLD|BREAK|CONTINUE,	0,	0},
+{"delete",	Op_K_delete,	 LEX_DELETE,	0,		0,	0},
+{"do",		Op_K_do,	 LEX_DO,	BREAK|CONTINUE,	0,	0},
 {"else",	Op_K_else,	 LEX_ELSE,	0,		0,	0},
 {"eval",	Op_symbol,	 LEX_EVAL,	0,		0,	0},
 {"exit",	Op_K_exit,	 LEX_EXIT,	0,		0,	0},
 {"exp",		Op_builtin,	 LEX_BUILTIN,	A(1),		do_exp,	MPF(exp)},
 {"fflush",	Op_builtin,	 LEX_BUILTIN,	A(0)|A(1), do_fflush,	0},
 {"for",		Op_K_for,	 LEX_FOR,	BREAK|CONTINUE,	0,	0},
-{"func",	Op_func, 	LEX_FUNCTION,	NOT_POSIX|NOT_OLD,	0,	0},
-{"function",	Op_func, 	LEX_FUNCTION,	NOT_OLD,	0,	0},
+{"func",	Op_func, 	LEX_FUNCTION,	NOT_POSIX,	0,	0},
+{"function",	Op_func, 	LEX_FUNCTION,	0,		0,	0},
 {"gensub",	Op_sub_builtin,	 LEX_BUILTIN,	GAWKX|A(3)|A(4), 0,	0},
-{"getline",	Op_K_getline_redir,	 LEX_GETLINE,	NOT_OLD,	0,	0},
-{"gsub",	Op_sub_builtin,	 LEX_BUILTIN,	NOT_OLD|A(2)|A(3), 0,	0},
+{"getline",	Op_K_getline_redir,	 LEX_GETLINE,	0,	0,	0},
+{"gsub",	Op_sub_builtin,	 LEX_BUILTIN,	A(2)|A(3), 0,	0},
 {"if",		Op_K_if,	 LEX_IF,	0,		0,	0},
 {"in",		Op_symbol,	 LEX_IN,	0,		0,	0},
 {"include",	Op_symbol,	 LEX_INCLUDE,	GAWKX,	0,	0},
@@ -2313,7 +2290,7 @@ static const struct token tokentab[] = {
 {"load",  	Op_symbol,	 LEX_LOAD,	GAWKX,		0,	0},
 {"log",		Op_builtin,	 LEX_BUILTIN,	A(1),		do_log,	MPF(log)},
 {"lshift",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(2),	do_lshift,	MPF(lshift)},
-{"match",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(2)|A(3), do_match,	0},
+{"match",	Op_builtin,	 LEX_BUILTIN,	A(2)|A(3),	do_match,	0},
 {"mkbool",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(1),	do_mkbool,	0},
 {"mktime",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2), do_mktime, 0},
 {"namespace",  	Op_symbol,	 LEX_NAMESPACE,	GAWKX,		0,	0},
@@ -2324,26 +2301,26 @@ static const struct token tokentab[] = {
 {"patsplit",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(2)|A(3)|A(4), do_patsplit,	0},
 {"print",	Op_K_print,	 LEX_PRINT,	0,		0,	0},
 {"printf",	Op_K_printf,	 LEX_PRINTF,	0,		0,	0},
-{"rand",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(0),	do_rand,	MPF(rand)},
-{"return",	Op_K_return,	 LEX_RETURN,	NOT_OLD,	0,	0},
+{"rand",	Op_builtin,	 LEX_BUILTIN,	A(0),		do_rand,	MPF(rand)},
+{"return",	Op_K_return,	 LEX_RETURN,	0,		0,	0},
 {"rshift",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(2),	do_rshift,	MPF(rshift)},
-{"sin",		Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_sin,	MPF(sin)},
+{"sin",		Op_builtin,	 LEX_BUILTIN,	A(1),		do_sin,	MPF(sin)},
 {"split",	Op_builtin,	 LEX_BUILTIN,	A(2)|A(3)|A(4),	do_split,	0},
 {"sprintf",	Op_builtin,	 LEX_BUILTIN,	0,		do_sprintf,	0},
 {"sqrt",	Op_builtin,	 LEX_BUILTIN,	A(1),		do_sqrt,	MPF(sqrt)},
-{"srand",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(0)|A(1), do_srand,	MPF(srand)},
+{"srand",	Op_builtin,	 LEX_BUILTIN,	A(0)|A(1),	do_srand,	MPF(srand)},
 #if defined(GAWKDEBUG) || defined(ARRAYDEBUG) /* || ... */
 {"stopme",	Op_builtin,	LEX_BUILTIN,	GAWKX|A(0)|DEBUG_USE,	stopme,		0},
 #endif
 {"strftime",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(0)|A(1)|A(2)|A(3), do_strftime,	0},
 {"strtonum",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(1),	do_strtonum, MPF(strtonum)},
-{"sub",		Op_sub_builtin,	 LEX_BUILTIN,	NOT_OLD|A(2)|A(3), 0,	0},
+{"sub",		Op_sub_builtin,	 LEX_BUILTIN,	A(2)|A(3),	0,	0},
 {"substr",	Op_builtin,	 LEX_BUILTIN,	A(2)|A(3),	do_substr,	0},
 {"switch",	Op_K_switch,	 LEX_SWITCH,	GAWKX|BREAK,	0,	0},
-{"system",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_system,	0},
+{"system",	Op_builtin,	 LEX_BUILTIN,	A(1),		do_system,	0},
 {"systime",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(0),	do_systime,	0},
-{"tolower",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_tolower,	0},
-{"toupper",	Op_builtin,	 LEX_BUILTIN,	NOT_OLD|A(1),	do_toupper,	0},
+{"tolower",	Op_builtin,	 LEX_BUILTIN,	A(1),		do_tolower,	0},
+{"toupper",	Op_builtin,	 LEX_BUILTIN,	A(1),	do_toupper,	0},
 {"typeof",	Op_builtin,	 LEX_BUILTIN,	GAWKX|A(1)|A(2), do_typeof,	0},
 {"while",	Op_K_while,	 LEX_WHILE,	BREAK|CONTINUE,	0,	0},
 {"xor",		Op_builtin,    LEX_BUILTIN,	GAWKX,		do_xor,	MPF(xor)},
@@ -3876,8 +3853,6 @@ retry:
 					did_warn_assgn = true;
 					if (do_lint)
 						lintwarn(_("POSIX does not allow operator `%s'"), "**=");
-					if (do_lint_old)
-						lintwarn(_("operator `%s' is not supported in old awk"), "**=");
 				}
 				yylval = GET_INSTRUCTION(Op_assign_exp);
 				return ASSIGNOP;
@@ -3887,8 +3862,6 @@ retry:
 					did_warn_op = true;
 					if (do_lint)
 						lintwarn(_("POSIX does not allow operator `%s'"), "**");
-					if (do_lint_old)
-						lintwarn(_("operator `%s' is not supported in old awk"), "**");
 				}
 				yylval = GET_INSTRUCTION(Op_exp);
 				return lasttok = '^';
@@ -3918,21 +3891,11 @@ retry:
 
 	case '^':
 	{
-		static bool did_warn_op = false, did_warn_assgn = false;
-
 		if (nextc(true) == '=') {
-			if (do_lint_old && ! did_warn_assgn) {
-				did_warn_assgn = true;
-				lintwarn(_("operator `%s' is not supported in old awk"), "^=");
-			}
 			yylval = GET_INSTRUCTION(Op_assign_exp);
 			return lasttok = ASSIGNOP;
 		}
 		pushback();
-		if (do_lint_old && ! did_warn_op) {
-			did_warn_op = true;
-			lintwarn(_("operator `%s' is not supported in old awk"), "^");
-		}
 		yylval = GET_INSTRUCTION(Op_exp);
 		return lasttok = '^';
 	}
@@ -4397,13 +4360,6 @@ retry:
 					tokentab[mid].operator);
 				warntab[mid] |= NOT_POSIX;
 			}
-		}
-		if (do_lint_old && (tokentab[mid].flags & NOT_OLD) != 0
-				 && (warntab[mid] & NOT_OLD) == 0
-		) {
-			lintwarn(_("`%s' is not supported in old awk"),
-					tokentab[mid].operator);
-			warntab[mid] |= NOT_OLD;
 		}
 
 		if ((tokentab[mid].flags & BREAK) != 0)
