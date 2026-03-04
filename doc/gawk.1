@@ -38,25 +38,26 @@ This manual page is provided as a
 .IR courtesy .
 Please note that the One Source Of Truth for
 .I gawk
-is the Texinfo manual, available online in several formats at
+is the Texinfo manual,
+\*(EP,
+available online in several formats at
 .IR https://www.gnu.org/software/gawk/manual .
 It may also be installed in the Info subsystem on your system,
 and available therefore via the
 .IR info (1)
 command.
+The Texinfo manual should always be considered to be authoritative.
 .PP
-In the case of any contradiction between the Texinfo manual and
-this manual page, the Texinfo manual should be considered to be authoritative.
-.PP
-Note that the Info documentation, HTML web page(s), and PDF version of
-the manual all have the same content, since they are all generated
-from the same Texinfo source file.
+This manual page is intentionally as terse as possible.
+Full details are provided in in the manual, and you should
+look there for the full story on any specific feature.
+Where possible, links to the online version of the manual
+are provided.
 .PP
 Furthermore, the
 .I gawk
 maintainer reserves the right in the future to remove this manual page from
-the distribution or to severely truncate the content in order to
-ease his maintenance burden.
+the distribution in order to ease his maintenance burden.
 .SH DESCRIPTION
 .I Gawk
 is the \*(GN Project's implementation of the \*(AK programming language.
@@ -83,41 +84,19 @@ available in the
 and
 .B ARGV
 pre-defined \*(AK variables.
-.SH PREFACE
-This manual page is intentionally as terse as possible.
-Full details are provided in \*(EP, and you should look
-there for the full story on any specific feature.
-Where possible, links to the online version of the manual
-are provided.
 .SH OPTION FORMAT
 .I Gawk
 options may be either traditional \*(PX-style one letter options,
 or \*(GN-style long options.  \*(PX options start with a single \*(lq\-\*(rq,
 while long options start with \*(lq\-\^\-\*(rq.
-Long options are provided for both \*(GN-specific features and
-for \*(PX-mandated features.
-.PP
-.IR Gawk -specific
-options are typically used in long-option form.
-Arguments to long options are either joined with the option
-by an
-.B =
-sign, with no intervening spaces, or they may be provided in the
-next command line argument.
-Long options may be abbreviated, as long as the abbreviation
-remains unique.
-.PP
-Additionally, every long option has a corresponding short
-option, so that the option's functionality may be used from
-within
-.B #!\&
-executable scripts.
 .SH OPTIONS
 .I Gawk
 accepts the following options.
 Standard options are listed first, followed by options for
 .I gawk
 extensions, listed alphabetically by short option.
+A full description of the options is provided at
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#Options .
 .TP
 .BI \-f " program-file\fR,\fP " \-\^\-file " program-file"
 Read the \*(AK program source from the file
@@ -126,9 +105,6 @@ instead of from the first command line argument.
 Multiple
 .B \-f
 options may be used.
-Files read with
-.B \-f
-are treated as if they begin with an implicit \fB@namespace "awk"\fR statement.
 .TP
 .BI \-F " fs\fR, \fP" \-\^\-field-separator " fs"
 Use
@@ -144,9 +120,6 @@ Assign the value
 to the variable
 .IR var ,
 before execution of the program begins.
-Such variable values are available to the
-.B BEGIN
-rule of an \*(AK program.
 .TP
 .BR \-b ", " \-\^\-characters\-as\-bytes
 Treat all input data as single-byte characters.
@@ -157,11 +130,7 @@ option overrides this one.
 .BR \-c ", " \-\^\-traditional
 Run in
 .I compatibility
-mode.  In compatibility mode,
-.I gawk
-behaves identically to Brian Kernighan's
-.IR awk ;
-none of the \*(GN-specific extensions are recognized.
+mode.
 .TP
 .BR \-C ", " \-\^\-copyright
 Print the short version of the \*(GN copyright information message on
@@ -182,27 +151,13 @@ The optional
 .I file
 argument specifies a file with a list
 of commands for the debugger to execute non-interactively.
-.sp .5
-In this mode of execution,
-.I gawk
-loads the
-AWK source code and then prompts for debugging commands.
-.I Gawk
-can only debug AWK program source provided with the
-.B \-f
-and
-.B \-\^\-include
-options.
-The debugger is documented in \*(EP; see
+For details about the debugger, see
 .IR https://www.gnu.org/software/gawk/manual/html_node/Debugger.html#Debugger .
 .TP
 .BI \-e " program-text\fR, \fP" \-\^\-source " program-text"
 Use
 .I program-text
 as \*(AK program source code.
-Each argument supplied via
-.B \-e
-is treated as if it begins with an implicit \fB@namespace "awk"\fR statement.
 .TP
 \fB\-E \fIfile\fR, \fB\-\^\-exec \fIfile\fR
 Similar to
@@ -231,22 +186,12 @@ these options cause an immediate, successful exit.
 .TP
 \fB\-i \fIinclude-file\fR, \fB\-\^\-include \fIinclude-file\fR
 Load an awk source library.
-This searches for the library using the
-.B AWKPATH
-environment variable.  If the initial search fails, another attempt will
-be made after appending the
-.B \&.awk
-suffix.  The file will be loaded only
-once (i.e., duplicates are eliminated), and the code does not constitute
-the main program source.
-Files read with
-.B \-\^\-include
-are treated as if they begin with an implicit \fB@namespace "awk"\fR statement.
+For more information, see
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#AWKPATH-Variable .
 .TP
 .BR \-I ", " \-\^\-trace
-Print the internal byte code names as they are executed when running
+Print to standard error the internal byte code names as they are executed when running
 the program.
-The trace is printed to standard error.
 Each \*(lqop code\*(rq is preceded by a
 .B +
 sign in the output.
@@ -255,19 +200,15 @@ sign in the output.
 Enable CSV special processing.
 See
 .BR "Comma Separated Values" ,
-below, for more detail.
+below, for more information.
 .TP
 .BI \-l " lib\fR, " \-\^\-load " lib"
 Load a
 .I gawk
 extension from the shared library
 .IR lib .
-This searches for the library using the
-.B AWKLIBPATH
-environment variable.  If the initial search fails, another attempt will
-be made after appending the default shared library suffix for the platform.
-The library initialization routine is expected to be named
-.BR dl_load() .
+For more information, see
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#AWKLIBPATH-Variable .
 .TP
 \fB\-L \fR[\fIvalue\fR], \fB\-\^\-lint\fR[\fB=\fIvalue\fR]
 Provide warnings about constructs that are
@@ -285,22 +226,6 @@ is not compiled to use the GNU MPFR and GMP libraries.
 (In such a case,
 .I gawk
 issues a warning.)
-.sp
-.B NOTE:
-This feature is
-.IR "on parole" .
-The primary
-.I gawk
-maintainer is no longer supporting it, although there is
-a member of the development team who is.
-If this situation changes,
-the feature will be removed from
-.IR gawk .
-.ig
-Set
-.B GAWK_NO_MPFR_WARN
-in the environment to silence the warning.
-..
 .TP
 .BR \-n ", " \-\^\-non\-decimal\-data
 Recognize octal and hexadecimal values in input data.
@@ -332,10 +257,6 @@ Start a profiling session, and send the profiling data to
 The default is
 .B awkprof.out
 in the current directory.
-The profile contains execution counts of each statement in the program
-in the left margin and function call counts for each user-defined function.
-.I Gawk
-runs more slowly in this mode.
 This option implies
 .BR \-\^\-no\-optimize .
 .TP
@@ -343,13 +264,6 @@ This option implies
 This turns on
 .I compatibility
 mode, and disables a number of common extensions.
-.TP
-.BR \-r ", " \-\^\-re\-interval
-Enable the use of
-.I "interval expressions"
-in regular expression matching.
-Interval expressions
-are enabled by default, but this option remains for backwards compatibility.
 .TP
 .BR \-s ", " \-\^\-no\-optimize
 Disable
@@ -359,19 +273,7 @@ default optimizations upon the internal representation of the program.
 .BR \-S ", " \-\^\-sandbox
 Run
 .I gawk
-in sandbox mode, disabling the
-.B system()
-function, input redirection with
-.BR getline ,
-output redirection with
-.BR print " and " printf ,
-and loading dynamic extensions.
-Command execution (through pipelines) is also disabled.
-.TP
-.BR \-t ", " \-\^\-lint\-old
-Provide warnings about constructs that are
-not portable to the original version of \*(UX
-.IR awk .
+in sandbox mode.
 .TP
 .BR \-V ", " \-\^\-version
 Print version information for this particular copy of
@@ -424,11 +326,6 @@ if specified,
 from arguments to
 .BR \-\^\-source ,
 or from the first non-option argument on the command line.
-The
-.B \-f
-and
-.B \-\^\-source
-options may be used multiple times on the command line.
 .I Gawk
 reads the program text as if all the
 .IR program-file s
@@ -442,7 +339,6 @@ This is equivalent
 to using the
 .B \-\^\-include
 option.
-.PP
 Lines beginning with
 .B @nsinclude
 also include files, but with two differences.
@@ -466,25 +362,17 @@ the
 .B \-f
 and
 .B \-\^\-include
-options.  If this variable does not exist, the default path is
-\fB".:/usr/local/share/awk"\fR.
-(The actual directory may vary, depending upon how
-.I gawk
-was built and installed.)
-If a file name given to the
-.B \-f
-option contains a \*(lq/\*(rq character, no path search is performed.
+options. See
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#AWKPATH-Variable .
 .PP
 The environment variable
 .B AWKLIBPATH
 specifies a search path to use when finding source files named with
 the
 .B \-\^\-load
-option.  If this variable does not exist, the default path is
-\fB"/usr/local/lib/gawk"\fR.
-(The actual directory may vary, depending upon how
-.I gawk
-was built and installed.)
+option.
+See
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#AWKLIBPATH-Variable .
 .PP
 .I Gawk
 executes \*(AK programs in the following order.
@@ -509,11 +397,11 @@ If there are no files named on the command line,
 .I gawk
 reads the standard input.
 .PP
-If a filename on the command line has the form
+A filename on the command line of the form
 .IB var = val
-it is treated as a variable assignment.  The variable
+is treated as a variable assignment.  The variable
 .I var
-will be assigned the value
+is assigned the value
 .IR val .
 (This happens after any
 .B BEGIN
@@ -556,26 +444,6 @@ Finally, after all the input is exhausted,
 executes the code in the
 .B END
 rule(s) (if any).
-.SS Command Line Directories
-According to POSIX, files named on the
-.I awk
-command line must be
-text files.  The behavior is \*(lqundefined\*(rq if they are not.  Most versions
-of
-.I awk
-treat a directory on the command line as a fatal error.
-.PP
-For
-.IR gawk ,
-a directory on the command line
-produces a warning, but is otherwise skipped.  If either of the
-.B \-\^\-posix
-or
-.B \-\^\-traditional
-options is given, then
-.I gawk
-reverts to
-treating directories on the command line as a fatal error.
 .SH VARIABLES, RECORDS AND FIELDS
 \*(AK variables are dynamic; they come into existence when they are
 first used.  Their values are either floating-point numbers or strings,
@@ -592,7 +460,7 @@ provides true arrays of arrays.
 Several pre-defined variables are set as a program
 runs; these are described as needed and summarized below.
 .SS Records
-Normally, records are separated by newline characters.  You can control how
+Normally, records are separated by newline characters.  You control how
 records are separated by assigning values to the built-in variable
 .BR RS .
 See
@@ -626,26 +494,6 @@ The variable
 .B NF
 is set to the total number of fields in the input record.
 .PP
-References to non-existent fields (i.e., fields after
-.BR $NF )
-produce the null string.  However, assigning to a non-existent field
-(e.g.,
-.BR "$(NF+2) = 5" )
-increases the value of
-.BR NF ,
-creates any intervening fields with the null string as their values, and
-causes the value of
-.B $0
-to be recomputed, with the fields being separated by the value of
-.BR OFS .
-References to negative numbered fields cause a fatal error.
-Decrementing
-.B NF
-causes the values of fields past the new value to be lost, and the value of
-.B $0
-to be recomputed, with the fields being separated by the value of
-.BR OFS .
-.PP
 Assigning a value to an existing field
 causes the whole record to be rebuilt when
 .B $0
@@ -661,9 +509,8 @@ or the
 .B \-\^\-csv
 option,
 .I gawk
-does not use regular record determination and field splitting
-as described above.
-Instead, records are terminated by unquoted newlines, and
+record determination and field splitting are different:
+records are terminated by unquoted newlines, and
 fields are separated by commas.
 Double-quotes may be used to enclose fields containing
 commas, newlines, or doubled double-quotes.
@@ -702,31 +549,20 @@ The conversion format for numbers, \fB"%.6g"\fR, by default.
 .TP
 .B ENVIRON
 An array containing the values of the current environment.
-The array is indexed by the environment variables, each element being
-the value of that variable.
 .TP
 .B ERRNO
-If a system error occurs either doing a redirection for
+A string describing the problem if
+a system error occurs doing a redirection for
 .BR getline ,
 during a read for
 .BR getline ,
 or during a
-.BR close() ,
-then
-.B ERRNO
-is set to
-a string describing the error.
-The value is subject to translation in non-English locales.
+.BR close() .
 .TP
 .B FIELDWIDTHS
-A whitespace-separated list of field widths.  When set,
-.I gawk
-parses the input into fields of fixed width, instead of using the
-value of the
-.B FS
-variable as the field separator.
-Each field width may optionally be preceded by a colon-separated
-value specifying the number of characters to skip before the field starts.
+A whitespace-separated list of field widths.
+See
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#Constant-Size .
 .TP
 .B FILENAME
 The name of the current input file.
@@ -746,38 +582,24 @@ The input record number in the current input file.
 .TP
 .B FPAT
 A regular expression describing the contents of the
-fields in a record.
-When set,
-.I gawk
-parses the input into fields, where the fields match the
-regular expression, instead of using the
-value of
-.B FS
-as the field separator.
+fields in a record. See
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#Splitting-By-Content .
 .TP
 .B FS
 The input field separator, a space by default.
 See
-.I https://www.gnu.org/software/gawk/manual/html_node/Field-Separators.html
-for the details.
+.IR https://www.gnu.org/software/gawk/manual/html_node/Field-Separators.html .
 .TP
 .B FUNCTAB
 An array whose indices and corresponding values
 are the names of all the user-defined
 or extension functions in the program.
-.BR NOTE :
-You may not use the
-.B delete
-statement with the
-.B FUNCTAB
-array.
 .TP
 .B IGNORECASE
 Controls the case-sensitivity of all regular expression
 and string operations.
 See
-.I https://www.gnu.org/software/gawk/manual/html_node/Case_002dsensitivity.html
-for details.
+.IR https://www.gnu.org/software/gawk/manual/html_node/Case_002dsensitivity.html .
 .TP
 .B LINT
 Provides dynamic control of the
@@ -807,15 +629,13 @@ numbers, 53 by default.
 The elements of this array provide access to information about the
 running \*(AK program.
 See
-.I https://www.gnu.org/software/gawk/manual/html_node/Auto_002dset
-for the details.
+.IR https://www.gnu.org/software/gawk/manual/html_node/Auto_002dset .
 .TP
 .B ROUNDMODE
 The rounding mode to use for arbitrary precision arithmetic on
 numbers, by default \fB"N"\fR (IEEE-754 roundTiesToEven mode).
 See
-.I https://www.gnu.org/software/gawk/manual/html_node/Setting-the-rounding-mode
-for the details.
+.IR https://www.gnu.org/software/gawk/manual/html_node/Setting-the-rounding-mode .
 .TP
 .B RS
 The input record separator, by default a newline.
@@ -846,12 +666,6 @@ elements, by default \fB"\e034"\fR.
 .B SYMTAB
 An array whose indices are the names of all currently defined
 global variables and arrays in the program.
-You may not use the
-.B delete
-statement with the
-.B SYMTAB
-array, nor assign to elements with an index that is
-not a variable name.
 .TP
 .B TEXTDOMAIN
 The text domain of the \*(AK program; used to find the localized
@@ -866,7 +680,7 @@ concatenation of the (string) value of each expression,
 separated by the value of the
 .B SUBSEP
 variable.
-This facility is used to simulate multiply dimensioned
+This facility simulates multiply dimensioned
 arrays.  For example:
 .PP
 .RS
@@ -922,38 +736,13 @@ just by specifying the array name without a subscript.
 supports true multidimensional arrays.
 It does not require that such arrays be \*(lqrectangular\*(rq as in C or C++.
 See
-.I https://www.gnu.org/software/gawk/manual/html_node/Arrays
-for details.
+.IR https://www.gnu.org/software/gawk/manual/html_node/Arrays .
 .SS Namespaces
 .I Gawk
 provides a simple
 .I namespace
 facility to help work around the fact that all variables in
 AWK are global.
-.PP
-A
-.I "qualified name"
-consists of a two simple identifiers joined by a double colon
-.RB ( :: ).
-The left-hand identifier represents the namespace and the right-hand
-identifier is the variable within it.
-All simple (non-qualified) names are considered to be in the
-\*(lqcurrent\*(rq namespace; the default namespace is
-.BR awk .
-However, simple identifiers consisting solely of uppercase
-letters are forced into the
-.B awk
-namespace, even if the current namespace is different.
-.PP
-You change the current namespace with an
-\fB@namespace "\fIname\^\fB"\fR
-directive.
-.PP
-The standard predefined builtin function names may not be used as
-namespace names.  The names of additional functions provided by
-.I gawk
-may be used as namespace names or as simple identifiers in other
-namespaces.
 For more details, see
 .IR https://www.gnu.org/software/gawk/manual/html_node/Namespaces.html#Namespaces .
 .SS Variable Typing And Conversion
@@ -971,58 +760,11 @@ to be treated as a string, concatenate it with the null string.
 Uninitialized variables have the numeric value zero and the string value ""
 (the null, or empty, string).
 .PP
-When a string must be converted to a number, the conversion is accomplished
-using
-.IR strtod (3).
-A number is converted to a string by using the value of
-.B CONVFMT
-as a format string for
-.IR sprintf (3),
-with the numeric value of the variable as the argument.
-However, even though all numbers in \*(AK are floating-point,
-integral values are
-.I always
-converted as integers.
-.PP
-.I Gawk
-performs comparisons as follows:
-If two variables are numeric, they are compared numerically.
-If one value is numeric and the other has a string value that is a
-\*(lqnumeric string,\*(rq then comparisons are also done numerically.
-Otherwise, the numeric value is converted to a string and a string
-comparison is performed.
-Two strings are compared, of course, as strings.
-.PP
-Note that string constants, such as \fB"57"\fP, are
-.I not
-numeric strings, they are string constants.
-The idea of \*(lqnumeric string\*(rq
-only applies to fields,
-.B getline
-input,
-.BR FILENAME ,
-.B ARGV
-elements,
-.B ENVIRON
-elements and the elements of an array created by
-.B split()
-or
-.B patsplit()
-that are numeric strings.
-The basic idea is that
-.IR "user input" ,
-and only user input, that looks numeric,
-should be treated that way.
+Much more (important!) detail may be found in the manual. See
+.IR https://www.gnu.org/software/gawk/manual/gawk.html#Typing-and-Comparison .
 .SS Octal and Hexadecimal Constants
 You may use C-style octal and hexadecimal constants in your AWK
 program source code.
-For example, the octal value
-.B 011
-is equal to decimal
-.BR 9 ,
-and the hexadecimal value
-.B 0x11
-is equal to decimal 17.
 .SS String Constants
 String constants in \*(AK are sequences of characters enclosed
 between double quotes (like \fB"value"\fR).  Within strings, certain
@@ -1035,12 +777,8 @@ for the details.
 A regular expression constant is a sequence of characters enclosed
 between forward slashes (like
 .BR /value/ ).
-.PP
 The escape sequences described in the manual may also be used inside
-constant regular expressions
-(e.g.,
-.B "/[\ \et\ef\en\er\ev]/"
-matches whitespace characters).
+constant regular expressions.
 .PP
 .I Gawk
 provides
@@ -1048,8 +786,8 @@ provides
 regular expression constants.
 These are written with a leading
 .B @
-symbol (like so:
-.BR @/value/ ).
+symbol like so:
+.BR @/value/ .
 Such constants may be assigned to scalars (variables, array elements)
 and passed to user-defined functions.
 Variables that have been so assigned have regular expression type.
@@ -1063,11 +801,7 @@ Either the pattern may be missing, or the action may be missing, but,
 of course, not both.  If the pattern is missing, the action
 executes for every single record of input.
 A missing action is equivalent to
-.RS
-.PP
 .B "{ print }"
-.RE
-.PP
 which prints the entire record.
 .PP
 Comments begin with the
@@ -1075,30 +809,9 @@ Comments begin with the
 character, and continue until the
 end of the line.
 Empty lines may be used to separate statements.
-Normally, a statement ends with a newline, however, this is not the
-case for lines ending in
-a comma,
-.BR { ,
-.BR ? ,
-.BR : ,
-.BR && ,
-or
-.BR || .
-Lines ending in
-.B do
-or
-.B else
-also have their statements automatically continued on the following line.
-In other cases, a line can be continued by ending it with a \*(lq\e\*(rq,
-in which case the newline is ignored.  However, a \*(lq\e\*(rq after a
-.B #
-is not special.
-.PP
-Multiple statements may
-be put on one line by separating them with a \*(lq;\*(rq.
-This applies to both the statements within the action part of a
-pattern-action pair (the usual case),
-and to the pattern-action statements themselves.
+See
+.I https://www.gnu.org/software/gawk/manual/gawk.html#Statements_002fLines
+for the rules about when statements continue across lines.
 .SS Patterns
 \*(AK patterns may be one of the following:
 .PP
@@ -1126,24 +839,21 @@ are two special kinds of patterns which are not tested against
 the input.
 The action parts of all
 .B BEGIN
-patterns are merged as if all the statements had
+patterns execute in order as if all the statements had
 been written in a single
 .B BEGIN
-rule.  They are executed before any
+rule.  They execute before any
 of the input is read.  Similarly, all the
 .B END
-rules are merged,
-and executed when all the input is exhausted (or when an
+rule statements
+execute when all the input is exhausted (or when an
 .B exit
 statement is executed).
 .B BEGIN
 and
 .B END
-patterns cannot be combined with other patterns in pattern expressions.
-.B BEGIN
-and
-.B END
-patterns cannot have missing action parts.
+patterns cannot be combined with other patterns in pattern expressions,
+nor may they have have missing action parts.
 .PP
 .B BEGINFILE
 and
