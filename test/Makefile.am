@@ -1728,9 +1728,6 @@ NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
 	profile4 profile5 profile8 profile9 profile10 profile11 profile13 \
 	profile14 profile15 profile16 profile17
 
-# List of tests that need --re-interval
-NEED_RE_INTERVAL = gsubtst3 reint reint2
-
 # List of tests that need --sandbox
 NEED_SANDBOX = sandbox1
 
@@ -2627,7 +2624,7 @@ symtab9:
 
 reginttrad:
 	@echo $@
-	@-$(AWK) --traditional -r -f "$(srcdir)"/$@.awk > _$@ || echo EXIT CODE: $$? >> _$@
+	@-$(AWK) --traditional -f "$(srcdir)"/$@.awk > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 colonwarn:

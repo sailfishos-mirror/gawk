@@ -1221,22 +1221,20 @@ extern enum do_flag_values {
 	DO_POSIX	   = 0x00010,	/* turn off gnu and unix extensions */
 	DO_INTL		   = 0x00020,	/* dump locale-izable strings to stdout */
 	DO_NON_DEC_DATA	   = 0x00040,	/* allow octal/hex C style DATA. Use with caution! */
-	DO_INTERVALS	   = 0x00080,	/* allow {...,...} in regexps, see resetup() */
-	DO_PRETTY_PRINT	   = 0x00100,	/* pretty print the program */
-	DO_DUMP_VARS	   = 0x00200,	/* dump all global variables at end */
-	DO_TIDY_MEM	   = 0x00400,	/* release vars when done */
-	DO_SANDBOX	   = 0x00800,	/* sandbox mode - disable 'system' function & redirections */
-	DO_PROFILE	   = 0x01000,	/* profile the program */
-	DO_DEBUG	   = 0x02000,	/* debug the program */
-	DO_MPFR		   = 0x04000,	/* arbitrary-precision floating-point math */
-	DO_CSV		   = 0x08000,	/* process comma-separated-value files */
+	DO_PRETTY_PRINT	   = 0x00080,	/* pretty print the program */
+	DO_DUMP_VARS	   = 0x00100,	/* dump all global variables at end */
+	DO_TIDY_MEM	   = 0x00200,	/* release vars when done */
+	DO_SANDBOX	   = 0x00400,	/* sandbox mode - disable 'system' function & redirections */
+	DO_PROFILE	   = 0x00800,	/* profile the program */
+	DO_DEBUG	   = 0x01000,	/* debug the program */
+	DO_MPFR		   = 0x02000,	/* arbitrary-precision floating-point math */
+	DO_CSV		   = 0x04000,	/* process comma-separated-value files */
 } do_flags;
 
 #define do_traditional      (do_flags & DO_TRADITIONAL)
 #define do_posix            (do_flags & DO_POSIX)
 #define do_intl             (do_flags & DO_INTL)
 #define do_non_decimal_data (do_flags & DO_NON_DEC_DATA)
-#define do_intervals        (do_flags & DO_INTERVALS)
 #define do_pretty_print     (do_flags & DO_PRETTY_PRINT)
 #define do_profile          (do_flags & DO_PROFILE)
 #define do_dump_vars        (do_flags & DO_DUMP_VARS)

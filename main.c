@@ -198,7 +198,6 @@ static const struct option optab[] = {
 	{ "posix",		no_argument,		NULL,	'P' },
 	{ "pretty-print",	optional_argument,	NULL,	'o' },
 	{ "profile",		optional_argument,	NULL,	'p' },
-	{ "re-interval",	no_argument,		NULL,	'r' },
 	{ "sandbox",		no_argument,		NULL, 	'S' },
 	{ "source",		required_argument,	NULL,	'e' },
 	{ "trace",		no_argument,		NULL,	'I' },
@@ -361,12 +360,8 @@ main(int argc, char **argv)
 	if (do_csv && do_posix)
 		fatal(_("`--posix' and `--csv' conflict"));
 
-	if (do_lint) {
-		if (os_is_setuid())
-			lintwarn(_("running %s setuid root may be a security problem"), myname);
-		if (do_intervals)
-			lintwarn(_("The -r/--re-interval options no longer have any effect"));
-	}
+	if (do_lint && os_is_setuid())
+		lintwarn(_("running %s setuid root may be a security problem"), myname);
 
 	if (do_debug)	/* Need to register the debugger pre-exec hook before any other */
 		init_debug();
@@ -627,7 +622,6 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-O\t\t\t--optimize\n"), fp);
 	fputs(_("\t-p[file]\t\t--profile[=file]\n"), fp);
 	fputs(_("\t-P\t\t\t--posix\n"), fp);
-	fputs(_("\t-r\t\t\t--re-interval\n"), fp);
 	fputs(_("\t-s\t\t\t--no-optimize\n"), fp);
 	fputs(_("\t-S\t\t\t--sandbox\n"), fp);
 	fputs(_("\t-V\t\t\t--version\n"), fp);
@@ -1546,7 +1540,7 @@ parse_args(int argc, char **argv)
 	 * The + on the front tells GNU getopt not to rearrange argv.
 	 */
 	// FIXME: 'G' is temporary (and undocumented!)
-	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSsVYZ:G";
+	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPSsVYZ:G";
 	int old_optind;
 	int c;
 	char *scan;
@@ -1716,12 +1710,6 @@ parse_args(int argc, char **argv)
 		case 'P':
 			do_flags |= DO_POSIX;
 			break;
-
-		case 'r':
-			// This no longer has any effect. It remains for the
-			// lint check in main().
-			do_flags |= DO_INTERVALS;
- 			break;
 
 		case 's':
 			do_optimize = false;
