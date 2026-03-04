@@ -116,7 +116,7 @@ is_integer(NODE *symbol, NODE *subs)
 #ifndef CHECK_INTEGER_USING_FORCE_NUMBER
 	long l;
 #endif
-	AWKNUM d;
+	double d;
 
 	if ((subs->flags & NUMINT) != 0)
 		/* quick exit */
@@ -565,7 +565,7 @@ int_list(NODE *symbol, NODE *t)
 					subs->numbr = num;
 					subs->flags |= (NUMCUR|NUMINT);
 				} else {
-					subs = make_number((AWKNUM) num);
+					subs = make_number((double) num);
 					subs->flags |= (INTIND|NUMINT);
 				}
 				list[k++] = subs;
@@ -593,20 +593,20 @@ int_list(NODE *symbol, NODE *t)
 
 /* int_kilobytes --- calculate memory consumption of the assoc array */
 
-AWKNUM
+double
 int_kilobytes(NODE *symbol)
 {
 	unsigned long i, bucket_cnt = 0;
 	BUCKET *b;
-	AWKNUM kb;
-	extern AWKNUM str_kilobytes(NODE *symbol);
+	double kb;
+	extern double str_kilobytes(NODE *symbol);
 
 	for (i = 0; i < symbol->array_size; i++) {
 		for (b = symbol->buckets[i]; b != NULL; b = b->ainext)
 			bucket_cnt++;
 	}
-	kb = (((AWKNUM) bucket_cnt) * sizeof (BUCKET) +
-			((AWKNUM) symbol->array_size) * sizeof (BUCKET *)) / 1024.0;
+	kb = (((double) bucket_cnt) * sizeof (BUCKET) +
+			((double) symbol->array_size) * sizeof (BUCKET *)) / 1024.0;
 
 	if (symbol->xarray != NULL)
 		kb += str_kilobytes(symbol->xarray);
@@ -659,7 +659,7 @@ int_dump(NODE *symbol, NODE *ndump)
 			(unsigned long) symbol->table_size, int_size, str_size);
 	indent(indent_level);
 	fprintf(output_fp, "Avg # of items per chain (int): %.2g\n",
-			((AWKNUM) int_size) / symbol->array_size);
+			((double) int_size) / symbol->array_size);
 
 	indent(indent_level);
 	fprintf(output_fp, "memory: %.2g kB (total)\n", int_kilobytes(symbol));
@@ -701,7 +701,7 @@ int_dump(NODE *symbol, NODE *ndump)
 		fprintf(output_fp, "\n");
 
 		aname = make_aname(symbol);
-		subs = make_number((AWKNUM) 0);
+		subs = make_number((double) 0);
 		subs->flags |= (INTIND|NUMINT);
 
 		for (i = 0; i < symbol->array_size; i++) {

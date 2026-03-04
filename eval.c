@@ -1255,10 +1255,10 @@ r_get_field(NODE *n, Func_ptr *assign, bool reference)
  * using exponentiation by squaring without recursion.
  */
 
-static AWKNUM
-calc_exp_posint(AWKNUM x, long n)
+static double
+calc_exp_posint(double x, long n)
 {
-	AWKNUM mult = 1;
+	double mult = 1;
 
 	while (n > 1) {
 		if ((n % 2) == 1)
@@ -1271,8 +1271,8 @@ calc_exp_posint(AWKNUM x, long n)
 
 /* calc_exp --- calculate x1^x2 */
 
-AWKNUM
-calc_exp(AWKNUM x1, AWKNUM x2)
+double
+calc_exp(double x1, double x2)
 {
 	long lx;
 
@@ -1282,7 +1282,7 @@ calc_exp(AWKNUM x1, AWKNUM x2)
 		return (lx > 0) ? calc_exp_posint(x1, lx)
 				: 1.0 / calc_exp_posint(x1, -lx);
 	}
-	return (AWKNUM) pow((double) x1, (double) x2);
+	return (double) pow((double) x1, (double) x2);
 }
 
 
@@ -1682,7 +1682,7 @@ op_assign(OPCODE op)
 {
 	NODE **lhs;
 	NODE *t1, *t2;
-	AWKNUM x = 0.0, x1, x2;
+	double x = 0.0, x1, x2;
 
 	lhs = POP_ADDRESS();
 	t1 = *lhs;
@@ -1703,14 +1703,14 @@ op_assign(OPCODE op)
 		x = x1 * x2;
 		break;
 	case Op_assign_quotient:
-		if (x2 == (AWKNUM) 0) {
+		if (x2 == (double) 0) {
 			decr_sp();
 			fatal(_("division by zero attempted in `/='"));
 		}
 		x = x1 / x2;
 		break;
 	case Op_assign_mod:
-		if (x2 == (AWKNUM) 0) {
+		if (x2 == (double) 0) {
 			decr_sp();
 			fatal(_("division by zero attempted in `%%='"));
 		}

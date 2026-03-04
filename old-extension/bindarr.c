@@ -342,5 +342,5 @@ dlload(NODE *obj, void *dl)
 {
 	make_old_builtin("bind_array", do_bind_array, 2);
 	make_old_builtin("unbind_array", do_unbind_array, 1);
-	return make_number((AWKNUM) 0);
+	return make_number((double) 0);
 }

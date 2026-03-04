@@ -490,7 +490,7 @@ mpg_cmp(const NODE *t1, const NODE *t2)
 		return mpz_cmp(t1->mpg_i, t2->mpg_i);
 	}
 
-	/* t1 and t2 are AWKNUMs */
+	/* t1 and t2 are doubles */
 	return cmp_awknums(t1, t2);
 }
 
@@ -564,7 +564,7 @@ mpg_update_var(NODE *n)
 		cant_happen("invalid node for mpg_update_var%s", "");
 
 	if (mpz_sgn(nq) == 0) {
-		/* Efficiency hack similar to that for AWKNUM */
+		/* Efficiency hack similar to that for double */
 		if (is_mpg_float(val) || mpz_get_si(val->mpg_i) != nr) {
 			unref(n->var_value);
 			val = n->var_value = mpg_integer();
@@ -1368,7 +1368,7 @@ do_mpfr_intdiv(int nargs)
 			/* [+-]inf or NaN */
 			unref(numerator);
 			unref(denominator);
-			return make_number((AWKNUM) -1);
+			return make_number((double) -1);
 		}
 
 		num = mpg_integer();
@@ -1384,7 +1384,7 @@ do_mpfr_intdiv(int nargs)
 			unref(numerator);
 			unref(denominator);
 			unref(num);
-			return make_number((AWKNUM) -1);
+			return make_number((double) -1);
 		}
 
 		denom = mpg_integer();
@@ -1410,7 +1410,7 @@ do_mpfr_intdiv(int nargs)
 	sub = make_string("remainder", 9);
 	assoc_set(result, sub, remainder);
 
-	return make_number((AWKNUM) 0.0);
+	return make_number((double) 0.0);
 }
 #endif /* SUPPLY_INTDIV */
 

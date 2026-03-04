@@ -1108,7 +1108,7 @@ set_element(long num, char *s, long len, NODE *n)
 
 	it = make_string(s, len);
 	it->flags |= USER_INPUT;
-	sub = make_number((AWKNUM) (num));
+	sub = make_number((double) (num));
 	assoc_set(n, sub, it);
 }
 
@@ -1179,7 +1179,7 @@ do_split(int nargs)
 		 */
 		tmp = POP_SCALAR();
 		DEREF(tmp);
-		return make_number((AWKNUM) 0);
+		return make_number((double) 0);
 	}
 
 	if ((sep->flags & REGEX) != 0)
@@ -1218,7 +1218,7 @@ do_split(int nargs)
 	}
 
 	s = src->stptr;
-	tmp = make_number((AWKNUM) (*parseit)(UNLIMITED, &s, (int) src->stlen,
+	tmp = make_number((double) (*parseit)(UNLIMITED, &s, (int) src->stlen,
 					     fs, rp, set_element, arr, sep_arr, false));
 
 	src = POP_SCALAR();	/* really pop off stack */
@@ -1302,11 +1302,11 @@ do_patsplit(int nargs)
 		/*
 		 * Skip the work if first arg is the null string.
 		 */
-		tmp = make_number((AWKNUM) 0);
+		tmp = make_number((double) 0);
 	} else {
 		rp = re_update(sep);
 		s = src->stptr;
-		tmp = make_number((AWKNUM) fpat_parse_field(UNLIMITED, &s,
+		tmp = make_number((double) fpat_parse_field(UNLIMITED, &s,
 				(int) src->stlen, fpat, rp,
 				set_element, arr, sep_arr, false));
 	}
@@ -1631,7 +1631,7 @@ update_PROCINFO_str(const char *subscript, const char *str)
 /* update_PROCINFO_num --- update PROCINFO[sub] with numeric value */
 
 void
-update_PROCINFO_num(const char *subscript, AWKNUM val)
+update_PROCINFO_num(const char *subscript, double val)
 {
 	NODE *tmp;
 

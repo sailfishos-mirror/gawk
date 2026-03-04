@@ -261,8 +261,6 @@ extern int re_numsubpats(Regexp *rp, const char *s);
 
 /* ------------------ Constants, Structures, Typedefs  ------------------ */
 
-#define AWKNUM	double
-
 /* On z/OS, the xlc compiler doesn't yield consistent enum sizes
    unless specifically requested.  */
 #ifdef __MVS__
@@ -409,13 +407,13 @@ typedef struct exp_node {
 		struct {
 #ifdef HAVE_MPFR
 			union {
-				AWKNUM fltnum;
+				double fltnum;
 				mpfr_t mpnum;
 				mpz_t mpi;
 			} nm;
 			int rndmode;
 #else
-			AWKNUM fltnum;
+			double fltnum;
 #endif
 			char *sp;
 			size_t slen;
@@ -1191,7 +1189,7 @@ extern int errcount;
 extern const char *version_string;
 extern const char *persist_file;
 extern int (*interpret)(INSTRUCTION *);	/* interpreter routine */
-extern NODE *(*make_number)(double);	/* double instead of AWKNUM on purpose */
+extern NODE *(*make_number)(double);
 extern NODE *(*str2number)(NODE *);
 extern NODE *(*format_val)(const char *, int, NODE *);
 extern int (*cmp_numbers)(const NODE *, const NODE *);
@@ -1566,7 +1564,7 @@ extern NODE *do_or(int nargs);
 extern NODE *do_xor(int nargs);
 extern NODE *do_compl(int nargs);
 extern NODE *do_strtonum(int nargs);
-extern AWKNUM nondec2awknum(char *str, size_t len, char **endptr);
+extern double nondec2awknum(char *str, size_t len, char **endptr);
 extern NODE *do_dcgettext(int nargs);
 extern NODE *do_dcngettext(int nargs);
 extern NODE *do_bindtextdomain(int nargs);
@@ -1608,7 +1606,7 @@ extern const char *flags2str(int);
 extern const char *genflags2str(int flagval, const struct flagtab *tab);
 extern const char *nodetype2str(NODETYPE type);
 extern void load_casetable(void);
-extern AWKNUM calc_exp(AWKNUM x1, AWKNUM x2);
+extern double calc_exp(double x1, double x2);
 extern const char *opcode2str(OPCODE type);
 extern const char *op2str(OPCODE type);
 extern NODE **r_get_lhs(NODE *n, bool reference);
@@ -1647,7 +1645,7 @@ extern void set_RS(void);
 extern void set_FIELDWIDTHS(void);
 extern void set_FPAT(void);
 extern void update_PROCINFO_str(const char *subscript, const char *str);
-extern void update_PROCINFO_num(const char *subscript, AWKNUM val);
+extern void update_PROCINFO_num(const char *subscript, double val);
 
 typedef enum {
 	Using_FS,

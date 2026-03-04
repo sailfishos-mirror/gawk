@@ -40,27 +40,27 @@
 #endif
 
 /*
- * The number of base-FLT_RADIX digits in an AWKNUM fraction, assuming
- * that AWKNUM is not long double.
+ * The number of base-FLT_RADIX digits in an double fraction, assuming
+ * that double is not long double.
  */
 #define AWKSMALL_MANT_DIG \
-  (sizeof (AWKNUM) == sizeof (double) ? DBL_MANT_DIG : FLT_MANT_DIG)
+  (sizeof (double) == sizeof (double) ? DBL_MANT_DIG : FLT_MANT_DIG)
 
 /*
- * The number of base-FLT_DIGIT digits in an AWKNUM fraction, even if
- * AWKNUM is long double.  Don't mention 'long double' unless
+ * The number of base-FLT_DIGIT digits in an double fraction, even if
+ * double is long double.  Don't mention 'long double' unless
  * LDBL_MANT_DIG is defined, for the sake of ancient compilers that
  * lack 'long double'.
  */
 #ifdef LDBL_MANT_DIG
-#define AWKNUM_MANT_DIG \
-  (sizeof (AWKNUM) == sizeof (long double) ? LDBL_MANT_DIG : AWKSMALL_MANT_DIG)
+#define double_MANT_DIG \
+  (sizeof (double) == sizeof (long double) ? LDBL_MANT_DIG : AWKSMALL_MANT_DIG)
 #else
-#define AWKNUM_MANT_DIG AWKSMALL_MANT_DIG
+#define double_MANT_DIG AWKSMALL_MANT_DIG
 #endif
 
 /*
- * The number of bits in an AWKNUM fraction, assuming FLT_RADIX is
+ * The number of bits in an double fraction, assuming FLT_RADIX is
  * either 2 or 16.  IEEE and VAX formats use radix 2, and IBM
  * mainframe format uses radix 16; we know of no other radices in
  * practical use.
@@ -68,7 +68,7 @@
 #if FLT_RADIX != 2 && FLT_RADIX != 16
 Please port the following code to your weird host;
 #endif
-#define AWKNUM_FRACTION_BITS (AWKNUM_MANT_DIG * (FLT_RADIX == 2 ? 1 : 4))
+#define double_FRACTION_BITS (double_MANT_DIG * (FLT_RADIX == 2 ? 1 : 4))
 #define DBL_FRACTION_BITS (DBL_MANT_DIG * (FLT_RADIX == 2 ? 1 : 4))
 
 /* Return the number of trailing zeros in N.  N must be nonzero.  */
@@ -91,24 +91,24 @@ uintmax_t
 adjust_uint(uintmax_t n)
 {
 	/*
-	 * If uintmax_t is so wide that AWKNUM cannot represent all its
+	 * If uintmax_t is so wide that double cannot represent all its
 	 * values, strip leading nonzero bits of integers that are so large
-	 * that they cannot be represented exactly as AWKNUMs, so that their
+	 * that they cannot be represented exactly as doubles, so that their
 	 * low order bits are represented exactly, without rounding errors.
 	 *
-	 * When computing with integers that AWKNUM cannot represent exactly,
-	 * GAWK uses AWKNUM to approximate wraparound integer arithmetic
-	 * using the widest integer that AWKNUM can represent this time.
+	 * When computing with integers that double cannot represent exactly,
+	 * GAWK uses double to approximate wraparound integer arithmetic
+	 * using the widest integer that double can represent this time.
 	 * GAWK prefers to lose excess high-order information instead of
 	 * the more-usual rounding that would lose low-order information.
 	 *
-	 * Typically uintmax_t is 64-bit and AWKNUM is IEEE 754 binary64,
-	 * so AWKNUM_FRACTION_BITS is DBL_MANT_DIG (i.e., 53) and
+	 * Typically uintmax_t is 64-bit and double is IEEE 754 binary64,
+	 * so double_FRACTION_BITS is DBL_MANT_DIG (i.e., 53) and
 	 * some 64-bit uintmax_t values have nonzero bits that are too widely
-	 * spread apart to fit into AWKNUM's 53-bit significand.
+	 * spread apart to fit into double's 53-bit significand.
 	 * For example, let N = 8 + 2**62 (0x4000000000000008), one such value.
-	 * Then ((AWKNUM) N) equals 2**62 (0x4000000000000000) due to rounding,
-	 * whereas ((AWKNUM) adjust_uint (N)) exactly equals (adjust_uint (N))
+	 * Then ((double) N) equals 2**62 (0x4000000000000000) due to rounding,
+	 * whereas ((double) adjust_uint (N)) exactly equals (adjust_uint (N))
 	 * which is 8 (in other words, N modulo 2**56),
 	 * because N's low-order 3 bits are zero and 56 = 53 + 3.
 	 * In this example, adjust_uint implements 56-bit wraparound
@@ -127,11 +127,11 @@ adjust_uint(uintmax_t n)
 	 * but that is a matter for another day.)
 	 */
 	int wordbits = CHAR_BIT * sizeof n;
-	if (AWKNUM_FRACTION_BITS < wordbits) {
+	if (double_FRACTION_BITS < wordbits) {
 		uintmax_t one = 1;
-		uintmax_t sentinel = one << (wordbits - AWKNUM_FRACTION_BITS);
+		uintmax_t sentinel = one << (wordbits - double_FRACTION_BITS);
 		int shift = count_trailing_zeros(n | sentinel);
-		uintmax_t mask = (one << AWKNUM_FRACTION_BITS) - 1;
+		uintmax_t mask = (one << double_FRACTION_BITS) - 1;
 
 		n &= mask << shift;
 	}

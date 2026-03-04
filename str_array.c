@@ -445,17 +445,17 @@ str_list(NODE *symbol, NODE *t)
 
 /* str_kilobytes --- calculate memory consumption of the assoc array */
 
-AWKNUM
+double
 str_kilobytes(NODE *symbol)
 {
 	unsigned long bucket_cnt;
-	AWKNUM kb;
+	double kb;
 
 	bucket_cnt = symbol->table_size;
 
 	/* This does not include extra memory for indices with stfmt != STFMT_UNUSED */
-	kb = (((AWKNUM) bucket_cnt) * sizeof (BUCKET) +
-		((AWKNUM) symbol->array_size) * sizeof (BUCKET *)) / 1024.0;
+	kb = (((double) bucket_cnt) * sizeof (BUCKET) +
+		((double) symbol->array_size) * sizeof (BUCKET *)) / 1024.0;
 	return kb;
 }
 
@@ -493,7 +493,7 @@ str_dump(NODE *symbol, NODE *ndump)
 	fprintf(output_fp, "table_size: %lu\n", (unsigned long) symbol->table_size);
 	indent(indent_level);
 	fprintf(output_fp, "Avg # of items per chain: %.2g\n",
-				((AWKNUM) symbol->table_size) / symbol->array_size);
+				((double) symbol->table_size) / symbol->array_size);
 
 	indent(indent_level);
 	fprintf(output_fp, "memory: %.2g kB\n", str_kilobytes(symbol));

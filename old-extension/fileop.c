@@ -203,7 +203,7 @@ do_filesize(int nargs)
 {
 	NODE *file;
 	struct stat sbuf;
-	AWKNUM d = -1.0;
+	double d = -1.0;
 
 	file = get_scalar_argument(0, false);
 	force_string(file);
@@ -375,7 +375,7 @@ dlload(NODE *tree, void *dl)
 	make_old_builtin("fclose", do_fclose, 2);
 	make_old_builtin("ftruncate", do_ftruncate, 3);
 	make_old_builtin("unlink", do_unlink, 1);
-	return make_number((AWKNUM) 0);
+	return make_number((double) 0);
 }
 
 

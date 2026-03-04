@@ -775,7 +775,7 @@ init_args(int argc0, int argc, const char *argv0, char **argv)
 
 
 	for (i = argc0, j = 1; i < argc; i++, j++) {
-		sub = make_number((AWKNUM) j);
+		sub = make_number((double) j);
 		val = make_string(argv[i], strlen(argv[i]));
 		val->flags |= USER_INPUT;
 		assoc_set(ARGV_node, sub, val);
@@ -788,7 +788,7 @@ init_args(int argc0, int argc, const char *argv0, char **argv)
 	}
 
 	ARGC_node = install_symbol(estrdup("ARGC", 4), Node_var);
-	ARGC_node->var_value = make_number((AWKNUM) j);
+	ARGC_node->var_value = make_number((double) j);
 
 	if (do_sandbox)
 		init_argv_array(ARGV_node, shadow_node);
@@ -807,7 +807,7 @@ struct varinit {
 	NODE **spec;
 	const char *name;
 	const char *strval;
-	AWKNUM numval;
+	double numval;
 	Func_ptr update;
 	Func_ptr assign;
 	bool do_assign;
@@ -1007,7 +1007,7 @@ load_procinfo()
 #if (defined (HAVE_GETGROUPS) && defined(NGROUPS_MAX) && NGROUPS_MAX > 0) || defined(HAVE_MPFR)
 	char name[100];
 #endif
-	AWKNUM value;
+	double value;
 	static bool been_here = false;
 
 	if (been_here)
@@ -1026,8 +1026,8 @@ load_procinfo()
 	update_PROCINFO_str("mpfr_version", name);
 	sprintf(name, "GNU MP %s", gmp_version);
 	update_PROCINFO_str("gmp_version", name);
-	update_PROCINFO_num("prec_max", (AWKNUM) MPFR_PREC_MAX);
-	update_PROCINFO_num("prec_min", (AWKNUM) MPFR_PREC_MIN);
+	update_PROCINFO_num("prec_max", (double) MPFR_PREC_MAX);
+	update_PROCINFO_num("prec_min", (double) MPFR_PREC_MIN);
 #endif
 
 #ifdef DYNAMIC

@@ -928,7 +928,7 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 
 		if (tmpval < 0) {
 			uval = (uintmax_t) (intmax_t) tmpval;
-			if ((AWKNUM)(intmax_t)uval != double_to_int(tmpval)) {
+			if ((double)(intmax_t)uval != double_to_int(tmpval)) {
 				flags->format = 'g';
 				free((void *) buf);
 				*used_float = true;
@@ -937,7 +937,7 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 			}
 		} else {
 			uval = (uintmax_t) tmpval;
-			if ((AWKNUM)uval != double_to_int(tmpval)) {
+			if ((double)uval != double_to_int(tmpval)) {
 				flags->format = 'g';
 				free((void *) buf);
 				*used_float = true;

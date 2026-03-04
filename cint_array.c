@@ -499,9 +499,9 @@ cint_dump(NODE *symbol, NODE *ndump)
 	int indent_level;
 	size_t i;
 	long cint_size = 0, xsize = 0;
-	AWKNUM kb = 0;
-	extern AWKNUM int_kilobytes(NODE *symbol);
-	extern AWKNUM str_kilobytes(NODE *symbol);
+	double kb = 0;
+	extern double int_kilobytes(NODE *symbol);
+	extern double str_kilobytes(NODE *symbol);
 
 	indent_level = ndump->alevel;
 
@@ -532,7 +532,7 @@ cint_dump(NODE *symbol, NODE *ndump)
 	indent(indent_level);
 	fprintf(output_fp, "array_capacity: %lu\n", (unsigned long) symbol->array_capacity);
 	indent(indent_level);
-	fprintf(output_fp, "Load Factor: %.2g\n", (AWKNUM) cint_size / symbol->array_capacity);
+	fprintf(output_fp, "Load Factor: %.2g\n", (double) cint_size / symbol->array_capacity);
 
 	for (i = NHAT; i < INT32_BIT; i++) {
 		tn = symbol->nodes[i];
@@ -1188,7 +1188,7 @@ leaf_list(NODE *array, NODE **list, assoc_kind_t assoc_kind)
 			subs->numbr = num;
 			subs->flags |= (NUMCUR|NUMINT);
 		} else {
-			subs = make_number((AWKNUM) num);
+			subs = make_number((double) num);
 			subs->flags |= (INTIND|NUMINT);
 		}
 		list[k++] = subs;
@@ -1221,7 +1221,7 @@ leaf_info(NODE *array, NODE *ndump, const char *aname)
 
 	size = array->array_size;
 
-	subs = make_number((AWKNUM) 0.0);
+	subs = make_number((double) 0.0);
 	subs->flags |= (INTIND|NUMINT);
 	for (i = 0; i < size; i++) {
 		val = array->nodes[i];

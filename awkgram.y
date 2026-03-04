@@ -1859,14 +1859,14 @@ non_post_simp_exp
 			) {
 				NODE *n = $2->nexti->memory;
 				if ((n->flags & STRING) != 0) {
-					n->numbr = (AWKNUM) (n->stlen == 0);
+					n->numbr = (double) (n->stlen == 0);
 					n->flags &= ~(STRCUR|STRING);
 					n->flags |= (NUMCUR|NUMBER);
 					efree(n->stptr);
 					n->stptr = NULL;
 					n->stlen = 0;
 				} else
-					n->numbr = (AWKNUM) (n->numbr == 0.0);
+					n->numbr = (double) (n->numbr == 0.0);
 				bcfree($1);
 				$$ = $2;
 			} else {
@@ -3554,7 +3554,7 @@ yylex(void)
 	char *tokkey;
 	bool inhex = false;
 	bool intlstr = false;
-	AWKNUM d;
+	double d;
 	bool collecting_typed_regexp = false;
 	static int qm_col_count = 0;
 
@@ -5432,7 +5432,7 @@ static INSTRUCTION *
 mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 {
 	INSTRUCTION *ip1,*ip2, *lint_plus;
-	AWKNUM res;
+	double res;
 
 	ip2 = s2->nexti;
 	if (s2->lasti == ip2 && ip2->opcode == Op_push_i) {

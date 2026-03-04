@@ -27,7 +27,7 @@
 #include "awk.h"
 
 static NODE *r_make_number(double x);
-static AWKNUM get_ieee_magic_val(char *val);
+static double get_ieee_magic_val(char *val);
 extern NODE **fmt_list;          /* declared in eval.c */
 
 NODE *(*make_number)(double) = r_make_number;
@@ -126,7 +126,7 @@ r_force_number(NODE *n)
 
 	if (cpend - cp == 1) {		/* only one character */
 		if (isdigit((unsigned char) *cp)) {	/* it's a digit! */
-			n->numbr = (AWKNUM)(*cp - '0');
+			n->numbr = (double)(*cp - '0');
 			if (n->stlen == 1)		/* no white space */
 				n->flags |= NUMINT;
 			goto goodnum;
@@ -142,7 +142,7 @@ r_force_number(NODE *n)
 	} else {
 		save = *cpend;
 		*cpend = '\0';
-		n->numbr = (AWKNUM) strtod((const char *) cp, &ptr);
+		n->numbr = (double) strtod((const char *) cp, &ptr);
 		*cpend = save;
 	}
 
@@ -370,7 +370,7 @@ r_make_number(double x)
 	return r;
 }
 
-/* cmp_awknums --- compare two AWKNUMs */
+/* cmp_awknums --- compare two doubles */
 
 int
 cmp_awknums(const NODE *t1, const NODE *t2)
@@ -1095,18 +1095,18 @@ is_ieee_magic_val(const char *val)
 
 /* get_ieee_magic_val --- return magic value for string */
 
-static AWKNUM
+static double
 get_ieee_magic_val(char *val)
 {
 	static bool first = true;
-	static AWKNUM inf;
-	static AWKNUM nan;
+	static double inf;
+	static double nan;
 	char save;
 
 	char *ptr;
 	save = val[4];
 	val[4] = '\0';
-	AWKNUM v = strtod(val, &ptr);
+	double v = strtod(val, &ptr);
 	val[4] = save;
 
 	if (val == ptr) { /* Older strtod implementations don't support inf or nan. */
@@ -1206,7 +1206,7 @@ make_bool_node(bool value)
 {
 	NODE *val;
 	const char *sval;
-	AWKNUM nval;
+	double nval;
 
 	sval = (value ? "1" : "0");
 	nval = (value ? 1.0 : 0.0);

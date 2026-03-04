@@ -159,5 +159,5 @@ dlload(NODE *obj, void *dl)
 	register_dyn_array(a1, fetch_SYS, store_SYS, & data);
 	a2 = install_array("READLINE");
 	register_deferred_array(a2, load_READLINE, & data);
-	return make_number((AWKNUM) 0);
+	return make_number((double) 0);
 }
