@@ -155,8 +155,8 @@ static awk_ext_func_t func_table[] = {
 	{ "isspace", do_isspace, 1, 1, awk_false, NULL },
 	{ "isupper", do_isupper, 1, 1, awk_false, NULL },
 	{ "isxdigit", do_isxdigit, 1, 1, awk_false, NULL },
-	{ "tolower_val", do_tolower, 1, 1, awk_false, NULL },
-	{ "toupper_val", do_toupper, 1, 1, awk_false, NULL },
+	{ "tolower_i", do_tolower, 1, 1, awk_false, NULL },
+	{ "toupper_i", do_toupper, 1, 1, awk_false, NULL },
 };
 
 /* define the dl_load function using the boilerplate macro */

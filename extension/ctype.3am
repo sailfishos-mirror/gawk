@@ -1,6 +1,6 @@
-.TH CTYPE 3am "Feb 25 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH CTYPE 3am "March 09 2026" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
-isalpha, isdigit, etc. \- character type functions
+isalpha, isdigit, etc. \- character type testing and conversion functions
 .SH SYNOPSIS
 .nf
 .ft CW
@@ -18,6 +18,9 @@ result = isprint(value)
 result = isspace(value)
 result = isupper(value)
 result = isxdigit(value)
+.sp
+result = tolower_i(value)
+result = toupper_i(value)
 .fi
 .ft R
 .SH DESCRIPTION
@@ -39,9 +42,14 @@ or
 functions, depending upon if the current locale is
 eight-bit or multibyte; this is transparant to the
 AWK programmer.
+.PP
+In addition, two functions convert the case of the
+character value passed as their argument. These functions
+accept and return numeric code point values, not strings.
 .SH RETURN VALUE
-All the functions return either one or zero for true or
-false, respectively.
+All the \f(CWisXXX()\fP functions return either one or zero for true or
+false, respectively.  \f(CWtolower_i()\fP and \f(CWtoupper_i()\fP return
+converted numeric character values.
 .\" .SH NOTES
 .SH BUGS
 These functions should also accept a string parameter
@@ -61,6 +69,8 @@ and the man pages for the other extensions shipped with
 .IR gawk .
 .PP
 .IR ctype (3),
+.IR tolower (3),
+.IR toupper (3),
 .IR wctype (3).
 .SH AUTHOR
 Arnold Robbins,
