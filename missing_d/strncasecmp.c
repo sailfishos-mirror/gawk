@@ -14,8 +14,8 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA  02110-1301  USA */
+   Software Foundation, Inc. See https://www.fsf.org/about/contact/mailing
+   for the address. */
 
 /*
  * August 2006. For Gawk: Borrowed from GLIBC to replace BSD licensed version.
@@ -62,9 +62,7 @@ strcasecmp (s1, s2)
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-   MA 02110-1335, USA 
+   License along with the GNU C Library; if not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
