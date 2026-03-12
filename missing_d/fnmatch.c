@@ -13,9 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public License
-along with this library; see the file COPYING.LIB.  If not, write to the Free
-Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-USA.  */
+along with this library; see the file COPYING.LIB.  If not,
+see <https://www.gnu.org/licenses/>.  */
 
 #if HAVE_CONFIG_H
 # include <config.h>
