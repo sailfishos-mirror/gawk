@@ -1358,39 +1358,6 @@ api_release_value(awk_ext_id_t id, awk_value_cookie_t value)
 	return awk_true;
 }
 
-/* api_get_mpfr --- allocate an mpfr_ptr */
-
-static void *
-api_get_mpfr(awk_ext_id_t id)
-{
-#ifdef HAVE_MPFR
-	mpfr_ptr p;
-	emalloc(p, mpfr_ptr, sizeof(mpfr_t));
-	mpfr_init(p);
-	return p;
-#else
-	fatal(_("api_get_mpfr: MPFR not supported"));
-	return NULL;	// silence compiler warning
-#endif
-}
-
-/* api_get_mpz --- allocate an mpz_ptr */
-
-static void *
-api_get_mpz(awk_ext_id_t id)
-{
-#ifdef HAVE_MPFR
-	mpz_ptr p;
-	emalloc(p, mpz_ptr, sizeof (mpz_t));
-
-	mpz_init(p);
-	return p;
-#else
-	fatal(_("api_get_mpfr: MPFR not supported"));
-	return NULL;	// silence compiler warning
-#endif
-}
-
 /* api_get_file --- return a handle to an existing or newly opened file */
 
 static awk_bool_t
@@ -1528,7 +1495,7 @@ gawk_api_t api_impl = {
 	0, 0, 0, 0,
 #endif
 
-	{ 0 },			/* do_flags */
+	0,		/* do_flags */
 
 	/* registration functions */
 	api_add_ext_func,
@@ -1580,8 +1547,6 @@ gawk_api_t api_impl = {
 	calloc,
 	realloc,
 	free,
-	api_get_mpfr,
-	api_get_mpz,
 
 	/* Find/open a file */
 	api_get_file,
@@ -1595,14 +1560,15 @@ gawk_api_t api_impl = {
 void
 init_ext_api()
 {
-	/* force values to 1 / 0 */
-	api_impl.do_flags[gawk_do_lint] = (do_lint ? 1 : 0);
-	api_impl.do_flags[gawk_do_traditional] = (do_traditional ? 1 : 0);
-	api_impl.do_flags[gawk_do_profile] = (do_profile ? 1 : 0);
-	api_impl.do_flags[gawk_do_sandbox] = (do_sandbox ? 1 : 0);
-	api_impl.do_flags[gawk_do_debug] = (do_debug ? 1 : 0);
-	api_impl.do_flags[gawk_do_mpfr] = (do_mpfr ? 1 : 0);
-	api_impl.do_flags[gawk_do_csv] = (do_csv ? 1 : 0);
+	api_impl.do_flags = 0;
+
+	api_impl.do_flags |= do_lint ? GAWK_DO_LINT : 0;
+	api_impl.do_flags |= do_traditional ? GAWK_DO_TRADITIONAL : 0;
+	api_impl.do_flags |= do_profile ? GAWK_DO_PROFILE : 0;
+	api_impl.do_flags |= do_sandbox ? GAWK_DO_SANDBOX : 0;
+	api_impl.do_flags |= do_debug ? GAWK_DO_DEBUG : 0;
+	api_impl.do_flags |= do_mpfr ? GAWK_DO_MPFR : 0;
+	api_impl.do_flags |= do_csv ? GAWK_DO_CSV : 0;
 }
 
 /* update_ext_api --- update the variables in the API that can change */
@@ -1610,7 +1576,10 @@ init_ext_api()
 void
 update_ext_api()
 {
-	api_impl.do_flags[0] = (do_lint ? 1 : 0);
+	if (do_lint)
+		api_impl.do_flags |= GAWK_DO_LINT;
+	else
+		api_impl.do_flags &= ~GAWK_DO_LINT;
 }
 
 /* print_ext_versions --- print the list */

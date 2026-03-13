@@ -36916,43 +36916,6 @@ instead of @code{gawk_malloc()}.
 The arguments are the same as for the @code{emalloc()} macro.
 @end table
 
-Two additional functions allocate MPFR and GMP objects for use
-by extension functions that need to create and then return such
-values.
-
-@quotation NOTE
-These functions are obsolete. Extension functions that need local MPFR
-and GMP values should simply allocate them on the stack and clear them,
-as any other code would.
-@end quotation
-
-@noindent
-The functions are:
-
-@table @code
-@item void *get_mpfr_ptr();
-Allocate and initialize an MPFR object and return a pointer to it.
-If the allocation fails, @command{gawk} exits with a fatal
-``out of memory'' error.  If @command{gawk} was compiled without
-MPFR support, calling this function causes a fatal error.
-
-@item void *get_mpz_ptr();
-Allocate and initialize a GMP object and return a pointer to it.
-If the allocation fails, @command{gawk} exits with a fatal
-``out of memory'' error.  If @command{gawk} was compiled without
-MPFR support, calling this function causes a fatal error.
-@end table
-
-Both of these functions return @samp{void *}, since the @file{gawkapi.h}
-header file should not have dependency upon @code{<mpfr.h>} (and @code{<gmp.h>},
-which is included from @code{<mpfr.h>}).  The actual return values are of
-types @code{mpfr_ptr} and @code{mpz_ptr} respectively, and you should cast
-the return values appropriately before assigning the results to variables
-of the correct types.
-
-The memory allocated by these functions should be freed with
-@code{gawk_free()}.
-
 @node Constructor Functions
 @subsection Constructor Functions
 
