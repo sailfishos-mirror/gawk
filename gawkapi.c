@@ -1538,6 +1538,7 @@ gawk_api_t api_impl = {
 	api_set_array_element,
 	api_del_array_element,
 	api_create_array,
+	api_destroy_array,
 	api_clear_array,
 	api_flatten_array_typed,
 	api_release_flattened_array,
@@ -1550,9 +1551,6 @@ gawk_api_t api_impl = {
 
 	/* Find/open a file */
 	api_get_file,
-
-	/* Additional array hook to destroy an array */
-	api_destroy_array,
 };
 
 /* init_ext_api --- init the extension API */

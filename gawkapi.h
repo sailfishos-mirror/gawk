@@ -3,7 +3,7 @@
  */
 
 /*
- * copyright (c) 2012-2019, 2021-2024, 2026
+ * Copyright (c) 2012-2019, 2021-2024, 2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -466,7 +466,7 @@ typedef struct awk_ext_func {
 					struct awk_ext_func *finfo);
 	const size_t max_expected_args;
 	const size_t min_required_args;
-	awk_bool_t suppress_lint;
+	awk_bool_t suppress_lint;	/* true => don't warn if more args than expected */
 	void *data;		/* opaque pointer to any extra state */
 } awk_ext_func_t;
 
@@ -640,7 +640,7 @@ typedef struct gawk_api {
 	 * the real type, as described above.
 	 *
 	 * 	awk_value_t val;
-	 * 	if (! api->sym_lookup(id, name, wanted, & val))
+	 * 	if (! api->sym_lookup(id, ns, name, wanted, & val))
 	 * 		error_code_here();
 	 *	else {
 	 *		// safe to use val
@@ -675,7 +675,7 @@ typedef struct gawk_api {
 	 *
 	 * Return will be false if the value cannot be retrieved.
 	 *
-	 * Flow is thus
+	 * Flow is thus:
 	 *	awk_value_t val;
 	 * 	awk_scalar_t cookie;
 	 * 	api->sym_lookup(id, "variable", AWK_SCALAR, & val);	// get the cookie
@@ -690,7 +690,7 @@ typedef struct gawk_api {
 
 	/*
 	 * Update the value associated with a scalar cookie.
-	 * Flow is
+	 * Flow is:
 	 * 	sym_lookup with wanted == AWK_SCALAR
 	 * 	if returns false
 	 * 		sym_update with real initial value to install it
@@ -699,7 +699,7 @@ typedef struct gawk_api {
 	 *		use the scalar cookie
 	 *
 	 * Return will be false if the new value is not one of
-	 * AWK_STRING, AWK_NUMBER, AWK_REGEX.
+	 * AWK_STRING, AWK_NUMBER, or AWK_REGEX.
 	 *
 	 * Here too, the built-in variables may not be updated.
 	 */
@@ -765,6 +765,9 @@ typedef struct gawk_api {
 
 	/* Create a new array cookie to which elements may be added. */
 	awk_array_t (*api_create_array)(awk_ext_id_t id);
+
+	/* Destroy an array. */
+	awk_bool_t (*api_destroy_array)(awk_ext_id_t id, awk_array_t a_cookie);
 
 	/* Clear out an array. */
 	awk_bool_t (*api_clear_array)(awk_ext_id_t id, awk_array_t a_cookie);
@@ -840,9 +843,6 @@ typedef struct gawk_api {
 			 */
 			const awk_input_buf_t **ibufp,
 			const awk_output_buf_t **obufp);
-
-	/* Destroy an array. */
-	awk_bool_t (*api_destroy_array)(awk_ext_id_t id, awk_array_t a_cookie);
 } gawk_api_t;
 
 #ifndef GAWK	/* these are not for the gawk code itself! */
@@ -1093,7 +1093,7 @@ make_bool(awk_bool_t boolval, awk_value_t *result)
  * variable named 'api' and save id in a global variable named 'ext_id'.
  * In addition, a global function pointer named 'init_func' should be
  * defined and set to either NULL or an initialization function that
- * returns non-zero on success and zero upon failure.
+ * returns non-zero on success or zero upon failure.
  */
 
 extern int dl_load(const gawk_api_t *const api_p, awk_ext_id_t id);
@@ -1107,7 +1107,7 @@ static awk_ext_id_t ext_id;
 static const char *ext_version = NULL; /* or ... = "some string" */
 
 static awk_ext_func_t func_table[] = {
-	{ "name", do_name, 1 },
+	{ "name", do_name, 2, 1, awk_false, NULL },
 	/* ... */
 };
 
