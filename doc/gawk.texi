@@ -6223,6 +6223,20 @@ operators.  The older GNU matchers do not.  Also, when invoked with the
 @option{--traditional} option, shortest-match operators are not supported,
 since traditional @command{awk} does not have these operators.
 
+@quotation NOTE
+The addition of a trailing @samp{?} into the syntax can lead to unexpected
+incompatibilities with previous versions of @command{gawk}. For example,
+consider a regexp like @samp{a@{1,2@}?b+}.  With the GNU matchers,
+this matches an optional occurrence of one or two @code{a} characters
+followed by one or more @code{b} characters.  With the new POSIX syntax,
+this is a non-greedy match of one or two @code{a} characters followed
+by one or more @code{b} characters.
+
+Technically speaking, using one repetition operator immediately after
+another is undefined.  The correct way to write the previous regexp is
+to use parentheses: @samp{(a@{1,2@})?b+}.  This is clear and unambiguous.
+@end quotation
+
 @node Bracket Expressions
 @section Using Bracket Expressions
 @cindex bracket expressions
@@ -6396,8 +6410,12 @@ These features are very valuable in non-English-speaking locales.
 @cindex POSIX @command{awk} @subentry bracket expressions and @subentry character classes
 @quotation CAUTION
 The library functions that @command{gawk} uses for regular
-expression matching currently recognize only POSIX character classes;
-they do not recognize collating symbols or equivalence classes.
+expression matching currently recognize POSIX character classes.
+The MinRX matcher supports
+single-letter equivalence classes and single-letter collating symbols.
+@c FIXME:
+The GNU matchers do not support either equivalence classes
+or collating symbols.
 @end quotation
 @c maybe one day ...
 
