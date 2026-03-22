@@ -30,6 +30,7 @@
  *
  * FILE			- <stdio.h>
  * NULL			- <stddef.h>
+ * int32_t		- <stdint.h>
  * memset(), memcpy()	- <string.h>
  * size_t		- <sys/types.h>
  * struct stat		- <sys/stat.h>
@@ -328,6 +329,8 @@ enum {
 typedef struct awk_string {
 	char *str;	/* data */
 	size_t len;	/* length thereof, in chars */
+	int32_t *wstr;	/* wide char data */
+	size_t wlen;	/* length thereof, in int32_t */
 } awk_string_t;
 
 enum AWK_NUMBER_TYPE {
@@ -508,6 +511,9 @@ typedef struct gawk_api {
 #define GAWK_DO_DEBUG		0x0010
 #define GAWK_DO_MPFR		0x0020
 #define GAWK_DO_CSV		0x0040
+
+	/* cached value of MB_CUR_MAX */
+	int mb_cur_max;
 
 	/* Next, registration functions: */
 
@@ -843,6 +849,16 @@ typedef struct gawk_api {
 			 */
 			const awk_input_buf_t **ibufp,
 			const awk_output_buf_t **obufp);
+
+	/*
+	 * Functions for converting between multibyte encoded
+	 * strings and wide character strings. int32_t is used
+	 * for wide characters, since there are portability issues
+	 * trying to use wchar_t or char32_t and we wish to avoid
+	 * autoconf machinery in this file.
+	 */
+	int32_t *(*api_mbstowcs)(const char *str, size_t len, size_t *wlen);
+	char *(*api_wcstombs)(const int32_t *wstr, size_t wlen, size_t *len);
 } gawk_api_t;
 
 #ifndef GAWK	/* these are not for the gawk code itself! */
@@ -961,6 +977,9 @@ typedef struct gawk_api {
 		if ((pointer = (type) gawk_realloc(pointer, size)) == 0) \
 			fatal(ext_id, "%s: realloc of %d bytes failed", message, size); \
 	} while(0)
+
+#define mbstowcs(str, len, wlen) (api->api_mbstowcs(str, len, wlen))
+#define wcstombs(wstr, wlen, len) (api->api_wcstombs(wstr, wlen, len))
 
 /* Constructor functions */
 
