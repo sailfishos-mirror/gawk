@@ -6907,6 +6907,24 @@ Il precedente motore GNU non li supporta.  Inoltre, quando si invoca
 ``non-avidi'' non sono supportati, poich@'e @command{awk} non prevede tali
 operatori.
 
+@quotation NOTA
+Aggiungere un carattere @samp{?} in fondo a un'espressione di ricerca
+pu@`o portare a inattese incompatibilit@`a con le precedenti versioni di
+@command{gawk}.  Per esempio, si consideri un'espressione regolare
+come @samp{a@{1,2@}?b+}.  Con il precedente algoritmo di corrispondenza
+l'espressione richiede una corrispondenza facoltativa di uno o due
+caratteri @code{a}, seguiti da uno o pi@`u caratteri @code{b}.
+Con la nuova sintassi prescritta da POSIX, qui si richiede invece una
+corrispondenza ``non-avida'' di uno o pi@`u caratteri @code{a},
+seguiti da uno o pi@`u caratteri @code{b}.
+
+Tecnicamente parlando, usare un operatore di ripetizione che viene
+immediatamente dopo un altro, @`e una situazione indefinita [in POSIX].
+La maniera corretta per scrivere l'espressione precedente consiste
+nel fare uso di parentesi: @samp{(a@{1,2@})?b+}.  in questo modo
+l'espressione @`e chiara e non ambigua.
+@end quotation
+
 @node Espressioni tra parentesi quadre
 @section Usare espressioni tra parentesi quadre
 @cindex espressioni @subentry tra parentesi quadre
@@ -7098,8 +7116,12 @@ Queste funzionalit@`a sono molto utili in localizzazioni non inglesi.
 @cindex POSIX @command{awk} @subentry espressioni tra parentesi quadre @subentry classi di caratteri
 @quotation ATTENZIONE
 Le funzioni di libreria che @command{gawk} usa per individuare le espressioni
-regolari per ora riconoscono solo le classi di caratteri POSIX;
-non riconoscono simboli di collazione o classi di equivalenza.
+regolari per ora riconoscono solo le classi di caratteri POSIX.
+Il motore MinRX supporta classi di equivalenza e simboli che individuano
+sequenze di ordinamento di lettere singole.
+@c FIXME:
+Il motore GNU, invece, non riconosce n@'e simboli di collazione n@'e classi di
+equivalenza.
 @end quotation
 @c maybe one day ...
 
