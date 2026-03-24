@@ -54,12 +54,9 @@ enum {
 	CSET_ESPACE,		// Corresponds to REG_ESPACE
 	CSET_ERANGE,		// Corresponds to REG_ERANGE
 };
-Static charset_t *charset_create(int *errcode, int mb_cur_max, bool is_utf8);
+Static charset_t *charset_create(int *errcode, bool locale_is_8bit, bool is_utf8);
 Static int charset_add_char(charset_t *set, int32_t wc);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
 Static int charset_add_char_ic(charset_t *set, int32_t wc);
-#pragma GCC diagnostic pop
 Static int charset_add_range(charset_t *set, int32_t first, int32_t last);
 Static charset_t *charset_invert(charset_t *set, int *errcode);
 #pragma GCC diagnostic push
