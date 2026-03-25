@@ -25,8 +25,6 @@
 
 #include "awk.h"
 
-#include <langinfo.h>
-
 /* Declare some globals used by api_get_file: */
 extern IOBUF *curfile;
 extern INSTRUCTION *main_beginfile;
