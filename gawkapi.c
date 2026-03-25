@@ -25,6 +25,8 @@
 
 #include "awk.h"
 
+#include <langinfo.h>
+
 /* Declare some globals used by api_get_file: */
 extern IOBUF *curfile;
 extern INSTRUCTION *main_beginfile;
@@ -1554,6 +1556,8 @@ gawk_api_t api_impl = {
 
 	0,		/* mb_cur_max */
 
+	NULL,		/* codeset */
+
 	/* registration functions */
 	api_add_ext_func,
 	api_register_input_parser,
@@ -1619,6 +1623,11 @@ gawk_api_t api_impl = {
 void
 init_ext_api()
 {
+	const char *codeset = nl_langinfo(CODESET);
+	if (codeset == NULL)
+		codeset = "unknown";
+
+	api_impl.codeset = codeset;
 	api_impl.mb_cur_max = gawk_mb_cur_max;
 
 	api_impl.do_flags = 0;

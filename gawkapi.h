@@ -512,8 +512,11 @@ typedef struct gawk_api {
 #define GAWK_DO_MPFR		0x0020
 #define GAWK_DO_CSV		0x0040
 
-	/* cached value of MB_CUR_MAX */
+	/* Cached value of MB_CUR_MAX */
 	int mb_cur_max;
+
+	/* Current codeset */
+	const char *codeset;
 
 	/* Next, registration functions: */
 
