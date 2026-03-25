@@ -70,7 +70,7 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	assert(result != NULL);
 
 	if (get_argument(0, AWK_STRING, & str)) {
-		if (api->mb_cur_max == 1) {
+		if (gawk_mb_cur_max == 1) {
 			ret = str.str_value.str[0] & 0xff;
 		} else {
 			ret = str.str_value.wstr[0];
@@ -100,7 +100,7 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	if (get_argument(0, AWK_NUMBER, & num)) {
 		val = num.num_value;
 		ret = val;	/* convert to int */
-		if (api->mb_cur_max == 1) {
+		if (gawk_mb_cur_max == 1) {
 			buf[0] = ret & 0xff;
 			goto done;
 		} else {
