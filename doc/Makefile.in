@@ -179,16 +179,18 @@ am__v_texidevnull_0 = > /dev/null
 am__v_texidevnull_1 = 
 INFO_DEPS = $(srcdir)/gawk.info $(srcdir)/gawkinet.info \
 	$(srcdir)/gawkworkflow.info $(srcdir)/pm-gawk.info \
-	$(srcdir)/notes.info
+	$(srcdir)/gawknotes.info
 TEXINFO_TEX = $(top_srcdir)/build-aux/texinfo.tex
 am__TEXINFO_TEX_DIR = $(top_srcdir)/build-aux
-DVIS = gawk.dvi gawkinet.dvi gawkworkflow.dvi pm-gawk.dvi notes.dvi
-PDFS = gawk.pdf gawkinet.pdf gawkworkflow.pdf pm-gawk.pdf notes.pdf
-PSS = gawk.ps gawkinet.ps gawkworkflow.ps pm-gawk.ps notes.ps
+DVIS = gawk.dvi gawkinet.dvi gawkworkflow.dvi pm-gawk.dvi \
+	gawknotes.dvi
+PDFS = gawk.pdf gawkinet.pdf gawkworkflow.pdf pm-gawk.pdf \
+	gawknotes.pdf
+PSS = gawk.ps gawkinet.ps gawkworkflow.ps pm-gawk.ps gawknotes.ps
 HTMLS = gawk.html gawkinet.html gawkworkflow.html pm-gawk.html \
-	notes.html
+	gawknotes.html
 TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi \
-	notes.texi
+	gawknotes.texi
 TEXI2DVI = texi2dvi
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
@@ -367,7 +369,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi notes.texi
+info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi \
+		gawknotes.texi
+
 man_MANS = gawk.1 gawkbug.1 pm-gawk.1
 png_images = gawk_api-figure1.png gawk_api-figure2.png gawk_api-figure3.png \
 	gawk_array-elements.png gawk_general-program.png gawk_process-flow.png
@@ -505,10 +509,10 @@ $(srcdir)/pm-gawk.info: pm-gawk.texi
 pm-gawk.dvi: pm-gawk.texi 
 pm-gawk.pdf: pm-gawk.texi 
 pm-gawk.html: pm-gawk.texi 
-$(srcdir)/notes.info: notes.texi 
-notes.dvi: notes.texi 
-notes.pdf: notes.texi 
-notes.html: notes.texi 
+$(srcdir)/gawknotes.info: gawknotes.texi 
+gawknotes.dvi: gawknotes.texi 
+gawknotes.pdf: gawknotes.texi 
+gawknotes.html: gawknotes.texi 
 .dvi.ps:
 	$(AM_V_DVIPS)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	$(DVIPS) $(AM_V_texinfo) -o $@ $<
@@ -591,19 +595,20 @@ dist-info: $(INFO_DEPS)
 
 mostlyclean-aminfo:
 	-rm -rf gawk.t2d gawk.t2p gawkinet.t2d gawkinet.t2p gawkworkflow.t2d \
-	  gawkworkflow.t2p pm-gawk.t2d pm-gawk.t2p notes.t2d notes.t2p
+	  gawkworkflow.t2p pm-gawk.t2d pm-gawk.t2p gawknotes.t2d \
+	  gawknotes.t2p
 
 clean-aminfo:
 	-test -z "gawk.dvi gawk.pdf gawk.ps gawk.html gawkinet.dvi gawkinet.pdf \
 	  gawkinet.ps gawkinet.html gawkworkflow.dvi gawkworkflow.pdf \
 	  gawkworkflow.ps gawkworkflow.html pm-gawk.dvi pm-gawk.pdf \
-	  pm-gawk.ps pm-gawk.html notes.dvi notes.pdf notes.ps \
-	  notes.html" \
+	  pm-gawk.ps pm-gawk.html gawknotes.dvi gawknotes.pdf \
+	  gawknotes.ps gawknotes.html" \
 	|| rm -rf gawk.dvi gawk.pdf gawk.ps gawk.html gawkinet.dvi gawkinet.pdf \
 	  gawkinet.ps gawkinet.html gawkworkflow.dvi gawkworkflow.pdf \
 	  gawkworkflow.ps gawkworkflow.html pm-gawk.dvi pm-gawk.pdf \
-	  pm-gawk.ps pm-gawk.html notes.dvi notes.pdf notes.ps \
-	  notes.html
+	  pm-gawk.ps pm-gawk.html gawknotes.dvi gawknotes.pdf \
+	  gawknotes.ps gawknotes.html
 
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \

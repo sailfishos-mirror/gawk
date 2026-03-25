@@ -24,7 +24,8 @@
 
 ## process this file with automake to produce Makefile.in
 
-info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi notes.texi
+info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi \
+		gawknotes.texi
 
 man_MANS = gawk.1 gawkbug.1 pm-gawk.1
 
