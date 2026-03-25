@@ -161,7 +161,7 @@ out:
 }
 
 
-/* do_getlocale --- quety the locale */
+/* do_getlocale --- query the locale */
 
 static awk_value_t *
 do_getlocale(int nargs, awk_value_t *result, struct awk_ext_func *unused)
