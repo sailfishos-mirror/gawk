@@ -849,6 +849,8 @@ EXTRA_DIST = \
 	memleak2.ok \
 	memleak3.awk \
 	memleak3.ok \
+	memleak4.awk \
+	memleak4.ok \
 	messages.awk \
 	minusstr.awk \
 	minusstr.ok \
@@ -1579,6 +1581,7 @@ CLEANFILES = core core.* fmtspcl.ok
 
 # try to keep these sorted. each letter starts a new line
 BASIC_TESTS = \
+	memleak4 \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
