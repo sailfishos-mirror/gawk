@@ -2098,9 +2098,10 @@ do_sub(int nargs, unsigned int flags)
 
 				memset(& mbs, 0, sizeof(mbs));
 				j = mbrlen(matchend, (target->stptr + target->stlen) - matchend, & mbs);
-				// FIXME: Error checking on the value of `j' would be a good idea....
-				for (i = 0; i < j; i++)
-					*bp++ = *matchend++;
+				if (j != (size_t) -1 && j != (size_t) -2 && j >= 1) {
+					for (i = 0; i < j; i++)
+						*bp++ = *matchend++;
+				}
 			}
 		}
 		textlen = text + textlen - matchend;
