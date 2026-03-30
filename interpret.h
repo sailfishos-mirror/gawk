@@ -473,8 +473,17 @@ uninitialized_scalar:
 			lhs = r_get_field(t1, (Func_ptr *) 0, true);
 			decr_sp();
 			DEREF(t1);
-			r = *lhs;
-			UPREF(r);
+			/*
+			 * 3/2026:
+			 * This was:
+			 *	r = *lhs;
+			 *	UPREF(r);
+			 *
+			 * Instead, use dupnode(),  as multiple concatenations
+			 * involving fields can end up clobbering memory. See
+			 * test/memleak4.awk.
+			 */
+			r = dupnode(*lhs);
 			PUSH(r);
 			break;
 
