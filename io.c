@@ -2852,21 +2852,24 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 	redir_exp = TOP();
 	redir_exp = elem_new_to_scalar(redir_exp);
 	rp = redirect(redir_exp, redirtype, & redir_error, false);
-	DEREF(redir_exp);
 	decr_sp();
 	if (rp == NULL) {
 		if (redir_error) { /* failed redirect */
 			update_ERRNO_int(redir_error);
 		}
+		DEREF(redir_exp);
 		return make_number((AWKNUM) -1.0);
 	} else if ((rp->flag & RED_TWOWAY) != 0 && rp->iop == NULL) {
 		if (is_non_fatal_redirect(redir_exp->stptr, redir_exp->stlen)) {
 			update_ERRNO_int(EBADF);
+			DEREF(redir_exp);
 			return make_number((AWKNUM) -1.0);
 		}
 		(void) close_rp(rp, CLOSE_ALL);
+		DEREF(redir_exp);	// we're about to die, but what the heck, release it anyway
 		fatal(_("getline: attempt to read from closed read end of two-way pipe"));
 	}
+	DEREF(redir_exp);
 	iop = rp->iop;
 	if (iop == NULL)		/* end of input */
 		return make_number((AWKNUM) 0.0);
