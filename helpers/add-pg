@@ -1,0 +1,12 @@
+#! /bin/sh
+
+for i in . support extension
+do
+	sed -e '/CFLAGS =/s/$/ -pg/' \
+		< $i/Makefile > foo
+	mv foo $i/Makefile
+	sed -e '/LDFLAGS =/s/$/ -pg/' \
+		< $i/Makefile > foo
+	mv foo $i/Makefile
+	echo $i/Makefile
+done
