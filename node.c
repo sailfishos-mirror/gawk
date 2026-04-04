@@ -583,7 +583,7 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 	static char buf[MB_LEN_MAX];
 	enum escape_results retval = ESCAPE_OK;
 	int c = *(*string_ptr)++;
-	long i;
+	int64_t i;
 	int count;
 	int j;
 	const char *start;
