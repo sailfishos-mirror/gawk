@@ -6872,13 +6872,15 @@ Release 5.4.0 of @command{gawk} introduced a new
 regular expression matching engine, named
 @uref{https://github.com/mikehaertel/minrx, MinRX}.
 
-MinRX is fully compliant with the POSIX standard for Extended
-Regular Expressions (EREs), including the additional features needed
-by @command{awk} and @command{gawk}.  It is also a little stricter
-that the original matchers are
-in terms of accepting valid regular expression syntax when specifying
-a regexp.  (These restrictions apply to corner cases that should
-not come up in day-to-day use.)
+MinRX is fully compliant with the POSIX standard for Extended Regular
+Expressions (EREs), including the additional features needed by
+@command{awk} and @command{gawk}.  Of note is full compliance with the
+leftmost-longest submatch rules, and support for non-greedy operators.
+
+MinRX is also a little stricter that the original matchers are in terms
+of accepting valid regular expression syntax when specifying a regexp.
+(These restrictions apply to corner cases that should not come up in
+day-to-day use.)
 
 Previously, @command{gawk} used GNU @code{regex} and @code{dfa}
 from GNULIB. These matchers are fast and generally robust, albeit not
@@ -6904,6 +6906,10 @@ maintainers and the MinRX author fix any issues that are found.
 After one major release, the old matchers, and the use of the
 @env{GAWK_GNU_MATCHERS} environment variable, will be removed
 from @command{gawk}.
+
+This will considerably reduce the maintenance burdern for the maintainer:
+it should be possible to remove on the order of 27 source files from
+the distribution once the GNU matchers are gone.
 
 @node Regexp Summary
 @section Summary
