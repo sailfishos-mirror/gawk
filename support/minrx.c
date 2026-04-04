@@ -81,8 +81,7 @@
 #endif
 
 #ifdef __GNUC__
-#undef inline
-#define inline __attribute__((__always_inline__)) inline
+#define unused unused __attribute__((__unused__))
 #endif
 
 static inline
@@ -404,6 +403,12 @@ qset_construct(QSet *q, size_t limit)
 		q->bits[i] = next, next += s[q->depth - 1 - i];
 	q->bits0 = 0;
 	return true;
+}
+
+static void
+qset_clear(QSet *q)
+{
+	q->bits0 = 0;
 }
 
 static void
@@ -847,6 +852,7 @@ struct Compile {
 	size_t esc_W;
 	NInt nmin;
 	NInt nsub;
+	bool anchored;
 };
 
 static void
@@ -1302,7 +1308,7 @@ nodelist_emplace_final(Compile *c, NodeList *x, NInt type, NInt arg0, NInt arg1,
 }
 
 static NodeList
-nodelist_empty()
+nodelist_empty(void)
 {
 	NodeList r;
 	r.first = (ListNode *) NULL;
@@ -1325,6 +1331,7 @@ struct Regexp {
 	bool firstvalid;
 	FirstBytes firstbytes;
 	int32_t firstunique;
+	bool anchored;
 };
 
 static NInt
@@ -1377,7 +1384,7 @@ alt(Compile *c, bool nested, NInt nstk)
 		size_t count = 0;
 		while (c->wc == L'|') {
 			if (count == NAlt) {
-				size_t alloc = NAlt * 2;
+				volatile size_t alloc = NAlt * 2; // volatile is logically unnecessary but prevents mistaken gcc warning
 				Subexp *newalts = (Subexp *) malloc(alloc * sizeof (Subexp));
 				if (!newalts)
 					cerr(c, MINRX_REG_ESPACE);
@@ -1823,42 +1830,52 @@ firstclosure(Compile *c, const Node *nodes, NInt nnode)
 		qset_destruct(&epsv);
 		cerr(c, MINRX_REG_ESPACE);
 	}
-	qset_insert(&epsq, 0);
-	do {
-		NInt k = qset_remove(&epsq);
-		const Node *np = &nodes[k];
-		if (np->type <= Cset)
-			qset_insert(&firsts, k);
-		else
-			switch (np->type) {
-			case Exit:
-				qset_destruct(&firsts);
-				qset_destruct(&epsv);
-				qset_destruct(&epsq);
-				return (CSet *) NULL;
-			case Fork:
-				do {
-					firstinsert(&epsq, &epsv, k + 1);
-					k = k + 1 + nodes[k].args[0];
-				} while (nodes[k].type != Join);
-				break;
-			case Goto:
-				firstinsert(&epsq, &epsv, k + 1 + np->args[0]);
-				break;
-			case Loop:
-				firstinsert(&epsq, &epsv, k + 1);
-				if (np->args[1])
+	for (int anchorcheck = 1; anchorcheck >= 0; anchorcheck--) {
+		qset_clear(&epsq);
+		qset_clear(&epsv);
+		firstinsert(&epsq, &epsv, 0);
+		do {
+			NInt k = qset_remove(&epsq);
+			const Node *np = &nodes[k];
+			if (np->type <= Cset)
+				qset_insert(&firsts, k);
+			else
+				switch (np->type) {
+				case Exit:
+					qset_destruct(&firsts);
+					qset_destruct(&epsv);
+					qset_destruct(&epsq);
+					return (CSet *) NULL;
+				case Fork:
+					do {
+						firstinsert(&epsq, &epsv, k + 1);
+						k = k + 1 + nodes[k].args[0];
+					} while (nodes[k].type != Join);
+					break;
+				case Goto:
 					firstinsert(&epsq, &epsv, k + 1 + np->args[0]);
-				break;
-			case Skip:
-				firstinsert(&epsq, &epsv, k + 1);
-				firstinsert(&epsq, &epsv, k + 1 + np->args[0]);
-				break;
-			default:
-				firstinsert(&epsq, &epsv, k + 1);
-				break;
-			}
-	} while (!qset_empty(&epsq));
+					break;
+				case Loop:
+					firstinsert(&epsq, &epsv, k + 1);
+					if (np->args[1])
+						firstinsert(&epsq, &epsv, k + 1 + np->args[0]);
+					break;
+				case Skip:
+					firstinsert(&epsq, &epsv, k + 1);
+					firstinsert(&epsq, &epsv, k + 1 + np->args[0]);
+					break;
+				case ZBOB:
+					if (anchorcheck)
+						break;
+					// fall through
+				default:
+					firstinsert(&epsq, &epsv, k + 1);
+					break;
+				}
+		} while (!qset_empty(&epsq));
+		if (qset_empty(&firsts))
+			c->anchored = true;
+	}
 	CSet *cs = c->fc = (CSet *) malloc(sizeof (CSet));
 	if (cs) {
 		cset_construct(c, cs, c->enc);
@@ -1907,6 +1924,7 @@ compile(Compile *c)
 	r->firstvalid = false;
 	memset(&r->firstbytes, 0, sizeof r->firstbytes);
 	r->firstunique = -1;
+	r->anchored = false;
 	int err;
 	if ((err = setjmp(c->errjmp)) != 0) {
 		c = vc, r = vr;
@@ -1950,6 +1968,7 @@ compile(Compile *c)
 	r->nsub = c->nsub + 1;
 	r->firstcset = firstclosure(c, nodes, nnode);
 	r->firstvalid = firstbytes(c, &r->firstbytes, &r->firstunique, c->enc, r->firstcset);
+	r->anchored = c->anchored;
 	return r;
 }
 
@@ -1973,6 +1992,7 @@ struct Execute {
 	NInt bestmincount; // note mincounts are negated so this means +infinity
 	QSet epsq;
 	QVec epsv;
+	bool exiting;
 };
 
 static bool
@@ -1996,6 +2016,7 @@ execute_construct(Execute *e, const Regexp *r, minrx_regexec_flags_t flags, cons
 		qset_destruct(&e->epsq);
 		return false;
 	}
+	e->exiting = r->anchored;
 	return true;
 }
 
@@ -2194,6 +2215,7 @@ execute_epsclosure(Execute *e, QVec *ncsv, WChar wcnext)
 					cowvec_put(&e->best, e->suboff + 1, end);
 					if (minvalid)
 						e->bestmincount = MAX(e->bestmincount, mincount);
+					e->exiting = true;
 				}
 			}
 			break;
@@ -2400,14 +2422,14 @@ execute(Execute *e, size_t nm, minrx_regmatch_t *rm)
 			execute_add(e, &mcsvs[1], r.index + 1, e->nodes[r.index].nstk, &r.nstate, wcnext);
 			nstate_destruct(&r.nstate);
 		}
-		if (!cowvec_valid(&e->best)) {
+		if (!e->exiting) {
 			nsinit.boff = e->off;
 			execute_add(e, &mcsvs[1], 0, 0, &nsinit, wcnext);
 		}
 		if (!qset_empty(&e->epsq))
 			execute_epsclosure(e, &mcsvs[1], wcnext);
 		if (qvec_empty(&mcsvs[1])) {
-			if (cowvec_valid(&e->best))
+			if (e->exiting)
 				break;
 			if ((e->flags & MINRX_REG_NOFIRSTBYTES) == 0 && e->r->firstvalid)
 				goto zoom;
@@ -2421,14 +2443,14 @@ execute(Execute *e, size_t nm, minrx_regmatch_t *rm)
 			execute_add(e, &mcsvs[0], r.index + 1, e->nodes[r.index].nstk, &r.nstate, wcnext);
 			nstate_destruct(&r.nstate);
 		}
-		if (!cowvec_valid(&e->best)) {
+		if (!e->exiting) {
 			nsinit.boff = e->off;
 			execute_add(e, &mcsvs[0], 0, 0, &nsinit, wcnext);
 		}
 		if (!qset_empty(&e->epsq))
 			execute_epsclosure(e, &mcsvs[0], wcnext);
 		if (qvec_empty(&mcsvs[0])) {
-			if (cowvec_valid(&e->best))
+			if (e->exiting)
 				break;
 			if ((e->flags & MINRX_REG_NOFIRSTBYTES) == 0 && e->r->firstvalid)
 				goto zoom;
@@ -2495,6 +2517,7 @@ minrx_regncomp(minrx_regex_t *rx, size_t ns, const char *s, int flags)
 	c.nsub = 0;
 	c.np = (NodePool *) NULL;
 	c.fc = (CSet *) NULL;
+	c.anchored = false;
 	Regexp *r = compile(&c);
 	if (!r)
 		return MINRX_REG_ESPACE;

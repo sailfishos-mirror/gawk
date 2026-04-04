@@ -1805,7 +1805,7 @@ do_sub(int nargs, unsigned int flags)
 	char *repl;
 	char *replend;
 	size_t repllen;
-	int sofar;
+	size_t sofar;
 	int ampersands;
 	int matches = 0;
 	Regexp *rp;
