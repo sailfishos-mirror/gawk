@@ -159,7 +159,7 @@ CLEANFILES = core core.* fmtspcl.ok
 # try to keep these sorted. each letter starts a new line
 BASIC_TESTS = \
 	memleak4 \
-	greek-utf \
+	case-check greek-equiv greek-utf \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -347,7 +347,7 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
-	greek-utf \
+	case-check greek-equiv greek-utf \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
 	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
 	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 \
@@ -1352,16 +1352,27 @@ indirectbuiltin2:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
+memleak4:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
-greek-utf:
+case-check:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
-memleak4:
+greek-equiv:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+greek-utf:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 addcomma:

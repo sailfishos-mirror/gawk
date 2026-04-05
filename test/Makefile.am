@@ -178,6 +178,8 @@ EXTRA_DIST = \
 	beginfile2.ok \
 	beginfile2.sh \
 	binmode1.ok \
+	case-check.awk \
+	case-check.ok \
 	callparam.awk \
 	callparam.ok \
 	charasbytes.awk \
@@ -579,6 +581,8 @@ EXTRA_DIST = \
 	gnureops.ok \
 	greek-8bit.awk \
 	greek-8bit.ok \
+	greek-equiv.awk \
+	greek-equiv.ok \
 	greek-utf.awk \
 	greek-utf.ok \
 	gsubasgn.awk \
@@ -1584,7 +1588,7 @@ CLEANFILES = core core.* fmtspcl.ok
 # try to keep these sorted. each letter starts a new line
 BASIC_TESTS = \
 	memleak4 \
-	greek-utf \
+	case-check greek-equiv greek-utf \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1769,7 +1773,7 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
-	greek-utf \
+	case-check greek-equiv greek-utf \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
 	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
 	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 \
