@@ -995,16 +995,18 @@ cset_parse(Compile *c, CSet *cs, minrx_regcomp_flags_t flags, WConv_Encoding enc
 				wclo = wchi = wc;
 #ifdef CHARSET_NOT_YET
 				int32_t coll[2] = { wc, L'\0' };
-				int err;
-				// since we only support single character collating sequences,
-				// we can just use charset_add_char_ic() for the ignore-case case.
-				if ((flags & MINRX_REG_ICASE) != 0) {
-					err = charset_add_char_ic(c, cs->charset, wc);
-				} else {
-					err = charset_add_collate(c, cs->charset, coll);
-				}
+				int err = charset_add_collate(c, cs->charset, coll);
 				if (err != CSET_SUCCESS)
 					cserr(c, err);
+				if ((flags & MINRX_REG_ICASE) != 0) {
+					if (iswlower(wc))
+						coll[0] = towupper(wc);
+					else if (iswupper(wc))
+						coll[0] = towlower(wc);
+					err = charset_add_collate(c, cs->charset, coll);
+					if (err != CSET_SUCCESS)
+						cserr(c, err);
+				}
 #endif
 				wc = wconv_nextchr(wconv);
 				if (wc != L'.' || (wc = wconv_nextchr(wconv)) != L']')
@@ -1028,7 +1030,6 @@ cset_parse(Compile *c, CSet *cs, minrx_regcomp_flags_t flags, WConv_Encoding enc
 				wclo = wchi = wc;
 				cset_add_equiv(c, cs, wc);
 				if ((flags & MINRX_REG_ICASE) != 0) {
-					// FIXME: this isn't quite right...
 					if (iswlower(wc))
 						cset_add_equiv(c, cs, towupper(wc));
 					else if (iswupper(wc))
@@ -1076,12 +1077,20 @@ cset_parse(Compile *c, CSet *cs, minrx_regcomp_flags_t flags, WConv_Encoding enc
 		if (wclo > wchi || (wclo != wchi && (wclo < 0 || wchi < 0)))
 			cerr(c, MINRX_REG_ERANGE);
 		if (wclo >= 0) {
+			cset_set_range(c, cs, wclo, wchi);
 			if ((flags & MINRX_REG_ICASE) != 0) {
 				for (WChar wc = wclo; wc <= wchi; ++wc) {
-					cset_set_ic(c, cs, wc);
+					WChar l, u;
+
+					l = enc == Byte ? tolower(wc) : towlower(wc);
+					u = enc == Byte ? toupper(wc) : towupper(wc);
+					// only add the char if it's outside the original range
+					if (l < wclo || l > wchi)
+						cset_set(c, cs, l);
+					if (u < wclo || u > wchi)
+						cset_set(c, cs, u);
 				}
-			} else
-				cset_set_range(c, cs, wclo, wchi);
+			}
 		}
 		if (range && wc == L'-' && wconv_lookahead(wconv) != L']')
 			cerr(c, MINRX_REG_ERANGE);

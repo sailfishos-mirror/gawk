@@ -8908,149 +8908,6 @@ charset_add_char(charset_t *set, int32_t wc)
 
 	return CSET_SUCCESS;
 }
-/* flip_case --- return the opposite case of the current character (bytes) */
-
-static int32_t
-flip_case(int32_t wc)
-{
-    wc &= 0xff;
-
-	if (islower(wc))
-		return toupper(wc);
-	else if (isupper(wc))
-		return tolower(wc);
-
-	return wc;
-}
-
-/* wflip_case --- return the opposite case of the current character (wide chars) */
-
-static int32_t
-wflip_case(int32_t wc)
-{
-	if (iswlower(wc))
-		return towupper(wc);
-	else if (iswupper(wc))
-		return towlower(wc);
-
-	return wc;
-}
-
-/* add_case_variants_utf --- add the case variants in a UTF-8 locale */
-
-static int
-add_case_variants_utf(charset_t *set, int32_t wc, bool *added)
-{
-	struct casemap {
-		int32_t	the_char;
-		int	count;
-		int32_t	alts[3];
-	} case_chars[] = {
-		{ 0x49, 2, { 0x69, 0x131, } }, // "I": "i" "ı"
-		{ 0x53, 2, { 0x73, 0x17f, } }, // "S": "s" "ſ"
-		{ 0x69, 2, { 0x49, 0x130, } }, // "i": "I" "İ"
-		{ 0x6b, 2, { 0x4b, 0x212a, } }, // "k": "K" "K"
-		{ 0xdf, 2, { 0xdf, 0x1e9e, } }, // "ß": "ß" "ẞ"
-		{ 0xe5, 2, { 0xc5, 0x212b, } }, // "å": "Å" "Å"
-		{ 0x1c6, 2, { 0x1c4, 0x1c5, } }, // "ǆ": "Ǆ" "ǅ"
-		{ 0x1c9, 2, { 0x1c7, 0x1c8, } }, // "ǉ": "Ǉ" "ǈ"
-		{ 0x1cc, 2, { 0x1ca, 0x1cb, } }, // "ǌ": "Ǌ" "ǋ"
-		{ 0x1f3, 2, { 0x1f1, 0x1f2, } }, // "ǳ": "Ǳ" "ǲ"
-		{ 0x392, 2, { 0x3b2, 0x3d0, } }, // "Β": "β" "ϐ"
-		{ 0x395, 2, { 0x3b5, 0x3f5, } }, // "Ε": "ε" "ϵ"
-		{ 0x398, 2, { 0x3b8, 0x3d1, } }, // "Θ": "θ" "ϑ"
-		{ 0x399, 3, { 0x345, 0x3b9, 0x1fbe, } }, // "Ι": "ͅ" "ι" "ι"
-		{ 0x39a, 2, { 0x3ba, 0x3f0, } }, // "Κ": "κ" "ϰ"
-		{ 0x39c, 2, { 0xb5, 0x3bc, } }, // "Μ": "µ" "μ"
-		{ 0x3a0, 2, { 0x3c0, 0x3d6, } }, // "Π": "π" "ϖ"
-		{ 0x3a1, 2, { 0x3c1, 0x3f1, } }, // "Ρ": "ρ" "ϱ"
-		{ 0x3a3, 2, { 0x3c3, 0x3c2, } }, // "Σ": "σ" "ς"
-		{ 0x3a6, 2, { 0x3c6, 0x3d5, } }, // "Φ": "φ" "ϕ"
-		{ 0x3b8, 2, { 0x398, 0x3f4, } }, // "θ": "Θ" "ϴ"
-		{ 0x3c9, 2, { 0x3a9, 0x2126, } }, // "ω": "Ω" "Ω"
-		{ 0x412, 2, { 0x432, 0x1c80, } }, // "В": "в" "ᲀ"
-		{ 0x414, 2, { 0x434, 0x1c81, } }, // "Д": "д" "ᲁ"
-		{ 0x41e, 2, { 0x43e, 0x1c82, } }, // "О": "о" "ᲂ"
-		{ 0x421, 2, { 0x441, 0x1c83, } }, // "С": "с" "ᲃ"
-		{ 0x422, 3, { 0x442, 0x1c84, 0x1c85, } }, // "Т": "т" "ᲄ" "ᲅ"
-		{ 0x42a, 2, { 0x44a, 0x1c86, } }, // "Ъ": "ъ" "ᲆ"
-		{ 0x462, 2, { 0x463, 0x1c87, } }, // "Ѣ": "ѣ" "ᲇ"
-		{ 0x1e60, 2, { 0x1e61, 0x1e9b, } }, // "Ṡ": "ṡ" "ẛ"
-		{ 0xa64a, 2, { 0x1c88, 0xa64b, } }, // "Ꙋ": "ᲈ" "ꙋ"
-		{ 0, 0, { 0 } },
-	};
-	int i, j, result;
-
-	// simple linear search, there's not a lot
-	for (i = 0; case_chars[i].the_char != 0; i++) {
-		if (case_chars[i].the_char == wc) {
-			// found it, add the alternatives
-			for (j = 0; j < case_chars[i].count; j++) {
-				result = charset_add_char(set, case_chars[i].alts[j]);
-				if (result != CSET_SUCCESS)
-					break;
-				*added = true;
-			}
-			return result;
-		}
-	}
-
-	return CSET_SUCCESS;
-}
-/* add_case_variants_single_byte --- add the case variants in a single-byte locale */
-
-static int
-add_case_variants_single_byte(charset_t *set, int32_t wc, bool *added)
-{
-	int result;
-	int32_t converted_wc;
-	int (*to_this_case)(int wc) = NULL;
-
-	wc &= 0xff;		// for safety, don't allow sign extension
-	if (islower(wc))
-		to_this_case = tolower;
-	else
-		to_this_case = toupper;
-
-	for (int32_t i = 0; i <= 255; i++) {
-		converted_wc = to_this_case(i);		// if have upper, convert i to upper and compare
-		if (converted_wc == wc && i != wc) {
-			result = charset_add_char(set, i);	// add original lower case that we just found
-			if (result != CSET_SUCCESS)
-				return result;
-			*added = true;
-		}
-	}
-
-	return CSET_SUCCESS;
-}
-/* add_case_variants_non_utf --- add the case variants in a non-Unicode locale */
-
-static int
-add_case_variants_non_utf(charset_t *set, int32_t wc, int limit, bool *added)
-{
-	int result;
-	int32_t converted_wc;
-	wint_t (*to_this_case)(wint_t wc) = NULL;
-
-	if (iswlower(wc))
-		to_this_case = towlower;
-	else
-		to_this_case = towupper;
-
-	for (int32_t i = 0; i <= limit; i++) {
-		converted_wc = to_this_case(i);		// if have upper, convert i to upper and compare
-		if (converted_wc == wc && i != wc) {
-			result = charset_add_char(set, i);	// add original lower case that we just found
-			if (result != CSET_SUCCESS)
-				return result;
-			*added = true;
-		}
-	}
-
-	return CSET_SUCCESS;
-}
-
 /* charset_add_char_ic --- add a single wide character to the set, and its case alternatives */
 
 Static int
@@ -9064,55 +8921,26 @@ charset_add_char_ic(charset_t *set, int32_t wc)
 	if (wc < 0)
 		return CSET_ERANGE;
 
-	int result = charset_add_char(set, wc);
-	bool is_alpha = (set->locale_is_8bit ? isalpha(wc) : iswalpha(wc));
+	int result1 = charset_add_char(set, wc);
 
-	if (result != CSET_SUCCESS || ! is_alpha)
-		return result;
+	if (result1 == CSET_SUCCESS) {
+		int result2, result3;
+		result2 = result3 = CSET_SUCCESS;
 
-	// at this point, we know we have a letter
-     
-	bool added = false;
+		int32_t wcl = set->locale_is_8bit == 1 ? tolower(wc) : (int32_t) towlower(wc);
+		int32_t wcu = set->locale_is_8bit == 1 ? toupper(wc) : (int32_t) towupper(wc);
 
-	if (set->locale_is_8bit)
-		result = add_case_variants_single_byte(set, wc, & added);
-	else if (set->is_utf8)
-		result = add_case_variants_utf(set, wc, & added);
-	else {
-		int32_t limit = MAX_CODE_POINT;
-		switch (MB_CUR_MAX) {
-		case 2:
-			limit = 0xffff;
-			break;
-		case 3:
-			limit = 0xffffff;
-			break;
-		default:
-			break;
+		if (wc != wcl || wc != wcu) {
+			result2 = charset_add_char(set, wcl);
+			result3 = charset_add_char(set, wcu);
 		}
-		result = add_case_variants_non_utf(set, wc, limit, & added);
+		if (result3 != CSET_SUCCESS)
+			return result3;
+		if (result2 != CSET_SUCCESS)
+			return result2;
 	}
 
-	if (result != CSET_SUCCESS)
-		return result;
-
-	if (! added) {
-		int32_t flipped_wc, flipped_back;
-
-		if (set->locale_is_8bit) {
-			flipped_wc = flip_case(wc);
-			flipped_back = flip_case(flipped_wc);
-		} else {
-			flipped_wc = wflip_case(wc);
-			flipped_back = wflip_case(flipped_wc);
-		}
-
-		if (flipped_back == wc)
-			result = charset_add_char(set, flipped_wc);
-		// fall through to return result
-	}
-
-	return result;
+	return result1;
 }
 /* charset_add_range --- add a range item */
 
