@@ -178,6 +178,8 @@ EXTRA_DIST = \
 	beginfile2.ok \
 	beginfile2.sh \
 	binmode1.ok \
+	case-check.awk \
+	case-check.ok \
 	callparam.awk \
 	callparam.ok \
 	charasbytes.awk \
@@ -577,6 +579,12 @@ EXTRA_DIST = \
 	gnuops3.ok \
 	gnureops.awk \
 	gnureops.ok \
+	greek-8bit.awk \
+	greek-8bit.ok \
+	greek-equiv.awk \
+	greek-equiv.ok \
+	greek-utf.awk \
+	greek-utf.ok \
 	gsubasgn.awk \
 	gsubasgn.ok \
 	gsubind.awk \
@@ -631,8 +639,6 @@ EXTRA_DIST = \
 	igncfs.ok \
 	ignrcas2.awk \
 	ignrcas2.ok \
-	ignrcas3.awk \
-	ignrcas3.ok \
 	ignrcas4.awk \
 	ignrcas4.ok \
 	ignrcase.awk \
@@ -1582,6 +1588,7 @@ CLEANFILES = core core.* fmtspcl.ok
 # try to keep these sorted. each letter starts a new line
 BASIC_TESTS = \
 	memleak4 \
+	case-check greek-equiv greek-utf \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1684,7 +1691,7 @@ GAWK_EXT_TESTS = \
 
 ARRAYDEBUG_TESTS = arrdbg
 
-EXTRA_TESTS = inftest regtest ignrcas3 
+EXTRA_TESTS = inftest regtest greek-8bit
 
 INET_TESTS = inetdayu inetdayt inetechu inetecht
 
@@ -1766,6 +1773,7 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
+	case-check greek-equiv greek-utf \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
 	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
 	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 \
@@ -1774,7 +1782,7 @@ NEED_LOCALE_EN = \
 
 # Unused at the moment, since nlstringtest has additional stuff it does
 # NEED_LOCALE_FR =
-# Same for ignrcas3
+# Same for greek-8bit
 # NEED_LOCALE_GR =
 
 NEED_LOCALE_JP = mbprintf2
@@ -1987,9 +1995,9 @@ charset-msg-start:
 	@echo "**************************************************************************"
 	@echo "* Some or all of these tests may fail if you have inadequate or missing  *"
 	@echo "* locale support. At least en_US.UTF-8, fr_FR.UTF-8, ru_RU.UTF-8 and     *"
-	@echo "* ja_JP.UTF-8 are needed. The el_GR.iso88597 is optional but helpful.    *"
-	@echo "* However, if you see this message, the Makefile thinks you have what    *"
-	@echo "* you need ...                                                           *"
+	@echo "* ja_JP.UTF-8 are needed. The el_GR.iso88597@euro locale is optional but *"
+	@echo "* helpful.  However, if you see this message, the Makefile thinks you    *"
+	@echo "* have  what you need ...                                                *"
 	@echo "**************************************************************************"
 
 charset-msg-end:
@@ -2690,10 +2698,10 @@ pty2:
 	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ;; \
 	esac
 
-ignrcas3::
+greek-8bit::
 	@echo $@
-	@-if locale -a | grep el_GR.iso88597 > /dev/null ; then \
-	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597 ; export GAWKLOCALE; \
+	@-if locale -a | grep el_GR.iso88597@euro > /dev/null ; then \
+	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro ; export GAWKLOCALE; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ ; \
 	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
 	fi

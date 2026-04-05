@@ -159,6 +159,7 @@ CLEANFILES = core core.* fmtspcl.ok
 # try to keep these sorted. each letter starts a new line
 BASIC_TESTS = \
 	memleak4 \
+	case-check greek-equiv greek-utf \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -260,7 +261,7 @@ GAWK_EXT_TESTS = \
 	watchpoint1
 
 ARRAYDEBUG_TESTS = arrdbg
-EXTRA_TESTS = inftest regtest ignrcas3 
+EXTRA_TESTS = inftest regtest greek-8bit
 INET_TESTS = inetdayu inetdayt inetechu inetecht
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 LOCALE_CHARSET_TESTS = \
@@ -346,6 +347,7 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
+	case-check greek-equiv greek-utf \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
 	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
 	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 \
@@ -355,7 +357,7 @@ NEED_LOCALE_EN = \
 
 # Unused at the moment, since nlstringtest has additional stuff it does
 # NEED_LOCALE_FR =
-# Same for ignrcas3
+# Same for greek-8bit
 # NEED_LOCALE_GR =
 NEED_LOCALE_JP = mbprintf2
 NEED_LOCALE_RU = mtchi18n
@@ -549,9 +551,9 @@ charset-msg-start:
 	@echo "**************************************************************************"
 	@echo "* Some or all of these tests may fail if you have inadequate or missing  *"
 	@echo "* locale support. At least ENU_USA, FRA_FRA, RUS_RUS and     *"
-	@echo "* JPN_JPN are needed. The ELL_GRC is optional but helpful.    *"
-	@echo "* However, if you see this message, the Makefile thinks you have what    *"
-	@echo "* you need ...                                                           *"
+	@echo "* JPN_JPN are needed. The ELL_GRC locale is optional but *"
+	@echo "* helpful.  However, if you see this message, the Makefile thinks you    *"
+	@echo "* have  what you need ...                                                *"
 	@-echo "**************************************************************************"
 
 charset-msg-end:
@@ -1261,7 +1263,7 @@ pty2:
 	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ;; \
 	esac
 
-ignrcas3::
+greek-8bit::
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-if locale -a | grep ELL_GRC > /dev/null ; then \
 	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC ; export GAWKLOCALE; $(CHCP) 1253; \
@@ -1353,6 +1355,24 @@ Gt-dummy:
 memleak4:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+case-check:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+greek-equiv:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+greek-utf:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 addcomma:
