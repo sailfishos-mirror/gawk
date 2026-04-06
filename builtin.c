@@ -1819,11 +1819,13 @@ do_sub(int nargs, unsigned int flags)
 	bool lastmatchnonzero;
 	char *mb_indices = NULL;
 	int searchflags = RE_NEED_START;
+	const char *fname = NULL;	// for fatal message, below
 
 	if ((flags & GENSUB) != 0) {
 		double d;
 		NODE *glob_flag;
 
+		fname = "gensub";
 		check_exact_args(nargs, "gensub", 4);
 
 		tmp = PEEK(3);
@@ -1855,11 +1857,9 @@ do_sub(int nargs, unsigned int flags)
 		DEREF(glob_flag);
 		searchflags |= RE_NEED_SUB;
 	} else {
-		if ((flags & GSUB) != 0) {
-			check_exact_args(nargs, "gsub", 3);
-		} else {
-			check_exact_args(nargs, "sub", 3);
-		}
+		fname = ((flags & GSUB) != 0) ? "gsub" : "sub";
+
+		check_exact_args(nargs, fname, 3);
 
 		/* take care of regexp early, in case re_update is fatal */
 
@@ -1974,6 +1974,21 @@ do_sub(int nargs, unsigned int flags)
 		 * string. note that length of replacement string can
 		 * vary since ampersand is actual text of regexp match.
 		 */
+
+		// 4/2026: This overflow check simply provides a fatal
+		// message instead of letting realloc() die later after
+		// a buffer overrun.  It simply makes the user experience better,
+		// but does not prevent gawk from dying miserably.  I suppose
+		// it's worth the trouble, but just barely.
+
+		/* uint64_t so the product is 64-bit even on 32-bit ILP32 builds */
+		uint64_t repl_contribution =
+			(uint64_t)(unsigned int)ampersands
+			* (uint64_t)(uintptr_t)(matchend - matchstart);
+		if (repl_contribution > (uint64_t)SIZE_MAX
+		    || repl_contribution > (uint64_t)SIZE_MAX - (size_t)(matchend - text)
+						- repllen - 1)
+			fatal(_("%s: replacement expansion too large"), fname);
 
 		/*
 		 * add 1 to len to handle "empty" case where
