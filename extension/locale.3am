@@ -1,33 +1,22 @@
-.TH LOCALE 3am "March 25 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH LOCALE 3am "April 06 2026" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
-getlocale(), setlocale() \- query or set the locale
+getlocale() \- query the locale
 .SH SYNOPSIS
 .nf
 .ft CW
 @load "locale"
 .sp
 result = getlocale(category)
-result = setlocale(category, new_locale)
 .fi
 .ft R
 .SH DESCRIPTION
 The
 .I locale
-extension adds two functions.
+extension adds one function.
 .TP
-.BI getlocale(\fIcategory\fP\^)
+.BI getlocale( category\^ )
 Return the current locale for the given
 .IR category .
-.TP
-.BI setlocale(\fIcategory\fP\^,\  \fInew_locale\fP)
-Set the locale for the given
-.I category
-to
-.IR new_locale .
-The old locale value is returned.
-Calling this function updates the
-.B MB_CUR_MAX
-predefined variable.
 .PP
 The following predefined variables hold the
 numeric values for the standard locale categories:
@@ -40,11 +29,11 @@ and
 .BR LC_TIME .
 .PP
 The following predefined variables hold the numeric
-values for categories that are GNU extensions.
-.BR LC_MESSAGES ,
+values for categories that are GNU extensions:
 .BR LC_ADDRESS ,
 .BR LC_IDENTIFICATION ,
 .BR LC_MEASUREMENT ,
+.BR LC_MESSAGES ,
 .BR LC_NAME ,
 .BR LC_PAPER ,
 and
@@ -57,23 +46,21 @@ The variable
 is also defined; it tells how many bytes are
 needed to hold the encoding of wide characters.
 .SH RETURN VALUE
-Both functions return a string value with the
-requested data.
-.\" .SH NOTES
-.SH BUGS
-Changing the locale is likely to have adverse
-effects on the rest of
+.B getlocale()
+returns a string value with the requested data.
+.SH NOTES
+Changing the locale is not offered in this extension as
+doing so would adversely effect the rest of
 .IR gawk 's
-operation; there is no way to notify it.
-Do so with caution!
+operation; there is no way to notify it that the locale has changed.
+Attempting to add such a mechanism would open up a large
+can of worms, so it's better to let sleeping dogs lie.
 .SH EXAMPLE
 .ft CW
 .nf
 @load "locale"
 \&...
 print getlocale(LC_CTYPE)
-\&...
-setlocale(LC_TYPE, "en_CA.UTF-8")  # move to Canada
 .fi
 .ft R
 .SH "SEE ALSO"

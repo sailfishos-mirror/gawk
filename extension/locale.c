@@ -1,5 +1,5 @@
 /*
- * locale.c - Provide setlocale function and variables for gawk.
+ * locale.c - Provide getlocale function and variables for gawk.
  *
  * February 2026.
  */
@@ -125,42 +125,6 @@ locale_init(void)
 	return awk_true;
 }
 
-/* do_setlocale --- set the locale and update MB_CUR_MAX */
-
-static awk_value_t *
-do_setlocale(int nargs, awk_value_t *result, struct awk_ext_func *unused)
-{
-	assert(result != NULL);
-
-	awk_value_t category, new_locale;
-	if (! get_argument(0, AWK_NUMBER, & category)) {
-		warning(ext_id, _("setlocale: could not get category argument"));
-		make_const_string("", 0, result);
-		goto out;
-	}
-	if (! get_argument(1, AWK_STRING, & new_locale)) {
-		warning(ext_id, _("setlocale: could not get locale argument"));
-		make_const_string("", 0, result);
-		goto out;
-	}
-
-	const char *old_locale;
-
-	// value can be "" or a locale name
-	old_locale = setlocale(category.num_value, new_locale.str_value.str);
-
-	awk_value_t mb_cur_max;
-	make_number(MB_CUR_MAX, & mb_cur_max);
-	if (! sym_update("MB_CUR_MAX", & mb_cur_max))
-		return awk_false;
-
-	make_const_string(old_locale, strlen(old_locale), result);
-
-out:
-	return result;
-}
-
-
 /* do_getlocale --- query the locale */
 
 static awk_value_t *
@@ -187,7 +151,6 @@ out:
 }
 
 static awk_ext_func_t func_table[] = {
-	{ "setlocale", do_setlocale, 2, 2, awk_false, NULL },
 	{ "getlocale", do_getlocale, 1, 1, awk_false, NULL },
 };
 

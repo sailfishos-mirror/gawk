@@ -1,4 +1,4 @@
-.TH CTYPE 3am "March 09 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH CTYPE 3am "April 06 2026" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
 isalpha, isdigit, etc. \- character type testing and conversion functions
 .SH SYNOPSIS
@@ -26,15 +26,19 @@ result = toupper_i(value)
 .SH DESCRIPTION
 The
 .I ctype
-extension adds twelve functions that perform the standard
-character type tests.  See
+extension adds 14 functions.
+The first 12 perform the standard
+character type tests (see
 .IR ctype (3)
-for more information.
+for more information).
 .PP
-These functions accept
-.I numeric
-values.  They test the result of the corresponding C
+If passed a numeric value,
+they test the result of the corresponding C
 function in the current locale on the given value.
+.PP
+If passed a string value, they apply the test to the first
+character in the string.
+.PP
 The functions use the corresponding
 .IR ctype (3)
 or
@@ -43,7 +47,7 @@ functions, depending upon if the current locale is
 eight-bit or multibyte; this is transparant to the
 AWK programmer.
 .PP
-In addition, two functions convert the case of the
+The final two functions convert the case of the
 character value passed as their argument. These functions
 accept and return numeric code point values, not strings.
 .SH RETURN VALUE
@@ -51,10 +55,6 @@ All the \f(CWisXXX()\fP functions return either one or zero for true or
 false, respectively.  \f(CWtolower_i()\fP and \f(CWtoupper_i()\fP return
 converted numeric character values.
 .\" .SH NOTES
-.SH BUGS
-These functions should also accept a string parameter
-and apply the test to the first character in the string.
-This may be fixed in a later version.
 .SH EXAMPLE
 .ft CW
 .nf
