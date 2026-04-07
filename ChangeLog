@@ -42,6 +42,20 @@
 	GNULIB localeinfo struct.  This will help for when we eventually
 	nuke regex and dfa.
 
+2026-03-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h: Note that <stdint.h> must be included.
+	(awk_string_t): Add wide char pointer and length.
+	(struct gawk_api): Add mb_cur_max member and functions
+	for converting m.b. string <--> wide string.
+	(mbstowcs, wcstombs): New macros.
+	* gawkapi.c (assign_string): Call force_wstr(). Copy in
+	wide string and length values to result.
+	(assign_number): Fix fatal error message.
+	(api_mbstowcs, api_wcstombs): New functions.
+	(api_impl): Add the functions and init mb_cur_max.
+	(init_ext_api): Init api_impl.mb_cur_max.
+
 2026-03-15         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawkapi.h: Futher API cleanup: comments fixed up, moved
