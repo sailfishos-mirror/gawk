@@ -960,6 +960,7 @@ particular records in a file and perform operations upon them.
 * Creating Arrays::                     How to create and populate arrays.
 * Redirection API::                     How to access and manipulate
                                         redirections.
+* Extension String Conversions::        Functions for converting strings.
 * Extension API Variables::             Variables provided by the API.
 * Extension Versioning::                API Version information.
 * Extension GMP/MPFR Versioning::       Version information about GMP and
@@ -967,7 +968,7 @@ particular records in a file and perform operations upon them.
 * Extension API Informational Variables:: Variables providing information about
                                         @command{gawk}'s invocation.
 * Extension API Boilerplate::           Boilerplate code for using the API.
-* Changes from API V1::                 Changes from V1 of the API.
+* API Changes Over Time::               How the API has evolved.
 * Finding Extensions::                  How @command{gawk} finds compiled
                                         extensions.
 * Extension Example::                   Example C code for an extension.
@@ -36433,9 +36434,10 @@ This (rather large) section describes the API in detail.
 * Array Manipulation::                   Functions for working with arrays.
 * Redirection API::                      How to access and manipulate
                                          redirections.
+* Extension String Conversions::         Functions for converting strings.
 * Extension API Variables::              Variables provided by the API.
 * Extension API Boilerplate::            Boilerplate code for using the API.
-* Changes from API V1::                  Changes from V1 of the API.
+* API Changes Over Time::                How the API has evolved.
 @end menu
 
 @node Extension API Functions Introduction
@@ -36513,6 +36515,9 @@ Flattening an array for easy C-style looping over all its indices and elements
 @item
 Accessing and manipulating redirections.
 
+@item
+Converting back and forth between multibyte strings and wide character strings.
+
 @end itemize
 
 Some points about using the API:
@@ -36532,6 +36537,7 @@ The list of macros and related header files is shown in @ref{table-api-std-heade
 @item Values for @code{errno} @tab @code{<errno.h>}
 @item @code{FILE} @tab @code{<stdio.h>}
 @item @code{NULL} @tab @code{<stddef.h>}
+@item @code{int32_t} @tab @code{<stdint.h>}
 @item @code{memcpy()} @tab @code{<string.h>}
 @item @code{memset()} @tab @code{<string.h>}
 @item @code{size_t} @tab @code{<sys/types.h>}
@@ -36556,11 +36562,10 @@ The @file{gawkapi.h} file may be included more than once without ill effect.
 Doing so, however, is poor coding practice.
 
 @item
-Although the API only uses ISO C 90 features, there is an exception; the
-``constructor'' functions use the @code{inline} keyword. If your compiler
-does not support this keyword, you should either place
-@samp{-Dinline=''} on your command line or use the GNU Autotools and include a
-@file{config.h} file in your extensions.
+Starting with release 6.0 of @command{gawk}, the API is allowed
+to use ISO C 99 features.  Concretely, this is seen in the use
+of the @code{int32_t} type, and in the use of the @code{inline}
+keyword for the ``constructor'' functions.
 
 @item
 All pointers filled in by @command{gawk} point to memory
@@ -36584,16 +36589,17 @@ The API defines several simple @code{struct}s that map values as seen
 from @command{awk}.  A value can be a @code{double}, a string, or an
 array (as in multidimensional arrays, or when creating a new array).
 
+@item
 String values maintain both pointer and length, because embedded @sc{nul}
 characters are allowed.
-
-@quotation NOTE
-By intent, @command{gawk} maintains strings using the current multibyte
-encoding (as defined by @env{LC_@var{xxx}} environment variables)
-and not using wide characters.  This matches how @command{gawk} stores
-strings internally and also how characters are likely to be input into
-and output from files.
-@end quotation
+The multibyte encoded version of the string (@code{char *}) is maintained
+using the current multibyte
+encoding (as defined by @env{LC_@var{xxx}} environment variables).
+As of release 6.0 of @command{gawk}, string values also include
+the wide character version of the original string. This value
+is also represented with a pointer (@code{int32_t *)} and a length.
+The API does @emph{not} use either the @code{wchar_t} type or the
+@code{char32_t} type, in order to avoid portability issues.
 
 @quotation NOTE
 String values passed to an extension by @command{gawk} are always
@@ -36670,6 +36676,8 @@ A simple Boolean type.
 @item typedef struct awk_string @{
 @itemx @ @ @ @ char *str;@ @ @ @ @ @ /* data */
 @itemx @ @ @ @ size_t len;@ @ @ @ @ /* length thereof, in chars */
+@itemx x@ @ @ @ int32_t *wstr;@ @ @ /* wide char data */
+@itemx x@ @ @ @ size_t wlen;@ @ @ @ /* length thereof, in int32_t */
 @itemx @} awk_string_t;
 This represents a mutable string. @command{gawk}
 owns the memory pointed to if it supplied
@@ -36678,8 +36686,12 @@ the value. Otherwise, it takes ownership of the memory pointed to.
 @code{gawk_malloc()}, @code{gawk_calloc()}, or
 @code{gawk_realloc()} functions!}
 
-As mentioned earlier, strings are maintained using the current
-multibyte encoding.
+A string value supplied by @command{gawk} will have both the multibyte
+encoded value and the wide character string value supplied.  (As mentioned
+earlier, strings are maintained using the current multibyte encoding.)
+If you create a string and pass it to @code{gawk}, you should do it
+in the @code{str} and @code{len} members, and set the @code{wstr} and
+@code{wlen} members to @code{NULL}.
 
 @item typedef enum @{
 @itemx @ @ @ @ AWK_UNDEFINED,
@@ -39044,6 +39056,77 @@ To check for success, you must check whether either matches.
 It is anticipated that this API function will be used to implement I/O
 multiplexing and a socket library.
 
+@node Extension String Conversions
+@subsection String Conversion Functions and Variables
+
+Two variables provide information related to the current locale:
+
+@table @code
+@item int gawk_mb_cur_max;
+The value of @code{MB_CUR_MAX}.  This acts as a cache, since,
+on GLIBC systems at least, the @code{MB_CUR_MAX} macro hides a
+function call. As this value doesn't change during any particular
+execution of @command{gawk}, it's much more efficient to retrieve
+it once, instead of many times. This is particularly true should the
+value need to be used inside a loop.
+
+@item const char *gawk_codeset;
+The name of the current codeset (for example, @code{"UTF-8"}).
+This too is a cached value, allowing extensions to avoid
+calling @code{nl_langinfo(CODESET)}.
+
+@end table
+
+Additionally, two function make it easy to convert between
+multibyte encoded strings and wide character strings. Both
+functions allocate data using @code{gawk_malloc()}. If the
+result is passed back to @command{gawk}, it takes ownership
+of the memory. Otherwise, the extension must free the memory.
+
+@table @code
+@item int32_t *mbstowcs(const char *str, size_t len, size_t *wlen);
+Convert a multibyte encoded string to a wide
+character string. Return a pointer to the string on success,
+or @code{NULL} on failure. Fill in @code{*wlen} with the length
+of the string upon success.  The parameters are:
+
+@c nested table
+@table @code
+@item const char *str
+The string to be converted.
+
+@item size_t len
+The length of the string, in bytes.
+
+@item size_t *wlen
+A pointer to variable of type @code{size_t} which receives the
+length of the new wide character string, in units of wide characters.
+@end table
+@c end nested table
+
+@item char *wcstombs(const int32_t *wstr, size_t wlen, size_t *len);
+Convert a wide character string to a multibyte encoded string. Return
+a pointer to the string on success, or @code{NULL} on failure. Fill in
+@code{*len} with the length of the string upon success.  The parameters
+are:
+
+@c nested table
+@table @code
+@item const int32_t *wstr
+The string to be converted.
+
+@item size_t wlen
+The length of the string, in wide characters.
+
+@item size_t *len
+A pointer to variable of type @code{size_t} which receives the
+length of the new multibyte encoded character string, in units of bytes.
+@end table
+@c end nested table
+@end table
+
+The @code{ordchr} sample extension makes use of these facilities.
+
 @node Extension API Variables
 @subsection API Variables
 
@@ -39322,22 +39405,20 @@ If @code{ext_version} is not @code{NULL}, register
 the version string with @command{gawk}.
 @end enumerate
 
+@node API Changes Over Time
+@subsection How The API Has Evolved
 
-@node Changes from API V1
-@subsection Changes From Version 1 of the API
-
-The current API is @emph{not} binary compatible with version 1 of the API.
-You will have to recompile your extensions in order to use them with
-the current version of @command{gawk}.
+The API has evolved over time since its first release in
+@command{gawk} version 4.0. This section looks at
+the changes.
 
 Fortunately, at the possible expense of some compile-time warnings, the API remains
-source-code--compatible with the previous API. The major differences are
+source-code--compatible with earlier versions of the API. The major differences are
 the additional members in the @code{awk_ext_func_t} structure, and the
 addition of the third argument to the C implementation function
 (@pxref{Extension Functions}).
 
-Here is a list of individual features that changed from version 1 to
-version 2 of the API:
+Here is a list of individual features that have changed over time:
 
 @itemize @bullet
 
@@ -39346,34 +39427,38 @@ Numeric values can now have MPFR/MPZ variants
 (@pxref{General Data Types}).
 
 @item
-There are new string types: @code{AWK_REGEX} and @code{AWK_STRNUM}
+There are additional string types: @code{AWK_REGEX} and @code{AWK_STRNUM}
 (@pxref{General Data Types}).
 
 @item
-The @code{ezalloc()} macro is new
+The @code{ezalloc()} macro is added
 (@pxref{Memory Allocation Functions}).
 
 @item
 The @code{awk_ext_func_t} structure changed. Instead of
-@code{num_expected_args}, it now has @code{max_expected} and
+@code{num_expected_args}, it has @code{max_expected} and
 @code{min_required}
 (@pxref{Extension Functions}).
 
 @item
-For @code{get_record()}, an input parser can now specify field widths
+For @code{get_record()}, an input parser can specify field widths
 (@pxref{Input Parsers}).
 
 @item
-Extensions can now produce nonfatal error messages
+Extensions can produce nonfatal error messages
 (@pxref{Printing Messages}).
 
 @item
-When flattening an array, you can now specify the index and value types
+When flattening an array, you can specify the index and value types
 (@pxref{Array Functions}).
 
 @item
-The @code{get_file()} API is new
+The @code{get_file()} API is added
 (@pxref{Redirection API}).
+
+@item
+The @code{gawk_mb_cur_max} and @code{gawk_codeset} variables are added,
+along with the @code{mbstowcs()} and @code{wcstombs()} functions.
 @end itemize
 
 @node Finding Extensions
@@ -42674,6 +42759,20 @@ Windows terminal (@pxref{PC Using}).
 @item
 Support was added for OpenVMS 9 on x86_64 hardware, and
 support for OpenVMS 8 on Alpha and Itanium was updated.
+@end itemize
+
+Version 6.0 added the following features:
+
+@itemize
+@item
+The extension API was cleaned up some, removing obsolete
+functions and making changes allowing for easier expansion
+in the case of the @code{do_@var{XXX}} variables.
+New variables and functions were added for dealing with
+character sets and converting between multibyte encoded
+strings and wide character strings
+(@pxref{Dynamic Extensions}).
+
 @end itemize
 
 @c XXX ADD MORE STUFF HERE
