@@ -879,6 +879,7 @@ typedef struct gawk_api {
 #define do_csv		((api->do_flags & GAWK_DO_CSV) != 0)
 
 #define gawk_mb_cur_max	(api->mb_cur_max)
+#define gawk_codeset	(api->codeset)
 
 #define get_argument(count, wanted, result) \
 	(api->api_get_argument(ext_id, count, wanted, result))
