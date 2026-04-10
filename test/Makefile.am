@@ -1372,6 +1372,9 @@ EXTRA_DIST = \
 	split_after_fpat.awk \
 	split_after_fpat.in \
 	split_after_fpat.ok \
+	splitany.awk \
+	splitany.in \
+	splitany.ok \
 	splitarg4.awk \
 	splitarg4.in \
 	splitarg4.ok \
@@ -1589,6 +1592,7 @@ CLEANFILES = core core.* fmtspcl.ok
 BASIC_TESTS = \
 	memleak4 \
 	case-check greek-equiv greek-utf \
+	splitany \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
