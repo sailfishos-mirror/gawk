@@ -739,7 +739,7 @@ mod:
 			break;
 
 		case Op_unary_minus:
-			t1 = TOP_NUMBER();
+			t1 = force_number(TOP());
 			r = make_number(-t1->numbr);
 			DEREF(t1);
 			REPLACE(r);
@@ -747,7 +747,7 @@ mod:
 
 		case Op_unary_plus:
 			// Force argument to be numeric
-			t1 = TOP_NUMBER();
+			t1 = force_number(TOP());
 			r = make_number(t1->numbr);
 			DEREF(t1);
 			REPLACE(r);
