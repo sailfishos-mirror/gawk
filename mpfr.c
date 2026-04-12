@@ -1845,7 +1845,7 @@ mod:
 		break;
 
 	case Op_unary_minus:
-		t1 = TOP_NUMBER();
+		t1 = force_number(TOP());
 		if (is_mpg_float(t1)) {
 			r = mpg_float();
 			tval = mpfr_neg(r->mpg_numbr, t1->mpg_numbr, ROUND_MODE);
@@ -1868,7 +1868,7 @@ mod:
 		break;
 
 	case Op_unary_plus:
-		t1 = TOP_NUMBER();
+		t1 = force_number(TOP());
 		if (is_mpg_float(t1)) {
 			r = mpg_float();
 			tval = mpfr_set(r->mpg_numbr, t1->mpg_numbr, ROUND_MODE);

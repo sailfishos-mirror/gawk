@@ -1194,6 +1194,20 @@ do_split(int nargs)
 		fs = force_string(FS_node->var_value);
 		rp = FS_regexp;
 	} else {
+		/*
+		 * 4/2026: Things start to get a little hairy here.
+		 *
+		 * When the third argument is a regex constant, then splitting needs to
+		 * happen via the regex matcher.  That introduces some issues, discussed
+		 * further below.
+		 *
+		 * When the third argument is a string, then the same rules as for FS apply:
+		 * 	* A single space		-->	Default fields splitting
+		 * 	* Any other single character	-->	That character splits
+		 * 	* Longer than one character	-->	Regex splitting
+		 *
+		 * Both // and "" split on each character.
+		 */
 		fs = sep->re_exp;
 
 		if (fs->stlen == 0) {
@@ -1205,20 +1219,34 @@ do_split(int nargs)
 				warned = true;
 				lintwarn(_("split: null string for third arg is a non-standard extension"));
 			}
-		} else if (fs->stlen == 1) {
-			if ((sep->re_flags & CONSTANT) == 0 && fs->stptr[0] == ' ') {
-				parseit = def_parse_field;
-			} else
-				parseit = sc_parse_field;
-		} else {
+		} else if ((sep->re_flags & CONSTANT) != 0 || fs->stlen > 1) {
+			// regex constant OR length > 1
 			parseit = re_parse_field;
 			rp = re_update(sep);
+		} else if (fs->stlen == 1) {
+			if ((sep->re_flags & CONSTANT) == 0 && fs->stptr[0] == ' ') {
+				// " " ---> default parsing
+				parseit = def_parse_field;
+			} else
+				parseit = sc_parse_field;	// single char parsing
 		}
 	}
 
+	/*
+	 * 4/2026: Hairiness continued:
+	 *
+	 * The final argument to (*parsit)() is "in_middle", indicating that
+	 * we're starting from the middle of the string.  Typically, that should
+	 * be false.  However, in the case of single character regexps (such as /^/),
+	 * it needs to be true, so that we don't lop off the first character of
+	 * the input data. (See the splitwht2 and splitany tests.)
+	 * 
+	 * The check for do_csv prevents dereferencing fs which is NULL if do_csv.
+	 */
 	s = src->stptr;
 	tmp = make_number((AWKNUM) (*parseit)(UNLIMITED, &s, (int) src->stlen,
-					     fs, rp, set_element, arr, sep_arr, false));
+					     fs, rp, set_element, arr, sep_arr,
+					     ! do_csv && fs->stlen == 1));
 
 	src = POP_SCALAR();	/* really pop off stack */
 	DEREF(src);
