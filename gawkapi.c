@@ -465,6 +465,7 @@ free_api_string_copies()
 static inline void
 assign_string(NODE *node, awk_value_t *val, awk_valtype_t val_type)
 {
+	force_wstring(node);
 	val->val_type = val_type;
 	if (node->stptr[node->stlen] != '\0') {
 		/*
@@ -490,6 +491,8 @@ assign_string(NODE *node, awk_value_t *val, awk_valtype_t val_type)
 	else
 		val->str_value.str = node->stptr;
 	val->str_value.len = node->stlen;
+	val->str_value.wstr = (int32_t *) node->wstptr;
+	val->str_value.wlen = node->wstlen;
 }
 
 /* assign_number -- return a number node */
@@ -522,7 +525,7 @@ assign_number(NODE *node, awk_value_t *val)
 		val->num_ptr = &node->mpg_i;
 		break;
 	default:
-		fatal(_("node_to_awk_value: detected invalid numeric flags combination `%s'; please file a bug report"), flags2str(node->flags));
+		fatal(_("assign_number: detected invalid numeric flags combination `%s'; please file a bug report"), flags2str(node->flags));
 		break;
 	}
 #endif
@@ -1358,39 +1361,6 @@ api_release_value(awk_ext_id_t id, awk_value_cookie_t value)
 	return awk_true;
 }
 
-/* api_get_mpfr --- allocate an mpfr_ptr */
-
-static void *
-api_get_mpfr(awk_ext_id_t id)
-{
-#ifdef HAVE_MPFR
-	mpfr_ptr p;
-	emalloc(p, mpfr_ptr, sizeof(mpfr_t));
-	mpfr_init(p);
-	return p;
-#else
-	fatal(_("api_get_mpfr: MPFR not supported"));
-	return NULL;	// silence compiler warning
-#endif
-}
-
-/* api_get_mpz --- allocate an mpz_ptr */
-
-static void *
-api_get_mpz(awk_ext_id_t id)
-{
-#ifdef HAVE_MPFR
-	mpz_ptr p;
-	emalloc(p, mpz_ptr, sizeof (mpz_t));
-
-	mpz_init(p);
-	return p;
-#else
-	fatal(_("api_get_mpfr: MPFR not supported"));
-	return NULL;	// silence compiler warning
-#endif
-}
-
 /* api_get_file --- return a handle to an existing or newly opened file */
 
 static awk_bool_t
@@ -1513,6 +1483,58 @@ api_register_ext_version(awk_ext_id_t id, const char *version)
 	vi_head = info;
 }
 
+/* api_mbstowcs --- convert multibyte string to wide character string */
+
+static int32_t *
+api_mbstowcs(const char *str, size_t len, size_t *wlen)
+{
+	if (str == NULL || wlen == NULL)
+		fatal(_("api_mbstowcs: received at least one NULL pointer"));
+
+	NODE *n;
+	getnode(n);
+	memset(n, 0, sizeof(NODE));
+
+	n->stptr = (char *) str;
+	n->stlen = len;
+	n->flags = (STRING|STRCUR);
+	n->type = Node_val;
+	n->valref = 1;
+
+	str2wstr(n, NULL);
+	int32_t *ret = (int32_t *) n->wstptr;
+	*wlen = n->wstlen;
+	freenode(n);
+
+	return ret;
+}
+
+/* api_wcstombs --- convert wide character string to multibyte string */
+
+static char *
+api_wcstombs(const int32_t *wstr, size_t wlen, size_t *len)
+{
+	if (wstr == NULL || len == NULL)
+		fatal(_("api_wcstombs: received at least one NULL pointer"));
+
+	NODE *n;
+	getnode(n);
+	memset(n, 0, sizeof(NODE));
+
+	n->wstptr = (char32_t *) wstr;
+	n->wstlen = wlen;
+	n->flags = (STRING|STRCUR|WSTRCUR);
+	n->type = Node_val;
+	n->valref = 1;
+
+	wstr2str(n);
+	char *ret =  n->stptr;
+	*len = n->stlen;
+	freenode(n);
+
+	return ret;
+}
+
 /* the struct api */
 gawk_api_t api_impl = {
 	/* data */
@@ -1528,7 +1550,11 @@ gawk_api_t api_impl = {
 	0, 0, 0, 0,
 #endif
 
-	{ 0 },			/* do_flags */
+	0,		/* do_flags */
+
+	0,		/* mb_cur_max */
+
+	NULL,		/* codeset */
 
 	/* registration functions */
 	api_add_ext_func,
@@ -1571,6 +1597,7 @@ gawk_api_t api_impl = {
 	api_set_array_element,
 	api_del_array_element,
 	api_create_array,
+	api_destroy_array,
 	api_clear_array,
 	api_flatten_array_typed,
 	api_release_flattened_array,
@@ -1580,14 +1607,13 @@ gawk_api_t api_impl = {
 	calloc,
 	realloc,
 	free,
-	api_get_mpfr,
-	api_get_mpz,
 
 	/* Find/open a file */
 	api_get_file,
 
-	/* Additional array hook to destroy an array */
-	api_destroy_array,
+	/* string functions */
+	api_mbstowcs,
+	api_wcstombs,
 };
 
 /* init_ext_api --- init the extension API */
@@ -1595,14 +1621,21 @@ gawk_api_t api_impl = {
 void
 init_ext_api()
 {
-	/* force values to 1 / 0 */
-	api_impl.do_flags[gawk_do_lint] = (do_lint ? 1 : 0);
-	api_impl.do_flags[gawk_do_traditional] = (do_traditional ? 1 : 0);
-	api_impl.do_flags[gawk_do_profile] = (do_profile ? 1 : 0);
-	api_impl.do_flags[gawk_do_sandbox] = (do_sandbox ? 1 : 0);
-	api_impl.do_flags[gawk_do_debug] = (do_debug ? 1 : 0);
-	api_impl.do_flags[gawk_do_mpfr] = (do_mpfr ? 1 : 0);
-	api_impl.do_flags[gawk_do_csv] = (do_csv ? 1 : 0);
+	const char *codeset = nl_langinfo(CODESET);
+	if (codeset == NULL)
+		codeset = "unknown";
+
+	api_impl.codeset = codeset;
+	api_impl.mb_cur_max = gawk_mb_cur_max;
+
+	api_impl.do_flags = 0;
+	api_impl.do_flags |= do_lint ? GAWK_DO_LINT : 0;
+	api_impl.do_flags |= do_traditional ? GAWK_DO_TRADITIONAL : 0;
+	api_impl.do_flags |= do_profile ? GAWK_DO_PROFILE : 0;
+	api_impl.do_flags |= do_sandbox ? GAWK_DO_SANDBOX : 0;
+	api_impl.do_flags |= do_debug ? GAWK_DO_DEBUG : 0;
+	api_impl.do_flags |= do_mpfr ? GAWK_DO_MPFR : 0;
+	api_impl.do_flags |= do_csv ? GAWK_DO_CSV : 0;
 }
 
 /* update_ext_api --- update the variables in the API that can change */
@@ -1610,7 +1643,10 @@ init_ext_api()
 void
 update_ext_api()
 {
-	api_impl.do_flags[0] = (do_lint ? 1 : 0);
+	if (do_lint)
+		api_impl.do_flags |= GAWK_DO_LINT;
+	else
+		api_impl.do_flags &= ~GAWK_DO_LINT;
 }
 
 /* print_ext_versions --- print the list */

@@ -13,6 +13,10 @@
 	correctly. Thanks to Ben Hoyt <benhoyt@gmail.com> for the
 	report and test case. New test case is splitany.
 
+2026-04-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h (gawk_codeset): New macro.
+
 2026-04-06         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* builtin.c (do_sub): Check for overflow in calculation of size
@@ -47,9 +51,55 @@
 	of UPREF on the pointer.  Thanks to Marc Schönefeld
 	<marc.schoenefeld@gmx.org> for the report and test case.
 
+2026-03-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h: Add macro for gawk_mb_cur_max.
+	Add codeset member to the API struct.
+	* gawkapi.c (init_ext_api): Initialize it.
+	* awk.h: Include <langinfo.h>.
+	* re.c (using_utf8): Use nl_langinfo() which is POSIX instead of
+	GNULIB localeinfo struct.  This will help for when we eventually
+	nuke regex and dfa.
+
+2026-03-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h: Note that <stdint.h> must be included.
+	(awk_string_t): Add wide char pointer and length.
+	(struct gawk_api): Add mb_cur_max member and functions
+	for converting m.b. string <--> wide string.
+	(mbstowcs, wcstombs): New macros.
+	* gawkapi.c (assign_string): Call force_wstr(). Copy in
+	wide string and length values to result.
+	(assign_number): Fix fatal error message.
+	(api_mbstowcs, api_wcstombs): New functions.
+	(api_impl): Add the functions and init mb_cur_max.
+	(init_ext_api): Init api_impl.mb_cur_max.
+
+2026-03-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkapi.h: Futher API cleanup: comments fixed up, moved
+	api_destroy_array up with the rest of the array functions.
+	* gawkapi.c (api_impl): Moved api_destroy_array up with the
+	rest of the array functions.
+
 2026-03-13         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* NEWS: Updated.
+
+2026-03-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Start updating the API.
+
+	* gawkapi.h (gawk_api_major_version, gawk_api_minor_version): Set to
+	5.0.
+	(do_flags): Now an int with bit flags. Various macros revised for
+	this.
+	(api_get_mpfr, api_get_mpz): Removed obsolete function pointers.
+	(get_mpfr_ptr, get_mpz_ptr): Removed obsolete macros.
+	* gawkapi.c (api_get_mpfr, api_get_mpz): Removed obsolete functions.
+	(api_impl): Remove braces around do_flag initializer, removed function
+	pointers for obsolete functions.
+	(init_ext_api, update_ext_api): Appropriate changes for do_flags.
 
 2026-03-12         Arnold D. Robbins     <arnold@skeeve.com>
 

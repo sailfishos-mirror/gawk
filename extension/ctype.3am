@@ -1,0 +1,101 @@
+.TH CTYPE 3am "April 06 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.SH NAME
+isalpha, isdigit, etc. \- character type testing and conversion functions
+.SH SYNOPSIS
+.nf
+.ft CW
+@load "ctype"
+.sp
+result = isalnum(value)
+result = isalpha(value)
+result = isblank(value)
+result = iscntrl(value)
+result = isdigit(value)
+result = isgraph(value)
+result = islower(value)
+result = ispunct(value)
+result = isprint(value)
+result = isspace(value)
+result = isupper(value)
+result = isxdigit(value)
+.sp
+result = tolower_i(value)
+result = toupper_i(value)
+.fi
+.ft R
+.SH DESCRIPTION
+The
+.I ctype
+extension adds 14 functions.
+The first 12 perform the standard
+character type tests (see
+.IR ctype (3)
+for more information).
+.PP
+If passed a numeric value,
+they test the result of the corresponding C
+function in the current locale on the given value.
+.PP
+If passed a string value, they apply the test to the first
+character in the string.
+.PP
+The functions use the corresponding
+.IR ctype (3)
+or
+.IR wctype (3)
+functions, depending upon if the current locale is
+eight-bit or multibyte; this is transparant to the
+AWK programmer.
+.PP
+The final two functions convert the case of the
+character value passed as their argument. These functions
+accept and return numeric code point values, not strings.
+.SH RETURN VALUE
+All the \f(CWisXXX()\fP functions return either one or zero for true or
+false, respectively.  \f(CWtolower_i()\fP and \f(CWtoupper_i()\fP return
+converted numeric character values.
+.\" .SH NOTES
+.SH EXAMPLE
+.ft CW
+.nf
+@load "ctype"
+\&...
+print "65 is alphabetic:", isalpha(65) ? "true" : "false"
+.fi
+.ft R
+.SH "SEE ALSO"
+.IR "GAWK: Effective AWK Programming" ,
+and the man pages for the other extensions shipped with
+.IR gawk .
+.PP
+.IR ctype (3),
+.IR tolower (3),
+.IR toupper (3),
+.IR wctype (3).
+.SH AUTHOR
+Arnold Robbins,
+.BR arnold@skeeve.com .
+.SH COPYING PERMISSIONS
+Copyright \(co 2026,
+Free Software Foundation, Inc.
+.PP
+Permission is granted to make and distribute verbatim copies of
+this manual page provided the copyright notice and this permission
+notice are preserved on all copies.
+.ig
+Permission is granted to process this file through troff and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual page).
+..
+.PP
+Permission is granted to copy and distribute modified versions of this
+manual page under the conditions for verbatim copying, provided that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+.PP
+Permission is granted to copy and distribute translations of this
+manual page into another language, under the above conditions for
+modified versions, except that this permission notice may be stated in
+a translation approved by the Foundation.
+.\" vim: set filetype=nroff :

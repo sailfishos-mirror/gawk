@@ -3,7 +3,7 @@
  */
 
 /*
- * copyright (c) 2012-2019, 2021-2024, 2026
+ * Copyright (c) 2012-2019, 2021-2024, 2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -30,6 +30,7 @@
  *
  * FILE			- <stdio.h>
  * NULL			- <stddef.h>
+ * int32_t		- <stdint.h>
  * memset(), memcpy()	- <string.h>
  * size_t		- <sys/types.h>
  * struct stat		- <sys/stat.h>
@@ -303,8 +304,8 @@ typedef struct awk_two_way_processor {
 	awk_const struct awk_two_way_processor *awk_const next;  /* for use by gawk */
 } awk_two_way_processor_t;
 
-#define gawk_api_major_version 4
-#define gawk_api_minor_version 1
+#define gawk_api_major_version 5
+#define gawk_api_minor_version 0
 
 /* Current version of the API. */
 enum {
@@ -328,6 +329,8 @@ enum {
 typedef struct awk_string {
 	char *str;	/* data */
 	size_t len;	/* length thereof, in chars */
+	int32_t *wstr;	/* wide char data */
+	size_t wlen;	/* length thereof, in int32_t */
 } awk_string_t;
 
 enum AWK_NUMBER_TYPE {
@@ -466,7 +469,7 @@ typedef struct awk_ext_func {
 					struct awk_ext_func *finfo);
 	const size_t max_expected_args;
 	const size_t min_required_args;
-	awk_bool_t suppress_lint;
+	awk_bool_t suppress_lint;	/* true => don't warn if more args than expected */
 	void *data;		/* opaque pointer to any extra state */
 } awk_ext_func_t;
 
@@ -497,22 +500,23 @@ typedef struct gawk_api {
 	 * Currently only do_lint is prone to change, but we reserve
 	 * the right to allow the others to do so also.
 	 *
-	 * N.B. If we ever again need to add an additional do_flags value,
-	 * it would be wise to convert this from an array to a bitmask. If
-	 * we add a new do_flags value and bump DO_FLAGS_SIZE, then it requires
-	 * us to increment the ABI version. If we use a bitmask instead, then
-	 * we will be free to add new flags without breaking ABI compatibility.
+	 * By using a bitmap here, we can add more possibilities without
+	 * affecting binary compatibility.
 	 */
-#define DO_FLAGS_SIZE	7
-	awk_const int do_flags[DO_FLAGS_SIZE];
-/* Use these as indices into do_flags[] array to check the values */
-#define gawk_do_lint		0
-#define gawk_do_traditional	1
-#define gawk_do_profile		2
-#define gawk_do_sandbox		3
-#define gawk_do_debug		4
-#define gawk_do_mpfr		5
-#define gawk_do_csv		6
+	awk_const int do_flags;
+#define GAWK_DO_LINT		0x0001
+#define GAWK_DO_TRADITIONAL	0x0002
+#define GAWK_DO_PROFILE		0x0004
+#define GAWK_DO_SANDBOX		0x0008
+#define GAWK_DO_DEBUG		0x0010
+#define GAWK_DO_MPFR		0x0020
+#define GAWK_DO_CSV		0x0040
+
+	/* Cached value of MB_CUR_MAX */
+	int mb_cur_max;
+
+	/* Current codeset */
+	const char *codeset;
 
 	/* Next, registration functions: */
 
@@ -645,7 +649,7 @@ typedef struct gawk_api {
 	 * the real type, as described above.
 	 *
 	 * 	awk_value_t val;
-	 * 	if (! api->sym_lookup(id, name, wanted, & val))
+	 * 	if (! api->sym_lookup(id, ns, name, wanted, & val))
 	 * 		error_code_here();
 	 *	else {
 	 *		// safe to use val
@@ -680,7 +684,7 @@ typedef struct gawk_api {
 	 *
 	 * Return will be false if the value cannot be retrieved.
 	 *
-	 * Flow is thus
+	 * Flow is thus:
 	 *	awk_value_t val;
 	 * 	awk_scalar_t cookie;
 	 * 	api->sym_lookup(id, "variable", AWK_SCALAR, & val);	// get the cookie
@@ -695,7 +699,7 @@ typedef struct gawk_api {
 
 	/*
 	 * Update the value associated with a scalar cookie.
-	 * Flow is
+	 * Flow is:
 	 * 	sym_lookup with wanted == AWK_SCALAR
 	 * 	if returns false
 	 * 		sym_update with real initial value to install it
@@ -704,7 +708,7 @@ typedef struct gawk_api {
 	 *		use the scalar cookie
 	 *
 	 * Return will be false if the new value is not one of
-	 * AWK_STRING, AWK_NUMBER, AWK_REGEX.
+	 * AWK_STRING, AWK_NUMBER, or AWK_REGEX.
 	 *
 	 * Here too, the built-in variables may not be updated.
 	 */
@@ -771,6 +775,9 @@ typedef struct gawk_api {
 	/* Create a new array cookie to which elements may be added. */
 	awk_array_t (*api_create_array)(awk_ext_id_t id);
 
+	/* Destroy an array. */
+	awk_bool_t (*api_destroy_array)(awk_ext_id_t id, awk_array_t a_cookie);
+
 	/* Clear out an array. */
 	awk_bool_t (*api_clear_array)(awk_ext_id_t id, awk_array_t a_cookie);
 
@@ -799,20 +806,6 @@ typedef struct gawk_api {
 	void *(*api_calloc)(size_t nmemb, size_t size);
 	void *(*api_realloc)(void *ptr, size_t size);
 	void (*api_free)(void *ptr);
-
-	/*
-	 * Obsolete function, should not be used. It remains only
-	 * for binary compatibility.  Any value it returns should be
-	 * freed via api_free.
-	 */
-	void *(*api_get_mpfr)(awk_ext_id_t id);
-
-	/*
-	 * Obsolete function, should not be used. It remains only
-	 * for binary compatibility.  Any value it returns should be
-	 * freed via api_free.
-	 */
-	void *(*api_get_mpz)(awk_ext_id_t id);
 
         /*
 	 * Look up a file.  If the name is NULL or name_len is 0, it returns
@@ -860,8 +853,15 @@ typedef struct gawk_api {
 			const awk_input_buf_t **ibufp,
 			const awk_output_buf_t **obufp);
 
-	/* Destroy an array. */
-	awk_bool_t (*api_destroy_array)(awk_ext_id_t id, awk_array_t a_cookie);
+	/*
+	 * Functions for converting between multibyte encoded
+	 * strings and wide character strings. int32_t is used
+	 * for wide characters, since there are portability issues
+	 * trying to use wchar_t or char32_t and we wish to avoid
+	 * autoconf machinery in this file.
+	 */
+	int32_t *(*api_mbstowcs)(const char *str, size_t len, size_t *wlen);
+	char *(*api_wcstombs)(const int32_t *wstr, size_t wlen, size_t *len);
 } gawk_api_t;
 
 #ifndef GAWK	/* these are not for the gawk code itself! */
@@ -870,13 +870,16 @@ typedef struct gawk_api {
  * and ext_id to make the code a little easier to read.
  * See the sample boilerplate code, below.
  */
-#define do_lint		(api->do_flags[gawk_do_lint])
-#define do_traditional	(api->do_flags[gawk_do_traditional])
-#define do_profile	(api->do_flags[gawk_do_profile])
-#define do_sandbox	(api->do_flags[gawk_do_sandbox])
-#define do_debug	(api->do_flags[gawk_do_debug])
-#define do_mpfr		(api->do_flags[gawk_do_mpfr])
-#define do_csv		(api->do_flags[gawk_do_csv])
+#define do_lint		((api->do_flags & GAWK_DO_LINT) != 0)
+#define do_traditional	((api->do_flags & GAWK_DO_TRADITIONAL) != 0)
+#define do_profile	((api->do_flags & GAWK_DO_PROFILE) != 0)
+#define do_sandbox	((api->do_flags & GAWK_DO_SANDBOX) != 0)
+#define do_debug	((api->do_flags & GAWK_DO_DEBUG) != 0)
+#define do_mpfr		((api->do_flags & GAWK_DO_MPFR) != 0)
+#define do_csv		((api->do_flags & GAWK_DO_CSV) != 0)
+
+#define gawk_mb_cur_max	(api->mb_cur_max)
+#define gawk_codeset	(api->codeset)
 
 #define get_argument(count, wanted, result) \
 	(api->api_get_argument(ext_id, count, wanted, result))
@@ -960,10 +963,6 @@ typedef struct gawk_api {
 #define get_file(name, namelen, filetype, fd, ibuf, obuf) \
 	(api->api_get_file(ext_id, name, namelen, filetype, fd, ibuf, obuf))
 
-/* These two are obsolete and should not be used. */
-#define get_mpfr_ptr() (api->api_get_mpfr(ext_id))
-#define get_mpz_ptr() (api->api_get_mpz(ext_id))
-
 #define register_ext_version(version) \
 	(api->api_register_ext_version(ext_id, version))
 
@@ -984,6 +983,9 @@ typedef struct gawk_api {
 		if ((pointer = (type) gawk_realloc(pointer, size)) == 0) \
 			fatal(ext_id, "%s: realloc of %d bytes failed", message, size); \
 	} while(0)
+
+#define mbstowcs(str, len, wlen) (api->api_mbstowcs(str, len, wlen))
+#define wcstombs(wstr, wlen, len) (api->api_wcstombs(wstr, wlen, len))
 
 /* Constructor functions */
 
@@ -1116,7 +1118,7 @@ make_bool(awk_bool_t boolval, awk_value_t *result)
  * variable named 'api' and save id in a global variable named 'ext_id'.
  * In addition, a global function pointer named 'init_func' should be
  * defined and set to either NULL or an initialization function that
- * returns non-zero on success and zero upon failure.
+ * returns non-zero on success or zero upon failure.
  */
 
 extern int dl_load(const gawk_api_t *const api_p, awk_ext_id_t id);
@@ -1130,7 +1132,7 @@ static awk_ext_id_t ext_id;
 static const char *ext_version = NULL; /* or ... = "some string" */
 
 static awk_ext_func_t func_table[] = {
-	{ "name", do_name, 1 },
+	{ "name", do_name, 2, 1, awk_false, NULL },
 	/* ... */
 };
 

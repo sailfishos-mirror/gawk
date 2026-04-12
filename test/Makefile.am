@@ -1772,6 +1772,7 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
+	ordchr \
 	case-check greek-equiv greek-utf \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
 	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
