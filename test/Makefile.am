@@ -180,6 +180,7 @@ EXTRA_DIST = \
 	binmode1.ok \
 	case-check.awk \
 	case-check.ok \
+	case-check.ok2 \
 	callparam.awk \
 	callparam.ok \
 	charasbytes.awk \
@@ -2792,6 +2793,14 @@ indirectbuiltin2:
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+case-check:
+	@echo $@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP) -s "$(srcdir)"/$@.ok2 _$@ || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
 
 # Targets generated for other tests:
 include Maketests
