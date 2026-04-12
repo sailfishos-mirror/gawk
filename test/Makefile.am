@@ -180,6 +180,7 @@ EXTRA_DIST = \
 	binmode1.ok \
 	case-check.awk \
 	case-check.ok \
+	case-check.ok2 \
 	callparam.awk \
 	callparam.ok \
 	charasbytes.awk \
@@ -1369,6 +1370,9 @@ EXTRA_DIST = \
 	split_after_fpat.awk \
 	split_after_fpat.in \
 	split_after_fpat.ok \
+	splitany.awk \
+	splitany.in \
+	splitany.ok \
 	splitarg4.awk \
 	splitarg4.in \
 	splitarg4.ok \
@@ -1547,6 +1551,8 @@ EXTRA_DIST = \
 	uparrfs.ok \
 	uplus.awk \
 	uplus.ok \
+	uplus2.awk \
+	uplus2.ok \
 	valgrind.awk \
 	watchpoint1.awk \
 	watchpoint1.in \
@@ -1586,6 +1592,8 @@ CLEANFILES = core core.* fmtspcl.ok
 BASIC_TESTS = \
 	memleak4 \
 	case-check greek-equiv greek-utf \
+	splitany \
+	uplus2 \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -2776,6 +2784,14 @@ indirectbuiltin2:
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+case-check:
+	@echo $@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP) -s "$(srcdir)"/$@.ok2 _$@ || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
 
 # Targets generated for other tests:
 include Maketests
