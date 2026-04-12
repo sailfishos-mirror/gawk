@@ -160,6 +160,8 @@ CLEANFILES = core core.* fmtspcl.ok
 BASIC_TESTS = \
 	memleak4 \
 	case-check greek-equiv greek-utf \
+	splitany \
+	uplus2 \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1350,17 +1352,19 @@ indirectbuiltin2:
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-Gt-dummy:
-# file Maketests, generated from Makefile.am by the Gentests program
-memleak4:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 case-check:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP) -s "$(srcdir)"/$@.ok2 _$@ || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
+Gt-dummy:
+# file Maketests, generated from Makefile.am by the Gentests program
+memleak4:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 greek-equiv:
@@ -1373,6 +1377,16 @@ greek-utf:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+splitany:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+uplus2:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 addcomma:
