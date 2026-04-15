@@ -6,6 +6,10 @@
 #
 # Katie Wasserman, katie@wass.net
 # August 2014
+#
+# Adjusted to use intdiv extension, April 2026
+
+@load "intdiv"
 
 BEGIN {
     digits = 100000
@@ -14,7 +18,7 @@ BEGIN {
     for (m = digits * 4; m > 0; --m) {
         d = m * 2 + 1
         x = pi * m
-        intdiv0(x, d, result)
+        intdiv(x, d, result)
         pi = result["quotient"]
         pi = pi + two
     }
