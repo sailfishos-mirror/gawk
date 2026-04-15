@@ -798,7 +798,6 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_lint
-enable_builtin_intdiv0
 enable_mpfr
 enable_pma
 enable_versioned_extension_dir
@@ -1455,8 +1454,6 @@ Optional Features:
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --disable-lint          do not compile in gawk lint checking
-  --enable-builtin-intdiv0
-                          enable built-in intdiv0 function
   --disable-mpfr          do not check for MPFR
   --disable-pma           do not build gawk with the persistent memory
                           allocator
@@ -3631,22 +3628,6 @@ then :
 
 printf "%s\n" "#define NO_LINT 1" >>confdefs.h
 
-	fi
-
-fi
-
-# Check whether --enable-builtin-intdiv0 was given.
-if test ${enable_builtin_intdiv0+y}
-then :
-  enableval=$enable_builtin_intdiv0; if test "$enableval" = yes
-	then
-
-printf "%s\n" "#define SUPPLY_INTDIV 1" >>confdefs.h
-
-		sed '/^@set PATCHLEVEL/a\
-@set INTDIV' < "$srcdir"/doc/gawk.texi > foo
-		cp foo "$srcdir"/doc/gawk.texi
-		rm foo
 	fi
 
 fi

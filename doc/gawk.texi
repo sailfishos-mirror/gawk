@@ -18366,29 +18366,6 @@ truncated toward zero.
 For example, @code{int(3)} is 3, @code{int(3.9)} is 3, @code{int(-3.9)}
 is @minus{}3, and @code{int(-3)} is @minus{}3 as well.
 
-@ifset INTDIV
-@item @code{intdiv0(@var{numerator}, @var{denominator}, @var{result})}
-@cindexawkfunc{intdiv0}
-@cindex intdiv0
-Perform integer division, similar to the standard C @code{div()} function.
-First, truncate @code{numerator} and @code{denominator}
-towards zero, creating integer values.  Clear the @code{result}
-array, and then set @code{result["quotient"]} to the result of
-@samp{numerator / denominator}, truncated towards zero to an integer,
-and set @code{result["remainder"]} to the result of @samp{numerator %
-denominator}, truncated towards zero to an integer.
-Attempting division by zero causes a fatal error.
-The function returns zero upon success, and @minus{}1 upon error.
-
-This function is
-primarily intended for use with arbitrary length integers; it avoids
-creating MPFR arbitrary precision floating-point values (@pxref{Arbitrary
-Precision Integers}).
-
-This function is a @code{gawk} extension.  It is not available in
-compatibility mode (@pxref{Options}).
-@end ifset
-
 @item @code{log(@var{x})}
 @cindexawkfunc{log}
 @cindex logarithm
@@ -35816,128 +35793,6 @@ When dividing two arbitrary precision integers with either
 @samp{/} or @samp{%}, the result is typically an arbitrary
 precision floating point value (unless the denominator evenly
 divides into the numerator).
-@ifset INTDIV
-In order to do integer division
-or remainder with arbitrary precision integers, use the built-in
-@code{intdiv0()} function (@pxref{Numeric Functions}).
-
-You can simulate the @code{intdiv0()} function in standard @command{awk}
-using this user-defined function:
-
-@example
-@c file eg/lib/intdiv0.awk
-# intdiv0 --- do integer division
-@c endfile
-@ignore
-@c file eg/lib/intdiv0.awk
-#
-# This file and how to use it are described in the manual.
-# Therefore, we respectfully advise you to Read The Fine Manual
-# for more information.
-#
-# Arnold Robbins, arnold@@skeeve.com, Public Domain
-# July, 2014
-#
-# Name changed from div() to intdiv()
-# April, 2015
-#
-# Changed to intdiv0()
-# April, 2016
-@c endfile
-@end ignore
-@c file eg/lib/intdiv0.awk
-
-function intdiv0(numerator, denominator, result)
-@{
-    split("", result)
-
-    numerator = int(numerator)
-    denominator = int(denominator)
-    result["quotient"] = int(numerator / denominator)
-    result["remainder"] = int(numerator % denominator)
-
-    return 0.0
-@}
-@c endfile
-@end example
-
-The following example program, contributed by Katie Wasserman,
-uses @code{intdiv0()} to
-compute the digits of @value{PI} to as many places as you
-choose to set:
-
-@c 4/2026: Don't extract this version, as there's now a slightly
-@c different one in the section on example extensions that uses
-@c the intdiv loadable extension
-
-@example
-@group
-# pi.awk --- compute the digits of pi
-@ignore
-#
-# This file and how to use it are described in the manual.
-# Therefore, we respectfully advise you to Read The Fine Manual
-# for more information.
-#
-# Katie Wasserman, katie@@wass.net
-# August 2014
-@end ignore
-
-BEGIN @{
-    digits = 100000
-    two = 2 * 10 ^ digits
-@end group
-    pi = two
-    for (m = digits * 4; m > 0; --m) @{
-        d = m * 2 + 1
-        x = pi * m
-        intdiv0(x, d, result)
-        pi = result["quotient"]
-        pi = pi + two
-    @}
-    print pi
-@}
-@end example
-
-@ignore
-Date: Wed, 20 Aug 2014 10:19:11 -0400
-To: arnold@skeeve.com
-From: Katherine Wasserman <katie@wass.net>
-Subject: Re: computation of digits of pi?
-
-Arnold,
-
->The program that you sent to compute the digits of pi using div(). Is
->that some standard algorithm that every math student knows? If so,
->what's it called?
-
-It's not that well known but it's not that obscure either
-
-It's Euler's modification to Newton's method for calculating pi.
-
-Take a look at lines (23) - (25)  here: http://mathworld.wolfram.com/PiFormulas.htm
-
-The algorithm I wrote simply expands the multiply by 2 and works from the innermost expression outwards.  I used this to program HP calculators because it's quite easy to modify for tiny memory devices with smallish word sizes.
-
-http://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899
-
--Katie
-@end ignore
-
-When asked about the algorithm used, Katie replied:
-
-@quotation
-It's not that well known but it's not that obscure either.
-It's Euler's modification to Newton's method for calculating pi.
-Take a look at lines (23) - (25) here: @uref{https://mathworld.wolfram.com/PiFormulas.html}.
-
-The algorithm I wrote simply expands the multiply by 2 and works from
-the innermost expression outwards.  I used this to program HP calculators
-because it's quite easy to modify for tiny memory devices with smallish
-word sizes. See
-@uref{https://www.hpmuseum.org/cgi-bin/articles.cgi?read=899}.
-@end quotation
-@end ifset
 
 @node Checking for MPFR
 @section How To Check If MPFR Is Available
@@ -41740,13 +41595,6 @@ The @code{mkbool()} function to create a Boolean value
 The @code{bindtextdomain()}, @code{dcgettext()}, and @code{dcngettext()}
 functions for internationalization
 (@pxref{Programmer i18n})
-
-@ifset INTDIV
-@item
-The @code{intdiv0()} function for doing integer
-division and remainder
-(@pxref{Numeric Functions})
-@end ifset
 @end itemize
 
 @item
@@ -42586,12 +42434,6 @@ Strongly typed regexp constants of the form @samp{@@/@dots{}/}
 The bitwise functions changed, making negative arguments into
 a fatal error (@pxref{Bitwise Functions}).
 
-@ifset INTDIV
-@item
-The @code{intdiv0()} function.
-@xref{Numeric Functions}.
-@end ifset
-
 @item
 The @code{mktime()} function now accepts an optional
 second argument
@@ -42865,6 +42707,11 @@ New variables and functions were added for dealing with
 character sets and converting between multibyte encoded
 strings and wide character strings
 (@pxref{Dynamic Extensions}).
+
+@item
+The @option{--enable-builtin-intdiv0} option to @command{configure}
+was removed, along with the corresponding documentation and
+code within @command{gawk}.
 
 @end itemize
 
@@ -43921,15 +43768,6 @@ MPFR support is not available.
 Disable all message-translation facilities.
 This is usually not desirable, but it may bring you some slight performance
 improvement.
-
-@cindex @option{--enable-builtin-intdiv0} configuration option
-@cindex configuration option @subentry @option{--enable-builtin-intdiv0}
-@item --enable-builtin-intdiv0
-Add a new built-in function, @code{intdiv0()}, which generates
-integer division and remainder results at the same time.
-@ifset INTDIV
-This is discussed more in @ref{Arbitrary Precision Integers}.
-@end ifset
 
 @cindex @option{--enable-O3} configuration option
 @cindex configuration option @subentry @option{--enable-O3}

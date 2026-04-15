@@ -52,17 +52,6 @@ AC_ARG_ENABLE([lint],
 		AC_DEFINE(NO_LINT, 1, [disable lint checks])
 	fi
 )
-AC_ARG_ENABLE([builtin-intdiv0],
-	[AS_HELP_STRING([--enable-builtin-intdiv0],[enable built-in intdiv0 function])],
-	if test "$enableval" = yes
-	then
-		AC_DEFINE(SUPPLY_INTDIV, 1, [enable built-in intdiv0 function])
-		sed '/^@set PATCHLEVEL/a\
-@set INTDIV' < "$srcdir"/doc/gawk.texi > foo
-		cp foo "$srcdir"/doc/gawk.texi
-		rm foo
-	fi
-)
 
 SKIP_MPFR=no
 AC_ARG_ENABLE([mpfr],
