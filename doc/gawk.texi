@@ -980,6 +980,7 @@ particular records in a file and perform operations upon them.
 * Extension Sample Fnmatch::            An interface to @code{fnmatch()}.
 * Extension Sample Fork::               An interface to @code{fork()} and
                                         other process functions.
+* Extension Sample Intdiv::             Integer Division For High Precision Integers.
 * Extension Sample Inplace::            Enabling in-place file editing.
 * Extension Sample Ord::                Character to value to character
                                         conversions.
@@ -6907,7 +6908,7 @@ After one major release, the old matchers, and the use of the
 @env{GAWK_GNU_MATCHERS} environment variable, will be removed
 from @command{gawk}.
 
-This will considerably reduce the maintenance burdern for the maintainer:
+This will considerably reduce the maintenance burden for the maintainer:
 it should be possible to remove on the order of 27 source files from
 the distribution once the GNU matchers are gone.
 
@@ -35886,14 +35887,14 @@ uses @code{intdiv0()} to
 compute the digits of @value{PI} to as many places as you
 choose to set:
 
+@c 4/2026: Don't extract this version, as there's now a slightly
+@c different one in the section on example extensions that uses
+@c the intdiv loadable extension
+
 @example
-@c file eg/prog/pi.awk
 @group
 # pi.awk --- compute the digits of pi
-@c endfile
-@c endfile
 @ignore
-@c file eg/prog/pi.awk
 #
 # This file and how to use it are described in the manual.
 # Therefore, we respectfully advise you to Read The Fine Manual
@@ -35901,9 +35902,7 @@ choose to set:
 #
 # Katie Wasserman, katie@@wass.net
 # August 2014
-@c endfile
 @end ignore
-@c file eg/prog/pi.awk
 
 BEGIN @{
     digits = 100000
@@ -35919,7 +35918,6 @@ BEGIN @{
     @}
     print pi
 @}
-@c endfile
 @end example
 
 @ignore
@@ -35958,7 +35956,7 @@ The algorithm I wrote simply expands the multiply by 2 and works from
 the innermost expression outwards.  I used this to program HP calculators
 because it's quite easy to modify for tiny memory devices with smallish
 word sizes. See
-@uref{https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899}.
+@uref{https://www.hpmuseum.org/cgi-bin/articles.cgi?read=899}.
 @end quotation
 @end ifset
 
@@ -40084,6 +40082,7 @@ shows how to use the extension API.
 * Extension Sample Fork::             An interface to @code{fork()} and other
                                       process functions.
 * Extension Sample Inplace::          Enabling in-place file editing.
+* Extension Sample Intdiv::           Integer Division For High Precision Integers.
 * Extension Sample Ord::              Character to value to character
                                       conversions.
 * Extension Sample Readdir::          An interface to @code{readdir()}.
@@ -40529,6 +40528,113 @@ file.
 
 If the program dies prematurely, as might happen if an unhandled signal
 is received, a temporary file may be left behind.
+
+@node Extension Sample Intdiv
+@subsection Integer Division For High Precision Integers
+
+The @code{intdiv} extension adds a single function named
+@code{intdiv()}, as follows:
+
+@table @code
+@item @@load intdiv
+This is how you load the extension.
+
+@cindex @code{intdiv()} extension function
+@item success = intdiv(numerator, denominator, result)
+Perform integer division, similar to the standard C @code{div()} function.
+First, truncate @code{numerator} and @code{denominator} towards zero,
+creating integer values.  Clear the @code{result} array, and then set
+@code{result["quotient"]} to the result of @samp{numerator / denominator},
+truncated towards zero to an integer, and set @code{result["remainder"]}
+to the result of @samp{numerator % denominator}, truncated towards
+zero to an integer.  Attempting division by zero causes a fatal error.
+Return zero upon success, and @minus{}1 upon error.
+@end table
+
+This function is primarily for use with arbitrary length
+integers; it avoids creating MPFR arbitrary precision floating-point
+values (@pxref{Arbitrary Precision Integers}).
+
+The following example program, contributed by Katie Wasserman, uses
+@code{intdiv()} to compute the digits of @value{PI} to as many places
+as you choose to set.  This program should be run with @samp{gawk -M
+-f pi.awk}:
+
+@example
+@c file eg/prog/pi.awk
+# pi.awk --- compute the digits of pi
+@c endfile
+@ignore
+@c file eg/prog/pi.awk
+#
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
+# Katie Wasserman, katie@@wass.net
+# August 2014
+#
+# Adjusted to use intdiv extension, April 2026
+@c endfile
+@end ignore
+@c file eg/prog/pi.awk
+
+@@load "intdiv"
+
+BEGIN @{
+    digits = 100000
+    two = 2 * 10 ^ digits
+    pi = two
+    for (m = digits * 4; m > 0; --m) @{
+        d = m * 2 + 1
+        x = pi * m
+        intdiv(x, d, result)
+        pi = result["quotient"]
+        pi = pi + two
+    @}
+    print pi
+@}
+@c endfile
+@end example
+
+@ignore
+Date: Wed, 20 Aug 2014 10:19:11 -0400
+To: arnold@skeeve.com
+From: Katherine Wasserman <katie@wass.net>
+Subject: Re: computation of digits of pi?
+
+Arnold,
+
+>The program that you sent to compute the digits of pi using div(). Is
+>that some standard algorithm that every math student knows? If so,
+>what's it called?
+
+It's not that well known but it's not that obscure either
+
+It's Euler's modification to Newton's method for calculating pi.
+
+Take a look at lines (23) - (25)  here: http://mathworld.wolfram.com/PiFormulas.htm
+
+The algorithm I wrote simply expands the multiply by 2 and works from the innermost expression outwards.  I used this to program HP calculators because it's quite easy to modify for tiny memory devices with smallish word sizes.
+
+http://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899
+
+-Katie
+@end ignore
+
+When asked about the algorithm used, Katie replied:
+
+@quotation
+It's not that well known but it's not that obscure either.
+It's Euler's modification to Newton's method for calculating pi.
+Take a look at lines (23) - (25) here: @uref{https://mathworld.wolfram.com/PiFormulas.html}.
+
+The algorithm I wrote simply expands the multiply by 2 and works from
+the innermost expression outwards.  I used this to program HP calculators
+because it's quite easy to modify for tiny memory devices with smallish
+word sizes. See
+@uref{https://www.hpmuseum.org/cgi-bin/articles.cgi?read=899}.
+@end quotation
 
 @node Extension Sample Ord
 @subsection Character and Numeric values: @code{ord()} and @code{chr()}
@@ -43771,8 +43877,10 @@ improvement.
 @cindex configuration option @subentry @option{--enable-builtin-intdiv0}
 @item --enable-builtin-intdiv0
 Add a new built-in function, @code{intdiv0()}, which generates
-integer division and remainder results at the same time. This
-is discussed more in @ref{Arbitrary Precision Integers}.
+integer division and remainder results at the same time.
+@ifset INTDIV
+This is discussed more in @ref{Arbitrary Precision Integers}.
+@end ifset
 
 @cindex @option{--enable-O3} configuration option
 @cindex configuration option @subentry @option{--enable-O3}
