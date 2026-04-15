@@ -135,8 +135,8 @@ spellmanual:
 	sort -u | comm -23 - "$(srcdir)"/wordlist
 
 spellnotes:
-	@echo ==== notes.texi ====;
-	export LC_ALL=C ; spell "$(srcdir)"/notes.texi | \
+	@echo ==== gawknotes.texi ====;
+	export LC_ALL=C ; spell "$(srcdir)"/gawknotes.texi | \
 	sort -u | comm -23 - "$(srcdir)"/wordlist7
 
 spellworkflow:
