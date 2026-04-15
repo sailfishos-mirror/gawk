@@ -117,8 +117,12 @@ ftype(struct dirent *entry, const char *dirname)
 #endif
 	char fname[PATH_MAX];
 	struct stat sbuf;
+	int count;
 
-	sprintf(fname, "%s/%s", dirname, entry->d_name);
+	count = snprintf(fname, sizeof(fname), "%s/%s", dirname, entry->d_name);
+	if (count > sizeof(fname))
+		return "u";	// buffer overflow. skip stat() call.
+
 	if (stat(fname, &sbuf) == 0) {
 		if (S_ISBLK(sbuf.st_mode))
 			return "b";
