@@ -582,9 +582,8 @@ add_preassign(enum assign_type type, char *val)
 static void
 usage(int exitval, FILE *fp)
 {
-	static const char gnu_url[] = "https://ftp.gnu.org/gnu/gawk";
-	static const char beta_url[] = "https://www.skeeve.com/gawk";
-	const char *url;
+	static const char gnu_url[] = "https://ftp.gnu.org/gnu/gawk/";
+	static const char beta_url[] = "https://www.skeeve.com/gawk/";
 	int major_version, minor_version, patchlevel;
 
 	major_version = minor_version = patchlevel = 0;
@@ -651,16 +650,10 @@ https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.\n\
 PLEASE do NOT try to report bugs by posting in comp.lang.awk,\n\
 or by using a web forum such as Stack Overflow.\n\n"), fp);
 
-	// 5.2.60 is beta release on master, will become 5.3.0.
-	// 5.2.2a is beta release on stable, will become 5.2.3.
-	if (patchlevel >= 60 || isalpha((int) PACKAGE_VERSION[strlen(PACKAGE_VERSION)-1]))
-		url = beta_url;
-	else
-		url = gnu_url;
-
 	/* ditto */
-	fprintf(fp, _("Source code for gawk may be obtained from\n%s/gawk-%s.tar.gz\n\n"),
-		url, PACKAGE_VERSION);
+	fprintf(fp, _("Source code for gawk formal releases may be obtained from\n%s.\n\n"), gnu_url);
+	fprintf(fp, _("Source code for gawk beta releases may be obtained from\n%s.\n\n"), beta_url);
+	fprintf(fp, _("Alpha and beta releases have a version number >= 60 or that end in a letter.\n\n"));
 
 	/* ditto */
 	fputs(_("gawk is a pattern scanning and processing language.\n\
