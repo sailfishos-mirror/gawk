@@ -120,7 +120,7 @@ ftype(struct dirent *entry, const char *dirname)
 	int count;
 
 	count = snprintf(fname, sizeof(fname), "%s/%s", dirname, entry->d_name);
-	if (count > sizeof(fname))
+	if (count >= sizeof(fname))
 		return "u";	// buffer overflow. skip stat() call.
 
 	if (stat(fname, &sbuf) == 0) {
