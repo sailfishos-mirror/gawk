@@ -709,6 +709,10 @@ c32type (const char *property)
 }
 #endif
 
+#ifndef LOCALE_INVARIANT
+#define LOCALE_INVARIANT 0x007f
+#endif
+
 char32_t
 c32toupper (char32_t c32)
 {
@@ -720,7 +724,7 @@ c32toupper (char32_t c32)
     return c32;	/* UB */
   else if (mingw_using_utf8 (UTF8_QUERY))
     {
-      wchar_t wc[2];
+      wchar_t wc[2], uwc[2];
 
       /* Convert C32 to UTF-16.  */
       if (c32 < 0x10000)
@@ -733,15 +737,19 @@ c32toupper (char32_t c32)
 	  wc[0] = ((c32 - 0x10000) >> 10) + 0xD800; /* high surrogate */
 	  wc[1] = (c32 & 0x3FF) + 0xDC00;	    /* low surrogate */
 	}
-      if (CharUpperBuffW (wc, 2) != 2)
+      /* Must use LCMAP_LINGUISTIC_CASING because Gawk expects us to
+         know about cases like Greek final sigma.  */
+      if (LCMapStringW (LOCALE_INVARIANT,
+			LCMAP_UPPERCASE | LCMAP_LINGUISTIC_CASING,
+			wc, 2, uwc, 2) == 0)
 	return c32;
       else
 	{
 	  /* Convert back to 32-bit codepoint. */
-	  char32_t c32u = wc[0];
+	  char32_t c32u = uwc[0];
 
-	  if (wc[1] != 0)
-	    c32u = (((wc[0] - 0xD800) << 10) | (wc[1] - 0xDC00)) + 0x10000;
+	  if (uwc[1] != 0)
+	    c32u = (((uwc[0] - 0xD800) << 10) | (uwc[1] - 0xDC00)) + 0x10000;
 	  return c32u;
 	}
     }
@@ -763,7 +771,7 @@ c32tolower (char32_t c32)
     return c32;	/* UB */
   else if (mingw_using_utf8 (UTF8_QUERY))
     {
-      wchar_t wc[2];
+      wchar_t wc[2], lwc[2];
 
       /* Convert C32 to UTF-16.  */
       if (c32 < 0x10000)
@@ -776,15 +784,17 @@ c32tolower (char32_t c32)
 	  wc[0] = ((c32 - 0x10000) >> 10) + 0xD800; /* high surrogate */
 	  wc[1] = (c32 & 0x3FF) + 0xDC00;	    /* low surrogate */
 	}
-      if (CharLowerBuffW (wc, 2) != 2)
+      if (LCMapStringW (LOCALE_INVARIANT,
+			LCMAP_LOWERCASE | LCMAP_LINGUISTIC_CASING,
+			wc, 2, lwc, 2) == 0)
 	return c32;
       else
 	{
 	  /* Convert back to 32-bit codepoint. */
-	  char32_t c32l = wc[0];
+	  char32_t c32l = lwc[0];
 
-	  if (wc[1] != 0)
-	    c32l = (((wc[0] - 0xD800) << 10) | (wc[1] - 0xDC00)) + 0x10000;
+	  if (lwc[1] != 0)
+	    c32l = (((lwc[0] - 0xD800) << 10) | (lwc[1] - 0xDC00)) + 0x10000;
 	  return c32l;
 	}
     }
