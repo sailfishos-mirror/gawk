@@ -1835,6 +1835,7 @@ NEED_TESTOUTCMP = \
 	beginfile2 double2 exit fmttest hsprint posix profile5 space printf-corners hexfloat
 
 CMP = cmp
+CMP_S = cmp -s
 # RM Needed for NetBSD standard make. Sigh.
 RM = rm
 AWKPROG = ../gawk$(EXEEXT)
@@ -2748,7 +2749,7 @@ nlstringtest::
 	@echo $@ $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=fr_FR.UTF-8; export GAWKLOCALE ; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP) -s "$(srcdir)"/nlstringtest-nogettext.ok _$@ > /dev/null ; \
+	@-if $(CMP_S) "$(srcdir)"/nlstringtest-nogettext.ok _$@ > /dev/null ; \
 	then \
 		rm -f _$@ ; \
 	else \
@@ -2798,7 +2799,7 @@ case-check:
 	@echo $@
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP) -s "$(srcdir)"/$@.ok2 _$@ || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
 	then rm -f _$@ ; \
 	fi
 
