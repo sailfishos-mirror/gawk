@@ -98,6 +98,8 @@ LS = ls.exe
 #CMP = diff
 CMP = diff -u
 #CMP = gcmp
+CMP_S = $(CMP) -q
+#CMP_S = cmp -s
 
 # cmp replacement program for PC where the error messages aren't
 # exactly the same.  Should run even on old awk.
