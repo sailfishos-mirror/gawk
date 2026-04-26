@@ -1013,7 +1013,7 @@ prune_impossible_nodes (re_match_context_t *mctx)
 	      goto free_return;
 	  if (sifted_states[0] != NULL || lim_states[0] != NULL)
 	    break;
-	  do
+	  for (;;)
 	    {
 	      --match_last;
 	      if (match_last < 0)
@@ -1021,14 +1021,17 @@ prune_impossible_nodes (re_match_context_t *mctx)
 		  ret = REG_NOMATCH;
 		  goto free_return;
 		}
-	    } while (mctx->state_log[match_last] == NULL
-		     || !mctx->state_log[match_last]->halt
-		     || !check_halt_state_context (mctx,
-						   mctx->state_log[match_last],
-						   match_last));
-	  halt_node = check_halt_state_context (mctx,
-						mctx->state_log[match_last],
-						match_last);
+              if (mctx->state_log[match_last] != NULL
+                  && mctx->state_log[match_last]->halt)
+                {
+                  halt_node
+                    = check_halt_state_context (mctx,
+                                                mctx->state_log[match_last],
+                                                match_last);
+                  if (halt_node)
+                    break;
+                }
+	    }
 	}
       ret = merge_state_array (dfa, sifted_states, lim_states,
 			       match_last + 1);
@@ -2338,7 +2341,7 @@ merge_state_with_log (reg_errcode_t *err, re_match_context_t *mctx,
       mctx->state_log[cur_idx] = next_state;
       mctx->state_log_top = cur_idx;
     }
-  else if (mctx->state_log[cur_idx] == 0)
+  else if (mctx->state_log[cur_idx] == NULL)
     {
       mctx->state_log[cur_idx] = next_state;
     }
