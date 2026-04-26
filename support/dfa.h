@@ -20,7 +20,8 @@
 #define DFA_H_
 
 #ifndef GAWK
-/* This file uses _Noreturn, _GL_ATTRIBUTE_DEALLOC, _GL_ATTRIBUTE_MALLOC,
+/* This file uses _Noreturn, _GL_ATTRIBUTE_DEALLOC,
+   _GL_ATTRIBUTE_DEALLOC_FREE, _GL_ATTRIBUTE_MALLOC,
    _GL_ATTRIBUTE_PURE, _GL_ATTRIBUTE_RETURNS_NONNULL.  */
 #if !_GL_CONFIG_H_INCLUDED
  #error "Please include config.h first."
@@ -57,6 +58,7 @@ struct dfa;
 # define _GL_ATTRIBUTE_DEALLOC(f, i)
 # define _GL_ATTRIBUTE_DEALLOC_FREE
 # define _GL_ATTRIBUTE_RETURNS_NONNULL
+# define _GL_ATTRIBUTE_PURE
 #endif
 
 /* Entry points. */
