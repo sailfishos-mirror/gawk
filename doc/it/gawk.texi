@@ -396,8 +396,8 @@ Pubblicato dalla: @b{Free Software Foundation}@*
 e da: @b{Italian Linux Documentation Project (ILDP)}@*
 Email: @email{ildp@@pluto.it}@*
 URL: @uref{http://www.pluto.it/ildp}@*
-@end ifnotdocbook
 @insertcopying
+@end ifnotdocbook
 @end titlepage
 
 @c Thanks to Bob Chassell for directions on doing dedications.
@@ -10758,7 +10758,8 @@ caratteri di spazio vuoto.
 
 @item Si pu@`o far riferimento ai campi usando una variabile, come in @code{$NF}.
 Ai campi possono anche essere assegnati dei valori, e questo implica che il
-valore di @code{$0} sia ricalcolato se ad esso si fa riferimento in seguito.
+valore di @code{$0} sia ricalcolato se ad esso si fa riferimento in seguito,
+usando il valore di @code{OFS} corrente al tempo dell'assegnamento del campo.
 Fare un assegnamento a un campo con un numero maggiore di @code{NF} crea il
 campo e ricostruisce il record, usando @code{OFS} per separare i campi.
 Incrementare @code{NF} fa la stessa cosa.  Decrementare @code{NF} scarta dei
@@ -39490,14 +39491,14 @@ usa @code{intdiv0()} per
 calcolare le cifre di @value{PI} al numero di cifre significative
 che si @`e scelto di impostare:
 
+@c 4/2026: Don't extract this version, as there's now a slightly
+@c different one in the section on example extensions that uses
+@c the intdiv loadable extension
+
 @example
-@c file eg/prog/pi.awk
 @group
 # pi.awk --- calcola le cifre di pi
-@c endfile
-@c endfile
 @ignore
-@c file eg/prog/pi.awk
 #
 # This file and how to use it are described in the manual.
 # Therefore, we respectfully advise you to Read The Fine Manual
@@ -39505,9 +39506,7 @@ che si @`e scelto di impostare:
 #
 # Katie Wasserman, katie@@wass.net
 # August 2014
-@c endfile
 @end ignore
-@c file eg/prog/pi.awk
 
 BEGIN @{
     cifre = 100000
@@ -39523,7 +39522,6 @@ BEGIN @{
     @}
     print pi
 @}
-@c endfile
 @end example
 
 @ignore
@@ -39549,13 +39547,12 @@ the innermost expression outwards.  I used this to program HP calculators
 because it's quite easy to modify for tiny memory devices with smallish
 word sizes.
 
-https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899
-@end quotation
+http://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899
 
 -Katie
 @end ignore
 
-Quando gli fu chiesto dell'algoritmo usato, Katie rispose:
+Quando le fu chiesto dell'algoritmo usato, Katie rispose:
 
 @quotation
 Non @`e quello pi@`u noto ma nemmeno quello pi@`u incomprensibile.
@@ -39568,7 +39565,7 @@ lavora dall'espressione pi@`u interna verso l'esterno.  Ho usato questo per
 programmare delle calcolatrici HP perch@'e @`e piuttosto facile da adattare ai
 dispositivi di scarsa memoria con dimensioni di parola piuttosto piccole.
 Si veda
-@uref{https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899}.
+@uref{https://www.hpmuseum.org/cgi-bin/articles.cgi?read=899}.
 @end quotation
 @end ifset
 
@@ -44119,7 +44116,11 @@ si usa l'estensione API.
 * Esempio di estensione Fnmatch::       Un'interfaccia a @code{fnmatch()}.
 * Esempio di estensione Fork::          Un'interfaccia a @code{fork()} e
                                         altre funzioni di processo.
+* Esempio di estensione Intdiv::        Divisione a numeri interi per numeri
+                                        interi ad alta precisione.
 * Esempio di estensione Inplace::       Consentire modifica diretta dei file.
+* Esempio di estensione Intdiv::        Divisione a numeri interi per numeri
+                                        interi ad alta precisione.
 * Esempio di estensione Ord::           Conversioni a valore e a stringa di
                                         caratteri.
 * Esempio di estensione Readdir::       Un'interfaccia a @code{readdir()}.
@@ -44620,6 +44621,128 @@ ulteriori permessi di accesso
 Se il programma termina prima del previsto, come potrebbe succedere se riceve
 dal sistema un segnale non gestito, pu@`o lasciare come residuo un file
 temporaneo.
+
+@node Esempio di estensione Intdiv
+@subsection Divisione a numeri interi per numeri interi ad alta precisione
+
+L'estensione @code{intdiv} aggiunge la seguente singola funzione di nome
+@code{intdiv()}:
+
+@table @code
+@item @@load intdiv
+In questo modo si carica l'estensione.
+
+@cindex @code{intdiv()} (funzione estesa)
+@cindex funzione estesa @subentry @code{intdiv()}
+@item esito = intdiv(numeratore, denominatore, risultato)
+Esegue una divisione a numeri interi, analogamente alla funzione C standard
+@code{div()}.
+Per prima cosa, si tronca @code{numeratore} e @code{denominatore} verso lo
+zero, ottenendo dei numeri interi.  Poi si annulla l'eventuale vettore
+@code{risultato} e si imposta @code{risultato["quotient"]} al risultato di
+@samp{numeratore / denominatore}, troncato verso lo zero, in modo da ottenere
+un numero intero e si imposta @code{risultato["remainder"]} al risultato
+dell'operazione @samp{numeratore % denominatore}, troncato verso lo zero, in
+modo da ottenere un numero intero.  Se si tenta una divisione per zero, si
+ottiene un errore fatale.
+Il codice di ritorno, @samp{esito}, vale zero, se la divisione riesce, o
+@minus{}1 in caso di errore.
+@end table
+
+Questa funzione è stata preparata avendo in mente numeri interi di lunghezza
+arbitraria; evita di creare numeri in virgola mobile MPFR a precisione
+arbitraria
+@iftex
+@xrefil{Calcolo con precisione arbitraria},
+@end iftex
+@ifnottex
+@xref{Calcolo con precisione arbitraria},
+@end ifnottex
+
+Il seguente programma d'esempio, proposto da Katie Wasserman,
+usa @code{intdiv()} per
+calcolare le cifre di @value{PI} al numero di cifre significative
+che si @`e scelto di impostare.
+Questo programma dovrebbe essere eseguito immettendo
+@samp{gawk -M -f pi.awk}:
+
+@example
+@c file eg/prog/pi.awk
+# pi.awk --- calcola le cifre di pi
+@c endfile
+@ignore
+@c file eg/prog/pi.awk
+#
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
+# Katie Wasserman, katie@@wass.net
+# August 2014
+#
+# Adjusted to use intdiv extension, April 2026
+@c endfile
+@end ignore
+@c file eg/prog/pi.awk
+
+@@load "intdiv"
+
+BEGIN @{
+    cifre = 100000
+    due = 2 * 10 ^ cifre
+    pi = due
+    for (m = cifre * 4; m > 0; --m) @{
+        d = m * 2 + 1
+        x = pi * m
+        intdiv(x, d, risultato)
+        pi = risultato["quotient"]
+        pi = pi + due
+    @}
+    print pi
+@}
+@c endfile
+@end example
+
+@ignore
+Date: Wed, 20 Aug 2014 10:19:11 -0400
+To: arnold@skeeve.com
+From: Katherine Wasserman <katie@wass.net>
+Subject: Re: computation of digits of pi?
+
+Arnold,
+
+>The program that you sent to compute the digits of pi using div(). Is
+>that some standard algorithm that every math student knows? If so,
+>what's it called?
+
+It's not that well known but it's not that obscure either
+
+It's Euler's modification to Newton's method for calculating pi.
+
+Take a look at lines (23) - (25)  here: http://mathworld.wolfram.com/PiFormulas.htm
+
+The algorithm I wrote simply expands the multiply by 2 and works from the innermost expression outwards.  I used this to program HP calculators because it's quite easy to modify for tiny memory devices with smallish word sizes.
+
+http://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=899
+
+-Katie
+@end ignore
+
+Quando le fu chiesto dell'algoritmo usato, Katie rispose:
+
+@quotation
+Non @`e quello pi@`u noto ma nemmeno quello pi@`u incomprensibile.
+@`E la variante di Eulero al metodo di Newton  per il calcolo del Pi greco.
+Si vedano le righe (23) - (25) nel sito:
+@uref{https://mathworld.wolfram.com/PiFormulas.html}.
+
+L'algoritmo che ho scritto semplicemente espande il moltiplicare per 2 e
+lavora dall'espressione pi@`u interna verso l'esterno.  Ho usato questo per
+programmare delle calcolatrici HP perch@'e @`e piuttosto facile da adattare ai
+dispositivi di scarsa memoria con dimensioni di parola piuttosto piccole.
+Si veda
+@uref{https://www.hpmuseum.org/cgi-bin/articles.cgi?read=899}.
+@end quotation
 
 @node Esempio di estensione Ord
 @subsection Caratteri e valori numerici: @code{ord()} e @code{chr()}
@@ -48247,8 +48370,11 @@ miglioramento nei tempi di esecuzione di un programma.
 @item --enable-builtin-intdiv0
 Aggiungere una nuova funzione predefinita, @code{intdiv0()}, che restituisce
 sia il risultato di una divisione a numeri interi che il
-resto della divisione stessa.  Ci@`o @`e spiegato pi@`u estesamente in
+resto della divisione stessa.
+@ifset INTDIV
+Ci@`o @`e spiegato pi@`u estesamente in
 @ref{Interi a precisione arbitraria}.
+@end ifset
 
 @cindex @option{--enable-O3} (opzione di configurazione)
 @cindex opzioni di configurazione @subentry @option{--enable-O3}
