@@ -58,7 +58,6 @@ struct dfa;
 # define _GL_ATTRIBUTE_DEALLOC(f, i)
 # define _GL_ATTRIBUTE_DEALLOC_FREE
 # define _GL_ATTRIBUTE_RETURNS_NONNULL
-# define _GL_ATTRIBUTE_PURE
 #endif
 
 /* Entry points. */
