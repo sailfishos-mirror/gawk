@@ -858,7 +858,7 @@ do_adump(int nargs)
 	ndump.adepth = depth;
 	ndump.alevel = 0;
 	assoc_dump(symbol, & ndump);
-	return make_number((double) 0);
+	return make_number(0.0);
 }
 
 
@@ -941,7 +941,7 @@ asort_actual(int nargs, sort_context_t ctxt)
  			assoc_clear(dest);
 		if (list != NULL)
 			efree(list);
- 		return make_number((double) 0);
+ 		return make_number(0.0);
  	}
 
 	/*
@@ -1033,7 +1033,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 		result == dest
 		dest != NULL and dest != array */
 
-	return make_number((double) num_elems);
+	return make_number(num_elems);
 }
 
 /* do_asort --- sort array by value */

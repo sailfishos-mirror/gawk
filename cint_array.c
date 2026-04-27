@@ -1187,7 +1187,7 @@ leaf_list(NODE *array, NODE **list, assoc_kind_t assoc_kind)
 			subs->numbr = num;
 			subs->flags |= (NUMCUR|NUMINT);
 		} else {
-			subs = make_number((double) num);
+			subs = make_number(num);
 			subs->flags |= (INTIND|NUMINT);
 		}
 		list[k++] = subs;
@@ -1220,7 +1220,7 @@ leaf_info(NODE *array, NODE *ndump, const char *aname)
 
 	size = array->array_size;
 
-	subs = make_number((double) 0.0);
+	subs = make_number(0.0);
 	subs->flags |= (INTIND|NUMINT);
 	for (i = 0; i < size; i++) {
 		val = array->nodes[i];

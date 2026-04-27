@@ -209,7 +209,7 @@ do_exp(int nargs)
 	res = exp(d);
 	if (errno == ERANGE)
 		warning(_("exp: argument %g is out of range"), d);
-	return make_number((double) res);
+	return make_number(res);
 }
 
 /* stdfile --- return fp for a standard file */
@@ -267,7 +267,7 @@ do_fflush(int nargs)
 	/* fflush() */
 	if (nargs == 0) {
 		status = flush_io();	// ERRNO updated
-		return make_number((double) status);
+		return make_number(status);
 	}
 
 	tmp = POP_STRING();
@@ -280,7 +280,7 @@ do_fflush(int nargs)
 	if (tmp->stlen == 0) {
 		status = flush_io();	// ERRNO updated
 		DEREF(tmp);
-		return make_number((double) status);
+		return make_number(status);
 	}
 
 	/* fflush("/some/path") */
@@ -295,7 +295,7 @@ do_fflush(int nargs)
 				warning(_("fflush: cannot flush: file `%.*s' opened for reading, not writing"),
 					len, file);
 			DEREF(tmp);
-			return make_number((double) status);
+			return make_number(status);
 		}
 		fp = rp->output.fp;
 		if (fp != NULL) {
@@ -317,7 +317,7 @@ do_fflush(int nargs)
 		warning(_("fflush: `%.*s' is not an open file, pipe or co-process"), len, file);
 	}
 	DEREF(tmp);
-	return make_number((double) status);
+	return make_number(status);
 }
 
 /* strncasecmpmbs --- like strncasecmp (multibyte string version)  */
@@ -513,7 +513,7 @@ do_index(int nargs)
 out:
 	DEREF(s1);
 	DEREF(s2);
-	return make_number((double) ret);
+	return make_number(ret);
 }
 
 /* double_to_int --- convert double to int, used several places */
@@ -544,7 +544,7 @@ do_int(int nargs)
 	d = force_number(tmp)->numbr;
 	d = double_to_int(d);
 	DEREF(tmp);
-	return make_number((double) d);
+	return make_number(d);
 }
 
 /* do_isarray --- check if argument is array */
@@ -572,7 +572,7 @@ do_isarray(int nargs)
 		if (tmp->type == Node_val)
 			DEREF(tmp);
 	}
-	return make_number((double) ret);
+	return make_number(ret);
 }
 
 /* do_length --- length of a string, array or $0 */
@@ -627,7 +627,7 @@ do_length(int nargs)
 		len = tmp->stlen;
 
 	DEREF(tmp);
-	return make_number((double) len);
+	return make_number(len);
 }
 
 /* do_log --- the log function */
@@ -648,7 +648,7 @@ do_log(int nargs)
 		warning(_("%s: received negative argument %g"), "log", arg);
 	d = log(arg);
 	DEREF(tmp);
-	return make_number((double) d);
+	return make_number(d);
 }
 
 /* do_sqrt --- do the sqrt function */
@@ -664,11 +664,11 @@ do_sqrt(int nargs)
 	tmp = POP_SCALAR();
 	if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 		lintwarn(_("%s: received non-numeric argument"), "sqrt");
-	arg = (double) force_number(tmp)->numbr;
+	arg = force_number(tmp)->numbr;
 	DEREF(tmp);
 	if (arg < 0.0)
 		warning(_("%s: received negative argument %g"), "sqrt", arg);
-	return make_number((double) sqrt(arg));
+	return make_number(sqrt(arg));
 }
 
 /* do_substr --- do the substr function */
@@ -989,7 +989,7 @@ do_systime(int nargs ATTRIBUTE_UNUSED)
 #else
 	(void) time(& lclock);
 #endif
-	return make_number((double) lclock);
+	return make_number(lclock);
 }
 
 /* do_mktime --- turn a time string into a timestamp */
@@ -1045,7 +1045,7 @@ do_mktime(int nargs)
 	    || month == INT_MIN
 	    || year < INT_MIN + 1900
 	    || year - 1900 > INT_MAX)
-		return make_number((double) -1);
+		return make_number(-1.0);
 
 	memset(& then, '\0', sizeof(then));
 	then.tm_sec = second;
@@ -1057,7 +1057,7 @@ do_mktime(int nargs)
 	then.tm_isdst = dst;
 
 	then_stamp = (do_gmt ? timegm(& then) : mktime(& then));
-	return make_number((double) then_stamp);
+	return make_number(then_stamp);
 }
 
 /* do_system --- run an external command */
@@ -1111,7 +1111,7 @@ do_system(int nargs)
 		cmd[tmp->stlen] = save;
 	}
 	DEREF(tmp);
-	return make_number((double) ret);
+	return make_number(ret);
 }
 
 /* do_print --- print items, separated by OFS, terminated with ORS */
@@ -1402,7 +1402,7 @@ do_atan2(int nargs)
 	d2 = force_number(t2)->numbr;
 	DEREF(t1);
 	DEREF(t2);
-	return make_number((double) atan2(d1, d2));
+	return make_number(atan2(d1, d2));
 }
 
 /* do_sin --- do the sin function */
@@ -1418,9 +1418,9 @@ do_sin(int nargs)
 	tmp = POP_SCALAR();
 	if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 		lintwarn(_("%s: received non-numeric argument"), "sin");
-	d = sin((double) force_number(tmp)->numbr);
+	d = sin(force_number(tmp)->numbr);
 	DEREF(tmp);
-	return make_number((double) d);
+	return make_number(d);
 }
 
 /* do_cos --- do the cos function */
@@ -1436,9 +1436,9 @@ do_cos(int nargs)
 	tmp = POP_SCALAR();
 	if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 		lintwarn(_("%s: received non-numeric argument"), "cos");
-	d = cos((double) force_number(tmp)->numbr);
+	d = cos(force_number(tmp)->numbr);
 	DEREF(tmp);
-	return make_number((double) d);
+	return make_number(d);
 }
 
 /* do_rand --- do the rand function */
@@ -1528,7 +1528,7 @@ do_rand(int nargs ATTRIBUTE_UNUSED)
 		tmprand -= 0.5;
 	} while (tmprand == 1.0);
 
- 	return make_number((double) tmprand);
+ 	return make_number(tmprand);
 }
 
 /* do_srand --- seed the random number generator */
@@ -1558,7 +1558,7 @@ do_srand(int nargs)
 		srandom((unsigned int) (save_seed = (unsigned long) force_number(tmp)->numbr));
 		DEREF(tmp);
 	}
-	return make_number((double) ret);
+	return make_number(ret);
 }
 
 /* do_match --- match a regexp, set RSTART and RLENGTH,
@@ -1635,7 +1635,7 @@ do_match(int nargs)
 
 					it = make_string(start, len);
 					it->flags |= USER_INPUT;
-					assoc_set(dest, make_number((double) (ii)), it);;
+					assoc_set(dest, make_number((ii)), it);;
 
 					sprintf(buff, "%d", ii);
 					ilen = strlen(buff);
@@ -1653,7 +1653,7 @@ do_match(int nargs)
 
 					slen = ilen + subseplen + 5;
 
-					assoc_set(dest, make_string(buf, slen), make_number((double) subpat_start + 1));
+					assoc_set(dest, make_string(buf, slen), make_number(subpat_start + 1));
 
 					memcpy(buf, buff, ilen);
 					memcpy(buf + ilen, subsepstr, subseplen);
@@ -1661,7 +1661,7 @@ do_match(int nargs)
 
 					slen = ilen + subseplen + 6;
 
-					assoc_set(dest, make_string(buf, slen), make_number((double) subpat_len));
+					assoc_set(dest, make_string(buf, slen), make_number(subpat_len));
 				}
 			}
 
@@ -1684,10 +1684,10 @@ do_match(int nargs)
 		tre->re_exp = NULL;
 	}
 	unref(RSTART_node->var_value);
-	RSTART_node->var_value = make_number((double) rstart);
+	RSTART_node->var_value = make_number(rstart);
 	unref(RLENGTH_node->var_value);
-	RLENGTH_node->var_value = make_number((double) rlength);
-	return make_number((double) rstart);
+	RLENGTH_node->var_value = make_number(rlength);
+	return make_number(rstart);
 }
 
 /* do_sub --- do the work for sub, gsub, and gensub */
@@ -2203,7 +2203,7 @@ done:
 			*lhs = make_str_node(buf, textlen, ALREADY_MALLOCED);
 	}
 
-	return make_number((double) matches);
+	return make_number(matches);
 }
 
 /* call_sub --- call do_sub indirectly */
@@ -2661,14 +2661,14 @@ do_strtonum(int nargs)
 
 	tmp = fixtype(POP_SCALAR());
 	if ((tmp->flags & NUMBER) != 0)
-		d = (double) tmp->numbr;
+		d = tmp->numbr;
 	else if (get_numbase(tmp->stptr, tmp->stlen, use_lc_numeric) != 10)
 		d = nondec2awknum(tmp->stptr, tmp->stlen, NULL);
 	else
-		d = (double) force_number(tmp)->numbr;
+		d = force_number(tmp)->numbr;
 
 	DEREF(tmp);
-	return make_number((double) d);
+	return make_number(d);
 }
 
 /* nondec2awknum --- convert octal or hex value to double */
@@ -2697,7 +2697,7 @@ nondec2awknum(char *str, size_t len, char **endptr)
 		if (len <= 2) {
 			if (endptr)
 				*endptr = start;
-			return (double) 0.0;
+			return 0.0;
 		}
 
 		for (str += 2, len -= 2; len > 0; len--, str++) {

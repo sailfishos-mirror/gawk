@@ -458,7 +458,7 @@ nextfile(IOBUF **curfile, bool skipping)
 	}
 
 	for (; i < get_number_si(ARGC_node->var_value);  i++) {
-		tmp = make_number((double) i);
+		tmp = make_number(i);
 		(void) force_string(tmp);
 		arg = in_array(ARGV_node, tmp);
 		unref(tmp);
@@ -467,7 +467,7 @@ nextfile(IOBUF **curfile, bool skipping)
 		arg = force_string(arg);
 		if (! do_traditional) {
 			unref(ARGIND_node->var_value);
-			ARGIND_node->var_value = make_number((double) i);
+			ARGIND_node->var_value = make_number(i);
 		}
 
 		if (! arg_assign(arg->stptr, false)) {
@@ -1278,11 +1278,11 @@ do_close(int nargs)
 		}
 
 		DEREF(tmp);
-		return make_number((double) -1.0);
+		return make_number(-1.0);
 	}
 	DEREF(tmp);
 	fflush(stdout);	/* synchronize regular output */
-	tmp = make_number((double) close_redir(rp, false, how));
+	tmp = make_number(close_redir(rp, false, how));
 	rp = NULL;
 	/*
 	 * POSIX says close() returns 0 on success, non-zero otherwise.
@@ -1293,7 +1293,7 @@ do_close(int nargs)
 	 */
 	if (do_posix) {
 		unref(tmp);
-		tmp = make_number((double) 0);
+		tmp = make_number(0.0);
 	}
 	return tmp;
 }
@@ -2858,12 +2858,12 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 			update_ERRNO_int(redir_error);
 		}
 		DEREF(redir_exp);
-		return make_number((double) -1.0);
+		return make_number(-1.0);
 	} else if ((rp->flag & RED_TWOWAY) != 0 && rp->iop == NULL) {
 		if (is_non_fatal_redirect(redir_exp->stptr, redir_exp->stlen)) {
 			update_ERRNO_int(EBADF);
 			DEREF(redir_exp);
-			return make_number((double) -1.0);
+			return make_number(-1.0);
 		}
 		(void) close_rp(rp, CLOSE_ALL);
 		DEREF(redir_exp);	// we're about to die, but what the heck, release it anyway
@@ -2872,14 +2872,14 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 	DEREF(redir_exp);
 	iop = rp->iop;
 	if (iop == NULL)		/* end of input */
-		return make_number((double) 0.0);
+		return make_number(0.0);
 
 	errcode = 0;
 	retval = get_a_record(& s, & cnt, iop, & errcode, (lhs ? NULL : & field_width));
 	if (errcode != 0) {
 		if (errcode != -1)
 			update_ERRNO_int(errcode);
-		return make_number((double) retval);
+		return make_number(retval);
 	}
 
 	if (retval == EOF) {
@@ -2893,7 +2893,7 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 			rp->iop = NULL;
 		}
 		rp->flag |= RED_EOF;	/* sticky EOF */
-		return make_number((double) 0.0);
+		return make_number(0.0);
 	}
 
 	if (lhs == NULL)	/* no optional var. */
@@ -2906,7 +2906,7 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 		(*lhs)->flags |= USER_INPUT;
 	}
 
-	return make_number((double) 1.0);
+	return make_number(1.0);
 }
 
 /* do_getline --- read in a line, into var and without redirection */
@@ -2923,7 +2923,7 @@ do_getline(int into_variable, IOBUF *iop)
 	if (iop == NULL) {	/* end of input */
 		if (into_variable)
 			(void) POP_ADDRESS();
-		return make_number((double) 0.0);
+		return make_number(0.0);
 	}
 
 	errcode = 0;
@@ -2933,7 +2933,7 @@ do_getline(int into_variable, IOBUF *iop)
 			update_ERRNO_int(errcode);
 		if (into_variable)
 			(void) POP_ADDRESS();
-		return make_number((double) retval);
+		return make_number(retval);
 	}
 
 	if (retval == EOF)
@@ -2952,7 +2952,7 @@ do_getline(int into_variable, IOBUF *iop)
 		*lhs = make_string(s != NULL ? s : "", cnt);
 		(*lhs)->flags |= USER_INPUT;
 	}
-	return make_number((double) 1.0);
+	return make_number(1.0);
 }
 
 typedef struct {

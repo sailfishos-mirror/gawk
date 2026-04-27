@@ -767,7 +767,7 @@ init_args(int argc0, int argc, const char *argv0, char **argv)
 
 
 	for (i = argc0, j = 1; i < argc; i++, j++) {
-		sub = make_number((double) j);
+		sub = make_number(j);
 		val = make_string(argv[i], strlen(argv[i]));
 		val->flags |= USER_INPUT;
 		assoc_set(ARGV_node, sub, val);
@@ -780,7 +780,7 @@ init_args(int argc0, int argc, const char *argv0, char **argv)
 	}
 
 	ARGC_node = install_symbol(estrdup("ARGC", 4), Node_var);
-	ARGC_node->var_value = make_number((double) j);
+	ARGC_node->var_value = make_number(j);
 
 	if (do_sandbox)
 		init_argv_array(ARGV_node, shadow_node);

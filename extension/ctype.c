@@ -79,7 +79,7 @@ do_ ## sbfunc(int nargs, awk_value_t *result, struct awk_ext_func *unused) \
 	assert(result != NULL); \
  \
 	awk_value_t the_char; \
-	int char_val = the_char.num_value; \
+	int char_val = 0; \
  \
 	if (get_argument(0, AWK_UNDEFINED, & the_char)) { \
 		if (the_char.val_type == AWK_NUMBER) \

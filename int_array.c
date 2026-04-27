@@ -564,7 +564,7 @@ int_list(NODE *symbol, NODE *t)
 					subs->numbr = num;
 					subs->flags |= (NUMCUR|NUMINT);
 				} else {
-					subs = make_number((double) num);
+					subs = make_number(num);
 					subs->flags |= (INTIND|NUMINT);
 				}
 				list[k++] = subs;
@@ -700,7 +700,7 @@ int_dump(NODE *symbol, NODE *ndump)
 		fprintf(output_fp, "\n");
 
 		aname = make_aname(symbol);
-		subs = make_number((double) 0);
+		subs = make_number(0.0);
 		subs->flags |= (INTIND|NUMINT);
 
 		for (i = 0; i < symbol->array_size; i++) {

@@ -4778,7 +4778,7 @@ unserialize_list_item(struct list_item *list, char **pstr, int *pstr_len, int fi
 	if (type == D_field) {
 		int field_num;
 		field_num = strtol(pstr[2], NULL, 0);
-		symbol = make_number((double) field_num);
+		symbol = make_number(field_num);
 		cnt = 3;
 	} else {
 		char *name;
