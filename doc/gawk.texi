@@ -54,9 +54,9 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH February, 2026
+@set UPDATE-MONTH April, 2026
 @set VERSION 5.4
-@set PATCHLEVEL 0
+@set PATCHLEVEL 1
 
 @set GAWKINETTITLE TCP/IP Internetworking with @command{gawk}
 @set GAWKWORKFLOWTITLE Participating in @command{gawk} Development
@@ -3846,8 +3846,8 @@ values of those variables as it needs to, possibly ignoring any
 initial value you may have given.
 @end quotation
 
-@item -W @var{gawk-opt}
 @cindex @option{-W} option
+@item -W @var{gawk-opt}
 Provide an implementation-specific option.
 This is the POSIX convention for providing implementation-specific options.
 These options
@@ -3856,9 +3856,9 @@ Note that the long options may be abbreviated, as long as
 the abbreviations remain unique.
 The full list of @command{gawk}-specific options is provided next.
 
-@item --
 @cindex command line @subentry options @subentry end of
 @cindex options @subentry command-line @subentry end of
+@item --
 Signal the end of the command-line options.  The following arguments
 are not treated as options even if they begin with @samp{-}.  This
 interpretation of @option{--} follows the POSIX argument parsing
@@ -12892,6 +12892,10 @@ to a number.
 @cindex caret (@code{^}) @subentry @code{^=} operator
 @cindex @code{*} (asterisk) @subentry @code{**=} operator
 @cindex asterisk (@code{*}) @subentry @code{**=} operator
+@cindex common extensions @subentry @code{**=} operator
+@cindex extensions @subentry common @subentry @code{**=} operator
+@cindex @command{awk} @subentry language, POSIX version
+@cindex POSIX @command{awk}
 @float Table,table-assign-ops
 @caption{Arithmetic assignment operators}
 @multitable @columnfractions .30 .70
@@ -12901,10 +12905,6 @@ to a number.
 @item @var{lvalue} @code{*=} @var{coefficient} @tab Multiply the value of @var{lvalue} by @var{coefficient}.
 @item @var{lvalue} @code{/=} @var{divisor} @tab Divide the value of @var{lvalue} by @var{divisor}.
 @item @var{lvalue} @code{%=} @var{modulus} @tab Set @var{lvalue} to its remainder by @var{modulus}.
-@cindex common extensions @subentry @code{**=} operator
-@cindex extensions @subentry common @subentry @code{**=} operator
-@cindex @command{awk} @subentry language, POSIX version
-@cindex POSIX @command{awk}
 @item @var{lvalue} @code{^=} @var{power} @tab Raise @var{lvalue} to the power @var{power}.
 @item @var{lvalue} @code{**=} @var{power} @tab Raise @var{lvalue} to the power @var{power}. (c.e.)
 @end multitable
@@ -16214,8 +16214,8 @@ The following elements (listed alphabetically)
 are guaranteed to be available:
 
 @table @code
-@item PROCINFO["argv"]
 @cindex command line @subentry arguments
+@item PROCINFO["argv"]
 The @code{PROCINFO["argv"]} array contains all of the command-line arguments
 (after glob expansion and redirection processing on platforms where that must
 be done manually by the program) with subscripts ranging from 0 through
@@ -16243,8 +16243,8 @@ The value of the @code{getegid()} system call.
 The value of the C @code{errno} variable when @code{ERRNO} is set to
 the associated error message.
 
-@item PROCINFO["euid"]
 @cindex effective user ID of @command{gawk} user
+@item PROCINFO["euid"]
 The value of the @code{geteuid()} system call.
 
 @item PROCINFO["FS"]
@@ -16254,12 +16254,12 @@ This is
 @code{"FPAT"} if field matching with @code{FPAT} is in effect,
 or @code{"API"} if field splitting is controlled by an API input parser.
 
-@item PROCINFO["gid"]
 @cindex group ID of @command{gawk} user
+@item PROCINFO["gid"]
 The value of the @code{getgid()} system call.
 
-@item PROCINFO["identifiers"]
 @cindex program identifiers
+@item PROCINFO["identifiers"]
 A subarray, indexed by the names of all identifiers used in the text of
 the @command{awk} program.  An @dfn{identifier} is simply the name of a variable
 (be it scalar or array), built-in function, user-defined function, or
@@ -16296,9 +16296,9 @@ The values indicate what @command{gawk} knows about the identifiers
 after it has finished parsing the program; they are @emph{not} updated
 while the program runs.
 
-@item PROCINFO["platform"]
 @cindex platform running on
 @cindex @code{PROCINFO} array @subentry platform running on
+@item PROCINFO["platform"]
 This element gives a string indicating the platform for which
 @command{gawk} was compiled. The value will be one of the following:
 
@@ -16317,23 +16317,23 @@ GNU/Linux, Cygwin, macOS, and legacy Unix systems.
 OpenVMS.
 @end table
 
-@item PROCINFO["pgrpid"]
 @cindex process group ID of @command{gawk} process
+@item PROCINFO["pgrpid"]
 The process group ID of the current process.
 
-@item PROCINFO["pid"]
 @cindex process ID of @command{gawk} process
+@item PROCINFO["pid"]
 The process ID of the current process.
 
-@item PROCINFO["pma"]
 @cindex persistent memory @subentry compiled into @command{gawk}
 @cindex PMA memory allocator
+@item PROCINFO["pma"]
 The version of the PMA memory allocator compiled into @command{gawk}.
 This element will not be present if the PMA allocator is not available
 for use. @xref{Persistent Memory}.
 
-@item PROCINFO["ppid"]
 @cindex parent process ID of @command{gawk} process
+@item PROCINFO["ppid"]
 The parent process ID of the current process.
 
 @item PROCINFO["strftime"]
@@ -16344,9 +16344,9 @@ Assigning a new value to this element changes the default.
 @item PROCINFO["uid"]
 The value of the @code{getuid()} system call.
 
-@item PROCINFO["version"]
 @cindex version of @subentry @command{gawk}
 @cindex @command{gawk} @subentry version of
+@item PROCINFO["version"]
 The version of @command{gawk}.
 @end table
 
@@ -16356,20 +16356,20 @@ if your version of @command{gawk} supports arbitrary-precision arithmetic
 (@pxref{Arbitrary Precision Arithmetic}):
 
 @table @code
-@item PROCINFO["gmp_version"]
 @cindex version of @subentry GNU MP library
+@item PROCINFO["gmp_version"]
 The version of the GNU MP library.
 
 @cindex version of @subentry GNU MPFR library
 @item PROCINFO["mpfr_version"]
 The version of the GNU MPFR library.
 
-@item PROCINFO["prec_max"]
 @cindex maximum precision supported by MPFR library
+@item PROCINFO["prec_max"]
 The maximum precision supported by MPFR.
 
-@item PROCINFO["prec_min"]
 @cindex minimum precision required by MPFR library
+@item PROCINFO["prec_min"]
 The minimum precision required by MPFR.
 @end table
 
@@ -16379,9 +16379,9 @@ of @command{gawk} supports dynamic loading of extension functions
 (@pxref{Dynamic Extensions}):
 
 @table @code
-@item PROCINFO["api_major"]
 @cindex version of @subentry @command{gawk} extension API
 @cindex extension API @subentry version number
+@item PROCINFO["api_major"]
 The major version of the extension API.
 
 @item PROCINFO["api_minor"]
@@ -18344,8 +18344,8 @@ available in compatibility mode (@pxref{Options}):
 
 @c @asis for docbook
 @table @asis
-@item @code{mkbool(@var{expression})}
 @cindexgawkfunc{mkbool}
+@item @code{mkbool(@var{expression})}
 Return a Boolean-typed value based on the regular Boolean value
 of @var{expression}.  Boolean ``true'' values have numeric value one.
 Boolean ``false'' values have numeric
@@ -18363,37 +18363,37 @@ Optional parameters are enclosed in square brackets@w{ ([ ]):}
 
 @c @asis for docbook
 @table @asis
-@item @code{atan2(@var{y}, @var{x})}
 @cindexawkfunc{atan2}
 @cindex arctangent
+@item @code{atan2(@var{y}, @var{x})}
 Return the arctangent of @code{@var{y} / @var{x}} in radians.
 You can use @samp{pi = atan2(0, -1)} to retrieve the value of
 @value{PI}.
 
-@item @code{cos(@var{x})}
 @cindexawkfunc{cos}
 @cindex cosine
+@item @code{cos(@var{x})}
 Return the cosine of @var{x}, with @var{x} in radians.
 
-@item @code{exp(@var{x})}
 @cindexawkfunc{exp}
 @cindex exponent
+@item @code{exp(@var{x})}
 Return the exponential of @var{x} (@code{e ^ @var{x}}) or report
 an error if @var{x} is out of range.  The range of values @var{x} can have
 depends on your machine's floating-point representation.
 
-@item @code{int(@var{x})}
 @cindexawkfunc{int}
 @cindex round to nearest integer
+@item @code{int(@var{x})}
 Return the nearest integer to @var{x}, located between @var{x} and zero and
 truncated toward zero.
 For example, @code{int(3)} is 3, @code{int(3.9)} is 3, @code{int(-3.9)}
 is @minus{}3, and @code{int(-3)} is @minus{}3 as well.
 
 @ifset INTDIV
-@item @code{intdiv0(@var{numerator}, @var{denominator}, @var{result})}
 @cindexawkfunc{intdiv0}
 @cindex intdiv0
+@item @code{intdiv0(@var{numerator}, @var{denominator}, @var{result})}
 Perform integer division, similar to the standard C @code{div()} function.
 First, truncate @code{numerator} and @code{denominator}
 towards zero, creating integer values.  Clear the @code{result}
@@ -18413,18 +18413,18 @@ This function is a @code{gawk} extension.  It is not available in
 compatibility mode (@pxref{Options}).
 @end ifset
 
-@item @code{log(@var{x})}
 @cindexawkfunc{log}
 @cindex logarithm
+@item @code{log(@var{x})}
 Return the natural logarithm of @var{x}, if @var{x} is positive;
 otherwise, return NaN (``not a number'') on IEEE 754 systems.
 Additionally, @command{gawk} prints a warning message when @code{x}
 is negative.
 
 @cindex Beebe, Nelson H.F.@:
-@item @code{rand()}
 @cindexawkfunc{rand}
 @cindex random numbers @subentry @code{rand()}/@code{srand()} functions
+@item @code{rand()}
 Return a random number.  The values of @code{rand()} are
 uniformly distributed between zero and one.
 The value could be zero but is never one.@footnote{The C version of
@@ -18484,20 +18484,20 @@ the seed to a value that is different in each run.  To do this,
 use @code{srand()}.
 @end quotation
 
-@item @code{sin(@var{x})}
 @cindexawkfunc{sin}
 @cindex sine
+@item @code{sin(@var{x})}
 Return the sine of @var{x}, with @var{x} in radians.
 
-@item @code{sqrt(@var{x})}
 @cindexawkfunc{sqrt}
 @cindex square root
+@item @code{sqrt(@var{x})}
 Return the positive square root of @var{x}.
 @command{gawk} prints a warning message
 if @var{x} is negative.  Thus, @code{sqrt(4)} is 2.
 
-@item @code{srand(}[@var{x}]@code{)}
 @cindexawkfunc{srand}
+@item @code{srand(}[@var{x}]@code{)}
 Set the starting point, or seed,
 for generating random numbers to the value @var{x}.
 
@@ -18647,10 +18647,10 @@ array to use for the actual sorting.
 You are allowed to use the same array for both the @var{source} and @var{dest}
 arguments, but doing so only makes sense if you're also supplying the third argument.
 
-@item @code{gensub(@var{regexp}, @var{replacement}, @var{how}} [@code{, @var{target}}]@code{) #}
 @cindexgawkfunc{gensub}
 @cindex search and replace in strings
 @cindex substitute in string
+@item @code{gensub(@var{regexp}, @var{replacement}, @var{how}} [@code{, @var{target}}]@code{) #}
 Search the target string @var{target} for matches of the regular
 expression @var{regexp}.  If @var{how} is a string beginning with
 @samp{g} or @samp{G} (short for ``global''), then replace all matches
@@ -18719,8 +18719,8 @@ is simply elided. For example, @samp{\q} becomes @samp{q} in the result.
 If the final character in the replacement string is a backslash,
 it is left alone.
 
-@item @code{gsub(@var{regexp}, @var{replacement}} [@code{, @var{target}}]@code{)}
 @cindexawkfunc{gsub}
+@item @code{gsub(@var{regexp}, @var{replacement}} [@code{, @var{target}}]@code{)}
 Search @var{target} for
 @emph{all} of the longest, leftmost, @emph{nonoverlapping} matching
 substrings it can find and replace them with @var{replacement}.
@@ -18741,10 +18741,10 @@ omitted, then the entire input record (@code{$0}) is used.
 As in @code{sub()}, the characters @samp{&} and @samp{\} are special,
 and the third argument must be assignable.
 
-@item @code{index(@var{in}, @var{find})}
 @cindexawkfunc{index}
 @cindex search for substring
 @cindex find substring in string
+@item @code{index(@var{in}, @var{find})}
 Search the string @var{in} for the first occurrence of the string
 @var{find}, and return the position in characters where that occurrence
 begins in the string @var{in}.  Consider the following example:
@@ -18763,10 +18763,10 @@ it is a fatal error to use a regexp constant for @var{find}.
 Other implementations allow it, simply treating the regexp
 constant as an expression meaning @samp{$0 ~ /regexp/}. @value{DARKCORNER}
 
-@item @code{length(}[@var{string}]@code{)}
 @cindexawkfunc{length}
 @cindex string @subentry length
 @cindex length of string
+@item @code{length(}[@var{string}]@code{)}
 Return the number of characters in @var{string}.  If
 @var{string} is a number, the length of the digit string representing
 that number is returned.  For example, @code{length("abcde")} is five.  By
@@ -18835,10 +18835,10 @@ in it.
 Applying @code{length()} to an array was standardized by POSIX in 2024.
 Thus this usage should become more portable over time.
 
-@item @code{match(@var{string}, @var{regexp}} [@code{, @var{array}}]@code{)}
 @cindexawkfunc{match}
 @cindex string @subentry regular expression match of
 @cindex match regexp in string
+@item @code{match(@var{string}, @var{regexp}} [@code{, @var{array}}]@code{)}
 Search @var{string} for the
 longest, leftmost substring matched by the regular expression
 @var{regexp} and return the character position (index)
@@ -18961,9 +18961,9 @@ The @var{array} argument to @code{match()} is a
 (@pxref{Options}),
 using a third argument is a fatal error.
 
-@item @code{patsplit(@var{string}, @var{array}} [@code{, @var{fieldpat}} [@code{, @var{seps}} ] ]@code{) #}
 @cindexgawkfunc{patsplit}
 @cindex split string into array
+@item @code{patsplit(@var{string}, @var{array}} [@code{, @var{fieldpat}} [@code{, @var{seps}} ] ]@code{) #}
 Divide
 @var{string} into pieces (or ``fields'') defined by @var{fieldpat}
 and store the pieces in @var{array} and the separator strings in the
@@ -18989,8 +18989,8 @@ manner similar to the way input lines are split into fields using @code{FPAT}
 Before splitting the string, @code{patsplit()} deletes any previously existing
 elements in the arrays @var{array} and @var{seps}.
 
-@item @code{split(@var{string}, @var{array}} [@code{, @var{fieldsep}} [@code{, @var{seps}} ] ]@code{)}
 @cindexawkfunc{split}
+@item @code{split(@var{string}, @var{array}} [@code{, @var{fieldsep}} [@code{, @var{seps}} ] ]@code{)}
 Divide @var{string} into pieces separated by @var{fieldsep}
 and store the pieces in @var{array} and the separator strings in the
 @var{seps} array.  The first piece is stored in
@@ -19086,9 +19086,9 @@ If @var{string} does not match @var{fieldsep} at all (but is not null),
 @cindex POSIX mode
 In POSIX mode (@pxref{Options}), the fourth argument is not allowed.
 
-@item @code{sprintf(@var{format}, @var{expression1}, @dots{})}
 @cindexawkfunc{sprintf}
 @cindex formatting @subentry strings
+@item @code{sprintf(@var{format}, @var{expression1}, @dots{})}
 Return (without printing) the string that @code{printf} would
 have printed out with the same arguments
 (@pxref{Printf}).
@@ -19125,9 +19125,9 @@ you use the @option{--non-decimal-data} option, which isn't recommended.
 Note also that @code{strtonum()} uses the current locale's decimal point
 for recognizing numbers (@pxref{Locales}).
 
-@item @code{sub(@var{regexp}, @var{replacement}} [@code{, @var{target}}]@code{)}
 @cindexawkfunc{sub}
 @cindex replace in string
+@item @code{sub(@var{regexp}, @var{replacement}} [@code{, @var{target}}]@code{)}
 Search @var{target}, which is treated as a string, for the
 leftmost, longest substring matched by the regular expression @var{regexp}.
 Modify the entire string
@@ -19228,9 +19228,9 @@ will not run.
 Finally, if the @var{regexp} is not a regexp constant, it is converted into a
 string, and then the value of that string is treated as the regexp to match.
 
-@item @code{substr(@var{string}, @var{start}} [@code{, @var{length}} ]@code{)}
 @cindexawkfunc{substr}
 @cindex substring
+@item @code{substr(@var{string}, @var{start}} [@code{, @var{length}} ]@code{)}
 Return a @var{length}-character-long substring of @var{string},
 starting at character number @var{start}.  The first character of a
 string is character number one.@footnote{This is different from
@@ -19288,17 +19288,17 @@ string = substr(string, 1, 2) "CDE" substr(string, 6)
 
 @cindex case sensitivity @subentry converting case
 @cindex strings @subentry converting letter case
-@item @code{tolower(@var{string})}
 @cindexawkfunc{tolower}
 @cindex converting @subentry string to lower case
+@item @code{tolower(@var{string})}
 Return a copy of @var{string}, with each uppercase character
 in the string replaced with its corresponding lowercase character.
 Nonalphabetic characters are left unchanged.  For example,
 @code{tolower("MiXeD cAsE 123")} returns @code{"mixed case 123"}.
 
-@item @code{toupper(@var{string})}
 @cindexawkfunc{toupper}
 @cindex converting @subentry string to upper case
+@item @code{toupper(@var{string})}
 Return a copy of @var{string}, with each lowercase character
 in the string replaced with its corresponding uppercase character.
 Nonalphabetic characters are left unchanged.  For example,
@@ -19713,10 +19713,10 @@ The following functions relate to input/output (I/O).
 Optional parameters are enclosed in square brackets ([ ]):
 
 @table @asis
-@item @code{close(}@var{filename} [@code{,} @var{how}]@code{)}
 @cindexawkfunc{close}
 @cindex files @subentry closing
 @cindex close file or coprocess
+@item @code{close(}@var{filename} [@code{,} @var{how}]@code{)}
 Close the file @var{filename} for input or output. Alternatively, the
 argument may be a shell command that was used for creating a coprocess, or
 for redirecting to or from a pipe; then the coprocess or pipe is closed.
@@ -19736,9 +19736,9 @@ which discusses this feature in more detail and gives an example.
 Note that the second argument to @code{close()} is a @command{gawk}
 extension; it is not available in compatibility mode (@pxref{Options}).
 
-@item @code{fflush(}[@var{filename}]@code{)}
 @cindexawkfunc{fflush}
 @cindex flush buffered output
+@item @code{fflush(}[@var{filename}]@code{)}
 Flush any buffered output associated with @var{filename}, which is either a
 file opened for writing or a shell command for redirecting output to
 a pipe or coprocess.
@@ -19843,10 +19843,10 @@ it is all buffered and sent down the pipe to @command{cat} in one shot.
 @end cartouche
 
 @table @asis
-@item @code{system(@var{command})}
 @cindexawkfunc{system}
 @cindex invoke shell command
 @cindex interacting with other programs
+@item @code{system(@var{command})}
 Execute the operating system
 command @var{command} and then return to the @command{awk} program.
 Return @var{command}'s exit status (see further on).
@@ -20031,9 +20031,9 @@ Optional parameters are enclosed in square brackets ([ ]):
 
 @c @asis for docbook
 @table @asis
-@item @code{mktime(@var{datespec}} [@code{, @var{utc-flag}} ]@code{)}
 @cindexgawkfunc{mktime}
 @cindex generate time values
+@item @code{mktime(@var{datespec}} [@code{, @var{utc-flag}} ]@code{)}
 Turn @var{datespec} into a timestamp in the same form
 as is returned by @code{systime()}.  It is similar to the function of the
 same name in ISO C.  The argument, @var{datespec}, is a string of the form
@@ -20063,9 +20063,9 @@ is out of range, @code{mktime()} returns @minus{}1.
 
 @cindex @command{gawk} @subentry @code{PROCINFO} array in
 @cindex @code{PROCINFO} array
-@item @code{strftime(}[@var{format} [@code{,} @var{timestamp} [@code{,} @var{utc-flag}] ] ]@code{)}
 @cindexgawkfunc{strftime}
 @cindex format time string
+@item @code{strftime(}[@var{format} [@code{,} @var{timestamp} [@code{,} @var{utc-flag}] ] ]@code{)}
 Format the time specified by @var{timestamp}
 based on the contents of the @var{format} string and return the result.
 It is similar to the function of the same name in ISO C.
@@ -20084,10 +20084,10 @@ output that is equivalent to that of the @command{date} utility.
 You can assign a new value to @code{PROCINFO["strftime"]} to
 change the default format; see the following list for the various format directives.
 
-@item @code{systime()}
 @cindexgawkfunc{systime}
 @cindex timestamps
 @cindex current system time
+@item @code{systime()}
 Return the current time as the number of seconds since
 the system epoch.  On POSIX systems, this is the number of seconds
 since 1970-01-01 00:00:00 UTC, not counting leap seconds.
@@ -30889,9 +30889,9 @@ obsolete, as it never worked very well. @command{gawk} issues
 a warning if UDP is used. Support for it will be removed in
 version 6.0.
 
-@item local-port
 @cindex @code{getaddrinfo()} function (C library)
 @cindex C library functions @subentry @code{getaddrinfo()}
+@item local-port
 The local TCP or UDP port number to use.  Use a port number of @samp{0}
 when you want the system to pick a port. This is what you should do
 when writing a TCP or UDP client.
@@ -32723,8 +32723,8 @@ call stack, as well as from where each function on the stack was
 invoked. Commands that print the call stack print information about
 each stack frame (as detailed later on).
 
-@item Breakpoint
 @cindex breakpoint
+@item Breakpoint
 During debugging, you often wish to let the program run until it
 reaches a certain point, and then continue execution from there one
 statement (or instruction) at a time.  The way to do this is to set
@@ -32733,8 +32733,8 @@ execution of the program should break off (stop), so that you can
 take over control of the program's execution.  You can add and remove
 as many breakpoints as you like.
 
-@item Watchpoint
 @cindex watchpoint (debugger)
+@item Watchpoint
 A watchpoint is similar to a breakpoint.  The difference is that
 breakpoints are oriented around the code: stop when a certain point in the
 code is reached.  A watchpoint, however, specifies that program execution
@@ -33610,39 +33610,39 @@ The value for @var{what} should be one of the following:
 
 @c nested table
 @table @code
-@item args
 @cindex show in debugger @subentry function arguments
 @cindex function arguments, show in debugger
+@item args
 List arguments of the selected frame.
 
-@item break
 @cindex show in debugger @subentry breakpoints
 @cindex breakpoint @subentry show all in debugger
+@item break
 List all currently set breakpoints.
 
-@item display
 @cindex automatic displays, in debugger
+@item display
 List all items in the automatic display list.
 
-@item frame
 @cindex describe call stack frame, in debugger
+@item frame
 Give a description of the selected stack frame.
 
-@item functions
 @cindex list function definitions, in debugger
 @cindex function definitions, list in debugger
+@item functions
 List all function definitions including source @value{FN}s and
 line numbers.
 
-@item locals
 @cindex show in debugger @subentry local variables
 @cindex local variables @subentry show in debugger
+@item locals
 List local variables of the selected frame.
 
-@item source
 @cindex show in debugger @subentry name of current source file
 @cindex current source file, show in debugger
 @cindex source file, show in debugger
+@item source
 Print the name of the current source file. Each time the program stops, the
 current source file is the file containing the current instruction.
 When the debugger first starts, the current source file is the first file
@@ -33650,19 +33650,19 @@ included via the @option{-f} option. The
 @samp{list @var{filename}:@var{lineno}} command can
 be used at any time to change the current source.
 
-@item sources
 @cindex show in debugger @subentry all source files
 @cindex all source files, show in debugger
+@item sources
 List all program sources.
 
-@item variables
 @cindex list all global variables, in debugger
 @cindex global variables, show in debugger
+@item variables
 List all global variables.
 
-@item watch
 @cindex show in debugger @subentry watchpoints
 @cindex watchpoints, show in debugger
+@item watch
 List all items in the watch list.
 @end table
 @end table
@@ -33689,39 +33689,39 @@ The available options are:
 @c nested table
 @c asis for docbook
 @table @asis
-@item @code{history_size}
 @cindex debugger @subentry history size
+@item @code{history_size}
 Set the maximum number of lines to keep in the history file
 @file{./.gawk_history}.  The default is 100.
 
-@item @code{listsize}
 @cindex debugger @subentry default list amount
+@item @code{listsize}
 Specify the number of lines that @code{list} prints. The default is 15.
 
-@item @code{outfile}
 @cindex redirect @command{gawk} output, in debugger
+@item @code{outfile}
 Send @command{gawk} output to a file; debugger output still goes
 to standard output. An empty string (@code{""}) resets output to
 standard output.
 
-@item @code{prompt}
 @cindex debugger @subentry prompt
+@item @code{prompt}
 Change the debugger prompt. The default is @samp{@w{gawk> }}.
 
-@item @code{save_history} [@code{on} | @code{off}]
 @cindex debugger @subentry history file
+@item @code{save_history} [@code{on} | @code{off}]
 Save command history to file @file{./.gawk_history}.
 The default is @code{on}.
 
-@item @code{save_options} [@code{on} | @code{off}]
 @cindex save debugger options
+@item @code{save_options} [@code{on} | @code{off}]
 Save current options to file @file{./.gawkrc} upon exit.
 The default is @code{on}.
 Options are read back into the next session upon startup.
 
-@item @code{trace} [@code{on} | @code{off}]
 @cindex instruction tracing, in debugger
 @cindex debugger @subentry instruction tracing
+@item @code{trace} [@code{on} | @code{off}]
 Turn instruction tracing on or off. The default is @code{off}.
 @end table
 
@@ -33730,8 +33730,8 @@ Turn instruction tracing on or off. The default is @code{off}.
 Save the commands from the current session to the given @value{FN},
 so that they can be replayed using the @command{source} command.
 
-@item @code{source} @var{filename}
 @cindex debugger @subentry read commands from a file
+@item @code{source} @var{filename}
 Run command(s) from a file; an error in any command does not
 terminate execution of subsequent commands. Comments (lines starting
 with @samp{#}) are allowed in a command file.
@@ -45281,9 +45281,9 @@ profiling.  You may find it at either
 or
 @uref{https://www.math.utah.edu/pub/pawk/pawk-20030606.tar.gz}.
 
-@item BusyBox @command{awk}
 @cindex BusyBox Awk
 @cindex source code @subentry BusyBox Awk
+@item BusyBox @command{awk}
 BusyBox is a GPL-licensed program providing small versions of many
 applications within a single executable. It is aimed at embedded systems.
 It includes a full implementation of POSIX @command{awk}.  When building
@@ -45311,9 +45311,9 @@ However, that project was ended and the website shut down.  Fortunately, the
 makes this implementation available.  You can view the files one at a time from
 @uref{https://github.com/joyent/illumos-joyent/blob/master/usr/src/cmd/awk_xpg4}.
 
-@item Libmawk
 @cindex libmawk
 @cindex source code @subentry libmawk
+@item Libmawk
 This is an embeddable @command{awk} interpreter derived from
 @command{mawk}. For more information, see
 @c 1/2025, still on http
@@ -45328,10 +45328,10 @@ at @uref{https://github.com/neacsum/awk}.
 A short overview of how to use it may be found at
 @uref{https://www.codeproject.com/Articles/5264205/Embedding-AWK-in-a-C-program}.
 
-@item @command{awkcc}
 @cindex source code @subentry @command{awkcc}
 @cindex @command{awkcc}, @command{awk} to C translator
 @cindex Ramming, J.@: Christopher
+@item @command{awkcc}
 This is an early adaptation of Unix @command{awk} that
 translates @command{awk} into C code. It was done by
 J.@: Christopher Ramming at Bell Labs, circa 1988.
@@ -45339,18 +45339,18 @@ It's available at @uref{https://github.com/nokia/awkcc}.
 Bringing this up to date would be an interesting
 software engineering exercise.
 
-@item @w{QSE @command{awk}}
 @cindex QSE @command{awk}
 @cindex source code @subentry QSE @command{awk}
+@item @w{QSE @command{awk}}
 This is an embeddable @command{awk} interpreter. For more information,
 see @uref{https://code.google.com/p/qse/}. The source can be found at
 @uref{https://code.google.com/archive/p/qse/source/default/source}.
 
 @c It's been gone for at least a year, no reason to document it
 @ignore
-@item @command{QTawk}
 @cindex QuikTrim Awk
 @cindex source code @subentry QuikTrim Awk
+@item @command{QTawk}
 This is an independent implementation of @command{awk} distributed
 under the GPL. It has a large number of extensions over standard
 @command{awk} and may not be 100% syntactically compatible with it.
@@ -45428,9 +45428,9 @@ modern Java build tools.
 This version is written in Python:
 
 @table @asis
-@item @code{pawk}
 @cindex source code @subentry @command{pawk} (Python version)
 @cindex @code{pawk}, @command{awk}-like facilities for Python
+@item @code{pawk}
 This is a Python module that claims to bring @command{awk}-like
 features to Python. See @uref{https://github.com/alecthomas/pawk}
 for more information. (This is not related to Nelson Beebe's
@@ -45487,9 +45487,9 @@ name. The code is available at
 This version is written in Zig:
 
 @table @asis
-@item @code{dawk}
-@cindex dawk
 @cindex source code @subentry dawk
+@cindex dawk
+@item @code{dawk}
 An implementation of @command{awk} in the Zig programming
 language. See @uref{https://codeberg.org/triallax/dawk}.
 @end table
@@ -45497,9 +45497,9 @@ language. See @uref{https://codeberg.org/triallax/dawk}.
 And finally, this tool is written in shell:
 
 @table @asis
-@item @command{cppawk}
 @cindex @command{cppawk}
 @cindex source code @subentry @command{cppawk}
+@item @command{cppawk}
 Quoting from the web page, ``@command{cppawk} is a tiny shell script that is
 used like @command{awk}. It invokes the C preprocessor (GNU @command{cpp}) on the Awk
 code and calls Awk on the result.''  This program may be of use if
@@ -47192,8 +47192,8 @@ standard date and time formats.
 The epoch on Unix and POSIX systems is 1970-01-01 00:00:00 UTC.
 See also ``GMT'' and ``UTC.''
 
-@item Escape Sequences
 @cindex ASCII
+@item Escape Sequences
 A special sequence of characters used for describing nonprinting
 characters, such as @samp{\n} for newline or @samp{\033} for the ASCII
 ESC (Escape) character. (@xref{Escape Sequences}.)
