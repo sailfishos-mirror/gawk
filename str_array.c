@@ -40,6 +40,7 @@
  * 11/2002: We make the constant a variable, so that it can be tweaked
  * via environment variable.
  * 11/2002: Modern machines are bigger, cut this down from 10.
+ * 2/2025: Bump it back up to 10, to not take up quite so much space.
  */
 
 static size_t STR_CHAIN_MAX = 10;
