@@ -231,6 +231,9 @@ static int integrity_check(int line) {  // can be slow; intended for debugging s
       for (p = f->fnext; p != f; p = p->fnext) { nfwd++; assert(VAF(p)); assert(0 == getbit(p, IU)); }
       for (p = f->fprev; p != f; p = p->fprev) { nrev++; assert(VAF(p)); assert(0 == getbit(p, IU)); }
       assert(nfwd == nrev);    // count should be the same in both directions
+      // the following line uses nrev to silence a stupid gcc 16.1 warning.
+      if (nfwd != nrev) fprintf(stderr, "%s:%d: shouldn't happen\n",
+		      __FILE__, __LINE__);
       tf += nfwd;
       // check ao sizes against UB
       for (p = f->fnext; p != f; p = p->fnext) {
