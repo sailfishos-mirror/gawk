@@ -406,8 +406,9 @@ struct mb_char_classes
 {
   ptrdiff_t cset;
   bool invert;
-  char32_t *chars;              /* Normal characters.  */
   idx_t nchars;
+  char32_t *chars               /* Normal characters.  */
+    _GL_ATTRIBUTE_COUNTED_BY (nchars);
   idx_t nchars_alloc;
 };
 
@@ -1148,7 +1149,8 @@ parse_bracket_exp (struct dfa *dfa)
                   = maybe_realloc (dfa->lex.brack.chars, dfa->lex.brack.nchars,
                                    &dfa->lex.brack.nchars_alloc, -1,
                                    sizeof *dfa->lex.brack.chars);
-                dfa->lex.brack.chars[dfa->lex.brack.nchars++] = folded[i];
+                idx_t char_index = dfa->lex.brack.nchars++;
+                dfa->lex.brack.chars[char_index] = folded[i];
               }
         }
     }
