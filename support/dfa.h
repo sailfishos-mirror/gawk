@@ -58,6 +58,7 @@ struct dfa;
 # define _GL_ATTRIBUTE_DEALLOC(f, i)
 # define _GL_ATTRIBUTE_DEALLOC_FREE
 # define _GL_ATTRIBUTE_RETURNS_NONNULL
+# define _GL_ATTRIBUTE_COUNTED_BY(x)
 #endif
 
 /* Entry points. */
@@ -114,8 +115,6 @@ extern void dfacopysyntax (struct dfa *, struct dfa const *);
 
 /* Parse the given string of given length into the given struct dfa.  */
 extern void dfaparse (char const *, idx_t, struct dfa *);
-
-struct dfamust;
 
 /* Free the storage held by the components of a struct dfamust. */
 extern void dfamustfree (struct dfamust *);
