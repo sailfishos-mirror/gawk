@@ -2573,11 +2573,11 @@ readdir:
 	echo This test may fail on GNU/Linux systems when run on NFS or JFS filesystems.; \
 	echo If it does, try rerunning on an ext'[234]' filesystem. ; \
 	fi
-	@-$(AWK) -f "$(srcdir)"/readdir.awk "$(top_srcdir)" > _$@ || echo EXIT CODE: $$? >> _$@
+	@-$(AWK) -f "$(srcdir)"/readdir.awk "$(top_srcdir)" | sort -n > _$@ || echo EXIT CODE: $$? >> _$@
 	@-ls -afi "$(top_srcdir)" > _dirlist
 	@-ls -lna "$(top_srcdir)" | sed 1d > _longlist
 	@-$(AWK) -f "$(srcdir)"/readdir0.awk -v extout=_$@  \
-		-v dirlist=_dirlist -v longlist=_longlist > $@.ok
+		-v dirlist=_dirlist -v longlist=_longlist | sort -n  > $@.ok
 	@-rm -f _dirlist _longlist
 	@-$(CMP) $@.ok _$@ && rm -f $@.ok _$@
 
