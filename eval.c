@@ -922,8 +922,8 @@ fmt_index(NODE *n)
 	}
 
 	/* not found */
-	if (do_lint && ! fmt_ok(n))
-		lintwarn(_("bad `%sFMT' specification `%s'"),
+	if (! fmt_ok(n))
+		warning(_("bad `%sFMT' specification `%s'"),
 			    n == CONVFMT_node->var_value ? "CONV"
 			  : n == OFMT_node->var_value ? "O"
 			  : "", n->stptr);
