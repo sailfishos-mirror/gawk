@@ -1,3 +1,12 @@
+2026-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* eval.c (fmt_index): If OFMT or CONVFMT value is bad, always
+	warn.  Using something like %sf for CONVFMT causes a core dump
+	due to infinite recursion, but mawk and nawk also fail this way.
+	It's a user error, we should not correct the value for them but
+	instead have them fix their code.  Thanks to Michael D. Setzer II
+	<mikes@guam.net> for the report.
+
 2026-04-28         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* str_array.c (STR_CHAIN_MAX): Document the change in size
