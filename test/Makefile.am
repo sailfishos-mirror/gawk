@@ -1233,6 +1233,8 @@ EXTRA_DIST = \
 	regexpbrack2.awk \
 	regexpbrack2.in \
 	regexpbrack2.ok \
+	regexpbrack3.awk \
+	regexpbrack3.ok \
 	regexprange.awk \
 	regexprange.ok \
 	regexpuparrow.awk \
@@ -1594,6 +1596,7 @@ BASIC_TESTS = \
 	case-check greek-equiv greek-utf \
 	splitany \
 	uplus2 \
+	regexpbrack3 \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \

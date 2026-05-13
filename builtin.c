@@ -207,7 +207,7 @@ do_exp(int nargs)
 	DEREF(tmp);
 	errno = 0;
 	res = exp(d);
-	if (errno == ERANGE)
+	if (errno == ERANGE && res != 0.0)
 		warning(_("exp: argument %g is out of range"), d);
 	return make_number(res);
 }
