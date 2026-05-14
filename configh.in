@@ -299,7 +299,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to 1 if the system has the type `unsigned long long int'. */
+/* Define to 1 if the system has the type 'unsigned long long int'. */
 #undef HAVE_UNSIGNED_LONG_LONG_INT
 
 /* Define to 1 if you have the `waitpid' function. */
@@ -555,7 +555,13 @@
    do not define. */
 #undef uintmax_t
 
-#ifndef HAVE_C_BOOL
+#if !(defined __cplusplus \
+      ? 1 \
+      : (defined __clang__ \
+         ? __STDC_VERSION__ >= 202000L && __clang_major__ >= 15 \
+         : (defined __GNUC__ \
+            ? __STDC_VERSION__ >= 202000L && __GNUC__ >= 13 \
+            : defined HAVE_C_BOOL)))
 # if !defined __cplusplus && !defined __bool_true_false_are_defined
 #  if HAVE_STDBOOL_H
 #   include <stdbool.h>

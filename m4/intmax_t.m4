@@ -1,10 +1,18 @@
-#serial 6
+# intmax_t.m4
+# serial 9
+dnl Copyright (C) 1997-2004, 2006-2007, 2009-2026 Free Software Foundation,
+dnl Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Paul Eggert.
 
-AC_PREREQ(2.52)
+AC_PREREQ([2.53])
 
-# Define intmax_t to long or long long if <inttypes.h> doesn't define.
+# Define intmax_t to 'long' or 'long long'
+# if it is not already defined in <stdint.h> or <inttypes.h>.
 
 AC_DEFUN([gl_AC_TYPE_INTMAX_T],
 [
@@ -13,28 +21,41 @@ AC_DEFUN([gl_AC_TYPE_INTMAX_T],
   AC_REQUIRE([gl_AC_HEADER_INTTYPES_H])
   AC_REQUIRE([gl_AC_HEADER_STDINT_H])
   if test $gl_cv_header_inttypes_h = no && test $gl_cv_header_stdint_h = no; then
-    AC_REQUIRE([gl_AC_TYPE_LONG_LONG])
-    test $ac_cv_type_long_long = yes \
-      && ac_type='long long' \
-      || ac_type='long'
-    AC_DEFINE_UNQUOTED(intmax_t, $ac_type,
+    AC_DEFINE_UNQUOTED([intmax_t], [long long],
      [Define to long or long long if <inttypes.h> and <stdint.h> don't define.])
   else
-    AC_DEFINE(HAVE_INTMAX_T, 1,
+    AC_DEFINE([HAVE_INTMAX_T], [1],
       [Define if you have the 'intmax_t' type in <stdint.h> or <inttypes.h>.])
   fi
 ])
 
-# Define uintmax_t to unsigned long or unsigned long long
-# if <inttypes.h> doesn't define.
+dnl An alternative would be to explicitly test for 'intmax_t'.
 
-AC_DEFUN([jm_AC_TYPE_UINTMAX_T],
+AC_DEFUN([gt_AC_TYPE_INTMAX_T],
 [
-  AC_REQUIRE([jm_AC_TYPE_UNSIGNED_LONG_LONG])
-  AC_CHECK_TYPE(uintmax_t, ,
-    [test $ac_cv_type_unsigned_long_long = yes \
-       && ac_type='unsigned long long' \
-       || ac_type='unsigned long'
-     AC_DEFINE_UNQUOTED(uintmax_t, $ac_type,
-       [Define to widest unsigned type if <inttypes.h> doesn't define.])])
+  AC_REQUIRE([gl_AC_HEADER_INTTYPES_H])
+  AC_REQUIRE([gl_AC_HEADER_STDINT_H])
+  AC_CACHE_CHECK([for intmax_t], [gt_cv_c_intmax_t],
+    [AC_COMPILE_IFELSE(
+       [AC_LANG_PROGRAM(
+          [[
+#include <stddef.h>
+#include <stdlib.h>
+#if HAVE_STDINT_H_WITH_UINTMAX
+#include <stdint.h>
+#endif
+#if HAVE_INTTYPES_H_WITH_UINTMAX
+#include <inttypes.h>
+#endif
+          ]],
+          [[intmax_t x = -1; return !x;]])],
+       [gt_cv_c_intmax_t=yes],
+       [gt_cv_c_intmax_t=no])])
+  if test $gt_cv_c_intmax_t = yes; then
+    AC_DEFINE([HAVE_INTMAX_T], [1],
+      [Define if you have the 'intmax_t' type in <stdint.h> or <inttypes.h>.])
+  else
+    AC_DEFINE_UNQUOTED([intmax_t], [long long],
+     [Define to long or long long if <stdint.h> and <inttypes.h> don't define.])
+  fi
 ])
