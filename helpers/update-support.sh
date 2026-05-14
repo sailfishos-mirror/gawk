@@ -48,6 +48,7 @@ cd support
 rm -f pma.c pma.h
 wget --no-check-certificate https://web.eecs.umich.edu/~tpkelly/pma/latest/pma.h
 wget --no-check-certificate https://web.eecs.umich.edu/~tpkelly/pma/latest/pma.c
+cd ..
 
 
 M4_FILE_LIST="
@@ -81,6 +82,6 @@ for i in $M4_FILE_LIST
 do
 	if [ -f $GL/../m4/$i ] && [ -f m4/$i ]
 	then
-		cp $GL/../m4/$i $i
+		cp $GL/../m4/$i m4/$i
 	fi
 done
