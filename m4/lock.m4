@@ -1,8 +1,10 @@
-# lock.m4 serial 13 (gettext-0.18.2)
-dnl Copyright (C) 2005-2015 Free Software Foundation, Inc.
+# lock.m4
+# serial 15
+dnl Copyright (C) 2005-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
@@ -10,13 +12,18 @@ AC_DEFUN([gl_LOCK],
 [
   AC_REQUIRE([gl_THREADLIB])
   if test "$gl_threads_api" = posix; then
-    # OSF/1 4.0 and Mac OS X 10.1 lack the pthread_rwlock_t type and the
-    # pthread_rwlock_* functions.
+    # Mac OS X 10.1 lacks the pthread_rwlock_t type and the pthread_rwlock_*
+    # functions.
+    has_rwlock=false
     AC_CHECK_TYPE([pthread_rwlock_t],
-      [AC_DEFINE([HAVE_PTHREAD_RWLOCK], [1],
+      [has_rwlock=true
+       AC_DEFINE([HAVE_PTHREAD_RWLOCK], [1],
          [Define if the POSIX multithreading library has read/write locks.])],
       [],
       [#include <pthread.h>])
+    if $has_rwlock; then
+      gl_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER
+    fi
     # glibc defines PTHREAD_MUTEX_RECURSIVE as enum, not as a macro.
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM(

@@ -5421,13 +5421,13 @@ else $as_nop
     ac_cv_path_MSGFMT="$MSGFMT" # Let the user override the test with a path.
     ;;
   *)
-    ac_save_IFS="$IFS"; IFS=$PATH_SEPARATOR
+    gt_saved_IFS="$IFS"; IFS=$PATH_SEPARATOR
     for ac_dir in $PATH; do
-      IFS="$ac_save_IFS"
+      IFS="$gt_saved_IFS"
       test -z "$ac_dir" && ac_dir=.
       for ac_exec_ext in '' $ac_executable_extensions; do
         if $ac_executable_p "$ac_dir/$ac_word$ac_exec_ext"; then
-          echo "$as_me: trying $ac_dir/$ac_word..." >&5
+          echo "$as_me:${as_lineno-$LINENO}: trying $ac_dir/$ac_word..." >&5
           if $ac_dir/$ac_word --statistics /dev/null >&5 2>&1 &&
      (if $ac_dir/$ac_word --statistics /dev/null 2>&1 >/dev/null | grep usage >/dev/null; then exit 1; else exit 0; fi); then
             ac_cv_path_MSGFMT="$ac_dir/$ac_word$ac_exec_ext"
@@ -5436,7 +5436,7 @@ else $as_nop
         fi
       done
     done
-    IFS="$ac_save_IFS"
+    IFS="$gt_saved_IFS"
   test -z "$ac_cv_path_MSGFMT" && ac_cv_path_MSGFMT=":"
     ;;
 esac
@@ -5544,13 +5544,13 @@ else $as_nop
     ac_cv_path_XGETTEXT="$XGETTEXT" # Let the user override the test with a path.
     ;;
   *)
-    ac_save_IFS="$IFS"; IFS=$PATH_SEPARATOR
+    gt_saved_IFS="$IFS"; IFS=$PATH_SEPARATOR
     for ac_dir in $PATH; do
-      IFS="$ac_save_IFS"
+      IFS="$gt_saved_IFS"
       test -z "$ac_dir" && ac_dir=.
       for ac_exec_ext in '' $ac_executable_extensions; do
         if $ac_executable_p "$ac_dir/$ac_word$ac_exec_ext"; then
-          echo "$as_me: trying $ac_dir/$ac_word..." >&5
+          echo "$as_me:${as_lineno-$LINENO}: trying $ac_dir/$ac_word..." >&5
           if $ac_dir/$ac_word --omit-header --copyright-holder= --msgid-bugs-address= /dev/null >&5 2>&1 &&
      (if $ac_dir/$ac_word --omit-header --copyright-holder= --msgid-bugs-address= /dev/null 2>&1 >/dev/null | grep usage >/dev/null; then exit 1; else exit 0; fi); then
             ac_cv_path_XGETTEXT="$ac_dir/$ac_word$ac_exec_ext"
@@ -5559,7 +5559,7 @@ else $as_nop
         fi
       done
     done
-    IFS="$ac_save_IFS"
+    IFS="$gt_saved_IFS"
   test -z "$ac_cv_path_XGETTEXT" && ac_cv_path_XGETTEXT=":"
     ;;
 esac
@@ -5622,13 +5622,13 @@ else $as_nop
     ac_cv_path_MSGMERGE="$MSGMERGE" # Let the user override the test with a path.
     ;;
   *)
-    ac_save_IFS="$IFS"; IFS=$PATH_SEPARATOR
+    gt_saved_IFS="$IFS"; IFS=$PATH_SEPARATOR
     for ac_dir in $PATH; do
-      IFS="$ac_save_IFS"
+      IFS="$gt_saved_IFS"
       test -z "$ac_dir" && ac_dir=.
       for ac_exec_ext in '' $ac_executable_extensions; do
         if $ac_executable_p "$ac_dir/$ac_word$ac_exec_ext"; then
-          echo "$as_me: trying $ac_dir/$ac_word..." >&5
+          echo "$as_me:${as_lineno-$LINENO}: trying $ac_dir/$ac_word..." >&5
           if $ac_dir/$ac_word --update -q /dev/null /dev/null >&5 2>&1; then
             ac_cv_path_MSGMERGE="$ac_dir/$ac_word$ac_exec_ext"
             break 2
@@ -5636,7 +5636,7 @@ else $as_nop
         fi
       done
     done
-    IFS="$ac_save_IFS"
+    IFS="$gt_saved_IFS"
   test -z "$ac_cv_path_MSGMERGE" && ac_cv_path_MSGMERGE=":"
     ;;
 esac
@@ -5679,10 +5679,10 @@ fi
   else
     acl_final_exec_prefix="$exec_prefix"
   fi
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
   eval acl_final_exec_prefix=\"$acl_final_exec_prefix\"
-  prefix="$acl_save_prefix"
+  prefix="$acl_saved_prefix"
 
 
 
@@ -5734,7 +5734,7 @@ else $as_nop
     if test "$GCC" = yes; then
       # Check if gcc -print-prog-name=ld gives a path.
       case $host in
-        *-*-mingw*)
+        *-*-mingw* | windows*)
           # gcc leaves a trailing carriage return which upsets mingw
           acl_output=`($CC -print-prog-name=ld) 2>&5 | tr -d '\015'` ;;
         *)
@@ -5764,9 +5764,9 @@ else $as_nop
     fi
     if test -n "$ac_prog"; then
       # Search for $ac_prog in $PATH.
-      acl_save_ifs="$IFS"; IFS=$PATH_SEPARATOR
+      acl_saved_IFS="$IFS"; IFS=$PATH_SEPARATOR
       for ac_dir in $PATH; do
-        IFS="$acl_save_ifs"
+        IFS="$acl_saved_IFS"
         test -z "$ac_dir" && ac_dir=.
         if test -f "$ac_dir/$ac_prog" || test -f "$ac_dir/$ac_prog$ac_exeext"; then
           acl_cv_path_LD="$ac_dir/$ac_prog"
@@ -5783,13 +5783,13 @@ else $as_nop
           esac
         fi
       done
-      IFS="$acl_save_ifs"
+      IFS="$acl_saved_IFS"
     fi
     case $host in
       *-*-aix*)
         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#if defined __powerpc64__ || defined _ARCH_PPC64
+#if defined __powerpc64__ || defined __LP64__
                 int ok;
                #else
                 error fail
@@ -5912,261 +5912,63 @@ if test ${gl_cv_host_cpu_c_abi_32bit+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  if test -n "$gl_cv_host_cpu_c_abi"; then
-       case "$gl_cv_host_cpu_c_abi" in
-         i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
-           gl_cv_host_cpu_c_abi_32bit=yes ;;
-         x86_64 | alpha | arm64 | hppa64 | ia64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
-           gl_cv_host_cpu_c_abi_32bit=no ;;
-         *)
-           gl_cv_host_cpu_c_abi_32bit=unknown ;;
-       esac
-     else
-       case "$host_cpu" in
+  case "$host_cpu" in
 
-         # CPUs that only support a 32-bit ABI.
-         arc \
-         | bfin \
-         | cris* \
-         | csky \
-         | epiphany \
-         | ft32 \
-         | h8300 \
-         | m68k \
-         | microblaze | microblazeel \
-         | nds32 | nds32le | nds32be \
-         | nios2 | nios2eb | nios2el \
-         | or1k* \
-         | or32 \
-         | sh | sh1234 | sh1234elb \
-         | tic6x \
-         | xtensa* )
-           gl_cv_host_cpu_c_abi_32bit=yes
-           ;;
+       # CPUs that only support a 32-bit ABI.
+       arc \
+       | bfin \
+       | cris* \
+       | csky \
+       | epiphany \
+       | ft32 \
+       | h8300 \
+       | m68k \
+       | microblaze | microblazeel \
+       | nds32 | nds32le | nds32be \
+       | nios2 | nios2eb | nios2el \
+       | or1k* \
+       | or32 \
+       | sh | sh1234 | sh1234elb \
+       | tic6x \
+       | xtensa* )
+         gl_cv_host_cpu_c_abi_32bit=yes
+         ;;
 
-         # CPUs that only support a 64-bit ABI.
-         alpha | alphaev[4-8] | alphaev56 | alphapca5[67] | alphaev6[78] \
-         | mmix )
-           gl_cv_host_cpu_c_abi_32bit=no
-           ;;
+       # CPUs that only support a 64-bit ABI.
+       alpha | alphaev[4-8] | alphaev56 | alphapca5[67] | alphaev6[78] \
+       | mmix )
+         gl_cv_host_cpu_c_abi_32bit=no
+         ;;
 
-         i[34567]86 )
-           gl_cv_host_cpu_c_abi_32bit=yes
-           ;;
-
-         x86_64 )
-           # On x86_64 systems, the C compiler may be generating code in one of
-           # these ABIs:
-           # - 64-bit instruction set, 64-bit pointers, 64-bit 'long': x86_64.
-           # - 64-bit instruction set, 64-bit pointers, 32-bit 'long': x86_64
-           #   with native Windows (mingw, MSVC).
-           # - 64-bit instruction set, 32-bit pointers, 32-bit 'long': x86_64-x32.
-           # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': i386.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if (defined __x86_64__ || defined __amd64__ \
-                       || defined _M_X64 || defined _M_AMD64) \
-                      && !(defined __ILP32__ || defined _ILP32)
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         arm* | aarch64 )
-           # Assume arm with EABI.
-           # On arm64 systems, the C compiler may be generating code in one of
-           # these ABIs:
-           # - aarch64 instruction set, 64-bit pointers, 64-bit 'long': arm64.
-           # - aarch64 instruction set, 32-bit pointers, 32-bit 'long': arm64-ilp32.
-           # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': arm or armhf.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if defined __aarch64__ && !(defined __ILP32__ || defined _ILP32)
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         hppa1.0 | hppa1.1 | hppa2.0* | hppa64 )
-           # On hppa, the C compiler may be generating 32-bit code or 64-bit
-           # code. In the latter case, it defines _LP64 and __LP64__.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#ifdef __LP64__
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         ia64* )
-           # On ia64 on HP-UX, the C compiler may be generating 64-bit code or
-           # 32-bit code. In the latter case, it defines _ILP32.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#ifdef _ILP32
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=yes
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         mips* )
-           # We should also check for (_MIPS_SZPTR == 64), but gcc keeps this
-           # at 32.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if defined _MIPS_SZLONG && (_MIPS_SZLONG == 64)
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         powerpc* )
-           # Different ABIs are in use on AIX vs. Mac OS X vs. Linux,*BSD.
-           # No need to distinguish them here; the caller may distinguish
-           # them based on the OS.
-           # On powerpc64 systems, the C compiler may still be generating
-           # 32-bit code. And on powerpc-ibm-aix systems, the C compiler may
-           # be generating 64-bit code.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if defined __powerpc64__ || defined _ARCH_PPC64
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         rs6000 )
-           gl_cv_host_cpu_c_abi_32bit=yes
-           ;;
-
-         riscv32 | riscv64 )
-           # There are 6 ABIs: ilp32, ilp32f, ilp32d, lp64, lp64f, lp64d.
-           # Size of 'long' and 'void *':
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if defined __LP64__
-                    int ok;
-                  #else
-                    error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         s390* )
-           # On s390x, the C compiler may be generating 64-bit (= s390x) code
-           # or 31-bit (= s390) code.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if defined __LP64__ || defined __s390x__
-                    int ok;
-                  #else
-                    error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         sparc | sparc64 )
-           # UltraSPARCs running Linux have `uname -m` = "sparc64", but the
-           # C compiler still generates 32-bit code.
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if defined __sparcv9 || defined __arch64__
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_host_cpu_c_abi_32bit=no
-else $as_nop
-  gl_cv_host_cpu_c_abi_32bit=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-           ;;
-
-         *)
+       *)
+         if test -n "$gl_cv_host_cpu_c_abi"; then
+                      case "$gl_cv_host_cpu_c_abi" in
+             i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | loongarch32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
+               gl_cv_host_cpu_c_abi_32bit=yes ;;
+             x86_64 | alpha | arm64 | aarch64c | hppa64 | ia64 | loongarch64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
+               gl_cv_host_cpu_c_abi_32bit=no ;;
+             *)
+               gl_cv_host_cpu_c_abi_32bit=unknown ;;
+           esac
+         else
            gl_cv_host_cpu_c_abi_32bit=unknown
-           ;;
-       esac
-     fi
+         fi
+         if test $gl_cv_host_cpu_c_abi_32bit = unknown; then
+           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+int test_pointer_size[sizeof (void *) - 5];
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  gl_cv_host_cpu_c_abi_32bit=no
+else $as_nop
+  gl_cv_host_cpu_c_abi_32bit=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+         fi
+         ;;
+     esac
 
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gl_cv_host_cpu_c_abi_32bit" >&5
@@ -6461,7 +6263,7 @@ then :
 else $as_nop
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#ifdef __ELF__
+#if defined __ELF__ || (defined __linux__ && (defined __EDG__ || defined __SUNPRO_C))
         Extensible Linking Format
         #endif
 
@@ -6479,7 +6281,7 @@ rm -rf conftest*
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gl_cv_elf" >&5
 printf "%s\n" "$gl_cv_elf" >&6; }
-  if test $gl_cv_elf; then
+  if test $gl_cv_elf = yes; then
     # Extract the ELF class of a file (5th byte) in decimal.
     # Cf. https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header
     if od -A x < /dev/null >/dev/null 2>/dev/null; then
@@ -6496,19 +6298,22 @@ printf "%s\n" "$gl_cv_elf" >&6; }
         echo
       }
     fi
+    # Use 'expr', not 'test', to compare the values of func_elfclass, because on
+    # Solaris 11 OpenIndiana and Solaris 11 OmniOS, the result is 001 or 002,
+    # not 1 or 2.
     case $HOST_CPU_C_ABI_32BIT in
       yes)
         # 32-bit ABI.
         acl_is_expected_elfclass ()
         {
-          test "`func_elfclass | sed -e 's/[ 	]//g'`" = 1
+          expr "`func_elfclass | sed -e 's/[ 	]//g'`" = 1 > /dev/null
         }
         ;;
       no)
         # 64-bit ABI.
         acl_is_expected_elfclass ()
         {
-          test "`func_elfclass | sed -e 's/[ 	]//g'`" = 2
+          expr "`func_elfclass | sed -e 's/[ 	]//g'`" = 2 > /dev/null
         }
         ;;
       *)
@@ -6545,6 +6350,13 @@ else $as_nop
            esac
          fi
          ;;
+       netbsd*)
+                           if test $HOST_CPU_C_ABI_32BIT != no; then
+           case "$host_cpu" in
+             sparc*) acl_libdirstem2=lib/sparc ;;
+           esac
+         fi
+         ;;
        *)
                                                                                  searchpath=`(LC_ALL=C $CC $CPPFLAGS $CFLAGS -print-search-dirs) 2>/dev/null \
                      | sed -n -e 's,^libraries: ,,p' | sed -e 's,^=,,'`
@@ -6561,7 +6373,7 @@ else $as_nop
            fi
          fi
          if test -n "$searchpath"; then
-           acl_save_IFS="${IFS= 	}"; IFS=":"
+           acl_saved_IFS="${IFS= 	}"; IFS=":"
            for searchdir in $searchpath; do
              if test -d "$searchdir"; then
                case "$searchdir" in
@@ -6578,7 +6390,7 @@ else $as_nop
                esac
              fi
            done
-           IFS="$acl_save_IFS"
+           IFS="$acl_saved_IFS"
            if test $HOST_CPU_C_ABI_32BIT = yes; then
              # 32-bit ABI.
              acl_libdirstem3=
@@ -6613,9 +6425,9 @@ printf "%s\n" "$acl_cv_libdirstems" >&6; }
 
     use_additional=yes
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
 
     eval additional_includedir=\"$includedir\"
@@ -6623,8 +6435,8 @@ printf "%s\n" "$acl_cv_libdirstems" >&6; }
     eval additional_libdir2=\"$exec_prefix/$acl_libdirstem2\"
     eval additional_libdir3=\"$exec_prefix/$acl_libdirstem3\"
 
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
 
 # Check whether --with-libiconv-prefix was given.
@@ -6636,9 +6448,9 @@ then :
     else
       if test "X$withval" = "X"; then
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
 
           eval additional_includedir=\"$includedir\"
@@ -6646,8 +6458,8 @@ then :
           eval additional_libdir2=\"$exec_prefix/$acl_libdirstem2\"
           eval additional_libdir3=\"$exec_prefix/$acl_libdirstem3\"
 
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
       else
         additional_includedir="$withval/include"
@@ -6759,13 +6571,13 @@ fi
           if test "X$found_dir" = "X"; then
             for x in $LDFLAGS $LTLIBICONV; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
               case "$x" in
                 -L*)
@@ -6853,13 +6665,13 @@ fi
                                                                                 haveit=
                     for x in $LDFLAGS $LIBICONV; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                       if test "X$x" = "X-L$found_dir"; then
                         haveit=yes
@@ -6921,13 +6733,13 @@ fi
                 if test -z "$haveit"; then
                   for x in $CPPFLAGS $INCICONV; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                     if test "X$x" = "X-I$additional_includedir"; then
                       haveit=yes
@@ -6943,12 +6755,12 @@ fi
               fi
             fi
                         if test -n "$found_la"; then
-                                                        save_libdir="$libdir"
+                                                        saved_libdir="$libdir"
               case "$found_la" in
                 */* | *\\*) . "$found_la" ;;
                 *) . "./$found_la" ;;
               esac
-              libdir="$save_libdir"
+              libdir="$saved_libdir"
                             for dep in $dependency_libs; do
                 case "$dep" in
                   -L*)
@@ -6970,13 +6782,13 @@ fi
                         haveit=
                         for x in $LDFLAGS $LIBICONV; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                           if test "X$x" = "X-L$dependency_libdir"; then
                             haveit=yes
@@ -6991,13 +6803,13 @@ fi
                         haveit=
                         for x in $LDFLAGS $LTLIBICONV; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                           if test "X$x" = "X-L$dependency_libdir"; then
                             haveit=yes
@@ -7038,7 +6850,14 @@ fi
                     fi
                     ;;
                   -l*)
-                                        names_next_round="$names_next_round "`echo "X$dep" | sed -e 's/^X-l//'`
+                                                                                                                                                                dep=`echo "X$dep" | sed -e 's/^X-l//'`
+                    if test "X$dep" != Xc \
+                       || case $host_os in
+                            linux* | gnu* | k*bsd*-gnu) false ;;
+                            *)                          true ;;
+                          esac; then
+                      names_next_round="$names_next_round $dep"
+                    fi
                     ;;
                   *.la)
                                                                                 names_next_round="$names_next_round "`echo "X$dep" | sed -e 's,^X.*/,,' -e 's,^lib,,' -e 's,\.la$,,'`
@@ -7064,17 +6883,17 @@ fi
       for found_dir in $rpathdirs; do
         alldirs="${alldirs}${alldirs:+$acl_hardcode_libdir_separator}$found_dir"
       done
-            acl_save_libdir="$libdir"
+            acl_saved_libdir="$libdir"
       libdir="$alldirs"
       eval flag=\"$acl_hardcode_libdir_flag_spec\"
-      libdir="$acl_save_libdir"
+      libdir="$acl_saved_libdir"
       LIBICONV="${LIBICONV}${LIBICONV:+ }$flag"
     else
             for found_dir in $rpathdirs; do
-        acl_save_libdir="$libdir"
+        acl_saved_libdir="$libdir"
         libdir="$found_dir"
         eval flag=\"$acl_hardcode_libdir_flag_spec\"
-        libdir="$acl_save_libdir"
+        libdir="$acl_saved_libdir"
         LIBICONV="${LIBICONV}${LIBICONV:+ }$flag"
       done
     fi
@@ -7119,7 +6938,7 @@ if test ${gt_cv_func_CFPreferencesCopyAppValue+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  gt_save_LIBS="$LIBS"
+  gt_saved_LIBS="$LIBS"
      LIBS="$LIBS -Wl,-framework -Wl,CoreFoundation"
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -7140,7 +6959,7 @@ else $as_nop
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
-     LIBS="$gt_save_LIBS"
+     LIBS="$gt_saved_LIBS"
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gt_cv_func_CFPreferencesCopyAppValue" >&5
 printf "%s\n" "$gt_cv_func_CFPreferencesCopyAppValue" >&6; }
@@ -7155,7 +6974,7 @@ if test ${gt_cv_func_CFLocaleCopyPreferredLanguages+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  gt_save_LIBS="$LIBS"
+  gt_saved_LIBS="$LIBS"
      LIBS="$LIBS -Wl,-framework -Wl,CoreFoundation"
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -7176,7 +6995,7 @@ else $as_nop
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
-     LIBS="$gt_save_LIBS"
+     LIBS="$gt_saved_LIBS"
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gt_cv_func_CFLocaleCopyPreferredLanguages" >&5
 printf "%s\n" "$gt_cv_func_CFLocaleCopyPreferredLanguages" >&6; }
@@ -7188,7 +7007,7 @@ printf "%s\n" "#define HAVE_CFLOCALECOPYPREFERREDLANGUAGES 1" >>confdefs.h
   INTL_MACOSX_LIBS=
   if test $gt_cv_func_CFPreferencesCopyAppValue = yes \
      || test $gt_cv_func_CFLocaleCopyPreferredLanguages = yes; then
-    INTL_MACOSX_LIBS="-Wl,-framework -Wl,CoreFoundation"
+                    INTL_MACOSX_LIBS="-Wl,-framework -Wl,CoreFoundation -Wl,-framework -Wl,CoreServices"
   fi
 
 
@@ -7277,19 +7096,19 @@ printf "%s\n" "$ac_res" >&6; }
 
 
 
-          am_save_CPPFLAGS="$CPPFLAGS"
+          gl_saved_CPPFLAGS="$CPPFLAGS"
 
   for element in $INCICONV; do
     haveit=
     for x in $CPPFLAGS; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
       if test "X$x" = "X$element"; then
         haveit=yes
@@ -7334,7 +7153,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
     if test "$am_cv_func_iconv" != yes; then
-      am_save_LIBS="$LIBS"
+      gl_saved_LIBS="$LIBS"
       LIBS="$LIBS $LIBICONV"
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -7359,7 +7178,7 @@ then :
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
-      LIBS="$am_save_LIBS"
+      LIBS="$gl_saved_LIBS"
     fi
 
 fi
@@ -7373,7 +7192,7 @@ then :
   printf %s "(cached) " >&6
 else $as_nop
 
-                  am_save_LIBS="$LIBS"
+                  gl_saved_LIBS="$LIBS"
       if test $am_cv_lib_iconv = yes; then
         LIBS="$LIBS $LIBICONV"
       fi
@@ -7400,8 +7219,9 @@ int
 main (void)
 {
 int result = 0;
-  /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
-     returns.  */
+  /* Test against AIX 5.1...7.2 bug: Failures are not distinguishable from
+     successful returns.  This is even documented in
+     <https://www.ibm.com/support/knowledgecenter/ssw_aix_72/i_bostechref/iconv.html> */
   {
     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
     if (cd_utf8_to_88591 != (iconv_t)(-1))
@@ -7417,6 +7237,35 @@ int result = 0;
                             &outptr, &outbytesleft);
         if (res == 0)
           result |= 1;
+        iconv_close (cd_utf8_to_88591);
+      }
+  }
+  /* Test against macOS 14.4 bug: Failures are not distinguishable from
+     successful returns.
+     POSIX:2018 says: "The iconv() function shall ... return the number of
+     non-identical conversions performed."
+     But here, the conversion always does transliteration (the suffixes
+     "//TRANSLIT" and "//IGNORE" have no effect, nor does iconvctl()) and
+     does not report when it does a non-identical conversion.  */
+  {
+    iconv_t cd_utf8_to_88591 = iconv_open ("ISO-8859-1", "UTF-8");
+    if (cd_utf8_to_88591 != (iconv_t)(-1))
+      {
+        static ICONV_CONST char input[] = "\305\202"; /* LATIN SMALL LETTER L WITH STROKE */
+        char buf[10];
+        ICONV_CONST char *inptr = input;
+        size_t inbytesleft = strlen (input);
+        char *outptr = buf;
+        size_t outbytesleft = sizeof (buf);
+        size_t res = iconv (cd_utf8_to_88591,
+                            &inptr, &inbytesleft,
+                            &outptr, &outbytesleft);
+        /* Here:
+           With glibc, GNU libiconv (including macOS up to 13): res == (size_t)-1, errno == EILSEQ.
+           With musl libc, NetBSD 10, Solaris 11: res == 1.
+           With macOS 14.4: res == 0, output is "l".  */
+        if (res == 0)
+          result |= 2;
         iconv_close (cd_utf8_to_88591);
       }
   }
@@ -7436,7 +7285,7 @@ int result = 0;
                             &inptr, &inbytesleft,
                             &outptr, &outbytesleft);
         if (res == 0)
-          result |= 2;
+          result |= 4;
         iconv_close (cd_ascii_to_88591);
       }
   }
@@ -7455,7 +7304,7 @@ int result = 0;
                             &inptr, &inbytesleft,
                             &outptr, &outbytesleft);
         if (res != (size_t)(-1) || outptr - buf > 1 || buf[1] != (char)0xAD)
-          result |= 4;
+          result |= 8;
         iconv_close (cd_88591_to_utf8);
       }
   }
@@ -7475,7 +7324,7 @@ int result = 0;
                             &inptr, &inbytesleft,
                             &outptr, &outbytesleft);
         if ((int)res > 0)
-          result |= 8;
+          result |= 16;
         iconv_close (cd_88591_to_utf8);
       }
   }
@@ -7485,7 +7334,7 @@ int result = 0;
   {
     /* Try standardized names.  */
     iconv_t cd1 = iconv_open ("UTF-8", "EUC-JP");
-    /* Try IRIX, OSF/1 names.  */
+    /* Try possible *BSD names.  */
     iconv_t cd2 = iconv_open ("UTF-8", "eucJP");
     /* Try AIX names.  */
     iconv_t cd3 = iconv_open ("UTF-8", "IBM-eucJP");
@@ -7493,7 +7342,7 @@ int result = 0;
     iconv_t cd4 = iconv_open ("utf8", "eucJP");
     if (cd1 == (iconv_t)(-1) && cd2 == (iconv_t)(-1)
         && cd3 == (iconv_t)(-1) && cd4 == (iconv_t)(-1))
-      result |= 16;
+      result |= 32;
     if (cd1 != (iconv_t)(-1))
       iconv_close (cd1);
     if (cd2 != (iconv_t)(-1))
@@ -7519,7 +7368,7 @@ fi
 
         test "$am_cv_func_iconv_works" = no || break
       done
-      LIBS="$am_save_LIBS"
+      LIBS="$gl_saved_LIBS"
 
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $am_cv_func_iconv_works" >&5
@@ -7542,7 +7391,7 @@ printf %s "checking how to link with libiconv... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $LIBICONV" >&5
 printf "%s\n" "$LIBICONV" >&6; }
   else
-            CPPFLAGS="$am_save_CPPFLAGS"
+            CPPFLAGS="$gl_saved_CPPFLAGS"
     LIBICONV=
     LTLIBICONV=
   fi
@@ -7558,9 +7407,9 @@ printf "%s\n" "$LIBICONV" >&6; }
 
     use_additional=yes
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
 
     eval additional_includedir=\"$includedir\"
@@ -7568,8 +7417,8 @@ printf "%s\n" "$LIBICONV" >&6; }
     eval additional_libdir2=\"$exec_prefix/$acl_libdirstem2\"
     eval additional_libdir3=\"$exec_prefix/$acl_libdirstem3\"
 
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
 
 # Check whether --with-libintl-prefix was given.
@@ -7581,9 +7430,9 @@ then :
     else
       if test "X$withval" = "X"; then
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
 
           eval additional_includedir=\"$includedir\"
@@ -7591,8 +7440,8 @@ then :
           eval additional_libdir2=\"$exec_prefix/$acl_libdirstem2\"
           eval additional_libdir3=\"$exec_prefix/$acl_libdirstem3\"
 
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
       else
         additional_includedir="$withval/include"
@@ -7704,13 +7553,13 @@ fi
           if test "X$found_dir" = "X"; then
             for x in $LDFLAGS $LTLIBINTL; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
               case "$x" in
                 -L*)
@@ -7798,13 +7647,13 @@ fi
                                                                                 haveit=
                     for x in $LDFLAGS $LIBINTL; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                       if test "X$x" = "X-L$found_dir"; then
                         haveit=yes
@@ -7866,13 +7715,13 @@ fi
                 if test -z "$haveit"; then
                   for x in $CPPFLAGS $INCINTL; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                     if test "X$x" = "X-I$additional_includedir"; then
                       haveit=yes
@@ -7888,12 +7737,12 @@ fi
               fi
             fi
                         if test -n "$found_la"; then
-                                                        save_libdir="$libdir"
+                                                        saved_libdir="$libdir"
               case "$found_la" in
                 */* | *\\*) . "$found_la" ;;
                 *) . "./$found_la" ;;
               esac
-              libdir="$save_libdir"
+              libdir="$saved_libdir"
                             for dep in $dependency_libs; do
                 case "$dep" in
                   -L*)
@@ -7915,13 +7764,13 @@ fi
                         haveit=
                         for x in $LDFLAGS $LIBINTL; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                           if test "X$x" = "X-L$dependency_libdir"; then
                             haveit=yes
@@ -7936,13 +7785,13 @@ fi
                         haveit=
                         for x in $LDFLAGS $LTLIBINTL; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
                           if test "X$x" = "X-L$dependency_libdir"; then
                             haveit=yes
@@ -7983,7 +7832,14 @@ fi
                     fi
                     ;;
                   -l*)
-                                        names_next_round="$names_next_round "`echo "X$dep" | sed -e 's/^X-l//'`
+                                                                                                                                                                dep=`echo "X$dep" | sed -e 's/^X-l//'`
+                    if test "X$dep" != Xc \
+                       || case $host_os in
+                            linux* | gnu* | k*bsd*-gnu) false ;;
+                            *)                          true ;;
+                          esac; then
+                      names_next_round="$names_next_round $dep"
+                    fi
                     ;;
                   *.la)
                                                                                 names_next_round="$names_next_round "`echo "X$dep" | sed -e 's,^X.*/,,' -e 's,^lib,,' -e 's,\.la$,,'`
@@ -8009,17 +7865,17 @@ fi
       for found_dir in $rpathdirs; do
         alldirs="${alldirs}${alldirs:+$acl_hardcode_libdir_separator}$found_dir"
       done
-            acl_save_libdir="$libdir"
+            acl_saved_libdir="$libdir"
       libdir="$alldirs"
       eval flag=\"$acl_hardcode_libdir_flag_spec\"
-      libdir="$acl_save_libdir"
+      libdir="$acl_saved_libdir"
       LIBINTL="${LIBINTL}${LIBINTL:+ }$flag"
     else
             for found_dir in $rpathdirs; do
-        acl_save_libdir="$libdir"
+        acl_saved_libdir="$libdir"
         libdir="$found_dir"
         eval flag=\"$acl_hardcode_libdir_flag_spec\"
-        libdir="$acl_save_libdir"
+        libdir="$acl_saved_libdir"
         LIBINTL="${LIBINTL}${LIBINTL:+ }$flag"
       done
     fi
@@ -8192,13 +8048,13 @@ printf "%s\n" "$LIBINTL" >&6; }
     haveit=
     for x in $CPPFLAGS; do
 
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   eval x=\"$x\"
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 
       if test "X$x" = "X$element"; then
         haveit=yes
