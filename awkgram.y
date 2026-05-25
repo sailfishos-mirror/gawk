@@ -1155,6 +1155,8 @@ non_compound_stmt
 simple_stmt
 	: print { in_print = true; in_parens = 0; } print_expression_list output_redir
 	  {
+		static bool warned = false;
+
 		/*
 		 * Optimization: plain `print' has no expression list, so $3 is null.
 		 * If $3 is NULL or is a bytecode list for $0 use Op_K_print_rec,
@@ -1169,7 +1171,6 @@ simple_stmt
 					&& $3->nexti->nexti->memory->type == Node_val)
 			)
 		) {
-			static bool warned = false;
 			/*   -----------------
 			 *      output_redir
 			 *    [ redirect exp ]
@@ -1229,6 +1230,12 @@ regular_print:
 						$1->opcode = Op_K_print_rec;
 					$1->redir_type = redirect_none;
 					$$ = list_create($1);
+
+					if (do_lint && (rule == BEGIN || rule == END) && ! warned) {
+						warned = true;
+						lintwarn_ln($1->source_line,
+			_("plain `print' in BEGIN or END rule should probably be `print \"\"'"));
+					}
 				} else {
 					INSTRUCTION *t = $3;
 					$1->expr_count = count_expressions(&t, false);
@@ -5477,14 +5484,16 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 	INSTRUCTION *ip1,*ip2, *lint_plus;
 	AWKNUM res;
 
+	if (! do_optimize)
+		goto regular;
+
 	ip2 = s2->nexti;
 	if (s2->lasti == ip2 && ip2->opcode == Op_push_i) {
 	/* do any numeric constant folding */
 		ip1 = s1->nexti;
-		if (do_optimize
-				&& ip1 == s1->lasti && ip1->opcode == Op_push_i
-				&& (ip1->memory->flags & (MPFN|MPZN|STRCUR|STRING)) == 0
-				&& (ip2->memory->flags & (MPFN|MPZN|STRCUR|STRING)) == 0
+		if (ip1 == s1->lasti && ip1->opcode == Op_push_i
+			&& (ip1->memory->flags & (MPFN|MPZN|STRCUR|STRING)) == 0
+			&& (ip2->memory->flags & (MPFN|MPZN|STRCUR|STRING)) == 0
 		) {
 			NODE *n1 = ip1->memory, *n2 = ip2->memory;
 			res = force_number(n1)->numbr;
