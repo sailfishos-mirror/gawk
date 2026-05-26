@@ -5505,7 +5505,12 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 			case Op_quotient:
 				if ((n2->flags & NUMBER) != 0 && n2->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
-					error_ln(op->source_line, _("division by zero attempted"));
+					/* 5/2026: make it a lint warning, keep Doug McIlroy happy. */
+					static bool warned = false;
+					if (do_lint && ! warned) {
+						warned = true;
+						lintwarn(_("division by zero may occur at runtime"));
+					}
 					goto regular;
 				}
 
@@ -5514,7 +5519,12 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 			case Op_mod:
 				if ((n2->flags & NUMBER) != 0 && n2->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
-					error_ln(op->source_line, _("division by zero attempted in `%%'"));
+					/* 5/2026: make it a lint warning, keep Doug McIlroy happy. */
+					static bool warned = false;
+					if (do_lint && ! warned) {
+						warned = true;
+						lintwarn(_("division by zero in `%%' may occur at runtime"));
+					}
 					goto regular;
 				}
 #ifdef HAVE_FMOD
@@ -5558,7 +5568,12 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 			case Op_quotient:
 				if ((ip2->memory->flags & NUMBER) != 0 && ip2->memory->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
-					error_ln(op->source_line, _("division by zero attempted"));
+					/* 5/2026: make it a lint warning, keep Doug McIlroy happy. */
+					static bool warned = false;
+					if (do_lint && ! warned) {
+						warned = true;
+						lintwarn(_("division by zero may occur at runtime"));
+					}
 					goto regular;
 				}
 
@@ -5567,7 +5582,12 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 			case Op_mod:
 				if ((ip2->memory->flags & NUMBER) != 0 && ip2->memory->numbr == 0.0) {
 					/* don't fatalize, allow parsing rest of the input */
-					error_ln(op->source_line, _("division by zero attempted in `%%'"));
+					/* 5/2026: make it a lint warning, keep Doug McIlroy happy. */
+					static bool warned = false;
+					if (do_lint && ! warned) {
+						warned = true;
+						lintwarn(_("division by zero in `%%' may occur at runtime"));
+					}
 					goto regular;
 				}
 
