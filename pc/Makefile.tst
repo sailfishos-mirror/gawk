@@ -290,6 +290,7 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4 \
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \
+	divzero \
 	defref fmtspcl lintexp lintindex lintint lintlength lintplus \
 	lintplus2 lintplus3 lintwarn noeffect nofmtch nonl shadow uninit2 \
 	lintsubarray linttypeof \
@@ -1687,7 +1688,7 @@ dfastress:
 
 divzero:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 divzero2:
