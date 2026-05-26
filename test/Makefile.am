@@ -1724,6 +1724,7 @@ NEED_DEBUG = dbugtypedre1 dbugtypedre2 dbugeval2 dbugeval3 dbugeval4 \
 
 # List of the tests which should be run with --lint option:
 NEED_LINT = \
+	divzero \
 	defref fmtspcl lintexp lintindex lintint lintlength lintplus \
 	lintplus2 lintplus3 lintwarn noeffect nofmtch nonl shadow uninit2 \
 	lintsubarray linttypeof \
