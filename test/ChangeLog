@@ -1,3 +1,20 @@
+2026-05-28         Aditya G S            <adityags2004@gmail.com>
+
+	* randtest.sh: The randtest previously failed if any
+	autocorrelation value exceeded the sigma threshold, which
+	could lead to intermittent failures due to normal statistical
+	fluctuations.
+	
+	An earlier attempt allowed a limited number of exceedances, but this
+	approach weakens the strictness of the test.
+	
+	Instead, detect cases where sigma is too small (indicating unstable
+	normalization) and retry the computation from scratch. This avoids
+	false positives while preserving strict validation criteria.
+	
+	This approach maintains test integrity and improves stability across
+	different environments, following upstream feedback.
+
 2026-05-26         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* Makefile.am (NEED_LINT): Add divzero.
