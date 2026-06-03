@@ -54,8 +54,6 @@ cd ..
 M4_FILE_LIST="
 c-bool.m4
 codeset.m4
-extern-inline.m4
-fcntl-o.m4
 host-cpu-c-abi.m4
 iconv.m4
 intlmacosx.m4
