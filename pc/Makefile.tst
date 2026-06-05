@@ -239,7 +239,7 @@ GAWK_EXT_TESTS = \
 	include2 indirectbuiltin indirectbuiltin3 indirectbuiltin4 \
 	indirectbuiltin5 indirectbuiltin6 indirectcall indirectcall2 \
 	indirectcall3 intarray iolint isarrayunset \
-	lint lintexp lintindex lintint lintlength lintold lintplus lintplus2 lintplus3 \
+	lint lintexp lintindex lintint lintlength lintplus lintplus2 lintplus3 \
 	lintset lintsubarray linttypeof lintwarn \
 	manyfiles match1 match2 match3 mdim1 mdim2 mdim3 mdim4 mdim5 mdim6 mdim7 \
 	mdim8 memleak2 memleak3 mixed1 mktime modifiers muldimposix nastyparm \
@@ -297,9 +297,6 @@ NEED_LINT = \
 	uninit3 uninit4 uninit5 uninitialized
 
 
-# List of the tests which should be run with --lint-old option:
-NEED_LINT_OLD = lintold
-
 # List of tests that must be run with -M
 NEED_MPFR = \
 	mpfranswer42 mpfrbigint mpfrbigint2 mpfrcase mpfrcase2 \
@@ -321,9 +318,6 @@ NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
 	profile4 profile5 profile8 profile9 profile10 profile11 profile13 \
 	profile14 profile15 profile16 profile17
 
-
-# List of tests that need --re-interval
-NEED_RE_INTERVAL = gsubtst3 reint reint2
 
 # List of tests that need --sandbox
 NEED_SANDBOX = sandbox1
@@ -353,6 +347,7 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
+	ordchr \
 	case-check greek-equiv greek-utf \
 	backbigs1 backsmalls1 backsmalls2 commas concat4 dfamb1 \
 	gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
@@ -1214,7 +1209,7 @@ symtab9:
 
 reginttrad:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) --traditional -r -f "$(srcdir)"/$@.awk > _$@ || echo EXIT CODE: $$? >> _$@
+	@-$(AWK) --traditional -f "$(srcdir)"/$@.awk > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 colonwarn:
@@ -1910,7 +1905,7 @@ gsubtst2:
 
 gsubtst3:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --re-interval < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 gsubtst4:
@@ -3348,11 +3343,6 @@ lintlength:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
-lintold:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint-old < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
 lintplus:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -3666,13 +3656,13 @@ regx8bit:
 
 reint:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --re-interval < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 reint2:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --re-interval < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 rsgetline:
@@ -4091,7 +4081,8 @@ functab5:
 
 ordchr:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 revout:

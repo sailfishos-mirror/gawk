@@ -1107,7 +1107,7 @@ set_element(long num, char *s, long len, NODE *n)
 
 	it = make_string(s, len);
 	it->flags |= USER_INPUT;
-	sub = make_number((AWKNUM) (num));
+	sub = make_number(num);
 	assoc_set(n, sub, it);
 }
 
@@ -1135,7 +1135,7 @@ do_split(int nargs)
 			fatal(_("split: fourth argument is not an array"));
 		check_symtab_functab(sep_arr, "split",
 				_("%s: cannot use %s as fourth argument"));
-		if ((do_lint_extensions || do_lint_old) && ! warned) {
+		if (do_lint_extensions && ! warned) {
 			warned = true;
 			lintwarn(_("split: fourth argument is a gawk extension"));
 		}
@@ -1178,7 +1178,7 @@ do_split(int nargs)
 		 */
 		tmp = POP_SCALAR();
 		DEREF(tmp);
-		return make_number((AWKNUM) 0);
+		return make_number(0.0);
 	}
 
 	if ((sep->flags & REGEX) != 0)
@@ -1244,7 +1244,7 @@ do_split(int nargs)
 	 * The check for do_csv prevents dereferencing fs which is NULL if do_csv.
 	 */
 	s = src->stptr;
-	tmp = make_number((AWKNUM) (*parseit)(UNLIMITED, &s, (int) src->stlen,
+	tmp = make_number((double) (*parseit)(UNLIMITED, &s, (int) src->stlen,
 					     fs, rp, set_element, arr, sep_arr,
 					     ! do_csv && fs->stlen == 1));
 
@@ -1329,11 +1329,11 @@ do_patsplit(int nargs)
 		/*
 		 * Skip the work if first arg is the null string.
 		 */
-		tmp = make_number((AWKNUM) 0);
+		tmp = make_number(0.0);
 	} else {
 		rp = re_update(sep);
 		s = src->stptr;
-		tmp = make_number((AWKNUM) fpat_parse_field(UNLIMITED, &s,
+		tmp = make_number((double) fpat_parse_field(UNLIMITED, &s,
 				(int) src->stlen, fpat, rp,
 				set_element, arr, sep_arr, false));
 	}
@@ -1554,8 +1554,6 @@ choose_fs_function:
 			lintwarn(_("null string for `FS' is a gawk extension"));
 		}
 	} else if (fs->stlen > 1 || (fs->flags & REGEX) != 0) {
-		if (do_lint_old)
-			lintwarn(_("old awk does not support regexps as value of `FS'"));
 		set_parser(re_parse_field);
 	} else if (RS_is_null) {
 		/* we know that fs->stlen <= 1 */
@@ -1660,7 +1658,7 @@ update_PROCINFO_str(const char *subscript, const char *str)
 /* update_PROCINFO_num --- update PROCINFO[sub] with numeric value */
 
 void
-update_PROCINFO_num(const char *subscript, AWKNUM val)
+update_PROCINFO_num(const char *subscript, double val)
 {
 	NODE *tmp;
 

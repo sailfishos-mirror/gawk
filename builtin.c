@@ -209,7 +209,7 @@ do_exp(int nargs)
 	res = exp(d);
 	if (errno == ERANGE && res != 0.0)
 		warning(_("exp: argument %g is out of range"), d);
-	return make_number((AWKNUM) res);
+	return make_number(res);
 }
 
 /* stdfile --- return fp for a standard file */
@@ -267,7 +267,7 @@ do_fflush(int nargs)
 	/* fflush() */
 	if (nargs == 0) {
 		status = flush_io();	// ERRNO updated
-		return make_number((AWKNUM) status);
+		return make_number(status);
 	}
 
 	tmp = POP_STRING();
@@ -280,7 +280,7 @@ do_fflush(int nargs)
 	if (tmp->stlen == 0) {
 		status = flush_io();	// ERRNO updated
 		DEREF(tmp);
-		return make_number((AWKNUM) status);
+		return make_number(status);
 	}
 
 	/* fflush("/some/path") */
@@ -295,7 +295,7 @@ do_fflush(int nargs)
 				warning(_("fflush: cannot flush: file `%.*s' opened for reading, not writing"),
 					len, file);
 			DEREF(tmp);
-			return make_number((AWKNUM) status);
+			return make_number(status);
 		}
 		fp = rp->output.fp;
 		if (fp != NULL) {
@@ -317,7 +317,7 @@ do_fflush(int nargs)
 		warning(_("fflush: `%.*s' is not an open file, pipe or co-process"), len, file);
 	}
 	DEREF(tmp);
-	return make_number((AWKNUM) status);
+	return make_number(status);
 }
 
 /* strncasecmpmbs --- like strncasecmp (multibyte string version)  */
@@ -513,7 +513,7 @@ do_index(int nargs)
 out:
 	DEREF(s1);
 	DEREF(s2);
-	return make_number((AWKNUM) ret);
+	return make_number(ret);
 }
 
 /* double_to_int --- convert double to int, used several places */
@@ -544,7 +544,7 @@ do_int(int nargs)
 	d = force_number(tmp)->numbr;
 	d = double_to_int(d);
 	DEREF(tmp);
-	return make_number((AWKNUM) d);
+	return make_number(d);
 }
 
 /* do_isarray --- check if argument is array */
@@ -572,7 +572,7 @@ do_isarray(int nargs)
 		if (tmp->type == Node_val)
 			DEREF(tmp);
 	}
-	return make_number((AWKNUM) ret);
+	return make_number(ret);
 }
 
 /* do_length --- length of a string, array or $0 */
@@ -627,7 +627,7 @@ do_length(int nargs)
 		len = tmp->stlen;
 
 	DEREF(tmp);
-	return make_number((AWKNUM) len);
+	return make_number(len);
 }
 
 /* do_log --- the log function */
@@ -648,7 +648,7 @@ do_log(int nargs)
 		warning(_("%s: received negative argument %g"), "log", arg);
 	d = log(arg);
 	DEREF(tmp);
-	return make_number((AWKNUM) d);
+	return make_number(d);
 }
 
 /* do_sqrt --- do the sqrt function */
@@ -664,11 +664,11 @@ do_sqrt(int nargs)
 	tmp = POP_SCALAR();
 	if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 		lintwarn(_("%s: received non-numeric argument"), "sqrt");
-	arg = (double) force_number(tmp)->numbr;
+	arg = force_number(tmp)->numbr;
 	DEREF(tmp);
 	if (arg < 0.0)
 		warning(_("%s: received negative argument %g"), "sqrt", arg);
-	return make_number((AWKNUM) sqrt(arg));
+	return make_number(sqrt(arg));
 }
 
 /* do_substr --- do the substr function */
@@ -989,7 +989,7 @@ do_systime(int nargs ATTRIBUTE_UNUSED)
 #else
 	(void) time(& lclock);
 #endif
-	return make_number((AWKNUM) lclock);
+	return make_number(lclock);
 }
 
 /* do_mktime --- turn a time string into a timestamp */
@@ -1045,7 +1045,7 @@ do_mktime(int nargs)
 	    || month == INT_MIN
 	    || year < INT_MIN + 1900
 	    || year - 1900 > INT_MAX)
-		return make_number((AWKNUM) -1);
+		return make_number(-1.0);
 
 	memset(& then, '\0', sizeof(then));
 	then.tm_sec = second;
@@ -1057,7 +1057,7 @@ do_mktime(int nargs)
 	then.tm_isdst = dst;
 
 	then_stamp = (do_gmt ? timegm(& then) : mktime(& then));
-	return make_number((AWKNUM) then_stamp);
+	return make_number(then_stamp);
 }
 
 /* do_system --- run an external command */
@@ -1066,7 +1066,7 @@ NODE *
 do_system(int nargs)
 {
 	NODE *tmp;
-	AWKNUM ret = 0;		/* floating point on purpose, compat Unix awk */
+	double ret = 0;		/* floating point on purpose, compat Unix awk */
 	char *cmd;
 	char save;
 	int status;
@@ -1111,7 +1111,7 @@ do_system(int nargs)
 		cmd[tmp->stlen] = save;
 	}
 	DEREF(tmp);
-	return make_number((AWKNUM) ret);
+	return make_number(ret);
 }
 
 /* do_print --- print items, separated by OFS, terminated with ORS */
@@ -1402,7 +1402,7 @@ do_atan2(int nargs)
 	d2 = force_number(t2)->numbr;
 	DEREF(t1);
 	DEREF(t2);
-	return make_number((AWKNUM) atan2(d1, d2));
+	return make_number(atan2(d1, d2));
 }
 
 /* do_sin --- do the sin function */
@@ -1418,9 +1418,9 @@ do_sin(int nargs)
 	tmp = POP_SCALAR();
 	if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 		lintwarn(_("%s: received non-numeric argument"), "sin");
-	d = sin((double) force_number(tmp)->numbr);
+	d = sin(force_number(tmp)->numbr);
 	DEREF(tmp);
-	return make_number((AWKNUM) d);
+	return make_number(d);
 }
 
 /* do_cos --- do the cos function */
@@ -1436,9 +1436,9 @@ do_cos(int nargs)
 	tmp = POP_SCALAR();
 	if (do_lint && (fixtype(tmp)->flags & NUMBER) == 0)
 		lintwarn(_("%s: received non-numeric argument"), "cos");
-	d = cos((double) force_number(tmp)->numbr);
+	d = cos(force_number(tmp)->numbr);
 	DEREF(tmp);
-	return make_number((AWKNUM) d);
+	return make_number(d);
 }
 
 /* do_rand --- do the rand function */
@@ -1528,7 +1528,7 @@ do_rand(int nargs ATTRIBUTE_UNUSED)
 		tmprand -= 0.5;
 	} while (tmprand == 1.0);
 
- 	return make_number((AWKNUM) tmprand);
+ 	return make_number(tmprand);
 }
 
 /* do_srand --- seed the random number generator */
@@ -1558,7 +1558,7 @@ do_srand(int nargs)
 		srandom((unsigned int) (save_seed = (unsigned long) force_number(tmp)->numbr));
 		DEREF(tmp);
 	}
-	return make_number((AWKNUM) ret);
+	return make_number(ret);
 }
 
 /* do_match --- match a regexp, set RSTART and RLENGTH,
@@ -1635,7 +1635,7 @@ do_match(int nargs)
 
 					it = make_string(start, len);
 					it->flags |= USER_INPUT;
-					assoc_set(dest, make_number((AWKNUM) (ii)), it);;
+					assoc_set(dest, make_number((ii)), it);;
 
 					sprintf(buff, "%d", ii);
 					ilen = strlen(buff);
@@ -1653,7 +1653,7 @@ do_match(int nargs)
 
 					slen = ilen + subseplen + 5;
 
-					assoc_set(dest, make_string(buf, slen), make_number((AWKNUM) subpat_start + 1));
+					assoc_set(dest, make_string(buf, slen), make_number(subpat_start + 1));
 
 					memcpy(buf, buff, ilen);
 					memcpy(buf + ilen, subsepstr, subseplen);
@@ -1661,7 +1661,7 @@ do_match(int nargs)
 
 					slen = ilen + subseplen + 6;
 
-					assoc_set(dest, make_string(buf, slen), make_number((AWKNUM) subpat_len));
+					assoc_set(dest, make_string(buf, slen), make_number(subpat_len));
 				}
 			}
 
@@ -1684,10 +1684,10 @@ do_match(int nargs)
 		tre->re_exp = NULL;
 	}
 	unref(RSTART_node->var_value);
-	RSTART_node->var_value = make_number((AWKNUM) rstart);
+	RSTART_node->var_value = make_number(rstart);
 	unref(RLENGTH_node->var_value);
-	RLENGTH_node->var_value = make_number((AWKNUM) rlength);
-	return make_number((AWKNUM) rstart);
+	RLENGTH_node->var_value = make_number(rlength);
+	return make_number(rstart);
 }
 
 /* do_sub --- do the work for sub, gsub, and gensub */
@@ -2203,7 +2203,7 @@ done:
 			*lhs = make_str_node(buf, textlen, ALREADY_MALLOCED);
 	}
 
-	return make_number((AWKNUM) matches);
+	return make_number(matches);
 }
 
 /* call_sub --- call do_sub indirectly */
@@ -2433,7 +2433,7 @@ make_integer(uintmax_t n)
 {
 	n = adjust_uint(n);
 
-	return make_number((AWKNUM) n);
+	return make_number((double) n);
 }
 
 /* do_lshift --- perform a << operation */
@@ -2443,7 +2443,7 @@ do_lshift(int nargs)
 {
 	NODE *s1, *s2;
 	uintmax_t uval, ushift, res;
-	AWKNUM val, shift;
+	double val, shift;
 
 	check_exact_args(nargs, "lshift", 2);
 
@@ -2489,7 +2489,7 @@ do_rshift(int nargs)
 {
 	NODE *s1, *s2;
 	uintmax_t uval, ushift, res;
-	AWKNUM val, shift;
+	double val, shift;
 
 	check_exact_args(nargs, "rshift", 2);
 
@@ -2535,7 +2535,7 @@ do_and(int nargs)
 {
 	NODE *s1;
 	uintmax_t res, uval;
-	AWKNUM val;
+	double val;
 
 	res = ~(uintmax_t) 0;	/* start off with all ones */
 	if (nargs < 2)
@@ -2566,7 +2566,7 @@ do_or(int nargs)
 {
 	NODE *s1;
 	uintmax_t res, uval;
-	AWKNUM val;
+	double val;
 
 	res = 0;
 	if (nargs < 2)
@@ -2597,7 +2597,7 @@ do_xor(int nargs)
 {
 	NODE *s1;
 	uintmax_t res, uval;
-	AWKNUM val;
+	double val;
 
 	if (nargs < 2)
 		fatal(_("%s: called with less than two arguments"), "xor");
@@ -2655,20 +2655,20 @@ NODE *
 do_strtonum(int nargs)
 {
 	NODE *tmp;
-	AWKNUM d;
+	double d;
 
 	check_exact_args(nargs, "strtonum", 1);
 
 	tmp = fixtype(POP_SCALAR());
 	if ((tmp->flags & NUMBER) != 0)
-		d = (AWKNUM) tmp->numbr;
+		d = tmp->numbr;
 	else if (get_numbase(tmp->stptr, tmp->stlen, use_lc_numeric) != 10)
 		d = nondec2awknum(tmp->stptr, tmp->stlen, NULL);
 	else
-		d = (AWKNUM) force_number(tmp)->numbr;
+		d = force_number(tmp)->numbr;
 
 	DEREF(tmp);
-	return make_number((AWKNUM) d);
+	return make_number(d);
 }
 
 /* nondec2awknum --- convert octal or hex value to double */
@@ -2679,10 +2679,10 @@ do_strtonum(int nargs)
  * first invalid character.
  */
 
-AWKNUM
+double
 nondec2awknum(char *str, size_t len, char **endptr)
 {
-	AWKNUM retval = 0.0;
+	double retval = 0.0;
 	char save;
 	short val;
 	char *start = str;
@@ -2697,7 +2697,7 @@ nondec2awknum(char *str, size_t len, char **endptr)
 		if (len <= 2) {
 			if (endptr)
 				*endptr = start;
-			return (AWKNUM) 0.0;
+			return 0.0;
 		}
 
 		for (str += 2, len -= 2; len > 0; len--, str++) {
@@ -2938,7 +2938,7 @@ do_dcngettext(int nargs)
 	NODE *tmp, *t1, *t2, *t3;
 	char *string1, *string2;
 	unsigned long number;
-	AWKNUM d;
+	double d;
 	char *the_result;
 	size_t reslen;
 
@@ -3087,72 +3087,6 @@ do_bindtextdomain(int nargs)
 	return make_string(the_result, strlen(the_result));
 }
 
-#ifdef SUPPLY_INTDIV
-/* do_intdiv --- do integer division, return quotient and remainder in dest array */
-
-/*
- * We define the semantics as:
- * 	numerator = int(numerator)
- *	denominator = int(denominator)
- *	quotient = int(numerator / denominator)
- *	remainder = int(numerator % denominator)
- */
-
-NODE *
-do_intdiv(int nargs)
-{
-	NODE *numerator, *denominator, *result;
-	double num, denom, quotient, remainder;
-
-	check_exact_args(nargs, "intdiv", 3);
-
-	result = POP_PARAM();
-	if (result->type != Node_var_array)
-		fatal(_("intdiv: third argument is not an array"));
-	assoc_clear(result);
-
-	denominator = POP_SCALAR();
-	numerator = POP_SCALAR();
-
-	if (do_lint) {
-		if ((fixtype(numerator)->flags & NUMBER) == 0)
-			lintwarn(_("%s: received non-numeric first argument"), "intdiv");
-		if ((fixtype(denominator)->flags & NUMBER) == 0)
-			lintwarn(_("%s: received non-numeric second argument"), "intdiv");
-	}
-
-	(void) force_number(numerator);
-	(void) force_number(denominator);
-	num = double_to_int(get_number_d(numerator));
-	denom = double_to_int(get_number_d(denominator));
-
-	if (denom == 0.0)
-		fatal(_("intdiv: division by zero attempted"));
-
-	quotient = double_to_int(num / denom);
-	/*
-	 * FIXME: This code is duplicated, factor it out to a
-	 * separate function.
-	 */
-#ifdef HAVE_FMOD
-	remainder = fmod(num, denom);
-#else	/* ! HAVE_FMOD */
-	(void) modf(num / denom, & remainder);
-	remainder = num - remainder * denom;
-#endif	/* ! HAVE_FMOD */
-	remainder = double_to_int(remainder);
-
-	assoc_set(result, make_string("quotient", 8), make_number((AWKNUM) quotient));
-
-	assoc_set(result, make_string("remainder", 9), make_number((AWKNUM) remainder));
-
-	DEREF(denominator);
-	DEREF(numerator);
-
-	return make_number((AWKNUM) 0.0);
-}
-#endif /* SUPPLY_INTDIV */
-
 /* do_typeof --- return a string with the type of the arg */
 
 NODE *
@@ -3217,7 +3151,7 @@ do_typeof(int nargs)
 	size_t l = nl + sizeof(#X);	\
 	emalloc(p, char *, l+1);	\
 	sprintf(p, "%s_" #X, nextfree[i].name);	\
-	assoc_set(dbg, make_str_node(p, l, ALREADY_MALLOCED), make_number((AWKNUM) (V)));	\
+	assoc_set(dbg, make_str_node(p, l, ALREADY_MALLOCED), make_number((double) (V)));	\
 }
 					SETVAL(highwater, hw)
 					SETVAL(active, active)

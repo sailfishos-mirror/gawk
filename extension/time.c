@@ -276,7 +276,7 @@ do_strptime(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	}
 
 	time_t epoch_time = mktime(& broken_time);
-	make_number((double) epoch_time, result);
+	make_number(epoch_time, result);
 	goto done0;
 
 done1:

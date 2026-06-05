@@ -134,9 +134,9 @@ static void parse_args(int argc, char **argv);
 static void set_locale_stuff(void);
 static bool stopped_early = false;
 
+enum do_flag_values do_flags = DO_FLAG_NONE;
 bool using_persistent_malloc = false;
 const char *persist_file;
-int do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
 static int do_binary = false;		/* hands off my data! */
@@ -185,7 +185,6 @@ static const struct option optab[] = {
 	{ "help",		no_argument,		NULL,	'h' },
 	{ "include",		required_argument,	NULL,	'i' },
 	{ "lint",		optional_argument,	NULL,	'L' },
-	{ "lint-old",		no_argument,		NULL,	't' },
 	{ "load",		required_argument,	NULL,	'l' },
 #if defined(LOCALEDEBUG)
 	{ "locale",		required_argument,	NULL,	'Z' },
@@ -196,11 +195,9 @@ static const struct option optab[] = {
 #if defined(YYDEBUG) || defined(GAWKDEBUG)
 	{ "parsedebug",		no_argument,		NULL,	'Y' },
 #endif
-	{ "persist",		optional_argument,	NULL,	'T' },
 	{ "posix",		no_argument,		NULL,	'P' },
 	{ "pretty-print",	optional_argument,	NULL,	'o' },
 	{ "profile",		optional_argument,	NULL,	'p' },
-	{ "re-interval",	no_argument,		NULL,	'r' },
 	{ "sandbox",		no_argument,		NULL, 	'S' },
 	{ "source",		required_argument,	NULL,	'e' },
 	{ "trace",		no_argument,		NULL,	'I' },
@@ -363,12 +360,8 @@ main(int argc, char **argv)
 	if (do_csv && do_posix)
 		fatal(_("`--posix' and `--csv' conflict"));
 
-	if (do_lint) {
-		if (os_is_setuid())
-			lintwarn(_("running %s setuid root may be a security problem"), myname);
-		if (do_intervals)
-			lintwarn(_("The -r/--re-interval options no longer have any effect"));
-	}
+	if (do_lint && os_is_setuid())
+		lintwarn(_("running %s setuid root may be a security problem"), myname);
 
 	if (do_debug)	/* Need to register the debugger pre-exec hook before any other */
 		init_debug();
@@ -628,10 +621,8 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-O\t\t\t--optimize\n"), fp);
 	fputs(_("\t-p[file]\t\t--profile[=file]\n"), fp);
 	fputs(_("\t-P\t\t\t--posix\n"), fp);
-	fputs(_("\t-r\t\t\t--re-interval\n"), fp);
 	fputs(_("\t-s\t\t\t--no-optimize\n"), fp);
 	fputs(_("\t-S\t\t\t--sandbox\n"), fp);
-	fputs(_("\t-t\t\t\t--lint-old\n"), fp);
 	fputs(_("\t-V\t\t\t--version\n"), fp);
 #ifdef GAWKDEBUG
 	fputs(_("\t-Y\t\t\t--parsedebug\n"), fp);
@@ -777,7 +768,7 @@ init_args(int argc0, int argc, const char *argv0, char **argv)
 
 
 	for (i = argc0, j = 1; i < argc; i++, j++) {
-		sub = make_number((AWKNUM) j);
+		sub = make_number(j);
 		val = make_string(argv[i], strlen(argv[i]));
 		val->flags |= USER_INPUT;
 		assoc_set(ARGV_node, sub, val);
@@ -790,7 +781,7 @@ init_args(int argc0, int argc, const char *argv0, char **argv)
 	}
 
 	ARGC_node = install_symbol(estrdup("ARGC", 4), Node_var);
-	ARGC_node->var_value = make_number((AWKNUM) j);
+	ARGC_node->var_value = make_number(j);
 
 	if (do_sandbox)
 		init_argv_array(ARGV_node, shadow_node);
@@ -809,7 +800,7 @@ struct varinit {
 	NODE **spec;
 	const char *name;
 	const char *strval;
-	AWKNUM numval;
+	double numval;
 	Func_ptr update;
 	Func_ptr assign;
 	bool do_assign;
@@ -1009,7 +1000,7 @@ load_procinfo()
 #if (defined (HAVE_GETGROUPS) && defined(NGROUPS_MAX) && NGROUPS_MAX > 0) || defined(HAVE_MPFR)
 	char name[100];
 #endif
-	AWKNUM value;
+	double value;
 	static bool been_here = false;
 
 	if (been_here)
@@ -1028,8 +1019,8 @@ load_procinfo()
 	update_PROCINFO_str("mpfr_version", name);
 	sprintf(name, "GNU MP %s", gmp_version);
 	update_PROCINFO_str("gmp_version", name);
-	update_PROCINFO_num("prec_max", (AWKNUM) MPFR_PREC_MAX);
-	update_PROCINFO_num("prec_min", (AWKNUM) MPFR_PREC_MIN);
+	update_PROCINFO_num("prec_max", (double) MPFR_PREC_MAX);
+	update_PROCINFO_num("prec_min", (double) MPFR_PREC_MIN);
 #endif
 
 #ifdef DYNAMIC
@@ -1542,7 +1533,7 @@ parse_args(int argc, char **argv)
 	 * The + on the front tells GNU getopt not to rearrange argv.
 	 */
 	// FIXME: 'G' is temporary (and undocumented!)
-	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSstVYZ:G";
+	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPSsVYZ:G";
 	int old_optind;
 	int c;
 	char *scan;
@@ -1669,12 +1660,8 @@ parse_args(int argc, char **argv)
 			}
 			break;
 
-		case 't':
-			do_flags |= DO_LINT_OLD;
-			break;
 #else
 		case 'L':
-		case 't':
 			break;
 #endif
 
@@ -1717,28 +1704,12 @@ parse_args(int argc, char **argv)
 			do_flags |= DO_POSIX;
 			break;
 
-		case 'r':
-			// This no longer has any effect. It remains for the
-			// lint check in main().
-			do_flags |= DO_INTERVALS;
- 			break;
-
 		case 's':
 			do_optimize = false;
 			break;
 
 		case 'S':
 			do_flags |= DO_SANDBOX;
-			break;
-
-		case 'T':	// --persist[=file]
-#ifdef USE_PERSISTENT_MALLOC
-			if (optarg == NULL)
-				optarg = (char *) "/some/file";
-			fatal(_("Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."), optarg);
-#else
-			warning(_("Persistent memory is not supported."));
-#endif /* USE_PERSISTENT_MALLOC */
 			break;
 
 		case 'V':

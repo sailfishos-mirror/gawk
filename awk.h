@@ -40,6 +40,7 @@
 #include <ctype.h>
 #include <setjmp.h>
 #include <math.h>
+#include <langinfo.h>
 
 #include "gettext.h"
 #define _(msgid)  gettext(msgid)
@@ -266,8 +267,6 @@ extern int re_numsubpats(Regexp *rp, const char *s);
 #endif /* ATTRIBUTE_PRINTF */
 
 /* ------------------ Constants, Structures, Typedefs  ------------------ */
-
-#define AWKNUM	double
 
 /* On z/OS, the xlc compiler doesn't yield consistent enum sizes
    unless specifically requested.  */
@@ -496,13 +495,13 @@ typedef struct exp_node {
 		struct {
 #ifdef HAVE_MPFR
 			union {
-				AWKNUM fltnum;
+				double fltnum;
 				mpfr_t mpnum;
 				mpz_t mpi;
 			} nm;
 			int rndmode;
 #else
-			AWKNUM fltnum;
+			double fltnum;
 #endif
 			char *sp;
 			size_t slen;
@@ -1208,7 +1207,7 @@ extern int errcount;
 extern const char *version_string;
 extern const char *persist_file;
 extern int (*interpret)(INSTRUCTION *);	/* interpreter routine */
-extern NODE *(*make_number)(double);	/* double instead of AWKNUM on purpose */
+extern NODE *(*make_number)(double);
 extern NODE *(*str2number)(NODE *);
 extern NODE *(*format_val)(const char *, int, NODE *);
 extern int (*cmp_numbers)(const NODE *, const NODE *);
@@ -1229,33 +1228,29 @@ extern bool use_gnu_matchers;	/* Use gnu matchers, not minrx */
 
 extern SRCFILE *srcfiles; /* source files */
 
-enum do_flag_values {
+extern enum do_flag_values {
 	DO_FLAG_NONE       = 0x00000,
 	DO_LINT_INVALID	   = 0x00001,	/* only warn about invalid */
 	DO_LINT_EXTENSIONS = 0x00002,	/* warn about gawk extensions */
 	DO_LINT_ALL	   = 0x00004,	/* warn about all things */
-	DO_LINT_OLD	   = 0x00008,	/* warn about stuff not in V7 awk */
-	DO_TRADITIONAL	   = 0x00010,	/* no gnu extensions, add traditional weirdnesses */
-	DO_POSIX	   = 0x00020,	/* turn off gnu and unix extensions */
-	DO_INTL		   = 0x00040,	/* dump locale-izable strings to stdout */
-	DO_NON_DEC_DATA	   = 0x00080,	/* allow octal/hex C style DATA. Use with caution! */
-	DO_INTERVALS	   = 0x00100,	/* allow {...,...} in regexps, see resetup() */
-	DO_PRETTY_PRINT	   = 0x00200,	/* pretty print the program */
-	DO_DUMP_VARS	   = 0x00400,	/* dump all global variables at end */
-	DO_TIDY_MEM	   = 0x00800,	/* release vars when done */
-	DO_SANDBOX	   = 0x01000,	/* sandbox mode - disable 'system' function & redirections */
-	DO_PROFILE	   = 0x02000,	/* profile the program */
-	DO_DEBUG	   = 0x04000,	/* debug the program */
-	DO_MPFR		   = 0x08000,	/* arbitrary-precision floating-point math */
-	DO_CSV		   = 0x10000,	/* process comma-separated-value files */
-};
-extern int do_flags;
+	DO_TRADITIONAL	   = 0x00008,	/* no gnu extensions, add traditional weirdnesses */
+	DO_POSIX	   = 0x00010,	/* turn off gnu and unix extensions */
+	DO_INTL		   = 0x00020,	/* dump locale-izable strings to stdout */
+	DO_NON_DEC_DATA	   = 0x00040,	/* allow octal/hex C style DATA. Use with caution! */
+	DO_PRETTY_PRINT	   = 0x00080,	/* pretty print the program */
+	DO_DUMP_VARS	   = 0x00100,	/* dump all global variables at end */
+	DO_TIDY_MEM	   = 0x00200,	/* release vars when done */
+	DO_SANDBOX	   = 0x00400,	/* sandbox mode - disable 'system' function & redirections */
+	DO_PROFILE	   = 0x00800,	/* profile the program */
+	DO_DEBUG	   = 0x01000,	/* debug the program */
+	DO_MPFR		   = 0x02000,	/* arbitrary-precision floating-point math */
+	DO_CSV		   = 0x04000,	/* process comma-separated-value files */
+} do_flags;
 
 #define do_traditional      (do_flags & DO_TRADITIONAL)
 #define do_posix            (do_flags & DO_POSIX)
 #define do_intl             (do_flags & DO_INTL)
 #define do_non_decimal_data (do_flags & DO_NON_DEC_DATA)
-#define do_intervals        (do_flags & DO_INTERVALS)
 #define do_pretty_print     (do_flags & DO_PRETTY_PRINT)
 #define do_profile          (do_flags & DO_PROFILE)
 #define do_dump_vars        (do_flags & DO_DUMP_VARS)
@@ -1272,11 +1267,9 @@ extern bool using_persistent_malloc;
 
 #ifdef NO_LINT
 #define do_lint 0
-#define do_lint_old 0
 #define do_lint_extensions 0
 #else
 #define do_lint             (do_flags & (DO_LINT_INVALID|DO_LINT_ALL))
-#define do_lint_old         (do_flags & DO_LINT_OLD)
 #define do_lint_extensions  (do_flags & DO_LINT_EXTENSIONS)
 #endif
 extern int gawk_mb_cur_max;
@@ -1589,7 +1582,7 @@ extern NODE *do_or(int nargs);
 extern NODE *do_xor(int nargs);
 extern NODE *do_compl(int nargs);
 extern NODE *do_strtonum(int nargs);
-extern AWKNUM nondec2awknum(char *str, size_t len, char **endptr);
+extern double nondec2awknum(char *str, size_t len, char **endptr);
 extern NODE *do_dcgettext(int nargs);
 extern NODE *do_dcngettext(int nargs);
 extern NODE *do_bindtextdomain(int nargs);
@@ -1631,7 +1624,7 @@ extern const char *flags2str(int);
 extern const char *genflags2str(int flagval, const struct flagtab *tab);
 extern const char *nodetype2str(NODETYPE type);
 extern void load_casetable(void);
-extern AWKNUM calc_exp(AWKNUM x1, AWKNUM x2);
+extern double calc_exp(double x1, double x2);
 extern const char *opcode2str(OPCODE type);
 extern const char *op2str(OPCODE type);
 extern NODE **r_get_lhs(NODE *n, bool reference);
@@ -1670,7 +1663,7 @@ extern void set_RS(void);
 extern void set_FIELDWIDTHS(void);
 extern void set_FPAT(void);
 extern void update_PROCINFO_str(const char *subscript, const char *str);
-extern void update_PROCINFO_num(const char *subscript, AWKNUM val);
+extern void update_PROCINFO_num(const char *subscript, double val);
 
 typedef enum {
 	Using_FS,

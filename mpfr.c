@@ -489,7 +489,7 @@ mpg_cmp(const NODE *t1, const NODE *t2)
 		return mpz_cmp(t1->mpg_i, t2->mpg_i);
 	}
 
-	/* t1 and t2 are AWKNUMs */
+	/* t1 and t2 are doubles */
 	return cmp_awknums(t1, t2);
 }
 
@@ -563,7 +563,7 @@ mpg_update_var(NODE *n)
 		cant_happen("invalid node for mpg_update_var%s", "");
 
 	if (mpz_sgn(nq) == 0) {
-		/* Efficiency hack similar to that for AWKNUM */
+		/* Efficiency hack similar to that for double */
 		if (is_mpg_float(val) || mpz_get_si(val->mpg_i) != nr) {
 			unref(n->var_value);
 			val = n->var_value = mpg_integer();
@@ -1318,100 +1318,6 @@ do_mpfr_srand(int nargs)
 	gmp_randseed(state, seed);
 	return res;
 }
-
-#ifdef SUPPLY_INTDIV
-/* do_mpfr_intdiv --- do integer division, return quotient and remainder in dest array */
-
-/*
- * We define the semantics as:
- * 	numerator = int(numerator)
- *	denominator = int(denominator)
- *	quotient = int(numerator / denominator)
- *	remainder = int(numerator % denominator)
- */
-
-NODE *
-do_mpfr_intdiv(int nargs)
-{
-	NODE *numerator, *denominator, *result;
-	NODE *num, *denom;
-	NODE *quotient, *remainder;
-	NODE *sub, **lhs;
-
-	check_exact_args(nargs, "intdiv", 3);
-
-	result = POP_PARAM();
-	if (result->type != Node_var_array)
-		fatal(_("intdiv: third argument is not an array"));
-	assoc_clear(result);
-
-	denominator = POP_SCALAR();
-	numerator = POP_SCALAR();
-
-	if (do_lint) {
-		if ((fixtype(numerator)->flags & NUMBER) == 0)
-			lintwarn(_("intdiv: received non-numeric first argument"));
-		if ((fixtype(denominator)->flags & NUMBER) == 0)
-			lintwarn(_("intdiv: received non-numeric second argument"));
-	}
-
-	(void) force_number(numerator);
-	(void) force_number(denominator);
-
-	/* convert numerator and denominator to integer */
-	if (is_mpg_integer(numerator)) {
-		num = mpg_integer();
-		mpz_set(num->mpg_i, numerator->mpg_i);
-	} else {
-		if (! mpfr_number_p(numerator->mpg_numbr)) {
-			/* [+-]inf or NaN */
-			unref(numerator);
-			unref(denominator);
-			return make_number((AWKNUM) -1);
-		}
-
-		num = mpg_integer();
-		mpfr_get_z(num->mpg_i, numerator->mpg_numbr, MPFR_RNDZ);
-	}
-
-	if (is_mpg_integer(denominator)) {
-		denom = mpg_integer();
-		mpz_set(denom->mpg_i, denominator->mpg_i);
-	} else {
-		if (! mpfr_number_p(denominator->mpg_numbr)) {
-			/* [+-]inf or NaN */
-			unref(numerator);
-			unref(denominator);
-			unref(num);
-			return make_number((AWKNUM) -1);
-		}
-
-		denom = mpg_integer();
-		mpfr_get_z(denom->mpg_i, denominator->mpg_numbr, MPFR_RNDZ);
-	}
-
-	if (mpz_sgn(denom->mpg_i) == 0)
-		fatal(_("intdiv: division by zero attempted"));
-
-	quotient = mpg_integer();
-	remainder = mpg_integer();
-
-	/* do the division */
-	mpz_tdiv_qr(quotient->mpg_i, remainder->mpg_i, num->mpg_i, denom->mpg_i);
-	unref(num);
-	unref(denom);
-	unref(numerator);
-	unref(denominator);
-
-	sub = make_string("quotient", 8);
-	assoc_set(result, sub, quotient);
-
-	sub = make_string("remainder", 9);
-	assoc_set(result, sub, remainder);
-
-	return make_number((AWKNUM) 0.0);
-}
-#endif /* SUPPLY_INTDIV */
 
 /*
  * mpg_tofloat --- convert an arbitrary-precision integer operand to

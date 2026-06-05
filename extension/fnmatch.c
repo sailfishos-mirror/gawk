@@ -140,7 +140,7 @@ do_fnmatch(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 	retval = fnmatch(pattern.str_value.str,
 			string.str_value.str, int_flags);
-	make_number((double) retval, result);
+	make_number(retval, result);
 
 out:
 #else

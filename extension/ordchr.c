@@ -8,10 +8,11 @@
  * Revised 5/2012
  * Revised 6/2025
  * Revised 12/2025
+ * Revised 3/2026
  */
 
 /*
- * Copyright (C) 2001, 2004, 2011, 2012, 2013, 2018, 2020, 2021, 2025,
+ * Copyright (C) 2001, 2004, 2011, 2012, 2013, 2018, 2020, 2021, 2025, 2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -37,11 +38,10 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <wchar.h>
-#include <langinfo.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -51,16 +51,6 @@
 #include "gettext.h"
 #define _(msgid)  gettext(msgid)
 #define N_(msgid) msgid
-
-#ifndef __MINGW32__
-#if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
-#include <uchar.h>
-#else
-#define char32_t wchar_t
-#define mbrtoc32 mbrtowc
-#define c32rtomb wcrtomb
-#endif
-#endif /* __MINGW32__ */
 
 static const gawk_api_t *api;	/* for convenience macros to work */
 static awk_ext_id_t ext_id;
@@ -76,31 +66,14 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 {
 	awk_value_t str;
 	double ret = 0xFFFD;	// unicode bad char
-	mbstate_t mbs;
-	const char *src;
 
 	assert(result != NULL);
 
-	memset(& mbs, 0, sizeof(mbs));
-
 	if (get_argument(0, AWK_STRING, & str)) {
-		if (MB_CUR_MAX == 1) {
+		if (gawk_mb_cur_max == 1) {
 			ret = str.str_value.str[0] & 0xff;
 		} else {
-			char32_t wc;
-			size_t res;
-
-			src = str.str_value.str;
-			res = mbrtoc32(& wc, src, MB_CUR_MAX, & mbs);
-			if (res == 0 || res == (size_t) -1 || res == (size_t) -2) {
-				// mimic gawk's behavior
-				char *codeset = nl_langinfo(CODESET);
-				if (strcmp(codeset, "UTF-8") == 0)
-					ret = 0xFFFD;	// unicode bad char
-				else
-					ret = wc;
-			} else
-				ret = wc;
+			ret = str.str_value.wstr[0];
 		}
 	} else if (do_lint)
 		lintwarn(ext_id, _("ord: first argument is not a string"));
@@ -117,32 +90,35 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	awk_value_t num;
 	unsigned int ret = 0;
 	double val = 0.0;
-	char32_t wc = 0;
 	char buf[20] = { '\0', '\0' };
+	size_t len;
+	char *mb_str = NULL;
+	int32_t wbuf[2];
 
 	assert(result != NULL);
 
 	if (get_argument(0, AWK_NUMBER, & num)) {
 		val = num.num_value;
 		ret = val;	/* convert to int */
-		if (MB_CUR_MAX == 1) {
+		if (gawk_mb_cur_max == 1) {
 			buf[0] = ret & 0xff;
 			goto done;
 		} else {
-			wc = ret;
+			wbuf[0] = ret;
+			wbuf[1] = 0;
+			mb_str = wcstombs(wbuf, 1, & len);
+			if (mb_str == NULL) {
+				buf[0] = buf[1] = '\0';
+			} else
+				memcpy(buf, mb_str, len);
+
 		}
 	} else if (do_lint)
 		lintwarn(ext_id, _("chr: first argument is not a number"));
 
-	mbstate_t mbs;
-	size_t res;
-
-	memset(& mbs, 0, sizeof(mbs));
-	res = c32rtomb(buf, wc,  & mbs);
-	if (res == 0 || res == (size_t)-1 || res == (size_t) -2)
-		buf[0] = buf[1] = '\0';
-
 done:
+	if (mb_str != NULL)
+		free(mb_str);
 	/* Set the return value */
 	return make_const_string(buf, strlen(buf), result);
 }
