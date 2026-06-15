@@ -511,8 +511,8 @@ uninitialized_scalar:
 		case Op_lint_plus:
 			// no need to check do_lint, this opcode won't
 			// be generated if that's not true
-			t1 = fixtype(TOP());
-			t2 = fixtype(PEEK(1));
+			t1 = fixtype(elem_new_to_scalar(TOP()));
+			t2 = fixtype(elem_new_to_scalar(PEEK(1)));
 			if ((t1->flags & (STRING|USER_INPUT)) == STRING
 			    && (t2->flags & (STRING|USER_INPUT)) == STRING)
 				lintwarn(_("operator `+' used on two string values"));
