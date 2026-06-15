@@ -1697,6 +1697,10 @@ mpg_interpret(INSTRUCTION **cp)
 		t2 = POP_NUMBER();
 plus:
 		t1 = TOP_NUMBER();
+		if (do_lint &&
+		    (t1->flags & (STRING|USER_INPUT)) == STRING &&
+		    (t2->flags & (STRING|USER_INPUT)) == STRING)
+			lintwarn(_("operator `+' used on two string values"));
 		r = mpg_add(t1, t2);
 		DEREF(t1);
 		if (op == Op_plus)

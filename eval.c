@@ -371,7 +371,6 @@ static struct optypetab {
 	{ "Op_exec_count", NULL },
 	{ "Op_breakpoint", NULL },
 	{ "Op_lint", NULL },
-	{ "Op_lint_plus", NULL },
 	{ "Op_atexit", NULL },
 	{ "Op_stop", NULL },
 	{ "Op_token", NULL },

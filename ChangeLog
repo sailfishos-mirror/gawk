@@ -1,3 +1,16 @@
+2026-06-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Thoroughly fix lint of plus on two strings with Op_elem_new.
+
+	* awk.h (OPCODE): Remove Op_lint_plus.
+	* awkgram.y (isnoeffect): Ditto.
+	(mk_binary): Just do Op_plus; lint check moved to interpret.h.
+	* eval.c (optypes): Remove Op_lint_plus.
+	* interpret.h (r_interpret): Remove Op_lint_plus case. Add lint
+	check to Op_plus case, rearranging code a bit.
+	* mpfr.c (mpg_interpret):. Add lint check to Op_plus case.
+	* profile.c (pprint): Remove Op_lint_plus.
+
 2026-06-14         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* eval.c (fmt_ok): Don't complain if no width or precision. Thanks

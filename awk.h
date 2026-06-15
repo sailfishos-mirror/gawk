@@ -764,7 +764,6 @@ typedef enum opcodeval {
 	Op_exec_count,
 	Op_breakpoint,
 	Op_lint,
-	Op_lint_plus,
 	Op_atexit,
 	Op_stop,
 

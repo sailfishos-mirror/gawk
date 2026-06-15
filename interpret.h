@@ -508,16 +508,6 @@ uninitialized_scalar:
 			}
 			break;
 
-		case Op_lint_plus:
-			// no need to check do_lint, this opcode won't
-			// be generated if that's not true
-			t1 = fixtype(elem_new_to_scalar(TOP()));
-			t2 = fixtype(elem_new_to_scalar(PEEK(1)));
-			if ((t1->flags & (STRING|USER_INPUT)) == STRING
-			    && (t2->flags & (STRING|USER_INPUT)) == STRING)
-				lintwarn(_("operator `+' used on two string values"));
-			break;
-
 		case Op_K_break:
 		case Op_K_continue:
 		case Op_jmp:
@@ -607,14 +597,20 @@ uninitialized_scalar:
 			break;
 
 		case Op_plus_i:
+			t2 = pc->memory;
 			x2 = force_number(pc->memory)->numbr;
 			goto plus;
 		case Op_plus:
 			t2 = POP_NUMBER();
 			x2 = t2->numbr;
-			DEREF(t2);
 plus:
 			t1 = TOP_NUMBER();
+			if (do_lint &&
+			    (t1->flags & (STRING|USER_INPUT)) == STRING &&
+			    (t2->flags & (STRING|USER_INPUT)) == STRING)
+				lintwarn(_("operator `+' used on two string values"));
+			if (op == Op_plus)
+				DEREF(t2);
 			r = make_number(t1->numbr + x2);
 			r->numbr = fix_nan_sign(t1->numbr, x2, r->numbr);
 			DEREF(t1);
