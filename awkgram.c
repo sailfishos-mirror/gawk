@@ -7840,7 +7840,6 @@ isnoeffect(OPCODE type)
 	case Op_push_i:
 	case Op_push_array:
 	case Op_pop:
-	case Op_lint_plus:
 	case Op_exec_count:
 		return true;
 	default:
@@ -7939,7 +7938,7 @@ dumpintlstr2(const char *str1, size_t len1, const char *str2, size_t len2)
 static INSTRUCTION *
 mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 {
-	INSTRUCTION *ip1,*ip2, *lint_plus;
+	INSTRUCTION *ip1,*ip2;
 	double res;
 
 	if (! do_optimize)
@@ -8076,10 +8075,6 @@ mk_binary(INSTRUCTION *s1, INSTRUCTION *s2, INSTRUCTION *op)
 regular:
 	/* append lists s1, s2 and add `op' bytecode */
 	(void) list_merge(s1, s2);
-	if (do_lint && op->opcode == Op_plus) {
-		lint_plus = instruction(Op_lint_plus);
-		(void) list_append(s1, lint_plus);
-	}
 	return list_append(s1, op);
 }
 
