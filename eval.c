@@ -857,10 +857,9 @@ set_ORS()
 /* fmt_ok --- is the conversion format a valid one? */
 
 NODE **fmt_list = NULL;
-static int fmt_ok(NODE *n);
 static int fmt_index(NODE *n);
 
-static int
+static bool
 fmt_ok(NODE *n)
 {
 	NODE *tmp = force_string(n);
@@ -880,22 +879,23 @@ fmt_ok(NODE *n)
 	// We rely on the caller to zero-terminate n->stptr.
 
 	if (*p++ != '%')
-		return 0;
+		return false;
 	while (*p && strchr(flags, *p) != NULL)	/* flags */
 		p++;
 	while (*p && isdigit((unsigned char) *p))	/* width - %*.*g is NOT allowed */
 		p++;
-	if (*p == '\0' || (*p != '.' && ! isdigit((unsigned char) *p)))
-		return 0;
-	if (*p == '.')
+	if (*p == '\0')
+		return false;
+	if (*p == '.') {
 		p++;
-	while (*p && isdigit((unsigned char) *p))	/* precision */
-		p++;
+		while (*p && isdigit((unsigned char) *p))	/* precision */
+			p++;
+	}
 	if (*p == '\0' || strchr(float_formats, *p) == NULL)
-		return 0;
+		return false;
 	if (*++p != '\0')
-		return 0;
-	return 1;
+		return false;
+	return true;
 }
 
 /* fmt_index --- track values of OFMT and CONVFMT to keep semantics correct */
