@@ -219,6 +219,7 @@ UNIX_TESTS = \
 
 GAWK_EXT_TESTS = \
 	gensub5 \
+	mdim9 \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc ar2fn_elnew_sc2 \
 	ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val argtest arraysort \
 	arraysort2 arraytype asortbool asortsymtab backw badargs beginfile1 \
@@ -2813,6 +2814,11 @@ rtlen01:
 gensub5:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+mdim9:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 aadelete1:
