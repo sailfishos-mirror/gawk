@@ -210,10 +210,6 @@ Some comments on the layout for TeX.
 @syncodeindex fn cp
 @syncodeindex vr cp
 @end iflatex
-@ifxml
-@syncodeindex fn cp
-@syncodeindex vr cp
-@end ifxml
 @ifdocbook
 @synindex fn cp
 @synindex vr cp
@@ -380,7 +376,6 @@ for enrichening our lives in innumerable ways.</para>
 @end iftex
 
 @ifnottex
-@ifnotxml
 @ifnotdocbook
 @node Top
 @top General Introduction
@@ -394,7 +389,6 @@ particular records in a file and perform operations upon them.
 @insertcopying
 
 @end ifnotdocbook
-@end ifnotxml
 @end ifnottex
 
 @menu
@@ -5967,11 +5961,13 @@ As in arithmetic, parentheses can change how operators are grouped.
 According to the POSIX specification, when @samp{*}, @samp{+}, @samp{?},
 or @samp{@{} are not preceded by a character, the behavior is
 ``undefined.''
-In practice, for @command{gawk}, the @samp{*}, @samp{+}, @samp{?} and
-@samp{@{} operators stand for themselves when there is nothing in the
-regexp that precedes them.  For example, @code{/+/} matches a literal
-plus sign.  However, many other versions of @command{awk} treat such a
-usage as a syntax error.
+Prior to version 5.4.0@footnote{Due to a mistake on the part of the maintainer},
+@command{gawk} allowed the @samp{*}, @samp{+}, @samp{?} and
+@samp{@{} operators to stand for themselves when there was nothing in the
+regexp that precedes them.  For example, @code{/+/} matched a literal
+plus sign.
+As of version 5.4.0, @command{gawk} treats such standalone metacharacters
+as syntax errors.  This is true of other @command{awk} versions as well.
 
 @cindex sidebar @subentry What About The Empty Regexp?
 @cartouche What About The Empty Regexp?
