@@ -15,7 +15,7 @@ function SetUpServer() {
 function HandleGET() {
   if (MENU[2] == "AboutServer") {
     Document  = "This is a GUI for remote configuration of an\
-      embedded system. It is is implemented as one GAWK script."
+      embedded system. It is implemented as one GAWK script."
   } else if (MENU[2] == "ReadConfig") {
     RS = "\n"
     while ((getline < ConfigFile) > 0)
