@@ -148,6 +148,8 @@ EXTRA_DIST = \
 	assignnumfield.ok \
 	assignnumfield2.awk \
 	assignnumfield2.ok \
+	assignnumfield3.awk \
+	assignnumfield3.ok \
 	awkpath.ok \
 	back89.awk \
 	back89.in \
@@ -1602,6 +1604,7 @@ BASIC_TESTS = \
 	splitany \
 	uplus2 \
 	regexpbrack3 \
+	assignnumfield3 \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
