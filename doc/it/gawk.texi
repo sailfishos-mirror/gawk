@@ -221,10 +221,6 @@ Some comments on the layout for TeX.
 @syncodeindex fn cp
 @syncodeindex vr cp
 @end iflatex
-@ifxml
-@syncodeindex fn cp
-@syncodeindex vr cp
-@end ifxml
 @ifdocbook
 @synindex fn cp
 @synindex vr cp
@@ -439,7 +435,6 @@ per aver arricchito le nostre vite in misura incalcolabile.</para>
 @end iftex
 
 @ifnottex
-@ifnotxml
 @ifnotdocbook
 @node Top
 @top Introduzione Generale
@@ -461,7 +456,6 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 @insertcopying
 
 @end ifnotdocbook
-@end ifnotxml
 @end ifnottex
 
 @menu
@@ -4731,14 +4725,6 @@ restrizioni:
 I ritorni a capo non sono consentiti dopo @samp{?} o @samp{:}
 (@pxref{Espressioni condizionali}).
 
-
-@cindex @code{FS} (variabile) @subentry carattere TAB come
-@cindex variabile @subentry @code{FS} @subentry carattere TAB come
-@item
-Specificando @samp{-Ft} sulla riga di comando non si imposta il valore
-della variabile @code{FS} a un singolo carattere TAB
-(@pxref{Separatori di campo}).
-
 @cindex localizzazione @subentry separatore decimale della
 @cindex separatore decimale @subentry carattere specifico della localizzazione
 @item
@@ -4812,14 +4798,6 @@ In modalità di compatibilità,
 ogni altra opzione, se è stato specificato il testo di un programma,
 è contrassegnata come non valida con un messaggio di avvertimento,
 ma è in ogni caso ignorata.
-
-@cindex @option{-F} (opzione) @subentry @option{-Ft} imposta @code{FS} a TAB
-@cindex opzione @subentry @option{-F} @subentry opzione @option{-Ft} imposta @code{FS} a TAB
-In modalità di compatibilità, come caso particolare, se il valore di @var{fs}
-fornito all'opzione @option{-F} è @samp{t}, @code{FS} è impostata al carattere
-TAB (@code{"\t"}).  Questo è vero solo per @option{--traditional} e non
-per @option{--posix}
-(@pxref{Separatori di campo}).
 
 @cindex @option{-f} (opzione) @subentry usi multipli
 @cindex opzione @subentry @option{-f} @subentry usi multipli
@@ -6598,13 +6576,14 @@ operatori.
 Secondo le specifiche POSIX, quando i metacaratteri
 @samp{*}, @samp{+}, @samp{?} o @samp{@{}
 non sono preceduti da un carattere, il comportamento è ``indefinito''.
-In pratica, per @command{gawk}, gli operatori
-@samp{*}, @samp{+}, @samp{?} e @samp{@{}
-rappresentano se stessi
-quando non c'è nulla prima di essi nella @dfn{regexp}.
-Per esempio, @code{/+/} individua un semplice segno
-più.  Tuttavia, molte altre versioni di @command{awk} trattano una
-tale notazione come un errore di sintassi.
+Prima della versione 5.4.0@footnote{A causa di un
+errore da parte del manutentore.} @command{gawk} consentiva agli operatori
+@samp{*}, @samp{+}, @samp{?} e @samp{@{} di rappresentare
+se stessi quando non c'era nulla prima di essi nella @dfn{regexp}.
+Per esempio, @code{/+/} individuava un semplice segno più.
+A partire dalla versione 5.4.0, @command{gawk} considera tali caratteri,
+quando sono a se stanti, come errori di sintassi.
+Ciò vale anche per altre versioni di @command{awk}.
 
 @cindex riquadro @subentry E se la @dfn{regexp} è vuota?
 @cartouche E se la @dfn{regexp} è vuota?
@@ -8599,7 +8578,7 @@ trasforma ogni parte di una riga in input che consiste di una virgola seguita
 da uno spazio e una tabulazione in un separatore di campo.
 @ifinfo
 (@samp{\t}
-è una @dfn{sequenza di protezione} che sta per un segno di tabulazione;
+è una @dfn{sequenza di protezione} che sta per un segno di tabulazione (<TAB>).
 @pxref{Sequenze di protezione},
 per l'elenco completo di sequenze di protezione simili.)
 @end ifinfo
@@ -9501,9 +9480,9 @@ Il programma che segue usa come @code{FPAT} quest'espressione migliorata,
 per determinare i campi nel file di dati CSV visto sopra,
 estrarre i dati contenuti in ogni campo delimitato da doppi apici,
 e stampare poi i dati stessi come valori separati dal carattere di
-tabulazione.
+tabulazione (<Tab>).
 Quest'ultima cosa è ottenuta impostando @code{OFS} al carattere di
-tabulazione (TAB).
+tabulazione (<Tab>).
 
 @example
 @ignore
@@ -9518,7 +9497,7 @@ tabulazione (TAB).
 @c file eg/misc/quoted-csv.awk
 BEGIN @{
     FPAT = "([^,]*)|(\"([^\"]|\"\")+\")"
-    OFS = "\t"    # Stampa valori separati da una tabulazione
+    OFS = "\t"    # Stampa valori separati da una tabulazione (<Tab>)
 @}
 @end group
 
@@ -22198,7 +22177,7 @@ Equivalente a specificare @samp{%H:%M}.
 Il secondo come numero decimale (00--60).
 
 @item %t
-Un carattere di tabulazione [TAB].
+Un carattere di tabulazione (<Tab>).
 
 @item %T
 Equivalente a specificare @samp{%H:%M:%S}.
@@ -47038,6 +47017,10 @@ viceversa
 L'opzione @option{--enable-builtin-intdiv0} per il comando @command{configure}
 è stata rimossa, come pure la relativa documentazione e il codice all'interno
 di @command{gawk}.
+
+@item
+La combinazione di opzioni @option{--traditional} e @option{-Ft}
+non imposta più la variabile @code{FS} al carattere di tabulazione (<Tab>).
 
 @end itemize
 
