@@ -796,6 +796,8 @@ EXTRA_DIST = \
 	mdim8.awk \
 	mdim8.in \
 	mdim8.ok \
+	mdim9.awk \
+	mdim9.ok \
 	modifiers.sh \
 	modifiers.ok \
 	muldimposix.awk \
@@ -1651,6 +1653,7 @@ UNIX_TESTS = \
 
 GAWK_EXT_TESTS = \
 	gensub5 \
+	mdim9 \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc ar2fn_elnew_sc2 \
 	ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val argtest arraysort \
 	arraysort2 arraytype asortbool asortsymtab backw badargs beginfile1 \

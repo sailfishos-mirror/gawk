@@ -1949,12 +1949,12 @@ elem_new_to_scalar(NODE *n)
 
 	elem_new_reset(n);
 
+	n->type = Node_val;
+
 	if (n->valref > 1) {
 		unref(n);
 		return dupnode(Nnull_string);
 	}
-
-	n->type = Node_val;
 
 	return n;
 }

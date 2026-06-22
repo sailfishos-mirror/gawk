@@ -725,19 +725,6 @@ cmdline_fs(char *str)
 
 	tmp = &FS_node->var_value;
 	unref(*tmp);
-	/*
-	 * Only if in full compatibility mode check for the stupid special
-	 * case so -F\t works as documented in awk book even though the shell
-	 * hands us -Ft.  Bleah!
-	 *
-	 * Thankfully, POSIX didn't propagate this "feature".
-	 */
-	if (str[0] == 't' && str[1] == '\0') {
-		if (do_lint)
-			lintwarn(_("-Ft does not set FS to tab in POSIX awk"));
-		if (do_traditional && ! do_posix)
-			str[0] = '\t';
-	}
 
 	*tmp = make_str_node(str, strlen(str), SCAN); /* do process escapes */
 	set_FS();
