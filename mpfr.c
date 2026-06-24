@@ -47,7 +47,7 @@ static mpfr_prec_t default_prec;
 static mpfr_rnd_t get_rnd_mode(const char rmode);
 static NODE *mpg_force_number(NODE *n);
 static NODE *mpg_make_number(double);
-static NODE *mpg_format_val(const char *format, int index, NODE *s);
+static NODE *mpg_format_val(const char *format, int index, int fmtflag, NODE *s);
 static int mpg_interpret(INSTRUCTION **cp);
 
 static mpfr_exp_t min_exp = MPFR_EMIN_DEFAULT;
@@ -423,7 +423,7 @@ badnum:
 /* mpg_format_val --- format a numeric value based on format */
 
 static NODE *
-mpg_format_val(const char *format, int index, NODE *s)
+mpg_format_val(const char *format, int index, int fmtflag, NODE *s)
 {
 	NODE *dummy[2], *r;
 	unsigned int oflags;
@@ -451,7 +451,8 @@ mpg_format_val(const char *format, int index, NODE *s)
 	if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 		efree(s->stptr);
 	s->stptr = r->stptr;
-	s->flags |= STRCUR;
+	s->flags &= ~(CONVFMT_FMT|OFMT_FMT);
+	s->flags |= STRCUR | fmtflag;
 	s->strndmode = MPFR_round_mode;
 	freenode(r);	/* Do not unref(r)! We want to keep s->stptr == r->stpr.  */
 	free_wstr(s);

@@ -1236,7 +1236,7 @@ do_print_rec(int nargs, int redirtype)
 	if (! field0_valid || do_lint)	// lint check for field access in END
 		(void) get_field(0L, NULL);
 
-	f0 = fields_arr[0];
+	f0 = force_string_ofmt(fields_arr[0]);
 
 	if (do_lint && (f0->flags & NULL_FIELD) != 0)
 		lintwarn(_("reference to uninitialized field `$%d'"), 0);
