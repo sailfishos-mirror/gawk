@@ -458,6 +458,8 @@ flags2str(int flagval)
 		{ XARRAY, "XARRAY" },
 		{ NUMCONSTSTR, "NUMCONSTSTR" },
 		{ REGEX, "REGEX" },
+		{ CONVFMT_FMT, "CONVFMT_FMT" },
+		{ OFMT_FMT, "OFMT_FMT" },
 		{ 0,	NULL },
 	};
 

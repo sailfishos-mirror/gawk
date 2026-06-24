@@ -1,3 +1,41 @@
+2026-06-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Make string formatting smarter by tracking whether it was OFMT
+	or CONVFMT that was last used to create a string value.
+	Thanks to Stephane CHAZELAS <stephane@chazelas.org>
+	for the report.
+
+	* awk.h: New flags: CONVFMT_FMT and OFMT_FMT.
+	(format_val): Function now takes an additional argument.
+	(r_format_val): Function now takes an additional argument.
+	(force_string_fmt): Function now takes an additional argument, the
+	flag. Adjust logic to check which one was used.
+	(force_string, force_string_ofmt): Adjust calls.
+	* eval.c (flags2str): Add new flags to the array of flags.
+	* mpfr.c (mpg_format_val): Function now takes an additional argument.
+	Adjust the logic to set the flags.
+	* node.c (format_val): Function now takes an additional argument.
+	(r_format_val): Function now takes an additional argument.
+	Adjust the logic to set the flags.
+
+	Unrelated:
+
+	* NEWS: Updated.
+
+2026-06-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_print_rec): Use force_string_ofmt() when
+	printing $0. Thanks to Stephane CHAZELAS <stephane@chazelas.org>
+	for the report.
+
+2026-06-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* field.c (get_field): Add special case handling when $0
+	has been assigned a numeric value. See test/assignnumfield3.awk
+	Thanks to Stephane CHAZELAS <stephane@chazelas.org> for the
+	report and discussion. The full thread can be found starting at
+	https://lists.gnu.org/archive/html/bug-gawk/2026-06/msg00001.html.
+
 2026-06-21         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* main.c (cmdline_fs): Don't treat -Ft as -F\t anymore.

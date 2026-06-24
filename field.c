@@ -1054,6 +1054,11 @@ get_field(long requested, Func_ptr *assign)
 		*assign = invalidate_field0;	/* $0 needs reconstruction */
 #endif
 
+	if ((fields_arr[0]->flags & NUMBER) != 0) {
+		reset_record();
+		NF = -1;
+	}
+
 	if (requested <= parse_high_water)	/* already parsed this field */
 		return &fields_arr[requested];
 
