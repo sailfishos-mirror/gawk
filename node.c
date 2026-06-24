@@ -31,7 +31,7 @@ extern NODE **fmt_list;          /* declared in eval.c */
 
 NODE *(*make_number)(double) = r_make_number;
 NODE *(*str2number)(NODE *) = r_force_number;
-NODE *(*format_val)(const char *, int, NODE *) = r_format_val;
+NODE *(*format_val)(const char *, int, int, NODE *) = r_format_val;
 int (*cmp_numbers)(const NODE *, const NODE *) = cmp_awknums;
 
 /* is_hex --- return true if a string looks like a hex value */
@@ -204,7 +204,7 @@ static const char *values[] = {
 /* r_format_val --- format a numeric value based on format */
 
 NODE *
-r_format_val(const char *format, int index, NODE *s)
+r_format_val(const char *format, int index, int fmtflag, NODE *s)
 {
 	char buf[BUFSIZ];
 	char *sp = buf;
@@ -258,6 +258,8 @@ r_format_val(const char *format, int index, NODE *s)
 			r = format_args(format, fmt_list[index]->stlen, dummy, 2);
 			assert(r != NULL);
 			s->stfmt = index;
+			oflags &= ~(CONVFMT_FMT|OFMT_FMT);
+			oflags |= fmtflag;
 		}
 		s->flags = oflags;
 		s->stlen = r->stlen;

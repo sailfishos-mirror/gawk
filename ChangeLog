@@ -1,5 +1,25 @@
 2026-06-24         Arnold D. Robbins     <arnold@skeeve.com>
 
+	Make string formatting smarter by tracking whether it was OFMT
+	or CONVFMT that was last used to create a string value.
+	Thanks to Stephane CHAZELAS <stephane@chazelas.org>
+	for the report.
+
+	* awk.h: New flags: CONVFMT_FMT and OFMT_FMT.
+	(format_val): Function now takes an additional argument.
+	(r_format_val): Function now takes an additional argument.
+	(force_string_fmt): Function now takes an additional argument, the
+	flag. Adjust logic to check which one was used.
+	(force_string, force_string_ofmt): Adjust calls.
+	* eval.c (flags2str): Add new flags to the array of flags.
+	* mpfr.c (mpg_format_val): Function now takes an additional argument.
+	Adjust the logic to set the flags.
+	* node.c (format_val): Function now takes an additional argument.
+	(r_format_val): Function now takes an additional argument.
+	Adjust the logic to set the flags.
+
+2026-06-24         Arnold D. Robbins     <arnold@skeeve.com>
+
 	* builtin.c (do_print_rec): Use force_string_ofmt() when
 	printing $0. Thanks to Stephane CHAZELAS <stephane@chazelas.org>
 	for the report.

@@ -396,6 +396,9 @@ EXTRA_DIST = \
 	fldterm.awk \
 	fldterm.in \
 	fldterm.ok \
+	fmtmix.awk \
+	fmtmix.in \
+	fmtmix.ok \
 	fmtspcl-mpfr.ok \
 	fmtspcl.awk \
 	fmtspcl.tok \
@@ -1605,6 +1608,7 @@ BASIC_TESTS = \
 	uplus2 \
 	regexpbrack3 \
 	assignnumfield3 \
+	fmtmix \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
