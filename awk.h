@@ -505,7 +505,10 @@ typedef struct exp_node {
 						 * See cint_array.c */
 		XARRAY		= 0x020000,
 		NUMCONSTSTR	= 0x040000,	/* have string value for numeric constant */
+	/* more flags */
 		REGEX           = 0x080000,	/* this is a typed regex */
+		CONVFMT_FMT	= 0x0100000,	/* string formatted via CONVFMT */
+		OFMT_FMT	= 0x0200000,	/* string formatted via OFMT */
 	} flags;
 	long valref;
 } NODE;
@@ -1190,7 +1193,7 @@ extern const char *persist_file;
 extern int (*interpret)(INSTRUCTION *);	/* interpreter routine */
 extern NODE *(*make_number)(double);
 extern NODE *(*str2number)(NODE *);
-extern NODE *(*format_val)(const char *, int, NODE *);
+extern NODE *(*format_val)(const char *, int, int, NODE *);
 extern int (*cmp_numbers)(const NODE *, const NODE *);
 
 /* built-in array types */
@@ -1799,7 +1802,7 @@ extern void pp_string_fp(Func_print print_func, FILE *fp, const char *str,
 		size_t namelen, int delim, bool breaklines);
 /* node.c */
 extern NODE *r_force_number(NODE *n);
-extern NODE *r_format_val(const char *format, int index, NODE *s);
+extern NODE *r_format_val(const char *format, int index, int fmtflag, NODE *s);
 extern NODE *r_dupnode(NODE *n);
 extern NODE *make_str_node(const char *s, size_t len, int flags);
 extern NODE *make_bool_node(bool value);
@@ -2028,7 +2031,7 @@ dupnode(NODE *n)
  */
 
 static inline NODE *
-force_string_fmt(NODE *s, const char *fmtstr, int fmtidx)
+force_string_fmt(NODE *s, const char *fmtstr, int fmtidx, int fmtflag)
 {
 	if (s->type == Node_elem_new) {
 		elem_new_reset(s);
@@ -2039,18 +2042,19 @@ force_string_fmt(NODE *s, const char *fmtstr, int fmtidx)
 
 	if ((s->flags & STRCUR) != 0
 		&& (s->stfmt == STFMT_UNUSED || (s->stfmt == fmtidx
+						&& (s->flags & (CONVFMT_FMT|OFMT_FMT)) == fmtflag
 #ifdef HAVE_MPFR
 						&& s->strndmode == MPFR_round_mode
 #endif
 				)))
 		return s;
-	return format_val(fmtstr, fmtidx, s);
+	return format_val(fmtstr, fmtidx, fmtflag, s);
 }
 
 /* conceptually should be force_string_convfmt, but this is the typical case */
-#define force_string(s)		force_string_fmt((s), CONVFMT, CONVFMTidx)
+#define force_string(s)		force_string_fmt((s), CONVFMT, CONVFMTidx, CONVFMT_FMT)
 
-#define force_string_ofmt(s)	force_string_fmt((s), OFMT, OFMTidx)
+#define force_string_ofmt(s)	force_string_fmt((s), OFMT, OFMTidx, OFMT_FMT)
 
 #ifdef GAWKDEBUG
 #define unref	r_unref
