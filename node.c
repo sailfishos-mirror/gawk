@@ -874,7 +874,10 @@ str2wstr(NODE *n, size_t **ptr)
 		 * big speed up. Thanks to Ulrich Drepper for the tip.
 		 * 11/2010: Thanks to Paolo Bonzini for some even faster code.
 		 */
-		if (is_valid_character(*sp)) {
+		if (gawk_mb_cur_max == 1) {
+			count = 1;
+			wc = *sp;
+		} else if (is_valid_character(*sp)) {
 			count = 1;
 			wc = btowc_cache(*sp);
 		} else
