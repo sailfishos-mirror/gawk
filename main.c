@@ -1696,6 +1696,7 @@ parse_args(int argc, char **argv)
 
 		case 'S':
 			do_flags |= DO_SANDBOX;
+			warning(_("sandbox mode is deprecated and will be removed in the next major release"));
 			break;
 
 		case 'V':
