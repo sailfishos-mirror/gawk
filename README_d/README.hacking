@@ -7,3 +7,26 @@
 	get_number_uj(n)	uintmax_t
 
 * Use iszero(n) to test if a numeric NODE is zero.
+
+----------------------------------------------
+From Tim Rice <trice@posteo.net>:
+
+A specific version of Automake is wanted for GNU Awk (gawk) development;
+at the time of writing this is Automake 1.16.5.
+
+(The current version of Automake may be seen in the call to
+AM_INIT_AUTOMAKE in configure.ac.)
+
+This can conflict with the system version of Automake, e.g., in Gentoo
+it is currently 1.18.1.  To allow updating Makefiles in GNU Awk without
+conflicting with the system automake, follow this procedure:
+
+1. mkdir -p $HOME/src/gnu/automake
+2. cd $HOME/src/gnu/automake
+3. wget https://ftpmirror.gnu.org/gnu/automake/automake-1.16.5.tar.gz
+4. wget https://ftpmirror.gnu.org/gnu/automake/automake-1.16.5.tar.gz.sig
+5. gpg --verify automake-1.16.5.tar.gz.sig automake-1.16.5.tar.gz
+6. tar xf automake-1.16.5.tar.gz
+7. cd automake-1.16.5
+8. ./configure --prefix=$HOME/src/gnu/automake/build-1.16.5 && make -j12 install
+9. Then when working on GNU Awk: export PATH="$HOME/src/gnu/automake/build-1.16.5/bin:$PATH"
