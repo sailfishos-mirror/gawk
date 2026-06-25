@@ -510,10 +510,9 @@ typedef struct gawk_api {
 #define GAWK_DO_LINT		0x0001
 #define GAWK_DO_TRADITIONAL	0x0002
 #define GAWK_DO_PROFILE		0x0004
-#define GAWK_DO_SANDBOX		0x0008
-#define GAWK_DO_DEBUG		0x0010
-#define GAWK_DO_MPFR		0x0020
-#define GAWK_DO_CSV		0x0040
+#define GAWK_DO_DEBUG		0x0008
+#define GAWK_DO_MPFR		0x0010
+#define GAWK_DO_CSV		0x0020
 
 	/* Cached value of MB_CUR_MAX */
 	int mb_cur_max;
@@ -876,7 +875,6 @@ typedef struct gawk_api {
 #define do_lint		((api->do_flags & GAWK_DO_LINT) != 0)
 #define do_traditional	((api->do_flags & GAWK_DO_TRADITIONAL) != 0)
 #define do_profile	((api->do_flags & GAWK_DO_PROFILE) != 0)
-#define do_sandbox	((api->do_flags & GAWK_DO_SANDBOX) != 0)
 #define do_debug	((api->do_flags & GAWK_DO_DEBUG) != 0)
 #define do_mpfr		((api->do_flags & GAWK_DO_MPFR) != 0)
 #define do_csv		((api->do_flags & GAWK_DO_CSV) != 0)

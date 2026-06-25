@@ -1632,7 +1632,6 @@ init_ext_api()
 	api_impl.do_flags |= do_lint ? GAWK_DO_LINT : 0;
 	api_impl.do_flags |= do_traditional ? GAWK_DO_TRADITIONAL : 0;
 	api_impl.do_flags |= do_profile ? GAWK_DO_PROFILE : 0;
-	api_impl.do_flags |= do_sandbox ? GAWK_DO_SANDBOX : 0;
 	api_impl.do_flags |= do_debug ? GAWK_DO_DEBUG : 0;
 	api_impl.do_flags |= do_mpfr ? GAWK_DO_MPFR : 0;
 	api_impl.do_flags |= do_csv ? GAWK_DO_CSV : 0;
