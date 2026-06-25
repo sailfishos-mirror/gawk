@@ -138,7 +138,7 @@ ISBN 1-882114-93-0 @*
 @end iftex
 
 @ifnottex
-@node Top, Preface, (dir), (dir)
+@node Top
 @top General Introduction
 @comment node-name, next,          previous, up
 
@@ -169,7 +169,6 @@ version 4.0 and later.
 * Special File Fields::            The fields in the special file name.
 * Comparing Protocols::            Differences between the protocols.
 * File /inet/tcp::                 The TCP special file.
-* File /inet/udp::                 The UDP special file.
 * TCP Connecting::                 Making a TCP connection.
 * Troubleshooting::                Troubleshooting TCP/IP connections.
 * Interacting::                    Interacting with a service.
@@ -197,7 +196,7 @@ version 4.0 and later.
 
 @contents
 
-@node Preface, Introduction, Top, Top
+@node Preface
 @unnumbered Preface
 
 In May of 1997, J@"urgen Kahrs felt the need for network access
@@ -236,7 +235,7 @@ March, 2001
 
 @c system if test ! -d eg         ; then mkdir eg         ; fi
 @c system if test ! -d eg/network ; then mkdir eg/network ; fi
-@node Introduction, Using Networking, Preface, Top
+@node Introduction
 @chapter Networking Concepts
 
 This @value{CHAPTER} provides a (necessarily) brief introduction to
@@ -258,7 +257,7 @@ and the postal system (best-effort datagrams).
 * Making Connections::          Making TCP/IP connections.
 @end menu
 
-@node Stream Communications, Datagram Communications, Introduction, Introduction
+@node Stream Communications
 @section Reliable Byte-streams (Phone Calls)
 
 When you make a phone call, the following steps occur:
@@ -291,7 +290,7 @@ The same steps occur in a duplex reliable computer networking connection.
 There is considerably more overhead in setting up the communications,
 but once it's done, data moves in both directions, reliably, in sequence.
 
-@node Datagram Communications, The TCP/IP Protocols, Stream Communications, Introduction
+@node Datagram Communications
 @section Best-effort Datagrams (Mailed Letters)
 
 Suppose you mail three different documents to your office on the
@@ -349,7 +348,7 @@ is exactly the lower reliability; it is often necessary for user-level
 protocols that use datagram communications to add their own reliability
 features on top of the basic communications.
 
-@node The TCP/IP Protocols, Making Connections, Datagram Communications, Introduction
+@node The TCP/IP Protocols
 @section The Internet Protocols
 
 The Internet Protocol Suite (usually referred to as just TCP/IP)@footnote{It
@@ -365,7 +364,7 @@ protocols (e.g., HTTP, used later in this @value{DOCUMENT}).
 * Ports::                       The idea behind ports.
 @end menu
 
-@node Basic Protocols, Ports, The TCP/IP Protocols, The TCP/IP Protocols
+@node Basic Protocols
 @subsection The Basic Internet Protocols
 
 @table @asis
@@ -397,7 +396,7 @@ as the original IPv4 versions, we will not distinguish further between them.
 @item UDP
 The User Datagram Protocol.  This is a best effort datagram protocol.
 It provides a small amount of extra reliability over IP, and adds
-the notion of @dfn{ports}, described in @ref{Ports, ,TCP and UDP Ports}.
+the notion of @dfn{ports}, described in @ref{Ports}.
 
 @item TCP
 The Transmission Control Protocol.  This is a duplex, reliable, sequenced
@@ -414,7 +413,7 @@ FTP (File Transfer Protocol), and HTTP (HyperText Transfer Protocol).
 @cindex FTP (File Transfer Protocol)
 @cindex HTTP (Hypertext Transfer Protocol)
 
-@node Ports, , Basic Protocols, The TCP/IP Protocols
+@node Ports
 @subsection TCP and UDP Ports
 
 In the postal system, the address on an envelope indicates a physical
@@ -439,7 +438,7 @@ below 1024 for ``well known'' services, such as SMTP, FTP, and HTTP.
 Numbers 1024 and above may be used by any application, although there is no
 promise made that a particular port number is always available.
 
-@node Making Connections, , The TCP/IP Protocols, Introduction
+@node Making Connections
 @section Making TCP/IP Connections (And Some Terminology)
 
 Two terms come up repeatedly when discussing networking:
@@ -514,7 +513,7 @@ UDP&&X&\cr
 }}}
 @end tex
 
-@node Using Networking, Some Applications and Techniques, Introduction, Top
+@node Using Networking
 @comment node-name, next, previous, up
 @chapter Networking With @command{gawk}
 
@@ -560,7 +559,8 @@ the libraries necessary to extend these languages before they are ready for the 
 @cindex Transmission Control Protocol @seeentry{TCP}
 @cindex TCP (Transmission Control Protocol)
 This @value{CHAPTER} demonstrates how to use the TCP protocol. The
-UDP protocol is much less important for most users.
+UDP protocol is much less important for most users, and
+is no longer supported by @command{gawk}.
 
 @menu
 * Gawk Special Files::          How to do @command{gawk} networking.
@@ -577,7 +577,7 @@ UDP protocol is much less important for most users.
 * Challenges::                  Where to go from here.
 @end menu
 
-@node Gawk Special Files, TCP Connecting, Using Networking, Using Networking
+@node Gawk Special Files
 @comment node-name,      next,  previous, up
 @section @command{gawk}'s Networking Mechanisms
 
@@ -631,7 +631,7 @@ you allow the system to choose.
 * Comparing Protocols::         Differences between the protocols.
 @end menu
 
-@node Special File Fields, Comparing Protocols, Gawk Special Files, Gawk Special Files
+@node Special File Fields
 @subsection The Fields of the Special @value{FFN}
 This @value{SECTION} explains the meaning of all of the fields,
 as well as the range of values and the defaults.
@@ -688,7 +688,7 @@ availability to one remote host by entering a host name here.
 @item remoteport
 Determines which port on the remote
 machine is used to communicate across the network.
-For @file{/inet/tcp} and @file{/inet/udp},
+For @file{/inet/tcp},
 application-level clients @emph{must} use a number
 other than @samp{0} to indicate to which port on the remote machine
 they want to connect.
@@ -742,42 +742,38 @@ patterns printed in bold letters.
       @strong{Dedicated client, fails if immediately connecting to a
               server on the other side fails}
 @item udp      @tab 0 @tab x @tab x @tab Dedicated client
-@item @strong{tcp, udp} @tab @strong{x} @tab @strong{x} @tab @strong{x} @tab
+@item @strong{tcp} @tab @strong{x} @tab @strong{x} @tab @strong{x} @tab
       @strong{Client, switches to dedicated server if necessary}
-@item @strong{tcp, udp} @tab @strong{x} @tab @strong{0} @tab @strong{0} @tab
+@item @strong{tcp} @tab @strong{x} @tab @strong{0} @tab @strong{0} @tab
       @strong{Dedicated server}
-@item tcp, udp @tab x @tab x @tab 0 @tab Invalid
-@item tcp, udp @tab 0 @tab 0 @tab x @tab Invalid
-@item tcp, udp @tab x @tab 0 @tab x @tab Invalid
-@item tcp, udp @tab 0 @tab 0 @tab 0 @tab Invalid
-@item tcp, udp @tab 0 @tab x @tab 0 @tab Invalid
+@item tcp @tab x @tab x @tab 0 @tab Invalid
+@item tcp @tab 0 @tab 0 @tab x @tab Invalid
+@item tcp @tab x @tab 0 @tab x @tab Invalid
+@item tcp @tab 0 @tab 0 @tab 0 @tab Invalid
+@item tcp @tab 0 @tab x @tab 0 @tab Invalid
 @end multitable
 @end float
 
 In general, TCP is the preferred mechanism to use.  It is the simplest
-protocol to understand and to use.  Use UDP only if circumstances
-demand low-overhead.
+protocol to understand and to use.
 
-@node Comparing Protocols, , Special File Fields, Gawk Special Files
+@node Comparing Protocols
 @subsection Comparing Protocols
 
 This @value{SECTION} develops a pair of programs (sender and receiver)
 that do nothing but send a timestamp from one machine to another. The
-sender and the receiver are implemented with each of the two protocols
-available and demonstrate the differences between them.
+sender and the receiver are implemented with TCP.
 
 @menu
 * File /inet/tcp::              The TCP special file.
-* File /inet/udp::              The UDP special file.
 @end menu
 
-@node File /inet/tcp, File /inet/udp, Comparing Protocols, Comparing Protocols
+@node File /inet/tcp
 @subsubsection @file{/inet/tcp}
 @cindex @code{/inet/tcp} special files (@command{gawk})
 @cindex files @subentry @code{/inet/tcp} (@command{gawk})
 @cindex TCP (Transmission Control Protocol)
 Once again, always use TCP.
-(Use UDP when low overhead is a necessity.)
 The first example is the sender
 program:
 
@@ -808,60 +804,7 @@ a reliable service.
 It does matter which side starts first. The sender/server has to be started
 first, and it waits for the receiver to read a line.
 
-@node File /inet/udp, , File /inet/tcp, Comparing Protocols
-@subsubsection @file{/inet/udp}
-@cindex @code{/inet/udp} special files (@command{gawk})
-@cindex files @subentry @code{/inet/udp} (@command{gawk})
-@cindex UDP (User Datagram Protocol)
-@cindex User Datagram Protocol @seeentry{UDP}
-The server and client programs that use UDP are almost identical to their TCP counterparts;
-only the @var{protocol} has changed. As before, it does matter which side
-starts first. The receiving side blocks and waits for the sender.
-In this case, the receiver/client has to be started first:
-
-@example
-# Server
-BEGIN @{
-  print strftime() |& "/inet/udp/8888/0/0"
-  close("/inet/udp/8888/0/0")
-@}
-@end example
-
-The receiver is almost identical to the TCP receiver:
-
-@example
-# Client
-BEGIN @{
-  print "hi!" |& "/inet/udp/0/localhost/8888"
-  "/inet/udp/0/localhost/8888" |& getline
-  print $0
-  close("/inet/udp/0/localhost/8888")
-@}
-@end example
-
-In the case of UDP, the initial @code{print} command is the one
-that actually sends data so that there is a connection.
-UDP and ``connection'' sounds strange to anyone
-who has learned that UDP is a connectionless protocol.
-Here, ``connection'' means that the @code{connect()} system call
-has completed its work and completed the ``association''
-between a certain socket and an IP address. Thus there are
-subtle differences between @code{connect()} for TCP and UDP;
-see the man page for details.@footnote{This subtlety
-is just one of many details that are hidden in the socket
-API, invisible and intractable for the @command{gawk} user.
-The developers are currently considering how to rework the
-network facilities to make them easier to understand and use.}
-
-UDP cannot guarantee that the datagrams at the receiving end will arrive in exactly
-the same order they were sent. Some datagrams could be
-lost, some doubled, and some could arrive out of order.
-But no overhead is necessary to
-accomplish this. This unreliable behavior is good enough for tasks
-such as data acquisition, logging, and even stateless services like
-the original versions of NFS.
-
-@node TCP Connecting, Troubleshooting, Gawk Special Files, Using Networking
+@node TCP Connecting
 @section Establishing a TCP Connection
 
 @cindex TCP (Transmission Control Protocol) @subentry connection, establishing
@@ -951,7 +894,7 @@ services like @file{daytime} openly to the Internet.
 Later on we will see that some of these nostalgic
 protocols have turned into security risks.
 
-@node Troubleshooting, Interacting, TCP Connecting, Using Networking
+@node Troubleshooting
 @section Troubleshooting Connection Problems
 @cindex advanced features, network connections
 @c last comma is part of secondary
@@ -1043,7 +986,7 @@ The rest of the line is treated as a comment.
 You see that some services (@samp{echo}) support TCP as
 well as UDP.
 
-@node Interacting, Setting Up, Troubleshooting, Using Networking
+@node Interacting
 @section Interacting with a Network Service
 
 The next program begins really interacting with a
@@ -1091,6 +1034,8 @@ With the Linux kernel,
 for example, proper closing results in flushing of buffers. Letting
 the close happen by default may result in discarding buffers.
 
+@c FIXME: Juergen, can you edit?
+@ignore
 When looking at @file{/etc/services} you may have noticed that the
 @samp{daytime} service is also available with @samp{udp}. In the earlier
 examples, change @samp{tcp} to @samp{udp} and try if the @samp{finger} and @samp{daytime}
@@ -1135,8 +1080,9 @@ security problem. A tool called
 @uref{https://seclists.org/fulldisclosure/2020/Sep/30, DarkFinger}
 allows to leverage the Microsoft Windows @samp{finger.exe} as a file downloader
 and help evade network security devices.
+@end ignore
 
-@node Setting Up, Email, Interacting, Using Networking
+@node Setting Up
 @section Setting Up a Service
 @c last comma is part of tertiary
 @cindex networks @subentry @command{gawk} and @subentry service@comma{} establishing
@@ -1258,7 +1204,7 @@ BEGIN @{
 @c endfile
 @end example
 
-@node Email, Web page, Setting Up, Using Networking
+@node Email
 @section Reading Email
 @cindex RFC 1939
 @cindex RFC 821
@@ -1338,7 +1284,7 @@ When it finds this sequence in the mail message, it quits.
 You can invoke this program as often as you like; it does not delete the
 message it reads, but instead leaves it on the server.
 
-@node Web page, Primitive Service, Email, Using Networking
+@node Web page
 @section Reading a Web Page
 @cindex web pages
 @cindex HTTP (Hypertext Transfer Protocol)
@@ -1431,7 +1377,7 @@ print get |& HttpService
 
 You can also request weather reports this way.
 
-@node Primitive Service, Interacting Service, Web page, Using Networking
+@node Primitive Service
 @section A Primitive Web Service
 @cindex web service
 Now we know enough about HTTP to set up a primitive web service that just
@@ -1498,7 +1444,7 @@ probably tries to connect to a proxy server that does not know your machine.
 If so, change the browser's configuration so that the browser does not try to
 use a proxy to connect to your machine.
 
-@node Interacting Service, Simple Server, Primitive Service, Using Networking
+@node Interacting Service
 @section A Web Service with Interaction
 @cindex @command{gawk} @subentry web and @seeentry{web service}
 @cindex web browsers, @seeentry{web service}
@@ -1720,7 +1666,7 @@ not so easy to handle. Another way of including images is to generate them
 with a tool such as GNUPlot,
 by calling the tool with the @code{system()} function or through a pipe.
 
-@node CGI Lib, , Interacting Service, Interacting Service
+@node CGI Lib
 @subsection A Simple CGI Library
 @quotation
 @i{HTTP is like being married: you have to be able to handle whatever
@@ -1942,7 +1888,7 @@ $ gawk -f testserv.awk
 p2=stuff%26junk&percent=a %25 sign
 @end example
 
-@node Simple Server, Caveats, Interacting Service, Using Networking
+@node Simple Server
 @section A Simple Web Server
 @cindex web servers
 @cindex servers @subentry web
@@ -2319,7 +2265,7 @@ Wikipedia provides much background information about
 including the original design of the software and
 its early implementations.
 
-@node Caveats, Challenges, Simple Server, Using Networking
+@node Caveats
 @section Network Programming Caveats
 
 @cindex networks @subentry @command{gawk} and @subentry troubleshooting
@@ -2353,7 +2299,7 @@ before they can reopen.
 Check this with the command @samp{netstat -a}, which
 provides a list of still-active connections.
 
-@node Challenges, , Caveats, Using Networking
+@node Challenges
 @section Where To Go From Here
 
 @cindex Loebner, Hugh
@@ -2504,7 +2450,7 @@ cases for solutions. If none exists, the database could, for example, consist
 of all the newsgroups, mailing lists and FAQs on the Internet.
 @end itemize
 
-@node Some Applications and Techniques, Links, Using Networking, Top
+@node Some Applications and Techniques
 @comment node-name,    next,  previous,      up
 
 @chapter Some Applications and Techniques
@@ -2554,7 +2500,7 @@ We can use HTML, JavaScript, VRML, or whatever else comes along to do our work.
 * PROTBASE::                    Searching Through A Protein Database.
 @end menu
 
-@node PANIC, GETURL, Some Applications and Techniques, Some Applications and Techniques
+@node PANIC
 @section PANIC: An Emergency Web Server
 @cindex PANIC program
 @cindex networks @seealso{web pages}
@@ -2599,7 +2545,7 @@ BEGIN @{
 @c endfile
 @end example
 
-@node GETURL, REMCONF, PANIC, Some Applications and Techniques
+@node GETURL
 @section GETURL: Retrieving Web Pages
 @cindex GETURL program
 @cindex web pages @subentry retrieving
@@ -2658,7 +2604,7 @@ breaks. Even as it is now, the byte sequence @code{"\r\n\r\n"} would
 disappear if it were contained in binary data. Don't get caught in a
 trap when trying a quick fix on this one.
 
-@node REMCONF, URLCHK, GETURL, Some Applications and Techniques
+@node REMCONF
 @section REMCONF: Remote Configuration of Embedded Systems
 @cindex REMCONF program
 @cindex Linux
@@ -2792,7 +2738,7 @@ they use are usually proprietary and also change from time to time.
 This is also true for the protocol that
 MiniSQL uses.
 
-@node URLCHK, WEBGRAB, REMCONF, Some Applications and Techniques
+@node URLCHK
 @section URLCHK: Look for Changed Web Pages
 @cindex URLCHK program
 Most people who make heavy use of Internet resources have a large
@@ -2882,7 +2828,7 @@ advanced approach is to look at some other header line that
 holds time information. But, as always when things get a bit more
 complicated, this is left as an exercise to the reader.
 
-@node WEBGRAB, STATIST, URLCHK, Some Applications and Techniques
+@node WEBGRAB
 @section WEBGRAB: Extract Links from a Page
 @cindex WEBGRAB program
 @c Inspired by iX 1/98 157.
@@ -2992,7 +2938,7 @@ Although this may sound funny or simply irrelevant, we are talking about
 severe security holes. Try to explore your own system this way and make
 sure that none of the above reveals too much information about your system.
 
-@node STATIST, MAZE, WEBGRAB, Some Applications and Techniques
+@node STATIST
 @section STATIST: Graphing a Statistical Distribution
 @cindex STATIST program
 
@@ -3248,7 +3194,7 @@ The result is not very readable.  Furthermore, the
 statistical part of the server does not take care of invalid input.
 Among others, using negative variances causes invalid results.
 
-@node MAZE, MOBAGWHO, STATIST, Some Applications and Techniques
+@node MAZE
 @section MAZE: Walking Through a Maze In Virtual Reality
 @cindex MAZE
 @cindex VRML
@@ -3397,7 +3343,7 @@ function MakeMaze(x, y) @{
 @c endfile
 @end smallexample
 
-@node MOBAGWHO, STOXPRED, MAZE, Some Applications and Techniques
+@node MOBAGWHO
 @section MOBAGWHO: a Simple Mobile Agent
 @cindex MOBAGWHO program
 @cindex agent
@@ -3732,7 +3678,7 @@ working there. Otherwise, we replace the @code{SUBSEP}s
 with a newline character in the resulting string, and report it to
 the originating host, whose name is stored in @code{MOBVAR["MyOrigin"]}.
 
-@node STOXPRED, PROTBASE, MOBAGWHO, Some Applications and Techniques
+@node STOXPRED
 @section STOXPRED: Stock Market Prediction As A Service
 @cindex STOXPRED program
 @cindex Yahoo!
@@ -4090,7 +4036,7 @@ Try to find a better one.
 Should you find one with a success rate of more than 50%, please tell
 us about it! It is only for the sake of curiosity, of course. @code{:-)}
 
-@node PROTBASE, , STOXPRED, Some Applications and Techniques
+@node PROTBASE
 @section PROTBASE: Searching Through A Protein Database
 @cindex PROTBASE
 @cindex NCBI, National Center for Biotechnology Information
@@ -4399,7 +4345,7 @@ take this as a clear indication that the divine creator has intended
 @samp{tcl}, or @samp{python} which are not even proper sequences. (:-)
 @end enumerate
 
-@node Links, GNU Free Documentation License, Some Applications and Techniques, Top
+@node Links
 @chapter Related Links
 
 This section lists the URLs for various items discussed in this @value{DOCUMENT}.
@@ -4510,7 +4456,7 @@ They are presented in the order in which they appear.
 @end table
 
 @c The GNU Free Documentation License.
-@node GNU Free Documentation License, Index, Links, Top
+@node GNU Free Documentation License
 @unnumbered GNU Free Documentation License
 @cindex FDL (Free Documentation License)
 @cindex Free Documentation License (FDL)
@@ -5021,7 +4967,7 @@ to permit their use in free software.
 @c End:
 
 
-@node Index, , GNU Free Documentation License, Top
+@node Index
 @comment node-name,    next,  previous,      up
 
 @unnumbered Index
