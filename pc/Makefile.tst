@@ -503,6 +503,7 @@ pma-tests:
 	./makepmafile ; \
 	$(MAKE) $(NEED_PMA) ; \
 	fi
+	@-$(RM) -f makepmafile
 
 makepmafile: makepmafile.c
 	$(CC) $(srcdir)/makepmafile.c -o $@
