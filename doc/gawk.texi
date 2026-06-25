@@ -4304,6 +4304,8 @@ This is particularly useful when you want to run @command{awk} scripts
 from questionable sources and need to make sure the scripts
 can't access your system (other than the specified input @value{DF}s).
 
+@strong{NOTE:} This feature will be removed in version 6.1 of @command{gawk}.
+
 @cindex @option{-V} option
 @cindex @option{--version} option
 @cindex @command{gawk} @subentry version of @subentry printing information about
@@ -39083,9 +39085,6 @@ This variable is true if @command{gawk} was invoked with @option{--bignum} optio
 @item do_profile
 This variable is true if @command{gawk} was invoked with @option{--profile} option.
 
-@item do_sandbox
-This variable is true if @command{gawk} was invoked with @option{--sandbox} option.
-
 @item do_traditional
 This variable is true if @command{gawk} was invoked with @option{--traditional} option.
 @end table
@@ -39093,6 +39092,10 @@ This variable is true if @command{gawk} was invoked with @option{--traditional} 
 The value of @code{do_lint} can change if @command{awk} code
 modifies the @code{LINT} predefined variable (@pxref{Built-in Variables}).
 The others should not change during execution.
+
+Earlier versions of the API provided a @code{do_sandbox} variable. However,
+as sandbox mode disabled extensions, this variable was always false, and
+it was a silly thing to have. Thus, it's been removed from the API.
 
 @node Extension API Boilerplate
 @subsection Boilerplate Code
