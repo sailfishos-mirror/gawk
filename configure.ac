@@ -177,7 +177,6 @@ AC_LANG([C])
 dnl initialize GNU gettext
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.20.2])
-AM_LANGINFO_CODESET
 gt_LC_MESSAGES
 
 dnl checks for header files

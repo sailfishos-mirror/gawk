@@ -9039,7 +9039,7 @@ printf "%s\n" "$ac_res" >&6; }
 
 
 
-          gl_saved_CPPFLAGS="$CPPFLAGS"
+          am_save_CPPFLAGS="$CPPFLAGS"
 
   for element in $INCICONV; do
     haveit=
@@ -9096,7 +9096,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
     if test "$am_cv_func_iconv" != yes; then
-      gl_saved_LIBS="$LIBS"
+      am_save_LIBS="$LIBS"
       LIBS="$LIBS $LIBICONV"
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9121,7 +9121,7 @@ then :
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
-      LIBS="$gl_saved_LIBS"
+      LIBS="$am_save_LIBS"
     fi
 
 fi
@@ -9135,7 +9135,7 @@ then :
   printf %s "(cached) " >&6
 else $as_nop
 
-                  gl_saved_LIBS="$LIBS"
+                  am_save_LIBS="$LIBS"
       if test $am_cv_lib_iconv = yes; then
         LIBS="$LIBS $LIBICONV"
       fi
@@ -9162,9 +9162,8 @@ int
 main (void)
 {
 int result = 0;
-  /* Test against AIX 5.1...7.2 bug: Failures are not distinguishable from
-     successful returns.  This is even documented in
-     <https://www.ibm.com/support/knowledgecenter/ssw_aix_72/i_bostechref/iconv.html> */
+  /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
+     returns.  */
   {
     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
     if (cd_utf8_to_88591 != (iconv_t)(-1))
@@ -9180,35 +9179,6 @@ int result = 0;
                             &outptr, &outbytesleft);
         if (res == 0)
           result |= 1;
-        iconv_close (cd_utf8_to_88591);
-      }
-  }
-  /* Test against macOS 14.4 bug: Failures are not distinguishable from
-     successful returns.
-     POSIX:2018 says: "The iconv() function shall ... return the number of
-     non-identical conversions performed."
-     But here, the conversion always does transliteration (the suffixes
-     "//TRANSLIT" and "//IGNORE" have no effect, nor does iconvctl()) and
-     does not report when it does a non-identical conversion.  */
-  {
-    iconv_t cd_utf8_to_88591 = iconv_open ("ISO-8859-1", "UTF-8");
-    if (cd_utf8_to_88591 != (iconv_t)(-1))
-      {
-        static ICONV_CONST char input[] = "\305\202"; /* LATIN SMALL LETTER L WITH STROKE */
-        char buf[10];
-        ICONV_CONST char *inptr = input;
-        size_t inbytesleft = strlen (input);
-        char *outptr = buf;
-        size_t outbytesleft = sizeof (buf);
-        size_t res = iconv (cd_utf8_to_88591,
-                            &inptr, &inbytesleft,
-                            &outptr, &outbytesleft);
-        /* Here:
-           With glibc, GNU libiconv (including macOS up to 13): res == (size_t)-1, errno == EILSEQ.
-           With musl libc, NetBSD 10, Solaris 11: res == 1.
-           With macOS 14.4: res == 0, output is "l".  */
-        if (res == 0)
-          result |= 2;
         iconv_close (cd_utf8_to_88591);
       }
   }
@@ -9228,7 +9198,7 @@ int result = 0;
                             &inptr, &inbytesleft,
                             &outptr, &outbytesleft);
         if (res == 0)
-          result |= 4;
+          result |= 2;
         iconv_close (cd_ascii_to_88591);
       }
   }
@@ -9247,7 +9217,7 @@ int result = 0;
                             &inptr, &inbytesleft,
                             &outptr, &outbytesleft);
         if (res != (size_t)(-1) || outptr - buf > 1 || buf[1] != (char)0xAD)
-          result |= 8;
+          result |= 4;
         iconv_close (cd_88591_to_utf8);
       }
   }
@@ -9267,7 +9237,7 @@ int result = 0;
                             &inptr, &inbytesleft,
                             &outptr, &outbytesleft);
         if ((int)res > 0)
-          result |= 16;
+          result |= 8;
         iconv_close (cd_88591_to_utf8);
       }
   }
@@ -9277,7 +9247,7 @@ int result = 0;
   {
     /* Try standardized names.  */
     iconv_t cd1 = iconv_open ("UTF-8", "EUC-JP");
-    /* Try possible *BSD names.  */
+    /* Try IRIX, OSF/1 names.  */
     iconv_t cd2 = iconv_open ("UTF-8", "eucJP");
     /* Try AIX names.  */
     iconv_t cd3 = iconv_open ("UTF-8", "IBM-eucJP");
@@ -9285,7 +9255,7 @@ int result = 0;
     iconv_t cd4 = iconv_open ("utf8", "eucJP");
     if (cd1 == (iconv_t)(-1) && cd2 == (iconv_t)(-1)
         && cd3 == (iconv_t)(-1) && cd4 == (iconv_t)(-1))
-      result |= 32;
+      result |= 16;
     if (cd1 != (iconv_t)(-1))
       iconv_close (cd1);
     if (cd2 != (iconv_t)(-1))
@@ -9311,7 +9281,7 @@ fi
 
         test "$am_cv_func_iconv_works" = no || break
       done
-      LIBS="$gl_saved_LIBS"
+      LIBS="$am_save_LIBS"
 
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $am_cv_func_iconv_works" >&5
@@ -9334,7 +9304,7 @@ printf %s "checking how to link with libiconv... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $LIBICONV" >&5
 printf "%s\n" "$LIBICONV" >&6; }
   else
-            CPPFLAGS="$gl_saved_CPPFLAGS"
+            CPPFLAGS="$am_save_CPPFLAGS"
     LIBICONV=
     LTLIBICONV=
   fi
@@ -10031,42 +10001,6 @@ printf "%s\n" "#define HAVE_DCGETTEXT 1" >>confdefs.h
 
 
 
-
-
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for nl_langinfo and CODESET" >&5
-printf %s "checking for nl_langinfo and CODESET... " >&6; }
-if test ${am_cv_langinfo_codeset+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <langinfo.h>
-int
-main (void)
-{
-char* cs = nl_langinfo(CODESET); return !cs;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  am_cv_langinfo_codeset=yes
-else $as_nop
-  am_cv_langinfo_codeset=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $am_cv_langinfo_codeset" >&5
-printf "%s\n" "$am_cv_langinfo_codeset" >&6; }
-  if test $am_cv_langinfo_codeset = yes; then
-
-printf "%s\n" "#define HAVE_LANGINFO_CODESET 1" >>confdefs.h
-
-  fi
 
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for LC_MESSAGES" >&5

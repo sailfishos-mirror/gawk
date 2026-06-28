@@ -496,7 +496,7 @@ pma-msg-end:
 	@-echo "======== Done with PMA tests ========"
 
 pma-tests:
-	@-if $(AWK) --version | $(AWK) ' /PMA/ { exit 1 }' ; then \
+	@if $(AWK) --version | $(AWK) ' /PMA/ { exit 1 }' ; then \
 	echo PMA tests not supported on this system ; \
 	else \
 	$(MAKE) makepmafile ; \
