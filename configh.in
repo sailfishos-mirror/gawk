@@ -40,9 +40,6 @@
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
-/* Define to 1 if bool, true and false work as per C2023. */
-#undef HAVE_C_BOOL
-
 /* Define to 1 if C supports variable-length arrays. */
 #undef HAVE_C_VARARRAYS
 
@@ -185,9 +182,6 @@
 
 /* Define to 1 if you have the <spawn.h> header file. */
 #undef HAVE_SPAWN_H
-
-/* Define to 1 if you have the <stdbool.h> header file. */
-#undef HAVE_STDBOOL_H
 
 /* Define to 1 if you have the <stddef.h> header file. */
 #undef HAVE_STDDEF_H
@@ -551,28 +545,5 @@
 /* Define to the widest unsigned integer type if <stdint.h> and <inttypes.h>
    do not define. */
 #undef uintmax_t
-
-#if !(defined __cplusplus \
-      ? 1 \
-      : (defined __clang__ \
-         ? __STDC_VERSION__ >= 202000L && __clang_major__ >= 15 \
-         : (defined __GNUC__ \
-            ? __STDC_VERSION__ >= 202000L && __GNUC__ >= 13 \
-            : defined HAVE_C_BOOL)))
-# if !defined __cplusplus && !defined __bool_true_false_are_defined
-#  if HAVE_STDBOOL_H
-#   include <stdbool.h>
-#  else
-#   if defined __SUNPRO_C
-#    error "<stdbool.h> is not usable with this configuration. To make it usable, add -D_STDC_C99= to $CC."
-#   else
-#    error "<stdbool.h> does not exist on this platform. Use gnulib module 'stdbool-c99' instead of gnulib module 'stdbool'."
-#   endif
-#  endif
-# endif
-# if !true
-#  define true (!false)
-# endif
-#endif
 
 #include "custom.h"

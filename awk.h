@@ -73,6 +73,7 @@ extern int errno;
 #include <stdlib.h>
 #endif	/* not STDC_HEADERS */
 
+#include <stdbool.h>
 
 /* We can handle multibyte strings.  */
 #include <wchar.h>
