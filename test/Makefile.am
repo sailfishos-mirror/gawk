@@ -1114,6 +1114,8 @@ EXTRA_DIST = \
 	posix2008sub.ok \
 	posix_compare.awk \
 	posix_compare.ok \
+	posix-inf.awk \
+	posix-inf.ok \
 	posix.awk \
 	posix.in \
 	posix.ok \
@@ -1609,6 +1611,7 @@ BASIC_TESTS = \
 	regexpbrack3 \
 	assignnumfield3 \
 	fmtmix \
+	posix-inf
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1758,6 +1761,7 @@ NEED_NONDEC = mpfrbigint2 nondec2 intarray forcenum
 
 # List of tests that need --posix
 NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 \
+	     posix-inf \
 	     muldimposix posix_compare rscompat
 
 # List of tests that need --pretty-print
