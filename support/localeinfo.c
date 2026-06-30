@@ -2,17 +2,17 @@
 
    Copyright 2016-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
@@ -32,7 +32,7 @@
 #ifndef __MINGW32__
 #if HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
-# include <uchar.h>
+#include <uchar.h>
 #else
 # define mbrtoc32  mbrtowc
 # define c32rtomb  wcrtomb
@@ -128,11 +128,14 @@ static unsigned short int const lonesome_lower[] =
     0x00B5, 0x0131, 0x017F, 0x01C5, 0x01C8, 0x01CB, 0x01F2, 0x0345,
     0x03C2, 0x03D0, 0x03D1, 0x03D5, 0x03D6, 0x03F0, 0x03F1,
 
+#if !defined __STDC_ISO_10646__ || __STDC_ISO_10646__ < 200305L
     /* U+03F2 GREEK LUNATE SIGMA SYMBOL lacks a specific uppercase
        counterpart in locales predating Unicode 4.0.0 (April 2003).  */
     0x03F2,
+#endif
 
-    0x03F5, 0x1E9B, 0x1FBE,
+    0x03F5, 0x1C80, 0x1C81, 0x1C82, 0x1C83, 0x1C84, 0x1C85, 0x1C86,
+    0x1C87, 0x1C88, 0x1E9B, 0x1FBE,
   };
 
 /* Verify that the worst case fits.  This is 1 for towupper, 1 for
@@ -149,16 +152,16 @@ case_folded_counterparts (wint_t c, char32_t folded[CASE_FOLDED_BUFSIZE])
 {
   int n = 0;
   wint_t uc = c32toupper (c);
-  wint_t lc = c32tolower (uc);
-  if (uc != c)
-    folded[n++] = uc;
-  if (lc != uc && lc != c && c32toupper (lc) == uc)
-    folded[n++] = lc;
+      wint_t lc = c32tolower (uc);
+      if (uc != c)
+        folded[n++] = uc;
+      if (lc != uc && lc != c && c32toupper (lc) == uc)
+        folded[n++] = lc;
   for (int i = 0; i < sizeof lonesome_lower / sizeof *lonesome_lower; i++)
-    {
-      wint_t li = lonesome_lower[i];
-      if (li != lc && li != uc && li != c && c32toupper (li) == uc)
-        folded[n++] = li;
-    }
+        {
+          wint_t li = lonesome_lower[i];
+          if (li != lc && li != uc && li != c && c32toupper (li) == uc)
+            folded[n++] = li;
+        }
   return n;
 }
