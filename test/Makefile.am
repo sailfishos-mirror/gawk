@@ -381,6 +381,9 @@ EXTRA_DIST = \
 	fieldassign.awk \
 	fieldassign.in \
 	fieldassign.ok \
+	fieldindex.awk \
+	fieldindex.in \
+	fieldindex.ok \
 	fieldwdth.awk \
 	fieldwdth.in \
 	fieldwdth.ok \
@@ -1611,7 +1614,8 @@ BASIC_TESTS = \
 	regexpbrack3 \
 	assignnumfield3 \
 	fmtmix \
-	posix-inf
+	posix-inf \
+	fieldindex \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
