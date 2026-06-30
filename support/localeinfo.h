@@ -2,17 +2,17 @@
 
    Copyright 2016-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
@@ -21,7 +21,7 @@
 #include <wchar.h>
 #ifdef HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
-# include <uchar.h>
+#include <uchar.h>
 #else
 # ifndef __MINGW32__
 #  define char32_t wchar_t
@@ -55,8 +55,8 @@ struct localeinfo
      than one byte.  */
   signed char sbclen[(unsigned char) -1 + 1];
 
-  /* An array indexed by byte values B that contains the corresponding
-     32-bit wide character (if any) for B if sbclen[B] == 1.  WEOF means
+  /* An array indexed by byte values B.  If sbclen[B] == 1,
+     this is the corresponding char32_t value.  Otherwise it is WEOF, as
      the byte is not a valid single-byte character, i.e., sbclen[B] == -1
      or -2.  */
   wint_t sbctowc[(unsigned char) -1 + 1];
@@ -65,9 +65,9 @@ struct localeinfo
 extern void init_localeinfo (struct localeinfo *);
 
 /* Maximum number of characters that can be the case-folded
-   counterparts of a single character, not counting the character
-   itself.  This is a generous upper bound.  */
-enum { CASE_FOLDED_BUFSIZE = 32 };
+   counterparts of a single character, not counting the character itself.
+   Subtract from 256 one for U+0000.  This is a generous upper bound.  */
+enum { CASE_FOLDED_BUFSIZE = (unsigned char) -1 };
 
 extern int case_folded_counterparts (wint_t, char32_t[CASE_FOLDED_BUFSIZE]);
 
