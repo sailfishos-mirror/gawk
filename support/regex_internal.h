@@ -126,12 +126,12 @@
 # undef __iswctype
 # undef __towlower
 # undef __towupper
-# define __wctype wctype
-# define __iswalnum iswalnum
-# define __iswctype iswctype
-# define __towlower towlower
-# define __towupper towupper
-# define __btowc btowc
+#  define __wctype wctype
+#  define __iswalnum iswalnum
+#  define __iswctype iswctype
+#  define __towlower towlower
+#  define __towupper towupper
+#  define __btowc btowc
 # define __regfree regfree
 #if defined HAVE_UCHAR_H
 #include <uchar.h>
@@ -142,8 +142,8 @@
 # define __wcrtomb c32rtomb
 #else
 # define char32_t wchar_t
-# define __mbrtowc mbrtowc
-# define __wcrtomb wcrtomb
+#  define __mbrtowc mbrtowc
+#  define __wcrtomb wcrtomb
 #endif /* not HAVE_UCHAR_H */
 #endif /* not _LIBC */
 
@@ -183,8 +183,8 @@
    reindenting a lot of regex code that formerly used 'int'.  */
 typedef regoff_t Idx;
 #ifdef _REGEX_LARGE_OFFSETS
-# define IDX_MAX SSIZE_MAX
-#else
+#  define IDX_MAX SSIZE_MAX
+# else
 # define IDX_MAX INT_MAX
 #endif
 
@@ -447,7 +447,11 @@ typedef struct re_dfa_t re_dfa_t;
 # define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define re_malloc(t,n) ((t *) malloc ((n) * sizeof (t)))
+#if defined _LIBC || HAVE_MALLOC_0_NONNULL
+# define re_malloc(t,n) ((t *) malloc ((n) * sizeof (t)))
+#else
+# define re_malloc(t,n) ((t *) malloc ((n) * sizeof (t) + ((n) == 0)))
+#endif
 #define re_realloc(p,t,n) ((t *) realloc (p, (n) * sizeof (t)))
 #define re_free(p) free (p)
 

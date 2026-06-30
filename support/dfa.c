@@ -45,7 +45,7 @@
 #ifndef __MINGW32__
 # if HAVE_UCHAR_H
 /* Use ISO C 11 API.  */
-#  include <uchar.h>
+#include <uchar.h>
 # else
 #  define mbrtoc32  mbrtowc
 #  define c32rtomb  wcrtomb
