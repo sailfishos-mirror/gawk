@@ -4772,6 +4772,9 @@ non siano già presenti all'inizio dell'esecuzione di @command{gawk}.
 da sorgenti dubbie e si vuol essere sicuri che gli @dfn{script} non abbiano
 accesso al sistema (oltre ai @value{DF} di input specificati).
 
+@strong{NOTA:} Questa funzionalità sarà rimossa a partire dalla versione 6.1
+di @command{gawk}.
+
 @cindex @option{-V} (opzione)
 @cindex opzione @subentry @option{-V}
 @cindex @option{--version} (opzione)
@@ -15067,7 +15070,7 @@ $1 == "END"     @{ pertinente = ! pertinente; next @}
 
 @noindent
 La variabile @code{pertinente}, così come tutte le variabili di @command{awk},
-è inizializzata a zero, che vale anche "falso".  Quando viene trovata
+è inizializzata a zero, che vale anche ``falso''.  Quando viene trovata
 una riga il cui primo campo è @samp{START}, il valore di @code{pertinente}
 viene commutato a vero, usando @samp{!}. La regola nella riga seguente stampa righe finché
 @code{pertinente} resta vero.   Quando viene trovata una riga il cui primo
@@ -43030,10 +43033,6 @@ con l'opzione @option{--bignum}.
 Questa variabile è @dfn{true} se @command{gawk} è stato invocato
 con l'opzione @option{--profile}.
 
-@item do_sandbox
-Questa variabile è @dfn{true} se @command{gawk} è stato invocato
-con l'opzione @option{--sandbox}.
-
 @item do_traditional
 Questa variabile è @dfn{true} se @command{gawk} è stato invocato
 con l'opzione @option{--traditional}.
@@ -43042,6 +43041,12 @@ con l'opzione @option{--traditional}.
 Il valore di @code{do_lint} può cambiare se il codice @command{awk}
 modifica la variabile predefinita @code{LINT} (@pxref{Variabili predefinite}).
 Gli altri valori non dovrebbero cambiare durante l'esecuzione.
+
+Le prime versioni di questa API rendevano disponibile la variabile
+@code{do_sandbox}.  Tuttavia, poiché lavorando in modalitò sandbox le
+estensioni venivano sempre disabilitate, il suo valore era era sempre
+``falso'', e non aveva quindi molto senso tenerla.  Per questo, è stata
+rimossa dall'API.
 
 @node Codice predefinito di un'estensione API
 @subsection Codice predefinito di interfaccia API
