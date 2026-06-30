@@ -1163,7 +1163,7 @@ format_out_of_range(NODE *arg, struct flags *flags)
 	// nan_inf_val points to a static buffer, don't free it.
 	const char *nan_inf_val = format_nan_inf(arg, flags->format);
 
-	if (do_posix || flags->magic_posix_flag || nan_inf_val == NULL) {
+	if ((do_posix || flags->magic_posix_flag) && nan_inf_val == NULL) {
 		if (do_lint && ! do_posix && ! flags->magic_posix_flag)
 			lintwarn(_("[s]printf: value %g is out of range for `%%%c' format"),
 						(double) arg->numbr,

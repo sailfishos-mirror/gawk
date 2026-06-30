@@ -30,3 +30,24 @@ conflicting with the system automake, follow this procedure:
 7. cd automake-1.16.5
 8. ./configure --prefix=$HOME/src/gnu/automake/build-1.16.5 && make -j12 install
 9. Then when working on GNU Awk: export PATH="$HOME/src/gnu/automake/build-1.16.5/bin:$PATH"
+
+More generally, the NEWS file contains Infrastructure notes about which tools
+are used to build gawk. For example:
+
+bash-5.1$ grep -Ei 'autoconf|automake|bison|gettext|libtool|texinfo' NEWS
+6. The manual now requires Texinfo 7.1 and its texinfo.tex for formatting.
+1. Infrastructure upgrades: Libtool 2.4.7, Bison 3.8.2.
+1. Infrastructure upgrades: Automake 1.16.5, Texinfo 6.8.
+1. Infrastructure upgrades: Bison 3.8, Gettext 0.20.2, Automake 1.16.4,
+   and (will wonders never cease) Autoconf 2.71.
+3. Infrastructure upgrades: Bison 3.5.4, Texinfo 6.7, Gettext 0.20.1,
+   Automake 1.16.2.
+   making use of the facilities in Texinfo 6.7.  That version (or newer)
+6. Infrastructure upgrades: Bison 3.4.
+4. Infrastructure upgrades: Bison 3.3, Automake 1.16.1, Gettext 0.19.8.1,
+
+To build cleanly, you should match the versions of autoconf, automake, bison,
+gettext, libtool, and texinfo. It may be simplest to put them in a common
+directory tree, something like $HOME/gawk-tools and build them all with the
+--prefix set to that value, and then add $HOME/gawk-tools/bin to your path when
+working on gawk.
