@@ -180,7 +180,7 @@ str_lookup(NODE *symbol, NODE *subs)
 	if (   subs->stfmt != STFMT_UNUSED
 	    || subs == Nnull_string
 	    || (subs->flags & STRING) == 0
-	    || (subs->flags & NULL_FIELD) != 0) {
+	    || (subs->flags & (USER_INPUT|NULL_FIELD)) != 0) {
 		NODE *tmp;
 
 		/*
