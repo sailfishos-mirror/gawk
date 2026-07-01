@@ -286,10 +286,10 @@ static void
 re_set_fastmap_icase (char *fastmap, wchar_t wc, mbstate_t *mbs)
 {
 #if defined _LIBC || defined _REGEX_AVOID_UCHAR_H
-  wchar_t folded[1] = {__towlower (wc)};
+  char32_t folded[1] = {__towlower (wc)};
   int nfolded = folded[0] != wc;
 #else
-  wchar_t folded[CASE_FOLDED_BUFSIZE];
+  char32_t folded[CASE_FOLDED_BUFSIZE];
   int nfolded = case_folded_counterparts (wc, folded);
 #endif
   for (int i = 0; i < nfolded; i++)
