@@ -1498,11 +1498,9 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([m4/arch.m4])
-m4_include([m4/ax_check_compile_flag.m4])
 m4_include([m4/gettext.m4])
 m4_include([m4/host-cpu-c-abi.m4])
 m4_include([m4/intlmacosx.m4])
-m4_include([m4/lcmessage.m4])
 m4_include([m4/lib-ld.m4])
 m4_include([m4/lib-link.m4])
 m4_include([m4/lib-prefix.m4])

@@ -7,7 +7,6 @@ dnl with or without modifications, as long as this notice is preserved.
 
 AC_DEFUN([GAWK_USE_PERSISTENT_MALLOC],
 [
-AC_REQUIRE([AX_CHECK_COMPILE_FLAG])
 AC_CHECK_SIZEOF([void *])
 use_persistent_malloc=no
 use_paxctl=no

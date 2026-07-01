@@ -56,10 +56,6 @@ codeset.m4
 host-cpu-c-abi.m4
 iconv.m4
 intlmacosx.m4
-intmax_t.m4
-inttypes.m4
-inttypes_h.m4
-lcmessage.m4
 lib-ld.m4
 lib-link.m4
 lib-prefix.m4
