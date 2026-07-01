@@ -30820,20 +30820,17 @@ Plain @samp{/inet/} (which used to be the only option) uses
 the system default, most likely IPv4.
 
 @item protocol
-The protocol to use over IP.  This must be either @samp{tcp}, or
-@samp{udp}, for a TCP or UDP IP connection,
-respectively.  TCP should be used for most applications.
-As of version 5.4 of @command{gawk}, use of UDP is considered
-obsolete, as it never worked very well. @command{gawk} issues
-a warning if UDP is used. Support for it will be removed in
-version 6.0.
+The protocol to use over IP.  This must be either @samp{tcp}
+for a TCP IP connection.
+@command{gawk} no longer provides support for UDP connections,
+as it never worked very well.
 
 @cindex @code{getaddrinfo()} function (C library)
 @cindex C library functions @subentry @code{getaddrinfo()}
 @item local-port
-The local TCP or UDP port number to use.  Use a port number of @samp{0}
+The local TCP port number to use.  Use a port number of @samp{0}
 when you want the system to pick a port. This is what you should do
-when writing a TCP or UDP client.
+when writing a TCP client.
 You may also use a well-known service name, such as @samp{smtp}
 or @samp{http}, in which case @command{gawk} attempts to determine
 the predefined port number using the C @code{getaddrinfo()} function.
@@ -30843,7 +30840,7 @@ The IP address or fully qualified domain name of the Internet
 host to which you want to connect.
 
 @item remote-port
-The TCP or UDP port number to use on the given @var{remote-host}.
+The TCP port number to use on the given @var{remote-host}.
 Again, use @samp{0} if you don't care, or else a well-known
 service name.
 @end table
@@ -31596,7 +31593,7 @@ optionally, close off one side of the two-way communications.
 
 @item
 By using special @value{FN}s with the @samp{|&} operator, you can open a
-TCP/IP (or UDP/IP) connection to remote hosts on the Internet. @command{gawk}
+TCP/IP connection to remote hosts on the Internet. @command{gawk}
 supports both IPv4 and IPv6.
 
 @item
@@ -42703,6 +42700,10 @@ code within @command{gawk}.
 @item
 The combination of @option{--traditional} and @option{-Ft} no longer
 sets @code{FS} to a TAB character.
+
+@item
+Support for UDP in @command{gawk}'s networking was removed
+(@pxref{TCP/IP Networking}).
 
 @end itemize
 
