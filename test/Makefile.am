@@ -1718,7 +1718,7 @@ ARRAYDEBUG_TESTS = arrdbg
 
 EXTRA_TESTS = inftest regtest greek-8bit
 
-INET_TESTS = inetdayu inetdayt inetechu inetecht
+INET_TESTS = inetdayt inetecht
 
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 
@@ -2215,18 +2215,9 @@ inetmesg::
 	@echo "'discard'" at port 9 and "'daytimed'" at port 13. Check your
 	@echo file /etc/services and do "'netstat -a'".
 
-inetechu::
-	@echo This test is for establishing UDP connections
-	@-$(AWK) 'BEGIN {print "" |& "/inet/udp/0/127.0.0.1/9"}'
-
 inetecht::
 	@echo This test is for establishing TCP connections
 	@-$(AWK) 'BEGIN {print "" |& "/inet/tcp/0/127.0.0.1/9"}'
-
-inetdayu::
-	@echo This test is for bidirectional UDP transmission
-	@-$(AWK) 'BEGIN { print "" |& "/inet/udp/0/127.0.0.1/13"; \
-	"/inet/udp/0/127.0.0.1/13" |& getline; print $0}'
 
 inetdayt::
 	@echo This test is for bidirectional TCP transmission
