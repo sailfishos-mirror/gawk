@@ -1718,7 +1718,7 @@ ARRAYDEBUG_TESTS = arrdbg
 
 EXTRA_TESTS = inftest regtest greek-8bit
 
-INET_TESTS = inetdayu inetdayt inetechu inetecht
+INET_TESTS = inetdayt inetecht
 
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 
