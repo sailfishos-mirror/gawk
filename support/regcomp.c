@@ -283,7 +283,7 @@ re_set_fastmap (char *fastmap, unsigned char ch)
    Use MBS as a scratch state.  */
 
 static void
-re_set_fastmap_icase (char *fastmap, wchar_t wc, mbstate_t *mbs)
+re_set_fastmap_icase (char *fastmap, char32_t wc, mbstate_t *mbs)
 {
 #if defined _LIBC || defined _REGEX_AVOID_UCHAR_H
   char32_t folded[1] = {__towlower (wc)};
