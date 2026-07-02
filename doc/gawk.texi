@@ -67,7 +67,7 @@
 @ifclear FOR_PRINT
 @set TITLE GAWK: Effective AWK Programming
 @end ifclear
-@set SUBTITLE A User's Guide for GNU Awk
+@set SUBTITLE The User's Guide for GNU Awk
 @set EDITION 5.4
 
 @iftex
@@ -154,6 +154,9 @@
 @set DF datafile
 @set DDF Datafile
 @end ifset
+
+@set POSIXYEAR 2024
+@set POSIXURL https://pubs.opengroup.org/onlinepubs/9799919799/
 
 @c For HTML, spell out email addresses, to avoid problems with
 @c address harvesters for spammers.
@@ -1331,16 +1334,19 @@ October 2014
 Several kinds of tasks occur repeatedly when working with text files.
 You might want to extract certain lines and discard the rest.  Or you
 may need to make changes wherever certain patterns appear, but leave the
-rest of the file alone.  Such jobs are often easy with @command{awk}.
+rest of the file alone.
+For example, you may need to clean up some data before processing
+it further.
+Such jobs are often easy with @command{awk}.
 The @command{awk} utility interprets a special-purpose programming
-language that makes it easy to handle simple data-reformatting jobs.
+language that makes it easy to handle data-reformatting jobs.
 
 @cindex @command{gawk}
 The GNU implementation of @command{awk} is called @command{gawk}; if you
 invoke it with the proper options or environment variables,
 it is fully compatible with
-the POSIX@footnote{The 2018 POSIX standard is accessible online at
-@w{@url{https://pubs.opengroup.org/onlinepubs/9699919799/}.}}
+the POSIX@footnote{The @value{POSIXYEAR} POSIX standard is accessible online at
+@w{@url{@value{POSIXURL}}.}}
 specification of the @command{awk} language
 and with the Unix version of @command{awk} maintained
 by Brian Kernighan.
@@ -1402,8 +1408,7 @@ Extend the language with functions written in C or C++
 This @value{DOCUMENT} teaches you about the @command{awk} language and
 how you can use it effectively.  You should already be familiar with basic
 system commands, such as @command{cat} and @command{ls},@footnote{These utilities
-are available on POSIX-compliant systems, as well as on traditional
-Unix-based systems. If you are using some other operating system, you still need to
+are available on POSIX-compliant systems. If you are using some other operating system, you still need to
 be familiar with the ideas of I/O redirection and pipes.} as well as basic shell
 facilities, such as input/output (I/O) redirection and pipes.
 
@@ -1411,8 +1416,8 @@ facilities, such as input/output (I/O) redirection and pipes.
 Implementations of the @command{awk} language are available for many
 different computing environments.  This @value{DOCUMENT}, while describing
 the @command{awk} language in general, also describes the particular
-implementation of @command{awk} called @command{gawk} (which stands for
-``GNU @command{awk}'').  @command{gawk} runs on a broad range of Unix systems,
+implementation of @command{awk} called @command{gawk}.
+@command{gawk} runs on a broad range of systems,
 ranging from Intel-architecture PC-based computers
 up through large-scale systems.
 @command{gawk} has also been ported to macOS, z/OS,
@@ -1485,7 +1490,7 @@ Jay Fenlason completed it, with advice from Richard Stallman.  John Woods
 contributed parts of the code as well.  In 1988 and 1989, David Trueman, with
 help from me, thoroughly reworked @command{gawk} for compatibility
 with the newer @command{awk}.
-Circa 1994, I became the primary maintainer.
+Towards the end of 1993, I became the primary maintainer.
 Current development focuses on bug fixes,
 performance improvements, standards compliance, and, occasionally, new features.
 
@@ -1516,7 +1521,7 @@ is often referred to as ``new @command{awk}.''
 By analogy, the original version of @command{awk} is
 referred to as ``old @command{awk}.''
 
-On most current systems, when you run the @command{awk} utility
+Usually, when you run the @command{awk} utility
 you get some version of new @command{awk}.@footnote{Only
 Solaris systems still use an old @command{awk} for the
 default @command{awk} utility. A more modern @command{awk} lives in
@@ -1563,14 +1568,9 @@ as defined in the POSIX standard.  It does so in the context of the
 @command{gawk} implementation.  While doing so, it also
 attempts to describe important differences between @command{gawk}
 and other @command{awk}
-@ifclear FOR_PRINT
 implementations.@footnote{All such differences
 appear in the index under the
 entry ``differences in @command{awk} and @command{gawk}.''}
-@end ifclear
-@ifset FOR_PRINT
-implementations.
-@end ifset
 Finally, it notes any @command{gawk} features that are not in
 the POSIX standard for @command{awk}.
 
@@ -1587,9 +1587,7 @@ There are sidebars
 scattered throughout the @value{DOCUMENT}.
 They add a more complete explanation of points that are relevant, but not likely
 to be of interest on first reading.
-@ifclear FOR_PRINT
 All appear in the index, under the heading ``sidebar.''
-@end ifclear
 
 Most of the time, the examples use complete @command{awk} programs.
 Some of the more advanced sections show only the part of the @command{awk}
@@ -1938,13 +1936,8 @@ corners is by definition incomplete.
 @cindex common extensions @subentry definition of
 Extensions to the standard @command{awk} language that are supported by
 more than one @command{awk} implementation are marked
-@ifclear FOR_PRINT
 ``(c.e.),'' and listed in the index under ``common extensions''
 and ``extensions, common.''
-@end ifclear
-@ifset FOR_PRINT
-``(c.e.)'' for ``common extension.''
-@end ifset
 
 @node Manual History
 @unnumberedsec The GNU Project and This Book
@@ -1995,8 +1988,11 @@ stage of development.
 @cindex GNU/Linux
 Until the GNU operating system is more fully developed, you should
 consider using GNU/Linux, a freely distributable, Unix-like operating
-system for Intel,
+system for
+ARM,
+Intel,
 Power Architecture,
+RiscV,
 Sun SPARC, IBM S/390, and other
 systems.@footnote{The terminology ``GNU/Linux'' is explained
 in the @ref{Glossary}.}
@@ -2032,7 +2028,7 @@ the title @cite{The GNU Awk User's Guide}.
 @ifset FOR_PRINT
 SSC published two editions of the @value{DOCUMENT} under the
 title @cite{Effective awk Programming}, and O'Reilly published
-the third edition in 2001.
+the third and fourth editions in 2001 and 2014, respectively.
 @end ifset
 
 This edition maintains the basic structure of the previous editions.
@@ -6268,7 +6264,7 @@ as @samp{[w]}, and @samp{[\<]} is the same as @samp{[<]}.
 The treatment of @samp{\} in bracket expressions
 is compatible with other @command{awk}
 implementations and is also mandated by POSIX.@footnote{See
-@uref{https://pubs.opengroup.org/onlinepubs/9799919799/utilities/awk.html#tag_20_06_13_04,
+@uref{@value{POSIXURL}/utilities/awk.html,
 the POSIX standard for @command{awk}}.
 The standard doesn't relate to the case
 of @samp{\]}, but it does explicitly relate to @samp{\}
@@ -41341,8 +41337,8 @@ The ability to delete all of an array at once with @samp{delete @var{array}}
 @xref{Common Extensions} for a list of common extensions
 not permitted by the POSIX standard.
 
-The 2018 POSIX standard can be found online at
-@url{https://pubs.opengroup.org/onlinepubs/9699919799/}.
+The @value{POSIXYEAR} POSIX standard can be found online at
+@url{@value{POSIXURL}}.
 
 
 @node BTL
@@ -42835,9 +42831,9 @@ Fortunately, shortly before the final release of @command{gawk} 4.0,
 the maintainer learned that the 2008 standard had changed the
 definition of ranges, such that outside the @code{"C"} and @code{"POSIX"}
 locales, the meaning of range expressions was @emph{undefined}.@footnote{See
-@uref{https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_03_05, the standard}
+@uref{@value{POSIXURL}/basedefs/V1_chap09.html#tag_09_03_05, the standard}
 and
-@uref{https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap09.html#tag_21_09_03_05, its rationale}.}
+@uref{@value{POSIXURL}/xrat/V4_xbd_chap09.html#tag_21_09_03_05, its rationale}.}
 
 By using this lovely technical term, the standard gives license
 to implementers to implement ranges in whatever way they choose.
@@ -47387,10 +47383,9 @@ The name for a series of standards
 that specify a Portable Operating System interface.  The ``IX'' denotes
 the Unix heritage of these standards.  The main standard of interest for
 @command{awk} users is
-@cite{IEEE Standard for Information Technology, Standard 1003.1@sup{TM}-2017
-(Revision of IEEE Std 1003.1-2008)}.
-The 2018 POSIX standard can be found online at
-@url{https://pubs.opengroup.org/onlinepubs/9699919799/}.
+@cite{IEEE Standard for Information Technology, Standard 1003.1@sup{TM}-2024}.
+The @value{POSIXYEAR} POSIX standard can be found online at
+@url{@value{POSIXURL}/}.
 
 @item Precedence
 The order in which operations are performed when operators are used

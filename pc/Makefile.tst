@@ -382,16 +382,17 @@ EXPECTED_FAIL_MINGW = \
 # List of tests that fail on z/OS
 EXPECTED_FAIL_ZOS = \
 	aasort aasorti arraysort asort asorti backbigs1 backsmalls1 \
-	backsmalls2 beginfile1 beginfile2 charasbytes clos1way6 \
-	cmdlinefsbacknl2 commas concat4 dbugarray4 \
-	dfamb1 double1 double2 elemnew4 errno fmttest forcenum getlndir \
-	gsubnulli18n gsubtst5 hexfloat ignrcas2 inf-nan-torture iolint lc_num1 \
-	mbfw1 mbprintf1 mbprintf2 mbprintf3 mbprintf4 mbprintf5 \
-	mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest nofile nonfatal2 \
-	numrange posix_compare printf-corners printhuge profile5 \
-	rebt8b2 regexpbad regrange reint2 rri1 sigpipe1 sort1 sortfor sortu \
-	space sprintfc subamp subi18n symtab1 symtab11 symtab8 timeout \
-	unicode1 wideidx wideidx2 widesub widesub2 widesub3 widesub4
+	backsmalls2 beginfile1 beginfile2 case-check charasbytes \
+	clos1way6 cmdlinefsbacknl2 commas concat4 dbugarray4 dfamb1 \
+	double1 double2 elemnew4 errno fmttest forcenum getlndir \
+	greek-equiv greek-utf gsubnulli18n gsubtst5 hexfloat ignrcas2 \
+	inf-nan-torture iolint lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
+	mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest \
+	nofile nonfatal2 numrange posix-inf posix_compare printf-corners \
+	printhuge profile5 rebt8b2 regexpbad regrange reint2 rri1 sigpipe1 \
+	sort1 sortfor sortu space sprintfc subamp subi18n symtab1 symtab8 \
+	symtab11 timeout unicode1 wideidx wideidx2 widesub widesub2 \
+	widesub3 widesub4
 
 
 # List of the files that appear in manual tests or are for reserve testing:
@@ -404,7 +405,8 @@ GENTESTS_UNUSED = Makefile.in checknegtime.awk dtdgport.awk fix-fmtspcl.awk \
 
 # List of tests on MinGW that need a different cmp program
 NEED_TESTOUTCMP = \
-	beginfile2 double2 exit fmttest hsprint posix profile5 space printf-corners hexfloat
+	assignnumfield3 beginfile2 double2 exit fmtmix fmttest hexfloat \
+	hsprint posix printf-corners profile5 space
 
 
 
@@ -1374,13 +1376,13 @@ memleak4:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 greek-equiv:
-	@echo $@; $(CHCP) $(ORIGCP)
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 greek-utf:
-	@echo $@; $(CHCP) $(ORIGCP)
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
@@ -1403,15 +1405,15 @@ regexpbrack3:
 assignnumfield3:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 fmtmix:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 posix-inf:
-	@echo $@; $(CHCP) $(ORIGCP)
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
