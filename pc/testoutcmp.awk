@@ -64,6 +64,10 @@ END {
 		actual1 = gensub(/([-+]?[0-9.]+[eE][-+])0([0-9][0-9])/, "\\1\\2", "g", actual)
 		if (good == actual1)
 		    continue
+		# For assignnumfield3
+		actual1 = gensub(/([-+])001/, "\\101", "g", actual1)
+		if (good == actual1)
+		    continue
 		# For NaN and Inf
 		actual1 = gensub(/([< \t])([-+])nan/, "\\1\\2NAN", "g", actual)
 		if (good == actual1)

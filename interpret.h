@@ -224,7 +224,7 @@ uninitialized_scalar:
 					m->flags &= ~(MPFN | MPZN);
 
 					// set up local param by value
-					m = dupnode(Nnull_string);
+					m = Nnull_string;
 				}
 
 				UPREF(m);
@@ -908,7 +908,7 @@ mod:
 			unref(*lhs);
 			if (r->type == Node_elem_new) {
 				DEREF(r);
-				r = dupnode(Nnull_string);
+				r = Nnull_string;
 			}
 			UPREF(r);
 			UNFIELD(*lhs, r);
