@@ -1854,7 +1854,8 @@ GENTESTS_UNUSED = Makefile.in checknegtime.awk dtdgport.awk fix-fmtspcl.awk \
 
 # List of tests on MinGW that need a different cmp program
 NEED_TESTOUTCMP = \
-	beginfile2 double2 exit fmttest hsprint posix profile5 space printf-corners hexfloat
+	assignnumfield3 beginfile2 double2 exit fmtmix fmttest hexfloat \
+	hsprint posix printf-corners profile5 space
 
 CMP = cmp
 CMP_S = cmp -s
