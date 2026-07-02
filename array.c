@@ -1396,6 +1396,7 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 		qsort_compfunc comp_func;
 		int kind;
 	} sort_funcs[] = {
+{ "@unsorted",		0,			AINDEX },// put most often first
 { "@ind_str_asc",	sort_up_index_string,	AINDEX|AISTR|AASC },
 { "@ind_num_asc",	sort_up_index_number,	AINDEX|AINUM|AASC },
 { "@val_str_asc",	sort_up_value_string,	AVALUE|AVSTR|AASC },
@@ -1406,7 +1407,6 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 { "@val_num_desc",	sort_down_value_number,	AVALUE|AVNUM|ADESC },
 { "@val_type_asc",	sort_up_value_type,	AVALUE|AASC },
 { "@val_type_desc",	sort_down_value_type,	AVALUE|ADESC },
-{ "@unsorted",		0,			AINDEX },
 };
 
 	/*
