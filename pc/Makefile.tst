@@ -1373,6 +1373,14 @@ case-check:
 	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
 	then rm -f _$@ ; \
 	fi
+
+posix-inf:
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
 memleak4:
@@ -1416,11 +1424,6 @@ fmtmix:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-posix-inf:
-	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 fieldindex:
 	@echo $@; $(CHCP) $(ORIGCP)
