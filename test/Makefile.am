@@ -1617,6 +1617,7 @@ BASIC_TESTS = \
 	fmtmix \
 	posix-inf \
 	fieldindex \
+	greek-8bit \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1720,7 +1721,7 @@ GAWK_EXT_TESTS = \
 
 ARRAYDEBUG_TESTS = arrdbg
 
-EXTRA_TESTS = inftest regtest greek-8bit
+EXTRA_TESTS = inftest regtest
 
 INET_TESTS = inetdayu inetdayt inetechu inetecht
 
@@ -1911,12 +1912,13 @@ charset-tests-all:
 		if locale -a | grep -i 'en_US.UTF.*8' > /dev/null && \
 		   locale -a | grep -i 'fr_FR.UTF.*8' > /dev/null && \
 		   locale -a | grep -i 'ru_RU.UTF.*8' > /dev/null && \
-		   locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null  ; \
+		   locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null && \
+		   locale -a | grep -i 'el_GR.iso88597@euro' > /dev/null ; \
 		then \
 			$(MAKE) charset-msg-start charset-tests charset-msg-end; \
 		else \
 			echo %%%%%%%%%% Inadequate locale support: skipping charset tests. ; \
-			echo %%%%%%%%%% At least en_US.UTF-8, fr_FR.UTF-8, ru_RU.UTF-8 and ja_JP.UTF-8 are needed. ; \
+			echo %%%%%%%%%% At least en_US.UTF-8, fr_FR.UTF-8, ru_RU.UTF-8, ja_JP.UTF-8 and el_GR.iso88597@euro are needed. ; \
 		fi ;; \
 	esac
 

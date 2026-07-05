@@ -22,7 +22,7 @@ BEGIN {
 
 	printf(format, uc_sigma_i, uc_sigma_i,  "true", tf[data1 ~ uc_sigma])
 	printf(format, lc_sigma1_i, uc_sigma_i,  "true",  tf[data2 ~ uc_sigma])
-	printf(format, lc_sigma2_i, uc_sigma_i,  "true",  tf[data3 ~ uc_sigma])
+	printf(format, lc_sigma2_i, uc_sigma_i,  "false",  tf[data3 ~ uc_sigma])
 	print ""
 
 	printf(format, uc_sigma_i, lc_sigma1_i, "true", tf[data1 ~ lc_sigma1])
@@ -30,7 +30,7 @@ BEGIN {
 	printf(format, lc_sigma2_i, lc_sigma1_i, "false", tf[data3 ~ lc_sigma1])
 	print ""
 
-	printf(format, uc_sigma_i, lc_sigma2_i, "false", tf[data1 ~ lc_sigma2])
+	printf(format, uc_sigma_i, lc_sigma2_i, "true", tf[data1 ~ lc_sigma2])
 	printf(format, lc_sigma1_i, lc_sigma2_i, "false", tf[data2 ~ lc_sigma2])
 	printf(format, lc_sigma2_i, lc_sigma2_i, "true",  tf[data3 ~ lc_sigma2])
 }

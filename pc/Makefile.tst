@@ -169,6 +169,7 @@ BASIC_TESTS = \
 	fmtmix \
 	posix-inf \
 	fieldindex \
+	greek-8bit \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -445,12 +446,13 @@ charset-tests-all:
 		if locale -a | grep -i 'en_US.UTF.*8' > /dev/null && \
 		   locale -a | grep -i 'fr_FR.UTF.*8' > /dev/null && \
 		   locale -a | grep -i 'ru_RU.UTF.*8' > /dev/null && \
-		   locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null  ; \
+		   locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null && \
+		   locale -a | grep -i 'ELL_GRC' > /dev/null ; \
 		then \
 			$(MAKE) charset-msg-start charset-tests charset-msg-end; \
 		else \
 			echo %%%%%%%%%% Inadequate locale support: skipping charset tests. ; \
-			echo %%%%%%%%%% At least ENU_USA, FRA_FRA, RUS_RUS and JPN_JPN are needed. ; \
+			echo %%%%%%%%%% At least ENU_USA, FRA_FRA, RUS_RUS, JPN_JPN and ELL_GRC are needed. ; \
 		fi ;; \
 	esac
 
