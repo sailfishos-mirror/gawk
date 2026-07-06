@@ -329,9 +329,6 @@ NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
 	profile14 profile15 profile16 profile17
 
 
-# List of tests that need --re-interval
-NEED_RE_INTERVAL = gsubtst3 reint reint2
-
 # List of tests that need --sandbox
 NEED_SANDBOX = sandbox1
 
@@ -370,8 +367,7 @@ NEED_LOCALE_EN = \
 
 # Unused at the moment, since nlstringtest has additional stuff it does
 # NEED_LOCALE_FR =
-# Same for greek-8bit
-# NEED_LOCALE_GR =
+NEED_LOCALE_GR = greek-8bit
 NEED_LOCALE_JP = mbprintf2
 NEED_LOCALE_RU = mtchi18n
 
@@ -1280,14 +1276,6 @@ pty2:
 	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ;; \
 	esac
 
-greek-8bit::
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-if locale -a | grep ELL_GRC > /dev/null ; then \
-	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC ; export GAWKLOCALE; $(CHCP) 1253; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ ; \
-	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
-	fi
-
 arrdbg:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@-mpfr.ok" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
@@ -1430,6 +1418,12 @@ fmtmix:
 fieldindex:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+greek-8bit:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC; export GAWKLOCALE; $(CHCP) 1253; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 addcomma:
@@ -1944,7 +1938,7 @@ gsubtst2:
 
 gsubtst3:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --re-interval < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 gsubtst4:
@@ -3705,13 +3699,13 @@ regx8bit:
 
 reint:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --re-interval < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 reint2:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --re-interval < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 rsgetline:

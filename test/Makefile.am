@@ -1775,9 +1775,6 @@ NEED_PRETTY = lintplus2 nsprof1 nsprof2 nsprof3 \
 	profile4 profile5 profile8 profile9 profile10 profile11 profile13 \
 	profile14 profile15 profile16 profile17
 
-# List of tests that need --re-interval
-NEED_RE_INTERVAL = gsubtst3 reint reint2
-
 # List of tests that need --sandbox
 NEED_SANDBOX = sandbox1
 
@@ -1814,8 +1811,8 @@ NEED_LOCALE_EN = \
 
 # Unused at the moment, since nlstringtest has additional stuff it does
 # NEED_LOCALE_FR =
-# Same for greek-8bit
-# NEED_LOCALE_GR =
+
+NEED_LOCALE_GR = greek-8bit
 
 NEED_LOCALE_JP = mbprintf2
 
@@ -2733,14 +2730,6 @@ pty2:
 	*) AWKPATH="$(srcdir)" $(AWK) -f $@.awk | od -c | $(AWK) '{ $$1 = $$1 ; print }' >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ ; \
 	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ;; \
 	esac
-
-greek-8bit::
-	@echo $@
-	@-if locale -a | grep el_GR.iso88597@euro > /dev/null ; then \
-	[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro ; export GAWKLOCALE; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ ; \
-	$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
-	fi
 
 arrdbg:
 	@echo $@
