@@ -13,7 +13,8 @@ $! This generates a []config.h file and also a config_vms.h file,
 $! which is used to supplement that file.
 $!
 $!
-$! Copyright (C) 2014, 2016, 2019, 2023, 2024 the Free Software Foundation, Inc.
+$! Copyright (C) 2014, 2016, 2019, 2023, 2024, 2026
+$! the Free Software Foundation, Inc.
 $!
 $! This file is part of GAWK, the GNU implementation of the
 $! AWK Programming Language.

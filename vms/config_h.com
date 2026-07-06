@@ -29,7 +29,7 @@ $!
 $! This procedure may not guess the options correctly for all architectures,
 $! and is a work in progress.
 $!
-$! Copyright (C) 2014-2023 the Free Software Foundation, Inc.
+$! Copyright (C) 2014-2023, 2026 the Free Software Foundation, Inc.
 $!
 $! This file is part of GAWK, the GNU implementation of the
 $! AWK Progamming Language.
