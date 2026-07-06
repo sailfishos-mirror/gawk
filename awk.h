@@ -415,6 +415,7 @@ typedef struct exp_node {
 			int rndmode;
 #else
 			double fltnum;
+			int for_alignment_only;	// especially on 32-bit
 #endif
 			char *sp;
 			size_t slen;
