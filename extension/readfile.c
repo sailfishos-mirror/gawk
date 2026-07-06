@@ -2,17 +2,10 @@
  * readfile.c - Read an entire file into a string.
  *
  * Arnold Robbins
- * Tue Apr 23 17:43:30 IDT 2002
- * Revised per Peter Tillier
- * Mon Jun  9 17:05:11 IDT 2003
- * Revised for new dynamic function facilities
- * Mon Jun 14 14:53:07 IDT 2004
- * Revised for formal API May 2012
- * Added input parser March 2014
  */
 
 /*
- * Copyright (C) 2002, 2003, 2004, 2011, 2012, 2013, 2014, 2018, 2022,
+ * Copyright (C) 2002, 2003, 2004, 2011, 2012, 2013, 2014, 2018, 2022, 2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the

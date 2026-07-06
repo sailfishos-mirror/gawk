@@ -1,6 +1,6 @@
 /* dlfcn.h replacement for MS-Windows build.  */
 /*
- * Copyright (C) 2010, 2013, the Free Software Foundation, Inc.
+ * Copyright (C) 2010, 2013, 2026, the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.

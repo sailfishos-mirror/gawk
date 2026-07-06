@@ -169,6 +169,7 @@ BASIC_TESTS = \
 	fmtmix \
 	posix-inf \
 	fieldindex \
+	greek-8bit \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -271,7 +272,7 @@ GAWK_EXT_TESTS = \
 	watchpoint1
 
 ARRAYDEBUG_TESTS = arrdbg
-EXTRA_TESTS = inftest regtest greek-8bit
+EXTRA_TESTS = inftest regtest
 INET_TESTS = inetdayu inetdayt inetechu inetecht
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 LOCALE_CHARSET_TESTS = \
@@ -440,12 +441,13 @@ charset-tests-all:
 		if locale -a | grep -i 'en_US.UTF.*8' > /dev/null && \
 		   locale -a | grep -i 'fr_FR.UTF.*8' > /dev/null && \
 		   locale -a | grep -i 'ru_RU.UTF.*8' > /dev/null && \
-		   locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null  ; \
+		   locale -a | grep -i 'ja_JP.UTF.*8' > /dev/null && \
+		   locale -a | grep -i 'ELL_GRC' > /dev/null ; \
 		then \
 			$(MAKE) charset-msg-start charset-tests charset-msg-end; \
 		else \
 			echo %%%%%%%%%% Inadequate locale support: skipping charset tests. ; \
-			echo %%%%%%%%%% At least ENU_USA, FRA_FRA, RUS_RUS and JPN_JPN are needed. ; \
+			echo %%%%%%%%%% At least ENU_USA, FRA_FRA, RUS_RUS, JPN_JPN and ELL_GRC are needed. ; \
 		fi ;; \
 	esac
 
@@ -1368,6 +1370,14 @@ case-check:
 	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
 	then rm -f _$@ ; \
 	fi
+
+posix-inf:
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
 memleak4:
@@ -1411,11 +1421,6 @@ fmtmix:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-posix-inf:
-	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 fieldindex:
 	@echo $@; $(CHCP) $(ORIGCP)
