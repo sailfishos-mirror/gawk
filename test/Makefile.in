@@ -1882,7 +1882,6 @@ BASIC_TESTS = \
 	fmtmix \
 	posix-inf \
 	fieldindex \
-	greek-8bit \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1988,9 +1987,9 @@ INET_TESTS = inetdayu inetdayt inetechu inetecht
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 commas fmttest fnarydel \
-	fnparydl jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 mbprintf4 \
-	mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest rebt8b2 rtlenmb \
-	sort1 sprintfc
+	fnparydl greek-8bit jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
+	mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest rebt8b2 \
+	rtlenmb sort1 sprintfc
 
 SHLIB_TESTS = \
 	apiterm filefuncs fnmatch fork fork2 fts functab4 functab5 \
@@ -3320,12 +3319,6 @@ fmtmix:
 fieldindex:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-greek-8bit:
-	@echo $@
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro; export GAWKLOCALE; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 addcomma:
@@ -5905,6 +5898,12 @@ fnparydl:
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
 	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
 	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
+
+greek-8bit:
+	@echo $@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro; export GAWKLOCALE; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 lc_num1:
 	@echo $@ $(ZOS_FAIL)

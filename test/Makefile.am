@@ -1618,7 +1618,6 @@ BASIC_TESTS = \
 	fmtmix \
 	posix-inf \
 	fieldindex \
-	greek-8bit \
 	addcomma anchgsub anchor argarray argcasfile arrayind1 arrayind2 \
 	arrayind3 arrayparm arrayprm2 arrayprm3 arrayref arrymem1 arryref2 \
 	arryref3 arryref4 arryref5 arynasty arynocls aryprm1 aryprm2 aryprm3 \
@@ -1728,9 +1727,9 @@ MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 
 LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 commas fmttest fnarydel \
-	fnparydl jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 mbprintf4 \
-	mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest rebt8b2 rtlenmb \
-	sort1 sprintfc
+	fnparydl greek-8bit jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
+	mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest rebt8b2 \
+	rtlenmb sort1 sprintfc
 
 SHLIB_TESTS = \
 	apiterm filefuncs fnmatch fork fork2 fts functab4 functab5 \
