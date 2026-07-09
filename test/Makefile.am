@@ -591,6 +591,7 @@ EXTRA_DIST = \
 	gnureops.ok \
 	greek-8bit.awk \
 	greek-8bit.ok \
+	greek-8bit.ok2 \
 	greek-equiv.awk \
 	greek-equiv.ok \
 	greek-utf.awk \
@@ -2798,6 +2799,14 @@ case-check:
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if $(CMP_S) "$(srcdir)"/$@.ok3 _$@ > /dev/null || \
 	$(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
+
+greek-8bit:
+	@echo $@
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro; export GAWKLOCALE; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
 	then rm -f _$@ ; \
 	fi
 

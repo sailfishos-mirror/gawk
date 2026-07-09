@@ -1344,6 +1344,14 @@ case-check:
 	then rm -f _$@ ; \
 	fi
 
+greek-8bit:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC; export GAWKLOCALE; $(CHCP) 1253; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
+	then rm -f _$@ ; \
+	fi
+
 posix-inf:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
@@ -3987,12 +3995,6 @@ fnparydl:
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
 	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
 	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
-greek-8bit:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC; export GAWKLOCALE; $(CHCP) 1253; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 lc_num1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)

@@ -2625,12 +2625,6 @@ fnparydl:
 	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
 	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
 
-greek-8bit:
-	@echo $@
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro; export GAWKLOCALE; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
 lc_num1:
 	@echo $@ $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
