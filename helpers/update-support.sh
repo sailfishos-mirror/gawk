@@ -59,17 +59,13 @@ intlmacosx.m4
 lib-ld.m4
 lib-link.m4
 lib-prefix.m4
-lock.m4
 longlong.m4
 nls.m4
 printf-posix.m4
 progtest.m4
 size_max.m4
 stdint_h.m4
-threadlib.m4
-visibility.m4
 wint_t.m4
-xsize.m4
 "
 for i in $M4_FILE_LIST
 do
