@@ -113,6 +113,7 @@ standard_integer_string(const char *s, size_t len)
 NODE **
 is_integer(NODE *symbol, NODE *subs)
 {
+	return NULL;
 #ifndef CHECK_INTEGER_USING_FORCE_NUMBER
 	long l;
 #endif

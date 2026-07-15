@@ -130,8 +130,9 @@ static const long power_two_table[] = {
 };
 
 
-#define ISUINT(a, s)	((((s)->flags & NUMINT) != 0 || is_integer(a, s) != NULL) \
-                                    && (s)->numbr >= 0)
+//#define ISUINT(a, s)	((((s)->flags & NUMINT) != 0 || is_integer(a, s) != NULL) \
+//                                    && (s)->numbr >= 0)
+#define ISUINT(a, s)	(false)
 
 /*
  * To store 2^n integers, allocate top-level array of size n, elements
@@ -190,8 +191,8 @@ cint_array_init(NODE *symbol ATTRIBUTE_UNUSED, NODE *subs ATTRIBUTE_UNUSED)
 NODE **
 is_uinteger(NODE *symbol, NODE *subs)
 {
-	if (is_integer(symbol, subs) != NULL && subs->numbr >= 0)
-		return & success_node;
+//	if (is_integer(symbol, subs) != NULL && subs->numbr >= 0)
+//		return & success_node;
 	return NULL;
 }
 
