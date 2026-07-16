@@ -156,8 +156,12 @@ get_inode(struct dirent *entry, const char *dirname)
 	HANDLE fh;
 	BOOL ok;
 	BY_HANDLE_FILE_INFORMATION info;
+	int count;
 
-	sprintf(fname, "%s\\%s", dirname, entry->d_name);
+	count = snprintf(fname, sizeof(fname), "%s\\%s", dirname, entry->d_name);
+	if (count >= sizeof(fname))
+		return 0;
+
 	fh = CreateFile(fname, 0, 0, NULL, OPEN_EXISTING,
 			FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (fh == INVALID_HANDLE_VALUE)

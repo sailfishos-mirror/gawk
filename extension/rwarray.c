@@ -730,10 +730,12 @@ read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs)
 		   || code == VT_MPFR) {
 		return read_number(fp, value, code, vs);
 	} else {
+		size_t read_amount;
+
 		if (fread(& len, 1, sizeof(len), fp) != sizeof(len)) {
 			return awk_false;
 		}
-		len = ntohl(len);
+		read_amount = ntohl(len);
 		switch (code) {
 		case VT_STRING:
 			value->val_type = AWK_STRING;
@@ -756,15 +758,17 @@ read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs)
 			value->val_type = AWK_STRING;
 			break;
 		}
-		value->str_value.len = len;
-		value->str_value.str = gawk_malloc(len + 1);
+		value->str_value.str = gawk_malloc(read_amount + 1);
 
-		if (fread(value->str_value.str, 1, len, fp) != (ssize_t) len) {
+		if (value->str_value.str == NULL)
+			return awk_false;
+
+		if (fread(value->str_value.str, 1, read_amount, fp) != read_amount) {
 			gawk_free(value->str_value.str);
 			return awk_false;
 		}
-		value->str_value.str[len] = '\0';
-		value->str_value.len = len;
+		value->str_value.str[read_amount] = '\0';
+		value->str_value.len = read_amount;
 
 		if (code == VT_BOOL) {
 			bool val = (strcmp(value->str_value.str, "TRUE") == 0);
@@ -793,7 +797,7 @@ read_number(FILE *fp, awk_value_t *value, uint32_t code, value_storage *vs)
 			return awk_false;
 
 		len = ntohl(len);
-		if (fread(buffer, 1, len, fp) != len)
+		if (len > sizeof(buffer) || fread(buffer, 1, len, fp) != len)
 			return awk_false;
 
 		(void) sscanf(buffer, "%lg", & d);
