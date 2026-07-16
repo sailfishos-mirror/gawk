@@ -1,3 +1,16 @@
+2026-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix some possible buffer overlow issues. Thanks to
+	zx (Jace) <g.mygenie@gmail.com> for the report.
+
+	* readdir.c (get_inode): In the MinGW code, use snprintf()
+	instead of sprintf() to create the file name.
+	* rwarray.c (read_value): Use a size_t variable for calculating
+	the amount of storage to allocate. Check the return value
+	of gawk_malloc().
+	(read_number): Check that the length of the value to be read
+	does not exceed the size of the buffer.
+
 2026-07-08         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.4.1: Release tar ball made.
