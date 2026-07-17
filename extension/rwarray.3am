@@ -1,4 +1,4 @@
-.TH RWARRAY 3am "Feb 25 2026" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH RWARRAY 3am "Jul 17 2026" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
 writea, reada, writeall, readall \- write and read gawk arrays to/from files
 .SH SYNOPSIS
@@ -91,6 +91,12 @@ ret = writeall("globalstate.bin")
 ret = readall("globalstate.bin")
 .fi
 .ft R
+.SH NOTE
+.\" Text from Simon Josefsson <simon@josefsson.org>, 16 July, 2026
+When you use \f(CWreada()\fP or \f(CWreadall()\fP to load external
+binary data, it is assumed the data was written using an earlier call to
+\f(CWwritea()\fP or \f(CWwriteall()\fP, respectively.  Maliciously crafted
+data coming from an untrusted source may confuse the parser.
 .SH "SEE ALSO"
 .IR "GAWK: Effective AWK Programming" ,
 and the man pages for the other extensions shipped with
