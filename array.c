@@ -747,6 +747,12 @@ value_info(NODE *n)
 
 	if ((n->flags & (STRING|STRCUR)) == STRCUR) {
 		size_t len;
+		const char *ov = "";
+
+		if ((n->flags & OFMT_FMT) != 0)
+			ov = "O";
+		else if ((n->flags & CONVFMT_FMT) != 0)
+			ov = "CONV";
 
 		fprintf(output_fp, "][");
 		fprintf(output_fp, "stfmt=%d, ", n->stfmt);
@@ -756,11 +762,14 @@ value_info(NODE *n)
 		 * was originally set as a string, or it's a number that has
 		 * an integer value.
 		 */
-		len = fmt_list[n->stfmt]->stlen;
-		fmt_list[n->stfmt]->stptr[len] = '\0';
-		fprintf(output_fp, "FMT=\"%s\"",
-					n->stfmt == STFMT_UNUSED ? "<unused>"
-					: fmt_list[n->stfmt]->stptr);
+		if (n->stfmt == STFMT_UNUSED)
+			fprintf(output_fp, "FMT=\"<unused>\"");
+		else {
+			len = fmt_list[n->stfmt]->stlen;
+			fmt_list[n->stfmt]->stptr[len] = '\0';
+			fprintf(output_fp, "%sFMT=\"%s\"",
+				ov, fmt_list[n->stfmt]->stptr);
+		}
 #ifdef HAVE_MPFR
 		fprintf(output_fp, ", ROUNDMODE=\"%c\"", n->strndmode);
 #endif
