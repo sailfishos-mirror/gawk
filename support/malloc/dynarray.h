@@ -95,6 +95,7 @@
 #define _DYNARRAY_H
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <string.h>
 
 struct dynarray_header

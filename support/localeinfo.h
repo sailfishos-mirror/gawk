@@ -17,6 +17,7 @@
 
 /* Written by Paul Eggert.  */
 
+#include <stdbool.h>
 #include <wchar.h>
 #ifdef HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */

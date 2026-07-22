@@ -32,6 +32,7 @@
 #include <regex.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -2813,7 +2813,6 @@ as_fn_append ac_header_c_list " unistd.h unistd_h HAVE_UNISTD_H"
 as_fn_append ac_header_c_list " wchar.h wchar_h HAVE_WCHAR_H"
 as_fn_append ac_header_c_list " minix/config.h minix_config_h HAVE_MINIX_CONFIG_H"
 gt_needs="$gt_needs "
-as_fn_append ac_header_c_list " stdbool.h stdbool_h HAVE_STDBOOL_H"
 as_fn_append ac_header_c_list " sys/time.h sys_time_h HAVE_SYS_TIME_H"
 
 # Auxiliary files required by this configure script.
@@ -10034,77 +10033,6 @@ printf "%s\n" "#define HAVE_DCGETTEXT 1" >>confdefs.h
 
 
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for nl_langinfo and CODESET" >&5
-printf %s "checking for nl_langinfo and CODESET... " >&6; }
-if test ${am_cv_langinfo_codeset+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <langinfo.h>
-int
-main (void)
-{
-char* cs = nl_langinfo(CODESET); return !cs;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  am_cv_langinfo_codeset=yes
-else $as_nop
-  am_cv_langinfo_codeset=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $am_cv_langinfo_codeset" >&5
-printf "%s\n" "$am_cv_langinfo_codeset" >&6; }
-  if test $am_cv_langinfo_codeset = yes; then
-
-printf "%s\n" "#define HAVE_LANGINFO_CODESET 1" >>confdefs.h
-
-  fi
-
-
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for LC_MESSAGES" >&5
-printf %s "checking for LC_MESSAGES... " >&6; }
-if test ${gt_cv_val_LC_MESSAGES+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <locale.h>
-int
-main (void)
-{
-return LC_MESSAGES
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  gt_cv_val_LC_MESSAGES=yes
-else $as_nop
-  gt_cv_val_LC_MESSAGES=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gt_cv_val_LC_MESSAGES" >&5
-printf "%s\n" "$gt_cv_val_LC_MESSAGES" >&6; }
-  if test $gt_cv_val_LC_MESSAGES = yes; then
-
-printf "%s\n" "#define HAVE_LC_MESSAGES 1" >>confdefs.h
-
-  fi
-
-
 ac_fn_c_check_header_compile "$LINENO" "arpa/inet.h" "ac_cv_header_arpa_inet_h" "$ac_includes_default"
 if test "x$ac_cv_header_arpa_inet_h" = xyes
 then :
@@ -10249,43 +10177,6 @@ then :
   printf "%s\n" "#define HAVE_WCTYPE_H 1" >>confdefs.h
 
 fi
-
-
-
-
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for bool, true, false" >&5
-printf %s "checking for bool, true, false... " >&6; }
-if test ${gl_cv_c_bool+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-          #if true == false
-           #error "true == false"
-          #endif
-          extern bool b;
-          bool b = true == false;
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  gl_cv_c_bool=yes
-else $as_nop
-  gl_cv_c_bool=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gl_cv_c_bool" >&5
-printf "%s\n" "$gl_cv_c_bool" >&6; }
-  if test "$gl_cv_c_bool" = yes; then
-
-printf "%s\n" "#define HAVE_C_BOOL 1" >>confdefs.h
-
-  fi
-
-
-
 
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sys/wait.h that is POSIX.1 compatible" >&5
@@ -10519,23 +10410,25 @@ then :
   printf %s "(cached) " >&6
 else $as_nop
   ac_cv_type_unsigned_long_long_int=yes
-     if test "x${ac_cv_prog_cc_c99-no}" = xno; then
-       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+     case $ac_prog_cc_stdc in
+       no | c89) ;;
+       *)
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
   /* For now, do not test the preprocessor; as of 2007 there are too many
-         implementations with broken preprocessors.  Perhaps this can
-         be revisited in 2012.  In the meantime, code should not expect
-         #if to work with literals wider than 32 bits.  */
+	 implementations with broken preprocessors.  Perhaps this can
+	 be revisited in 2012.  In the meantime, code should not expect
+	 #if to work with literals wider than 32 bits.  */
       /* Test literals.  */
       long long int ll = 9223372036854775807ll;
       long long int nll = -9223372036854775807LL;
       unsigned long long int ull = 18446744073709551615ULL;
       /* Test constant expressions.   */
       typedef int a[((-9223372036854775807LL < 0 && 0 < 9223372036854775807ll)
-                     ? 1 : -1)];
+		     ? 1 : -1)];
       typedef int b[(18446744073709551615ULL <= (unsigned long long int) -1
-                     ? 1 : -1)];
+		     ? 1 : -1)];
       int i = 63;
 int
 main (void)
@@ -10544,9 +10437,9 @@ main (void)
       long long int llmax = 9223372036854775807ll;
       unsigned long long int ullmax = 18446744073709551615ull;
       return ((ll << 63) | (ll >> 63) | (ll < i) | (ll > i)
-              | (llmax / ll) | (llmax % ll)
-              | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
-              | (ullmax / ull) | (ullmax % ull));
+	      | (llmax / ll) | (llmax % ll)
+	      | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
+	      | (ullmax / ull) | (ullmax % ull));
   ;
   return 0;
 }
@@ -10559,8 +10452,8 @@ else $as_nop
   ac_cv_type_unsigned_long_long_int=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-     fi
+    conftest$ac_exeext conftest.$ac_ext;;
+     esac
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_unsigned_long_long_int" >&5
 printf "%s\n" "$ac_cv_type_unsigned_long_long_int" >&6; }
@@ -10579,35 +10472,37 @@ then :
   printf %s "(cached) " >&6
 else $as_nop
   ac_cv_type_long_long_int=yes
-      if test "x${ac_cv_prog_cc_c99-no}" = xno; then
-        ac_cv_type_long_long_int=$ac_cv_type_unsigned_long_long_int
-        if test $ac_cv_type_long_long_int = yes; then
-                                        if test "$cross_compiling" = yes
+      case $ac_prog_cc_stdc in
+	no | c89) ;;
+	*)
+	  ac_cv_type_long_long_int=$ac_cv_type_unsigned_long_long_int
+	  if test $ac_cv_type_long_long_int = yes; then
+	    	    	    	    if test "$cross_compiling" = yes
 then :
   :
 else $as_nop
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <limits.h>
-                 #ifndef LLONG_MAX
-                 # define HALF \
-                          (1LL << (sizeof (long long int) * CHAR_BIT - 2))
-                 # define LLONG_MAX (HALF - 1 + HALF)
-                 #endif
+		   #ifndef LLONG_MAX
+		   # define HALF \
+			    (1LL << (sizeof (long long int) * CHAR_BIT - 2))
+		   # define LLONG_MAX (HALF - 1 + HALF)
+		   #endif
 int
 main (void)
 {
 long long int n = 1;
-                 int i;
-                 for (i = 0; ; i++)
-                   {
-                     long long int m = n << i;
-                     if (m >> i != n)
-                       return 1;
-                     if (LLONG_MAX / 2 < m)
-                       break;
-                   }
-                 return 0;
+		   int i;
+		   for (i = 0; ; i++)
+		     {
+		       long long int m = n << i;
+		       if (m >> i != n)
+			 return 1;
+		       if (LLONG_MAX / 2 < m)
+			 break;
+		     }
+		   return 0;
   ;
   return 0;
 }
@@ -10622,8 +10517,8 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
-        fi
-      fi
+	  fi;;
+      esac
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_long_long_int" >&5
 printf "%s\n" "$ac_cv_type_long_long_int" >&6; }
@@ -10641,23 +10536,25 @@ then :
   printf %s "(cached) " >&6
 else $as_nop
   ac_cv_type_unsigned_long_long_int=yes
-     if test "x${ac_cv_prog_cc_c99-no}" = xno; then
-       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+     case $ac_prog_cc_stdc in
+       no | c89) ;;
+       *)
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
   /* For now, do not test the preprocessor; as of 2007 there are too many
-         implementations with broken preprocessors.  Perhaps this can
-         be revisited in 2012.  In the meantime, code should not expect
-         #if to work with literals wider than 32 bits.  */
+	 implementations with broken preprocessors.  Perhaps this can
+	 be revisited in 2012.  In the meantime, code should not expect
+	 #if to work with literals wider than 32 bits.  */
       /* Test literals.  */
       long long int ll = 9223372036854775807ll;
       long long int nll = -9223372036854775807LL;
       unsigned long long int ull = 18446744073709551615ULL;
       /* Test constant expressions.   */
       typedef int a[((-9223372036854775807LL < 0 && 0 < 9223372036854775807ll)
-                     ? 1 : -1)];
+		     ? 1 : -1)];
       typedef int b[(18446744073709551615ULL <= (unsigned long long int) -1
-                     ? 1 : -1)];
+		     ? 1 : -1)];
       int i = 63;
 int
 main (void)
@@ -10666,9 +10563,9 @@ main (void)
       long long int llmax = 9223372036854775807ll;
       unsigned long long int ullmax = 18446744073709551615ull;
       return ((ll << 63) | (ll >> 63) | (ll < i) | (ll > i)
-              | (llmax / ll) | (llmax % ll)
-              | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
-              | (ullmax / ull) | (ullmax % ull));
+	      | (llmax / ll) | (llmax % ll)
+	      | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
+	      | (ullmax / ull) | (ullmax % ull));
   ;
   return 0;
 }
@@ -10681,8 +10578,8 @@ else $as_nop
   ac_cv_type_unsigned_long_long_int=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-     fi
+    conftest$ac_exeext conftest.$ac_ext;;
+     esac
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_unsigned_long_long_int" >&5
 printf "%s\n" "$ac_cv_type_unsigned_long_long_int" >&6; }
@@ -11508,45 +11405,6 @@ printf "%s\n" "$ac_cv_func_mbrtowc" >&6; }
 printf "%s\n" "#define HAVE_MBRTOWC 1" >>confdefs.h
 
   fi
-
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts " >&5
-printf %s "checking whether C compiler accepts ... " >&6; }
-if test ${ax_cv_check_cflags__+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-  ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  "
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  ax_cv_check_cflags__=yes
-else $as_nop
-  ax_cv_check_cflags__=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-  CFLAGS=$ax_check_save_flags
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__" >&5
-printf "%s\n" "$ax_cv_check_cflags__" >&6; }
-if test "x$ax_cv_check_cflags__" = xyes
-then :
-  :
-else $as_nop
-  :
-fi
 
 
 
