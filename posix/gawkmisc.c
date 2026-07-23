@@ -151,24 +151,19 @@ optimal_bufsize(int fd, struct stat *stb)
 	  	fall through */
 
 	/*
-	 * System V.n, n < 4, doesn't have the file system block size in the
-	 * stat structure. So we have to make some sort of reasonable
-	 * guess. We use stdio's BUFSIZ, since that is what it was
-	 * meant for in the first place.
+	 * 7/2026:
+	 * Assume we have the st_blksize member in the struct stat.
+	 * It's mandated by POSIX.  Use BUFSIZ if it's zero.
 	 */
-#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
-#define DEFBLKSIZE	(stb->st_blksize > 0 ? stb->st_blksize : BUFSIZ)
-#else
-#define DEFBLKSIZE	BUFSIZ
-#endif
+	size_t def_block_size = (stb->st_blksize > 0 ? stb->st_blksize : BUFSIZ);
 
 	if (S_ISREG(stb->st_mode)		/* regular file */
-	    && 0 < stb->st_size			/* non-zero size */
-	    && (stb->st_size < DEFBLKSIZE	/* small file */
+	    && stb->st_size > 0			/* non-zero size */
+	    && (stb->st_size < def_block_size	/* small file */
 		|| exact))			/* or debugging */
 		return stb->st_size;		/* use file size */
 
-	return DEFBLKSIZE;
+	return def_block_size;
 }
 
 /* ispath --- return true if path has directory components */
