@@ -421,11 +421,11 @@ fill_stat_array(const char *name, awk_array_t array, struct stat *sbuf)
 		array_set_numeric(array, "minor", minor(sbuf->st_rdev));
 	}
 
-#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
-	array_set_numeric(array, "blksize", sbuf->st_blksize);
-#elif defined(__MINGW32__)
+#if defined(__MINGW32__)
 	array_set_numeric(array, "blksize", 4096);
-#endif /* HAVE_STRUCT_STAT_ST_BLKSIZE */
+#else	/* ! __MINGW32__ */
+	array_set_numeric(array, "blksize", sbuf->st_blksize);
+#endif	/* ! __MINGW32__ */
 
 	/* the size of a block for st_blocks */
 	array_set_numeric(array, "devbsize", device_blocksize());
