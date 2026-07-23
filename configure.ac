@@ -438,7 +438,6 @@ no)	GNUPG_CHECK_MPFR
 esac
 
 dnl checks for structure members
-AC_CHECK_MEMBERS([struct stat.st_blksize])
 AC_CHECK_MEMBERS([struct passwd.pw_passwd],,,[
 #include <sys/types.h>
 #include <pwd.h>

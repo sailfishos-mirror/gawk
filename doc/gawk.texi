@@ -2192,10 +2192,12 @@ significant editorial help for this @value{DOCUMENT} for the
 @cindex Demaille, Akim
 @cindex G., Daniel Richard
 @cindex Jaegermann, Michal
+@cindex James, Sam
 @cindex Kahrs, J@"urgen
 @cindex Malmberg, John
 @cindex Ramey, Chet
 @cindex Rankin, Pat
+@cindex Rice, Tim
 @cindex Schorr, Andrew
 @cindex Vinschen, Corinna
 @cindex Zaretskii, Eli
@@ -2207,10 +2209,12 @@ Scott Deifik,
 Akim Demaille,
 Daniel Richard G.,
 Michal Jaegermann,
+Sam James,
 J@"urgen Kahrs,
 John Malmberg,
 Chet Ramey,
 Pat Rankin,
+Tim Rice,
 Andrew Schorr,
 Corinna Vinschen,
 and Eli Zaretskii
@@ -2232,13 +2236,17 @@ Thanks to Jasmine Kwityn for her copyediting work.
 
 Thanks to Michael Brennan for the Forewords.
 
+@cindex Haertel, Michael
+A special thank you to Mike Haertel for the MinRX regular expression
+matcher which is now the main matching engine in @command{gawk}.
+
 @cindex Duman, Patrice
 @cindex Berry, Karl
 @cindex Smith, Gavin
 Thanks to Patrice Dumas for the current @command{makeinfo} program.
 Thanks to Karl Berry for his past work on Texinfo, and
 to Gavin Smith, who continues to work to improve
-the Texinfo markup language.
+the Texinfo markup language and @file{texinfo.tex}.
 
 @cindex Kernighan, Brian
 @cindex Brennan, Michael
@@ -2277,7 +2285,7 @@ take advantage of those opportunities.
 Arnold Robbins @*
 Nof Ayalon @*
 Israel @*
-March, 2020
+July, 2026
 @end ifnotdocbook
 
 @ifnotinfo
@@ -2340,8 +2348,8 @@ the end of the input files.
 @cindex programming languages @subentry data-driven vs.@: procedural
 @cindex @command{awk} programs
 Programs in @command{awk} are different from programs in most other languages,
-because @command{awk} programs are @dfn{data driven} (i.e., you describe
-the data you want to work with and then what to do when you find it).
+because @command{awk} programs are @dfn{data driven}: i.e., you describe
+the data you want to work with and then what to do when you find it.
 Most other languages are @dfn{procedural}; you have to describe, in great
 detail, every step the program should take.  When working with procedural
 languages, it is usually much
@@ -2446,7 +2454,11 @@ input file(s).  There are single quotes around @var{program} so
 the shell won't interpret any @command{awk} characters as special shell
 characters.  The quotes also cause the shell to treat all of @var{program} as
 a single argument for @command{awk}, and allow @var{program} to be more
-than one line long.
+than one line long. For example:
+
+@example
+awk '/arnold/ @{ print @}' /etc/passwd      @ii{Find all instance of} arnold @ii{in} /etc/passwd
+@end example
 
 @cindex shells @subentry scripts
 @cindex @command{awk} programs @subentry running @subentry from shell scripts
@@ -2480,7 +2492,6 @@ awk '@var{program}'
 @command{awk} applies the @var{program} to the @dfn{standard input},
 which usually means whatever you type on the keyboard.  This continues
 until you indicate end-of-file by typing @kbd{Ctrl-d}.
-(On non-POSIX operating systems, the end-of-file character may be different.)
 
 @cindex files @subentry input @seeentry{input files}
 @cindex input files @subentry running @command{awk} without
@@ -2505,7 +2516,7 @@ the program, without having to engage in ugly shell quoting tricks.
 @quotation NOTE
 If you use Bash as your shell, you should execute the
 command @samp{set +H} before running this program interactively, to
-disable the C shell-style command history, which treats @samp{!} as a
+disable the @command{csh}-style command history, which treats @samp{!} as a
 special character. We recommend putting this command into your personal
 startup file.
 @end quotation
@@ -2543,7 +2554,7 @@ awk -f @var{source-file} @var{input-file1} @var{input-file2} @dots{}
 
 @cindex @option{-f} option
 @cindex command line @subentry option @option{-f}
-The @option{-f} instructs the @command{awk} utility to get the
+The @option{-f} option instructs the @command{awk} utility to get the
 @command{awk} program from the file @var{source-file} (@pxref{Options}).
 Any @value{FN} can be used for @var{source-file}.  For example, you
 could put the program:
@@ -2560,7 +2571,7 @@ awk -f advice
 @end example
 
 @noindent
-does the same thing as this one:
+does the same thing as this one (from @ref{Read Terminal}):
 
 @example
 awk 'BEGIN @{ print "Don\47t Panic!" @}'
@@ -2596,11 +2607,11 @@ affect the execution of the @command{awk} program but it does make
 Once you have learned @command{awk}, you may want to write self-contained
 @command{awk} scripts, using the @samp{#!} script mechanism.  You can do
 this on many systems.@footnote{The @samp{#!} mechanism works on
-GNU/Linux systems, BSD-based systems, and commercial Unix systems.}
+GNU/Linux systems, BSD-based systems, macOS, and commercial Unix systems.}
 For example, you could update the file @file{advice} to look like this:
 
 @example
-#! /bin/awk -f
+#! /usr/bin/awk -f
 
 BEGIN @{ print "Don't Panic!" @}
 @end example
@@ -2641,8 +2652,8 @@ interpreter with the given argument and the full argument list of the
 executed program.  The first argument in the list is the full @value{FN}
 of the @command{awk} program.  The rest of the argument list contains
 either options to @command{awk}, or @value{DF}s, or both. (Note that on
-many systems @command{awk} is found in @file{/usr/bin} instead of
-in @file{/bin}.)
+most systems @command{awk} is usually found in @file{/usr/bin}. Occasionally
+it may instead be found in @file{/bin}.)
 
 Some systems limit the length of the interpreter name to 32 characters.
 Often, this can be dealt with by using a symbolic link.
@@ -2660,7 +2671,7 @@ Finally, the value of @code{ARGV[0]}
 (@pxref{Built-in Variables})
 varies depending upon your operating system.
 Some systems put @samp{awk} there, some put the full pathname
-of @command{awk} (such as @file{/bin/awk}), and some put the name
+of @command{awk} (such as @file{/usr/bin/awk}), and some put the name
 of your script (@samp{advice}).  @value{DARKCORNER}
 Don't rely on the value of @code{ARGV[0]}
 to provide your script name.
@@ -2759,7 +2770,7 @@ awk '@var{program text}' @var{input-file1} @var{input-file2} @dots{}
 Once you are working with the shell, it is helpful to have a basic
 knowledge of shell quoting rules.  The following rules apply only to
 POSIX-compliant, Bourne-style shells (such as Bash, the GNU Bourne-Again
-Shell).  If you use the C shell, you're on your own.
+Shell).  If you use @command{csh}, you're on your own.
 
 Before diving into the rules, we introduce a concept that appears
 throughout this @value{DOCUMENT}, which is that of the @dfn{null},
@@ -3125,9 +3136,6 @@ is the pattern to search for.  This type of pattern is called a
 @dfn{regular expression}, which is covered in more detail later
 (@pxref{Regexp}).
 The pattern is allowed to match parts of words.
-There are
-single quotes around the @command{awk} program so that the shell won't
-interpret any of it as special shell characters.
 
 Here is what this program prints:
 
@@ -3165,7 +3173,7 @@ your own @value{FN}s for @file{data}.
 
 @cindex @command{ls} utility
 Some of the following examples use the output of @w{@samp{ls -l}} as input.
-@command{ls} is a system command that gives you a listing of the files in a
+@command{ls} gives you a listing of the files in a
 directory. With the @option{-l} option, this listing includes each file's
 size and the date the file was last modified. Its output looks like this:
 
@@ -3223,7 +3231,7 @@ Print the length of the longest line in @file{data}:
 
 @example
 expand data | awk '@{ if (x < length($0)) x = length($0) @}
-                   END @{ print "maximum line length is " x @}'
+                   END @{ print "maximum line length is", x @}'
 @end example
 
 This example differs slightly from the previous one:
@@ -3255,7 +3263,7 @@ Print the total number of bytes used by @var{files}:
 
 @example
 ls -l @var{files} | awk '@{ x += $5 @}
-                   END @{ print "total bytes: " x @}'
+                   END @{ print "total bytes:", x @}'
 @end example
 
 @item
@@ -3298,7 +3306,7 @@ the program would print the odd-numbered lines.
 @section An Example with Two Rules
 @cindex @command{awk} programs
 
-The @command{awk} utility reads the input files one line at a
+The @command{awk} utility reads its input files one line at a
 time.  For each line, @command{awk} tries the patterns of each rule.
 If several patterns match, then several actions execute in the order in
 which they appear in the @command{awk} program.  If no patterns match, then
@@ -3331,7 +3339,7 @@ This program prints every line that contains the string
 @samp{12} @emph{or} the string @samp{21}.  If a line contains both
 strings, it is printed twice, once by each rule.
 
-This is what happens if we run this program on our two sample @value{DF}s,
+Here is what happens if we run this program on our two sample @value{DF}s,
 @file{mail-list} and @file{inventory-shipped}:
 
 @example
@@ -3369,21 +3377,11 @@ ls -l | awk '$6 == "Nov" @{ sum += $5 @}
 This command prints the total number of bytes in all the files in the
 current directory that were last modified in November (of any year).
 
-As a reminder, the output of @w{@samp{ls -l}} gives you a listing of the
-files in a directory, including each file's size and the date the file
-was last modified.  The first field contains read-write permissions,
-the second field contains the number of links to the file, and the
-third field identifies the file's owner.  The fourth field identifies
-the file's group.  The fifth field contains the file's size in bytes.
-The sixth, seventh, and eighth fields contain the month, day, and time,
-respectively, that the file was last modified.  Finally, the ninth field
-contains the @value{FN}.
-
 @c @cindex automatic initialization
 @cindex initialization, automatic
-The @samp{$6 == "Nov"} in our @command{awk} program is an expression that
+The @samp{$6 == "Nov"} in our @command{awk} program
 tests whether the sixth field of the output from @w{@samp{ls -l}}
-matches the string @samp{Nov}.  Each time a line has the string
+is equal to the string @samp{Nov}.  Each time a line has the string
 @samp{Nov} for its sixth field, @command{awk} performs the action
 @samp{sum += $5}.  This adds the fifth field (the file's size) to the variable
 @code{sum}.  As a result, when @command{awk} has finished reading all the
@@ -3453,8 +3451,7 @@ We have generally not used backslash continuation in our sample programs.
 @command{gawk} places no limit on the
 length of a line, so backslash continuation is never strictly necessary;
 it just makes programs more readable.  For this same reason, as well as
-for clarity, we have kept most statements short in the programs
-presented throughout the @value{DOCUMENT}.
+for clarity, we have kept most statements short in our programs.
 
 Backslash continuation is
 most useful when your @command{awk} program is in a separate source file
@@ -3468,16 +3465,16 @@ lines in the middle of a regular expression or a string.
 @c solaris 2.7 nawk does not. Solaris /usr/xpg4/bin/awk does though!  sigh.
 
 @cindex @command{csh} utility
-@cindex line continuations @subentry with C shell
+@cindex line continuations @subentry with @command{csh}
 @cindex backslash (@code{\}) @subentry continuing lines and @subentry in @command{csh}
 @cindex @code{\} (backslash) @subentry continuing lines and @subentry in @command{csh}
 @quotation CAUTION
 @emph{Backslash continuation does not work as described
-with the C shell.}  It works for @command{awk} programs in files and
+with @command{csh}.}  It works for @command{awk} programs in files and
 for one-shot programs, @emph{provided} you are using a POSIX-compliant
-shell, such as the Unix Bourne shell or Bash.  But the C shell behaves
+shell, such as the Unix Bourne shell or Bash.  But @command{csh} behaves
 differently!  There you must use two backslashes in a row, followed by
-a newline.  Note also that when using the C shell, @emph{every} newline
+a newline.  Note also that when using @command{csh}, @emph{every} newline
 in your @command{awk} program must be escaped with a backslash. To illustrate:
 
 @example
@@ -3489,10 +3486,10 @@ in your @command{awk} program must be escaped with a backslash. To illustrate:
 @end example
 
 @noindent
-Here, the @samp{%} and @samp{?} are the C shell's primary and secondary
+Here, the @samp{%} and @samp{?} are @command{csh}'s primary and secondary
 prompts, analogous to the standard shell's @samp{$} and @samp{>}.
 
-Compare the previous example to how it is done with a POSIX-compliant shell:
+Compare the previous example to how it's done with a POSIX-compliant shell:
 
 @example
 $ @kbd{awk 'BEGIN @{}
@@ -3561,11 +3558,13 @@ to @code{FS}.  This same treatment applies to variable assignments
 made with the @option{-v} option (@pxref{Options})
 and to regular command-line variable assignments (@pxref{Assignment Options}).
 
+@ignore
 If you're interested, see
 @uref{https://lists.gnu.org/archive/html/bug-gawk/2022-10/msg00025.html}
 for a source code patch that allows lines to be continued when inside
 parentheses. This patch was not added to @command{gawk} since it would
 quietly decrease the portability of @command{awk} programs.
+@end ignore
 
 @cindex statements @subentry multiple
 @cindex @code{;} (semicolon) @subentry separating statements in actions
@@ -3583,13 +3582,6 @@ could also be written this way:
 /12/ @{ print $0 @} ; /21/ @{ print $0 @}
 @end example
 
-@quotation NOTE
-The requirement that states that rules on the same line must be
-separated with a semicolon was not in the original @command{awk}
-language; it was added for consistency with the treatment of statements
-within an action.
-@end quotation
-
 @node Other Features
 @section Other Features of @command{awk}
 
@@ -3597,7 +3589,7 @@ within an action.
 The @command{awk} language provides a number of predefined, or
 @dfn{built-in}, variables that your programs can use to get information
 from @command{awk}.  There are other variables your program can set
-as well to control how @command{awk} processes your data.
+to control how @command{awk} processes your data.
 
 In addition, @command{awk} provides a number of built-in functions for doing
 common computational and string-related operations.
@@ -3646,15 +3638,6 @@ computer.
 The original @command{awk}'s capabilities were strained by tasks
 of such complexity, but modern versions are more capable.
 
-@cindex @command{awk} programs @subentry complex
-If you find yourself writing @command{awk} scripts of more than, say,
-a few hundred lines, you might consider using a different programming
-language.  The shell is good at string and pattern matching; in addition,
-it allows powerful use of the system utilities.  Python offers a nice
-balance between high-level ease of programming and access to system
-facilities.@footnote{Other popular scripting languages include Ruby
-and Perl.}
-
 @node Intro Summary
 @section Summary
 
@@ -3674,7 +3657,7 @@ or
 to run @command{awk}.
 
 @item
-You may use the special @samp{#!} header line to create @command{awk}
+Use the special @samp{#!} header line to create @command{awk}
 programs that are directly executable.
 
 @item
@@ -3835,6 +3818,8 @@ Using @option{-v} to set the values of the built-in
 variables may lead to surprising results.  @command{awk} will reset the
 values of those variables as it needs to, possibly ignoring any
 initial value you may have given.
+However, setting @code{FS} and @code{RS} with @option{-v} is
+often useful.
 @end quotation
 
 @cindex @option{-W} option
@@ -3851,9 +3836,7 @@ The full list of @command{gawk}-specific options is provided next.
 @cindex options @subentry command-line @subentry end of
 @item --
 Signal the end of the command-line options.  The following arguments
-are not treated as options even if they begin with @samp{-}.  This
-interpretation of @option{--} follows the POSIX argument parsing
-conventions.
+are not treated as options even if they begin with @samp{-}.
 
 @cindex @code{-} (hyphen) @subentry file names beginning with
 @cindex hyphen (@code{-}) @subentry file names beginning with
@@ -4050,14 +4033,21 @@ that @command{gawk} accepts and then exit.
 Read an @command{awk} source library from @var{source-file}.  This option
 is completely equivalent to using the @code{@@include} directive inside
 your program.  It is very similar to the @option{-f} option,
-but there are two important differences.  First, when @option{-i} is
+but there are two important differences:
+
+@itemize @bullet
+@item
+When @option{-i} is
 used, the program source is not loaded if it has been previously
 loaded, whereas with @option{-f}, @command{gawk} always loads the file.
-Second, because this option is intended to be used with code libraries,
+
+@item
+Because this option is for use with code libraries,
 @command{gawk} does not recognize such files as constituting main program
 input.  Thus, after processing an @option{-i} argument, @command{gawk}
 still expects to find the main source code via the @option{-f} option
 or on the command line.
+@end itemize
 
 @cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive
 @cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive
@@ -4125,13 +4115,13 @@ argument may be one of the following:
 
 @table @code
 @item fatal
-Cause lint warnings become fatal errors.
+Cause lint warnings to become fatal errors.
 This may be drastic, but its use will certainly encourage the
 development of cleaner @command{awk} programs.
 
 @item invalid
 Only issue warnings about things
-that are actually invalid are issued. (This is not fully implemented yet.)
+that are actually invalid. (This is not fully implemented yet.)
 
 @item no-ext
 Disable warnings about @command{gawk} extensions.
@@ -4196,18 +4186,13 @@ when parsing numeric input data (@pxref{Locales}).
 @item @option{-o}[@var{file}]
 @itemx @option{--pretty-print}[@code{=}@var{file}]
 Enable pretty-printing of @command{awk} programs.
-Implies @option{--no-optimize}.
+This implies @option{--no-optimize}.
 By default, the output program is created in a file named @file{awkprof.out}
 (@pxref{Profiling}).
 The optional @var{file} argument allows you to specify a different
 @value{FN} for the output.
 No space is allowed between the @option{-o} and @var{file}, if
 @var{file} is supplied.
-
-@quotation NOTE
-In the past, this option would also execute your program.
-This is no longer the case.
-@end quotation
 
 @cindex @option{--optimize} option
 @cindex @option{-O} option
@@ -4229,7 +4214,7 @@ be used to cancel the effect of an earlier @option{-s} option
 @itemx @option{--profile}[@code{=}@var{file}]
 Enable profiling of @command{awk} programs
 (@pxref{Profiling}).
-Implies @option{--no-optimize}.
+This implies @option{--no-optimize}.
 By default, profiles are created in a file named @file{awkprof.out}.
 The optional @var{file} argument allows you to specify a different
 @value{FN} for the profile file.
@@ -4262,11 +4247,6 @@ restrictions apply:
 Newlines are not allowed after @samp{?} or @samp{:}
 (@pxref{Conditional Exp}).
 
-@cindex locale decimal point character
-@cindex decimal point character, locale specific
-@item
-The locale's decimal point character is used for parsing input
-data (@pxref{Locales}).
 @end itemize
 
 @c @cindex automatic warnings
@@ -4337,7 +4317,8 @@ of having to be included in each individual program.
 The @option{-i} option is similar in this regard.
 (As mentioned in
 @ref{Definition Syntax},
-function names must be unique.)
+function names must be unique.
+Namespaces mitigate this; @pxref{Namespaces}.)
 
 With standard @command{awk}, library functions can still be used, even
 if the program is entered at the keyboard,
@@ -4388,7 +4369,7 @@ export POSIXLY_CORRECT
 @end example
 
 @cindex @command{csh} utility @subentry @env{POSIXLY_CORRECT} environment variable
-For a C shell-compatible
+For a @command{csh}-compatible
 shell,@footnote{Not recommended.}
 you would add this line to the @file{.login} file in your home directory:
 
@@ -4464,16 +4445,6 @@ because such rules are run before @command{awk} begins scanning the argument lis
 The variable values given on the command line are processed for escape
 sequences (@pxref{Escape Sequences}).
 @value{DARKCORNER}
-
-In some very early implementations of @command{awk}, when a variable assignment
-occurred before any @value{FN}s, the assignment would happen @emph{before}
-the @code{BEGIN} rule was executed.  @command{awk}'s behavior was thus
-inconsistent; some command-line assignments were available inside the
-@code{BEGIN} rule, while others were not.  Unfortunately,
-some applications came to depend
-upon this ``feature.''  When @command{awk} was changed to be more consistent,
-the @option{-v} option was added to accommodate applications that depended
-upon the old behavior.
 
 The variable assignment feature is most useful for assigning to variables
 such as @code{RS}, @code{OFS}, and @code{ORS}, which control input and
@@ -4625,12 +4596,6 @@ colon or by placing two colons next to each other [@samp{::}].)
 @quotation NOTE
 To include the current directory in the path, either place @file{.}
 as an entry in the path or write a null entry in the path.
-
-Different past versions of @command{gawk} would also look explicitly in
-the current directory, either before or after the path search.  As of
-version 4.1.2, this no longer happens; if you wish to look
-in the current directory, you must include @file{.} either as a separate
-entry or as a null entry in the search path.
 @end quotation
 
 The default value for @env{AWKPATH} is
@@ -4638,16 +4603,13 @@ The default value for @env{AWKPATH} is
 may use a different directory; it
 will depend upon how @command{gawk} was built and installed. The actual
 directory is the value of @code{$(pkgdatadir)} generated when
-@command{gawk} was configured.
-(For more detail, see the @file{INSTALL} file in the source distribution,
-and see @ref{Quick Installation}.
-You probably don't need to worry about this,
-though.)}  Since @file{.} is included at the beginning, @command{gawk}
+@command{gawk} was configured.}
+Since @file{.} is included at the beginning, @command{gawk}
 searches first in the current directory and then in @file{/usr/local/share/awk}.
 In practice, this means that you will rarely need to change the
 value of @env{AWKPATH}.
 
-@xref{Shell Startup Files}, for information on functions that help to
+@xref{Shell Startup Files}, for information on functions that help
 manipulate the @env{AWKPATH} variable.
 
 @command{gawk} places the value of the search path that it used into
@@ -4805,6 +4767,14 @@ files one line at a time, instead of reading in blocks. This exists
 for debugging problems on filesystems on non-POSIX operating systems
 where I/O is performed in records, not in blocks.
 
+@cindex @env{GAWK_GNU_MATCHERS} environment variable
+@cindex environment variables @subentry @env{GAWK_GNU_MATCHERS}
+@item GAWK_GNU_MATCHERS
+If this variable exists, then @command{gawk} switches to using GNU
+@code{regex} and @code{dfa} for regexp matching.  Normally, the MinRX
+matcher is used.
+@strong{NOTE:} Use of this variable will eventually go away.
+
 @cindex @env{GAWK_MSG_SRC} environment variable
 @cindex environment variables @subentry @env{GAWK_MSG_SRC}
 @item GAWK_MSG_SRC
@@ -4818,19 +4788,22 @@ same warning or error message.
 @cindex @env{GAWK_LOCALE_DIR} environment variable
 @cindex environment variables @subentry @env{GAWK_LOCALE_DIR}
 @item GAWK_LOCALE_DIR
-Specifies the location of compiled message object files
+This specifies the location of compiled message object files
 for @command{gawk} itself. This is passed to the @code{bindtextdomain()}
 function when @command{gawk} starts up.
 
 @cindex @env{GAWK_NO_DFA} environment variable
 @cindex environment variables @subentry @env{GAWK_NO_DFA}
 @item GAWK_NO_DFA
-If this variable exists, @command{gawk} does not use the DFA regexp matcher
+If this variable exists, @emph{and} @env{GAWK_GNU_MATCHERS} also exists
+in the environment, then
+@command{gawk} does not use the DFA regexp matcher
 for ``does it match'' kinds of tests. This can cause @command{gawk}
 to be slower. Its purpose is to help isolate differences between the
-two regexp matchers that @command{gawk} uses internally. (There aren't
+@code{regex} and @code{dfa} regexp matchers. (There aren't
 supposed to be differences, but occasionally theory and practice don't
 coordinate with each other.)
+@strong{NOTE:} Use of this variable will eventually go away.
 
 @cindex @env{GAWK_STACKSIZE} environment variable
 @cindex environment variables @subentry @env{GAWK_STACKSIZE}
@@ -4876,6 +4849,17 @@ the C constant @code{EXIT_FAILURE}.  This is usually one.
 If @command{gawk} exits because of a fatal error, the exit
 status is two.  On non-POSIX systems, this value may be mapped
 to @code{EXIT_FAILURE}.
+
+A program's exit status is available at the shell level in the
+special shell variable @code{$?}. This rather silly example
+demonstrates:
+
+@example
+$ @kbd{awk 'BEGIN @{ print "exiting 42" ; exit 42 @}'}
+@print{} exiting 42
+$ @kbd{echo $?}
+@print{} 42
+@end example
 
 @node Include Files
 @section Including Other Files into Your Program
@@ -5006,12 +4990,9 @@ thus reducing the need for writing complex and tedious command lines.
 In particular, @code{@@include} is very useful for writing CGI scripts
 to be run from web pages.
 
-The @code{@@include} directive and the @option{-i}/@option{--include}
+The @code{@@include} directive and the @option{-i}
 command line option are completely equivalent. An included program
 source is not loaded if it has been previously loaded.
-
-The rules for finding a source file described in @ref{AWKPATH Variable} also
-apply to files loaded with @code{@@include}.
 
 @cindex @code{@@} (at-sign) @subentry @code{@@nsinclude} directive
 @cindex at-sign (@code{@@}) @subentry @code{@@nsinclude} directive
@@ -5224,14 +5205,11 @@ as described in @ref{Options}.  All options begin with @samp{-}.
 Any argument that is not recognized as an option is treated as a
 non-option argument, even if it begins with @samp{-}.
 
-@itemize @value{MINUS}
-@item
 However, when an option itself requires an argument, and the option is separated
 from that argument on the command line by at least one space, the space
 is ignored, and the argument is considered to be related to the option.  Thus, in
 the invocation, @samp{gawk -F x}, the @samp{x} is treated as belonging to the
 @option{-F} option, not as a separate non-option argument.
-@end itemize
 
 @item
 Once @command{gawk} finds a non-option argument, it stops looking for
@@ -30561,7 +30539,7 @@ open a @emph{two-way} pipe to another process.  The second process is
 termed a @dfn{coprocess}, as it runs in parallel with @command{gawk}.
 The two-way connection is created using the @samp{|&} operator
 (borrowed from the Korn shell, @command{ksh}):@footnote{This is very
-different from the same operator in the C shell and in Bash.}
+different from the same operator in @command{csh} and in Bash.}
 
 @example
 do @{
@@ -39440,8 +39418,7 @@ program by using the @code{in} operator
 
 @table @code
 @item "blksize"
-The preferred block size for I/O to the file. This field is not
-present on all POSIX-like systems in the C @code{stat} structure.
+The preferred block size for I/O to the file.
 
 @item "linkval"
 If the file is a symbolic link, this element is the name of the
@@ -39686,9 +39663,7 @@ for success:
 
 @example
 @group
-#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
     array_set_numeric(array, "blksize", sbuf->st_blksize);
-#endif
 @end group
 
     pmode = format_mode(sbuf->st_mode);
@@ -43813,9 +43788,7 @@ where you are attempting to compile @command{gawk}.  The three things
 described by this file are: what header files are available, so that
 they can be correctly included, what (supposedly) standard functions
 are actually available in your C libraries, and various miscellaneous
-facts about your operating system.  For example, there may not be an
-@code{st_blksize} element in the @code{stat} structure.  In this case,
-@samp{HAVE_STRUCT_STAT_ST_BLKSIZE} is undefined.
+facts about your operating system.
 
 @cindex @code{custom.h} file
 It is possible for your C compiler to lie to @command{configure}. It may
@@ -46862,13 +46835,13 @@ of ISO C as makes sense.
 @item c.e.
 See ``Common Extension.''
 
-@item C Shell
+@item @command{csh}
 The C Shell (@command{csh} or its improved version, @command{tcsh}) is a Unix shell that was
-created by Bill Joy in the late 1970s. The C shell was differentiated from
+created by Bill Joy in the late 1970s. @command{csh} was differentiated from
 other shells by its interactive features and overall style, which
-looks more like C. The C Shell is not backward compatible with the Bourne
+looks more like C. @command{csh} is not backward compatible with the Bourne
 Shell, so special attention is required when converting scripts
-written for other Unix shells to the C shell, especially with regard to the management of
+written for other Unix shells to @command{csh}, especially with regard to the management of
 shell variables.
 See also ``Bourne Shell.''
 
@@ -47290,7 +47263,7 @@ and
 @item Korn Shell
 The Korn Shell (@command{ksh}) is a Unix shell which was developed by David Korn at Bell
 Laboratories in the early 1980s. The Korn Shell is backward-compatible with the Bourne
-shell and includes many features of the C shell.
+shell and includes many features of @command{csh}.
 See also ``Bourne Shell.''
 
 @cindex LGPL (Lesser General Public License)
@@ -48951,3 +48924,7 @@ text.  It's ok as one word when it's a metasyntactic variable, though.
 ORA uses filename, thus the macro.
 
 TODO:
+* Consider nuking all text related to the C shell.
+* Move all the stuff on quoting in the early part of the book to an appendix.
+* Move the full list of options to an appendix. In the current place,
+  it keeps us from getting to the meat of learning awk.
