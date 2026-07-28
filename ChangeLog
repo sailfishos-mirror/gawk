@@ -1,3 +1,39 @@
+2026-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Begin the decades-overdue refactoring of the NODE structure.
+	Start by:
+
+	1. Having shared items (such as vname) be standalone fields.
+	2. Gathering the fields for different types into separate
+	structs, e.g., value, array, etc.
+	3. Using fields names in the struct that match the names for macros
+	by leveraging Standard C's rule that you can use a macro name in its
+	body without causing recursive macro invocation.
+	4. Placing the new structs in a union at the end of the NODE so that
+	we can do one type of struct at a time.  Eventually, remove the old
+	mega-union.
+
+	* awk.h (struct array_dump): New struct. Replaces Node_dump_array,
+	which is removed from enum nodvals.
+	(adumpfunc): New typedef for use in array vtables.
+	(array_funcs_t): Updated.
+	(struct_exp_node): Add vname and new union, temporarily named sub2.
+	(struct _value, _array): New structs, members of sub2, for Node_val
+	and Node_var_array, respectively.
+	(assoc_dump): Change second parameter to struct array_dump *.
+	(assoc_info): Same for third parameter.
+	[Macros]: Adjust macros as needed.
+	* array.c (null_dump): Change second parameter to struct array_dump *.
+	(assoc_dump): Change second parameter to struct array_dump *.
+	(assoc_info): Same for third parameter.
+	(do_adump): Make ndump be of type struct array_dump.
+	* cint_array.c (cint_dump): Change second parameter to struct array_dump *.
+	(tree_info, leaf_info): Ditto.
+	* eval.c (nodetypes): Remove Node_dump_array from the list.
+	* int_array.c (int_dump): Change second parameter to struct array_dump *.
+	* str_array.c (str_dump): Change second parameter to struct array_dump *.
+	* TODO: Updated.
+
 2026-07-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* configure.ac: Don't check anymore for st_blksize in struct stat.

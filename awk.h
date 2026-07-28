@@ -294,7 +294,6 @@ typedef enum nodevals {
 	Node_array_ref,		/* array passed by ref as parameter */
 	Node_array_tree,	/* Hashed array tree (HAT) */
 	Node_array_leaf,	/* Linear 1-D array */
-	Node_dump_array,	/* array info */
 
 	/* program execution -- stack item types */
 	Node_arrayfor,
@@ -352,8 +351,14 @@ enum escape_results {
 
 struct exp_instruction;
 
+struct array_dump {
+	long adepth;
+	long alevel;
+};
+
 typedef int (*Func_print)(FILE *, const char *, ...);
 typedef struct exp_node **(*afunc_t)(struct exp_node *, struct exp_node *);
+typedef struct exp_node **(*adumpfunc_t)(struct exp_node *, struct array_dump *);
 typedef struct {
 	const char *name;
 	afunc_t init;
@@ -364,7 +369,7 @@ typedef struct {
 	afunc_t remove;
 	afunc_t list;
 	afunc_t copy;
-	afunc_t dump;
+	adumpfunc_t dump;
 	afunc_t store;
 } array_funcs_t;
 
@@ -520,9 +525,40 @@ typedef struct exp_node {
 		OFMT_FMT	= 0x0200000,	/* string formatted via OFMT */
 	} flags;
 	long valref;
+	char *vname;	// common to several types
+	union {
+		struct _value {		// Node_val
+			enum commenttype comment_type;
+			char *stptr;
+			size_t slen;
+			int stfmt;
+			int strndmode;
+			char32_t *wstptr;
+			size_t wslen;
+			double numbr;
+#ifdef HAVE_MPFR
+			mpfr_t mpg_numbr;
+			mpz_t mpg_i;
+#endif
+		} value;
+		struct _array {		// Node_var_array
+			// FIXME: 7/2026: Arrays fall over and die miserably if
+			// these two fields aren't in a union. Try to figure
+			// this out one day.
+			union why {
+				BUCKET **buckets;
+				struct exp_node **nodes;
+			} why;
+			const array_funcs_t *array_funcs;
+			long array_base;
+			size_t table_size;
+			size_t array_size;
+			size_t array_capacity;
+			struct exp_node *xarray;
+			struct exp_node *parent_array;
+		} array;
+	} sub2;
 } NODE;
-
-#define vname sub.nodep.name
 
 #define lnode	sub.nodep.l.lptr
 #define rnode	sub.nodep.r.rptr
@@ -549,28 +585,25 @@ typedef struct exp_node {
 /*
  * Note that the string in stptr may not be NUL-terminated, but it is
  * guaranteed to have at least one extra byte that may be temporarily set
- * to '\0'. This is helpful when calling functions such as strtod that require
+ * to '\0'. This is helpful when calling functions such as strtod() that require
  * a NUL-terminated argument. In particular, field values $n for n > 0 and
  * n < NF will not have a NUL terminator, since they point into the $0 buffer.
  * All other strings are NUL-terminated.
  */
-#define stptr	sub.val.sp
-#define stlen	sub.val.slen
-#define stfmt	sub.val.idx
-#define strndmode sub.val.rndmode
-#define wstptr	sub.val.z.wsp
-#define wstlen	sub.val.wslen
-
-/* Node_elem_new */
-#define elemnew_vname	sub.val.z.vn
-#define elemnew_parent	sub.val.typre
+#define stptr	sub2.value.stptr
+#define stlen	sub2.value.slen
+#define stfmt	sub2.value.stfmt
+#define strndmode sub2.value.strndmode
+#define wstptr	sub2.value.wstptr
+#define wstlen	sub2.value.wslen
+#define numbr	sub2.value.numbr
 
 #ifdef HAVE_MPFR
-#define mpg_numbr	sub.val.nm.mpnum
-#define mpg_i		sub.val.nm.mpi
+#define mpg_numbr	sub2.value.mpg_numbr
+#define mpg_i		sub2.value.mpg_i
 #endif
-#define numbr		sub.val.nm.fltnum
-#define typed_re	sub.val.typre
+
+#define comment_type	sub2.value.comment_type		/* Op_comment */
 
 /*
  * If stfmt is set to STFMT_UNUSED, it means that the string representation
@@ -581,6 +614,13 @@ typedef struct exp_node {
  * CONVFMT and OFMT node pointers.
  */
 #define STFMT_UNUSED	-1
+
+/* Node_elem_new */
+#define elemnew_vname	sub.val.z.vn
+#define elemnew_parent	sub.val.typre
+
+
+#define typed_re	sub.val.typre
 
 /* Node_arrayfor */
 #define for_list	sub.nodep.r.av
@@ -599,16 +639,18 @@ typedef struct exp_node {
 #define var_update   sub.nodep.r.uptr
 #define var_assign   sub.nodep.x.aptr
 
+
 /* Node_var_array: */
-#define buckets		sub.nodep.r.bv
-#define nodes		sub.nodep.r.av
-#define array_funcs	sub.nodep.l.lp
-#define array_base	sub.nodep.l.ll
-#define table_size	sub.nodep.reflags
-#define array_size	sub.nodep.cnt
-#define array_capacity	sub.nodep.reserved
-#define xarray		sub.nodep.rn
-#define parent_array	sub.nodep.x.extra
+
+#define buckets		sub2.array.why.buckets
+#define nodes		sub2.array.why.nodes
+#define array_funcs	sub2.array.array_funcs
+#define array_base	sub2.array.array_base
+#define table_size	sub2.array.table_size
+#define array_size	sub2.array.array_size
+#define array_capacity	sub2.array.array_capacity
+#define xarray		sub2.array.xarray
+#define parent_array	sub2.array.parent_array
 
 #define ainit		array_funcs->init
 #define atypeof		array_funcs->type_of
@@ -624,13 +666,6 @@ typedef struct exp_node {
 /* Node_array_ref: */
 #define orig_array lnode
 #define prev_array rnode
-
-/* Node_array_print */
-#define adepth     sub.nodep.l.ll
-#define alevel     sub.nodep.x.xl
-
-/* Op_comment	*/
-#define comment_type	sub.val.comtype
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
@@ -1493,9 +1528,9 @@ extern NODE **null_afunc(NODE *symbol, NODE *subs);
 extern void set_SUBSEP(void);
 extern NODE *concat_exp(int nargs, bool do_subsep);
 extern NODE *assoc_copy(NODE *symbol, NODE *newsymb);
-extern void assoc_dump(NODE *symbol, NODE *p);
+extern void assoc_dump(NODE *symbol, struct array_dump *p);
 extern NODE **assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt);
-extern void assoc_info(NODE *subs, NODE *val, NODE *p, const char *aname);
+extern void assoc_info(NODE *subs, NODE *val, struct array_dump *p, const char *aname);
 extern void do_delete(NODE *symbol, int nsubs);
 extern void do_delete_loop(NODE *symbol, NODE **lhs);
 extern NODE *do_adump(int nargs);

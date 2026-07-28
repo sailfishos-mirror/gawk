@@ -54,7 +54,7 @@ static NODE **cint_clear(NODE *symbol, NODE *subs);
 static NODE **cint_remove(NODE *symbol, NODE *subs);
 static NODE **cint_list(NODE *symbol, NODE *t);
 static NODE **cint_copy(NODE *symbol, NODE *newsymb);
-static NODE **cint_dump(NODE *symbol, NODE *ndump);
+static NODE **cint_dump(NODE *symbol, struct array_dump *ndump);
 #ifdef ARRAYDEBUG
 static void cint_print(NODE *symbol);
 #endif
@@ -103,7 +103,7 @@ static int tree_remove(NODE *symbol, NODE *tree, long k);
 static void tree_copy(NODE *newsymb, NODE *tree, NODE *newtree);
 static long tree_list(NODE *tree, NODE **list, assoc_kind_t assoc_kind);
 static inline NODE **tree_find(NODE *tree, long k, int i);
-static void tree_info(NODE *tree, NODE *ndump, const char *aname);
+static void tree_info(NODE *tree, struct array_dump *ndump, const char *aname);
 static size_t tree_kilobytes(NODE *tree);
 #ifdef ARRAYDEBUG
 static void tree_print(NODE *tree, size_t bi, int indent_level);
@@ -115,7 +115,7 @@ static void leaf_clear(NODE *array);
 static int leaf_remove(NODE *symbol, NODE *array, long k);
 static void leaf_copy(NODE *newsymb, NODE *array, NODE *newarray);
 static long leaf_list(NODE *array, NODE **list, assoc_kind_t assoc_kind);
-static void leaf_info(NODE *array, NODE *ndump, const char *aname);
+static void leaf_info(NODE *array, struct array_dump *ndump, const char *aname);
 #ifdef ARRAYDEBUG
 static void leaf_print(NODE *array, size_t bi, int indent_level);
 #endif
@@ -493,7 +493,7 @@ cint_list(NODE *symbol, NODE *t)
 /* cint_dump --- dump array info */
 
 static NODE **
-cint_dump(NODE *symbol, NODE *ndump)
+cint_dump(NODE *symbol, struct array_dump *ndump)
 {
 	NODE *tn, *xn = NULL;
 	int indent_level;
@@ -968,7 +968,7 @@ tree_copy(NODE *newsymb, NODE *tree, NODE *newtree)
 /* tree_info --- print index, value info */
 
 static void
-tree_info(NODE *tree, NODE *ndump, const char *aname)
+tree_info(NODE *tree, struct array_dump *ndump, const char *aname)
 {
 	NODE *tn;
 	size_t j, hsize;
@@ -1214,7 +1214,7 @@ leaf_list(NODE *array, NODE **list, assoc_kind_t assoc_kind)
 /* leaf_info --- print index, value info */
 
 static void
-leaf_info(NODE *array, NODE *ndump, const char *aname)
+leaf_info(NODE *array, struct array_dump *ndump, const char *aname)
 {
 	NODE *subs, *val;
 	size_t i, size;
