@@ -535,7 +535,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         della riga di comando.
 * Monouso::                             Eseguire un breve programma
                                         @command{awk} di tipo usa-e-getta.
-* Leggere dal terminale::               Senza uso di file in input (input
+* Leggere dal terminale::               Senza usare file in input (input
                                         immesso da tastiera).
 * Lunghi::                              Mettere programmi @command{awk}
                                         permanenti in file.
@@ -918,13 +918,13 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Esercizi con le librerie::            Esercizi.
 * Eseguire esempi::                     Come eseguire i programmi di esempio.
 * Cloni::                               Cloni di programmi di utilità comuni.
-* Programma cut::                       Il programma di utilità @command{cut}.
-* Programma egrep::                     Il programma di utilità @command{egrep}.
-* Programma id::                        Il programma di utilità @command{id}.
-* Programma split::                     Il programma di utilità @command{split}.
-* Programma tee::                       Il programma di utilità @command{tee}.
-* Programma uniq::                      Il programma di utilità @command{uniq}.
-* Programma wc::                        Il programma di utilità @command{wc}.
+* Programma cut::                       Il comando di utilità @command{cut}.
+* Programma egrep::                     Il comando di utilità @command{egrep}.
+* Programma id::                        Il comando di utilità @command{id}.
+* Programma split::                     Il comando di utilità @command{split}.
+* Programma tee::                       Il comando di utilità @command{tee}.
+* Programma uniq::                      Il comando di utilità @command{uniq}.
+* Programma wc::                        Il comando di utilità @command{wc}.
 * Byte vs. Caratteri::                  Moderni insiemi di caratteri.
 * Usare le estensioni::                 Una breve introduzione alle estensioni.
 * Programmma @command{wc}::             Codice per @file{wc.awk}.
@@ -1483,7 +1483,7 @@ resto del file.
 Per esempio, potrebbe essere necessario togliere qualche dato, prima di
 effettuare ulteriori elaborazioni.
 Questi compiti risultano spesso più agevoli usando @command{awk}.
-Il programma di utilità @command{awk} può essere visto come un linguaggio
+Il comando di utilità @command{awk} può essere visto come un linguaggio
 di programmazione specializzato che rende facile eseguire attività
 di riformattazione di dati.
 
@@ -1555,7 +1555,7 @@ Estendere il linguaggio con funzioni scritte in C o C++.
 
 Questo @value{DOCUMENT} spiega il linguaggio @command{awk} e come lo si può
 usare efficacemente.  È richiesta una familiarità coi comandi di sistema
-di base, come @command{cat} e @command{ls},@footnote{Questi programmi di
+di base, come @command{cat} e @command{ls},@footnote{Questi comandi di
 utilità sono disponibili sui sistemi conformi a POSIX.
 Se si usa qualche altro sistema operativo, si
 deve comunque avere familiarità con i concetti di ridirezione I/O e di
@@ -1686,10 +1686,10 @@ viene spesso citato come ``nuovo @command{awk}''.
 Per analogia, la versione originale di @command{awk} è citata
 come ``vecchio @command{awk}.''
 
-Invocando il programma di utilità
+Invocando il comando di utilità
 @command{awk}, viene eseguita solitamente qualche versione del nuovo
 @command{awk}.@footnote{Solo i sistemi Solaris usano ancora un
-vecchio @command{awk} per il programma di utilità predefinito
+vecchio @command{awk} per il comando di utilità predefinito
 @command{awk}. Una versione più moderna di @command{awk} si trova
 nella directory @file{/usr/xpg6/bin} su questi sistemi.} Se
 il comando @command{awk} nel sistema in uso è il vecchio, il
@@ -2401,11 +2401,13 @@ versione 3.1 di @command{gawk}.
 @cindex Demaille, Akim
 @cindex G., Daniel Richard
 @cindex Jaegermann, Michal
+@cindex James, Sam
 @cindex Kahrs, Jürgen
 @cindex Malmberg, John
 @cindex Pitts, Dave
 @cindex Ramey, Chet
 @cindex Rankin, Pat
+@cindex Rice, Tim
 @cindex Schorr, Andrew
 @cindex Vinschen, Corinna
 @cindex Zaretskii, Eli
@@ -2417,10 +2419,12 @@ Scott Deifik,
 Akim Demaille,
 Daniel Richard G.,
 Michal Jaegermann,
+Sam James,
 Jürgen Kahrs,
 John Malmberg,
 Chet Ramey,
 Pat Rankin,
+Tim Rice,
 Andrew Schorr,
 Corinna Vinschen,
 ed Eli Zaretskii
@@ -2443,13 +2447,18 @@ Grazie a Jasmine Kwityn per il suo lavoro di revisione.
 
 Grazie a Michael Brennan per le Prefazioni.
 
+@cindex Haertel, Michael
+Uno speciale ringraziamento a Mike Haertel per aver introdotto
+il motore MinRX per esaminare le espressioni regolari, che è ora
+divenuto il motore principale in @command{gawk} usato per farlo.
+
 @cindex Duman, Patrice
 @cindex Berry, Karl
 @cindex Smith, Gavin
 Grazie a Patrice Dumas per il programma @command{makeinfo} in uso.
 Grazie a Karl Berry, per il lavoro svolto in passato
 su Texinfo, e a Gavin Smith, che continua a lavorare per
-migliorare il linguaggio di marcatura Texinfo.
+migliorare il linguaggio di marcatura Texinfo e il file @file{texinfo.tex}.
 
 @cindex Kernighan, Brian
 @cindex Brennan, Michael
@@ -2488,7 +2497,7 @@ vantaggio da quelle opportunità.
 Arnold Robbins @*
 Nof Ayalon @*
 Israel @*
-Marzo 2020
+Luglio 2026
 @end ifnotdocbook
 
 @ifnotinfo
@@ -2553,9 +2562,9 @@ righe nei file in input.
 @cindex programmi @command{awk}
 I programmi scritti in @command{awk} sono differenti dai programmi scritti
 nella maggior parte degli altri linguaggi,
-poiché i programmi @command{awk} sono @dfn{guidati dai dati} (ovvero,
+poiché i programmi @command{awk} sono @dfn{guidati-dai-dati}: cioè,
 richiedono di descrivere i dati sui quali si vuole operare, e in seguito
-che cosa fare una volta che tali dati siano stati individuati).
+che cosa fare una volta che tali dati siano stati individuati.
 La maggior parte degli altri linguaggi sono @dfn{procedurali}; si deve
 descrivere, in maniera molto dettagliata, ogni passo che il programma
 deve eseguire.  Lavorando con linguaggi procedurali, solitamente è
@@ -2633,7 +2642,7 @@ a parecchie varianti di ciascuna di esse.
 @menu
 * Monouso::                             Eseguire un breve programma
                                         @command{awk} di tipo usa-e-getta.
-* Leggere dal terminale::               Senza uso di file in input (input
+* Leggere dal terminale::               Senza usare file in input (input
                                         immesso da tastiera).
 * Lunghi::                              Mettere programmi @command{awk}
                                         permanenti in file.
@@ -2671,7 +2680,11 @@ la shell non interpreti qualche carattere destinato ad @command{awk} come
 carattere speciale
 della shell.  Gli apici fanno inoltre sì che la shell tratti tutto il
 @var{programma} come un solo argomento per @command{awk}, e permettono che
-@var{programma} sia più lungo di una riga.
+il @var{programma} sia più lungo di una riga.  Per esempio:
+
+@example
+awk '/arnold/ @{ print @}' /etc/passwd      @ii{Trova ogni stringa} arnold @ii{in} /etc/passwd
+@end example
 
 @cindex shell @subentry @dfn{script}
 @cindex programmi @command{awk} @subentry eseguire @subentry da @dfn{script} di shell
@@ -2692,11 +2705,11 @@ in
 sezione
 @end ifdocbook
 @ref{Molto semplice},
-si vedranno esempi di parecchi programmi,
-brevi, scritti sulla riga di comando.
+si vedranno esempi di parecchi programmi brevi,
+scritti sulla riga di comando.
 
 @node Leggere dal terminale
-@subsection Senza uso di file in input (input immesso da tastiera)
+@subsection Senza usare file in input (input immesso da tastiera)
 
 @cindex standard input
 @cindex input @subentry standard
@@ -2712,7 +2725,6 @@ awk '@var{programma}'
 @command{awk} prende come input del @var{programma} lo @dfn{standard input},
 che di solito significa qualsiasi cosa venga immesso dalla tastiera.
 Ciò prosegue finché non si segnala una fine-file battendo @kbd{Ctrl-d}.
-(In sistemi operativi non-POSIX, il carattere di fine-file può essere diverso.)
 
 @cindex input @subentry eseguire @command{awk} senza usare
 @cindex programmi @command{awk} @subentry eseguire @subentry senza file in input
@@ -2736,9 +2748,9 @@ di protezione della shell.
 
 @quotation NOTA
 Se si usa Bash come shell, si dovrebbe digitare il comando @samp{set +H} prima
-eseguire questo programma interattivamente, per non avere una cronologia dei
-comandi nello stile della C shell, che tratta il @samp{!} come un carattere
-speciale.  Si raccomanda di inserire quel comando nel proprio file di
+eseguire questo programma interattivamente, per disabilitare una cronologia dei
+comandi nello stile della @command{csh} shell, che tratta il @samp{!} come un
+carattere speciale.  Si raccomanda di inserire questo comando nel proprio file di
 personalizzazione della shell.
 @end quotation
 
@@ -2795,7 +2807,7 @@ awk -f consiglio
 @end example
 
 @noindent
-equivale al comando:
+equivale al comando (vedere @ref{Leggere dal terminale}):
 
 @example
 awk 'BEGIN @{ print \"Non v\47allarmate!\" @}'
@@ -2834,11 +2846,11 @@ Una volta familiarizzato con @command{awk}, si potrebbero scrivere
 @dfn{script} @samp{#!}.  Ciò è
 possibile in molti sistemi operativi.@footnote{Il meccanismo @samp{#!}
 funziona nei sistemi
-GNU/Linux, in quelli basati su BSD e nei sistemi Unix a pagamento.}
+GNU/Linux, in quelli basati su BSD, in macOS e nei sistemi Unix a pagamento.}
 Per esempio, si potrebbe modificare il file @file{consiglio} e farlo divenire:
 
 @example
-#! /bin/awk -f
+#! /usr/bin/awk -f
 
 BEGIN @{ print \"Non v'allarmate!\" @}
 @end example
@@ -2870,7 +2882,7 @@ comando @command{awk} legge il programma dell'utente e poi elabora i dati
 secondo le istruzioni contenute nel programma (diversamente da un linguaggio
 @dfn{compilato} come il C, dove il programma viene prima compilato in codice
 macchina che è eseguito direttamente dal processore del sistema).  Il
-programma di utilità @command{awk} è perciò chiamato @dfn{interpretatore}.
+comando di utilità @command{awk} è perciò chiamato @dfn{interpretatore}.
 Molti linguaggi moderni sono interpretati.
 
 La riga che inizia con @samp{#!} lista l'intero @value{FN} di un
@@ -2881,8 +2893,9 @@ richiama l'interpretatore con gli argomenti dati e con l'intera lista di
 argomenti con cui era stato invocato il programma.  Il primo argomento nella
 lista è l'intero @value{FN} del programma @command{awk}.  Il resto della lista
 degli argomenti contiene opzioni per  @command{awk}, oppure @value{DF}, o
-entrambi.  (Si noti che in molti sistemi @command{awk} si trova in
-@file{/usr/bin} invece che in @file{/bin}.)
+entrambi.  (Si noti che nella maggior parte dei sistemi @command{awk} si trova
+solitamente nella libreria @file{/usr/bin}.  Qualche volta può essere trovato
+invece nella libreria @file{/bin}.)
 
 Alcuni sistemi limitano la lunghezza del nome del programma interpretatore a
 32 caratteri.  Spesso, si può rimediare utilizzando un collegamento simbolico.
@@ -2903,10 +2916,11 @@ Infine, il valore di @code{ARGV[0]}
 (@pxref{Variabili predefinite})
 può variare a seconda del sistema operativo.
 Alcuni sistemi ci mettono @samp{awk}, altri il nome completo del percorso
-di @command{awk} (ad. es. @file{/bin/awk}), e altri ancora mettono il nome
-dello @dfn{script} dell'utente (@samp{consiglio}).  @value{DARKCORNER}
-Non bisogna fidarsi del valore di @code{ARGV[0]}
-per ottenere il nome del proprio @dfn{script}.
+di @command{awk} (p.es., @file{/usr/bin/awk}), e altri ancora mettono il
+nome dello @dfn{script} dell'utente, in questo caso (@samp{consiglio}).
+@value{DARKCORNER}
+Non bisogna fidarsi del valore di @code{ARGV[0]} per ottenere il nome
+del proprio @dfn{script}.
 @end cartouche
 
 @node Commenti
@@ -3015,7 +3029,8 @@ awk '@var{testo del programma}' @var{input-file1} @var{input-file2} @dots{}
 Quando si lavora con la shell, non guasta avere una conoscenza
 di base sulle regole per l'uso di apici nella shell.  Le regole
 seguenti valgono solo per shell in stile Bourne (come Bash, la
-Bourne-Again shell).  Se si usa la C shell, si avranno regole differenti.
+Bourne-Again shell).  Se si usa la @command{csh} shell valgono
+regole differenti, dovrete cavarvela da soli.
 
 Prima di immergerci nelle regole, introduciamo un concetto che ricorre
 in tutto questo @value{DOCUMENT}, che è quello della stringa @dfn{null},
@@ -3418,10 +3433,6 @@ modello da ricercare.  Questo tipo di notazione è definita come
 (@pxref{Espressioni regolari}).
 @end ifnottex
 Il modello può corrispondere anche solo a una parte di una parola.
-Ci sono
-apici singoli che racchiudono il programma @command{awk} in modo che la
-shell non interpreti alcuna parte di esso come un carattere speciale della
-shell.
 
 Questo è quello che il programma stampa:
 
@@ -3460,11 +3471,11 @@ Molti degli esempi usano un @value{DF} di nome @file{data}.  Questo serve solo
 a indicare la posizione del nome; se questi programmi devono venir usati per
 se stessi, sostituire i propri @value{FNS} al posto di @file{data}.
 
-@cindex @command{ls} programma di utilità
-@cindex programma di utilità @subentry @command{ls}
+@cindex @command{ls} comando di utilità
+@cindex comando di utilità @subentry @command{ls}
 Alcuni degli esempi che seguono usano l'output di @w{@samp{ls -l}}
 come input.
-@command{ls} è un comando di sistema che elenca la lista dei file
+Il comando @command{ls} elenca la lista dei file
 contenuti in una directory.  Specificando l'opzione @option{-l},
 la lista include anche la dimensione e la data di ultima modifica
 di ogni file.  Il suo output è simile a questo:
@@ -3522,22 +3533,22 @@ awk '@{ if (length($0) > max) max = length($0) @}
 Il codice associato a @code{END} viene eseguito dopo che tutto
 l'input è stato letto; è l'altra faccia della medaglia di @code{BEGIN}.
 
-@cindex @command{expand} (programma)
-@cindex programma @subentry @command{expand}
+@cindex @command{expand} (comando di utilità)
+@cindex comando di utilità @subentry @command{expand}
 @item
 Stampare la lunghezza della riga più lunga in @file{data}:
 
 @example
 expand data | awk '@{ if (x < length($0)) x = length($0) @}
-                   END @{ print "lunghezza massima di riga è" x @}'
+                   END @{ print "lunghezza massima di riga è", x @}'
 @end example
 
-Questo esempio è leggermente diverso da quello precedente:
-l'input è l'output del comando @command{expand}, che cambia i TAB
-in spazi, in modo che le larghezze confrontate siano quelle che sarebbero
-qualora le si stampasse, e non il numero dei caratteri di input su ogni
-riga.  [Il carattere TAB occupa un byte nel file, ma può generare fino a
-otto spazi bianchi in fase di stampa.]
+Questo esempio è leggermente diverso da quello precedente: l'input è l'output
+del comando di utilità @command{expand}, che cambia i TAB in spazi, in modo
+che le larghezze confrontate siano quelle che sarebbero qualora le si
+stampasse, e non il numero dei caratteri di input su ogni riga.  [Il carattere
+TAB occupa un byte nel file, ma può generare fino a otto spazi bianchi in fase
+di stampa.]
 
 @item
 Stampare ogni riga che abbia almeno un campo:
@@ -3563,7 +3574,7 @@ Stampare il numero totale di byte usato da un @var{elenco-file}:
 
 @example
 ls -l @var{elenco-file} | awk '@{ x += $5 @}
-                         END @{ print "byte totali: " x @}'
+                         END @{ print "byte totali:", x @}'
 @end example
 
 @item
@@ -3607,10 +3618,10 @@ il programma avrebbe stampato le righe dispari.
 @section Un esempio che usa due regole
 @cindex programmi @command{awk}
 
-Il programma @command{awk} legge il file in input una riga alla volta.
-Per ogni riga @command{awk} controlla la corrispondenza con ogni regola.
-Se viene trovata più di una corrispondenza, vengono eseguite altrettante
-azioni, nell'ordine in cui appaiono nel programma @command{awk}.
+Il comando di utilità @command{awk} legge i suoi file in input una riga alla
+volta. Per ogni riga @command{awk} controlla la corrispondenza con ogni
+regola. Se viene trovata più di una corrispondenza, vengono eseguite
+altrettante azioni, nell'ordine in cui appaiono nel programma @command{awk}.
 Se non viene trovata nessuna corrispondenza, non viene eseguita alcuna azione.
 
 Dopo aver elaborato tutte le regole che hanno corrispondenza con la riga (e
@@ -3641,7 +3652,7 @@ Questo programma stampa ogni riga che contiene la stringa
 @samp{12} @emph{oppure} la stringa @samp{21}.  Se una riga contiene entrambe
 le stringhe, è stampata due volte, una volta per ogni regola.
 
-Questo è ciò che capita se eseguiamo questo programma sui nostri @value{DF},
+Ecco ciò che capita se eseguiamo questo programma sui nostri @value{DF},
 @file{mail-list} e @file{inventory-shipped}:
 
 @example
@@ -3676,29 +3687,16 @@ ls -l | awk '$6 == "Nov" @{ somma += $5 @}
              END @{ print somma @}'
 @end example
 
-@cindex @command{ls} programma di utilità
-@cindex programma di utilità @subentry @command{ls}
+@cindex @command{ls} comando di utilità
+@cindex comando di utilità @subentry @command{ls}
 Questo comando stampa il numero totale di byte in tutti i file contenuti
 nella directory corrente, la cui data di modifica è novembre (di qualsiasi
 anno).
 
-Come già visto sopra, l'output di @w{@samp{ls -l}} elenca la lista
-dei file contenuti in una directory, compresa la lunghezza di ogni
-file e la data in cui il file è stato modificato per l'ultima volta.
-Il primo campo contiene le autorizzazioni di lettura-scrittura,
-il secondo campo contiene il numero di @dfn{link} di quel file
-e il terzo campo identifica il proprietario del file.
-Il quarto campo identifica il gruppo del file.
-Il quinto campo contiene la dimensione del file, in byte.
-Il sesto, settimo e ottavo campo contengono il mese, il giorno e
-l'ora, rispettivamente, in cui il file è stato modificato l'ultima
-volta.
-Infine, il nono campo contiene il valore @value{FN}.
-
 @c @cindex automatic initialization
 @cindex inizializzazione @subentry automatica
 L'espressione @samp{$6 == "Nov"} nel nostro programma @command{awk} controlla
-se il sesto campo dell'output di @w{@samp{ls -l}} corrisponda alla stringa
+se il sesto campo dell'output di @w{@samp{ls -l}} è uguale alla stringa
 @samp{Nov}.  Ogni volta che una riga ha la stringa
 @samp{Nov} come suo sesto campo, @command{awk} esegue l'azione
 @samp{somma += $5}.  Questo aggiunge il quinto campo (la dimensione del file)
@@ -3778,8 +3776,8 @@ Non abbiamo quasi mai usato la continuazione tramite barra inversa nei nostri
 programmi di esempio.  @command{gawk} non pone limiti alla lunghezza di
 una riga, quindi la continuazione tramite barra inversa non è mai strettamente
 necessaria; serve soltanto a migliorare la leggibilità del programma.
-Per la stessa ragione, ma anche per amore di chiarezza, abbiamo tenuto
-concise molte istruzioni nei programmi presentati in questo @value{DOCUMENT}.
+Per la stessa ragione, ma anche per amore di chiarezza, molte istruzioni
+nei programmi presentati sono concise.
 
 La continuazione tramite barra inversa è molto utile quando il proprio
 programma @command{awk} si trova in un file sorgente separato, invece di
@@ -3795,18 +3793,18 @@ mezzo di un'espressione regolare o di una stringa.
 
 @cindex comando di utilità @subentry @command{csh}
 @cindex @command{csh} (comando di utilità) @subentry continuazione di riga
-@cindex continuazione di riga @subentry con C shell
+@cindex continuazione di riga @subentry con @command{csh}
 @cindex barra inversa (@code{\}) @subentry continuazione di riga e @subentry in @command{csh}
 @cindex @code{\} (barra inversa) @subentry continuazione di riga e @subentry in @command{csh}
 @quotation ATTENZIONE
 @emph{la continuazione tramite barra inversa non funziona come sopra descritto
-nella C shell.}  Funziona per programmi @command{awk} contenuti in file e
-per programmi sulla riga di comando, @emph{ammesso} che si stia usando una
-shell conforme a POSIX, come la Unix Bourne shell o Bash.  Ma la C shell si
-comporta in maniera diversa!  In quel caso, occorre usare due barre inverse
-consecutive, in fondo alla riga.  Si noti anche che quando si usa la C shell
-@emph{ogni} andata a capo nel vostro programma @command{awk} dev'essere
-indicata con una barra inversa. Per esempio:
+nella @command{csh} shell.}  Funziona per programmi @command{awk} contenuti in
+file e per programmi sulla riga di comando, @emph{ammesso} che si stia usando
+una shell conforme a POSIX, come la Unix Bourne shell o Bash.  Ma la
+@command{csh} shell si comporta in maniera diversa!  In quel caso, occorre
+usare due barre inverse consecutive, in fondo alla riga.  Si noti anche che
+quando si usa la @command{csh} shell, @emph{ogni} ritorno a capo nel vostro
+programma @command{awk} dev'essere indicata con una barra inversa. Per esempio:
 
 @example
 % @kbd{awk 'BEGIN @{ \}
@@ -3818,10 +3816,10 @@ indicata con una barra inversa. Per esempio:
 
 @noindent
 Qui, il @samp{%} e il @samp{?} sono i prompt primario e secondario della
-C shell, analogamente a quelli usati nella shell standard @samp{$} e @samp{>}.
+@command{csh} shell, analogamente a quelli usati nella shell standard,
+@samp{$} e @samp{>}.
 
-Si confronti l'esempio precedente, come viene scritto in una shell conforme
-a POSIX:
+Si confronti l'esempio precedente, se scritto in una shell conforme a POSIX:
 
 @example
 $ @kbd{awk 'BEGIN @{}
@@ -3896,12 +3894,14 @@ utilizzando l'opzione @option{-v} (@pxref{Opzioni})
 e per l'assegnamento di variabili sulla riga di comando
 @pxref{Opzioni di assegnamento}).
 
+@ignore
 Chi è interessato può vedere
 @uref{https://lists.gnu.org/archive/html/bug-gawk/2022-10/msg00025.html}
 per una modifica al codice sorgente che consente la continuazione di
 righe se sono racchiuse fra parentesi.  Questa @dfn{patch} non è stata
 inclusa nella distribuzione di @command{gawk} perché implicitamente
 diminuisce la portabilità dei programmi @command{awk}.
+@end ignore
 
 @cindex istruzioni @subentry multiple
 @cindex @code{;} (punto e virgola) @subentry separare istruzioni nelle azioni
@@ -3919,20 +3919,13 @@ poteva essere scritto anche così:
 /12/ @{ print $0 @} ; /21/ @{ print $0 @}
 @end example
 
-@quotation NOTA BENE
-La possibilità che più regole coesistano sulla stessa riga, se sono separate
-da un punto e virgola, non esisteva nel linguaggio @command{awk} originale;
-è stata aggiunta per congruenza con quanto è consentito per le istruzioni
-all'interno di un'azione.
-@end quotation
-
 @node Altre funzionalità
 @section Altre funzionalità di @command{awk}
 
 @cindex variabili
 Il linguaggio @command{awk} mette a disposizione un numero di variabili
 @dfn{built-in}, o @dfn{predefinite}, che il programma dell'utente può usare
-per ottenere informazioni da @command{awk}.  Ci sono pure altre variabili
+per ottenere informazioni da @command{awk}.  Ci sono altre variabili
 che il programma può impostare, per definire come @command{awk} deve
 gestire i dati.
 
@@ -3999,17 +3992,6 @@ al linguaggio Prolog.
 Le possibilità dell'originale @command{awk} erano messe a dura prova
 da programmi di questa complessità, ma le versioni moderne sono più robuste.
 
-@cindex programmi @command{awk} @subentry complessi
-Se capita di scrivere programmi @command{awk} più lunghi di, diciamo,
-qualche centinaio di righe, si potrebbe considerare la possibilità di usare
-un linguaggio di programmazione differente da @command{awk}.
-La shell consente di ricercare stringhe ed espressioni regolari; inoltre
-consente di usare in maniera efficace i comandi di utilità del sistema.
-Python offre un piacevole equilibrio tra la facilità di una programmazione
-ad alto livello, e la possibilità di interagire a livello di sistema
-operativo.@footnote{Altri linguaggi di @dfn{script} popolari comprendono Ruby
-e Perl.}
-
 @node Sommario dell'introduzione
 @section Sommario
 
@@ -4030,8 +4012,8 @@ oppure
 per eseguire @command{awk}.
 
 @item
-Si può usare la notazione speciale @samp{#!} nella prima riga per creare
-programmi @command{awk} che siano eseguibili direttamente.
+Usando la notazione speciale @samp{#!} nella prima riga si creano
+programmi @command{awk} che sono eseguibili direttamente.
 
 @item
 I commenti nei programmi @command{awk} iniziano con @samp{#} e continuano
@@ -4210,6 +4192,8 @@ Usare @option{-v} per impostare valori di variabili predefinite
 può condurre a risultati sorprendenti.  @command{awk} reimposterà i
 valori di quelle variabili secondo le sue necessità, anche ignorando
 eventuali valori iniziali che possono essere stati assegnati.
+Tuttavia, impostare le variabili @code{FS} ed @code{RS} usando l'opzione
+@option{-v} è spesso utile.
 @end quotation
 
 @cindex @option{-W} (opzione)
@@ -4228,9 +4212,7 @@ seguito.
 @cindex opzioni @subentry sulla riga di comando @subentry fine delle
 @item --
 Segnale della fine delle opzioni da riga di comando.  I seguenti argomenti
-non sono trattati come opzioni anche se iniziano con @samp{-}.  Questa
-interpretazione di @option{--} segue le convenzioni POSIX per l'analisi degli
-argomenti.
+non sono trattati come opzioni anche se iniziano con @samp{-}.
 
 @cindex @code{-} (meno) @subentry nomi di file che iniziano con
 @cindex meno (@code{-}) @subentry nomi di file che iniziano con
@@ -4463,14 +4445,22 @@ accettate da @command{gawk} ed esce.
 Legge una libreria di sorgenti @command{awk} da @var{file-sorgente}.
 Quest'opzione è del tutto equivalente a usare la direttiva @code{@@include}
 all'interno del proprio programma.  È molto simile all'opzione
-@option{-f}, ma ci sono due differenze importanti.  Primo, quando viene usata
+@option{-f}, ma ci sono due differenze importanti.
+
+@itemize @bullet
+@item
+Quando viene usata
 l'opzione @option{-i}, il sorgente del programma non viene caricato se è
 stato caricato in precedenza, mentre con @option{-f}, @command{gawk} carica
-sempre il file.  Secondo, poiché quest'opzione è pensata per essere usata
+sempre il file.
+
+@item
+Poiché quest'opzione è pensata per essere usata
 con librerie di codice, @command{gawk} non riconosce tali file come
 costituenti l'input del programma principale.  Così, dopo l'elaborazione di
 un argomento @option{-i}, @command{gawk} si aspetta di trovare il codice
 sorgente principale attraverso l'opzione @option{-f} o sulla riga di comando.
+@end itemize
 
 @cindex @code{@@} (chiocciola) @subentry @code{@@namespace} (direttiva)
 @cindex chiocciola (@code{@@}) @subentry @code{@@namespace} (direttiva)
@@ -4563,8 +4553,8 @@ corretti.
 
 @item invalid
 Vengono emessi solo gli
-avvertimenti relativi a quello che è effettivamente non valido (funzionalità
-non ancora completamente implementata).
+avvertimenti relativi a quello che è effettivamente non valido
+(questa funzionalità non è ancora completamente implementata).
 
 @item no-ext
 Gli avvertimenti relativi alle estensioni @command{gawk} sono disabilitati.
@@ -4649,18 +4639,14 @@ quando analizza i dati in input
 @item @option{-o}[@var{file}]
 @itemx @option{--pretty-print}[@code{=}@var{file}]
 Consente la stampa di una versione formattata elegantemente dei programmi
-@command{awk}.  Implica l'opzione @option{--no-optimize}.
+@command{awk}.
+Usarla implica l'opzione @option{--no-optimize}.
 Per default il programma di output viene creato in un file
 chiamato @file{awkprof.out} (@pxref{Profilare}).
 L'argomento opzionale @var{file} consente di specificare un
 @value{FN} differente per l'output.
 Non sono consentiti spazi tra @option{-o} e @var{file}, se
 @var{file} viene indicato.
-
-@quotation NOTA
-In passato, quest'opzione eseguiva anche il programma.
-Ora non è più così.
-@end quotation
 
 @cindex @option{-O} (opzione)
 @cindex opzione @subentry @option{-O}
@@ -4686,7 +4672,7 @@ opzione @option{-s} (vedere più sotto in questa lista).
 @itemx @option{--profile}[@code{=}@var{file}]
 Abilita la creazione del profilo di esecuzione di programmi @command{awk}
 (@pxref{Profilare}).
-Implicitamente viene forzata l'opzione @option{--no-optimize}.
+Usarla implica l'opzione @option{--no-optimize}.
 Per default, i profili vengono creati in un file chiamato @file{awkprof.out}.
 L'argomento opzionale @var{file} consente di specificare un altro
 @value{FN} per il file del profilo.
@@ -4722,13 +4708,6 @@ restrizioni:
 @item
 I ritorni a capo non sono consentiti dopo @samp{?} o @samp{:}
 (@pxref{Espressioni condizionali}).
-
-@cindex localizzazione @subentry separatore decimale della
-@cindex separatore decimale @subentry carattere specifico della localizzazione
-@item
-Il carattere di separatore decimale della localizzazione è usato per analizzare
-i dati di input
-(@pxref{Localizzazioni}).
 @end itemize
 
 @c @cindex automatic warnings
@@ -4818,7 +4797,9 @@ nella
 in
 @end ifnottex
 @ref{Sintassi delle definizioni},
-i nomi di funzione devono essere univoci).
+i nomi di funzione devono essere univoci.
+L'utilizzo della funzionalità spazio-dei-nomi aiuta a mitigare il problema;
+@pxrefil{Spazi-dei-nomi}.)
 
 Con @command{awk} standard, le funzioni di libreria si possono ancora usare,
 anche se il  programma è immesso dalla tastiera,
@@ -4874,7 +4855,7 @@ export POSIXLY_CORRECT
 @end example
 
 @cindex @command{csh} (comando di utilità) @subentry variabile d'ambiente @env{POSIXLY_CORRECT}
-Per una shell compatibile con C,@footnote{Non raccomandato.}
+Per una shell compatibile con la @command{csh} shell,@footnote{Non raccomandato.}
 questa riga andrà aggiunta nel file @file{.login} nella directory "home"
 dell'utente:
 
@@ -4960,17 +4941,6 @@ esaminare la lista degli argomenti.
 I valori delle variabili dati sulla riga di comando sono elaborati per
 rimuovere sequenze di protezione (@pxref{Sequenze di protezione}).
 @value{DARKCORNER}
-
-In alcune implementazioni di @command{awk} molto vecchie, quando un
-assegnamento di variabile capitava prima di un qualsiasi @value{FN},
-l'assegnamento avveniva @emph{prima} che fosse stata eseguita la regola
-@code{BEGIN}.  Il comportamento di @command{awk} era in questo modo
-ambiguo; alcuni assegnamenti da riga di comando erano disponibili
-all'interno della regola @code{BEGIN}, mentre altri no.  Sfortunatamente,
-alcune applicazioni finivano per essere dipendenti da questa
-``funzionalità''.  Quando @command{awk} fu modificato per essere più
-coerente, fu aggiunta l'opzione @option{-v} a beneficio delle
-applicazioni che dipendevano dal vecchio comportamento.
 
 La funzionalità dell'assegnamento di variabile è molto utile per assegnare
 valori a variabili come @code{RS}, @code{OFS}, e @code{ORS}, che controllano i
@@ -5138,13 +5108,6 @@ di @samp{:} oppure mettendo due @samp{:} consecutivi [@samp{::}].)
 Per includere la directory corrente nel percorso di ricerca, si può
 aggiungere @file{.} come un elemento del percorso di ricerca, oppure
 inserire un elemento nullo.
-
-Diverse passate versioni di @command{gawk} avrebbero effettuato anche una
-ricerca esplicita nella directory corrente, prima o dopo aver esaminato il
-percorso di ricerca.  A partire dalla versione 4.1.2, questo non
-vale più; se si desidera una ricerca nella directory corrente, è
-necessario aggiungere @file{.} esplicitamente, oppure aggiungendo un
-elemento nullo al percorso di ricerca.
 @end quotation
 
 Il valore di default di @env{AWKPATH} è
@@ -5152,17 +5115,14 @@ Il valore di default di @env{AWKPATH} è
 che state usando potrebbe usare una directory diversa; ciò dipende da come
 @command{gawk} è stato compilato e installato.  La directory effettiva è il
 valore di @code{$(pkgdatadir)} generato quando è stato configurato
-@command{gawk}.
-(Per ulteriori dettagli vedere il file @file{INSTALL} nella distribuzione
-in formato sorgente, e anche @ref{Installazione veloce}.
-Non è comunque il caso di preoccuparsi per questo.)}
+@command{gawk}.}
 Poiché @file{.} è incluso all'inizio, @command{gawk} cerca dapprima nella
 directory corrente, e poi in @file{/usr/local/share/awk}.
 In pratica, questo vuol dire che solo raramente ci sarà bisogno di cambiare
 il valore di @env{AWKPATH}.
 
-@xref{File da usare a inizio sessione}, per informazioni su funzioni che possono
-essere di aiuto per gestire la variabile @env{AWKPATH}.
+@xref{File da usare a inizio sessione}, per informazioni su funzioni che
+possono essere usate aiuto per gestire la variabile @env{AWKPATH}.
 
 @command{gawk} memorizza il valore del percorso di ricerca in uso in
 @code{ENVIRON["AWKPATH"]}.  Questo consente di aver accesso al valore del
@@ -5328,6 +5288,14 @@ volta, anziché a blocchi.  Questa variabile è presente
 per problemi di debug su filesystem di sistemi operativi non POSIX,
 dove l'I/O è elaborato a record, non a blocchi.
 
+@cindex @env{GAWK_GNU_MATCHERS} (variabile d'ambiente)
+@cindex variabili d'ambiente @subentry @env{GAWK_GNU_MATCHERS}
+@item GAWK_GNU_MATCHERS
+Se questa variabile esiste, @command{gawk} utilizza i software
+GNU @code{regex} e @code{dfa} per gestire le espressioni regolari.
+Normalmente, viene usato il motore MinRX.
+@strong{NOTA:} L'utilizzo di questa variabile è destinato a venir meno.
+
 @cindex @env{GAWK_MSG_SRC} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{GAWK_MSG_SRC}
 @item GAWK_MSG_SRC
@@ -5341,20 +5309,23 @@ producono lo stesso messaggio di avvertimento o di errore.
 @cindex @env{GAWK_LOCALE_DIR} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{GAWK_LOCALE_DIR}
 @item GAWK_LOCALE_DIR
-Specifica la posizione dei file oggetto compilati contenenti la traduzione dei
-messaggi emessi da @command{gawk} stesso. Questa variabile è passata alla
-funzione @code{bindtextdomain()} nella fase di partenza di @command{gawk}.
+Questa variabile specifica la posizione dei file oggetto compilati
+contenenti la traduzione dei messaggi emessi da @command{gawk} stesso.
+Questa variabile è passata alla funzione @code{bindtextdomain()} nella
+fase di inizializzazione di @command{gawk}.
 
 @cindex @env{GAWK_NO_DFA} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{GAWK_NO_DFA}
 @item GAWK_NO_DFA
-Se questa variabile esiste, @command{gawk} non usa il riconoscitore di
-espressioni regolari ASFD [automa a stati finiti deterministico] per i tipi di
-test di corrispondenza.  Questo può causare un rallentamento di @command{gawk}.
+Se questa variabile esiste, @emph{ed esiste pure} la variabile
+@env{GAWK_GNU_MATCHERS} @command{gawk} non usa il riconoscitore di
+espressioni regolari GNU DFA per i tipi di test di corrispondenza.
+Questo può causare un rallentamento di @command{gawk}.
 Il suo intento è quello di aiutare a isolare le differenze tra i due
-riconoscitori di espressioni regolari che @command{gawk} usa internamente (non
-dovrebbero esserci differenze, ma a volte la teoria non coincide con la
-pratica).
+riconoscitori di espressioni regolari @code{regex} e @code{dfa}
+che @command{gawk} usa internamente (non dovrebbero esserci differenze,
+ma a volte la teoria non coincide con la pratica).
+@strong{NOTA:} L'utilizzo di questa variabile è destinato a venir meno.
 
 @cindex @env{GAWK_STACKSIZE} (variabile d'ambiente)
 @cindex variabili d'ambiente @subentry @env{GAWK_STACKSIZE}
@@ -5403,6 +5374,17 @@ costante C @code{EXIT_FAILURE}, che normalmente è uguale a uno.
 Se @command{gawk} esce a causa di un errore grave, il codice di ritorno
 è due.  Sui sistemi non POSIX questo valore può essere mappato
 a @code{EXIT_FAILURE}.
+
+Il codice di ritorno di un programma è disponibile a livello della
+shell, nella variabile speciale di shell @code{$?}.
+Il seguente, piuttosto banale, lo dimostra:
+
+@example
+$ @kbd{awk 'BEGIN @{ print "esco con 42" ; exit 42 @}'}
+@print{} esco con 42
+$ @kbd{echo $?}
+@print{} 42
+@end example
 
 @node Includere file
 @section Come includere altri file nel proprio programma
@@ -5543,25 +5525,15 @@ In particolare, @code{@@include} è molto utile per scrivere @dfn{script} CGI
 eseguibili da pagine web.
 
 @cindex direttiva @subentry @code{@@include}
-La direttiva @code{@@include} e l'opzione @option{-i}/@option{--include}
+La direttiva @code{@@include} e l'opzione @option{-i}
 sulla riga di comando sono completamente equivalenti. Un programma sorgente
 incluso non viene caricato di nuovo se è stato già caricato
 in precedenza.
 
-Le regole usate per trovare un file sorgente, descritte
-@iftex
-nella
-@end iftex
-@ifnottex
-in
-@end ifnottex
-@ref{AWKPATH (Variabile)}, valgono anche per i file
-caricati tramite @code{@@include}.
-
 @cindex @code{@@} (chiocciola) @subentry @code{@@nsinclude} (direttiva)
 @cindex chiocciola (@code{@@}) @subentry @code{@@nsinclude} (direttiva)
-@cindex file subentry nsincludere @subentry direttiva @code{@@nsinclude}
-@cindex nsincludere file @subentry direttiva @code{@@nsinclude}
+@cindex file subentry nsinclude @subentry direttiva @code{@@nsinclude}
+@cindex nsinclude file @subentry direttiva @code{@@nsinclude}
 @cindex @code{@@nsinclude} (direttiva) @sortas{nsinclude direttiva}
 Infine, i file inclusi con @code{@@include} sono considerati
 appartenere allo spazio-dei-nomi @samp{"awk" (@@namespace "awk")}
@@ -5800,15 +5772,12 @@ in
 Ogni argomento esaminato che non viene riconosciuto come un'opzione è
 considerato essere un argomento "non-opzione" anche se inizia con @samp{-}.
 
-@itemize @value{MINUS}
-@item
 Tuttavia, quando un'opzione richiede un argomento, e l'opzione è separata
 da quell'argomento da almeno uno spazio, lo spazio è ignorato, e
 l'argomento è considerato essere relativo a quell'opzione.  Quindi, se
 si scrive @samp{gawk -F x}, l'argomento @samp{x} è considerato come
 appartenente all'opzione @option{-F}, e non come un argomento "non-opzione"
 separato.
-@end itemize
 
 Dopo che @command{gawk} ha trovato il primo argomento "non-opzione",
 sospende la ricerca di ulteriori opzioni.  Quindi, tutti gli argomenti
@@ -6253,8 +6222,8 @@ occorre mettere due barre inverse nella stringa:
 @cindex @command{gawk} @subentry sequenze di protezione
 @cindex @command{gawk} @subentry sequenze di protezione @seealso{barra inversa}
 @cindex Unix @command{awk} @subentry barra inversa in sequenze di protezione
-@cindex @command{mawk} (programma di utilità)
-@cindex programma di utilità @subentry @command{mawk}
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 @item Tenere la barra inversa così com'è.
 Alcune altre implementazioni di @command{awk} fanno questo.
 In quelle implementazioni, immettere @code{"a\qc"} equivale a immettere
@@ -6953,8 +6922,8 @@ a @samp{[<]}.
 @cindex POSIX @command{awk} @subentry espressioni tra parentesi quadre
 @cindex espressioni regolari @subentry estese (ERE)
 @cindex ERE (espressioni regolari estese)
-@cindex @command{egrep} (programma di utilità)
-@cindex programma di utilità @subentry @command{egrep}
+@cindex @command{egrep} (comando di utilità)
+@cindex comando di utilità @subentry @command{egrep}
 L'utilizzo di @samp{\} nelle espressioni tra parentesi quadre
 è compatibile con altre implementazioni di @command{awk} ed è anche richiesto
 da POSIX.@footnote{Vedere
@@ -6966,7 +6935,7 @@ prima di un metacarattere in un'espressione regolare.}
 Le espressioni regolari in @command{awk} sono un insieme più esteso delle
 specificazioni POSIX per le espressioni regolari estese (ERE).
 Le ERE POSIX sono basate sulle espressioni regolari accettate dal
-tradizionale programma di utilità @command{egrep}.
+tradizionale comando di utilità @command{egrep}.
 
 @cindex espressioni @subentry tra parentesi quadre @subentry classi di caratteri
 @cindex POSIX @command{awk} @subentry espressioni tra parentesi quadre @subentry classi di caratteri
@@ -8970,8 +8939,8 @@ la loro suddivisione) sarà ancora quello ottenuto usando il precedente
 valore di @code{FS}, non quello nuovo.
 
 @cindex angolo buio @subentry separatore di campo
-@cindex @command{sed} (programma di utilità)
-@cindex programma di utilità @subentry @command{sed}
+@cindex @command{sed} (comando di utilità)
+@cindex comando di utilità @subentry @command{sed}
 @cindex editori di flusso
 Comunque, molte delle più vecchie implementazioni di @command{awk} non
 funzionano in questo modo.  Invece, rimandano la divisione dei campi
@@ -9001,7 +8970,7 @@ stampa l'intera prima riga del file, qualcosa come:
 root:x:0:0:Root:/:
 @end example
 
-(Il comando @command{sed}@footnote{Il programma di utilità @command{sed} è un
+(Il comando @command{sed}@footnote{Il comando di utilità @command{sed} è un
 ``editore di flusso''.  Anche il suo comportamento è definito dallo standard
 POSIX.} appena visto stampa solo la prima riga di @file{/etc/passwd}.)
 @end cartouche
@@ -9114,8 +9083,8 @@ questo è scomodo e inefficiente se il numero dei campi è elevato.
 
 @cindex risoluzione di problemi @subentry errori fatali @subentry specificare larghezza dei campi
 @cindex problemi @subentry risoluzione di @subentry errori fatali, specificare larghezza dei campi
-@cindex @command{w} (programma di utilità)
-@cindex programma di utilità @subentry @command{w}
+@cindex @command{w} (comando di utilità)
+@cindex comando di utilità @subentry @command{w}
 @cindex @code{FIELDWIDTHS} (variabile)
 @cindex @command{gawk} @subentry variabile @subentry @code{FIELDWIDTHS} in
 La suddivisione di un record in input in campi a larghezza fissa viene
@@ -9127,7 +9096,7 @@ separato che verrà poi ignorato.
 È un errore fatale definire una larghezza di campo che abbia un valore
 negativo.
 
-I dati seguenti costituiscono un output del programma di utilità
+I dati seguenti costituiscono un output del comando di utilità
 Unix @command{w}.  È utile per spiegare l'uso di @code{FIELDWIDTHS}:
 
 @example
@@ -10228,8 +10197,8 @@ invece @samp{(@w{"echo "} "date") | getline}, se il programma dev'essere
 portabile su tutte le implementazioni di @command{awk}.
 
 @cindex Brian Kernighan @subentry @command{awk} di
-@cindex @command{mawk} (programma di utilità)
-@cindex programma di utilità @subentry @command{mawk}
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 @quotation NOTA
 Sfortunatamente, @command{gawk} non ha un comportamento uniforme nel
 trattare un costrutto come @samp{@w{"echo "} "date" | getline}.
@@ -10251,7 +10220,7 @@ Quando si usa @samp{@var{comando} | getline @var{var}},
 l'output di @var{comando} è inviato tramite una @dfn{pipe} a
 @code{getline} a una variabile @var{var}.  Per esempio, il
 seguente programma legge la data e l'ora corrente nella variabile
-@code{current_time}, usando il programma di utilità @command{date}, e poi lo
+@code{current_time}, usando il comando di utilità @command{date}, e poi lo
 stampa:
 
 @example
@@ -11807,7 +11776,7 @@ awk '@{ print $1 > "nomi.non.ordinati"
 @end example
 
 La lista non ordinata è scritta usando una ridirezione normale, mentre
-la lista ordinata è scritta inviando una @dfn{pipe} in input al programma
+la lista ordinata è scritta inviando una @dfn{pipe} in input al comando
 di utilità @command{sort}.
 
 Il prossimo esempio usa la ridirezione per inviare un messaggio alla
@@ -11953,7 +11922,7 @@ La funzione @code{tolower()} restituisce la stringa che gli viene passata
 come argomento con tutti i caratteri maiuscoli convertiti in minuscolo
 (@pxref{Funzioni per stringhe}).
 Il programma costruisce una lista di righe di comando,
-usando il programma di utilità @command{mv} per rinominare i file.
+usando il comando di utilità @command{mv} per rinominare i file.
 Poi invia la lista alla shell per l'elaborazione.
 
 @xref{Apici alla shell} per una funzione che può essere utile nel generare
@@ -13816,8 +13785,8 @@ print "qualcosa di significativo" > nome file
 @end example
 
 @cindex Brian Kernighan @subentry @command{awk} di
-@cindex @command{mawk} (programma di utilità)
-@cindex programma di utilità @subentry @command{mawk}
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 @noindent
 Questo produce un errore di sintassi in alcune versioni di
 @command{awk} per Unix.@footnote{Può capitare che BWK @command{awk},
@@ -17159,8 +17128,8 @@ Vedere @uref{https://austingroupbugs.net/view.php?id=607, il sito web dell'Austi
 @cindex funzione definita dall'utente @subentry istruzioni @code{next}/@code{nextfile} e
 @cindex @code{nextfile} (istruzione) @subentry in funzioni definite dall'utente
 @cindex Brian Kernighan @subentry @command{awk} di
-@cindex @command{mawk} (programma di utilità)
-@cindex programma di utilità @subentry @command{mawk}
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 Le versioni correnti di BWK @command{awk} e @command{mawk}
 entrambe prevedono @code{nextfile}.  Tuttavia, non sono consentite istruzioni
 @code{nextfile} all'interno del corpo delle funzioni
@@ -21972,8 +21941,8 @@ il che è sufficiente per rappresentare date e ore fino a inizio 2038
 di date, compresi dei valori negativi per rappresentare delle date
 anteriori all'Epoca.
 
-@cindex @command{date} (programma di utilità GNU)
-@cindex programma di utilità GNU @subentry @command{date}
+@cindex @command{date} (comando di utilità GNU)
+@cindex comando di utilità GNU @subentry @command{date}
 @cindex tempo @subentry ottenerlo
 Per facilitare l'elaborazione di tali file di registro, e per produrre
 dei rapporti utili, @command{gawk} prevede le seguenti funzioni per
@@ -22045,7 +22014,7 @@ il valore di @code{PROCINFO["strftime"]} come stringa di formattazione
 (@pxref{Variabili predefinite}).
 Il valore di default della stringa è
 @code{@w{"%a %b %e %H:%M:%S %Z %Y"}}.  Questa stringa di formattazione
-produce lo stesso output del programma di utilità equivalente
+produce lo stesso output del comando di utilità equivalente
 @command{date}.
 Si può assegnare un nuovo valore a @code{PROCINFO["strftime"]} per
 modificare la formattazione di default; vedere
@@ -22254,7 +22223,7 @@ nel
 in
 @end ifnottex
 @ref{Internazionalizzazione}.}
-(Queste facilitano la compatibilità con il programma di utilità
+(Queste facilitano la compatibilità con il comando di utilità
 POSIX @command{date}.)
 
 @item %%
@@ -22319,12 +22288,12 @@ sono disponibili.  Va comunque tenuto presente che l'utilizzo di tali
 sistemi operativi.
 @end quotation
 
-@cindex @code{date} (programma di utilità POSIX)
-@cindex programma di utilità POSIX @subentry @command{date}
-@cindex POSIX @command{awk} @subentry @code{date} (programma di utilità)
+@cindex @code{date} (comando di utilità POSIX)
+@cindex comando di utilità POSIX @subentry @command{date}
+@cindex POSIX @command{awk} @subentry @code{date} (comando di utilità)
 Il seguente esempio è un'implementazione @command{awk} del
-programma di utilità POSIX @command{date}.
-Normalmente, il programma di utilità @command{date} stampa la
+comando di utilità POSIX @command{date}.
+Normalmente, il comando di utilità @command{date} stampa la
 data e l'ora corrente nel formato ben noto.  Tuttavia, se si
 specifica al comando un argomento che inizia con un @samp{+}, @command{date}
 copia i caratteri che non sono specifiche di formato nello standard output
@@ -22336,7 +22305,7 @@ $ @kbd{date '+Oggi è %A, %d %B %Y.'}
 @print{} Oggi è lunedì, 22 settembre 2014.
 @end example
 
-Ecco la versione @command{gawk} del programma di utilità @command{date}.
+Ecco la versione @command{gawk} del comando di utilità @command{date}.
 È all'interno di uno @dfn{script} di shell
 per gestire l'opzione @option{-u},
 che richiede che @command{date} sia eseguito come se il fuso orario
@@ -24850,7 +24819,7 @@ i propri programmi in questo modo: è solo auspicabile che lo si faccia.
 
 A partire dalla versione 5.0, @command{gawk} fornisce
 un meccanismo efficiente per risolvere i problemi descritti in
-questa sezione: gli spazi-dei-nomi (@dfn{spazi-dei-nomi}).
+questa sezione: gli @dfn{spazi-dei-nomi}.
 Gli spazi-dei-nomi e il loro utilizzo sono descritti in dettaglio
 @iftex
 nel
@@ -25509,7 +25478,7 @@ intuitivamente ovvii quando si legge un programma.
 
 La seguente funzione, @code{getlocaltime()}, riempie un vettore fornito
 dall'utente con informazioni sul tempo preformattate.  Restituisce una stringa
-con data e ora corrente formattata come nel programma di utilità @command{date}:
+con data e ora corrente formattata come nel comando di utilità @command{date}:
 
 @cindex @code{getlocaltime()} @subentry funzione definita dall'utente
 @cindex funzione definita dall'utente @subentry @code{getlocaltime()}
@@ -28142,23 +28111,23 @@ standard POSIX.  Questo non è un problema; il loro scopo
 I programmi sono presentati in ordine alfabetico.
 
 @menu
-* Programma cut::                 Il programma di utilità @command{cut}.
-* Programma egrep::               Il programma di utilità @command{egrep}.
-* Programma id::                  Il programma di utilità @command{id}.
-* Programma split::               Il programma di utilità @command{split}.
-* Programma tee::                 Il programma di utilità @command{tee}.
-* Programma uniq::                Il programma di utilità @command{uniq}.
-* Programma wc::                  Il programma di utilità @command{wc}.
+* Programma cut::                 Il comando di utilità @command{cut}.
+* Programma egrep::               Il comando di utilità @command{egrep}.
+* Programma id::                  Il comando di utilità @command{id}.
+* Programma split::               Il comando di utilità @command{split}.
+* Programma tee::                 Il comando di utilità @command{tee}.
+* Programma uniq::                Il comando di utilità @command{uniq}.
+* Programma wc::                  Il comando di utilità @command{wc}.
 @end menu
 
 @node Programma cut
 @subsection Ritagliare campi e colonne
 
-@cindex @command{cut} (programma di utilità)
-@cindex programma di utilità @subentry @command{cut}
+@cindex @command{cut} (comando di utilità)
+@cindex comando di utilità @subentry @command{cut}
 @cindex campi @subentry ritagliare
 @cindex colonne @subentry ritagliare
-Il programma di utilità @command{cut} seleziona, o ``taglia'' (@dfn{cut}),
+Il comando di utilità @command{cut} seleziona, o ``taglia'' (@dfn{cut}),
 caratteri o campi dal suo standard input e li
 spedisce al suo standard output.
 I campi sono separati da caratteri TAB per default,
@@ -28513,8 +28482,8 @@ di suddividere la riga in input in singoli caratteri.
 @cindex espressioni regolari @subentry ricerca di
 @cindex ricerca @subentry in file @subentry di espressioni regolari
 @cindex file @subentry ricercare espressioni regolari nei
-@cindex @command{egrep} (programma di utilità)
-@cindex programma di utilità @subentry @command{egrep}
+@cindex @command{egrep} (comando di utilità)
+@cindex comando di utilità @subentry @command{egrep}
 I programmi di utilità della "famiglia" @command{grep} cercano
 occorrenze di espressioni regolari all'interno di file.
 Questi programmi hanno una storia insolita.
@@ -28542,7 +28511,7 @@ default di @command{grep} è quello di cercare usando le BRE.
 Si specifica l'opzione @option{-E} per richiedere di usare le ERE,
 e l'opzione @option{-F} per richiedere di cercare stringhe fisse.
 
-In pratica, il sistema continua a includere come programmi di
+In pratica, il sistema continua a includere come comandi di
 utilità separati sia @command{egrep} che @command{fgrep}, per
 compatibilità all'indietro.
 Questa sezione
@@ -28860,9 +28829,9 @@ function sintassi()
 
 @cindex stampare @subentry informazioni utente
 @cindex utenti @subentry informazioni riguardo agli @subentry stampare
-@cindex @command{id} (programma di utilità)
-@cindex programma di utilità @subentry @command{id}
-Il programma di utilità @command{id} elenca i numeri identificativi (ID)
+@cindex @command{id} (comando di utilità)
+@cindex comando di utilità @subentry @command{id}
+Il comando di utilità @command{id} elenca i numeri identificativi (ID)
 reali ed effettivi di un utente, e l'insieme dei gruppi a cui l'utente
 appartiene, se ve ne sono.
 @command{id} stampa i numeri identificativi di utente e di gruppo solo se
@@ -28879,7 +28848,7 @@ $ @kbd{id}
 @cindex vettore @subentry @code{PROCINFO} @subentry @dfn{process ID} di utente e di gruppo e
 Questa informazione è parte di ciò che è reso disponibile dal vettore
 @code{PROCINFO} di @command{gawk} (@pxref{Variabili predefinite}).
-Comunque, il programma di utilità @command{id} fornisce un output più
+Comunque, il comando di utilità @command{id} fornisce un output più
 comprensibile che non una semplice lista di numeri.
 
 La versione POSIX di @command{id} prevede numerose opzioni che consentono
@@ -29267,9 +29236,9 @@ del programma funzioni come ci si aspetta che faccia:
 @subsection Suddividere in pezzi un file grosso
 
 @cindex file @subentry suddividere
-@cindex @code{split} (programma di utilità)
-@cindex programma di utilità @subentry @code{split}
-Il programma di utilità @command{split} divide grossi file di testo
+@cindex @code{split} (comando di utilità)
+@cindex comando di utilità @subentry @code{split}
+Il comando di utilità @command{split} divide grossi file di testo
 in pezzi più piccoli.
 La sintassi, che è quella prevista dallo standard POSIX per
 @command{split}, è la seguente:
@@ -29655,8 +29624,8 @@ END @{
 
 @cindex file @subentry multipli @subentry duplicare l'output su
 @cindex output @subentry duplicarlo su più file
-@cindex @code{tee} (programma di utilità)
-@cindex programma di utilità @subentry @code{tee}
+@cindex @code{tee} (comando di utilità)
+@cindex comando di utilità @subentry @code{tee}
 Il programma @code{tee} è noto come @dfn{pipe fitting} (tubo secondario).
 @code{tee} copia il suo standard input al suo standard output e inoltre lo
 duplica scrivendo sui file indicati nella riga di comando.  La sua sintassi
@@ -29788,9 +29757,9 @@ END @{
 
 @cindex stampare @subentry righe di testo non duplicate
 @cindex testo @subentry stampare @subentry righe non duplicate di
-@cindex @command{uniq} (programma di utilità)
-@cindex programma di utilità @subentry @command{uniq}
-Il programma di utilità @command{uniq} legge righe di dati ordinati sul suo
+@cindex @command{uniq} (comando di utilità)
+@cindex comando di utilità @subentry @command{uniq}
+Il comando di utilità @command{uniq} legge righe di dati ordinati sul suo
 standard input, e per default rimuove righe duplicate.  In altre parole,
 stampa solo righe uniche; da cui il
 nome.  @command{uniq} ha diverse opzioni.  La sintassi è la seguente:
@@ -30084,9 +30053,9 @@ sarebbe stato un po' più semplice da comprendere.
 @cindex caratteri @subentry contare i
 @cindex righe @subentry contare le
 @cindex byte @subentry contare i
-@cindex @command{wc} (programma di utilità)
-@cindex programma di utilità @subentry @command{wc}
-Il programma di utilità @command{wc} (@dfn{word count}, contatore di parole)
+@cindex @command{wc} (comando di utilità)
+@cindex comando di utilità @subentry @command{wc}
+Il comando di utilità @command{wc} (@dfn{word count}, contatore di parole)
 conta righe, parole, caratteri e byte in uno o più file in input.
 
 @menu
@@ -30368,7 +30337,7 @@ Si spera che siano interessanti e divertenti.
 @menu
 * Programma dupword::             Trovare parole duplicate in un documento.
 * Programma alarm::               Un programma di sveglia.
-* Programma translate::           Un programma simile al programma di utilità
+* Programma translate::           Un programma simile al comando di utilità
                                   @command{tr}.
 * Programma labels::              Stampare etichette per lettere.
 * Programma utilizzo parole::     Un programma per produrre un contatore
@@ -30638,11 +30607,11 @@ prima di far scattare la sveglia:
 @c endfile
 @end example
 
-@cindex @command{sleep} (programma di utilità)
-@cindex programma di utilità @subentry @command{sleep}
+@cindex @command{sleep} (comando di utilità)
+@cindex comando di utilità @subentry @command{sleep}
 Infine, il programma usa la funzione @code{system()}
 (@pxref{Funzioni di I/O})
-per chiamare il programma di utilità @command{sleep}.  Il programma di utilità
+per chiamare il comando di utilità @command{sleep}.  Il comando di utilità
 @command{sleep} non fa altro che aspettare per il numero di secondi
 specificato.  Se il codice di ritorno restituito è diverso da zero, il
 programma suppone che @command{sleep} sia stato interrotto ed esce. Se
@@ -30675,9 +30644,9 @@ per ritardare per il numero di secondi necessario:
 
 @cindex caratteri @subentry rimpiazzare
 @cindex rimpiazzare @subentry caratteri in un file
-@cindex @command{tr} (programma di utilità)
-@cindex programma di utilità @subentry @command{tr}
-Il programma di utilità di sistema @command{tr} rimpiazza caratteri.  Per
+@cindex @command{tr} (comando di utilità)
+@cindex comando di utilità @subentry @command{tr}
+Il comando di utilità di sistema @command{tr} rimpiazza caratteri.  Per
 esempio, è spesso usato per trasformare lettere maiuscole in lettere minuscole
 in vista di ulteriori elaborazioni:
 
@@ -30705,7 +30674,7 @@ un utente propose di aggiungere una funzione di traslitterazione a
 @c at least theoretically
 Il programma seguente è stato scritto per dimostrare che la traslitterazione
 di caratteri poteva essere fatta con una funzione definita dall'utente.
-Questo programma non è così completo come il programma di utilità di sistema
+Questo programma non è così completo come il comando di utilità di sistema
 @command{tr}, ma svolge buona parte dello stesso lavoro.
 
 Il programma @command{translate} è stato scritto molto prima che @command{gawk}
@@ -30829,7 +30798,7 @@ presuppone che le liste ``da'' e ``a'' non cambino mai durante tutta
 l'esecuzione del programma.
 
 Un altro miglioramento ovvio è di consentire l'uso di intervalli, come
-@samp{a-z}, come consentito dal programma di utilità @command{tr}.  Si può
+@samp{a-z}, come consentito dal comando di utilità @command{tr}.  Si può
 trarre ispirazione dal codice di @file{cut.awk} (@pxref{Programma cut}).
 
 
@@ -31039,12 +31008,12 @@ interessati a sapere quali parole ricorrono più di frequente, o ad avere
 una tabella in ordine alfabetico che mostra quante volte ricorre ogni parola.
 @end itemize
 
-@cindex @command{sort} (programma di utilità)
-@cindex programma di utilità @subentry @command{sort}
+@cindex @command{sort} (comando di utilità)
+@cindex comando di utilità @subentry @command{sort}
 Il primo problema si può risolvere usando @code{tolower()} per rimuovere la
 distinzione maiuscolo/minuscolo.  Il secondo problema si può risolvere usando
 @code{gsub()} per rimuovere i caratteri di interpunzione.  Infine, per
-risolvere il terzo problema si può usare il programma di utilità
+risolvere il terzo problema si può usare il comando di utilità
 @command{sort} per elaborare l'output dello @dfn{script} @command{awk}.  Ecco la
 nuova versione del programma:
 
@@ -31095,7 +31064,7 @@ decrescente di frequenza.
 
 Il programma @command{awk} da solo gestisce adeguatamente i dati e produce
 una tabella delle frequenza che non è ordinata.
-L'output di @command{awk} è poi messo in ordine dal programma di utilità
+L'output di @command{awk} è poi messo in ordine dal comando di utilità
 @command{sort} e stampato sullo schermo.
 
 Le opzioni passate a @command{sort}
@@ -31517,11 +31486,11 @@ function fine_file_inattesa()
 @node Programma sed semplice
 @subsection Un semplice editor di flusso
 
-@cindex @command{sed} (programma di utilità)
-@cindex programma di utilità @subentry @command{sed}
+@cindex @command{sed} (comando di utilità)
+@cindex comando di utilità @subentry @command{sed}
 @cindex editori di flusso
 @cindex flusso @subentry editori di
-Il programma di utilità @command{sed} è un @dfn{editore di flusso},
+Il comando di utilità @command{sed} è un @dfn{editore di flusso},
 ovvero un programma che legge un flusso di dati, lo modifica, e scrive il file
 così modificato.
 È spesso usato per fare modifiche generalizzate a un grosso file, o a un
@@ -31774,10 +31743,10 @@ Queste opzioni sono conservate e lasciate da gestire a @command{gawk}.
 @item @option{-f}, @option{--file}, @option{--file=}, @option{-Wfile=}
 Il @value{FN} è aggiunto alla variabile di shell @code{programma}, insieme
 a una direttiva @code{@@include}.
-Il programma di utilità @command{expr} è usato per eliminare la parte
+Il comando di utilità @command{expr} è usato per eliminare la parte
 iniziale dell'argomento (p.es., @samp{--file=}).
 (La sintassi tipica di @command{sh} richiederebbe di usare il comando
-@command{echo} e il programma di utilità @command{sed} per far questo.
+@command{echo} e il comando di utilità @command{sed} per far questo.
 Sfortunatamente, alcune versioni di @command{echo} valutano le sequenze
 di protezione contenute nei loro argomenti, e questo potrebbe finire per
 alterare il testo del programma.
@@ -32658,7 +32627,7 @@ BEGIN @{
 
 @item
 Quali sono vantaggi e svantaggi di @file{awksed.awk} rispetto al vero
-programma di utilità @command{sed}?
+comando di utilità @command{sed}?
 
 @ignore
   Advantage: egrep regexps
@@ -32717,7 +32686,7 @@ Fare questa modifica.
 
 @item
 Modificare @file{anagram.awk} (@pxref{Programma anagram}), per evitare di
-usare il programma di utilità esterno @command{sort}.
+usare il comando di utilità esterno @command{sort}.
 
 @end enumerate
 @c EXCLUDE END
@@ -33565,7 +33534,7 @@ verso un altro processo.  Il secondo processo è chiamato @dfn{coprocesso},
 poiché viene eseguito in parallelo con @command{gawk}.  La connessione
 bidirezionale viene creata usando l'operatore @samp{|&} (preso in prestito
 dalla shell Korn, @command{ksh}):@footnote{Questo è molto diverso dallo stesso
-operatore nella C shell e in Bash.}
+operatore nelle @command{csh} e @command{bash} shell.}
 
 @example
 do @{
@@ -33622,9 +33591,9 @@ Queste stringhe dicono a @command{gawk} di chiudere la @dfn{pipe}, rispettivamen
 nella direzione che invia i dati al coprocesso e nella direzione che legge da
 esso.
 
-@cindex @command{sort} (programma di utilità) @subentry coprocessi e
-@cindex programma di utilità @subentry @command{sort} @subentry coprocessi e
-Questo è particolarmente necessario per usare il programma di utilità
+@cindex @command{sort} (comando di utilità) @subentry coprocessi e
+@cindex comando di utilità @subentry @command{sort} @subentry coprocessi e
+Questo è particolarmente necessario per usare il comando di utilità
 di sistema @command{sort} come parte di un coprocesso;
 @command{sort} deve leggere @emph{tutti} i dati di input
 prima di poter produrre un qualsiasi output.
@@ -35306,8 +35275,8 @@ si crea il file iniziale @file{.pot}:
 gawk --gen-pot -f guide.awk > guide.pot
 @end example
 
-@cindex @command{xgettext} (programma di utilità)
-@cindex programma di utilità @subentry @command{xgettext}
+@cindex @command{xgettext} (comando di utilità)
+@cindex comando di utilità @subentry @command{xgettext}
 Quando viene chiamato specificando @option{--gen-pot}, @command{gawk} non
 esegue il programma.  Il programma viene esaminato come al solito, e tutte
 le stringhe che sono state marcate per essere tradotte vengono scritte nello
@@ -35671,9 +35640,9 @@ $ @kbd{mkdir en_US.UTF-8 en_US.UTF-8/LC_MESSAGES}
 @cindex file @subentry @dfn{portable object} (@file{.po}) @subentry conversione in @dfn{message object} file
 @cindex @dfn{message object} file (@file{.mo}) @subentry conversione da @dfn{portable object} file
 @cindex file @subentry @dfn{message object} (@file{.mo}) @subentry conversione da @dfn{portable object} file
-@cindex @command{msgfmt} (programma di utilità)
-@cindex programma di utilità @subentry @command{msgfmt}
-Il programma di utilità @command{msgfmt} effettua la conversione del file
+@cindex @command{msgfmt} (comando di utilità)
+@cindex comando di utilità @subentry @command{msgfmt}
+Il comando di utilità @command{msgfmt} effettua la conversione del file
 leggibile, in formato testo, @file{.po} nel file, in formato binario,
 @file{.mo}.
 Per default, @command{msgfmt} crea un file di nome @file{messages}.
@@ -43419,8 +43388,6 @@ dell'operatore @code{in}
 @table @code
 @item "blksize"
 La dimensione preferita di un blocco per effettuare operazioni di I/O sul file.
-Questo campo non è presente nella struttura C @code{stat} di tutti i sistemi
-che rispettano lo standard POSIX.
 
 @item "linkval"
 Se il file è un collegamento simbolico, questo elemento è il nome del
@@ -43676,9 +43643,7 @@ tutto è andato bene:
 
 @example
 @group
-#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
     array_set_numeric(vettore, "blksize", sbuf->st_blksize);
-#endif
 @end group
 
     pmode = format_mode(sbuf->st_mode);
@@ -44295,7 +44260,7 @@ else
 @cindex @code{inplace} (estensione)
 @cindex estensione @subentry @code{inplace()}
 L'estensione @code{inplace} svolge un lavoro simile a quello
-dell'opzione @option{-i} nel programma di utilità GNU @command{sed},
+dell'opzione @option{-i} nel comando di utilità GNU @command{sed},
 che svolge delle funzioni di modifica ``al volo'' su ogni file in input.
 Come il comando GNU @command{sed}, l'estensione @code{inplace}
 sostituisce i collegamenti (sia simbolici che fisici) con dei nuovi file.
@@ -45004,8 +44969,8 @@ Estensione analizzatore XML, usando la libreria di analisi XML
 @uref{https://expat.sourceforge.net, Expat}
 @end itemize
 
-@cindex @command{git} (programma di utilità)
-@cindex programma di utilità @subentry @command{git}
+@cindex @command{git} (comando di utilità)
+@cindex comando di utilità @subentry @command{git}
 Si può scaricare il codice del progetto @code{gawkextlib}
 usando il codice sorgente mantenuto tramite
 @uref{https://git-scm.com, Git}.
@@ -45049,7 +45014,7 @@ Il file @file{README} del sito spiega come compilare il codice.  Se si è
 installato @command{gawk} in una posizione non-standard, occorre
 specificare @samp{./configure --with-gawk=@var{/percorso/del/programma/gawk}}
 per far sì che venga trovato.
-Può essere necessario usare il programma di utilità @command{sudo}
+Può essere necessario usare il comando di utilità @command{sudo}
 per installare sia @command{gawk} che @code{gawkextlib}, a seconda di come
 funziona il sistema su cui si lavora.
 
@@ -45703,7 +45668,7 @@ identificativo a un particolare spazio-dei-nomi
 (@pxrefil{Spazi-dei-nomi}).
 @end iftex
 @ifnottex
-(@pxref{Spazi-dei-nomi}).
+(@pxrefil{Spazi-dei-nomi}).
 @end ifnottex
 @end itemize
 
@@ -48282,9 +48247,7 @@ compilare @command{gawk}.  Le tre cose descritte da questo file sono: quali
 file di intestazione sono disponibili, in modo da poterli includere correttamente,
 quali funzioni (presumibilmente) standard sono realmente disponibili nelle
 librerie C, e varie informazioni assortite riguardo al sistema operativo
-corrente.  Per esempio, può non esserci l'elemento @code{st_blksize} nella
-struttura @code{stat}.  In questo caso, @samp{HAVE_STRUCT_STAT_ST_BLKSIZE} è
-indefinito.
+corrente.
 
 @cindex @code{custom.h} (file)
 È possible che il compilatore C del sistema in uso "tragga in inganno"
@@ -48444,7 +48407,7 @@ directory che contiene il resto dei sorgenti di @command{gawk}, e quindi
 chiamare @command{make}, specificando il nome appropriato di obiettivo come
 argomento, per generare @command{gawk}.  Il @file{Makefile} copiato dalla
 directory @file{pc} contiene una sezione di configurazione con commenti, e può
-essere necessario modificarlo perché funzioni con il programma di utilità
+essere necessario modificarlo perché funzioni con il comando di utilità
 @command{make} corrente.
 
 Il @file{Makefile} contiene un certo numero di alternative, che permettono di
@@ -49026,7 +48989,7 @@ lista di ricerca multitraduzione @code{RMS}.
 Questa restrizione vale anche se si esegue @command{gawk} sotto GNV,
 in quanto la ridirezione è sempre verso un comando DCL.
 
-Se si ridirigono dati verso un comando o un programma di utilità OpenVMS,
+Se si ridirigono dati verso un comando o un comando di utilità OpenVMS,
 l'implementazione corrente richiede la creazione di un comando OpenVMS esterno che
 esegua un file di comandi, prima di invocare @command{gawk}.
 (Questa restrizione potrebbe essere rimossa in una futura versione di
@@ -49699,8 +49662,8 @@ versioni di BWK @command{awk} che è riuscito a trovare.  È disponibile in
 @uref{https://github.com/danfuzz/one-true-awk}.
 
 @cindex Brennan, Michael
-@cindex @command{mawk} (programma di utilità)
-@cindex programma di utilità @subentry @command{mawk}
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 @cindex codice sorgente @subentry @command{mawk}
 @item @command{mawk}
 Michael Brennan ha scritto un'implementazione indipendente di @command{awk},
@@ -50196,8 +50159,8 @@ La
 @ref{Distribuzione di Gawk} descrive come scaricare e installare
 le versioni ufficiali rilasciate di @command{gawk}.
 
-@cindex @command{git} (programma di utilità)
-@cindex programma di utilità @subentry @command{git}
+@cindex @command{git} (comando di utilità)
+@cindex comando di utilità @subentry @command{git}
 Peraltro, se si intende modificare @command{gawk} e mettere a disposizione le
 modifiche, è preferibile lavorare sulla versione in via di sviluppo.  Per far
 ciò è necessario accedere al deposito del codice sorgente di @command{gawk}.
@@ -50416,8 +50379,8 @@ in formato @command{man}.
 Si dovrà anche firmare un documento liberatorio relativo alle
 modifiche apportate alla documentazione.
 
-@cindex @command{git} (programma di utilità)
-@cindex programma di utilità @subentry @command{git}
+@cindex @command{git} (comando di utilità)
+@cindex comando di utilità @subentry @command{git}
 @item
 Inviare le modifiche come file di differenze nel formato contestuale unificato.
 Usare @samp{diff -u -r -N} per confrontare i sorgenti originali dell'albero
@@ -50428,7 +50391,7 @@ Per inviare le modifiche proposte spedire l'output prodotto da @command{diff}.
 (@xref{Bug}, per l'indirizzo di posta elettronica.)
 
 L'uso di questo formato rende semplice per me l'applicazione delle modifiche
-alla versione principale del sorgente di @command{gawk} (usando il programma di
+alla versione principale del sorgente di @command{gawk} (usando il comando di
 utilità @command{patch}).  Se invece tocca a me applicare le modifiche a mano,
 con un editor di testo, potrei decidere di non farlo, specialmente
 se le modifiche sono molte.
@@ -50754,7 +50717,7 @@ ma che non conoscono il linguaggio C.  Quindi, i rami più rilevanti
 dovrebbero essere sempre compilabili.
 
 È stato proposto poi di lanciare ogni notte uno @dfn{script} tramite il
-programma di utilità @command{cron} per creare archivi in formato @command{tar}
+comando di utilità @command{cron} per creare archivi in formato @command{tar}
 contenenti tutto ``il codice sorgente.''  Il problema in questo caso è che
 ci sono differenti alberi di sorgenti, che corrispondono ai vari rami!
 Quindi gli archivi notturni in questione non sono una risposta valida, anche
@@ -51023,7 +50986,7 @@ prima vista piuttosto difficile da rispettare.
 
 Un tipo di architettura, apparentemente usato da Perl e Ruby e forse da altri
 programmi, potrebbe consistere nel mettere il codice principale di
-@command{gawk} in una libreria, limitando il programma di utilità
+@command{gawk} in una libreria, limitando il comando di utilità
 @command{gawk} a una piccola funzione @code{main()} in C che richiamerebbe
 dinamicamente la libreria.
 
@@ -51299,7 +51262,7 @@ l'abbreviazione ``I/O''.  (In inglese ``input'' e ``output'' sono spesso usati
 come verbi, nel gergo informatico, al posto di leggere e scrivere.)
 
 @cindex guidati-dai-dati @subentry linguaggi di programmazione
-@cindex linguaggi di programmazione @subentry guidati dai dati
+@cindex linguaggi di programmazione @subentry guidati-dai-dati
 @command{awk} gestisce la lettura dei dati, come anche la divisione in
 record e campi.  Lo scopo del programma dell'utente è di dire ad @command{awk}
 cosa fare con i dati.  Questo vien fatto descrivendo @dfn{modelli} da
@@ -51487,8 +51450,8 @@ assegnati sono chiamati @dfn{rvalue}.
 @xref{Operatori di assegnamento}.
 
 @cindex Spencer, Henry
-@cindex @command{sed} (programma di utilità)
-@cindex programma di utilità @subentry @command{sed}
+@cindex @command{sed} (comando di utilità)
+@cindex comando di utilità @subentry @command{sed}
 @cindex amazing @command{awk} assembler (programma @command{aaa})
 @cindex programma @subentry @command{aaa} (amazing @command{awk} assembler)
 @item Assembler incredibilmente scritto in @command{awk}
@@ -51521,7 +51484,7 @@ La versione GNU della shell standard
 @ifinfo
 (la Bourne-Again SHell).
 @end ifinfo
-Vedere anche ``Bourne Shell''.
+Vedere anche ``Bourne shell''.
 
 @item Binario
 Notazione a base due, che usa le cifre @code{0}--@code{1}. Poiché
@@ -51621,7 +51584,7 @@ valori interi.  Molti sistemi sono a 32-bit, ma i sistemi a 64-bit sono sempre
 più numerosi, mentre i sistemi a 16-bit [e quelli a 8-bit] sono praticamente
 scomparsi.
 
-@item Bourne Shell
+@item Bourne shell
 La shell standard (@file{/bin/sh}) in Unix e nei sistemi derivati da Unix,
 Originariamente scritto da Steven R.@: Bourne dei Bell Laboratories.
 Molte shell (Bash, @command{ksh}, @command{pdksh}, @command{zsh}) sono
@@ -51637,17 +51600,6 @@ fra @command{awk} e C.
 
 In generale, @command{gawk} tenta di essere ragionevolmente simile alla
 versione 1990 del C ISO.
-
-@item C Shell
-La C Shell (@command{csh} o la sua versione migliorata @command{tcsh}) è una
-shell Unix creata da Bill Joy verso la fine degli anni '70.  La C shell si
-differenzia dalla altre shell per le sue funzionalità interattive, e per lo
-stile complessivo, che è abbastanza simile a quello del linguaggio C.
-La C shell non è compatibile all'indietro con la Bourne Shell, e per questo
-motivo un'attenzione speciale è necessaria se si convertono alla C shell
-degli @dfn{script} scritti per altre shell Unix, in particolare per ciò che
-concerne la gestione delle variabili di shell.
-Vedere anche ``Bourne Shell''.
 
 @item C++
 Un linguaggio di programmazione molto diffuso, orientato agli oggetti,
@@ -51691,8 +51643,8 @@ nei sistemi GNU/Linux.
 
 @cindex Kernighan, Brian
 @cindex Bentley, Jon
-@cindex @command{chem} (programma di utilità)
-@cindex programma di utilità @subentry @command{chem}
+@cindex @command{chem} (comando di utilità)
+@cindex comando di utilità @subentry @command{chem}
 @item CHEM
 Un preprocessore per @command{pic} che legge descrizioni di molecole
 e produce l'input a @command{pic} che serve a disegnarle.
@@ -51730,6 +51682,18 @@ contenere il valore della variabile è liberato.
 @item Coprocesso
 Un programma subordinato con il quale è possibile una comunicazione
 bidirezionale dal programma principale.
+
+@item @command{csh} shell
+La @command{csh} shell (o la sua versione migliorata @command{tcsh}) è una
+shell Unix creata da Bill Joy verso la fine degli anni '70.
+La @command{csh} shell si differenzia dalla altre shell per le sue
+funzionalità interattive, e per lo stile complessivo, che è abbastanza
+simile a quello del linguaggio C.
+La @command{csh} shell non è compatibile all'indietro con la Bourne shell,
+e per questo motivo un'attenzione speciale è necessaria se si convertono
+alla @command{csh} shell degli @dfn{script} scritti per altre shell Unix,
+in particolare per ciò che concerne la gestione delle variabili di shell.
+Vedere anche ``Bourne shell''.
 
 @item Dati oggetto
 Sono costituiti da numeri e stringhe di caratteri.  I numeri sono convertiti
@@ -51896,8 +51860,8 @@ Vedere ``Espressione tra parentesi quadre''.
 
 @item Estensione
 Una funzionalità aggiunta o una modifica a un linguaggio di programmazione
-o a un programma di utilità, non definita dallo standard di quel linguaggio
-o di quel programma di utilità.
+o a un comando di utilità, non definita dallo standard di quel linguaggio
+o di quel comando di utilità.
 @command{gawk} ha molte estensioni rispetto al POSIX @command{awk} (fin
 troppe).
 
@@ -52031,7 +51995,7 @@ I caratteri @samp{@{} e @samp{@}}.  Le parentesi graffe sono usate in
 @command{awk} per delimitare azioni, istruzioni composte, e il codice che
 costituisce le funzioni.
 
-@item Guidato dai dati
+@item Guidato-dai-dati
 Una descrizione dei programmi @command{awk}, nei quali si specifica quali sono
 i dati che si vogliono elaborare, e cosa fare quando si trovano tali dati.
 
@@ -52106,11 +52070,11 @@ oggetti.  Sebbene normalmente sia implementato compilando le istruzioni
 per una macchina virtuale standard (la JVM --- Java Virtual Machine) il
 linguaggio può essere compilato per essere eseguito in maniera nativa.
 
-@item Korn Shell
-La Korn Shell (@command{ksh}) è una shell Unix sviluppata da David Korn,
+@item Korn shell
+La Korn shell (@command{ksh}) è una shell Unix sviluppata da David Korn,
 presso i Bell Laboratories, nei primi anni '80.  La Korn shell è
 compatibile all'indietro con la Bourne shell e comprende molte funzionalità
-presenti nella C Shell.
+presenti nella @command{csh} shell.
 Vedere anche ``Bourne Shell''.
 
 @item LDL
@@ -53924,3 +53888,7 @@ text.  It's ok as one word when it's a metasyntactic variable, though.
 ORA uses filename, thus the macro.
 
 TODO:
+* Consider nuking all text related to the C shell.
+* Move all the stuff on quoting in the early part of the book to an appendix.
+* Move the full list of options to an appendix. In the current place,
+  it keeps us from getting to the meat of learning awk.
