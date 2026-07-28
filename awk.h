@@ -559,6 +559,9 @@ typedef struct exp_node {
 			size_t array_capacity;
 			struct exp_node *xarray;
 			struct exp_node *parent_array;
+			// Node_elem_new
+			char *elemnew_vname;
+			struct exp_node *elemnew_parent;
 		} array;
 		struct _regex {		/* Node_regex, Node_dynregex */
 			Regexp *re_reg[2];
@@ -600,11 +603,6 @@ typedef struct exp_node {
 /* Node_func */
 #define fparms		sub.nodep.rn
 #define code_ptr    sub.nodep.r.iptr
-
-/* Node_elem_new */
-#define elemnew_vname	sub.val.z.vn
-#define elemnew_parent	sub.val.typre
-
 
 /* Node_array_ref: */
 #define orig_array lnode
@@ -694,6 +692,11 @@ typedef struct exp_node {
 #define func_node    sub2.frame.func_node
 #define prev_frame_size	sub2.frame.prev_frame_size
 #define reti         sub2.frame.reti
+
+/* Node_elem_new: */
+#define elemnew_vname	sub2.array.elemnew_vname
+#define elemnew_parent	sub2.array.elemnew_parent
+
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
