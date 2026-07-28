@@ -573,6 +573,11 @@ typedef struct exp_node {
 			long cur_idx;
 			struct exp_node *for_array;
 		} arrayfor;
+		struct _var {	/* Node_var */
+			struct exp_node *var_value;
+			void (*var_update)(void);
+			void (*var_assign)(void);
+		} var;
 	} sub2;
 } NODE;
 
@@ -600,11 +605,6 @@ typedef struct exp_node {
 #define func_node    sub.nodep.x.extra
 #define prev_frame_size	sub.nodep.reflags
 #define reti         sub.nodep.l.li
-
-/* Node_var: */
-#define var_value    lnode
-#define var_update   sub.nodep.r.uptr
-#define var_assign   sub.nodep.x.aptr
 
 /* Node_array_ref: */
 #define orig_array lnode
@@ -683,6 +683,16 @@ typedef struct exp_node {
 #define for_list_size	sub2.arrayfor.for_list_size
 #define cur_idx		sub2.arrayfor.cur_idx
 #define for_array 	sub2.arrayfor.for_array
+
+/* Node_var: */
+/*
+#define var_value    lnode
+#define var_update   sub.nodep.r.uptr
+#define var_assign   sub.nodep.x.aptr
+*/
+#define var_value    sub2.var.var_value
+#define var_update   sub2.var.var_update
+#define var_assign   sub2.var.var_assign
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
