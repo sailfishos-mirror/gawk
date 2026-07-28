@@ -3457,6 +3457,7 @@ do_dump_node(int nargs)
 	printf("sizeof(long long) = %zu\n", sizeof(long long));
 #endif
 	printf("sizeof(void *) = %zu\n", sizeof(void *));
+	printf("sizeof(NODE) = %zu\n", sizeof(NODE));
 	printf("\n");
 	fflush(stdout);
 
