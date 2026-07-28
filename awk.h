@@ -529,7 +529,7 @@ typedef struct exp_node {
 	long valref;
 	char *vname;	// common to several types
 	union {
-		struct _value {		// Node_val
+		struct _value {		/* Node_val */
 			enum commenttype comment_type;
 			char *stptr;
 			size_t slen;
@@ -544,7 +544,7 @@ typedef struct exp_node {
 			mpz_t mpg_i;
 #endif
 		} value;
-		struct _array {		// Node_var_array
+		struct _array {		/* Node_var_array */
 			// FIXME: 7/2026: Arrays fall over and die miserably if
 			// these two fields aren't in a union. Try to figure
 			// this out one day.
@@ -578,6 +578,12 @@ typedef struct exp_node {
 			void (*var_update)(void);
 			void (*var_assign)(void);
 		} var;
+		struct _frame {	/* Node_frame */
+			struct exp_node **stack;
+			struct exp_node *func_node;
+			size_t prev_frame_size;
+			struct exp_instruction *reti;
+		} frame;
 	} sub2;
 } NODE;
 
@@ -600,12 +606,6 @@ typedef struct exp_node {
 #define elemnew_parent	sub.val.typre
 
 
-/* Node_frame: */
-#define stack        sub.nodep.r.av
-#define func_node    sub.nodep.x.extra
-#define prev_frame_size	sub.nodep.reflags
-#define reti         sub.nodep.l.li
-
 /* Node_array_ref: */
 #define orig_array lnode
 #define prev_array rnode
@@ -613,7 +613,7 @@ typedef struct exp_node {
 
 /* DONE: */
 
-/* Node_val */
+/* Node_val: */
 /*
  * Note that the string in stptr may not be NUL-terminated, but it is
  * guaranteed to have at least one extra byte that may be temporarily set
@@ -671,28 +671,29 @@ typedef struct exp_node {
 #define adump		array_funcs->dump
 #define astore		array_funcs->store
 
-/* Node_regex, Node_dynregex */
+/* Node_regex, Node_dynregex: */
 #define re_reg	sub2.regex.re_reg
 #define re_flags	sub2.regex.re_flags
 #define re_text	sub2.regex.re_text
 #define re_exp	sub2.regex.re_exp
 #define re_cnt	sub2.regex.re_cnt
 
-/* Node_arrayfor */
+/* Node_arrayfor: */
 #define for_list	sub2.arrayfor.for_list
 #define for_list_size	sub2.arrayfor.for_list_size
 #define cur_idx		sub2.arrayfor.cur_idx
 #define for_array 	sub2.arrayfor.for_array
 
 /* Node_var: */
-/*
-#define var_value    lnode
-#define var_update   sub.nodep.r.uptr
-#define var_assign   sub.nodep.x.aptr
-*/
 #define var_value    sub2.var.var_value
 #define var_update   sub2.var.var_update
 #define var_assign   sub2.var.var_assign
+
+/* Node_frame: */
+#define stack        sub2.frame.stack
+#define func_node    sub2.frame.func_node
+#define prev_frame_size	sub2.frame.prev_frame_size
+#define reti         sub2.frame.reti
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
