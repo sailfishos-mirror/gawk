@@ -587,6 +587,12 @@ typedef struct exp_node {
 			size_t prev_frame_size;
 			struct exp_instruction *reti;
 		} frame;
+		struct _pretty_printer {
+			char *pp_str;
+			size_t pp_len;
+			struct exp_node *pp_next;
+			struct exp_instruction *pp_comment;
+		} pp;
 	} sub2;
 } NODE;
 
