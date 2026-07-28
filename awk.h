@@ -560,13 +560,19 @@ typedef struct exp_node {
 			struct exp_node *xarray;
 			struct exp_node *parent_array;
 		} array;
-		struct _regex {
+		struct _regex {		/* Node_regex, Node_dynregex */
 			Regexp *re_reg[2];
 			enum reflagvals re_flags;
 			struct exp_node *re_text;
 			struct exp_node *re_exp;
 			long re_cnt;
 		} regex;
+		struct _arrayfor {	/* Node_arrayfor */
+			struct exp_node **for_list;
+			long for_list_size;
+			long cur_idx;
+			struct exp_node *for_array;
+		} arrayfor;
 	} sub2;
 } NODE;
 
@@ -588,12 +594,6 @@ typedef struct exp_node {
 #define elemnew_vname	sub.val.z.vn
 #define elemnew_parent	sub.val.typre
 
-
-/* Node_arrayfor */
-#define for_list	sub.nodep.r.av
-#define for_list_size	sub.nodep.reflags
-#define cur_idx		sub.nodep.l.ll
-#define for_array 	sub.nodep.rn
 
 /* Node_frame: */
 #define stack        sub.nodep.r.av
@@ -677,6 +677,12 @@ typedef struct exp_node {
 #define re_text	sub2.regex.re_text
 #define re_exp	sub2.regex.re_exp
 #define re_cnt	sub2.regex.re_cnt
+
+/* Node_arrayfor */
+#define for_list	sub2.arrayfor.for_list
+#define for_list_size	sub2.arrayfor.for_list_size
+#define cur_idx		sub2.arrayfor.cur_idx
+#define for_array 	sub2.arrayfor.for_array
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
