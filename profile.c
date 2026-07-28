@@ -1832,7 +1832,7 @@ pp_list(int nargs, const char *paren, const char *delim)
 			r = pp_args[i] = pp_pop();
 			len += r->pp_len + delimlen;
 			if (r->pp_comment != NULL) {
-				comment = (INSTRUCTION *) r->pp_comment;
+				comment = r->pp_comment;
 				len += comment->memory->stlen + indent_level + 1;	// comment\n indent
 			}
 		}
@@ -1863,7 +1863,7 @@ pp_list(int nargs, const char *paren, const char *delim)
 		// comment if any
 		if (r->pp_comment != NULL) {
 			check_indent_level();
-			comment = (INSTRUCTION *) r->pp_comment;
+			comment = r->pp_comment;
 			memcpy(s, comment->memory->stptr, comment->memory->stlen);
 			s += comment->memory->stlen;
 			memcpy(s, tabs, indent_level + 1);
