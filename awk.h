@@ -373,6 +373,11 @@ typedef struct {
 	afunc_t store;
 } array_funcs_t;
 
+enum reflagvals {
+	CONSTANT = 1,
+	FS_DFLT  = 2,
+};
+
 /*
  * NOTE - this struct is a rather kludgey -- it is packed to minimize
  * space usage, at the expense of cleanliness.  Alter at own risk.
@@ -404,10 +409,7 @@ typedef struct exp_node {
 			size_t reserved;
 			struct exp_node *rn;
 			unsigned long cnt;
-			enum reflagvals {
-				CONSTANT = 1,
-				FS_DFLT  = 2,
-			} reflags;
+			enum reflagvals reflags;
 		} nodep;
 
 		struct {
@@ -558,6 +560,13 @@ typedef struct exp_node {
 			struct exp_node *xarray;
 			struct exp_node *parent_array;
 		} array;
+		struct _regex {
+			Regexp *re_reg[2];
+			enum reflagvals re_flags;
+			struct exp_node *re_text;
+			struct exp_node *re_exp;
+			long re_cnt;
+		} regex;
 	} sub2;
 } NODE;
 
@@ -575,12 +584,34 @@ typedef struct exp_node {
 #define fparms		sub.nodep.rn
 #define code_ptr    sub.nodep.r.iptr
 
-/* Node_regex, Node_dynregex */
-#define re_reg	sub.nodep.r.preg
-#define re_flags sub.nodep.reflags
-#define re_text lnode
-#define re_exp	sub.nodep.x.extra
-#define re_cnt	flags
+/* Node_elem_new */
+#define elemnew_vname	sub.val.z.vn
+#define elemnew_parent	sub.val.typre
+
+
+/* Node_arrayfor */
+#define for_list	sub.nodep.r.av
+#define for_list_size	sub.nodep.reflags
+#define cur_idx		sub.nodep.l.ll
+#define for_array 	sub.nodep.rn
+
+/* Node_frame: */
+#define stack        sub.nodep.r.av
+#define func_node    sub.nodep.x.extra
+#define prev_frame_size	sub.nodep.reflags
+#define reti         sub.nodep.l.li
+
+/* Node_var: */
+#define var_value    lnode
+#define var_update   sub.nodep.r.uptr
+#define var_assign   sub.nodep.x.aptr
+
+/* Node_array_ref: */
+#define orig_array lnode
+#define prev_array rnode
+
+
+/* DONE: */
 
 /* Node_val */
 /*
@@ -617,29 +648,6 @@ typedef struct exp_node {
  */
 #define STFMT_UNUSED	-1
 
-/* Node_elem_new */
-#define elemnew_vname	sub.val.z.vn
-#define elemnew_parent	sub.val.typre
-
-
-/* Node_arrayfor */
-#define for_list	sub.nodep.r.av
-#define for_list_size	sub.nodep.reflags
-#define cur_idx		sub.nodep.l.ll
-#define for_array 	sub.nodep.rn
-
-/* Node_frame: */
-#define stack        sub.nodep.r.av
-#define func_node    sub.nodep.x.extra
-#define prev_frame_size	sub.nodep.reflags
-#define reti         sub.nodep.l.li
-
-/* Node_var: */
-#define var_value    lnode
-#define var_update   sub.nodep.r.uptr
-#define var_assign   sub.nodep.x.aptr
-
-
 /* Node_var_array: */
 
 #define buckets		sub2.array.why.buckets
@@ -663,9 +671,12 @@ typedef struct exp_node {
 #define adump		array_funcs->dump
 #define astore		array_funcs->store
 
-/* Node_array_ref: */
-#define orig_array lnode
-#define prev_array rnode
+/* Node_regex, Node_dynregex */
+#define re_reg	sub2.regex.re_reg
+#define re_flags	sub2.regex.re_flags
+#define re_text	sub2.regex.re_text
+#define re_exp	sub2.regex.re_exp
+#define re_cnt	sub2.regex.re_cnt
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
