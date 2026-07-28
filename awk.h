@@ -535,6 +535,7 @@ typedef struct exp_node {
 			int strndmode;
 			char32_t *wstptr;
 			size_t wslen;
+			struct exp_node *typed_re;
 			double numbr;
 #ifdef HAVE_MPFR
 			mpfr_t mpg_numbr;
@@ -597,6 +598,7 @@ typedef struct exp_node {
 #define wstptr	sub2.value.wstptr
 #define wstlen	sub2.value.wslen
 #define numbr	sub2.value.numbr
+#define typed_re	sub2.value.typed_re
 
 #ifdef HAVE_MPFR
 #define mpg_numbr	sub2.value.mpg_numbr
@@ -619,8 +621,6 @@ typedef struct exp_node {
 #define elemnew_vname	sub.val.z.vn
 #define elemnew_parent	sub.val.typre
 
-
-#define typed_re	sub.val.typre
 
 /* Node_arrayfor */
 #define for_list	sub.nodep.r.av
