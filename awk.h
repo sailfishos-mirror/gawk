@@ -529,7 +529,7 @@ typedef struct exp_node {
 	long valref;
 	char *vname;	// common to several types
 	union {
-		struct _value {		/* Node_val */
+		struct _value {		/* Node_val, Node_elem_new */
 			enum commenttype comment_type;
 			char *stptr;
 			size_t slen;
@@ -538,6 +538,8 @@ typedef struct exp_node {
 			char32_t *wstptr;
 			size_t wslen;
 			struct exp_node *typed_re;
+			char *elemnew_vname;			// Node_elem_new
+			struct exp_node *elemnew_parent;	// Node_elem_new
 			double numbr;
 #ifdef HAVE_MPFR
 			mpfr_t mpg_numbr;
@@ -559,9 +561,6 @@ typedef struct exp_node {
 			size_t array_capacity;
 			struct exp_node *xarray;
 			struct exp_node *parent_array;
-			// Node_elem_new
-			char *elemnew_vname;
-			struct exp_node *elemnew_parent;
 		} array;
 		struct _regex {		/* Node_regex, Node_dynregex */
 			Regexp *re_reg[2];
@@ -700,8 +699,8 @@ typedef struct exp_node {
 #define reti         sub2.frame.reti
 
 /* Node_elem_new: */
-#define elemnew_vname	sub2.array.elemnew_vname
-#define elemnew_parent	sub2.array.elemnew_parent
+#define elemnew_vname	sub2.value.elemnew_vname
+#define elemnew_parent	sub2.value.elemnew_parent
 
 
 /* --------------------------------lint warning types----------------------------*/
