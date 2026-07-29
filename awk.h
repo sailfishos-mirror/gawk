@@ -383,67 +383,6 @@ enum reflagvals {
  * space usage, at the expense of cleanliness.  Alter at own risk.
  */
 typedef struct exp_node {
-	union {
-		struct {
-			union {
-				struct exp_node *lptr;
-				struct exp_instruction *li;
-				long ll;
-				const array_funcs_t *lp;
-			} l;
-			union {
-				struct exp_node *rptr;
-				Regexp *preg[2];
-				struct exp_node **av;
-				BUCKET **bv;
-				void (*uptr)(void);
-				struct exp_instruction *iptr;
-			} r;
-			union {
-				struct exp_node *extra;
-				void (*aptr)(void);
-				long xl;
-				void *cmnt;	// used by pretty printer
-			} x;
-			char *name;
-			size_t reserved;
-			struct exp_node *rn;
-			unsigned long cnt;
-			enum reflagvals reflags;
-		} nodep;
-
-		struct {
-			union {
-				double fltnum;
-#ifdef HAVE_MPFR
-				mpfr_t mpnum;
-				mpz_t mpi;
-#else
-				// 7/2026:
-				// This is a workaround for systems that build
-				// gawk without MPFR and GMP.  The NODE struct
-				// desperately needs to be refactored.
-#if SIZEOF_VOID_P == 4
-				char alignment[28];
-#else	// SIZEOF_VOID_P != 4
-				char alignment[48];
-#endif	// SIZEOF_VOID_P != 4
-#endif	// HAVE_MPFR
-			} nm;
-			int rndmode;	// only used for MPFR.
-			char *sp;
-			size_t slen;
-			int idx;
-			union {	// this union is for convenience of space
-				// reuse; the elements aren't otherwise related
-				char32_t *wsp;
-				char *vn;
-			} z;
-			size_t wslen;
-			struct exp_node *typre;
-			enum commenttype comtype;
-		} val;
-	} sub;
 	NODETYPE type;
 	enum flagvals {
 	/* type = Node_val */
@@ -520,6 +459,7 @@ typedef struct exp_node {
 		HALFHAT		= 0x010000,	/* half-capacity Hashed Array Tree;
 						 * See cint_array.c */
 		XARRAY		= 0x020000,
+
 	/* more flags */
 		NUMCONSTSTR	= 0x040000,	/* have string value for numeric constant */
 		REGEX           = 0x080000,	/* this is a typed regex */
