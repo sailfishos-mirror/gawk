@@ -472,11 +472,11 @@ typedef struct exp_node {
 		struct _value {		/* Node_val, Node_elem_new */
 			enum commenttype comment_type;
 			char *stptr;
-			size_t slen;
+			size_t stlen;
 			int stfmt;
 			int strndmode;
 			char32_t *wstptr;
-			size_t wslen;
+			size_t wstlen;
 			struct exp_node *typed_re;
 			char *elemnew_vname;			// Node_elem_new
 			struct exp_node *elemnew_parent;	// Node_elem_new
@@ -555,11 +555,11 @@ typedef struct exp_node {
  * All other strings are NUL-terminated.
  */
 #define stptr	sub2.value.stptr
-#define stlen	sub2.value.slen
+#define stlen	sub2.value.stlen
 #define stfmt	sub2.value.stfmt
 #define strndmode	sub2.value.strndmode
 #define wstptr	sub2.value.wstptr
-#define wstlen	sub2.value.wslen
+#define wstlen	sub2.value.wstlen
 #define numbr	sub2.value.numbr
 #define typed_re	sub2.value.typed_re
 
