@@ -598,18 +598,12 @@ typedef struct exp_node {
 			struct exp_node *fparms;
 			struct exp_instruction *code_ptr;
 		} func;
+		struct _list {		/* linked lists of various sorts */
+			struct exp_node *lnode;
+			struct exp_node *rnode;
+		} llist;
 	} sub2;
 } NODE;
-
-#define lnode	sub.nodep.l.lptr
-#define rnode	sub.nodep.r.rptr
-
-/* Node_array_ref: */
-#define orig_array lnode
-#define prev_array rnode
-
-
-/* DONE: */
 
 /* Node_val: */
 /*
@@ -623,7 +617,7 @@ typedef struct exp_node {
 #define stptr	sub2.value.stptr
 #define stlen	sub2.value.slen
 #define stfmt	sub2.value.stfmt
-#define strndmode sub2.value.strndmode
+#define strndmode	sub2.value.strndmode
 #define wstptr	sub2.value.wstptr
 #define wstlen	sub2.value.wslen
 #define numbr	sub2.value.numbr
@@ -661,7 +655,7 @@ typedef struct exp_node {
 #define ainit		array_funcs->init
 #define atypeof		array_funcs->type_of
 #define alookup 	array_funcs->lookup
-#define aexists 	array_funcs->exists
+#define aexists		array_funcs->exists
 #define aclear		array_funcs->clear
 #define aremove		array_funcs->remove
 #define alist		array_funcs->list
@@ -680,18 +674,18 @@ typedef struct exp_node {
 #define for_list	sub2.arrayfor.for_list
 #define for_list_size	sub2.arrayfor.for_list_size
 #define cur_idx		sub2.arrayfor.cur_idx
-#define for_array 	sub2.arrayfor.for_array
+#define for_array	sub2.arrayfor.for_array
 
 /* Node_var: */
-#define var_value    sub2.var.var_value
-#define var_update   sub2.var.var_update
-#define var_assign   sub2.var.var_assign
+#define var_value	sub2.var.var_value
+#define var_update	sub2.var.var_update
+#define var_assign	sub2.var.var_assign
 
 /* Node_frame: */
-#define stack        sub2.frame.stack
-#define func_node    sub2.frame.func_node
+#define stack		sub2.frame.stack
+#define func_node	sub2.frame.func_node
 #define prev_frame_size	sub2.frame.prev_frame_size
-#define reti         sub2.frame.reti
+#define reti		sub2.frame.reti
 
 /* Node_elem_new: */
 #define elemnew_vname	sub2.value.elemnew_vname
@@ -708,6 +702,13 @@ typedef struct exp_node {
 #define fparms		sub2.func.fparms
 #define code_ptr	sub2.func.code_ptr
 
+/* linked lists, no specific node type */
+#define lnode	sub2.llist.lnode
+#define rnode	sub2.llist.rnode
+
+/* Node_array_ref: */
+#define orig_array lnode
+#define prev_array rnode
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
