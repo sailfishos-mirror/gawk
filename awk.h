@@ -520,15 +520,15 @@ typedef struct exp_node {
 		HALFHAT		= 0x010000,	/* half-capacity Hashed Array Tree;
 						 * See cint_array.c */
 		XARRAY		= 0x020000,
-		NUMCONSTSTR	= 0x040000,	/* have string value for numeric constant */
 	/* more flags */
+		NUMCONSTSTR	= 0x040000,	/* have string value for numeric constant */
 		REGEX           = 0x080000,	/* this is a typed regex */
 		CONVFMT_FMT	= 0x0100000,	/* string formatted via CONVFMT */
 		OFMT_FMT	= 0x0200000,	/* string formatted via OFMT */
 	} flags;
 	long valref;
 	char *vname;	// common to several types
-	union {
+	union subparts {
 		struct _value {		/* Node_val, Node_elem_new */
 			enum commenttype comment_type;
 			char *stptr;
@@ -575,39 +575,34 @@ typedef struct exp_node {
 			long cur_idx;
 			struct exp_node *for_array;
 		} arrayfor;
-		struct _var {	/* Node_var */
+		struct _var {		/* Node_var */
 			struct exp_node *var_value;
 			void (*var_update)(void);
 			void (*var_assign)(void);
 		} var;
-		struct _frame {	/* Node_frame */
+		struct _frame {		/* Node_frame */
 			struct exp_node **stack;
 			struct exp_node *func_node;
 			size_t prev_frame_size;
 			struct exp_instruction *reti;
 		} frame;
-		struct _pretty_printer {
+		struct _pprint {	/* used in profile.c */
 			char *pp_str;
 			size_t pp_len;
 			struct exp_node *pp_next;
 			struct exp_instruction *pp_comment;
 		} pp;
+		struct _func {		/* Node_param_list, Node_func */
+			struct exp_node *dup_ent;
+			long param_cnt;
+			struct exp_node *fparms;
+			struct exp_instruction *code_ptr;
+		} func;
 	} sub2;
 } NODE;
 
 #define lnode	sub.nodep.l.lptr
 #define rnode	sub.nodep.r.rptr
-
-/* Node_param_list */
-#define param      vname
-#define dup_ent    sub.nodep.r.rptr
-
-/* Node_param_list, Node_func */
-#define param_cnt  sub.nodep.l.ll
-
-/* Node_func */
-#define fparms		sub.nodep.rn
-#define code_ptr    sub.nodep.r.iptr
 
 /* Node_array_ref: */
 #define orig_array lnode
@@ -701,6 +696,17 @@ typedef struct exp_node {
 /* Node_elem_new: */
 #define elemnew_vname	sub2.value.elemnew_vname
 #define elemnew_parent	sub2.value.elemnew_parent
+
+/* Node_param_list */
+#define param	vname	// bit of a hack; code in the parser assumes this
+#define dup_ent	sub2.func.dup_ent
+
+/* Node_param_list, Node_func */
+#define param_cnt	sub2.func.param_cnt
+
+/* Node_func */
+#define fparms		sub2.func.fparms
+#define code_ptr	sub2.func.code_ptr
 
 
 /* --------------------------------lint warning types----------------------------*/
