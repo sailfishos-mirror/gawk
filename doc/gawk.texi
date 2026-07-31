@@ -21432,14 +21432,25 @@ The @var{expression} part is optional.
 Due most likely to an oversight, POSIX does not define what the return
 value is if you omit the @var{expression}.  Technically speaking, this
 makes the returned value undefined, and therefore, unpredictable.
-In practice, though, all versions of @command{awk} simply return the
-null string, which acts like zero if used in a numeric context.
+In practice, though, all versions of @command{awk} simply return
+an uninitialized value, which acts like the null string when used
+as a string, and like zero if used in a numeric context.
 
 A @code{return} statement without an @var{expression} is assumed at the end of
 every function definition.  So, if control reaches the end of the function
 body, then technically the function returns an unpredictable value.
-In practice, it returns the empty string.  @command{awk}
+In practice, here too it returns an uninitialized value.  @command{awk}
 does @emph{not} warn you if you use the return value of such a function.
+
+In both cases (returning without an expression and reaching the end
+of the function body), the return value is different from
+
+@example
+return ""
+@end example
+
+@noindent
+which return an explicit null string.
 
 Sometimes, you want to write a function for what it does, not for
 what it returns.  Such a function corresponds to a @code{void} function
@@ -21547,7 +21558,7 @@ BEGIN @{
     b = 1
     foo(b)  # invalid: fatal type mismatch
 
-    foo(x)  # x uninitialized, becomes an array dynamically
+    foo(x)  # x is untyped, becomes an array dynamically
     x = 1   # now not allowed, runtime error
 @}
 @end example
@@ -48928,3 +48939,6 @@ TODO:
 * Move all the stuff on quoting in the early part of the book to an appendix.
 * Move the full list of options to an appendix. In the current place,
   it keeps us from getting to the meat of learning awk.
+* When talking about expressions, make a clear distinction between
+  undefined and uninitialized. Introduce the concept of uninitialized
+  early on.
