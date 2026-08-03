@@ -324,13 +324,16 @@ r_dupnode(NODE *n)
 	*r = *n;
 
 #ifdef HAVE_MPFR
-	if ((n->flags & MPZN) != 0) {
-		mpz_init(r->mpg_i);
-		mpz_set(r->mpg_i, n->mpg_i);
-	} else if ((n->flags & MPFN) != 0) {
-		mpfr_init(r->mpg_numbr);
-		int tval = mpfr_set(r->mpg_numbr, n->mpg_numbr, ROUND_MODE);
-		IEEE_FMT(r->mpg_numbr, tval);
+	if (do_mpfr) {
+		ezalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+		if ((n->flags & MPZN) != 0) {
+			mpz_init(r->mpg_i);
+			mpz_set(r->mpg_i, n->mpg_i);
+		} else if ((n->flags & MPFN) != 0) {
+			mpfr_init(r->mpg_numbr);
+			int tval = mpfr_set(r->mpg_numbr, n->mpg_numbr, ROUND_MODE);
+			IEEE_FMT(r->mpg_numbr, tval);
+		}
 	}
 #endif
 

@@ -1957,6 +1957,13 @@ elem_new_to_scalar(NODE *n)
 		return dupnode(Nnull_string);
 	}
 
+#ifdef HAVE_MPFR
+	if (n->mpfr_data != NULL) {
+		free(n->mpfr_data);
+		n->mpfr_data = NULL;
+	}
+#endif // HAVE_MPFR
+
 	return n;
 }
 

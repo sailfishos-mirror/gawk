@@ -378,6 +378,13 @@ enum reflagvals {
 	FS_DFLT  = 2,
 };
 
+#ifdef HAVE_MPFR
+struct _mpfr_data {
+	mpfr_t mpg_numbr;
+	mpz_t mpg_i;
+};
+#endif /* HAVE_MPFR */
+
 /*
  * NOTE - this struct is a rather kludgey -- it is packed to minimize
  * space usage, at the expense of cleanliness.  Alter at own risk.
@@ -474,7 +481,6 @@ typedef struct exp_node {
 			char *stptr;
 			size_t stlen;
 			int stfmt;
-			int strndmode;
 			char32_t *wstptr;
 			size_t wstlen;
 			struct exp_node *typed_re;
@@ -482,8 +488,8 @@ typedef struct exp_node {
 			struct exp_node *elemnew_parent;	// Node_elem_new
 			double numbr;
 #ifdef HAVE_MPFR
-			mpfr_t mpg_numbr;
-			mpz_t mpg_i;
+			int strndmode;
+			struct _mpfr_data *mpfr_data;
 #endif
 		} value;
 		struct _array {		/* Node_var_array */
@@ -557,15 +563,16 @@ typedef struct exp_node {
 #define stptr	sub2.value.stptr
 #define stlen	sub2.value.stlen
 #define stfmt	sub2.value.stfmt
-#define strndmode	sub2.value.strndmode
 #define wstptr	sub2.value.wstptr
 #define wstlen	sub2.value.wstlen
 #define numbr	sub2.value.numbr
 #define typed_re	sub2.value.typed_re
 
 #ifdef HAVE_MPFR
-#define mpg_numbr	sub2.value.mpg_numbr
-#define mpg_i		sub2.value.mpg_i
+#define mpfr_data	sub2.value.mpfr_data
+#define strndmode	sub2.value.strndmode
+#define mpg_numbr	mpfr_data->mpg_numbr
+#define mpg_i		mpfr_data->mpg_i
 #endif
 
 #define comment_type	sub2.value.comment_type		/* Op_comment */
@@ -1442,8 +1449,12 @@ extern void r_freeblock(void *, int id);
 
 #endif /* MEMDEBUG */
 
-#define getnode(n)	getblock(n, BLOCK_NODE, NODE *)
+#define getnode(n)	getblock(n, BLOCK_NODE, NODE *), memset(n, 0, sizeof(NODE))
+#ifdef HAVE_MPR
+#define freenode(n)	(n->mpfr_data != NULL ? free(n->mpfr_data), n->mpfr_data = NULL : 0, freeblock(n, BLOCK_NODE))
+#else
 #define freenode(n)	freeblock(n, BLOCK_NODE)
+#endif
 
 #define getbucket(b) 	getblock(b, BLOCK_BUCKET, BUCKET *)
 #define freebucket(b)	freeblock(b, BLOCK_BUCKET)
@@ -2226,6 +2237,10 @@ make_number_node(unsigned int flags)
 	r->type = Node_val;
 	r->valref = 1;
 	r->flags = (flags|MALLOC|NUMBER|NUMCUR);
+#ifdef HAVE_MPFR
+	if (do_mpfr)
+		ezalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+#endif
 	return r;
 }
 

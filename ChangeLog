@@ -1,3 +1,27 @@
+2026-08-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Shrink the NODE further by moving the MPFR and GMP data
+	structures out into a separately allocated struct. This way
+	the space penalty is only paid if -M is actually used.
+	This makes the NODE about the same size as it was before.
+
+	* awk.h (struct _mpfr_data): New struct.
+	(struct _value): Move strndmode into MPFR ifdef. Use a pointer to
+	a struct _mpfr_data instead of the actual data.
+	(mpfr_data, strndmode, mpg_numbr, mpg_i): Update macros as
+	appropriate.
+	(getnode): Set new node to zero.
+	(freenode): Free mpfr_data and set the pointer to NULL.
+	(make_number_node): Allocate the mpfr_data if do_mpfr.
+	* builtin.c (do_dump_node): Revise as needed.
+	* debug.c (execute_code, parse_condition): Preserve the DO_MPFR flag.
+	* eval.c (elem_new_to_scalar): Free mpfr_data and set pointer to NULL.
+	* main.c (main): Init the mpfr_data for Nnull_string.
+	* mpfr.c (mpg_zero, force_mpnum): Init the mpfr_data if needed.
+	(mpfr_unset): Free the mpfr_data and set the pointer to NULL.
+	* node.c (r_dupnode): If do_mpfr, init the data for the new node
+	and copy the values.
+
 2026-07-29         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* awk.h (struct _value): Move Node_elem_new fields to here.

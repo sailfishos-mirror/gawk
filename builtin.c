@@ -3420,8 +3420,7 @@ do_dump_node(int nargs)
 	fprintf(fp, "%zu\tfunc_node\t%zu\n", offsetof(NODE, func_node), sizeof(n.func_node));
 	fprintf(fp, "%zu\tlnode\t%zu\n", offsetof(NODE, lnode), sizeof(n.lnode));
 #ifdef HAVE_MPFR
-	fprintf(fp, "%zu\tmpg_i\t%zu\n", offsetof(NODE, mpg_i), sizeof(n.mpg_i));
-	fprintf(fp, "%zu\tmpg_numbr\t%zu\n", offsetof(NODE, mpg_numbr), sizeof(n.mpg_numbr));
+	fprintf(fp, "%zu\tmpfr_data\t%zu\n", offsetof(NODE, mpfr_data), sizeof(n.mpfr_data));
 #endif
 	fprintf(fp, "%zu\tnodes\t%zu\n", offsetof(NODE, nodes), sizeof(n.nodes));
 	fprintf(fp, "%zu\tnumbr\t%zu\n", offsetof(NODE, numbr), sizeof(n.numbr));
