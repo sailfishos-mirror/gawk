@@ -349,6 +349,9 @@ NEED_LOCALE_GR = greek-8bit
 NEED_LOCALE_JP = mbprintf2
 NEED_LOCALE_RU = mtchi18n
 
+# Tests that have multipe .ok files
+NEED_CHECKMANY = case-check greek-8bit posix-inf
+
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
 	clos1way6 close_status dbugeval4 \
@@ -542,10 +545,9 @@ charset-msg-start:
 	@echo "======== Starting tests that can vary based on character set or locale support ========"
 	@echo "**************************************************************************"
 	@echo "* Some or all of these tests may fail if you have inadequate or missing  *"
-	@echo "* locale support. At least ENU_USA, FRA_FRA, RUS_RUS and     *"
-	@echo "* JPN_JPN are needed. The ELL_GRC locale is optional but *"
-	@echo "* helpful.  However, if you see this message, the Makefile thinks you    *"
-	@echo "* have  what you need ...                                                *"
+	@echo "* locale support. At least ENU_USA, FRA_FRA, RUS_RUS,        *"
+	@echo "* JPN_JPN and ELL_GRC are needed.  However, if you see   *"
+	@echo "* this message, the Makefile thinks you have  what you need ...          *"
 	@-echo "**************************************************************************"
 
 charset-msg-end:
@@ -1334,31 +1336,6 @@ indirectbuiltin2:
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-case-check:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/$@.ok3 _$@ > /dev/null || \
-	$(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
-	then rm -f _$@ ; \
-	fi
-
-greek-8bit:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC; export GAWKLOCALE; $(CHCP) 1253; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
-	then rm -f _$@ ; \
-	fi
-
-posix-inf:
-	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
-	then rm -f _$@ ; \
-	fi
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
 addcomma:
@@ -1541,6 +1518,10 @@ callparam:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+case-check:
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 childin:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -2281,6 +2262,9 @@ pcntplus:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+posix-inf:
+	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 posix2008sub:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -3996,6 +3980,10 @@ fnparydl:
 	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
 	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
 
+greek-8bit:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ELL_GRC; export GAWKLOCALE; $(CHCP) 1253; \
+	AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 lc_num1:
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \

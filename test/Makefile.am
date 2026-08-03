@@ -191,6 +191,7 @@ EXTRA_DIST = \
 	charasbytes.ok \
 	checknegtime.awk \
 	check_retest.awk \
+	checkmany.sh \
 	childin.awk \
 	childin.in \
 	childin.ok \
@@ -1799,6 +1800,10 @@ NEED_LOCALE_JP = mbprintf2
 
 NEED_LOCALE_RU = mtchi18n
 
+# Tests that have multipe .ok files
+
+NEED_CHECKMANY = case-check greek-8bit posix-inf
+
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
 	clos1way6 close_status dbugeval4 \
@@ -2009,10 +2014,9 @@ charset-msg-start:
 	@echo "======== Starting tests that can vary based on character set or locale support ========"
 	@echo "**************************************************************************"
 	@echo "* Some or all of these tests may fail if you have inadequate or missing  *"
-	@echo "* locale support. At least en_US.UTF-8, fr_FR.UTF-8, ru_RU.UTF-8 and     *"
-	@echo "* ja_JP.UTF-8 are needed. The el_GR.iso88597@euro locale is optional but *"
-	@echo "* helpful.  However, if you see this message, the Makefile thinks you    *"
-	@echo "* have  what you need ...                                                *"
+	@echo "* locale support. At least en_US.UTF-8, fr_FR.UTF-8, ru_RU.UTF-8,        *"
+	@echo "* ja_JP.UTF-8 and el_GR.iso88597@euro are needed.  However, if you see   *"
+	@echo "* this message, the Makefile thinks you have  what you need ...          *"
 	@echo "**************************************************************************"
 
 charset-msg-end:
@@ -2792,31 +2796,6 @@ indirectbuiltin2:
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
-
-case-check:
-	@echo $@
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/$@.ok3 _$@ > /dev/null || \
-	$(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
-	then rm -f _$@ ; \
-	fi
-
-greek-8bit:
-	@echo $@
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro; export GAWKLOCALE; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
-	then rm -f _$@ ; \
-	fi
-
-posix-inf:
-	@echo $@ $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/$@.ok2 _$@ > /dev/null || $(CMP) "$(srcdir)"/$@.ok _$@ ; \
-	then rm -f _$@ ; \
-	fi
 
 # Targets generated for other tests:
 include Maketests
