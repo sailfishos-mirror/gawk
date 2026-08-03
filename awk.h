@@ -477,10 +477,15 @@ typedef struct exp_node {
 	char *vname;	// common to several types
 	union subparts {
 		struct _value {		/* Node_val, Node_elem_new */
-			enum commenttype comment_type;
+			// ordering here helps reduce the size
+			// also use of char for comment_type and strndmode
+			char comment_type;	// enum commenttype comment_type;
+#ifdef HAVE_MPFR
+			char strndmode;
+#endif
+			int stfmt;
 			char *stptr;
 			size_t stlen;
-			int stfmt;
 			char32_t *wstptr;
 			size_t wstlen;
 			struct exp_node *typed_re;
@@ -488,7 +493,6 @@ typedef struct exp_node {
 			struct exp_node *elemnew_parent;	// Node_elem_new
 			double numbr;
 #ifdef HAVE_MPFR
-			int strndmode;
 			struct _mpfr_data *mpfr_data;
 #endif
 		} value;
