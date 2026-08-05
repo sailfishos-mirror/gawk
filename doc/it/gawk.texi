@@ -23656,17 +23656,28 @@ Probabilmente per una svista, POSIX non definisce qual è il valore
 restituito, se si omette @var{espressione}.  Tecnicamente parlando, questo
 rende il valore restituito indefinito, e quindi, indeterminato.
 In pratica, tuttavia, tutte le versioni di @command{awk} restituiscono
-semplicemente la stringa nulla, che vale zero se usata
-in un contesto che richiede un numero.
+semplicemente un valore non inizializzato, che equivale alla
+stringa nulla, se usato come stringa, e vale zero se usato in un contesto
+che richiede un numero.
 
 Un'istruzione @code{return} senza una @var{espressione} è considerata presente
 alla fine di ogni definizione di funzione.
 Quindi, se il flusso di esecuzione raggiunge la fine del corpo della
 funzione, tecnicamente la funzione
 restituisce un valore indeterminato.
-In pratica, restituisce la stringa nulla.  @command{awk}
+In pratica, restituisce anche qui un valore non inizializzato.  @command{awk}
 @emph{non} emette alcun messaggio di avvertimento se si usa
-il valore restituito di una tale funzione.
+il valore restituito da una tale funzione.
+
+In entrambi i casi (ritornare senza restituire un'espressione e arrivare
+al fondo della funzione), il valore di ritorno è diverso dal restituire
+
+@example
+return ""
+@end example
+
+@noindent
+...che restituisce esplicitamente una stringa nulla.
 
 Talvolta può capitare di scrivere una funzione per quello che fa, non per
 quello che restituisce.  Una tale funzione corrisponde a una funzione
@@ -23779,9 +23790,9 @@ function pippo(a)
 
 BEGIN @{
     b = 1
-    pippo(b) # non valido: errore fatale, tipi variabile in conflitto
+    pippo(b) # invalido: errore fatale, tipi variabile in conflitto
 
-    pippo(x) # x non inizializzato, diventa un vettore dinamicamente
+    pippo(x) # x non ancora usato, diventa un vettore dinamicamente
     x = 1    # a questo punto, non permesso: errore in esecuzione
 @}
 @end example
@@ -53964,3 +53975,6 @@ TODO:
 * Move all the stuff on quoting in the early part of the book to an appendix.
 * Move the full list of options to an appendix. In the current place,
   it keeps us from getting to the meat of learning awk.
+* When talking about expressions, make a clear distinction between
+  undefined and uninitialized. Introduce the concept of uninitialized
+  early on.
