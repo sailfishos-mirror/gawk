@@ -640,6 +640,7 @@ particular records in a file and perform operations upon them.
 * Typing and Comparison::               How variables acquire types and how
                                         this affects comparison of numbers and
                                         strings with @samp{<}, etc.
+* Variable Categories::                 Different ``species'' of variables.
 * Variable Typing::                     String type versus numeric type.
 * Comparison Operators::                The comparison operators.
 * POSIX String Comparison::             String comparison with POSIX rules.
@@ -13125,39 +13126,117 @@ the string constant @code{"0"} is actually true, because it is non-null.
 @cindex relational operators @seeentry{comparison operators}
 @cindex operators, relational @seeentry{operators, comparison}
 @cindex variables @subentry types of @subentry comparison expressions and
-Unlike in other programming languages, in @command{awk} variables do not have a
+Unlike most other programming languages, in @command{awk} variables do not have a
 fixed type. Instead, they can be either a number or a string, depending
 upon the value that is assigned to them.
 We look now at how variables are typed, and how @command{awk}
 compares variables.
 
 @menu
+* Variable Categories::         Different ``species'' of variables.
 * Variable Typing::             String type versus numeric type.
 * Comparison Operators::        The comparison operators.
 * POSIX String Comparison::     String comparison with POSIX rules.
 @end menu
+
+@node Variable Categories
+@subsubsection The Different ``Species'' of Variables
+
+This section introduces some terminology for consistently describing
+variables and their types. It relies on the @code{typeof()} function
+provided by @command{gawk} (not presented yet; @pxref{Type Functions})
+to demonstrate the subjects under discussion.
+
+Variables in @command{awk} don't receive a type until the first time they're used.
+Until that time, variables are @dfn{untyped}:
+
+@example
+$ @kbd{gawk 'BEGIN @{ print typeof(a) @}'}
+@print{} untyped
+@end example
+
+A variable can be used as an array:
+
+@example
+$ @kbd{gawk 'BEGIN @{ a[1] = 42; print typeof(a) @}'}
+@print{} array
+@end example
+
+Once a variable becomes an array, it cannot be used as a @dfn{scalar},
+that is, a variable with just a single value:
+
+@example
+$ @kbd{gawk 'BEGIN @{ a[1] = 42; print a @}'}
+@print{} gawk: cmd. line:2: fatal: attempt to use array `a' in a scalar context
+@end example
+
+Simply using an untyped variable by itself in a statement causes it
+to become a scalar:
+
+@example
+$ @kbd{gawk 'BEGIN @{}
+> @kbd{          print "a is", typeof(a)}
+> @kbd{          a           # use it by itself!}
+> @kbd{          print "a is now", typeof(a)}
+> @kbd{@}'}
+@print{} a is untyped
+@print{} a is now unassigned
+@end example
+
+The same is true as soon as you use an untyped variable in an
+expression or pass it to a built-in function:@footnote{The
+@code{isarray()} and @code{typeof()} functions are exceptions to
+this rule.}
+
+@example
+$ @kbd{gawk 'BEGIN @{}
+> @kbd{          print "a is", typeof(a)}
+> @kbd{          b = length(a)}
+> @kbd{          print "a is now", typeof(a)}
+> @kbd{@}'}
+@print{} a is untyped
+@print{} a is now unassigned
+@end example
+
+Scalars, in turn, have several subtypes. The following are the most
+important: @dfn{unassigned}, @dfn{numeric}, and @dfn{string}:
+
+@example
+$ @kbd{gawk 'BEGIN @{}
+> @kbd{          a = b   # b was never given a value, a and b both unassigned}
+> @kbd{          print "type of a is", typeof(a), "and type of b is", typeof(b)}
+> 
+> @kbd{          c = 42}
+> @kbd{          print "type of c is", typeof(c)}
+> 
+> @kbd{          d = "don\47t panic"}
+> @kbd{          print "type of d is", typeof(d)'}
+> @kbd{@}'}
+@print{} type of a is unassigned and type of b is unassigned
+@print{} type of c is number
+@print{} type of d is string
+@end example
 
 @node Variable Typing
 @subsubsection String Type versus Numeric Type
 
 Scalar objects in @command{awk} (variables, array elements, and fields)
 are @emph{dynamically} typed.  This means their type can change as the
-program runs, from @dfn{untyped} before any use,@footnote{@command{gawk}
-calls this @dfn{unassigned}, as the following example shows.} to string
-or number, and then from string to number or number to string, as the
+program runs, from @dfn{unassigned} before any use, to @dfn{string}
+or @dfn{number}, and then from string to number or number to string, as the
 program progresses.  (@command{gawk} also provides regexp-typed scalars,
 but let's ignore that for now; @pxref{Strong Regexp Constants}.)
 
-You can't do much with untyped variables, other than tell that they
-are untyped. The following program tests @code{a} against @code{""}
+You can't do much with unassigned variables, other than tell that they
+are unassigned. The following program tests @code{a} against @code{""}
 and @code{0}; the test succeeds when @code{a} has never been assigned
 a value.  It also uses the built-in @code{typeof()} function
 (not presented yet; @pxref{Type Functions}) to show @code{a}'s type:
 
 @example
 $ @kbd{gawk 'BEGIN @{ print (a == "" && a == 0 ?}
-> @kbd{"a is untyped" : "a has a type!") ; print typeof(a) @}'}
-@print{} a is untyped
+> @kbd{"a is an unassgined scalar" : "a has a type!") ; print typeof(a) @}'}
+@print{} a is an unassgined scalar
 @print{} unassigned
 @end example
 
@@ -13214,9 +13293,6 @@ $ @kbd{echo 37 | awk '@{ printf("%s %s < 42\n", $1,}
 > @kbd{                        ($1 < 42 ? "is" : "is not")) @}'}
 @print{} 37 is < 42
 @end example
-
-Here are the rules for when @command{awk}
-treats data as a number, and for when it treats data as a string.
 
 @cindex numeric @subentry strings
 @cindex strings @subentry numeric
@@ -34688,7 +34764,7 @@ this is the place to be.
 
 @cindex Sherman, Allan
 @quotation
-Have you ever considered that the plural of ``half'' is ``whole''?
+@i{Have you ever considered that the plural of ``half'' is ``whole''?}
 @author Allan Sherman
 @end quotation
 
@@ -44897,8 +44973,8 @@ will also be banned.
 @c Organization: ITS, Case Western Reserve University
 @c To: Aharon Robbins <arnold@skeeve.com>
 @c CC: chet.ramey@case.edu
-I gave up on Usenet a couple of years ago and haven't really looked back.
-It's like sports talk radio---you feel smarter for not having read it.
+@i{I gave up on Usenet a couple of years ago and haven't really looked back.
+It's like sports talk radio---you feel smarter for not having read it.}
 @author Chet Ramey
 @end quotation
 
