@@ -730,6 +730,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Tipi di variabile e confronti::       Come alle variabili si assegna il tipo
                                         e l'effetto che questo ha sul confronto
                                         di numeri e stringhe con @samp{<}, etc.
+* Categorie di variabili::              Differenti ``specie'' di variabili.
 * Tipi di variabile::                   Tipo stringa rispetto a tipo numero.
 * Operatori di confronto::              Gli operatori di confronto.
 * Confronto POSIX di stringhe::         Confronto tra stringhe usando le
@@ -14400,7 +14401,7 @@ la costante di stringa @code{"0"} sta effettivamente per vero, perché
 @cindex operatori @subentry relazionali @seeentry{espressioni di confronto}
 @cindex variabili @subentry tipi di
 @cindex variabili @subentry tipi di @subentry espressioni di confronto e
-Diversamente che in altri linguaggi di programmazione, le variabili di
+A differenza della maggior parte dei linguaggi di programmazione, le variabili in
 @command{awk} non hanno un tipo fisso. Possono essere sia un numero che una
 stringa, a seconda del valore loro assegnato.
 Vediamo ora come viene assegnato il tipo a una variabile, e come @command{awk}
@@ -14408,10 +14409,93 @@ le confronta.
 
 @menu
 * Tipi di variabile::           Tipo stringa rispetto a tipo numero.
+* Categorie di variabili::      Differenti ``specie'' di variabili.
 * Operatori di confronto::      Gli operatori di confronto.
 * Confronto POSIX di stringhe:: Confronto tra stringhe usando le
                                 regole POSIX.
 @end menu
+
+@node Categorie di variabili
+@subsubsection Differenti ``specie'' di variabili
+
+Questa sezione introduce la terminologia usata per descrivere in modo
+preciso le variabili e i loro tipi.  Si utilizzerà la funzione
+@code{typeof()}, disponibile in @command{gawk} (non ancora presentata;
+@pxref{Funzioni per i tipi}), per far comprendere l'argomento trattato.
+
+Alle variabili in @command{awk} non viene assegnato un tipo prima
+che siano utilizzate.  Fino ad allora esse sono senza-tipo (@dfn{untyped}):
+
+@example
+$ @kbd{gawk 'BEGIN @{ print typeof(a) @}'}
+@print{} untyped
+@end example
+
+Una variabile può essere usata come vettore (@dfn{array}):
+
+@example
+$ @kbd{gawk 'BEGIN @{ a[1] = 42; print typeof(a) @}'}
+@print{} array
+@end example
+
+Una volta che la variabile è divenuta un vettore, non può essere usata
+come una variabile scalare (@dfn{scalar}), ossia come una variabile
+che ha un solo valore:
+
+@example
+$ @kbd{gawk 'BEGIN @{ a[1] = 42; print a @}'}
+@print{} gawk: riga com.:1: fatale: tentativo di usare vettore `a' in un contesto scalare
+@end example
+
+Il semplice nominare, in un'istruzione, una variabile senza-tipo (@dfn{untyped}),
+senza assegnarle alcun valore, la fa diventare di tipo scalare non-assegnato
+(@dfn{unassigned}):
+
+@example
+$ @kbd{gawk 'BEGIN @{}
+> @kbd{          print "a è", typeof(a)}
+> @kbd{          a           # usata da sola!}
+> @kbd{          print "a è ora", typeof(a)}
+> @kbd{@}'}
+@print{} a è untyped
+@print{} a è ora unassigned
+@end example
+
+Lo stesso accade se si usa una variabile senza-tipo (@dfn{untyped})
+in un'espressione, o se la si passa a una funzione
+predefinita:@footnote{Un'eccezione a questa regola sono le funzioni
+@code{isarray()} e @code{typeof()}.}
+
+@example
+$ @kbd{gawk 'BEGIN @{}
+> @kbd{          print "a è", typeof(a)}
+> @kbd{          b = length(a)}
+> @kbd{          print "a è ora", typeof(a)}
+> @kbd{@}'}
+@print{} a è untyped
+@print{} a è ora unassigned
+@end example
+
+Le variabili di tipo scalare (@dfn{scalar}) hanno più sottotipi:
+i più importanti di questi sono:
+non-assegnato (@dfn{unassigned}), numerico (@dfn{numeric}) e stringa (@dfn{string}):
+
+@example
+$ @kbd{gawk 'BEGIN @{}
+> @kbd{          a = b   # alla variabile b non è mai stato dato un valore,}
+> @kbd{                  # quindi a e b sono entrambi non-assegnati}
+> @kbd{          print "il tipo di a è", typeof(a), "e il tipo di b è", typeof(b)}
+> 
+> @kbd{          c = 42}
+> @kbd{          print "il tipo di c è", typeof(c)}
+> 
+> @kbd{          d = "non v\47allarmate"}
+> @kbd{          print "il tipo di d è", typeof(d)'}
+> @kbd{@}'}
+@print{} il tipo di a è unassigned e il tipo di b è unassigned
+@print{} il tipo di c è number
+@print{} il tipo di d è string
+@end example
 
 @node Tipi di variabile
 @subsubsection Tipo stringa rispetto a tipo numero
@@ -14419,17 +14503,17 @@ le confronta.
 Per gli elementi scalari in @command{awk} (variabili, elementi di
 vettore e campi), il tipo degli stessi viene attribuito @emph{dinamicamente}.
 Ciò significa che il tipo di un elemento può cambiare nel corso
-dell'esecuzione di un programma, da @dfn{untyped} (non ancora tipizzata),
-valore assunto prima che la variabile sia utilizzata,@footnote{@command{gawk}
-chiama queste variabili @dfn{unassigned} (non ancora assegnate), come si
-vede dall'esempio che segue.} a stringa oppure a numero, e in seguito
-da stringa a numero o da numero a stringa, nel prosieguo del programma.
-(@command{gawk} prevede anche degli scalari di tipo @dfn{regexp}, ma
-per ora possiamo ignorarli;
+dell'esecuzione di un programma, da non-assegnato (@dfn{unassigned}),
+prima di essere usato in qualsiasi modo dal programma,
+a stringa (@dfn{string}) o numero (@dfn{number}), e in seguito da stringa a
+numero o da numero a stringa, nel prosieguo del programma.
+(@command{gawk} prevede anche degli scalari di tipo espressione-regolare
+(@dfn{regexp}), ma per ora possiamo ignorarli;
 @pxref{Costanti @dfn{regexp} forti}.)
 
-Non si può fare molto riguardo alle variabili di tipo @dfn{untyped},
-oltre a constatare che ancora non è stato loro attribuito un tipo.
+Non si può fare molto con le variabili di tipo non-assegnato
+(@dfn{unassigned}), oltre a constatare che ancora non è stato loro
+attribuito un tipo.
 Il seguente programma confronta la variabile @code{a} con i valori
 @code{""} e @code{0}; il confronto dà esito positivo se alla
 variabile @code{a} non è mai stato assegnato un valore.
@@ -14439,8 +14523,8 @@ visualizzare il tipo della variabile @code{a}:
 
 @example
 $ @kbd{gawk 'BEGIN @{ print (a == "" && a == 0 ?}
-> @kbd{"a non ha un tipo" : "a ha un tipo!") ; print typeof(a) @}'}
-@print{} a non ha un tipo
+> @kbd{"a è uno scalare non assegnato" : "a ha un tipo!") ; print typeof(a) @}'}
+@print{} a è uno scalare non assegnato
 @print{} unassigned
 @end example
 
@@ -14500,9 +14584,6 @@ $ @kbd{echo 37 | awk '@{ printf("%s %s < 42\n", $1,}
 > @kbd{                           ($1 < 42 ? "è" : "non è")) @}'}
 @print{} 37 is < 42
 @end example
-
-Queste sono le regole seguite per determinare quando @command{awk}
-tratta dei dati in input come numeri, e quando li considera stringhe.
 
 @cindex numeriche @subentry stringhe
 @cindex stringa @subentry numerica
@@ -38160,7 +38241,7 @@ questo capitolo. Tuttavia, se si vogliono eseguire calcoli scientifici con
 
 @cindex Sherman, Allan
 @quotation
-Vi è mai venuto in mente che il plurale di ``mezzo'' è ``intero''?
+@i{Vi è mai venuto in mente che il plurale di ``metà'' è ``intero''?}
 @author Allan Sherman
 @end quotation
 
@@ -49429,9 +49510,9 @@ richiesta di evitare di farlo, sarà parimenti bandito dalla lista.
 @c Organization: ITS, Case Western Reserve University
 @c To: Aharon Robbins <arnold@skeeve.com>
 @c CC: chet.ramey@case.edu
-Ho iniziato a ignorare Usenet un paio di anni fa, e non me ne sono mai
-pentito.  È come quando si parla di sport alla radio --- ci si sente
-più intelligenti per aver lasciato perdere.
+@i{Ho iniziato a ignorare Usenet un paio di anni fa, e non me ne sono mai
+pentito.  È come con la radio che parla solo di sport---ci si sente
+più intelligenti per averla lasciata perdere.}
 @author Chet Ramey
 @end quotation
 
