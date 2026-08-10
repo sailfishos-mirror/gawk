@@ -802,11 +802,7 @@ numindex:
 
 numrange:
 	@echo $@ $(ZOS_FAIL)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 numstr1:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -948,11 +944,7 @@ prec:
 
 printf-corners:
 	@echo $@ $(ZOS_FAIL)
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 printf0:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  --posix >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -990,11 +982,7 @@ prtoeval:
 
 rand:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 randtest:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -1522,11 +1510,7 @@ arraysort2:
 
 arraytype:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 asortbool:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -1534,11 +1518,7 @@ asortbool:
 
 asortsymtab:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 backw:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -2620,18 +2600,10 @@ fmttest:
 
 fnarydel:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 fnparydl:
 	@echo $@
-	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null ; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; fi
-
+	@-AWKPATH="$(srcdir)" $(srcdir)/checkmany.sh "$(AWKPROG)" "$@" "$(srcdir)" || echo EXIT CODE: $$? >>_$@
 greek-8bit:
 	@echo $@
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=el_GR.iso88597@euro; export GAWKLOCALE; \

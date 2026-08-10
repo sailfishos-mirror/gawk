@@ -82,7 +82,7 @@ EXTRA_DIST = \
 	arraysort2.ok \
 	arraytype.awk \
 	arraytype.ok \
-	arraytype-mpfr.ok \
+	arraytype.ok-mpfr \
 	arrdbg.awk \
 	arrymem1.awk \
 	arrymem1.ok \
@@ -142,7 +142,7 @@ EXTRA_DIST = \
 	asorti.ok \
 	asortsymtab.awk \
 	asortsymtab.ok \
-	asortsymtab-mpfr.ok \
+	asortsymtab.ok-mpfr \
 	assignnumfield.awk \
 	assignnumfield.in \
 	assignnumfield.ok \
@@ -404,7 +404,7 @@ EXTRA_DIST = \
 	fmtmix.awk \
 	fmtmix.in \
 	fmtmix.ok \
-	fmtspcl-mpfr.ok \
+	fmtspcl.ok-mpfr \
 	fmtspcl.awk \
 	fmtspcl.tok \
 	fmttest.awk \
@@ -417,7 +417,7 @@ EXTRA_DIST = \
 	fnarray2.awk \
 	fnarray2.in \
 	fnarray2.ok \
-	fnarydel-mpfr.ok \
+	fnarydel.ok-mpfr \
 	fnarydel.awk \
 	fnarydel.ok \
 	fnaryscl.awk \
@@ -429,7 +429,7 @@ EXTRA_DIST = \
 	fnmatch.ok \
 	fnmisc.awk \
 	fnmisc.ok \
-	fnparydl-mpfr.ok \
+	fnparydl.ok-mpfr \
 	fnparydl.awk \
 	fnparydl.ok \
 	forcenum.awk \
@@ -1041,7 +1041,7 @@ EXTRA_DIST = \
 	numindex.ok \
 	numrange.awk \
 	numrange.ok \
-	numrange-mpfr.ok \
+	numrange.ok-mpfr \
 	numstr1.awk \
 	numstr1.ok \
 	numsubstr.awk \
@@ -1134,7 +1134,7 @@ EXTRA_DIST = \
 	prec.ok \
 	printf-corners.awk \
 	printf-corners.ok \
-	printf-corners-mpfr.ok \
+	printf-corners.ok-mpfr \
 	printf0.awk \
 	printf0.ok \
 	printf1.awk \
@@ -1203,7 +1203,7 @@ EXTRA_DIST = \
 	pty1.ok \
 	pty2.awk \
 	pty2.ok \
-	rand-mpfr.ok \
+	rand.ok-mpfr \
 	rand.awk \
 	rand.ok \
 	randtest.sh \
@@ -1506,7 +1506,7 @@ EXTRA_DIST = \
 	tailrecurse.awk \
 	tailrecurse.ok \
 	testext.ok \
-	testext-mpfr.ok \
+	testext.ok-mpfr \
 	time.awk \
 	time.ok \
 	timeout.awk \
@@ -1802,7 +1802,9 @@ NEED_LOCALE_RU = mtchi18n
 
 # Tests that have multipe .ok files
 
-NEED_CHECKMANY = case-check greek-8bit posix-inf
+NEED_CHECKMANY = case-check greek-8bit posix-inf \
+	arraytype asortsymtab fmtspcl fnarydel fnparydl numrange \
+	printf-corners rand
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
@@ -1833,7 +1835,7 @@ ZOS_FAIL = @ZOS_FAIL@
 # List of the files that appear in manual tests or are for reserve testing:
 GENTESTS_UNUSED = \
 	Makefile.in check_retest.awk checknegtime.awk dtdgport.awk eofsrc1a.awk \
-	eofsrc1b.awk fix-fmtspcl.awk fmtspcl-mpfr.ok fmtspcl.awk fmtspcl.tok \
+	eofsrc1b.awk fix-fmtspcl.awk fmtspcl.awk fmtspcl.tok \
 	gtlnbufv.awk hello.awk inchello.awk inclib.awk inplace.1.in \
 	inplace.2.in inplace.in nsawk1.awk nsawk2.awk printfloat.awk \
 	readall1.awk readall2.awk readdir0.awk valgrind.awk xref.awk
@@ -2159,13 +2161,6 @@ nors::
 
 fmtspcl.ok: fmtspcl.tok Makefile fix-fmtspcl.awk
 	@$(AWK) -v "sd=$(srcdir)" -f "$(srcdir)/fix-fmtspcl.awk" < "$(srcdir)"/fmtspcl.tok > $@ 2>/dev/null
-
-fmtspcl: fmtspcl.ok
-	@echo $@
-	@$(AWK) $(AWKFLAGS) -f "$(srcdir)"/fmtspcl.awk  --lint >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if test -z "$$AWKFLAGS" ; then $(CMP) $@.ok _$@ && rm -f _$@ ; else \
-	$(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ ; \
-	fi
 
 rebuf::
 	@echo $@
@@ -2577,7 +2572,7 @@ testext::
 	@-$(AWK) ' /^(@load|BEGIN|function)/,/^}/' "$(top_srcdir)"/extension/testext.c > testext.awk
 	@-$(AWK) -f ./testext.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null; \
-	then $(CMP) "$(srcdir)"/$@-mpfr.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; \
+	then $(CMP) "$(srcdir)"/$@.ok-mpfr _$@ && rm -f _$@ testext.awk testexttmp.txt ; \
 	else $(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ testext.awk testexttmp.txt ; fi
 
 getfile:
@@ -2719,10 +2714,10 @@ pty2:
 
 arrdbg:
 	@echo $@
-	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@-mpfr.ok" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
+	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@.ok-mpfr" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
 	@-if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null; \
-	then $(CMP) "."/$@-mpfr.ok _$@ && rm -f _$@ $@.ok $@-mpfr.ok ; \
-	else $(CMP) "."/$@.ok _$@ && rm -f _$@ $@.ok $@-mpfr.ok ; fi
+	then $(CMP) "."/$@.ok-mpfr _$@ && rm -f _$@ $@.ok $@.ok-mpfr ; \
+	else $(CMP) "."/$@.ok _$@ && rm -f _$@ $@.ok $@.ok-mpfr ; fi
 
 sourcesplit:
 	@echo $@
@@ -2825,10 +2820,10 @@ diffout:
 		if [ "$$i" != "_*" ]; then \
 		echo ============== $$i ============= ; \
 		base=`echo $$i | sed 's/^_//'` ; \
-		if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null && [ -r $${base}-mpfr.ok ]; then \
-		diff -u $${base}-mpfr.ok $$i ; \
-		elif echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null && [ -r "$(srcdir)"/$${base}-mpfr.ok ]; then \
-		diff -u "$(srcdir)"/$${base}-mpfr.ok $$i ; \
+		if echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null && [ -r $${base}.ok-mpfr ]; then \
+		diff -u $${base}.ok-mpfr $$i ; \
+		elif echo "$$GAWK_TEST_ARGS" | egrep -s -e '-M|--bignum' > /dev/null && [ -r "$(srcdir)"/$${base}.ok-mpfr ]; then \
+		diff -u "$(srcdir)"/$${base}.ok-mpfr $$i ; \
 		elif [ -r $${base}.ok ]; then \
 		diff -u $${base}.ok $$i ; \
 		else \

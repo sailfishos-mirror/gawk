@@ -267,11 +267,7 @@ function generate(x,	s, i, locale_string)
 		printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1", s
 	printf " || echo EXIT CODE: $$? >>_$@\n"
 
-	if ((x "-mpfr.ok") in extra_dist) {
-		printf "\t@-if echo \"$$GAWK_TEST_ARGS\" | egrep -s -e '-M|--bignum' > /dev/null ; \\\n"
-		printf "\tthen $(CMP) \"$(srcdir)\"/$@-mpfr.ok _$@ && rm -f _$@ ; \\\n"
-		printf "\telse $(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@ ; fi\n\n"
-	} else if (x in checkmany)
+	if (x in checkmany)
 		delete checkmany[x]
 	else
 		printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
