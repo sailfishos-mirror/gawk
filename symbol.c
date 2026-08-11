@@ -284,7 +284,7 @@ remove_params(NODE *func)
 
 		p = parms + i;
 		assert(p->type == Node_param_list);
-		tmp = make_string(p->vname, strlen(p->vname));
+		tmp = make_string(p->param, strlen(p->param));
 		tmp2 = in_array(param_table, tmp);
 		if (tmp2 != NULL && tmp2->dup_ent != NULL)
 			tmp2->dup_ent = tmp2->dup_ent->dup_ent;

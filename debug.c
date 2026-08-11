@@ -5623,7 +5623,7 @@ execute_code(volatile INSTRUCTION *code)
 	 */
 
 	// save_stack_size = (stack_ptr  - stack_bottom) + 1;	// see comment below
-	do_flags = false;
+	do_flags &= DO_MPFR;	// preserve this flag
 
 	PUSH_BINDING(fatal_tag_stack, fatal_tag, fatal_tag_valid);
 	if (setjmp(fatal_tag) == 0) {
@@ -5873,7 +5873,7 @@ parse_condition(int type, int num, char *expr)
 	ctxt->install_func = check_symbol;
 	push_context(ctxt);
 	(void) add_srcfile(SRC_CMDLINE, expr, srcfiles, NULL, NULL);
-	do_flags = false;
+	do_flags &= DO_MPFR;	// preserve this flag
 	ret = parse_program(&code, true);
 	do_flags = save_flags;
 	remove_params(this_func);

@@ -247,7 +247,6 @@ static const char *const nodetypes[] = {
 	"Node_array_ref",
 	"Node_array_tree",
 	"Node_array_leaf",
-	"Node_dump_array",
 	"Node_arrayfor",
 	"Node_frame",
 	"Node_instruction",
@@ -1957,6 +1956,13 @@ elem_new_to_scalar(NODE *n)
 		unref(n);
 		return dupnode(Nnull_string);
 	}
+
+#ifdef HAVE_MPFR
+	if (n->mpfr_data != NULL) {
+		free(n->mpfr_data);
+		n->mpfr_data = NULL;
+	}
+#endif // HAVE_MPFR
 
 	return n;
 }

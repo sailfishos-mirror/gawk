@@ -250,6 +250,8 @@ mpg_maybe_float(const char *str, int use_locale)
 void
 mpg_zero(NODE *n)
 {
+	if (n->mpfr_data == NULL)
+		ezalloc(n->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
 	if (is_mpg_float(n)) {
 		mpfr_clear(n->mpg_numbr);
 		n->flags &= ~MPFN;
@@ -275,6 +277,9 @@ force_mpnum(NODE *n, bool do_nondec, bool use_locale)
 		mpg_zero(n);
 		return false;
 	}
+
+	if (n->mpfr_data == NULL)
+		ezalloc(n->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
 
 	cp = n->stptr;
 	cpend = n->stptr + n->stlen;
@@ -1872,6 +1877,8 @@ mpfr_unset(NODE *n)
 		mpfr_clear(n->mpg_numbr);
 	else if (is_mpg_integer(n))
 		mpz_clear(n->mpg_i);
+	free(n->mpfr_data);
+	n->mpfr_data = NULL;
 }
 
 /*

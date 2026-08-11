@@ -376,6 +376,8 @@ main(int argc, char **argv)
 
 #ifdef HAVE_MPFR
 	if (do_mpfr) {
+		ezalloc(Nnull_string->mpfr_data, struct _mpfr_data *,
+				sizeof(struct _mpfr_data));
 		mpz_init(Nnull_string->mpg_i);
 		Nnull_string->flags = (MALLOC|STRCUR|STRING|MPZN|NUMCUR|NUMBER);
 	} else

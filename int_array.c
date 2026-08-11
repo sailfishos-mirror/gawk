@@ -39,7 +39,7 @@ static NODE **int_clear(NODE *symbol, NODE *subs);
 static NODE **int_remove(NODE *symbol, NODE *subs);
 static NODE **int_list(NODE *symbol, NODE *t);
 static NODE **int_copy(NODE *symbol, NODE *newsymb);
-static NODE **int_dump(NODE *symbol, NODE *ndump);
+static NODE **int_dump(NODE *symbol, struct array_dump *ndump);
 
 static uint32_t int_hash(uint32_t k, uint32_t hsize);
 static inline NODE **int_find(NODE *symbol, long k, uint32_t hash1);
@@ -619,7 +619,7 @@ int_kilobytes(NODE *symbol)
 /* int_dump --- dump array info */
 
 static NODE **
-int_dump(NODE *symbol, NODE *ndump)
+int_dump(NODE *symbol, struct array_dump *ndump)
 {
 #define HCNT	31
 
