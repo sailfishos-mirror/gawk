@@ -134,7 +134,7 @@ static void parse_args(int argc, char **argv);
 static void set_locale_stuff(void);
 static bool stopped_early = false;
 
-enum do_flag_values do_flags = DO_FLAG_NONE;
+ENUM(do_flag_values) do_flags = DO_FLAG_NONE;
 bool using_persistent_malloc = false;
 const char *persist_file;
 bool do_itrace = false;			/* provide simple instruction trace */
@@ -377,6 +377,8 @@ main(int argc, char **argv)
 
 #ifdef HAVE_MPFR
 	if (do_mpfr) {
+		ezalloc(Nnull_string->mpfr_data, struct _mpfr_data *,
+				sizeof(struct _mpfr_data));
 		mpz_init(Nnull_string->mpg_i);
 		Nnull_string->flags = (MALLOC|STRCUR|STRING|MPZN|NUMCUR|NUMBER);
 	} else

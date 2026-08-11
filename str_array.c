@@ -55,7 +55,7 @@ static NODE **str_clear(NODE *symbol, NODE *subs);
 static NODE **str_remove(NODE *symbol, NODE *subs);
 static NODE **str_list(NODE *symbol, NODE *subs);
 static NODE **str_copy(NODE *symbol, NODE *newsymb);
-static NODE **str_dump(NODE *symbol, NODE *ndump);
+static NODE **str_dump(NODE *symbol, struct array_dump *ndump);
 
 const array_funcs_t str_array_func = {
 	"str",
@@ -463,7 +463,7 @@ str_kilobytes(NODE *symbol)
 /* str_dump --- dump array info */
 
 static NODE **
-str_dump(NODE *symbol, NODE *ndump)
+str_dump(NODE *symbol, struct array_dump *ndump)
 {
 #define HCNT	31
 

@@ -301,7 +301,6 @@ typedef enum nodevals {
 	Node_array_ref,		/* array passed by ref as parameter */
 	Node_array_tree,	/* Hashed array tree (HAT) */
 	Node_array_leaf,	/* Linear 1-D array */
-	Node_dump_array,	/* array info */
 
 	/* program execution -- stack item types */
 	Node_arrayfor,
@@ -359,8 +358,14 @@ enum escape_results {
 
 struct exp_instruction;
 
+struct array_dump {
+	long adepth;
+	long alevel;
+};
+
 typedef int (*Func_print)(FILE *, const char *, ...);
 typedef struct exp_node **(*afunc_t)(struct exp_node *, struct exp_node *);
+typedef struct exp_node **(*adumpfunc_t)(struct exp_node *, struct array_dump *);
 typedef struct {
 	const char *name;
 	afunc_t init;
@@ -371,7 +376,7 @@ typedef struct {
 	afunc_t remove;
 	afunc_t list;
 	afunc_t copy;
-	afunc_t dump;
+	adumpfunc_t dump;
 	afunc_t store;
 } array_funcs_t;
 
@@ -462,126 +467,128 @@ enum flagvals {
 	OFMT_FMT	= 0x0200000,	/* string formatted via OFMT */
 };
 
+#ifdef HAVE_MPFR
+struct _mpfr_data {
+	mpfr_t mpg_numbr;
+	mpz_t mpg_i;
+};
+#endif /* HAVE_MPFR */
+
 /*
  * NOTE - this struct is a rather kludgey -- it is packed to minimize
  * space usage, at the expense of cleanliness.  Alter at own risk.
  */
 typedef struct exp_node {
-	union {
-		struct {
-			union {
-				struct exp_node *lptr;
-				struct exp_instruction *li;
-				long ll;
-				const array_funcs_t *lp;
-			} l;
-			union {
-				struct exp_node *rptr;
-				Regexp *preg[2];
-				struct exp_node **av;
-				BUCKET **bv;
-				void (*uptr)(void);
-				struct exp_instruction *iptr;
-			} r;
-			union {
-				struct exp_node *extra;
-				void (*aptr)(void);
-				long xl;
-				void *cmnt;	// used by pretty printer
-			} x;
-			char *name;
-			size_t reserved;
-			struct exp_node *rn;
-			unsigned long cnt;
-			ENUM(reflagvals) reflags;
-		} nodep;
-
-		struct {
-			union {
-				double fltnum;
-#ifdef HAVE_MPFR
-				mpfr_t mpnum;
-				mpz_t mpi;
-#else
-				// 7/2026:
-				// This is a workaround for systems that build
-				// gawk without MPFR and GMP.  The NODE struct
-				// desperately needs to be refactored.
-#if SIZEOF_VOID_P == 4
-				char alignment[28];
-#else	// SIZEOF_VOID_P != 4
-				char alignment[48];
-#endif	// SIZEOF_VOID_P != 4
-#endif	// HAVE_MPFR
-			} nm;
-			int rndmode;	// only used for MPFR.
-			char *sp;
-			size_t slen;
-			int idx;
-			union {	// this union is for convenience of space
-				// reuse; the elements aren't otherwise related
-				char32_t *wsp;
-				char *vn;
-			} z;
-			size_t wslen;
-			struct exp_node *typre;
-			enum commenttype comtype;
-		} val;
-	} sub;
 	NODETYPE type;
 	ENUM(flagvals) flags;
 	long valref;
+	char *vname;	// common to several types
+	union subparts {
+		struct _array {		/* Node_var_array */
+			// FIXME: 7/2026: Arrays fall over and die miserably if
+			// these two fields aren't in a union. Try to figure
+			// this out one day.
+			union why {
+				BUCKET **buckets;
+				struct exp_node **nodes;
+			} why;
+			const array_funcs_t *array_funcs;
+			long array_base;
+			size_t table_size;
+			size_t array_size;
+			size_t array_capacity;
+			struct exp_node *xarray;
+			struct exp_node *parent_array;
+		} array;
+		struct _regex {		/* Node_regex, Node_dynregex */
+			Regexp *re_reg[2];
+			ENUM(reflagvals) re_flags;
+			struct exp_node *re_text;
+			struct exp_node *re_exp;
+			long re_cnt;
+		} regex;
+		struct _arrayfor {	/* Node_arrayfor */
+			struct exp_node **for_list;
+			long for_list_size;
+			long cur_idx;
+			struct exp_node *for_array;
+		} arrayfor;
+		struct _var {		/* Node_var */
+			struct exp_node *var_value;
+			void (*var_update)(void);
+			void (*var_assign)(void);
+		} var;
+		struct _frame {		/* Node_frame */
+			struct exp_node **stack;
+			struct exp_node *func_node;
+			size_t prev_frame_size;
+			struct exp_instruction *reti;
+		} frame;
+		struct _pprint {	/* used in profile.c */
+			char *pp_str;
+			size_t pp_len;
+			struct exp_node *pp_next;
+			struct exp_instruction *pp_comment;
+		} pp;
+		struct _func {		/* Node_param_list, Node_func */
+			struct exp_node *dup_ent;
+			long param_cnt;
+			struct exp_node *fparms;
+			struct exp_instruction *code_ptr;
+		} func;
+		struct _list {		/* linked lists of various sorts */
+			struct exp_node *lnode;
+			struct exp_node *rnode;
+		} llist;
+		// This is last, so that it's easy to see in GDB.
+		struct _value {		/* Node_val, Node_elem_new */
+			// ordering here helps reduce the size
+			// also use of char for comment_type and strndmode
+			char comment_type;	// enum commenttype comment_type;
+#ifdef HAVE_MPFR
+			char strndmode;
+#endif
+			int stfmt;
+			char *stptr;
+			size_t stlen;
+			char32_t *wstptr;
+			size_t wstlen;
+			struct exp_node *typed_re;
+			char *elemnew_vname;			// Node_elem_new
+			struct exp_node *elemnew_parent;	// Node_elem_new
+			double numbr;
+#ifdef HAVE_MPFR
+			struct _mpfr_data *mpfr_data;
+#endif
+		} value;
+	} sub;
 } NODE;
 
-#define vname sub.nodep.name
-
-#define lnode	sub.nodep.l.lptr
-#define rnode	sub.nodep.r.rptr
-
-/* Node_param_list */
-#define param      vname
-#define dup_ent    sub.nodep.r.rptr
-
-/* Node_param_list, Node_func */
-#define param_cnt  sub.nodep.l.ll
-
-/* Node_func */
-#define fparms		sub.nodep.rn
-#define code_ptr    sub.nodep.r.iptr
-
-/* Node_regex, Node_dynregex */
-#define re_reg	sub.nodep.r.preg
-#define re_flags sub.nodep.reflags
-#define re_text lnode
-#define re_exp	sub.nodep.x.extra
-#define re_cnt	flags
-
-/* Node_val */
+/* Node_val: */
 /*
  * Note that the string in stptr may not be NUL-terminated, but it is
  * guaranteed to have at least one extra byte that may be temporarily set
- * to '\0'. This is helpful when calling functions such as strtod that require
+ * to '\0'. This is helpful when calling functions such as strtod() that require
  * a NUL-terminated argument. In particular, field values $n for n > 0 and
  * n < NF will not have a NUL terminator, since they point into the $0 buffer.
  * All other strings are NUL-terminated.
  */
-#define stptr	sub.val.sp
-#define stlen	sub.val.slen
-#define stfmt	sub.val.idx
-#define strndmode sub.val.rndmode
-#define wstptr	sub.val.z.wsp
-#define wstlen	sub.val.wslen
-
-/* Node_elem_new */
-#define elemnew_vname	sub.val.z.vn
-#define elemnew_parent	sub.val.typre
+#define stptr	sub.value.stptr
+#define stlen	sub.value.stlen
+#define stfmt	sub.value.stfmt
+#define wstptr	sub.value.wstptr
+#define wstlen	sub.value.wstlen
+#define numbr	sub.value.numbr
+#define typed_re	sub.value.typed_re
 
 #ifdef HAVE_MPFR
-#define mpg_numbr	sub.val.nm.mpnum
-#define mpg_i		sub.val.nm.mpi
+#define mpfr_data	sub.value.mpfr_data
+#define strndmode	sub.value.strndmode
+#define mpg_numbr	mpfr_data->mpg_numbr
+#define mpg_i		mpfr_data->mpg_i
 #endif
-#define numbr		sub.val.nm.fltnum
-#define typed_re	sub.val.typre
+
+#define comment_type	sub.value.comment_type		/* Op_comment */
 
 /*
  * If stfmt is set to STFMT_UNUSED, it means that the string representation
@@ -593,38 +600,22 @@ typedef struct exp_node {
  */
 #define STFMT_UNUSED	-1
 
-/* Node_arrayfor */
-#define for_list	sub.nodep.r.av
-#define for_list_size	sub.nodep.reflags
-#define cur_idx		sub.nodep.l.ll
-#define for_array 	sub.nodep.rn
-
-/* Node_frame: */
-#define stack        sub.nodep.r.av
-#define func_node    sub.nodep.x.extra
-#define prev_frame_size	sub.nodep.reflags
-#define reti         sub.nodep.l.li
-
-/* Node_var: */
-#define var_value    lnode
-#define var_update   sub.nodep.r.uptr
-#define var_assign   sub.nodep.x.aptr
-
 /* Node_var_array: */
-#define buckets		sub.nodep.r.bv
-#define nodes		sub.nodep.r.av
-#define array_funcs	sub.nodep.l.lp
-#define array_base	sub.nodep.l.ll
-#define table_size	sub.nodep.reflags
-#define array_size	sub.nodep.cnt
-#define array_capacity	sub.nodep.reserved
-#define xarray		sub.nodep.rn
-#define parent_array	sub.nodep.x.extra
+
+#define buckets		sub.array.why.buckets
+#define nodes		sub.array.why.nodes
+#define array_funcs	sub.array.array_funcs
+#define array_base	sub.array.array_base
+#define table_size	sub.array.table_size
+#define array_size	sub.array.array_size
+#define array_capacity	sub.array.array_capacity
+#define xarray		sub.array.xarray
+#define parent_array	sub.array.parent_array
 
 #define ainit		array_funcs->init
 #define atypeof		array_funcs->type_of
 #define alookup 	array_funcs->lookup
-#define aexists 	array_funcs->exists
+#define aexists		array_funcs->exists
 #define aclear		array_funcs->clear
 #define aremove		array_funcs->remove
 #define alist		array_funcs->list
@@ -632,16 +623,52 @@ typedef struct exp_node {
 #define adump		array_funcs->dump
 #define astore		array_funcs->store
 
+/* Node_regex, Node_dynregex: */
+#define re_reg	sub.regex.re_reg
+#define re_flags	sub.regex.re_flags
+#define re_text	sub.regex.re_text
+#define re_exp	sub.regex.re_exp
+#define re_cnt	sub.regex.re_cnt
+
+/* Node_arrayfor: */
+#define for_list	sub.arrayfor.for_list
+#define for_list_size	sub.arrayfor.for_list_size
+#define cur_idx		sub.arrayfor.cur_idx
+#define for_array	sub.arrayfor.for_array
+
+/* Node_var: */
+#define var_value	sub.var.var_value
+#define var_update	sub.var.var_update
+#define var_assign	sub.var.var_assign
+
+/* Node_frame: */
+#define stack		sub.frame.stack
+#define func_node	sub.frame.func_node
+#define prev_frame_size	sub.frame.prev_frame_size
+#define reti		sub.frame.reti
+
+/* Node_elem_new: */
+#define elemnew_vname	sub.value.elemnew_vname
+#define elemnew_parent	sub.value.elemnew_parent
+
+/* Node_param_list */
+#define param	vname	// bit of a hack; code in the parser assumes this
+#define dup_ent	sub.func.dup_ent
+
+/* Node_param_list, Node_func */
+#define param_cnt	sub.func.param_cnt
+
+/* Node_func */
+#define fparms		sub.func.fparms
+#define code_ptr	sub.func.code_ptr
+
+/* linked lists, no specific node type */
+#define lnode	sub.llist.lnode
+#define rnode	sub.llist.rnode
+
 /* Node_array_ref: */
 #define orig_array lnode
 #define prev_array rnode
-
-/* Node_array_print */
-#define adepth     sub.nodep.l.ll
-#define alevel     sub.nodep.x.xl
-
-/* Op_comment	*/
-#define comment_type	sub.val.comtype
 
 /* --------------------------------lint warning types----------------------------*/
 typedef enum lintvals {
@@ -1237,7 +1264,7 @@ extern bool use_gnu_matchers;	/* Use gnu matchers, not minrx */
 
 extern SRCFILE *srcfiles; /* source files */
 
-extern enum do_flag_values {
+enum do_flag_values {
 	DO_FLAG_NONE       = 0x00000,
 	DO_LINT_INVALID	   = 0x00001,	/* only warn about invalid */
 	DO_LINT_EXTENSIONS = 0x00002,	/* warn about gawk extensions */
@@ -1254,7 +1281,8 @@ extern enum do_flag_values {
 	DO_DEBUG	   = 0x01000,	/* debug the program */
 	DO_MPFR		   = 0x02000,	/* arbitrary-precision floating-point math */
 	DO_CSV		   = 0x04000,	/* process comma-separated-value files */
-} do_flags;
+};
+extern ENUM(do_flag_values) do_flags;
 
 #define do_traditional      (do_flags & DO_TRADITIONAL)
 #define do_posix            (do_flags & DO_POSIX)
@@ -1442,8 +1470,12 @@ extern void r_freeblock(void *, int id);
 
 #endif /* MEMDEBUG */
 
-#define getnode(n)	getblock(n, BLOCK_NODE, NODE *)
+#define getnode(n)	getblock(n, BLOCK_NODE, NODE *), memset(n, 0, sizeof(NODE))
+#ifdef HAVE_MPR
+#define freenode(n)	(n->mpfr_data != NULL ? free(n->mpfr_data), n->mpfr_data = NULL : 0, freeblock(n, BLOCK_NODE))
+#else
 #define freenode(n)	freeblock(n, BLOCK_NODE)
+#endif
 
 #define getbucket(b) 	getblock(b, BLOCK_BUCKET, BUCKET *)
 #define freebucket(b)	freeblock(b, BLOCK_BUCKET)
@@ -1511,9 +1543,9 @@ extern NODE **null_afunc(NODE *symbol, NODE *subs);
 extern void set_SUBSEP(void);
 extern NODE *concat_exp(int nargs, bool do_subsep);
 extern NODE *assoc_copy(NODE *symbol, NODE *newsymb);
-extern void assoc_dump(NODE *symbol, NODE *p);
+extern void assoc_dump(NODE *symbol, struct array_dump *p);
 extern NODE **assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt);
-extern void assoc_info(NODE *subs, NODE *val, NODE *p, const char *aname);
+extern void assoc_info(NODE *subs, NODE *val, struct array_dump *p, const char *aname);
 extern void do_delete(NODE *symbol, int nsubs);
 extern void do_delete_loop(NODE *symbol, NODE **lhs);
 extern NODE *do_adump(int nargs);
@@ -2230,6 +2262,10 @@ make_number_node(unsigned int flags)
 	r->type = Node_val;
 	r->valref = 1;
 	r->flags = (flags|MALLOC|NUMBER|NUMCUR);
+#ifdef HAVE_MPFR
+	if (do_mpfr)
+		ezalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+#endif
 	return r;
 }
 

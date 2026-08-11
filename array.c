@@ -36,7 +36,7 @@ static char indent_char[] = "    ";
 
 static int sort_up_value_type(const void *p1, const void *p2);
 static NODE **null_lookup(NODE *symbol, NODE *subs);
-static NODE **null_dump(NODE *symbol, NODE *subs);
+static NODE **null_dump(NODE *symbol, struct array_dump *subs);
 static const array_funcs_t null_array_func = {
 	"null",
 	(afunc_t) 0,
@@ -160,7 +160,7 @@ null_afunc(NODE *symbol ATTRIBUTE_UNUSED, NODE *subs ATTRIBUTE_UNUSED)
 /* null_dump --- dump function for an empty array */
 
 static NODE **
-null_dump(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
+null_dump(NODE *symbol, struct array_dump *subs ATTRIBUTE_UNUSED)
 {
 	fprintf(output_fp, "array `%s' is empty\n", array_vname(symbol));
 	return NULL;
@@ -185,7 +185,7 @@ assoc_copy(NODE *symbol, NODE *newsymb)
 /* assoc_dump --- dump array */
 
 void
-assoc_dump(NODE *symbol, NODE *ndump)
+assoc_dump(NODE *symbol, struct array_dump *ndump)
 {
 	if (symbol->adump)
 		(void) symbol->adump(symbol, ndump);
@@ -790,7 +790,7 @@ indent(int indent_level)
 /* assoc_info --- print index, value info */
 
 void
-assoc_info(NODE *subs, NODE *val, NODE *ndump, const char *aname)
+assoc_info(NODE *subs, NODE *val, struct array_dump *ndump, const char *aname)
 {
 	int indent_level = ndump->alevel;
 
@@ -845,7 +845,7 @@ NODE *
 do_adump(int nargs)
 {
 	NODE *symbol, *tmp;
-	static NODE ndump;
+	static struct array_dump ndump;
 	long depth = 0;
 
 	/*
@@ -863,7 +863,6 @@ do_adump(int nargs)
 	if (symbol->type != Node_var_array)
 		fatal(_("%s: first argument is not an array"), "adump");
 
-	ndump.type = Node_dump_array;
 	ndump.adepth = depth;
 	ndump.alevel = 0;
 	assoc_dump(symbol, & ndump);
