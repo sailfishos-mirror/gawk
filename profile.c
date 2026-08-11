@@ -44,10 +44,10 @@ static void pp_namespace(const char *name, INSTRUCTION *comment);
 static void pp_namespace_list(INSTRUCTION *list);
 static char *adjust_namespace(char *name, bool *malloced);
 
-#define pp_str	sub2.pp.pp_str
-#define pp_len	sub2.pp.pp_len
-#define pp_next	sub2.pp.pp_next
-#define pp_comment	sub2.pp.pp_comment
+#define pp_str	sub.pp.pp_str
+#define pp_len	sub.pp.pp_len
+#define pp_next	sub.pp.pp_next
+#define pp_comment	sub.pp.pp_comment
 
 #define DONT_FREE 1
 #define CAN_FREE  2

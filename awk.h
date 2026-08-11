@@ -476,26 +476,6 @@ typedef struct exp_node {
 	long valref;
 	char *vname;	// common to several types
 	union subparts {
-		struct _value {		/* Node_val, Node_elem_new */
-			// ordering here helps reduce the size
-			// also use of char for comment_type and strndmode
-			char comment_type;	// enum commenttype comment_type;
-#ifdef HAVE_MPFR
-			char strndmode;
-#endif
-			int stfmt;
-			char *stptr;
-			size_t stlen;
-			char32_t *wstptr;
-			size_t wstlen;
-			struct exp_node *typed_re;
-			char *elemnew_vname;			// Node_elem_new
-			struct exp_node *elemnew_parent;	// Node_elem_new
-			double numbr;
-#ifdef HAVE_MPFR
-			struct _mpfr_data *mpfr_data;
-#endif
-		} value;
 		struct _array {		/* Node_var_array */
 			// FIXME: 7/2026: Arrays fall over and die miserably if
 			// these two fields aren't in a union. Try to figure
@@ -552,7 +532,28 @@ typedef struct exp_node {
 			struct exp_node *lnode;
 			struct exp_node *rnode;
 		} llist;
-	} sub2;
+		// This is last, so that it's easy to see in GDB.
+		struct _value {		/* Node_val, Node_elem_new */
+			// ordering here helps reduce the size
+			// also use of char for comment_type and strndmode
+			char comment_type;	// enum commenttype comment_type;
+#ifdef HAVE_MPFR
+			char strndmode;
+#endif
+			int stfmt;
+			char *stptr;
+			size_t stlen;
+			char32_t *wstptr;
+			size_t wstlen;
+			struct exp_node *typed_re;
+			char *elemnew_vname;			// Node_elem_new
+			struct exp_node *elemnew_parent;	// Node_elem_new
+			double numbr;
+#ifdef HAVE_MPFR
+			struct _mpfr_data *mpfr_data;
+#endif
+		} value;
+	} sub;
 } NODE;
 
 /* Node_val: */
@@ -564,22 +565,22 @@ typedef struct exp_node {
  * n < NF will not have a NUL terminator, since they point into the $0 buffer.
  * All other strings are NUL-terminated.
  */
-#define stptr	sub2.value.stptr
-#define stlen	sub2.value.stlen
-#define stfmt	sub2.value.stfmt
-#define wstptr	sub2.value.wstptr
-#define wstlen	sub2.value.wstlen
-#define numbr	sub2.value.numbr
-#define typed_re	sub2.value.typed_re
+#define stptr	sub.value.stptr
+#define stlen	sub.value.stlen
+#define stfmt	sub.value.stfmt
+#define wstptr	sub.value.wstptr
+#define wstlen	sub.value.wstlen
+#define numbr	sub.value.numbr
+#define typed_re	sub.value.typed_re
 
 #ifdef HAVE_MPFR
-#define mpfr_data	sub2.value.mpfr_data
-#define strndmode	sub2.value.strndmode
+#define mpfr_data	sub.value.mpfr_data
+#define strndmode	sub.value.strndmode
 #define mpg_numbr	mpfr_data->mpg_numbr
 #define mpg_i		mpfr_data->mpg_i
 #endif
 
-#define comment_type	sub2.value.comment_type		/* Op_comment */
+#define comment_type	sub.value.comment_type		/* Op_comment */
 
 /*
  * If stfmt is set to STFMT_UNUSED, it means that the string representation
@@ -593,15 +594,15 @@ typedef struct exp_node {
 
 /* Node_var_array: */
 
-#define buckets		sub2.array.why.buckets
-#define nodes		sub2.array.why.nodes
-#define array_funcs	sub2.array.array_funcs
-#define array_base	sub2.array.array_base
-#define table_size	sub2.array.table_size
-#define array_size	sub2.array.array_size
-#define array_capacity	sub2.array.array_capacity
-#define xarray		sub2.array.xarray
-#define parent_array	sub2.array.parent_array
+#define buckets		sub.array.why.buckets
+#define nodes		sub.array.why.nodes
+#define array_funcs	sub.array.array_funcs
+#define array_base	sub.array.array_base
+#define table_size	sub.array.table_size
+#define array_size	sub.array.array_size
+#define array_capacity	sub.array.array_capacity
+#define xarray		sub.array.xarray
+#define parent_array	sub.array.parent_array
 
 #define ainit		array_funcs->init
 #define atypeof		array_funcs->type_of
@@ -615,47 +616,47 @@ typedef struct exp_node {
 #define astore		array_funcs->store
 
 /* Node_regex, Node_dynregex: */
-#define re_reg	sub2.regex.re_reg
-#define re_flags	sub2.regex.re_flags
-#define re_text	sub2.regex.re_text
-#define re_exp	sub2.regex.re_exp
-#define re_cnt	sub2.regex.re_cnt
+#define re_reg	sub.regex.re_reg
+#define re_flags	sub.regex.re_flags
+#define re_text	sub.regex.re_text
+#define re_exp	sub.regex.re_exp
+#define re_cnt	sub.regex.re_cnt
 
 /* Node_arrayfor: */
-#define for_list	sub2.arrayfor.for_list
-#define for_list_size	sub2.arrayfor.for_list_size
-#define cur_idx		sub2.arrayfor.cur_idx
-#define for_array	sub2.arrayfor.for_array
+#define for_list	sub.arrayfor.for_list
+#define for_list_size	sub.arrayfor.for_list_size
+#define cur_idx		sub.arrayfor.cur_idx
+#define for_array	sub.arrayfor.for_array
 
 /* Node_var: */
-#define var_value	sub2.var.var_value
-#define var_update	sub2.var.var_update
-#define var_assign	sub2.var.var_assign
+#define var_value	sub.var.var_value
+#define var_update	sub.var.var_update
+#define var_assign	sub.var.var_assign
 
 /* Node_frame: */
-#define stack		sub2.frame.stack
-#define func_node	sub2.frame.func_node
-#define prev_frame_size	sub2.frame.prev_frame_size
-#define reti		sub2.frame.reti
+#define stack		sub.frame.stack
+#define func_node	sub.frame.func_node
+#define prev_frame_size	sub.frame.prev_frame_size
+#define reti		sub.frame.reti
 
 /* Node_elem_new: */
-#define elemnew_vname	sub2.value.elemnew_vname
-#define elemnew_parent	sub2.value.elemnew_parent
+#define elemnew_vname	sub.value.elemnew_vname
+#define elemnew_parent	sub.value.elemnew_parent
 
 /* Node_param_list */
 #define param	vname	// bit of a hack; code in the parser assumes this
-#define dup_ent	sub2.func.dup_ent
+#define dup_ent	sub.func.dup_ent
 
 /* Node_param_list, Node_func */
-#define param_cnt	sub2.func.param_cnt
+#define param_cnt	sub.func.param_cnt
 
 /* Node_func */
-#define fparms		sub2.func.fparms
-#define code_ptr	sub2.func.code_ptr
+#define fparms		sub.func.fparms
+#define code_ptr	sub.func.code_ptr
 
 /* linked lists, no specific node type */
-#define lnode	sub2.llist.lnode
-#define rnode	sub2.llist.rnode
+#define lnode	sub.llist.lnode
+#define rnode	sub.llist.rnode
 
 /* Node_array_ref: */
 #define orig_array lnode
