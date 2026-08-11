@@ -507,16 +507,16 @@ particular records in a file and perform operations upon them.
 * Undocumented::                        Undocumented Options and Features.
 * Invoking Summary::                    Invocation summary.
 * Regexp Usage::                        How to Use Regular Expressions.
+* Leftmost Longest::                    How much text matches.
 * Escape Sequences::                    How to write nonprinting characters.
 * Regexp Operators::                    Regular Expression Operators.
 * Regexp Operator Details::             The actual details.
+* GNU Regexp Operators::                Operators specific to GNU software.
 * Interval Expressions::                Notes on interval expressions.
 * Non-greedy operators::                The POSIX 2024 shortest match
                                         operators.
 * Bracket Expressions::                 What can go between @samp{[...]}.
-* Leftmost Longest::                    How much text matches.
 * Computed Regexps::                    Using Dynamic Regexps.
-* GNU Regexp Operators::                Operators specific to GNU software.
 * Case-sensitivity::                    How to do case-insensitive matching.
 * Choosing Matchers::                   Selecting the regexp matcher.
 * Regexp Summary::                      Regular expressions summary.
@@ -979,8 +979,9 @@ particular records in a file and perform operations upon them.
 * Extension Sample Fnmatch::            An interface to @code{fnmatch()}.
 * Extension Sample Fork::               An interface to @code{fork()} and
                                         other process functions.
-* Extension Sample Intdiv::             Integer Division For High Precision Integers.
 * Extension Sample Inplace::            Enabling in-place file editing.
+* Extension Sample Intdiv::             Integer Division For High Precision
+                                        Integers.
 * Extension Sample Ord::                Character to value to character
                                         conversions.
 * Extension Sample Readdir::            An interface to @code{readdir()}.
@@ -5286,7 +5287,8 @@ programming, their format and use deserve a separate chapter.
 @cindex @code{/} (forward slash) @subentry to enclose regular expressions
 A regular expression enclosed in slashes (@samp{/})
 is an @command{awk} pattern that matches every input record whose text
-belongs to that set.
+@dfn{matches} the regular expression.
+(Regular expressions are often called @dfn{patterns}.)
 The simplest regular expression is a sequence of letters, numbers, or
 both.  Such a regexp matches any string that contains that sequence.
 Thus, the regexp @samp{foo} matches any string containing @samp{foo}.
@@ -5302,12 +5304,11 @@ regular expressions work, we present more complicated instances.
 
 @menu
 * Regexp Usage::                How to Use Regular Expressions.
+* Leftmost Longest::            How much text matches.
 * Escape Sequences::            How to write nonprinting characters.
 * Regexp Operators::            Regular Expression Operators.
 * Bracket Expressions::         What can go between @samp{[...]}.
-* Leftmost Longest::            How much text matches.
 * Computed Regexps::            Using Dynamic Regexps.
-* GNU Regexp Operators::        Operators specific to GNU software.
 * Case-sensitivity::            How to do case-insensitive matching.
 * Choosing Matchers::           Selecting the regexp matcher.
 * Regexp Summary::              Regular expressions summary.
@@ -5408,6 +5409,45 @@ When a regexp is enclosed in slashes, such as @code{/foo/}, we call it
 a @dfn{regexp constant}, much like @code{5.27} is a numeric constant and
 @code{"foo"} is a string constant.
 
+@node Leftmost Longest
+@section How Much Text Matches?
+
+@cindex regular expressions @subentry leftmost longest match
+@c @cindex matching, leftmost longest
+Consider the following:
+
+@example
+echo aaaabcd | awk '@{ sub(/a+/, "<A>"); print @}'
+@end example
+
+This example uses the @code{sub()} function to make a change to the input
+record.  (@code{sub()} replaces the first instance of any text matched
+by the first argument with the string provided as the second argument;
+@pxref{String Functions}.)  Here, the regexp @code{/a+/} indicates ``one
+or more @samp{a} characters,'' and the replacement text is @samp{<A>}.
+
+The input contains four @samp{a} characters.
+@command{awk} (and POSIX) regular expressions always match
+the leftmost, @emph{longest} sequence of input characters that can
+match.  Thus, all four @samp{a} characters are
+replaced with @samp{<A>} in this example:
+
+@example
+$ @kbd{echo aaaabcd | awk '@{ sub(/a+/, "<A>"); print @}'}
+@print{} <A>bcd
+@end example
+
+For simple match/no-match tests, this is not so important. But when doing
+text matching and substitutions with the @code{match()}, @code{sub()}, @code{gsub()},
+and @code{gensub()} functions, it is very important.
+@ifinfo
+@xref{String Functions},
+for more information on these functions.
+@end ifinfo
+Understanding this principle is also important for regexp-based record
+and field splitting (@pxref{Records},
+and also @pxref{Field Separators}).
+
 @node Escape Sequences
 @section Escape Sequences
 
@@ -5454,7 +5494,7 @@ A literal backslash, @samp{\}.
 @cindex backslash (@code{\}) @subentry @code{\a} escape sequence
 @item \a
 The ``alert'' character, @kbd{Ctrl-g}, ASCII code 7 (BEL).
-(This often makes some sort of audible noise.)
+(This may make some sort of audible noise, or flash the screen or window.)
 
 @cindex @code{\} (backslash) @subentry @code{\b} escape sequence
 @cindex backslash (@code{\}) @subentry @code{\b} escape sequence
@@ -5500,7 +5540,7 @@ between @samp{0} and @samp{7}.  For example, the code for the ASCII ESC
 @cindex backslash (@code{\}) @subentry @code{\x} escape sequence
 @cindex common extensions @subentry @code{\x} escape sequence
 @cindex extensions @subentry common @subentry @code{\x} escape sequence
-@item \x@var{hh}@dots{}
+@item \x@var{hh}
 The hexadecimal value @var{hh}, where @var{hh} stands for a sequence
 of hexadecimal digits (@samp{0}--@samp{9}, and either @samp{A}--@samp{F}
 or @samp{a}--@samp{f}).  A maximum of two digits are allowed after
@@ -5510,14 +5550,7 @@ letters or numbers.  (c.e.)
 
 @quotation CAUTION
 In ISO C, the escape sequence continues until the first nonhexadecimal
-digit is seen.
-For many years, @command{gawk} would continue incorporating
-hexadecimal digits into the value until a non-hexadecimal digit
-or the end of the string was encountered.
-However, using more than two hexadecimal digits produced
-undefined results.
-As of version 4.2, only two digits
-are processed.
+digit is seen.  However, in @command{gawk}, only two digits are processed.
 @end quotation
 
 @cindex @code{\} (backslash) @subentry @code{\u} escape sequence
@@ -5539,13 +5572,13 @@ converts the given digits into an integer and then translates the given
 ``wide character'' value into the current locale's multibyte encoding. If
 the wide character value does not represent a valid character, or if
 the character is valid but cannot be encoded into the current locale's
-multibyte encoding, the value becomes @code{"?"}. @command{gawk} issues
+multibyte encoding, the value becomes @samp{?}. @command{gawk} issues
 a warning message when this happens.
 
 @cindex @code{\} (backslash) @subentry @code{\/} escape sequence
 @cindex backslash (@code{\}) @subentry @code{\/} escape sequence
 @item \/
-A literal slash (should be used for regexp constants only).
+A literal slash, which should be used for regexp constants only.
 This sequence is used when you want to write a regexp
 constant that contains a slash
 (such as @code{/.*:\/home\/[[:alnum:]]+:.*/}; the @samp{[[:alnum:]]}
@@ -5557,7 +5590,7 @@ in order to tell @command{awk} to keep processing the rest of the regexp.
 @cindex @code{\} (backslash) @subentry @code{\"} escape sequence
 @cindex backslash (@code{\}) @subentry @code{\"} escape sequence
 @item \"
-A literal double quote (should be used for string constants only).
+A literal double quote, which should be used for string constants only.
 This sequence is used when you want to write a string
 constant that contains a double quote
 (such as @code{"He said \"hi!\" to her."}).
@@ -5659,7 +5692,7 @@ Historically, such characters were taken literally.
 However, the POSIX standard indicates that they should be treated
 as real metacharacters, which is what @command{gawk} does.
 In compatibility mode (@pxref{Options}),
-@command{gawk} treats the characters represented by octal and hexadecimal
+@command{gawk} treats the characters represented by
 escape sequences literally when used in regexp constants. Thus,
 @code{/a\52b/} is equivalent to @code{/a\*b/}.
 @end cartouche
@@ -5675,6 +5708,7 @@ increase the power and versatility of regular expressions.
 
 @menu
 * Regexp Operator Details::     The actual details.
+* GNU Regexp Operators::        Operators specific to GNU software.
 * Interval Expressions::        Notes on interval expressions.
 * Non-greedy operators::        The POSIX 2024 shortest match operators.
 @end menu
@@ -5691,7 +5725,7 @@ are valid inside a regexp.  They are introduced by a @samp{\} and
 are recognized and converted into corresponding real characters as
 the very first step in processing regexps.
 
-Here is a list of metacharacters.  All characters that are not escape
+Here is a list of metacharacters which serve as operators.  All characters that are not escape
 sequences and that are not listed here stand for themselves:
 
 @c Use @asis so the docbook comes out ok. Sigh.
@@ -5890,7 +5924,7 @@ Matches @samp{whhy}, @samp{whhhy}, and so on.
 @item @code{@{}@var{n}@code{@}?}
 @itemx @code{@{}@var{n}@code{,@}?}
 @itemx @code{@{}@var{n}@code{,}@var{m}@code{@}?}
-Shortest match or non-greedy versions of the @samp{@{@}} operators.
+Shortest match or non-greedy versions of the @samp{@{@}} operator.
 @end table
 
 @cindex precedence @subentry regexp operators
@@ -5903,7 +5937,7 @@ As in arithmetic, parentheses can change how operators are grouped.
 
 @cindex POSIX @command{awk} @subentry regular expressions and
 @cindex @command{gawk} @subentry regular expressions @subentry precedence
-According to the POSIX specification, when @samp{*}, @samp{+}, @samp{?},
+According to POSIX, when @samp{*}, @samp{+}, @samp{?},
 or @samp{@{} are not preceded by a character, the behavior is
 ``undefined.''
 Prior to version 5.4@footnote{Due to a mistake on the part of the maintainer.},
@@ -5941,8 +5975,8 @@ $ @kbd{awk '}
 @print{} AbbC_CbbA
 @end example
 
-We can use @code{gsub()} to see where the empty strings
-are that match the empty regexp:
+We can use @code{gsub()} to see the empty strings
+that match the empty regexp:
 
 @example
 $ @kbd{awk '}
@@ -5955,569 +5989,8 @@ $ @kbd{awk '}
 @end example
 @end cartouche
 
-@node Interval Expressions
-@subsection Some Notes On Interval Expressions
-
-@cindex POSIX @command{awk} @subentry interval expressions in
-Interval expressions were not traditionally available in @command{awk}.
-They were added as part of the POSIX standard to make @command{awk}
-and @command{egrep} consistent with each other.
-
-@cindex @command{gawk} @subentry interval expressions and
-Initially, because old programs may use @samp{@{} and @samp{@}} in regexp
-constants,
-@command{gawk} did @emph{not} match interval expressions
-in regexps.
-
-However, beginning with version 4.0,
-@command{gawk} does match interval expressions by default.
-This is because compatibility with POSIX has become more
-important to most @command{gawk} users than compatibility with
-old programs.
-
-For programs that use @samp{@{} and @samp{@}} in regexp constants,
-it is good practice to always escape them with a backslash.  Then the
-regexp constants are valid and work the way you want them to, using
-any version of @command{awk}.@footnote{Use two backslashes if you're
-using a string constant with a regexp operator or function.}
-
-When @samp{@{} and @samp{@}} appear in regexp constants
-in a way that cannot be interpreted as an interval expression
-(such as @code{/q@{a@}/}), then they stand for themselves.
-
-@cindex BWK @command{awk} @subentry interval expressions in
-As mentioned, interval expressions were not traditionally available
-in @command{awk}. In March of 2019, BWK @command{awk} (finally) acquired them.
-Starting with version 5.2, @command{gawk}'s
-@option{--traditional} option no longer disables interval
-expressions in regular expressions.
-
-POSIX says that interval expressions containing repetition counts greater
-than 255 produce unspecified results.
-
-@cindex Eggert, Paul
-In the manual for GNU @command{grep}, Paul Eggert notes the following:
-
-@quotation
-Interval expressions may be implemented internally via repetition.
-For example, @samp{^(a|bc)@{2,4@}$} might be implemented as
-@samp{^(a|bc)(a|bc)((a|bc)(a|bc)?)?$}.  A large repetition count may
-exhaust memory or greatly slow matching.  Even small counts can cause
-problems if cascaded; for example, @samp{grep -E
-".*@{10,@}@{10,@}@{10,@}@{10,@}@{10,@}"} is likely to overflow a
-stack.  Fortunately, regular expressions like these are typically
-artificial, and cascaded repetitions do not conform to POSIX so cannot
-be used in portable programs anyway.
-@end quotation
-
-@noindent
-This same caveat applies to @command{gawk}.
-
-@node Non-greedy operators
-@subsection Shortest Match, or ``Non-greedy'' Regexp Operators
-
-Traditionally, regexps have always matched the leftmost, longest
-sequence of characters.  For example, given the text @samp{abxxxcd},
-the regexp @samp{x+} could match one, two, or all three @samp{x} characters.
-By defining a regexp to match the longest possible sequence, we know that
-@samp{x+} will match all three @samp{x}s.  Such behavior may
-be termed @dfn{greedy}, since a regexp will match as many characters
-as possible.
-
-The Perl language introduced ``non-greedy,'' or shortest-match operators.
-In the above example, @samp{x+} would only match a single @samp{x}.
-
-The 2024 POSIX standard introduced shortest-match operators into POSIX
-EREs.  Syntactically, you create a shortest-match operator by appending
-a @samp{?} to one of the traditional regexp operators: @samp{*}, @samp{+},
-@samp{?}, or @samp{@{@}}.
-
-The shortest-match operators don't always match what you might think would
-be the smallest sequence of characters, since the general, leftmost-longest
-rule still applies to the overall regexp.
-
-To illustrate the differences, we use a program named @file{shortest-match.awk}.
-This program takes several strings, and replaces the text matching a given
-pattern with a single @samp{X}.  The program uses a number of @command{gawk}-specific
-features which haven't yet been described. We therefore delay presenting the
-code until @ref{Shortest match program}.
-
-For each string, the program prints the following:
-
-@itemize @bullet
-@item
-The original string, in quotes.
-
-@item
-The pattern used with a shortest match operator and the result, indented.
-
-@item
-Further indented is a list of the start and lengths of the submatches.
-Submatch zero is the whole string, submatch one is the first
-parenthesized expression, and so on.
-
-@item
-The pattern used with a regular match operator and the result, indented.
-
-@item
-The same start plus length information for submatches of
-the long pattern.
-@end itemize
-
-Here is the output, with commentary:
-
-@example
-"aaaxxxzzz"
-    shortpat: /x+?/, result: "aaaXxxzzz"
-        0: (s: 4, l: 1) -> "x"
-    longpat: /x+/, result: "aaaXzzz"
-        0: (s: 4, l: 3) -> "xxx"
-@end example
-
-@noindent
-For the shortest match, only one @samp{x} is replaced.
-For the longest match, every @samp{x} is replaced.
-This is pretty straightforward.
-
-@example
-"aaaxxxyzzz"
-    shortpat: /x+?y/, result: "aaaXzzz"
-        0: (s: 4, l: 4) -> "xxxy"
-    longpat: /x+y/, result: "aaaXzzz"
-        0: (s: 4, l: 4) -> "xxxy"
-@end example
-
-@noindent
-In this case, the result is the same, since the longest
-possible string of characters is matched.
-
-@example
-"aaaxxxxxxxxxxxxxxxxzzz"
-    shortpat: /(x+?)(x+)(x+?)(x+)/, result: "aaaXzzz"
-        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
-        1: (s: 4, l: 1) -> "x"
-        2: (s: 5, l: 13) -> "xxxxxxxxxxxxx"
-        3: (s: 18, l: 1) -> "x"
-        4: (s: 19, l: 1) -> "x"
-    longpat: /(x+)(x+)(x+)(x+)/, result: "aaaXzzz"
-        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
-        1: (s: 4, l: 13) -> "xxxxxxxxxxxxx"
-        2: (s: 17, l: 1) -> "x"
-        3: (s: 18, l: 1) -> "x"
-        4: (s: 19, l: 1) -> "x"
-@end example
-
-@noindent
-This case is more interesting.
-The same total amount of text is matched for both patterns.
-However, the text matched by the subexpressions differs
-between the two cases. In the longest-match case, the 
-longest possible subexpressions match first.
-
-@example
-"aaaxyxxyxxyxzzz"
-    shortpat: /((x+)(y+?)(x+))+/, result: "aaaXyxxyxzzz"
-        0: (s: 4, l: 4) -> "xyxx"
-        1: (s: 4, l: 4) -> "xyxx"
-        2: (s: 4, l: 1) -> "x"
-        3: (s: 5, l: 1) -> "y"
-        4: (s: 6, l: 2) -> "xx"
-    longpat: /((x+)(y+)(x+))+/, result: "aaaXzzz"
-        0: (s: 4, l: 9) -> "xyxxyxxyx"
-        1: (s: 10, l: 3) -> "xyx"
-        2: (s: 10, l: 1) -> "x"
-        3: (s: 11, l: 1) -> "y"
-        4: (s: 12, l: 1) -> "x"
-@end example
-
-@noindent
-This case needs careful examination. There is a @samp{+} on the outside,
-meaning that the total inner expression may match multiple times.
-For the longest-match expression, that indeed happens. The subexpressions
-two through four have the start and length values for the last occasion
-where the inner expression matched.  The shortest-match expression
-only matched the inner expression once.
-
-@example
-"aaaxyxxyxxyxzzz"
-    shortpat: /((x+)(y+?)(x+))@{2@}/, result: "aaaXyxzzz"
-        0: (s: 4, l: 7) -> "xyxxyxx"
-        1: (s: 7, l: 4) -> "xyxx"
-        2: (s: 7, l: 1) -> "x"
-        3: (s: 8, l: 1) -> "y"
-        4: (s: 9, l: 2) -> "xx"
-    longpat: /((x+)(y+)(x+))@{2@}/, result: "aaaXyxzzz"
-        0: (s: 4, l: 7) -> "xyxxyxx"
-        1: (s: 7, l: 4) -> "xyxx"
-        2: (s: 7, l: 1) -> "x"
-        3: (s: 8, l: 1) -> "y"
-        4: (s: 9, l: 2) -> "xx"
-@end example
-
-@noindent
-Here, the results are identical; both the nature of the string
-to be matched and the POSIX longest-leftmost rule, cause this to happen.
-
-@c FIXME: Update this when the GNU matchers are finally gone.
-The MinRX regular expression matching engine, which is @command{gawk}'s
-default matcher (@pxref{Choosing Matchers}), supports the shortest-match
-operators.  The older GNU matchers do not.  Also, when invoked with the
-@option{--traditional} option, shortest-match operators are not supported,
-since traditional @command{awk} does not have these operators.
-
-@quotation NOTE
-The addition of a trailing @samp{?} into the syntax can lead to unexpected
-incompatibilities with previous versions of @command{gawk}. For example,
-consider a regexp like @samp{a@{1,2@}?b+}.  With the GNU matchers,
-this matches an optional occurrence of one or two @code{a} characters
-followed by one or more @code{b} characters.  With the new POSIX syntax,
-this is a non-greedy match of one or two @code{a} characters followed
-by one or more @code{b} characters.
-
-Technically speaking, using one repetition operator immediately after
-another is undefined.  The correct way to write the previous regexp is
-to use parentheses: @samp{(a@{1,2@})?b+}.  This is clear and unambiguous.
-@end quotation
-
-@node Bracket Expressions
-@section Using Bracket Expressions
-@cindex bracket expressions
-@cindex bracket expressions @subentry range expressions
-@cindex range expressions (regexps)
-@cindex bracket expressions @subentry character lists
-
-As mentioned earlier, a bracket expression matches any character among
-those listed between the opening and closing square brackets.
-
-Within a bracket expression, a @dfn{range expression} consists of two
-characters separated by a hyphen.  It matches any single character that
-sorts between the two characters, based upon the system's native character
-set.  For example, @samp{[0-9]} is equivalent to @samp{[0123456789]}.
-(See @ref{Ranges and Locales} for an explanation of how the POSIX
-standard and @command{gawk} have changed over time.  This is mainly
-of historical interest.)
-
-With the increasing popularity of the
-@uref{https://www.unicode.org, Unicode character standard},
-there is an additional wrinkle to consider. Octal and hexadecimal
-escape sequences inside bracket expressions are taken to represent
-only single-byte characters (characters whose values fit within
-the range 0--255).  To match a range of characters where the endpoints
-of the range are larger than 255, enter the multibyte encodings of
-the characters directly, or use the @code{\u} escape sequence.
-
-@cindex @code{\} (backslash) @subentry in bracket expressions
-@cindex backslash (@code{\}) @subentry in bracket expressions
-@cindex @code{^} (caret) @subentry in bracket expressions
-@cindex caret (@code{^}) @subentry in bracket expressions
-@cindex @code{-} (hyphen) @subentry in bracket expressions
-@cindex hyphen (@code{-}) @subentry in bracket expressions
-To include one of the characters @samp{\}, @samp{]}, @samp{-}, or @samp{^} in a
-bracket expression, put a @samp{\} in front of it.  For example:
-
-@example
-[d\]]
-@end example
-
-@noindent
-matches either @samp{d} or @samp{]}.
-Additionally, if you place @samp{]} right after the opening
-@samp{[} (@samp{[]d]}), the closing bracket is treated as one of the
-characters to be matched.
-Inside bracket expressions, it's not necessary to escape
-the other standard regular expression operators, such as @samp{*} and @samp{?},
-and for full portability you should not.
-
-@quotation NOTE
-Note that the additional regular expression operators that begin with a
-backslash, such as @samp{\<}, or @samp{\w}, have no meaning
-when used inside a bracket expression. There, the backslash is taken
-to mean escape the following character, so @samp{[\w]} is the same
-as @samp{[w]}, and @samp{[\<]} is the same as @samp{[<]}.
-@end quotation
-
-@cindex POSIX @command{awk} @subentry bracket expressions and
-@cindex Extended Regular Expressions (EREs)
-@cindex EREs (Extended Regular Expressions)
-@cindex @command{egrep} utility
-The treatment of @samp{\} in bracket expressions
-is compatible with other @command{awk}
-implementations and is also mandated by POSIX.@footnote{See
-@uref{@value{POSIXURL}/utilities/awk.html,
-the POSIX standard for @command{awk}}.
-The standard doesn't relate to the case
-of @samp{\]}, but it does explicitly relate to @samp{\}
-before a regular expression metacharacter.}
-The regular expressions in @command{awk} are a superset
-of the POSIX specification for Extended Regular Expressions (EREs).
-POSIX EREs are based on the regular expressions accepted by the
-traditional @command{egrep} utility.
-
-@cindex bracket expressions @subentry character classes
-@cindex POSIX @command{awk} @subentry bracket expressions and @subentry character classes
-@dfn{Character classes} are a feature introduced in the POSIX standard.
-A character class is a special notation for describing
-lists of characters that have a specific attribute, but the
-actual characters can vary from country to country and/or
-from character set to character set.  For example, the notion of what
-is an alphabetic character differs between the United States and France.
-
-A character class is only valid in a regexp @emph{inside} the
-brackets of a bracket expression.  Character classes consist of @samp{[:},
-a keyword denoting the class, and @samp{:]}.
-@ref{table-char-classes} lists the character classes defined by the
-POSIX standard.
-
-@float Table,table-char-classes
-@caption{POSIX character classes}
-@multitable @columnfractions .15 .85
-@headitem Class @tab Meaning
-@item @code{[:alnum:]} @tab Alphanumeric characters
-@item @code{[:alpha:]} @tab Alphabetic characters
-@item @code{[:blank:]} @tab Space and TAB characters
-@item @code{[:cntrl:]} @tab Control characters
-@item @code{[:digit:]} @tab Numeric characters
-@item @code{[:graph:]} @tab Characters that are both printable and visible
-(a space is printable but not visible, whereas an @samp{a} is both)
-@item @code{[:lower:]} @tab Lowercase alphabetic characters
-@item @code{[:print:]} @tab Printable characters (characters that are not control characters)
-@item @code{[:punct:]} @tab Punctuation characters (characters that are not letters, digits,
-control characters, or space characters)
-@item @code{[:space:]} @tab Space characters (these are: space, TAB, newline, carriage return, formfeed and vertical tab)
-@item @code{[:upper:]} @tab Uppercase alphabetic characters
-@item @code{[:xdigit:]} @tab Characters that are hexadecimal digits
-@end multitable
-@end float
-
-For example, before the POSIX standard, you had to write @code{/[A-Za-z0-9]/}
-to match alphanumeric characters.  If your
-character set had other alphabetic characters in it, this would not
-match them.
-With the POSIX character classes, you can write
-@code{/[[:alnum:]]/} to match the alphabetic
-and numeric characters in your character set.
-
-@c Thanks to
-@c Date: Tue, 01 Jul 2014 07:39:51 +0200
-@c From: Hermann Peifer <peifer@gmx.eu>
-@cindex ASCII
-Some utilities that match regular expressions provide a nonstandard
-@samp{[:ascii:]} character class; @command{awk} does not. However, you
-can simulate such a construct using @samp{[\x00-\x7F]}.  This matches
-all values numerically between zero and 127, which is the defined
-range of the ASCII character set.  Use a complemented character list
-(@samp{[^\x00-\x7F]}) to match any single-byte characters that are not
-in the ASCII range.
-
-@quotation NOTE
-Some older versions of Unix @command{awk}
-treat @code{[:blank:]} like @code{[:space:]}, incorrectly matching
-more characters than they should.  Caveat Emptor.
-@end quotation
-
-@cindex bracket expressions @subentry collating elements
-@cindex bracket expressions @subentry non-ASCII
-@cindex collating elements
-Two additional special sequences can appear in bracket expressions.
-These apply to non-ASCII character sets, which can have single symbols
-(called @dfn{collating elements}) that are represented with more than one
-character. They can also have several characters that are equivalent for
-@dfn{collating}, or sorting, purposes.  (For example, in French, a plain ``e''
-and a grave-accented ``@`e'' are equivalent.)
-These sequences are:
-
-@table @asis
-@cindex bracket expressions @subentry collating symbols
-@cindex collating symbols
-@item Collating symbols
-Multicharacter collating elements enclosed between
-@samp{[.} and @samp{.]}.  For example, if @samp{ch} is a collating element,
-then @samp{[[.ch.]]} is a regexp that matches this collating element, whereas
-@samp{[ch]} is a regexp that matches either @samp{c} or @samp{h}.
-
-@cindex bracket expressions @subentry equivalence classes
-@item Equivalence classes
-Locale-specific names for a list of
-characters that are equal. The name is enclosed between
-@samp{[=} and @samp{=]}.
-For example, the name @samp{e} might be used to represent all of
-``e,'' ``@^e,'' ``@`e,'' and ``@'e.'' In this case, @samp{[[=e=]]} is a regexp
-that matches any of @samp{e}, @samp{@^e}, @samp{@'e}, or @samp{@`e}.
-@end table
-
-These features are very valuable in non-English-speaking locales.
-
-@cindex internationalization @subentry localization @subentry character classes
-@cindex @command{gawk} @subentry character classes and
-@cindex POSIX @command{awk} @subentry bracket expressions and @subentry character classes
-@quotation CAUTION
-The library functions that @command{gawk} uses for regular
-expression matching currently recognize POSIX character classes.
-The MinRX matcher supports
-single-letter equivalence classes and single-letter collating symbols.
-@c FIXME:
-The GNU matchers do not support either equivalence classes
-or collating symbols.
-@end quotation
-@c maybe one day ...
-
-Inside a bracket expression, an opening bracket (@samp{[}) that does
-not start a character class, collating element or equivalence class is
-taken literally. This is also true of @samp{.} and @samp{*}.
-
-@node Leftmost Longest
-@section How Much Text Matches?
-
-@cindex regular expressions @subentry leftmost longest match
-@c @cindex matching, leftmost longest
-Consider the following:
-
-@example
-echo aaaabcd | awk '@{ sub(/a+/, "<A>"); print @}'
-@end example
-
-This example uses the @code{sub()} function to make a change to the input
-record.  (@code{sub()} replaces the first instance of any text matched
-by the first argument with the string provided as the second argument;
-@pxref{String Functions}.)  Here, the regexp @code{/a+/} indicates ``one
-or more @samp{a} characters,'' and the replacement text is @samp{<A>}.
-
-The input contains four @samp{a} characters.
-@command{awk} (and POSIX) regular expressions always match
-the leftmost, @emph{longest} sequence of input characters that can
-match.  Thus, all four @samp{a} characters are
-replaced with @samp{<A>} in this example:
-
-@example
-$ @kbd{echo aaaabcd | awk '@{ sub(/a+/, "<A>"); print @}'}
-@print{} <A>bcd
-@end example
-
-For simple match/no-match tests, this is not so important. But when doing
-text matching and substitutions with the @code{match()}, @code{sub()}, @code{gsub()},
-and @code{gensub()} functions, it is very important.
-@ifinfo
-@xref{String Functions},
-for more information on these functions.
-@end ifinfo
-Understanding this principle is also important for regexp-based record
-and field splitting (@pxref{Records},
-and also @pxref{Field Separators}).
-
-@node Computed Regexps
-@section Using Dynamic Regexps
-
-@cindex regular expressions @subentry computed
-@cindex regular expressions @subentry dynamic
-@cindex @code{~} (tilde), @code{~} operator
-@cindex tilde (@code{~}), @code{~} operator
-@cindex @code{!} (exclamation point) @subentry @code{!~} operator
-@cindex exclamation point (@code{!}) @subentry @code{!~} operator
-@c @cindex operators, @code{~}
-@c @cindex operators, @code{!~}
-The righthand side of a @samp{~} or @samp{!~} operator need not be a
-regexp constant (i.e., a string of characters between slashes).  It may
-be any expression.  The expression is evaluated and converted to a string
-if necessary; the contents of the string are then used as the
-regexp.  A regexp computed in this way is called a @dfn{dynamic
-regexp} or a @dfn{computed regexp}:
-
-@example
-BEGIN @{ digits_regexp = "[[:digit:]]+" @}
-$0 ~ digits_regexp    @{ print @}
-@end example
-
-@noindent
-This sets @code{digits_regexp} to a regexp that describes one or more digits,
-and tests whether the input record matches this regexp.
-
-@quotation NOTE
-When using the @samp{~} and @samp{!~}
-operators, be aware that there is a difference between a regexp constant
-enclosed in slashes and a string constant enclosed in double quotes.
-If you are going to use a string constant, you have to understand that
-the string is, in essence, scanned @emph{twice}: the first time when
-@command{awk} reads your program, and the second time when it goes to
-match the string on the lefthand side of the operator with the pattern
-on the right.  This is true of any string-valued expression (such as
-@code{digits_regexp}, shown in the previous example), not just string constants.
-@end quotation
-
-@cindex regexp constants @subentry slashes vs.@: double quotes
-@cindex @code{\} (backslash) @subentry in regexp constants
-@cindex backslash (@code{\}) @subentry in regexp constants
-@cindex @code{"} (double quote) @subentry in regexp constants
-@cindex double quote (@code{"}) @subentry in regexp constants
-What difference does it make if the string is
-scanned twice? The answer has to do with escape sequences, and particularly
-with backslashes.  To get a backslash into a regular expression inside a
-string, you have to type two backslashes.
-
-For example, @code{/\*/} is a regexp constant for a literal @samp{*}.
-Only one backslash is needed.  To do the same thing with a string,
-you have to type @code{"\\*"}.  The first backslash escapes the
-second one so that the string actually contains the
-two characters @samp{\} and @samp{*}.
-
-@cindex troubleshooting @subentry regexp constants vs.@: string constants
-@cindex regexp constants @subentry vs.@: string constants
-@cindex string @subentry constants @subentry vs.@: regexp constants
-Given that you can use both regexp and string constants to describe
-regular expressions, which should you use?  The answer is ``regexp
-constants,'' for several reasons:
-
-@itemize @value{BULLET}
-@item
-String constants are more complicated to write and
-more difficult to read. Using regexp constants makes your programs
-less error-prone.  Not understanding the difference between the two
-kinds of constants is a common source of errors.
-
-@item
-It is more efficient to use regexp constants. @command{awk} can note
-that you have supplied a regexp and store it internally in a form that
-makes pattern matching more efficient.  When using a string constant,
-@command{awk} must first convert the string into this internal form and
-then perform the pattern matching.
-
-@item
-Using regexp constants is better form; it shows clearly that you
-intend a regexp match.
-@end itemize
-
-@cindex sidebar @subentry Using @code{\n} in Bracket Expressions of Dynamic Regexps
-@cartouche Using @code{\n} in Bracket Expressions of Dynamic Regexps
-@cindex regular expressions @subentry dynamic @subentry with embedded newlines
-@cindex newlines @subentry in dynamic regexps
-
-Some older versions of @command{awk} do not allow the newline
-character to be used inside a bracket expression for a dynamic regexp:
-
-@example
-$ @kbd{awk '$0 ~ "[ \t\n]"'}
-@error{} awk: newline in character class [
-@error{} ]...
-@error{}  source line number 1
-@error{}  context is
-@error{}        $0 ~ "[ >>>  \t\n]" <<<
-@end example
-
-@cindex newlines @subentry in regexp constants
-But a newline in a regexp constant works with no problem:
-
-@example
-$ @kbd{awk '$0 ~ /[ \t\n]/'}
-@kbd{here is a sample line}
-@print{} here is a sample line
-@kbd{Ctrl-d}
-@end example
-
-@command{gawk} does not have this problem, and it isn't likely to
-occur often in practice, but it's worth noting for future reference.
-@end cartouche
-
 @node GNU Regexp Operators
-@section @command{gawk}-Specific Regexp Operators
+@subsection @command{gawk}-Specific Regexp Operators
 
 @c This section adapted (long ago) from the regex-0.12 manual
 
@@ -6670,7 +6143,7 @@ such a feature.
 
 We are told that BusyBox @command{awk} (@pxref{Other Versions}) is an
 exception, and that it allows backreferences, but only in dynamic regexps;
-for example @samp{"aa" ~ "(.)\1"}, whereas it treats the @samp{\1} in
+for example @samp{"aa" ~ "(.)\\1"}, whereas it treats the @samp{\1} in
 @samp{"aa" ~ /(.)\1/} as an octal escape sequence.
 @end cartouche
 
@@ -6683,32 +6156,514 @@ control how @command{gawk} interprets characters in regexps:
 @table @asis
 @item No options
 In the default case, @command{gawk} provides all the facilities of
-POSIX regexps and the
-@ifnotinfo
-previously described
-GNU regexp operators.
-@end ifnotinfo
-@ifnottex
-@ifnotdocbook
-GNU regexp operators described
-in @ref{Regexp Operators}.
-@end ifnotdocbook
-@end ifnottex
+POSIX regexps and the previously described GNU regexp operators.
 
 @item @option{--posix}
 Match only POSIX regexps; the GNU operators are not special
-(e.g., @samp{\w} matches a literal @samp{w}).  Interval expressions
-are allowed.
+(e.g., @samp{\w} matches a literal @samp{w}).
 
 @cindex Brian Kernighan's @command{awk}
 @item @option{--traditional}
 Match traditional Unix @command{awk} regexps. The GNU operators
-are not special.  Because BWK @command{awk} supports them,
-the POSIX character classes (@samp{[[:alnum:]]}, etc.) are available.
-So too, interval expressions are allowed.
-Characters described by octal and hexadecimal escape sequences are
+are not special.
+Characters described by octal, hexadecimal and Unicode escape sequences are
 treated literally, even if they represent regexp metacharacters.
+The shortest-match operators are not supported.
 @end table
+
+@node Interval Expressions
+@subsection Some Notes On Interval Expressions
+
+@cindex POSIX @command{awk} @subentry interval expressions in
+Interval expressions were not traditionally available in @command{awk}.
+They were added as part of the POSIX standard to make @command{awk}
+and @command{egrep} consistent with each other.
+
+@cindex @command{gawk} @subentry interval expressions and
+@cindex BWK @command{awk} @subentry interval expressions in
+For a long time, a special command-line option was required to use them in
+@command{gawk}.  When compatibility with POSIX has become more important
+to most @command{gawk} users than compatibility with old programs,
+@command{gawk} was changed to enable interval expressions by default.
+Eventually, BWK @command{awk} also acquired them.
+
+For programs that wish to use a literal @samp{@{} or @samp{@}} in regexp constants,
+it is good practice to always escape them with a backslash.  Then the
+regexp constants are valid and work the way you want them to, using
+any version of @command{awk}.@footnote{Use two backslashes if you're
+using a string constant with a regexp operator or function.}
+
+When @samp{@{} and @samp{@}} appear in regexp constants
+in a way that cannot be interpreted as an interval expression
+(such as @code{/q@{a@}/}), then they stand for themselves.
+
+POSIX says that interval expressions containing repetition counts greater
+than 255 produce unspecified results.
+
+@cindex Eggert, Paul
+In the manual for GNU @command{grep}, Paul Eggert notes the following:
+
+@quotation
+Interval expressions may be implemented internally via repetition.
+For example, @samp{^(a|bc)@{2,4@}$} might be implemented as
+@samp{^(a|bc)(a|bc)((a|bc)(a|bc)?)?$}.  A large repetition count may
+exhaust memory or greatly slow matching.  Even small counts can cause
+problems if cascaded; for example, @samp{grep -E
+".*@{10,@}@{10,@}@{10,@}@{10,@}@{10,@}"} is likely to overflow a
+stack.  Fortunately, regular expressions like these are typically
+artificial, and cascaded repetitions do not conform to POSIX so cannot
+be used in portable programs anyway.
+@end quotation
+
+@noindent
+This same caveat applies to @command{gawk}.
+
+@node Non-greedy operators
+@subsection Shortest Match, or ``Non-greedy'' Regexp Operators
+
+Traditionally, regexps have always matched the leftmost, longest
+sequence of characters.  For example, given the text @samp{abxxxcd},
+the regexp @samp{x+} could match one, two, or all three @samp{x} characters.
+By defining a regexp to match the longest possible sequence, we know that
+@samp{x+} will match all three @samp{x}s.  Such behavior may
+be termed @dfn{greedy}, since a regexp will match as many characters
+as possible.
+
+The Perl language introduced ``non-greedy,'' or shortest-match operators.
+In the above example, @samp{x+} would only match a single @samp{x}.
+
+The 2024 POSIX standard introduced shortest-match operators into POSIX
+extended regular expressions (which is what @command{awk} uses).
+Syntactically, you create a shortest-match operator by appending
+a @samp{?} to one of the traditional regexp operators: @samp{*}, @samp{+},
+@samp{?}, or @samp{@{@}}.
+
+The shortest-match operators don't always match what you might think would
+be the smallest sequence of characters, since the general, leftmost-longest
+rule still applies to the overall regexp.
+
+To illustrate the differences, we use a program named @file{shortest-match.awk}.
+This program takes several strings, and replaces the text matching a given
+pattern with a single @samp{X}.  The program uses a number of @command{gawk}-specific
+features which haven't yet been described. We therefore delay presenting the
+code until @ref{Shortest match program}.
+
+For each string, the program prints the following:
+
+@itemize @bullet
+@item
+The original string, in quotes.
+
+@item
+The pattern used with a shortest match operator and the result, indented.
+
+@item
+Further indented is a list of the start and lengths of the submatches.
+Submatch zero is the whole string, submatch one is the first
+parenthesized expression, and so on.
+
+@item
+The pattern used with a regular match operator and the result, indented.
+
+@item
+The same start plus length information for submatches of
+the long pattern.
+@end itemize
+
+Here is the output, with commentary:
+
+@enumerate 1
+@item
+@samp{x+?} versus @samp{x+}:
+
+@example
+"aaaxxxzzz"
+    shortpat: /x+?/, result: "aaaXxxzzz"
+        0: (s: 4, l: 1) -> "x"
+    longpat: /x+/, result: "aaaXzzz"
+        0: (s: 4, l: 3) -> "xxx"
+@end example
+
+@noindent
+For the shortest match, only one @samp{x} is replaced.
+For the longest match, every @samp{x} is replaced.
+This is pretty straightforward.
+
+@item
+@samp{x+?y} versus @samp{x+y}:
+
+@example
+"aaaxxxyzzz"
+    shortpat: /x+?y/, result: "aaaXzzz"
+        0: (s: 4, l: 4) -> "xxxy"
+    longpat: /x+y/, result: "aaaXzzz"
+        0: (s: 4, l: 4) -> "xxxy"
+@end example
+
+@noindent
+In this case, the result is the same, since the longest
+possible string of characters is matched.
+
+@item
+Mixing shortest- and longest-match operators versus all longest-match:
+
+@example
+"aaaxxxxxxxxxxxxxxxxzzz"
+    shortpat: /(x+?)(x+)(x+?)(x+)/, result: "aaaXzzz"
+        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
+        1: (s: 4, l: 1) -> "x"
+        2: (s: 5, l: 13) -> "xxxxxxxxxxxxx"
+        3: (s: 18, l: 1) -> "x"
+        4: (s: 19, l: 1) -> "x"
+    longpat: /(x+)(x+)(x+)(x+)/, result: "aaaXzzz"
+        0: (s: 4, l: 16) -> "xxxxxxxxxxxxxxxx"
+        1: (s: 4, l: 13) -> "xxxxxxxxxxxxx"
+        2: (s: 17, l: 1) -> "x"
+        3: (s: 18, l: 1) -> "x"
+        4: (s: 19, l: 1) -> "x"
+@end example
+
+@noindent
+This case is more interesting.
+The same total amount of text is matched for both patterns.
+However, the text matched by the subexpressions differs
+between the two cases. In the longest-match case, the 
+longest possible subexpressions match first.
+
+@item
+Embedding the shortest-match operator inside a pattern with
+a following repitition operator:
+
+@example
+"aaaxyxxyxxyxzzz"
+    shortpat: /((x+)(y+?)(x+))+/, result: "aaaXyxxyxzzz"
+        0: (s: 4, l: 4) -> "xyxx"
+        1: (s: 4, l: 4) -> "xyxx"
+        2: (s: 4, l: 1) -> "x"
+        3: (s: 5, l: 1) -> "y"
+        4: (s: 6, l: 2) -> "xx"
+    longpat: /((x+)(y+)(x+))+/, result: "aaaXzzz"
+        0: (s: 4, l: 9) -> "xyxxyxxyx"
+        1: (s: 10, l: 3) -> "xyx"
+        2: (s: 10, l: 1) -> "x"
+        3: (s: 11, l: 1) -> "y"
+        4: (s: 12, l: 1) -> "x"
+@end example
+
+@noindent
+This case needs careful examination. There is a @samp{+} on the outside,
+meaning that the total inner expression may match multiple times.
+For the longest-match expression, that indeed happens. The subexpressions
+two through four have the start and length values for the last occasion
+where the inner expression matched.  The shortest-match expression
+only matched the inner expression once.
+
+@item
+Embedding the shortest-match operator inside a pattern with
+a following interval expression:
+
+@example
+"aaaxyxxyxxyxzzz"
+    shortpat: /((x+)(y+?)(x+))@{2@}/, result: "aaaXyxzzz"
+        0: (s: 4, l: 7) -> "xyxxyxx"
+        1: (s: 7, l: 4) -> "xyxx"
+        2: (s: 7, l: 1) -> "x"
+        3: (s: 8, l: 1) -> "y"
+        4: (s: 9, l: 2) -> "xx"
+    longpat: /((x+)(y+)(x+))@{2@}/, result: "aaaXyxzzz"
+        0: (s: 4, l: 7) -> "xyxxyxx"
+        1: (s: 7, l: 4) -> "xyxx"
+        2: (s: 7, l: 1) -> "x"
+        3: (s: 8, l: 1) -> "y"
+        4: (s: 9, l: 2) -> "xx"
+@end example
+
+@noindent
+Here, the results are identical; both the nature of the string
+to be matched and the POSIX longest-leftmost rule, cause this to happen.
+@end enumerate
+
+@c FIXME: Update this when the GNU matchers are finally gone.
+The MinRX regular expression matching engine, which is @command{gawk}'s
+default matcher (@pxref{Choosing Matchers}), supports the shortest-match
+operators.  The older GNU matchers do not.  Also, when invoked with the
+@option{--traditional} option, shortest-match operators are not supported,
+since traditional @command{awk} does not have these operators.
+
+@quotation NOTE
+The addition of a trailing @samp{?} into the syntax can lead to unexpected
+incompatibilities with previous versions of @command{gawk}. For example,
+consider a regexp like @samp{a@{1,2@}?b+}.  With the GNU matchers,
+this matches an optional occurrence of one or two @code{a} characters
+followed by one or more @code{b} characters.  With the new POSIX syntax,
+this is a non-greedy match of one or two @code{a} characters followed
+by one or more @code{b} characters.
+
+Technically speaking, using one repetition operator immediately after
+another is undefined.  The correct way to write the previous regexp is
+to use parentheses: @samp{(a@{1,2@})?b+}.  This is clear and unambiguous.
+@end quotation
+
+@node Bracket Expressions
+@section Using Bracket Expressions
+@cindex bracket expressions
+@cindex bracket expressions @subentry range expressions
+@cindex range expressions (regexps)
+@cindex bracket expressions @subentry character lists
+
+As mentioned earlier, a bracket expression matches any character among
+those listed between the opening and closing square brackets.
+
+Within a bracket expression, a @dfn{range expression} consists of two
+characters separated by a hyphen.  It matches any single character that
+sorts between the two characters, based upon the system's native character
+set.  For example, @samp{[0-9]} is equivalent to @samp{[0123456789]}.
+(See @ref{Ranges and Locales} for an explanation of how the POSIX
+standard and @command{gawk} have changed over time.  This is mainly
+of historical interest.)
+
+With the increasing popularity of the
+@uref{https://www.unicode.org, Unicode character standard},
+there is an additional wrinkle to consider. Octal and hexadecimal
+escape sequences inside bracket expressions are taken to represent
+only single-byte characters (characters whose values fit within
+the range 0--255).  To match a range of characters where the endpoints
+of the range are larger than 255, enter the multibyte encodings of
+the characters directly, or use the @code{\u} escape sequence.
+
+@cindex @code{\} (backslash) @subentry in bracket expressions
+@cindex backslash (@code{\}) @subentry in bracket expressions
+@cindex @code{^} (caret) @subentry in bracket expressions
+@cindex caret (@code{^}) @subentry in bracket expressions
+@cindex @code{-} (hyphen) @subentry in bracket expressions
+@cindex hyphen (@code{-}) @subentry in bracket expressions
+To include one of the characters @samp{\}, @samp{]}, @samp{-}, or @samp{^} in a
+bracket expression, put a @samp{\} in front of it.  For example:
+
+@example
+[d\]]
+@end example
+
+@noindent
+matches either @samp{d} or @samp{]}.
+Additionally, if you place @samp{]} right after the opening
+@samp{[} (@samp{[]d]}), the closing bracket is treated as one of the
+characters to be matched.
+Inside bracket expressions, it's not necessary to escape
+the other standard regular expression operators, such as @samp{*} and @samp{?},
+and for full portability you should not.
+
+@quotation NOTE
+Note that the additional regular expression operators that begin with a
+backslash, such as @samp{\<}, or @samp{\w}, have no meaning
+when used inside a bracket expression. There, the backslash is taken
+to mean escape the following character, so @samp{[\w]} is the same
+as @samp{[w]}, and @samp{[\<]} is the same as @samp{[<]}.
+@end quotation
+
+@cindex POSIX @command{awk} @subentry bracket expressions and
+@cindex Extended Regular Expressions (EREs)
+@cindex EREs (Extended Regular Expressions)
+@cindex @command{egrep} utility
+The treatment of @samp{\} in bracket expressions
+is compatible with other @command{awk}
+implementations and is also mandated by POSIX.@footnote{See
+@uref{@value{POSIXURL}/utilities/awk.html,
+the POSIX standard for @command{awk}}.
+The standard doesn't relate to the case
+of @samp{\]}, but it does explicitly relate to @samp{\}
+before a regular expression metacharacter.}
+The regular expressions in @command{awk} are a superset
+of the POSIX specification for Extended Regular Expressions (EREs).
+POSIX EREs are based on the regular expressions accepted by the
+traditional @command{egrep} utility.
+
+@cindex bracket expressions @subentry character classes
+@cindex POSIX @command{awk} @subentry bracket expressions and @subentry character classes
+@dfn{Character classes} are a feature introduced in the POSIX standard.
+A character class is a special notation for describing
+lists of characters that have a specific attribute, but the
+actual characters can vary from country to country and/or
+from character set to character set.  For example, the notion of what
+is an alphabetic character differs between the United States and France.
+
+A character class is only valid in a regexp @emph{inside} the
+brackets of a bracket expression.  Character classes consist of @samp{[:},
+a keyword denoting the class, and @samp{:]}.
+@ref{table-char-classes} lists the character classes defined by the
+POSIX standard.
+
+@float Table,table-char-classes
+@caption{POSIX character classes}
+@multitable @columnfractions .15 .85
+@headitem Class @tab Meaning
+@item @code{[:alnum:]} @tab Alphanumeric characters
+@item @code{[:alpha:]} @tab Alphabetic characters
+@item @code{[:blank:]} @tab Space and TAB characters
+@item @code{[:cntrl:]} @tab Control characters
+@item @code{[:digit:]} @tab Numeric characters
+@item @code{[:graph:]} @tab Characters that are both printable and visible
+(a space is printable but not visible, whereas an @samp{a} is both)
+@item @code{[:lower:]} @tab Lowercase alphabetic characters
+@item @code{[:print:]} @tab Printable characters (characters that are not control characters)
+@item @code{[:punct:]} @tab Punctuation characters (characters that are not letters, digits,
+control characters, or space characters)
+@item @code{[:space:]} @tab Space characters (these are: space, TAB, newline, carriage return, formfeed and vertical tab)
+@item @code{[:upper:]} @tab Uppercase alphabetic characters
+@item @code{[:xdigit:]} @tab Characters that are hexadecimal digits
+@end multitable
+@end float
+
+For example, before the POSIX standard, you had to write @code{/[A-Za-z0-9]/}
+to match alphanumeric characters.  If your
+character set had other alphabetic characters in it, this would not
+match them.
+With the POSIX character classes, you can write
+@code{/[[:alnum:]]/} to match the alphabetic
+and numeric characters in your character set.
+
+@c Thanks to
+@c Date: Tue, 01 Jul 2014 07:39:51 +0200
+@c From: Hermann Peifer <peifer@gmx.eu>
+@cindex ASCII
+Some utilities that match regular expressions provide a nonstandard
+@samp{[:ascii:]} character class; @command{awk} does not. However, you
+can simulate such a construct using @samp{[\x00-\x7F]}.  This matches
+all values numerically between zero and 127, which is the defined
+range of the ASCII character set.  Use a complemented character list
+(@samp{[^\x00-\x7F]}) to match any single-byte characters that are not
+in the ASCII range.
+
+@cindex bracket expressions @subentry collating elements
+@cindex bracket expressions @subentry non-ASCII
+@cindex collating elements
+Two additional special sequences can appear in bracket expressions.
+These apply to non-ASCII character sets, which can have single symbols
+(called @dfn{collating elements}) that are represented with more than one
+character. They can also have several characters that are equivalent for
+@dfn{collating}, or sorting, purposes.  (For example, in French, a plain ``e''
+and a grave-accented ``@`e'' are equivalent.)
+These sequences are:
+
+@table @asis
+@cindex bracket expressions @subentry collating symbols
+@cindex collating symbols
+@item Collating symbols
+Multicharacter collating elements enclosed between
+@samp{[.} and @samp{.]}.  For example, if @samp{ch} is a collating element,
+then @samp{[[.ch.]]} is a regexp that matches this collating element, whereas
+@samp{[ch]} is a regexp that matches either @samp{c} or @samp{h}.
+
+@cindex bracket expressions @subentry equivalence classes
+@item Equivalence classes
+Locale-specific names for a list of
+characters that are equal. The name is enclosed between
+@samp{[=} and @samp{=]}.
+For example, the name @samp{e} might be used to represent all of
+``e,'' ``@^e,'' ``@`e,'' and ``@'e.'' In this case, @samp{[[=e=]]} is a regexp
+that matches any of @samp{e}, @samp{@^e}, @samp{@'e}, or @samp{@`e}.
+@end table
+
+These features are very valuable in non-English-speaking locales.
+
+@cindex internationalization @subentry localization @subentry character classes
+@cindex @command{gawk} @subentry character classes and
+@cindex POSIX @command{awk} @subentry bracket expressions and @subentry character classes
+@quotation CAUTION
+The library functions that @command{gawk} uses for regular
+expression matching currently recognize POSIX character classes.
+The MinRX matcher supports
+single-letter equivalence classes and single-letter collating symbols.
+@c FIXME:
+The GNU matchers do not support either equivalence classes
+or collating symbols.
+@end quotation
+@c maybe one day ...
+
+Inside a bracket expression, an opening bracket (@samp{[}) that does
+not start a character class, collating element or equivalence class is
+taken literally. This is also true of @samp{.} and @samp{*}.
+
+@node Computed Regexps
+@section Using Dynamic Regexps
+
+@cindex regular expressions @subentry computed
+@cindex regular expressions @subentry dynamic
+@cindex @code{~} (tilde), @code{~} operator
+@cindex tilde (@code{~}), @code{~} operator
+@cindex @code{!} (exclamation point) @subentry @code{!~} operator
+@cindex exclamation point (@code{!}) @subentry @code{!~} operator
+@c @cindex operators, @code{~}
+@c @cindex operators, @code{!~}
+The righthand side of a @samp{~} or @samp{!~} operator need not be a
+regexp constant (i.e., a string of characters between slashes).  It may
+be any expression.  The expression is evaluated and converted to a string
+if necessary; the contents of the string are then used as the
+regexp.  A regexp computed in this way is called a @dfn{dynamic
+regexp} or a @dfn{computed regexp}:
+
+@example
+BEGIN @{ digits_regexp = "[[:digit:]]+" @}
+$0 ~ digits_regexp    @{ print @}
+@end example
+
+@noindent
+This sets @code{digits_regexp} to a regexp that describes one or more digits,
+and tests whether the input record matches this regexp.
+
+@quotation NOTE
+When using the @samp{~} and @samp{!~}
+operators, be aware that there is a difference between a regexp constant
+enclosed in slashes and a string constant enclosed in double quotes.
+If you are going to use a string constant, you have to understand that
+the string is, in essence, scanned @emph{twice}: the first time when
+@command{awk} reads your program, and the second time when it goes to
+match the string on the lefthand side of the operator with the pattern
+on the right.  This is true of any string-valued expression (such as
+@code{digits_regexp}, shown in the previous example), not just string constants.
+@end quotation
+
+@cindex regexp constants @subentry slashes vs.@: double quotes
+@cindex @code{\} (backslash) @subentry in regexp constants
+@cindex backslash (@code{\}) @subentry in regexp constants
+@cindex @code{"} (double quote) @subentry in regexp constants
+@cindex double quote (@code{"}) @subentry in regexp constants
+What difference does it make if the string is
+scanned twice? The answer has to do with escape sequences, and particularly
+with backslashes.  To get a backslash into a regular expression inside a
+string, you have to type two backslashes.
+
+For example, @code{/\*/} is a regexp constant for a literal @samp{*}.
+Only one backslash is needed.  To do the same thing with a string,
+you have to type @code{"\\*"}.  The first backslash escapes the
+second one so that the string actually contains the
+two characters @samp{\} and @samp{*}.
+
+@cindex troubleshooting @subentry regexp constants vs.@: string constants
+@cindex regexp constants @subentry vs.@: string constants
+@cindex string @subentry constants @subentry vs.@: regexp constants
+Given that you can use both regexp and string constants to describe
+regular expressions, which should you use?  The answer is ``regexp
+constants,'' for several reasons:
+
+@itemize @value{BULLET}
+@item
+String constants are more complicated to write and
+more difficult to read. Using regexp constants makes your programs
+less error-prone.  Not understanding the difference between the two
+kinds of constants is a common source of errors.
+
+@item
+It is more efficient to use regexp constants. @command{awk} can note
+that you have supplied a regexp and store it internally in a form that
+makes pattern matching more efficient.  When using a string constant,
+@command{awk} must first convert the string into this internal form and
+then perform the pattern matching.
+
+@item
+Using regexp constants is better form; it shows clearly that you
+intend a regexp match.
+@end itemize
 
 @node Case-sensitivity
 @section Case Sensitivity in Matching
@@ -6788,14 +6743,9 @@ case sensitivity on or off for all the rules at once.
 Setting @code{IGNORECASE} from the command line is a way to make
 a program case insensitive without having to edit it.
 
-@c @cindex ISO 8859-1
-@c @cindex ISO Latin-1
 In multibyte locales, the equivalences between upper- and lowercase
 characters are tested based on the wide-character values of the locale's
-character set.  Prior to version 5.0, single-byte characters were
-tested based on the ISO-8859-1 (ISO Latin-1) character set.  However, as
-of version 5.0, single-byte characters are also tested based on
-the values of the locale's character set.@footnote{If you don't understand
+character set.@footnote{If you don't understand
 this, don't worry about it; it just means that @command{gawk} does the
 right thing.}
 
@@ -6815,7 +6765,7 @@ Expressions (EREs), including the additional features needed by
 @command{awk} and @command{gawk}.  Of note is full compliance with the
 leftmost-longest submatch rules, and support for non-greedy operators.
 
-MinRX is also a little stricter that the original matchers are in terms
+MinRX is also a little stricter than the original matchers are in terms
 of accepting valid regular expression syntax when specifying a regexp.
 (These restrictions apply to corner cases that should not come up in
 day-to-day use.)
@@ -6864,24 +6814,30 @@ in conditional expressions, or as part of matching expressions
 using the @samp{~} and @samp{!~} operators.
 
 @item
+Regular expressions match the leftmost longest text in the string being
+matched.  This matters for cases where you need to know the extent of
+the match, such as for text substitution and when the record separator
+is a regexp.
+
+@item
 Escape sequences let you represent nonprintable characters and
 also let you represent regexp metacharacters as literal characters
 to be matched.
 
 @item
 Regexp operators provide grouping, alternation, and repetition.
+GNU-specific operators provide additional power above those in
+standard @command{awk}'s regular expressions.
+
+@item
+The 2024 POSIX standard added shortest-match, or non-greedy
+repitition operators, which @command{gawk} supports.
 
 @item
 Bracket expressions give you a shorthand for specifying sets
 of characters that can match at a particular point in a regexp.
 Within bracket expressions, POSIX character classes let you specify
 certain groups of characters in a locale-independent fashion.
-
-@item
-Regular expressions match the leftmost longest text in the string being
-matched.  This matters for cases where you need to know the extent of
-the match, such as for text substitution and when the record separator
-is a regexp.
 
 @item
 Matching expressions may use dynamic regexps (i.e., string values
@@ -40021,7 +39977,8 @@ shows how to use the extension API.
 * Extension Sample Fork::             An interface to @code{fork()} and other
                                       process functions.
 * Extension Sample Inplace::          Enabling in-place file editing.
-* Extension Sample Intdiv::           Integer Division For High Precision Integers.
+* Extension Sample Intdiv::           Integer Division For High Precision
+                                      Integers.
 * Extension Sample Ord::              Character to value to character
                                       conversions.
 * Extension Sample Readdir::          An interface to @code{readdir()}.
@@ -49046,3 +49003,4 @@ TODO:
 * When talking about expressions, make a clear distinction between
   undefined and uninitialized. Introduce the concept of uninitialized
   early on.
+* Consider removing all the places where the title `Dr.' occurs.
