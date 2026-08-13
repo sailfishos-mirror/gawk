@@ -1,4 +1,3 @@
-% $Id: txi-it.tex 5191 2013-02-23 00:11:18Z karl $
 % txi-it.tex -- Italian translations for texinfo.tex
 %
 % Copyright 1999, 2007, 2008 Free Software Foundation.
@@ -15,6 +14,9 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+% modified for gawk.texi
+%
 
 \txisetlanguage{italian}{2}{2}
 
@@ -35,8 +37,8 @@
 \gdef\putwordpage{pagina}
 \gdef\putwordsection{sezione}
 \gdef\putwordSection{Sezione}
-\gdef\putwordsee{si veda la}
-\gdef\putwordSee{Si veda la}
+\gdef\putwordsee{vedere la}
+\gdef\putwordSee{Vedere la}
 \gdef\putwordShortTOC{Sommario abbreviato}
 \gdef\putwordTOC{Sommario}
 %
@@ -61,16 +63,24 @@
 
 \gdef\putwordla{la}
 \gdef\putwordLa{La}
-\gdef\putwordsivedail{si veda il}
-\gdef\putwordSivedail{Si veda il}
+\gdef\putwordvedereil{vedere il}
+\gdef\putwordVedereil{Vedere il}
 % Produces article before Section names
+\def\pxrefla#1{\putwordla{} \xrefX[#1,,,,,,,]}
+\def\pxrefLa#1{\putwordLa{} \xrefX[#1,,,,,,,]}
+\def\xrefla#1{\putwordla{} \xrefX[#1,,,,,,,]}
+\def\xrefLa#1{\putwordLa{} \xrefX[#1,,,,,,,]}
 \def\refla#1{\putwordla{} \xrefX[#1,,,,,,,]}
 \def\refLa#1{\putwordLa{} \xrefX[#1,,,,,,,]}
 % Produces article before Chapter names
-\def\pxrefil#1{\putwordsivedail{} \xrefX[#1,,,,,,,]}
-\def\pxrefIl#1{\putwordSivedail{} \xrefX[#1,,,,,,,]}
-\def\xrefil#1{\putwordsivedail{} \xrefX[#1,,,,,,,]}
-\def\xrefIl#1{\putwordSivedail{} \xrefX[#1,,,,,,,]}
+\def\pxrefil#1{\putwordvedereil{} \xrefX[#1,,,,,,,]}
+\def\pxrefIl#1{\putwordVedereil{} \xrefX[#1,,,,,,,]}
+\def\xrefil#1{\putwordvedereil{} \xrefX[#1,,,,,,,]}
+\def\xrefIl#1{\putwordVedereil{} \xrefX[#1,,,,,,,]}
+% Produces See and See also
+\def\putwordSeeAlso{Vedere anche}
+\def\seeentry#1{\i{\putwordVedere}\ #1}% for sorted index file only
+\def\putwordVedere{Vedere}
 
 % Produces Day Month Year style of output.
 \def\today{%
@@ -81,4 +91,3 @@
   \or\putwordMSep\or\putwordMOct\or\putwordMNov\or\putwordMDec
   \fi
   \space\number\year}
-% ultimo aggiornamento: 19 febbraio 2015 21:11
