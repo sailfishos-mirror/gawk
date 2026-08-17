@@ -6909,7 +6909,7 @@ record is automatically split into chunks called @dfn{fields}.
 This makes it more convenient for programs to work on the parts of a record.
 
 @cindex @code{getline} function
-On rare occasions, you may need to use the @code{getline} function.
+On occasion, you may need to use the @code{getline} function.
 The  @code{getline} function is valuable both because it
 can do explicit input from any number of files, and because the files
 used with it do not have to be named on the @command{awk} command line
@@ -6947,14 +6947,15 @@ used with it do not have to be named on the @command{awk} command line
 It keeps track of the number of records that have been read so far from
 the current input file.  This value is stored in a predefined variable
 called @code{FNR}, which is reset to zero every time a new file is started.
-Another predefined variable, @code{NR}, records the total number of input
+Another predefined variable, @code{NR}, tracks the total number of input
 records read so far from all @value{DF}s.  It starts at zero, but is
 never automatically reset to zero.
 
 Normally, records are separated by newline characters.  You can control how
 records are separated by assigning values to the built-in variable @code{RS}.
 If @code{RS} is any single character, that character separates records.
-Otherwise (in @command{gawk}), @code{RS} is treated as a regular expression.
+Otherwise (in @command{gawk}, @command{mawk}, and BWK @command{awk}),
+@code{RS} is treated as a regular expression.
 This mechanism is explained in greater detail shortly.
 
 @quotation NOTE
@@ -7001,7 +7002,7 @@ awk 'BEGIN @{ RS = "u" @}
 
 @noindent
 changes the value of @code{RS} to @samp{u}, before reading any input.
-The new value is a string whose first character is the letter ``u''; as a result, records
+The new value is a string whose only character is the letter ``u''; as a result, records
 are separated by the letter ``u''.  Then the input file is read, and the second
 rule in the @command{awk} program (the action with no pattern) prints each
 record.  Because each @code{print} statement adds a newline at the end of
@@ -7024,34 +7025,7 @@ $ @kbd{awk 'BEGIN @{ RS = "u" @}}
 @print{} Bill         555-1675     bill.drowning@@hotmail.com       A
 @print{} Broderick    555-0542     broderick.aliq
 @print{} otiens@@yahoo.com R
-@print{} Camilla      555-2912     camilla.inf
-@print{} sar
-@print{} m@@skynet.be     R
-@print{} Fabi
-@print{} s       555-1234     fabi
-@print{} s.
-@print{} ndevicesim
-@print{} s@@
-@print{} cb.ed
-@print{}     F
-@print{} J
-@print{} lie        555-6699     j
-@print{} lie.perscr
-@print{} tabor@@skeeve.com   F
-@print{} Martin       555-6480     martin.codicib
-@print{} s@@hotmail.com    A
-@print{} Sam
-@print{} el       555-3430     sam
-@print{} el.lanceolis@@sh
-@print{} .ed
-@print{}         A
-@print{} Jean-Pa
-@print{} l    555-2127     jeanpa
-@print{} l.campanor
-@print{} m@@ny
-@print{} .ed
-@print{}      R
-@print{}
+@dots{}
 @end example
 
 @noindent
@@ -7066,7 +7040,7 @@ Bill         555-1675     bill.drowning@@hotmail.com       A
 
 @noindent
 It contains no @samp{u}, so there is no reason to split the record,
-unlike the others, which each have one or more occurrences of the @samp{u}.
+unlike the others, which each have one or more occurrences of @samp{u}.
 In fact, this record is treated as part of the previous record;
 the newline separating them in the output
 is the original newline in the @value{DF}, not the one added by
@@ -7089,7 +7063,7 @@ Using an alphabetic character such as @samp{u} for the record separator
 is highly likely to produce strange results.
 Using an unusual character such as @samp{/} is more likely to
 produce correct behavior in the majority of cases, but there
-are no guarantees. The moral is: Know Your Data.
+are no guarantees. The moral is: Know Thy Data.
 
 @command{gawk} allows @code{RS} to be a full regular expression
 (discussed shortly; @pxref{gawk split records}).  Even so, using
@@ -7131,11 +7105,12 @@ sets the variable @code{RT} to the text in the input that matched
 @code{RS}.
 
 @node gawk split records
-@subsection Record Splitting with @command{gawk}
+@subsection Record Splitting with @command{gawk}, @command{mawk}, and BWK @command{awk}
 
 @cindex common extensions @subentry @code{RS} as a regexp
 @cindex extensions @subentry common @subentry @code{RS} as a regexp
-When using @command{gawk}, the value of @code{RS} is not limited to a
+When using @command{gawk}, @command{mawk}, and BWK @command{awk},
+the value of @code{RS} is not limited to a
 one-character string.  If it contains more than one character, it is
 treated as a regular expression
 (@pxref{Regexp}). (c.e.)
@@ -7177,7 +7152,9 @@ $ @kbd{echo record 1 AAAA record 2 BBBB record 3 |}
 The square brackets delineate the contents of @code{RT}, letting you
 see the leading and trailing whitespace. The final value of
 @code{RT} is a newline.
-@xref{Simple Sed} for a more useful example
+
+This program isn't useful, it merely illustrates the feature.
+@xref{Simple Sed} for a more practical example
 of @code{RS} as a regexp and @code{RT}.
 
 If you set @code{RS} to a regular expression that allows optional
@@ -7194,7 +7171,9 @@ Remember that in @command{awk}, the @samp{^} and @samp{$} anchor
 metacharacters match the beginning and end of a @emph{string}, and not
 the beginning and end of a @emph{line}.  As a result, something like
 @samp{RS = "^[[:upper:]]"} can only match at the beginning of a file.
-This is because @command{gawk} views the input file as one long string
+This is because
+the @command{awk} implementations that support @code{RS} as a regexp view
+the input file as one long string
 that happens to contain newline characters.
 It is thus best to avoid anchor metacharacters in the value of @code{RS}.
 
@@ -7212,13 +7191,13 @@ The use of @code{RS} as a regular expression and the @code{RT}
 variable are @command{gawk} extensions; they are not available in
 compatibility mode
 (@pxref{Options}).
-In compatibility mode, only the first character of the value of
+In POSIX mode, only the first character of the value of
 @code{RS} determines the end of the record.
 
+@cindex @command{mawk} utility
 @cindex Brian Kernighan's @command{awk}
-@command{mawk} has allowed @code{RS} to be a regexp for decades.
-As of October, 2019, BWK @command{awk} also supports it.  Neither
-version supplies @code{RT}, however.
+@command{mawk} has allowed @code{RS} to be a regexp since it was released.
+BWK @command{awk} also supports it.  Neither version supplies @code{RT}, however.
 
 @cindex sidebar @subentry @code{RS = "\0"} Is Not Portable
 @cartouche @code{RS = "\0"} Is Not Portable
@@ -7274,7 +7253,7 @@ Readfile} for another option.
 @cindex fields @subentry examining
 @cindex whitespace @subentry definition of
 When @command{awk} reads an input record, the record is
-automatically @dfn{parsed} or separated by the @command{awk} utility into chunks
+automatically @dfn{parsed} or separated into chunks
 called @dfn{fields}.  By default, fields are separated by @dfn{whitespace},
 like words in a line.
 Whitespace in @command{awk} means any string of one or more spaces,
@@ -7562,14 +7541,6 @@ $ @kbd{echo a b c d e f | awk '@{ print "NF =", NF;}
 @print{} a b c
 @end example
 
-@cindex portability @subentry @code{NF} variable, decrementing
-@quotation CAUTION
-Some versions of @command{awk} don't
-rebuild @code{$0} when @code{NF} is decremented.
-Until August, 2018, this included BWK @command{awk}; fortunately
-his version now handles this correctly.
-@end quotation
-
 Finally, there are times when it is convenient to force
 @command{awk} to rebuild the entire record, using the current
 values of the fields and @code{OFS}.  To do this, use the
@@ -7650,11 +7621,10 @@ Note the leading spaces in the values of the second and third fields.
 @cindex troubleshooting @subentry @command{awk} uses @code{FS} not @code{IFS}
 The field separator is represented by the predefined variable @code{FS}.
 Shell programmers take note:  @command{awk} does @emph{not} use the
-name @code{IFS} that is used by the POSIX-compliant shells (such as
-the Unix Bourne shell, @command{sh}, or Bash).
+name @code{IFS} that is used by POSIX-compliant shells (such as Bash).
 
 @cindex @code{FS} variable @subentry changing value of
-The value of @code{FS} can be changed in the @command{awk} program with the
+You change @code{FS} by assigning it a new value with the
 assignment operator, @samp{=} (@pxref{Assignment Ops}).
 Often, the right time to do this is at the beginning of execution
 before any input has been processed, so that the very first record
@@ -7719,7 +7689,7 @@ The reason this does not happen is that a single space as the value of
 @code{FS} is a special case---it is taken to specify the default manner
 of delimiting fields.
 
-If @code{FS} is any other single character, such as @code{","}, then
+If @code{FS} is any other single character, such as @code{":"}, then
 each occurrence of that character separates two fields.  Two consecutive
 occurrences delimit an empty field.  If the character occurs at the
 beginning or the end of the line, that too delimits an empty field.  The
@@ -7753,7 +7723,7 @@ for the complete list of similar escape sequences.)
 @end ifinfo
 
 For a less trivial example of a regular expression, try using
-single spaces to separate fields the way single commas are used.
+single spaces to separate fields the way single colons are used.
 @code{FS} can be set to @w{@code{"[@ ]"}} (left bracket, space, right
 bracket).  This regular expression matches a single space and nothing else
 (@pxref{Regexp}).
@@ -7783,9 +7753,9 @@ $ @kbd{echo ' a  b  c  d ' | awk 'BEGIN @{ FS = "[ \t\n]+" @}}
 @print{} a
 @end example
 
-@noindent
 @cindex null strings
 @cindex strings @subentry null
+@noindent
 In this case, the first field is null, or empty.
 
 The stripping of leading and trailing whitespace also comes into
@@ -7819,9 +7789,10 @@ should not rely on any specific behavior in your programs.
 @value{DARKCORNER}
 
 @cindex Brian Kernighan's @command{awk}
+@cindex @command{mawk} utility
 As a point of information, BWK @command{awk} allows @samp{^}
 to match only at the beginning of the record. @command{gawk}
-also works this way. For example:
+also works this way; @command{mawk} does not. For example:
 
 @example
 $ @kbd{echo 'xxAA  xxBxx  C' |}
@@ -7844,11 +7815,12 @@ empty string; field splitting does not.  Thus, for example @samp{FS =
 
 @cindex common extensions @subentry single character fields
 @cindex extensions @subentry common @subentry single character fields
-@cindex differences in @command{awk} and @command{gawk} @subentry single-character fields
+@c @cindex differences in @command{awk} and @command{gawk} @subentry single-character fields
 @cindex single-character fields
 @cindex fields @subentry single-character
 There are times when you may want to examine each character
-of a record separately.  This can be done in @command{gawk} by
+of a record separately.  This can be done in @command{gawk}
+@command{mawk}, and BWK @command{awk} by
 simply assigning the null string (@code{""}) to @code{FS}. (c.e.)
 In this case,
 each individual character in the record becomes a separate field.
@@ -7975,11 +7947,11 @@ a semicolon instead of a comma as the separator.
 do so.  For example:
 
 @example
-awk -F, '@var{program}' @var{input-files}
+awk -F: '@var{program}' @var{input-files}
 @end example
 
 @noindent
-sets @code{FS} to the @samp{,} character.  Notice that the option uses
+sets @code{FS} to the @samp{:} character.  Notice that the option uses
 an uppercase @samp{F} instead of a lowercase @samp{f}. The latter
 option (@option{-f}) specifies a file containing an @command{awk} program.
 
@@ -8003,6 +7975,7 @@ Because @samp{\} is used for quoting in the shell, @command{awk} sees
 characters (@pxref{Escape Sequences}), finally yielding
 a single @samp{\} to use for the field separator.
 
+@c FIXME: Nuke this paragraph for 6.0
 @c @cindex historical features
 As a special case, in compatibility mode
 (@pxref{Options}),
@@ -8047,9 +8020,9 @@ separator, instead of the @samp{-} in the phone number that was
 originally intended.  This demonstrates why you have to be careful in
 choosing your field and record separators.
 
-@cindex Unix @command{awk} @subentry password files, field separators and
+@cindex Unix @subentry password files, field separators and
 Perhaps the most common use of a single character as the field separator
-occurs when processing the Unix system password file.  On many Unix
+occurs when processing the system password file.  On many Unix-like
 systems, each user has a separate entry in the system password file, with one
 line per user.  The information in these lines is separated by colons.
 The first field is the user's login name and the second is the user's
@@ -8099,9 +8072,9 @@ should reflect the old value of @code{FS}, not the new one.
 @cindex dark corner @subentry field separators
 @cindex @command{sed} utility
 @cindex stream editors
-However, many older implementations of @command{awk} do not work this way.  Instead,
-they defer splitting the fields until a field is actually
-referenced.  The fields are split
+However, many ancient implementations of @command{awk} did not work this way.  Instead,
+they deferred splitting the fields until a field was actually
+referenced.  The fields were split
 using the @emph{current} value of @code{FS}!
 @value{DARKCORNER}
 This behavior can be difficult
@@ -8113,20 +8086,21 @@ sed 1q /etc/passwd | awk '@{ FS = ":" ; print $1 @}'
 @end example
 
 @noindent
-which usually prints:
+prints:
 
 @example
 root
 @end example
 
 @noindent
-on an incorrect implementation of @command{awk}, while @command{gawk}
-prints the full first line of the file, something like:
+on an incorrect implementation of @command{awk}, whereas correct versions
+print the full first line of the file, something like:
 
 @example
 root:x:0:0:Root:/:
 @end example
 
+@noindent
 (The @command{sed}@footnote{The @command{sed} utility is a ``stream editor.''
 Its behavior is also defined by the POSIX standard.}
 command prints just the first line of @file{/etc/passwd}.)
@@ -8137,7 +8111,7 @@ command prints just the first line of @file{/etc/passwd}.)
 
 It is important to remember that when you assign a string constant
 as the value of @code{FS}, it undergoes normal @command{awk} string
-processing.  For example, with Unix @command{awk} and @command{gawk},
+processing.  For example, with BWK @command{awk} and @command{gawk},
 the assignment @samp{FS = "\.."} assigns the character string @code{".."}
 to @code{FS} (the backslash is stripped).  This creates a regexp meaning
 ``fields are separated by occurrences of any two characters.''
@@ -8147,29 +8121,29 @@ by any single character, use @samp{FS = "\\.."}.
 The following list summarizes how fields are split, based on the value
 of @code{FS} (@samp{==} means ``is equal to''):
 
-@table @code
-@item @asis{@command{gawk} was invoked with @option{--csv}}
-Field splitting follows the rules given in @ref{Comma Separated Fields}.
-The value of @code{FS} is ignored.
-
-@item FS == " "
+@table @asis
+@item @code{FS == " "}
 Fields are separated by runs of whitespace.  Leading and trailing
 whitespace are ignored.  This is the default.
 
-@item FS == @var{any other single character}
+@item @code{FS == @var{any other single character}}
 Fields are separated by each occurrence of the character.  Multiple
 successive occurrences delimit empty fields, as do leading and
 trailing occurrences.
 The character can even be a regexp metacharacter; it does not need
 to be escaped.
 
-@item FS == @var{regexp}
+@item @code{FS == @var{regexp}}
 Fields are separated by occurrences of characters that match @var{regexp}.
 Leading and trailing matches of @var{regexp} delimit empty fields.
 
-@item FS == ""
+@item @code{FS == ""}
 Each individual character in the record becomes a separate field.
 (This is a common extension; it is not specified by the POSIX standard.)
+
+@item @command{gawk} was invoked with @option{--csv}
+Field splitting follows the rules given in @ref{Comma Separated Fields}.
+The value of @code{FS} is ignored.
 @end table
 
 @cindex sidebar @subentry @code{FS} and @code{IGNORECASE}
@@ -8191,8 +8165,8 @@ print $1
 @noindent
 The output is @samp{aCa}.  If you really want to split fields on an
 alphabetic character while ignoring case, use a regexp that will
-do it for you (e.g., @samp{FS = "[c]"}).  In this case, @code{IGNORECASE}
-will take effect.
+do it for you (e.g., @samp{FS = "[c]"}).  In such a case, @code{IGNORECASE}
+does take effect.
 @end cartouche
 
 
@@ -8317,7 +8291,7 @@ a system with card readers is another story!)
 @node Skipping intervening
 @subsection Skipping Intervening Fields
 
-Starting in version 4.2, each field width may optionally be
+Each field width may optionally be
 preceded by a colon-separated value specifying the number of characters
 to skip before the field starts.  Thus, the preceding program could be
 rewritten to specify @code{FIELDWIDTHS} like so:
@@ -8346,9 +8320,9 @@ There are times when fixed-width data may be followed by additional data
 that has no fixed length.  Such data may or may not be present, but if
 it is, it should be possible to get at it from an @command{awk} program.
 
-Starting with version 4.2, in order to provide a way to say ``anything
-else in the record after the defined fields,'' @command{gawk}
-allows you to add a final @samp{*} character to the value of
+In order to provide a way to say ``anything
+else in the record after the defined fields,''
+you may add a final @samp{*} character to the value of
 @code{FIELDWIDTHS}. There can only be one such character, and it must
 be the final non-whitespace character in @code{FIELDWIDTHS}.
 For example:
@@ -8368,10 +8342,7 @@ $ @kbd{gawk -f fw.awk fw.in}               @ii{Run the program}
 
 So far, so good.  But what happens if there isn't as much data as there
 should be based on the contents of @code{FIELDWIDTHS}? Or, what happens
-if there is more data than expected?
-
-For many years, what happens in these cases was not well defined. Starting
-with version 4.2, the rules are as follows:
+if there is more data than expected? The rules are as follows:
 
 @table @asis
 @item Enough data for some fields
@@ -8644,12 +8615,15 @@ and @code{patsplit()} functions (@pxref{String Functions}).
 @section Checking How @command{gawk} Is Splitting Records
 
 @cindex @command{gawk} @subentry splitting fields and
-As we've seen, @command{gawk} provides three independent methods to split
-input records into fields.  The mechanism used is based on which of the
+As we've seen, @command{gawk} provides four independent methods to split
+input records into fields.
+First, the @option{--csv} option overrides any other decisions in the source
+code.  If CSV parsing isn't in effect, then
+the mechanism used is based on which of the
 three variables---@code{FS}, @code{FIELDWIDTHS}, or @code{FPAT}---was
-last assigned to. In addition, an API input parser may choose to override
+last assigned to. (In addition, an API input parser may choose to override
 the record parsing mechanism; please refer to @ref{Input Parsers} for
-further information about this feature.
+further information about this feature.)
 
 To restore normal field splitting after using @code{FIELDWIDTHS}
 and/or @code{FPAT}, simply assign a value to @code{FS}.
@@ -8657,8 +8631,9 @@ You can use @samp{FS = FS} to do this,
 without having to know the current value of @code{FS}.
 
 In order to tell which kind of field splitting is in effect,
-use @code{PROCINFO["FS"]} (@pxref{Auto-set}).
-The value is @code{"FS"} if regular field splitting is being used,
+first check if @code{PROCINFO["CSV"]} exists. If it doesn't, then
+check @code{PROCINFO["FS"]} (@pxref{Auto-set}).
+The value of @code{PROCINFO["FS"]} is @code{"FS"} if regular field splitting is being used,
 @code{"FIELDWIDTHS"} if fixed-width field splitting is being used,
 or @code{"FPAT"} if content-based field splitting is being used:
 
@@ -8750,10 +8725,11 @@ It does apply to the default field separator of a single space:
 @samp{FS = @w{" "}}.
 
 Note that language in the POSIX specification implies that
-this special feature should apply when @code{FS} is a regexp.
-However, Unix @command{awk} has never behaved that way, nor has
+this special feature applies no matter what the value of @code{FS} may be.
+However, BWK @command{awk} has never behaved that way, nor has
 @command{gawk}. This is essentially a bug in POSIX.
 @c Noted as of 4/2019; working to get the standard fixed.
+@c Still not fixed in the 2024 standard.
 @end quotation
 
 The original motivation for this special exception was probably to provide
@@ -8801,7 +8777,7 @@ BEGIN @{ RS = "" ; FS = "\n" @}
 @{
       print "Name is:", $1
       print "Address is:", $2
-      print "City and State are:", $3
+      print "City, State and Zip code are:", $3
       print ""
 @}
 @end example
@@ -8812,11 +8788,11 @@ Running the program produces the following output:
 $ @kbd{awk -f addrs.awk addresses}
 @print{} Name is: Jane Doe
 @print{} Address is: 123 Main Street
-@print{} City and State are: Anywhere, SE 12345-6789
-@print{}
+@print{} City, State and Zip code are: Anywhere, SE 12345-6789
+@print{} 
 @print{} Name is: John Smith
 @print{} Address is: 456 Tree-lined Avenue
-@print{} City and State are: Smallville, MW 98765-4321
+@print{} City, State and Zip code are: Smallville, MW 98765-4321
 @print{}
 @dots{}
 @end example
@@ -8852,7 +8828,7 @@ always serves as a field separator, in addition to whatever value
 @item RS == @var{regexp}
 Records are separated by occurrences of characters that match @var{regexp}.
 Leading and trailing matches of @var{regexp} delimit empty records.
-(This is a @command{gawk} extension; it is not specified by the
+(This is a common extension; it is not specified by the
 POSIX standard.)
 @end table
 
@@ -12525,7 +12501,7 @@ print "something meaningful" > file name
 @cindex Brian Kernighan's @command{awk}
 @cindex @command{mawk} utility
 @noindent
-This produces a syntax error with some versions of Unix
+This produces a syntax error with some versions of
 @command{awk}.@footnote{It happens that BWK
 @command{awk}, @command{gawk}, and @command{mawk} all ``get it right,''
 but you should not rely on this.}
@@ -16158,7 +16134,7 @@ on the command line, @command{awk} reads from the standard input and
 @code{FILENAME} is set to @code{"-"}.  @code{FILENAME} changes each
 time a new file is read (@pxref{Reading Files}).  Inside a @code{BEGIN}
 rule, the value of @code{FILENAME} is @code{""}, because there are no input
-files being processed yet.@footnote{Some early implementations of Unix
+files being processed yet.@footnote{Some early implementations of
 @command{awk} initialized @code{FILENAME} to @code{"-"}, even if there
 were @value{DF}s to be processed. This behavior was incorrect and should
 not be relied upon in your programs.} @value{DARKCORNER} Note, though,
