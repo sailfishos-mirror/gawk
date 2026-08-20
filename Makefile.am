@@ -78,6 +78,7 @@ base_sources = \
 	array.c \
 	awk.h \
 	awkgram.y \
+	awkmem.c \
 	builtin.c \
 	cint_array.c \
 	cmd.h \

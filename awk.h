@@ -1894,13 +1894,12 @@ extern void install_params(NODE *func);
 extern void remove_params(NODE *func);
 extern void release_all_vars(void);
 extern int foreach_func(NODE **table, int (*)(INSTRUCTION *, void *), void *);
-extern INSTRUCTION *bcalloc(OPCODE op, int size, int srcline);
-extern void bcfree(INSTRUCTION *);
 extern AWK_CONTEXT *new_context(void);
 extern void push_context(AWK_CONTEXT *ctxt);
 extern void pop_context();
 extern int in_main_context();
 extern void free_context(AWK_CONTEXT *ctxt, bool keep_globals);
+extern INSTRUCTION_POOL *current_pools(void);
 extern NODE **variable_list();
 extern NODE **function_list(bool sort);
 extern void print_vars(NODE **table, Func_print print_func, FILE *fp);
@@ -1908,6 +1907,11 @@ extern bool check_param_names(void);
 extern bool is_all_upper(const char *name);
 extern void pma_mpfr_check(void);
 extern void pma_save_free_lists(void);
+
+/* awkmem.c */
+extern INSTRUCTION *bcalloc(OPCODE op, int size, int srcline);
+extern void bcfree(INSTRUCTION *);
+extern void free_bcpool(INSTRUCTION_POOL *pl);
 
 /* floatcomp.c */
 #ifdef HAVE_UINTMAX_T
