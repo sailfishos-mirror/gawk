@@ -6908,6 +6908,7 @@ By default, each record is one line.  Each
 record is automatically split into chunks called @dfn{fields}.
 This makes it more convenient for programs to work on the parts of a record.
 
+@c can't use @cindexawkfunc macro here, it adds parentheses
 @cindex @code{getline} function
 On occasion, you may need to use the @code{getline} function.
 The  @code{getline} function is valuable both because it
@@ -8843,7 +8844,6 @@ then @command{gawk} sets @code{RT} to the null string.
 @node Getline
 @section Explicit Input with @code{getline}
 
-@cindexawkfunc{getline}
 @cindex @code{getline} function @subentry explicit input with
 @cindex input @subentry explicit
 So far we have been getting our input data from @command{awk}'s main
@@ -8851,11 +8851,11 @@ input stream---either the standard input (usually your keyboard, sometimes
 the output from another program) or the
 files specified on the command line.  The @command{awk} language has a
 special built-in function called @code{getline} that
-can be used to read input under your explicit control.
+you can use to read input under your explicit control.
 
-The @code{getline} function is used in several different ways and should
-@emph{not} be used by beginners.
-The examples that follow the explanation of the @code{getline} function
+The @code{getline} function is used in several different ways; it is
+best avoided until after you are more familiar with the language.
+The examples that follow
 include material that has not been covered yet.  Therefore, come back
 and study the @code{getline} function @emph{after} you have reviewed the
 rest of
@@ -8878,7 +8878,7 @@ and have a good knowledge of how @command{awk} works.
 @cindex @code{getline} function @subentry return values
 @cindex @option{--sandbox} option @subentry input redirection with @code{getline}
 
-The @code{getline} function returns 1 if it finds a record and 0 if
+The @code{getline} function returns one if it finds a record and zero if
 it encounters the end of the file.  If there is some error in getting
 a record, such as a file that cannot be opened, then @code{getline}
 returns @minus{}1.  In this case, @command{gawk} sets the variable
@@ -8993,9 +8993,6 @@ The new value of @code{$0} is used to test
 the patterns of any subsequent rules.  The original value
 of @code{$0} that triggered the rule that executed @code{getline}
 is lost.
-By contrast, the @code{next} statement reads a new record
-but immediately begins processing it normally, starting with the first
-rule in the program.  @xref{Next Statement}.
 @end quotation
 
 @node Getline/Variable
@@ -9236,11 +9233,10 @@ to be portable to all @command{awk} implementations.
 @cindex Brian Kernighan's @command{awk}
 @cindex @command{mawk} utility
 @quotation NOTE
-Unfortunately, @command{gawk} has not been consistent in its treatment
-of a construct like @samp{@w{"echo "} "date" | getline}.
-Most versions, including the current version, treat it as
+Unfortunately, it's not well defined what a
+construct like @samp{@w{"echo "} "date" | getline} means.
+@command{gawk} and BWK @command{awk} treat it as
 @samp{@w{("echo "} "date") | getline}.
-(This is also how BWK @command{awk} behaves.)
 Some versions instead treat it as
 @samp{@w{"echo "} ("date" | getline)}.
 (This is how @command{mawk} behaves.)
@@ -9358,8 +9354,8 @@ However, the new record is tested against any subsequent rules.
 @cindex @command{awk} @subentry implementations @subentry limits
 @cindex @command{gawk} @subentry implementation issues @subentry limits
 @item
-Some very old @command{awk} implementations limit the number of pipelines that an @command{awk}
-program may have open to just one.  In @command{gawk}, there is no such limit.
+Some @command{awk} implementations limit the number of pipelines that an @command{awk}
+program may have open.  In @command{gawk}, there is no such limit.
 You can open as many pipelines (and coprocesses) as the underlying operating
 system permits.
 
@@ -9421,7 +9417,7 @@ it being interpreted as input redirection:
 
 @example
 if ((getline VAR) < 0)
-    print "Read error";
+    print "Read error"
 @end example
 
 It is, in fact, best to parenthesize calls to @code{getline}
@@ -9436,12 +9432,14 @@ while ((getline line < "file.txt") > 0)
     print line
 @end example
 
+@cindex dark corner @subentry @code{getline} evaluation of variable upon end-of-file
 @cindex Moore, Duncan
 @item
 If the variable being assigned is an expression with side effects,
 different versions of @command{awk} behave differently upon encountering
 end-of-file.  Some versions don't evaluate the expression; many versions
-(including @command{gawk}) do.  Here is an example, courtesy of Duncan Moore:
+(including @command{gawk}) do. @value{DARKCORNER}
+Here is an example, courtesy of Duncan Moore:
 
 @ignore
 Date: Sun, 01 Apr 2012 11:49:33 +0100
@@ -9525,7 +9523,8 @@ else if (ERRNO != "")
 @end example
 
 Here is how to read interactively from the user@footnote{This assumes
-that standard input is the keyboard.} without waiting
+that standard input is the keyboard. @code{"-"} can also be used, not
+just @code{"/dev/stdin"}.} without waiting
 for more than five seconds:
 
 @example
@@ -9592,7 +9591,7 @@ on a per-command or per-connection basis.
 @command{gawk} considers a timeout event to be an error even though
 the attempt to read from the underlying device may
 succeed in a later attempt. This is a limitation, and it also
-means that you cannot use this to multiplex input from
+means that you cannot use this feature to multiplex input from
 two or more sources.  @xref{Retrying Input} for a way to enable
 later I/O attempts to succeed.
 
@@ -9601,7 +9600,7 @@ blocked indefinitely. But bear in mind that there are other ways
 @command{gawk} can stall waiting for an input device to be ready.
 A network client can sometimes take a long time to establish
 a connection before it can start reading any data,
-or the attempt to open a FIFO special file for reading can be blocked
+or the attempt to open a FIFO special file for reading can block
 indefinitely until some other process opens it for writing.
 
 @node Retrying Input
@@ -9668,7 +9667,7 @@ as usable data from an @command{awk} program.
 Input is split into records based on the value of @code{RS}.
 The possibilities are as follows:
 
-@multitable @columnfractions .25 .35 .40
+@multitable @columnfractions .30 .40 .30
 @headitem Value of @code{RS} @tab Records are split on @dots{} @tab @command{awk} / @command{gawk}
 @item Any single character @tab That character @tab @command{awk}
 @item The empty string (@code{""}) @tab Runs of two or more newlines @tab @command{awk}
@@ -9704,6 +9703,7 @@ Field splitting is more complicated than record splitting:
 
 @multitable @columnfractions .40 .40 .20
 @headitem Field separator value @tab Fields are split @dots{} @tab @command{awk} / @command{gawk}
+@item @option{--csv} used @tab Using CSV definitions, overrides other methods @tab @command{gawk}, @command{nawk}
 @item @code{FS == " "} @tab On runs of whitespace @tab @command{awk}
 @item @code{FS == @var{any single character}} @tab On that character @tab @command{awk}
 @item @code{FS == @var{regexp}} @tab On text matching the regexp @tab @command{awk}
@@ -9711,6 +9711,12 @@ Field splitting is more complicated than record splitting:
 @item @code{FIELDWIDTHS == @var{list of columns}} @tab Based on character position @tab @command{gawk}
 @item @code{FPAT == @var{regexp}} @tab On the text surrounding text matching the regexp @tab @command{gawk}
 @end multitable
+
+@item
+For @command{gawk} and BWK @code{awk}, Comma-Separated-Value splitting
+with @option{--csv} overrides all other methods of fields splitting.
+For @command{gawk}, @code{PROCINFO["CSV"]} will exist if CSV-based
+splitting is in effect.
 
 @item
 Using @samp{FS = "\n"} causes the entire record to be a single field
@@ -9730,6 +9736,8 @@ from the default input stream, from a file, or from a pipe or coprocess.
 @item
 Use @code{PROCINFO[@var{file}, "READ_TIMEOUT"]} to cause reads to time out
 for @var{file}.
+Use @code{PROCINFO[@var{file}, "RETRY"]} to have reads that fail with @code{getline}
+not be fatal.
 
 @cindex POSIX mode
 @item
@@ -9844,22 +9852,8 @@ newline, the newline is output along with the rest of the string.  A
 single @code{print} statement can make any number of lines this way.
 
 @cindex newlines @subentry printing
-The following is an example of printing a string that contains embedded
-@ifinfo
-newlines
-(the @samp{\n} is an escape sequence, used to represent the newline
-character; @pxref{Escape Sequences}):
-@end ifinfo
-@ifhtml
-newlines
-(the @samp{\n} is an escape sequence, used to represent the newline
-character; @pxref{Escape Sequences}):
-@end ifhtml
-@ifnotinfo
-@ifnothtml
+The following example prints a string containing embedded
 newlines:
-@end ifnothtml
-@end ifnotinfo
 
 @example
 @group
@@ -9969,7 +9963,7 @@ is the string @w{@code{" "}} (i.e., a single space).
 
 The output from an entire @code{print} statement is called an @dfn{output
 record}.  Each @code{print} statement outputs one output record, and
-then outputs a string called the @dfn{output record separator} (or
+then outputs a string called the @dfn{output record separator} (from the variable
 @code{ORS}).  The initial value of @code{ORS} is the string @code{"\n"}
 (i.e., a newline character).  Thus, each @code{print} statement normally
 makes a separate line.
@@ -10003,19 +9997,7 @@ $ @kbd{awk 'BEGIN @{ OFS = ";"; ORS = "\n\n" @}}
 @print{} Bill;555-1675
 @print{}
 @print{} Broderick;555-0542
-@print{}
-@print{} Camilla;555-2912
-@print{}
-@print{} Fabius;555-1234
-@print{}
-@print{} Julie;555-6699
-@print{}
-@print{} Martin;555-6480
-@print{}
-@print{} Samuel;555-3430
-@print{}
-@print{} Jean-Paul;555-2127
-@print{}
+@dots{}
 @end example
 
 If the value of @code{ORS} does not contain a newline, the program's output
@@ -10025,7 +10007,7 @@ runs together on a single line.
 @section Controlling Numeric Output with @code{print}
 @cindex numeric @subentry output format
 @cindex formats, numeric output
-When printing numeric values with the @code{print} statement,
+When printing numeric values with @code{print},
 @command{awk} internally converts each number to a string of characters
 and prints that string.  @command{awk} uses the @code{sprintf()} function
 to do this conversion
@@ -10149,7 +10131,7 @@ a @dfn{format-control letter}---it tells the @code{printf} statement
 how to output one item.  The format-control letter specifies what @emph{kind}
 of value to print.  The rest of the format specifier is made up of
 optional @dfn{modifiers} that control @emph{how} to print the value, such as
-the field width.  Here is a list of the format-control letters:
+the field width.  First, here is a list of the format-control letters:
 
 @c @asis for docbook to come out right
 @table @asis
@@ -10157,19 +10139,14 @@ the field width.  Here is a list of the format-control letters:
 A floating point number of the form
 [@code{-}]@code{0x@var{h}.@var{hhhh}p+-@var{dd}}
 (C99 hexadecimal floating point format).
-For @code{%A},
+For @samp{%A},
 uppercase letters are used instead of lowercase ones.
 
 @quotation NOTE
-The current POSIX standard requires support for @code{%a} and @code{%A} in
+The current POSIX standard requires support for @samp{%a} and @samp{%A} in
 @command{awk}. As far as we know, besides @command{gawk}, the only other
 version of @command{awk} that actually implements it is BWK @command{awk}.
 It's use is thus highly nonportable!
-
-Furthermore, these formats are not available on any system where the
-underlying C library @code{printf()} function does not support them. As
-of this writing, among current systems, only older OpenVMS versions are known
-to not support them.
 @end quotation
 
 @item @code{%c}
@@ -10213,8 +10190,6 @@ printf "%4.3e\n", 1950
 @noindent
 prints @samp{1.950e+03}, with a total of four significant figures, three of
 which follow the decimal point.
-(The @samp{4.3} represents two modifiers,
-discussed in the next subsection.)
 @samp{%E} uses @samp{E} instead of @samp{e} in the output.
 
 @item @code{%f}
@@ -10289,7 +10264,8 @@ values or do something else entirely.
 @end quotation
 
 @quotation NOTE
-The IEEE 754 standard for floating-point arithmetic allows for special
+As mentioned,
+the IEEE 754 standard for floating-point arithmetic allows for special
 values that represent ``infinity'' (positive and negative) and values
 that are ``not a number'' (NaN).
 
@@ -10333,7 +10309,7 @@ printf "%2$s %1$s\n", "panic", "don't"
 @noindent
 prints the famous friendly message twice.
 
-At first glance, this feature doesn't seem to be of much use.
+At first glance, this feature doesn't seem to be useful.
 It is in fact a @command{gawk} extension, intended for use in translating
 messages at runtime.
 @xref{Printf Ordering},
@@ -10484,19 +10460,6 @@ printf "%5.3s\n", s
 
 @noindent
 Both programs output @samp{@w{@bullet{}@bullet{}abc}}.
-Earlier versions of @command{awk} did not support this capability.
-If you must use such a version, you may simulate this feature by using
-concatenation to build up the format string, like so:
-
-@example
-w = 5
-p = 3
-s = "abcdefg"
-printf "%" w "." p "s\n", s
-@end example
-
-@noindent
-This is not particularly easy to read, but it does work.
 
 @c @cindex lint checks
 @cindex troubleshooting @subentry fatal errors @subentry @code{printf} format strings
@@ -10543,8 +10506,8 @@ $ @kbd{awk '@{ printf "%-10s %s\n", $1, $2 @}' mail-list}
 
 In this case, the phone numbers had to be printed as strings because
 the numbers are separated by dashes.  Printing the phone numbers as
-numbers would have produced just the first three digits: @samp{555}.
-This would have been pretty confusing.
+numbers would have produced just the first three digits: @samp{555},
+which would have been pretty confusing.
 
 It wasn't necessary to specify a width for the phone numbers because
 they are last on their lines.  They don't need to have spaces
@@ -10668,7 +10631,7 @@ If @var{output-file} does not exist, then it is created.
 @item print @var{items} | @var{command}
 It is possible to send output to another program through a pipe
 instead of into a file.   This redirection opens a pipe to
-@var{command}, and writes the values of @var{items} through this pipe
+@var{command}, and writes the values of @var{items} through the pipe
 to another process created to execute @var{command}.
 
 The redirection argument @var{command} is actually an @command{awk}
@@ -10785,19 +10748,9 @@ same open file.)
 @cindex implementation issues, @command{gawk} @subentry limits
 @cindex @command{awk} @subentry implementation issues @subentry pipes
 @cindex @command{gawk} @subentry implementation issues @subentry pipes
-@ifnotinfo
-As mentioned earlier
-(@pxref{Getline Notes}),
-many
-@end ifnotinfo
-@ifnottex
-@ifnotdocbook
-Many
-@end ifnotdocbook
-@end ifnottex
-older
+As mentioned earlier, some
 @command{awk} implementations limit the number of pipelines that an @command{awk}
-program may have open to just one!  In @command{gawk}, there is no such limit.
+program may have open.  In @command{gawk}, there is no such limit.
 @command{gawk} allows a program to
 open as many pipelines as the underlying operating system permits.
 
@@ -10889,7 +10842,7 @@ terminal at all.
 Then opening @file{/dev/tty} fails.
 
 @command{gawk}, BWK @command{awk}, and @command{mawk} provide
-special @value{FN}s for accessing the three standard streams.
+special @value{FN}s for accessing the three standard streams. (c.e.)
 If the @value{FN} matches one of these special names when @command{gawk}
 (or one of the others) redirects input or output, then it directly uses
 the descriptor that the @value{FN} stands for.  These special
@@ -10931,7 +10884,13 @@ It is a common error to omit the double quotes, which leads
 to confusing results.
 
 @command{gawk} does not treat these @value{FN}s as special when
-in POSIX-compatibility mode. However, because BWK @command{awk}
+in POSIX-compatibility mode.@footnote{Many
+systems, including GNU/Linux, have special files
+@file{/dev/stdin},
+@file{/dev/stdout}, and
+@file{/dev/stderr},
+so the effect is the same, even in POSIX mode.}
+However, because BWK @command{awk}
 supports them, @command{gawk} does support them even when
 invoked with the @option{--traditional} option (@pxref{Options}).
 
@@ -11019,6 +10978,7 @@ compatibility mode (either @option{--traditional} or @option{--posix};
 @pxref{Options}).
 
 @item
+Otherwise,
 @command{gawk} @emph{always}
 interprets these special @value{FN}s.
 For example, using @samp{/dev/fd/4}
@@ -11209,43 +11169,26 @@ which describes it in more detail and gives an example.
 
 @node Close Return Value
 @subsection Using @code{close()}'s Return Value
-@cindex dark corner @subentry @code{close()} function
 @cindex @code{close()} function @subentry return value
 @cindex return value, @code{close()} function
-@cindex differences in @command{awk} and @command{gawk} @subentry @code{close()} function
-@cindex Unix @command{awk} @subentry @code{close()} function and
-
-In many older versions of Unix @command{awk}, the @code{close()} function
-is actually a statement.
-@value{DARKCORNER}
-It is a syntax error to try and use the return
-value from @code{close()}:
-
-@example
-command = "@dots{}"
-command | getline info
-retval = close(command)  # syntax error in many Unix awks
-@end example
 
 @cindex @command{gawk} @subentry @code{ERRNO} variable in
 @cindex @code{ERRNO} variable @subentry with @command{close()} function
-@command{gawk} treats @code{close()} as a function.
+@code{close()} is a function.
 The return value is @minus{}1 if the argument names something
 that was never opened with a redirection, or if there is
 a system problem closing the file or process.
 In these cases, @command{gawk} sets the predefined variable
 @code{ERRNO} to a string describing the problem.
 
-In @command{gawk}, starting with version 4.2, when closing a pipe or
+In @command{gawk}, when closing a pipe or
 coprocess (input or output), the return value is the exit status of the
-command, as described in @ref{table-close-pipe-return-values}.@footnote{Prior
-to version 4.2, the return value from closing a pipe or co-process
-was the full 16-bit exit value as defined by the @code{wait()} system
-call.} Otherwise, it is the return value from the system's @code{close()}
+command, as described in @ref{table-close-pipe-return-values}.
+Otherwise, it is the return value from the system's @code{close()}
 or @code{fclose()} C functions when closing input or output files,
 respectively.  This value is zero if the close succeeds, or @minus{}1
 if it fails.
-Recent versions of BWK @command{awk} also return the same values
+BWK @command{awk} also returns the same values
 from @command{close()}.
 
 @float Table,table-close-pipe-return-values
@@ -11260,13 +11203,11 @@ from @command{close()}.
 @end float
 
 @cindex POSIX mode
-The POSIX standard is very vague; it says that @code{close()}
+The POSIX standard is vague; it says that @code{close()}
 returns zero on success and a nonzero value otherwise.  In general,
 different implementations vary in what they report when closing
 pipes; thus, the return value cannot be used portably.
 @value{DARKCORNER}
-In POSIX mode (@pxref{Options}), @command{gawk} just returns zero
-when closing a pipe.
 
 @node Noflush
 @section Speeding Up Pipe Output
@@ -11298,11 +11239,11 @@ one of two ways:
 @itemize @bullet
 @item
 Set @code{PROCINFO["BUFFERPIPE"]} to any value. When this is done,
-@command{gawk} will buffer data for all pipelines.
+@command{gawk} buffers data for all pipelines.
 
 @item
 Set @code{PROCINFO["@var{command}", "BUFFERPIPE"]} to any value.
-In this case, only @var{command}'s data will be fully buffered.
+In this case, only @var{command}'s data is fully buffered.
 @end itemize
 
 You @emph{must} create one or the other of these elements
@@ -11390,7 +11331,8 @@ was a problem.
 @itemize @value{BULLET}
 @item
 The @code{print} statement prints comma-separated expressions. Each
-expression is separated by the value of @code{OFS} and terminated by
+expression is separated by the value of @code{OFS} and the full output
+record is terminated by
 the value of @code{ORS}.  @code{OFMT} provides the conversion format
 for numeric values for the @code{print} statement.
 
@@ -11405,7 +11347,7 @@ files, pipes, and coprocesses.
 
 @item
 @command{gawk} provides special @value{FN}s for access to standard input,
-output, and error, and for network communications.
+output, and error, other open files, and for network communications.
 
 @item
 Use @code{close()} to close open file, pipe, and coprocess redirections.
@@ -36123,7 +36065,7 @@ output when a value is either NaN or infinity. Starting with version
 4.2.2, for such values @command{gawk} prints one of the four strings
 just described: @samp{+inf}, @samp{-inf}, @samp{+nan}, or @samp{-nan}.
 Similarly, in POSIX mode, @command{gawk} prints the result of
-the system's C @code{printf()} function using the @code{%g} format string
+the system's C @code{printf()} function using the @samp{%g} format string
 for the value, whatever that may be.
 
 @node Floating point summary
