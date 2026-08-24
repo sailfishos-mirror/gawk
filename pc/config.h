@@ -238,9 +238,6 @@
 /* Define to 1 if `pw_passwd' is a member of `struct passwd'. */
 #undef HAVE_STRUCT_PASSWD_PW_PASSWD
 
-/* Define to 1 if `st_blksize' is a member of `struct stat'. */
-#undef HAVE_STRUCT_STAT_ST_BLKSIZE
-
 /* Define to 1 if `tm_zone' is a member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
 
@@ -343,7 +340,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.4.1"
+#define PACKAGE_STRING "GNU Awk 5.4.1a"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -352,7 +349,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.4.1"
+#define PACKAGE_VERSION "5.4.1a"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -480,7 +477,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.4.1"
+#define VERSION "5.4.1a"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
