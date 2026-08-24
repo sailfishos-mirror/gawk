@@ -3723,7 +3723,7 @@ dei rapporti molto utili ed esteticamente gradevoli.
 @node Istruzioni/Righe
 @section Istruzioni e righe in @command{awk}
 @cindex interruzioni di riga
-@cindex ritorno a capo
+@cindex ritorno-a-capo
 
 Molto spesso, ogni riga di un programma @command{awk} è un'istruzione a sé
 stante o una regola isolata, come:
@@ -3733,7 +3733,7 @@ awk '/12/  @{ print $0 @}
      /21/  @{ print $0 @}' mail-list inventory-shipped
 @end example
 
-@cindex @command{gawk} @subentry ritorno a capo
+@cindex @command{gawk} @subentry ritorno-a-capo
 Comunque, @command{gawk} ignora i ritorni a capo dopo ognuno di questi
 simboli e istruzioni:
 
@@ -3742,7 +3742,7 @@ simboli e istruzioni:
 @end example
 
 @noindent
-Un ritorno a capo in ogni altro punto del programma è considerato come la
+Un ritorno-a-capo in ogni altro punto del programma è considerato come la
 fine di un'istruzione.@footnote{Il @samp{?} e i @samp{:} elencati sopra sono
 usati nell'espressione condizionale in tre parti descritta
 @iftex
@@ -3763,7 +3763,7 @@ andando a capo sarebbe considerata conclusa, è possibile @dfn{continuare}
 nella riga successiva terminando la prima riga con un carattere di
 barra inversa (@samp{\}).  La barra inversa dev'essere l'ultimo carattere
 sulla riga, per essere riconosciuto come un carattere di continuazione.
-Una barra inversa seguita da un ritorno a capo  è consentita
+Una barra inversa seguita da un ritorno-a-capo  è consentita
 in ogni parte dell'istruzione, anche in mezzo
 a una stringa o a un'espressione regolare.  Per esempio:
 
@@ -3805,7 +3805,7 @@ file e per programmi sulla riga di comando, @emph{ammesso} che si stia usando
 una shell conforme a POSIX, come la Unix Bourne shell o Bash.  Ma la
 @command{csh} shell si comporta in maniera diversa!  In quel caso, occorre
 usare due barre inverse consecutive, in fondo alla riga.  Si noti anche che
-quando si usa la @command{csh} shell, @emph{ogni} ritorno a capo nel vostro
+quando si usa la @command{csh} shell, @emph{ogni} ritorno-a-capo nel vostro
 programma @command{awk} dev'essere indicata con una barra inversa. Per esempio:
 
 @example
@@ -3858,7 +3858,7 @@ $ @kbd{gawk 'BEGIN @{ print "Non allarmarti" # una amichevole \}
 
 @noindent
 In questo caso, parrebbe che la barra inversa continui il commento sulla riga
-successiva.  Invece, la combinazione barra inversa-ritorno a capo non viene
+successiva.  Invece, la combinazione barra inversa-ritorno-a-capo non viene
 per nulla notata, in quanto ``nascosta'' all'interno del commento.  Quindi,
 il @code{BEGIN} è marcato come errore di sintassi.
 
@@ -3889,7 +3889,7 @@ a"
 @end example
 
 @noindent
-In altre parole, la barra inversa e il ritorno a capo vengono eliminati,
+In altre parole, la barra inversa e il ritorno-a-capo vengono eliminati,
 e quindi si assegna il valore @code{"a"} alla variabile predefinita
 @code{FS}.  Lo stesso viene fatto quando si assegnano altre variabili
 utilizzando l'opzione @option{-v} (@pxref{Opzioni})
@@ -4333,7 +4333,7 @@ vogliono usare dai programmi da riga di comando
 (@pxref{AWKPATH (Variabile)}).
 
 Si noti che @command{gawk} elabora ogni stringa come se fosse terminata
-da un carattere di ritorno a capo (anche se non è questo il caso).
+da un carattere di ritorno-a-capo (anche se non è questo il caso).
 Ciò facilita la costruzione del programma completo.
 
 @quotation ATTENZIONE
@@ -4711,8 +4711,8 @@ restrizioni:
 
 @itemize @value{BULLET}
 
-@cindex ritorno a capo
-@cindex spazi vuoti @subentry ritorno a capo come
+@cindex ritorno-a-capo
+@cindex spazi vuoti @subentry ritorno-a-capo come
 @item
 I ritorni a capo non sono consentiti dopo @samp{?} o @samp{:}
 (@pxref{Espressioni condizionali}).
@@ -6078,7 +6078,7 @@ inversa nella stringa o @dfn{regexp}.  Quindi, la stringa costituita dai due
 caratteri @samp{"} e @samp{\} dev'essere scritta come @code{"\"\\"}.
 
 Altre sequenze di protezione rappresentano caratteri non stampabili
-come TAB o il ritorno a capo.  Anche se è possibile immettere la maggior parte dei
+come TAB o il ritorno-a-capo.  Anche se è possibile immettere la maggior parte dei
 caratteri non stampabili direttamente in una costante stringa o
 @dfn{regexp}, essi possono non essere di facile comprensione.
 
@@ -6387,7 +6387,7 @@ Il simbolo @samp{^} è conosciuto come @dfn{àncora}, perché àncora la ricerca
 solo all'inizio della stringa.
 
 È importante notare che @samp{^} non individua un inizio di riga
-(il punto subito dopo un ritorno a capo @samp{\n}) che si trovi all'interno
+(il punto subito dopo un ritorno-a-capo @samp{\n}) che si trovi all'interno
 di una stringa.  La condizione non è verificata nell'esempio seguente:
 
 @example
@@ -6401,7 +6401,7 @@ Simile a @samp{^}, ma serve a indicare la fine di una stringa.
 Per esempio, @samp{p$}
 individua un record che termina con la lettera @samp{p}.  Il @samp{$} è
 un'àncora e non individua una fine di riga (il punto immediatamente prima
-di un carattere di ritorno a capo @samp{\n})
+di un carattere di ritorno-a-capo @samp{\n})
 contenuta in una stringa.
 La condizione nell'esempio seguente non è verificata:
 
@@ -6413,7 +6413,7 @@ if ("riga1\nRIGA 2" ~ /1$/) @dots{}
 @cindex punto (@code{.}) @subentry operatore @dfn{regexp}
 @item @code{.} (punto)
 Individua un qualsiasi carattere,
-@emph{incluso} il carattere di ritorno a capo.  Per esempio, @samp{.P}
+@emph{incluso} il carattere di ritorno-a-capo.  Per esempio, @samp{.P}
 individua ogni carattere in una stringa che sia seguito da una @samp{P}.
 Usando la concatenazione, si può formare un'espressione regolare come
 @samp{U.A}, che individua qualsiasi sequenza di tre caratteri che inizia con
@@ -7258,7 +7258,7 @@ l'altro.)
 caratteri di controllo).
 @item @code{[:punct:]} @tab Caratteri di punteggiatura (caratteri che non
 sono lettere, cifre, caratteri di controllo, o caratteri di spazio).
-@item @code{[:space:]} @tab Caratteri di spazio (ovvero: @dfn{spazio}, TAB, avanzamento riga (@dfn{newline}), ritorno a capo (@dfn{carriage return}), avanzamento pagina (@dfn{formfeed}) e tabulazione verticale)
+@item @code{[:space:]} @tab Caratteri di spazio (ovvero: @dfn{spazio}, TAB, avanzamento riga (@dfn{newline}), ritorno-a-capo (@dfn{carriage return}), avanzamento pagina (@dfn{formfeed}) e tabulazione verticale)
 @item @code{[:upper:]} @tab Caratteri alfabetici maiuscoli.
 @item @code{[:xdigit:]} @tab Caratteri che sono cifre esadecimali.
 @end multitable
@@ -7658,11 +7658,11 @@ record è suddiviso automaticamente in "pezzi" chiamati @dfn{campi}.
 Questo rende più pratico far lavorare i programmi sulle parti di un record.
 
 @cindex @code{getline} (funzione)
-In rare occasioni, si potrebbe aver bisogno di usare la funzione
-@code{getline}. La funzione  @code{getline} è utile sia perché può procurare
-un input esplicito da un numero indeterminato di file, sia perché non vanno
-specificati sulla riga di comando di @command{awk} i nomi dei file usati con
-getline (@pxref{Getline}).
+Può anche capitare di aver bisogno di usare la funzione
+@code{getline}. La funzione  @code{getline} è utile sia perché può ottenere
+un input esplicito da un numero indeterminato di file, sia perché
+sulla riga di comando di @command{awk} non si devono specificare i nomi
+dei file usati con getline (@pxref{Getline}).
 
 @menu
 * Record::                           Controllare come i dati sono suddivisi
@@ -7700,7 +7700,7 @@ getline (@pxref{Getline}).
 Tiene traccia del numero di record già letti dal
 file in input corrente.  Questo valore è memorizzato in una variabile
 predefinita chiamata @code{FNR} che è reimpostata a zero ogni volta che si
-inizia un nuovo file.  Un'altra variabile predefinita, @code{NR}, registra il
+inizia un nuovo file.  Un'altra variabile predefinita, @code{NR}, contiene il
 numero totale di record in input già letti da tutti i @value{DF}.
 Il suo valore iniziale è zero ma non viene mai reimpostata a zero
 automaticamente.
@@ -7708,10 +7708,11 @@ automaticamente.
 I record sono normalmente separati dal carattere di avanzamento riga
 (@dfn{newline}).  È possibile specificare come vanno separati i record
 assegnando un valore alla variabile predefinita @code{RS}.
-Se il valore di @code{RS} è costituito da un solo carattere, è quello
+Se il valore di @code{RS} è costituito da un solo carattere, quello è
 il carattere che fa da separatore fra i record.
-Altrimenti (in @command{gawk}), @code{RS} è valutata come espressione
-regolare.  Questo meccanismo è spiegato più in dettaglio qui sotto.
+Altrimenti (in @command{gawk}, @command{mawk}, e BWK @command{awk}),
+la variabile @code{RS} è ritenuta essere un'espressione regolare.
+Questo meccanismo è spiegato più in dettaglio qui sotto.
 
 @quotation NOTA
 Quando @command{gawk} è chiamato con l'opzione @option{--csv}, nulla
@@ -7731,14 +7732,14 @@ per i dettagli.
 @cindex separatore di record
 @cindex record @subentry separatore di
 I record sono separati da un carattere chiamato @dfn{separatore di record}.
-Per default, il separatore di record è il carattere di ritorno a capo.
+Per default, il separatore di record è il carattere di ritorno-a-capo.
 Questo è il motivo per cui i record sono, per default, righe singole.
 Per usare un diverso carattere come separatore di record
 basta assegnare quel carattere alla variabile predefinita @code{RS}.
 
-@cindex separatore di record @subentry ritorno a capo come
-@cindex ritorno a capo @subentry come separatore di record
-@cindex ritorno a capo @subentry come separatore di record
+@cindex separatore di record @subentry ritorno-a-capo come
+@cindex ritorno-a-capo @subentry come separatore di record
+@cindex ritorno-a-capo @subentry come separatore di record
 @cindex @code{RS} (variabile)
 Come per ogni altra variabile,
 il valore di @code{RS} può essere cambiato nel programma @command{awk}
@@ -7759,14 +7760,14 @@ awk 'BEGIN @{ RS = "u" @}
 
 @noindent
 cambia il valore di @code{RS} in @samp{u}, prima di leggere qualsiasi input.
-Il nuovo valore è una stringa il cui primo carattere è la lettera ``u''; come
+Il nuovo valore è una stringa il cui unico carattere è la lettera ``u''; come
 risultato, i record sono separati dalla lettera ``u''.  Poi viene letto il
 file in input, e la seconda regola nel programma @command{awk} (l'azione
 eseguita se non si specifica un criterio)
 stampa ogni record.  Poiché ogni istruzione @code{print} aggiunge
-un ritorno a capo alla fine del suo output, questo programma
+un ritorno-a-capo alla fine del suo output, questo programma
 @command{awk} copia l'input con ogni @samp{u} trasformato in un
-ritorno a capo.
+ritorno-a-capo.
 Qui vediamo il risultato dell'esecuzione del programma sul file
 @file{mail-list}:
 
@@ -7785,34 +7786,7 @@ $ @kbd{awk 'BEGIN @{ RS = "u" @}}
 @print{} Bill         555-1675     bill.drowning@@hotmail.com       A
 @print{} Broderick    555-0542     broderick.aliq
 @print{} otiens@@yahoo.com R
-@print{} Camilla      555-2912     camilla.inf
-@print{} sar
-@print{} m@@skynet.be     R
-@print{} Fabi
-@print{} s       555-1234     fabi
-@print{} s.
-@print{} ndevicesim
-@print{} s@@
-@print{} cb.ed
-@print{}     F
-@print{} J
-@print{} lie        555-6699     j
-@print{} lie.perscr
-@print{} tabor@@skeeve.com   F
-@print{} Martin       555-6480     martin.codicib
-@print{} s@@hotmail.com    A
-@print{} Sam
-@print{} el       555-3430     sam
-@print{} el.lanceolis@@sh
-@print{} .ed
-@print{}         A
-@print{} Jean-Pa
-@print{} l    555-2127     jeanpa
-@print{} l.campanor
-@print{} m@@ny
-@print{} .ed
-@print{}      R
-@print{}
+@dots{}
 @end example
 
 @noindent
@@ -7827,10 +7801,11 @@ Bill         555-1675     bill.drowning@@hotmail.com       A
 
 @noindent
 Essa non contiene nessuna @samp{u}, per cui non c'è alcun motivo di dividere
-il record, diversamente dalle altre, che hanno una o più ricorrenze della
-@samp{u}. Infatti, questo record è trattato come parte del record precedente;
-il ritorno a capo che li separa nell'output è l'originale ritorno a capo nel
-@value{DF}, non quella aggiunta da @command{awk} quando ha stampato il record!
+il record, diversamente dalle altre, che hanno una o più ricorrenze di
+@samp{u}. In effetti, questo record è trattato come parte del record
+precedente; il ritorno-a-capo che li separa nell'output è l'originale
+ritorno-a-capo nel @value{DF}, non quello aggiunto da @command{awk}
+quando ha stampato il record!
 
 @cindex separatore di record @subentry cambiare il
 @cindex cambiare @subentry il separatore di record
@@ -7850,7 +7825,7 @@ Usando un carattere alfabetico come @samp{u} come separatore di record
 è molto probabile che si ottengano risultati strani.
 Usando un carattere insolito come @samp{/} è più probabile
 che si ottenga un comportamento corretto nella  maggioranza dei casi, ma non
-c'è nessuna garanzia.  La morale è: conosci i tuoi dati!
+c'è nessuna garanzia.  La morale è: Conoscere i Propri Dati!
 
 @command{gawk} consente di usare per @code{RS} un'espressione regolare
 normale (descritta più avanti; @pxref{gawk divisione record}).
@@ -7892,13 +7867,13 @@ imposta la variabile @code{RT} al testo nell'input che corrisponde a
 @code{RS}.
 
 @node gawk divisione record
-@subsection Divisione dei record con @command{gawk}
+@subsection Divisione dei record con @command{gawk}, @command{mawk}, e BWK @command{awk}
 
 @cindex estensioni comuni @subentry @code{RS} come espressione regolare
 @cindex comuni @subentry estensioni @subentry @code{RS} come espressione regolare
-Quando si usa @command{gawk},
+Quando si usa @command{gawk}, @command{mawk}, e BWK @command{awk},
 il valore di @code{RS} non è limitato a una stringa costituita da un solo
-carattere.  Se contiene più di un carattere, è considerato essere
+carattere.  Se contiene più di un carattere, è visto come
 un'espressione regolare
 @iftex
 (@pxrefil{Espressioni regolari}). (e.c.)
@@ -7909,11 +7884,11 @@ un'espressione regolare
 In generale, ogni record termina alla stringa più vicina che corrisponde
 all'espressione regolare; il record successivo inizia alla fine della stringa
 che corrisponde.  Questa regola generale è in realtà applicata anche nel caso
-normale, in cui @code{RS} contiene solo un ritorno a capo: un record
+normale, in cui @code{RS} contiene solo un ritorno-a-capo: un record
 termina all'inizio della prossima stringa che corrisponde (il prossimo
-ritorno a capo nell'input), e il record seguente inizia subito dopo la
+ritorno-a-capo nell'input), e il record seguente inizia subito dopo la
 fine di questa stringa (al primo carattere della riga seguente).
-Il ritorno a capo, poiché corrisponde a @code{RS}, non appartiene a
+Il ritorno-a-capo, poiché corrisponde a @code{RS}, non appartiene a
 nessuno dei due record.
 
 Quando @code{RS} è un singolo carattere, @code{RT}
@@ -7926,7 +7901,7 @@ Se il file in input termina senza che vi sia un testo che corrisponda a
 
 Il seguente esempio illustra entrambe queste caratteristiche.
 In quest'esempio @code{RS} è impostato a un'espressione regolare che
-cerca sia un ritorno a capo che una serie di una o più lettere
+cerca sia un ritorno-a-capo che una serie di una o più lettere
 maiuscole con uno spazio vuoto opzionale iniziale e/o finale:
 
 @example
@@ -7944,9 +7919,12 @@ $ @kbd{echo record 1 AAAA record 2 BBBB record 3 |}
 @noindent
 Le parentesi quadre racchiudono il contenuto di @code{RT}, rendendo visibile
 lo spazio vuoto iniziale e quello finale.  L'ultimo valore di
-@code{RT} è un ritorno a capo.
-@xref{Programma sed semplice} per un esempio più utile
-su @code{RS} come espressione regolare e su @code{RT}.
+@code{RT} è un ritorno-a-capo.
+
+Questo programma non è utile di per sé, serve solo come esempio della
+funzionalità.  Vedere
+@xref{Programma sed semplice} per un esempio più pratico di uso
+di @code{RS} come espressione regolare e di @code{RT}.
 
 Se si imposta @code{RS} a un'espressione regolare che consente del testo
 finale opzionale, come @samp{RS = "abc(XYZ)?"} è possibile, per via di
@@ -7961,9 +7939,10 @@ problema, ma al momento non ci sono garanzie che questo funzioni sempre.
 Si ricordi che in @command{awk}, i metacaratteri di ancoraggio @samp{^} e
 @samp{$} trovano l'inizio e la fine di una @emph{stringa}, e non l'inizio e la
 fine di una @emph{riga}.  Come risultato, qualcosa come
-@samp{RS = "^[[:upper:]]"} può  solo corrispondere all'inizio di un file.
-Questo perché @command{gawk} vede il file in input come un'unica lunga stringa
-in cui possono essere presenti dei caratteri di ritorno a capo.
+@samp{RS = "^[[:upper:]]"} può solo corrispondere all'inizio di un file.
+Questo perché le implementazioni di @command{awk} che supportano @code{RS}
+vedono il file in input come un'unica lunga stringa della quale possono
+far parte dei caratteri di ritorno-a-capo.
 È meglio perciò evitare metacaratteri di ancoraggio nel valore di @code{RS}.
 
 La suddivisione in campi usando espressioni regolari funziona in maniera
@@ -7983,12 +7962,14 @@ L'uso di @code{RS} come espressione regolare e la variabile @code{RT} sono
 estensioni @command{gawk}; non sono disponibili in
 modalità compatibile
 (@pxref{Opzioni}).
-In modalità compatibile, solo il primo carattere del valore di
+In modalità POSIX, solo il primo carattere del valore di
 @code{RS} determina la fine del record.
 
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 @cindex Brian Kernighan @subentry @command{awk} di
 @command{mawk} ha permesso che @code{RS} fosse un'espressione regolare
-da decenni. A partire dall'ottobre 2019, anche BWK @command{awk} lo permette.
+fin dall'inizio.  Anche BWK @command{awk} lo permette.
 Nessuna delle due versioni, tuttavia, fornisce @code{RT}.
 
 @cindex riquadro @subentry @code{RS = "\0"} non è portabile
@@ -8048,7 +8029,7 @@ file interi.  Se si usa  @command{gawk}, vedere la
 @cindex campi @subentry esame dei
 @cindex spazio bianco @subentry definizione di
 Quando @command{awk} legge un record in input, il record è
-automaticamente @dfn{analizzato} o separato da @command{awk} in "pezzi"
+automaticamente @dfn{analizzato}, ossia diviso in "pezzi"
 chiamati @dfn{campi}.  Per default, i campi sono separati da
 @dfn{spazi vuoti}, come le parole in una riga stampata.
 Uno spazio vuoto in @command{awk} è qualsiasi stringa composta da uno o più
@@ -8351,23 +8332,15 @@ $ @kbd{echo a b c d e f | awk '@{ print "NF =", NF;}
 @print{} a b c
 @end example
 
-@cindex portabilità @subentry variabile @code{NF}, decrementare
-@quotation ATTENZIONE
-Alcune versioni di @command{awk} non
-ricostruiscono @code{$0} quando @code{NF} viene diminuito.
-Fino ad agosto 2018, fra queste c'era BWK @command{awk}; per fortuna
-da allora la sua versione funziona correttamente.
-@end quotation
-
 Infine, ci sono casi in cui conviene forzare
 @command{awk} a ricostruire l'intero record, usando i valori correnti
-dei campi e @code{OFS}.  Per far ciò, si usa
-l'apparentemente innocuo assegnamento:
+dei campi e @code{OFS}.  Per far ciò, si usa l'assegnamento,
+apparentemente innocuo:
 
 @example
 @group
 $1 = $1   # forza la ricostruzione del record
-print $0  # o qualsiasi altra cosa con $0
+print $0  # o qualsiasi altra cosa che contiene $0
 @end group
 @end example
 
@@ -8445,16 +8418,16 @@ Notare gli spazi iniziali nei valori del secondo e del terzo campo.
 @cindex problemi @subentry risoluzione di @subentry @command{awk} usa @code{FS} anziché @code{IFS}
 Il separatore di campo è rappresentato dalla variable predefinita @code{FS}.
 I programmatori di shell notino:  @command{awk} @emph{non} usa il
-nome @code{IFS} che è usato dalle shell conformi a POSIX (come
-la Unix Bourne shell, @command{sh}, o Bash).
+nome @code{IFS} che è usato dalle shell conformi a POSIX (come Bash).
 
 @cindex @code{FS} (variabile) @subentry cambiare il valore della
 @cindex cambiare @subentry il valore di @code{FS} (variabile)
-Il valore di @code{FS} si può cambiare nel programma @command{awk} con
-l'operatore di assegnamento, @samp{=} (@pxref{Operatori di assegnamento}).
-Spesso il momento giusto per far ciò è all'inizio dell'esecuzione
-prima che sia stato elaborato qualsiasi input, così che il primo record
-sia letto col separatore  appropriato.  Per far questo, si usa il modello di
+È possibile cambiare il valore di @code{FS} assegnandogli un nuovo valore
+con l'operatore di assegnamento, @samp{=}
+(@pxref{Operatori di assegnamento}).
+Spesso il momento migliore per far ciò è all'inizio dell'esecuzione,
+prima che sia stato elaborato qualsiasi input, in modo che il primo record
+sia letto col separatore appropriato.  Per far questo, si usa il modello di
 ricerca speciale
 @code{BEGIN}
 (@pxref{BEGIN/END}).
@@ -8514,12 +8487,11 @@ vuoto tra di essi.  Il motivo per cui questo non succede è perché un singolo
 spazio come valore di @code{FS} è un caso particolare: è preso per specificare
 il modo di default di delimitare i campi.
 
-Se @code{FS} è qualsiasi altro carattere singolo, come @code{","}, ogni
+Se @code{FS} è qualsiasi altro carattere singolo, come @code{":"}, ogni
 ricorrenza di quel carattere separa due campi.  Due ricorrenze consecutive
 delimitano un campo vuoto.  Se il carattere si trova all'inizio o alla fine
-della riga, anche quello delimita un campo vuoto.  Il carattere di spazio è
-il solo carattere singolo che non segue queste
-regole.
+della riga, anch'esso delimita un campo vuoto.  Il carattere di spazio è
+il solo carattere singolo che non segue queste regole.
 
 @node Separare campi con @dfn{regexp}
 @subsection Usare @dfn{regexp} come separatori di campo
@@ -8548,7 +8520,7 @@ per l'elenco completo di sequenze di protezione simili.)
 @end ifinfo
 
 Per un esempio meno banale di espressione regolare, si provi a usare spazi
-singoli per separare campi nel modo in cui sono usate le virgole. @code{FS}
+singoli per separare campi nel modo in cui si sono usati i due punti. @code{FS}
 può essere impostato a @w{@code{"[@ ]"}} (parentesi quadra sinistra, spazio,
 parentesi quadra destra).  Quest'espressione regolare corrisponde a uno spazio
 @iftex
@@ -8582,9 +8554,9 @@ $ @kbd{echo ' a  b  c  d ' | awk 'BEGIN @{ FS = "[ \t\n]+" @}}
 @print{} a
 @end example
 
-@noindent
 @cindex stringa nulla
 @cindex stringa @subentry vuota @seeentry{stringa nulla}
+@noindent
 In questo caso, il primo campo è nullo, o vuoto.
 Il taglio degli spazi vuoti iniziale e finale ha luogo anche
 ogniqualvolta @code{$0} è ricalcolato.
@@ -8619,9 +8591,11 @@ su alcun comportamento specifico nei propri programmi.
 @value{DARKCORNER}
 
 @cindex Brian Kernighan @subentry @command{awk} di
+@cindex @command{mawk} (comando di utilità)
+@cindex comando di utilità @subentry @command{mawk}
 Di sicuro, BWK @command{awk} individua con @samp{^}
 solo l'inizio del record.  Anche @command{gawk}
-funziona in questo modo. Per esempio:
+funziona in questo modo; @command{mawk} invece no. Per esempio:
 
 @example
 $ @kbd{echo 'xxAA  xxBxx  C' |}
@@ -8647,12 +8621,13 @@ ciascuno.
 
 @cindex estensioni comuni @subentry campi di un solo carattere
 @cindex comuni @subentry estensioni @subentry campi di un solo carattere
-@cindex differenze tra @command{awk} e @command{gawk} @subentry campi di un solo carattere
+@c @cindex differenze tra @command{awk} e @command{gawk} @subentry campi di un solo carattere
 @cindex singolo carattere @subentry campi di un
 @cindex campi @subentry di un solo carattere
 Ci sono casi in cui si abbia la necessità di analizzare ciascun carattere di un
-record separatamente.  Questo si può fare in @command{gawk} semplicemente
-assegnando la stringa nulla (@code{""}) a @code{FS}. (e.c.)
+record separatamente.  Questo si può fare in @command{gawk}
+@command{mawk}, e BWK @command{awk}
+semplicemente assegnando la stringa nulla (@code{""}) a @code{FS}. (e.c.)
 In questo caso,
 ogni singolo carattere nel record diventa un campo separato.
 Per esempio:
@@ -8805,14 +8780,14 @@ punto-e-virgola al posto della virgola.
 l'opzione @option{-F}.  Per esempio:
 
 @example
-awk -F, '@var{programma}' @var{i-file-di-input}
+awk -F: '@var{programma}' @var{i-file-in-input}
 @end example
 
 @noindent
-imposta @code{FS} al carattere @samp{,}.  Si noti che l'opzione richiede
+imposta @code{FS} al carattere @samp{:}.  Si noti che l'opzione richiede
 un carattere maiuscolo @samp{F} anziché minuscolo @samp{f}.  Quest'ultima
-opzione (@option{-f}) serve a specificare il file contenente un programma
-@command{awk}.
+opzione (@option{-f}) serve invece a specificare quale file contiene un
+programma @command{awk}.
 
 Il valore usato per l'argomento di @option{-F} è elaborato esattamente nello
 stesso modo degli assegnamenti alla variabile predefinita @code{FS}. Qualsiasi
@@ -8834,6 +8809,7 @@ arriva @samp{-F\\}.  Quindi @command{awk} elabora @samp{\\} per caratteri di
 protezione (@pxref{Sequenze di protezione}), producendo alla fine
 un unico @samp{\} da usare come separatore di campo.
 
+@c FIXME: Nuke this paragraph for 6.0
 @c @cindex historical features
 Come caso particolare, in modalità di compatibilità
 (@pxref{Opzioni}),
@@ -8881,11 +8857,11 @@ che ci si aspettava venisse usato.
 Questo lascia intuire il motivo per cui si deve stare attenti nella scelta
 dei separatori di campo e di record.
 
-@cindex Unix @command{awk} @subentry file di password @subentry separatore di campo e
+@cindex Unix @subentry file di password @subentry separatore di campo e
 Forse l'uso più comune di un solo carattere come separatore di campo avviene
-quando si elabora il file delle password di un sistema Unix.  Su molti sistemi
-Unix, ogni utente è descritto da un elemento nel file delle password del
-sistema, che contiene una riga singola per ogni utente.  In queste righe le
+quando si elabora il file delle password di sistema.  Su molti sistemi di tipo
+Unix, ogni utente è descritto nel file delle password del sistema,
+che contiene una riga per ciascun utente.  In queste righe le
 informazioni sono separate da dei caratteri ":".  Il
 primo campo è il nome di login dell'utente e il secondo è la password
 dell'utente criptata o oscurata (una password oscurata è indicata dalla
@@ -8910,7 +8886,7 @@ awk -F: '$5 == ""' /etc/passwd
 @cindex Schorr, Andrew
 Occasionalmente, è utile trattare l'intera riga in input come un solo campo.
 Questo si può fare facilmente e in modo portabile semplicemente impostando
-@code{FS} a @code{"\n"} (un ritorno a capo).@footnote{Grazie ad
+@code{FS} a @code{"\n"} (un ritorno-a-capo).@footnote{Grazie ad
 Andrew Schorr per questo suggerimento.}
 
 @example
@@ -8936,10 +8912,10 @@ valore di @code{FS}, non quello nuovo.
 @cindex @command{sed} (comando di utilità)
 @cindex comando di utilità @subentry @command{sed}
 @cindex editori di flusso
-Comunque, molte delle più vecchie implementazioni di @command{awk} non
-funzionano in questo modo.  Invece, rimandano la divisione dei campi
-fino a quando si fa effettivamente riferimento a un campo.  I campi sono
-divisi usando il valore @emph{corrente} di @code{FS}!
+Comunque, molte delle prime implementazioni di @command{awk} non
+funzionavano in questo modo.  Invece, rimandavano la divisione dei campi
+fino a quando si faceva effettivamente riferimento a un campo.
+I campi erano divisi usando il valore @emph{corrente} di @code{FS}!
 @value{DARKCORNER}
 Questo comportamento può essere di difficile
 identificazione.  Il seguente esempio illustra la differenza
@@ -8950,20 +8926,21 @@ sed 1q /etc/passwd | awk '@{ FS = ":" ; print $1 @}'
 @end example
 
 @noindent
-normalmente stampa:
+stampa:
 
 @example
 @print{} root
 @end example
 
 @noindent
-su un'implementazione non standard di @command{awk}, mentre @command{gawk}
-stampa l'intera prima riga del file, qualcosa come:
+in un'implementazione non corretta di @command{awk}, mentre le versioni
+corrette stampano l'intera prima riga del file, qualcosa come:
 
 @example
-root:x:0:0:Root:/:
+root:x:0:0:root:/root:/bin/bash
 @end example
 
+@noindent
 (Il comando @command{sed}@footnote{Il comando di utilità @command{sed} è un
 ``editore di flusso''.  Anche il suo comportamento è definito dallo standard
 POSIX.} appena visto stampa solo la prima riga di @file{/etc/passwd}.)
@@ -8974,10 +8951,10 @@ POSIX.} appena visto stampa solo la prima riga di @file{/etc/passwd}.)
 
 È importante ricordare che quando si assegna una costante stringa
 come valore di @code{FS}, questa subisce una normale elaborazione di stringa
-da parte di @command{awk}.  Per esempio, con Unix @command{awk} e
+da parte di @command{awk}.  Per esempio, con BWK @command{awk} e
 @command{gawk}, l'assegnamento @samp{FS = "\.."} assegna la stringa di
-caratteri @code{".."}
-a @code{FS} (la barra inversa è tolta).  Questo crea un'espressione regolare
+caratteri @code{".."} a @code{FS} (la barra inversa viene ignorata).
+Questo crea un'espressione regolare
 che significa ``i campi sono separati da ricorrenze di due caratteri
 qualsiasi''.  Se invece si vuole che i campi siano separati da un punto
 seguito da un qualsiasi carattere singolo, si deve usare @samp{FS = "\\.."}.
@@ -8985,8 +8962,28 @@ seguito da un qualsiasi carattere singolo, si deve usare @samp{FS = "\\.."}.
 Il seguente elenco riassume come i campi vengono divisi, in base al valore
 di @code{FS} (@samp{==} significa ``è uguale a''):
 
-@table @code
-@item @asis{@command{gawk} è stato chiamato specificando l'opzione @option{--csv}}
+@table @asis
+@item @code{FS == " "}
+I campi sono separati da uno o più spazi vuoti.  Gli spazi vuoti iniziali
+e finali sono ignorati.  Questo è il comportamento di default.
+
+@item @code{FS == @var{qualsiasi altro carattere singolo}}
+I campi sono separati da ogni ricorrenza del carattere.  Ricorrenze
+successive multiple delimitano campi vuoti, e lo stesso fanno le ricorrenze
+iniziali e finali del carattere.
+Il carattere può essere anche un metacarattere di espressione regolare, che
+non è necessario proteggere.
+
+@item @code{FS == @var{espressione regolare}}
+I campi sono separati da ricorrenze di caratteri che corrispondono alla
+@var{espressione regolare}.  Corrispondenze iniziali e finali della
+@dfn{regexp} delimitano campi vuoti.
+
+@item @code{FS == ""}
+Ogni singolo carattere nel record diventa un campo separato.
+(Questa è un'estensione comune; non è specificata dallo standard POSIX.)
+
+@item @command{gawk} è stato chiamato specificando l'opzione @option{--csv}
 La divisione in campi segue le regole esposte
 @iftex
 nella
@@ -8996,25 +8993,6 @@ in
 @end ifnottex
 @ref{Campi separati da virgola}.
 Il valore di @code{FS} è ignorato.
-
-@item FS == " "
-I campi sono separati da uno o più spazi vuoti.  Gli spazi vuoti iniziali
-e finali sono ignorati.  Questo è il comportamento di default.
-
-@item FS == @var{qualsiasi altro carattere singolo}
-I campi sono separati da ogni ricorrenza del carattere.  Ricorrenze
-successive multiple delimitano campi vuoti, e lo stesso fanno le ricorrenze
-iniziali e finali del carattere.
-Il carattere può essere anche un metacarattere di espressione regolare, che
-non è necessario proteggere.
-
-@item FS == @var{espressione regolare}
-I campi sono separati da ricorrenze di caratteri che corrispondono alla
-@var{espressione regolare}.  Corrispondenze iniziali e finali della
-@dfn{regexp} delimitano campi vuoti.
-@item FS == ""
-Ogni singolo carattere nel record diventa un campo separato.
-(Questa è un'estensione comune; non è specificata dallo standard POSIX.)
 @end table
 
 @cindex riquadro @subentry @code{FS} e @code{IGNORECASE}
@@ -9037,7 +9015,7 @@ print $1
 @noindent
 L'output è @samp{aCa}.  Se si vuol veramente dividere i campi su un carattere
 alfabetico ignorandone il maiuscolo/minuscolo, si deve usare un'espressione
-regolare che lo farà in automatico (p.es., @samp{FS = "[c]"}).  In questo
+regolare che lo farà in automatico (p.es., @samp{FS = "[c]"}).  In quel
 caso, @code{IGNORECASE} avrà effetto.
 @end cartouche
 
@@ -9171,7 +9149,7 @@ schede è un'altra storia!)
 @node Saltare campi intermedi
 @subsection Saltare campi intermedi
 
-A partire dalla versione 4.2, ogni specifica di una larghezza di campo
+Ogni specifica di una larghezza di campo
 può essere opzionalmente preceduta da un valore, delimitato da due punti
 (@code{:}), che indica il numero di caratteri da saltare prima dell'inizio del campo
 successivo.  Quindi, il programma precedente potrebbe essere riscritto per
@@ -9182,7 +9160,7 @@ BEGIN  @{ FIELDWIDTHS = "8 1:5 4:7 6 1:6 1:6 2:33" @}
 @end example
 
 In questo modo si eliminano alcuni degli spazi bianchi che separano fra
-loro i campo.  Dopo esser stato così modificato, il programma produce
+loro i campi.  Dopo esser stato così modificato, il programma produce
 i risultati seguenti:
 
 @example
@@ -9203,9 +9181,9 @@ la cui lunghezza non è nota @dfn{a priori}.  Tali dati possono essere
 o non essere presenti, ma nel caso che lo siano dovrebbe essere possibile
 elaborarli all'interno di un programma @command{awk}.
 
-A partire dalla versione 4.2, per consentire di designare
+Per consentire di designare
 ``tutto il resto del record dopo i campi a lunghezza fissa''
-@command{gawk} prevede la possibilità di aggiungere un carattere @samp{*}
+si può aggiungere un carattere @samp{*}
 in fondo alla descrizione contenuta in @code{FIELDWIDTHS}.
 Ci può essere un solo carattere @samp{*}, e dev'essere l'ultimo carattere
 diverso da uno spazio in @code{FIELDWIDTHS}.
@@ -9227,10 +9205,7 @@ $ @kbd{gawk -f fw.awk fw.in}              @ii{Esegui il programma}
 Fin qui, tutto bene.  Ma cosa succede se non ci sono abbastanza dati
 rispetto a quelli che dovrebbero essere presenti in base alla descrizione
 contenuta in @code{FIELDWIDTHS}?  E invece cosa succede se i dati sono
-più di quelli previsti?
-
-Per molti anni, quel che succede in questi casi non era definito con
-esattezza.  A partire dalla versione 4.2 le regole sono le seguenti:
+più di quelli previsti?  Le regole sono le seguenti:
 
 @table @asis
 @item Dati sufficienti per uno o più campi
@@ -9328,7 +9303,7 @@ fatto quando si separino i campi usando @code{FPAT}.
 versione 5.3.
 
 Molti fogli elettronici, per esempio, possono esportare i dati in
-file di testo, nei quali ogni record termina con un ritorno a capo
+file di testo, nei quali ogni record termina con un ritorno-a-capo
 e i campi sono separati tra loro da virgole.  Se le virgole facessero solo
 da separatore fra i dati non ci sarebbero problemi usando semplicemente
 @samp{FS = ","} per dividere un record in campi.  Il problema sorge
@@ -9503,7 +9478,7 @@ $ @kbd{gawk -f quoted-csv.awk sample.csv}
 @end example
 
 Alcuni programmi trattano dati CVS che contengono nei campi dei
-@emph{caratteri di ritorno a capo}, racchiusi tra doppi apici,
+@emph{caratteri di ritorno-a-capo}, racchiusi tra doppi apici,
 e qui ci si scontra con uno dei limiti di @code{FPAT}: non c'è modo
 per gestire questa situazione. Per questo motivo, usare @code{FPAT}
 per fare la scansione di file CVS è un approccio che funziona
@@ -9563,14 +9538,18 @@ stringhe utilizzando le funzioni @code{split()} e @code{patsplit()}
 @section Controllare come @command{gawk} sta suddividendo i record
 
 @cindex @command{gawk} @subentry separazione in campi e
-Come visto sopra, @command{gawk} fornisce tre metodi indipendenti per
-dividere i record in input in campi.  Il meccanismo utilizzato dipende da
+Come visto sopra, @command{gawk} fornisce quattro metodi indipendenti per
+dividere in campi i record in input.
+Per prima cosa, se si specifica l'opzione @option{--csv}, essa prevale
+su qualsiasi decisione presa a livello di codice sorgente.
+Se la divisione di tipo CSV (Campi Separati da Virgole) non è attiva,
+il meccanismo utilizzato dipende da
 quale delle tre variabili --- @code{FS}, @code{FIELDWIDTHS} o
-@code{FPAT} --- è stato definito per ultimo.
-Inoltre, un analizzatore di input che utilizzi l'API (Application
+@code{FPAT} --- è stato assegnata per ultima.
+(Inoltre, un analizzatore di input che utilizzi l'API (Application
 Programming Interface) può scegliere di modificare il meccanismo di
 analisi dei record; vedere la @ref{Analizzatori di input} per ulteriori
-informazioni riguardo a questa funzionalità.
+informazioni riguardo a questa funzionalità.)
 
 Per ripristinare la normale divisione in campi dopo aver fatto uso
 di @code{FIELDWIDTHS} e/o @code{FPAT}, è sufficiente assegnare un valore
@@ -9579,8 +9558,11 @@ Si può usare @samp{FS = FS} per farlo, senza bisogno di conoscere il
 valore corrente di @code{FS}.
 
 Per determinare quale sia il tipo di divisione dei campi attiva al momento,
-si usi @code{PROCINFO["FS"]} (@pxref{Variabili auto-assegnate}).
-Il valore è @code{"FS"} se si usa la maniera normale di divisione dei campi,
+occorre anzitutto controllare se esiste la variabile @code{PROCINFO["CSV"]}.
+Se non esiste, va controllato
+@code{PROCINFO["FS"]} (@pxref{Variabili auto-assegnate}).
+Il valore di @code{PROCINFO["FS"]} è @code{"FS"} se si usa la maniera
+normale per dividere in campi,
 @code{"FIELDWIDTHS"} se si usa la divisione in campi di lunghezza fissa,
 oppure @code{"FPAT"} se si una la divisione in campi in base al contenuto:
 
@@ -9642,7 +9624,7 @@ spazi bianchi @emph{non} sono righe vuote.)
 @cindex individuare @subentry la stringa più lunga da sinistra
 Si può ottenere lo stesso effetto di @samp{RS = ""} assegnando la stringa
 @code{"\n\n+"} a @code{RS}.  Quest'espressione regolare individua
-il ritorno a capo alla fine del record e una o più righe vuote dopo il
+il ritorno-a-capo alla fine del record e una o più righe vuote dopo il
 record.  In aggiunta, un'espressione regolare individua sempre la sequenza più
 lunga possibile quando una tale stringa sia presente.
 (@pxref{Più lungo da sinistra}).
@@ -9654,7 +9636,7 @@ banca-dati, esse sono considerate come un unico separatore di record.
 Comunque, c'è una sostanziale differenza tra @samp{RS = ""} e @samp{RS =
 "\n\n+"}.  Nel primo caso, i ritorni a capo iniziali nel @value{DF} di
 input vengono ignorati, e se un file termina senza righe vuote aggiuntive dopo
-l'ultimo record, il ritorno a capo viene rimosso dal record.  Nel secondo
+l'ultimo record, il ritorno-a-capo viene rimosso dal record.  Nel secondo
 caso, questa particolare elaborazione non viene fatta.
 @value{DARKCORNER}
 
@@ -9666,7 +9648,7 @@ campi ognuna delle righe in input
 nel modo solito.  Questo viene fatto per default tramite una
 speciale funzionalità.  Quando @code{RS} è impostato alla stringa nulla
 @emph{e} @code{FS} è impostato a un solo carattere, il carattere di
-ritorno a capo agisce @emph{sempre} come separatore di campo.
+ritorno-a-capo agisce @emph{sempre} come separatore di campo.
 Questo in aggiunta a tutte le separazioni di campo che risultano da
 @code{FS}.
 
@@ -9678,18 +9660,19 @@ che è costituito da un solo spazio:
 @samp{FS = @w{" "}}.
 
 Si noti che la formulazione della specifica POSIX implica che
-questa particolare funzionalità dovrebbe valere anche quando
-@code{FS} sia un'espressione regolare.
-Tuttavia, Unix @command{awk} non si è mai comportato in questo
+questa particolare funzionalità dovrebbe valere per qualsiasi
+valore di @code{FS}.
+Tuttavia, BWK @command{awk} non si è mai comportato in questo
 modo, e neppure @command{gawk}.  Questo è fondamentalmente
 un errore nella specifica POSIX.
 @c Noted as of 4/2019; working to get the standard fixed.
+@c Still not fixed in the 2024 standard.
 @end quotation
 
 La motivazione originale per questa particolare eccezione probabilmente era
 quella di prevedere un comportamento che fosse utile nel caso di default
-(cioè, @code{FS} uguale a @w{@code{" "}}).  Questa funzionalità può
-costituire un problema se non si vuole che il carattere di ritorno a capo
+(cioè, quando @code{FS} è uguale a @w{@code{" "}}).  Questa funzionalità può
+costituire un problema se non si vuole che il carattere di ritorno-a-capo
 faccia da separatore tra i campi, perché non c'è alcun modo per impedirlo.
 Tuttavia, si può aggirare il problema usando la funzione @code{split()}
 per spezzare i record manualmente.
@@ -9704,7 +9687,7 @@ un carattere di percentuale, al posto di
 Un altro modo per separare i campi è quello di
 mettere ciascun campo su una riga separata: per far questo basta impostare la
 variabile @code{FS} alla stringa @code{"\n"}.
-(Questo separatore di un solo carattere individua un singolo ritorno a capo.)
+(Questo separatore di un solo carattere individua un singolo ritorno-a-capo.)
 Un esempio pratico di un @value{DF} organizzato in questo modo potrebbe essere
 un elenco di indirizzi, in cui delle righe vuote fungono da separatore fra
 record.  Si consideri un elenco di indirizzi in un file chiamato
@@ -9734,7 +9717,7 @@ BEGIN @{ RS = "" ; FS = "\n" @}
 @{
       print "Il nome è:", $1
       print "L'indirizzo è:", $2
-      print "Città e Stato sono:", $3
+      print "Città, Stato e Codice postale sono:", $3
       print ""
 @}
 @end example
@@ -9745,11 +9728,11 @@ L'esecuzione del programma produce questo output:
 $ @kbd{awk -f addrs.awk addresses}
 @print{} Il nome è: Jane Doe
 @print{} L'indirizzo è: 123 Main Street
-@print{} Città e Stato sono: Anywhere, SE 12345-6789
+@print{} Città, Stato e Codice postale sono: Anywhere, SE 12345-6789
 @print{}
 @print{} Il nome è: John Smith
 @print{} L'indirizzo è: 456 Tree-lined Avenue
-@print{} Città e Stato sono: Smallville, MW 98765-4321
+@print{} Città, Stato e Codice postale sono: Smallville, MW 98765-4321
 @print{}
 @dots{}
 @end example
@@ -9767,7 +9750,7 @@ a seconda del valore assunto da
 
 @table @code
 @item RS == "\n"
-I record sono separati dal carattere di ritorno a capo (@samp{\n}).  In
+I record sono separati dal carattere di ritorno-a-capo (@samp{\n}).  In
 effetti, ogni riga nel @value{DF} è un record separato, comprese le righe
 vuote.  Questo è il comportamento di default.
 
@@ -9778,7 +9761,7 @@ ricorrenze adiacenti delimitano record vuoti.
 @item RS == ""
 I record sono separati da una o più righe vuote.
 Quando @code{FS} è un carattere singolo,
-il carattere di ritorno a capo
+il carattere di ritorno-a-capo
 serve sempre come separatore di campo, in aggiunta a qualunque valore possa
 avere @code{FS}.  Le righe vuote a inizio-file e a fine-file sono ignorate.
 
@@ -9786,7 +9769,7 @@ avere @code{FS}.  Le righe vuote a inizio-file e a fine-file sono ignorate.
 I record sono separati da ricorrenze di caratteri corrispondenti a
 @var{regexp}.  Le corrispondenze iniziali e finali di
 @var{regexp} designano record vuoti.
-(Questa è un'estensione di @command{gawk}; non è specificata dallo
+(Questa è un'estensione comune; non è specificata dallo
 standard POSIX.)
 @end table
 
@@ -9802,7 +9785,7 @@ corrisponde a @code{RS}, @command{gawk} imposta @code{RT} alla stringa nulla.
 @node Getline
 @section Richiedere input usando @code{getline}
 
-@cindexawkfunc{getline}
+@cindex @code{getline} (funzione)
 @cindex @code{getline} (funzione) @subentry input esplicito con
 @cindex input @subentry esplicito
 Finora abbiamo ottenuto i dati di input dal flusso di input principale di
@@ -9834,7 +9817,7 @@ e avere acquisito una buona conoscenza di come funziona @command{awk}.
 @cindex @command{gawk} @subentry variabile @subentry @code{ERRNO} in
 @cindex @code{ERRNO} (variabile) @subentry con funzione @code{getline}
 @cindex differenze tra @command{awk} e @command{gawk} @subentry funzione @code{getline}
-@cindex @code{getline} (funzione) @subentry codice di ritorno
+@cindex @code{getline} (funzione) @subentry codice di ritorno da
 @cindex @option{--sandbox} (opzione) @subentry ridirezione dell'input con @code{getline}
 @cindex opzione @subentry @option{--sandbox} @subentry ridirezione dell'input con @code{getline}
 
@@ -10703,7 +10686,7 @@ Separare i campi è più complicato che separare i record.
 
 @item
 Usando @samp{FS = "\n"} l'intero record sarà un unico campo
-(nell'ipotesi che i record siano separati da caratteri di ritorno a capo).
+(nell'ipotesi che i record siano separati da caratteri di ritorno-a-capo).
 
 @item
 @code{FS} può essere impostato dalla riga di comando con l'opzione
@@ -10807,7 +10790,7 @@ maniera semplice, standardizzata.  Si
 specificano solo le stringhe o i numeri
 da stampare, in una lista separata da virgole.  Questi elementi sono stampati,
 separati tra loro da spazi singoli, e alla fine viene stampato un
-ritorno a capo.  L'istruzione è simile a questa:
+ritorno-a-capo.  L'istruzione è simile a questa:
 
 @example
 print @var{elemento1}, @var{elemento2}, @dots{}
@@ -10845,23 +10828,23 @@ un'istruzione @dfn{criterio di ricerca--azione}, per esempio.
 
 Ogni istruzione @code{print} produce almeno una riga in output.  Comunque,
 non è limitata a una sola riga.  Se il valore di un elemento è una stringa
-che contiene un ritorno a capo, il ritorno a capo è stampato insieme al
+che contiene un ritorno-a-capo, il ritorno-a-capo è stampato insieme al
 resto della stringa.  Una
 singola istruzione @code{print} può in questo modo generare un numero
 qualsiasi di righe.
 
-@cindex ritorno a capo @subentry stampare un
+@cindex ritorno-a-capo @subentry stampare un
 Quel che segue è un esempio di stampa di una stringa che contiene al suo
 interno dei
 @ifinfo
 ritorni a capo
 (la @samp{\n} è una sequenza di protezione, che si usa per rappresentare il
-carattere di ritorno a capo; @pxref{Sequenze di protezione}):
+carattere di ritorno-a-capo; @pxref{Sequenze di protezione}):
 @end ifinfo
 @ifhtml
 ritorni a capo
 (la @samp{\n} è una sequenza di protezione, che si usa per rappresentare il
-carattere di ritorno a capo; @pxref{Sequenze di protezione}):
+carattere di ritorno-a-capo; @pxref{Sequenze di protezione}):
 @end ifhtml
 @ifnotinfo
 @ifnothtml
@@ -10963,7 +10946,7 @@ una delle possibilità che offre è quella di allineare colonne di dati.
 @cindex @code{print} (istruzione) @subentry continuazione di riga e
 @quotation NOTA
 Si può continuare su più righe sia l'istruzione @code{print} che l'istruzione
-@code{printf} semplicemente mettendo un ritorno a capo dopo una virgola
+@code{printf} semplicemente mettendo un ritorno-a-capo dopo una virgola
 qualsiasi
 (@pxref{Istruzioni/Righe}).
 @end quotation
@@ -10985,7 +10968,7 @@ L'output di un'istruzione @code{print} completa è detto un @dfn{record di
 output}.  Ogni istruzione @code{print} stampa un record di output, e alla fine
 ci aggiunge una stringa detta @dfn{separatore record in output} (o
 @code{ORS}).  Il valore iniziale di @code{ORS} è la stringa @code{"\n"}
-(cioè, un carattere di ritorno a capo).  Quindi, ogni istruzione
+(cioè, un carattere di ritorno-a-capo).  Quindi, ogni istruzione
 @code{print} normalmente genera [almeno] una riga a sé stante.
 
 @cindex output @subentry record
@@ -11002,7 +10985,7 @@ oppure usando l'opzione della riga di comando @option{-v}
 (@pxref{Opzioni}).
 L'esempio seguente stampa il primo e il secondo campo di ogni record in input,
 separati da un punto e virgola, con una riga vuota aggiunta dopo ogni
-ritorno a capo:
+ritorno-a-capo:
 
 
 @example
@@ -11032,7 +11015,7 @@ $ @kbd{awk 'BEGIN @{ OFS = ";"; ORS = "\n\n" @}}
 @print{}
 @end example
 
-Se il valore di @code{ORS} non contiene un ritorno a capo, l'output del
+Se il valore di @code{ORS} non contiene un ritorno-a-capo, l'output del
 programma viene scritto tutto su un'unica riga.
 
 @node OFMT
@@ -11148,9 +11131,9 @@ Ogni specificatore di formato richiede di stampare l'elemento successivo
 nella lista degli argomenti
 in quella posizione del formato.
 
-L'istruzione @code{printf} non aggiunge in automatico un ritorno a capo
+L'istruzione @code{printf} non aggiunge in automatico un ritorno-a-capo
 al suo output.  Scrive solo quanto specificato dalla stringa di formato.
-Quindi, se serve un ritorno a capo, questo va incluso nella stringa di formato.
+Quindi, se serve un ritorno-a-capo, questo va incluso nella stringa di formato.
 Le variabili di separazione dell'output @code{OFS} e @code{ORS} non hanno
 effetto sulle istruzioni @code{printf}.
 Per esempio:
@@ -13777,7 +13760,7 @@ Poiché la concatenazione di stringhe non ha un operatore esplicito, è spesso
 necessario assicurarsi che venga effettuata al momento giusto usando le
 parentesi per racchiudere gli elementi da concatenare.  Per esempio, ci si
 potrebbe aspettare che il
-seguente fammento di codice concateni @code{nome} e @code{file}:
+seguente frammento di codice concateni @code{nome} e @code{file}:
 
 @example
 nome = "nome"
@@ -13790,8 +13773,8 @@ print "qualcosa di significativo" > nome file
 @cindex comando di utilità @subentry @command{mawk}
 @noindent
 Questo produce un errore di sintassi in alcune versioni di
-@command{awk} per Unix.@footnote{Può capitare che BWK @command{awk},
-@command{gawk} e @command{mawk} lo interpretino nel modo giusto,
+@command{awk}.@footnote{Per combinazione BWK @command{awk},
+@command{gawk} e @command{mawk} lo interpretano nel modo giusto,
 ma non ci si dovrebbe fare affidamento.}
 È necessario usare la seguente sintassi:
 
@@ -14286,8 +14269,8 @@ Per dirla diversamente, questo è compito di ogni specifica versione di
 @command{awk}.  Il risultato del primo esempio può essere 12 o 13, e del
 secondo può essere 22 o 23.
 
-In breve, è sconsigliato fare cose come questa e, in ogni caso,
-ogni cosa che possa incidere sulla portabilità.
+In breve, è sconsigliato fare cose come questa e, in genere,
+qualsiasi cosa che possa incidere sulla portabilità.
 Si dovrebbero evitare cose come queste nei programmi.
 @c You'll sleep better at night and be able to look at yourself
 @c in the mirror in the morning.
@@ -15094,13 +15077,13 @@ prima di aver completato interamente la valutazione.
 
 @cindex continuazione di riga
 Le istruzioni che finiscono con @samp{&&} o @samp{||} si possono continuare
-semplicemente mettendo un ritorno a capo dopo di esse.  Però non si può mettere
-un ritorno a capo @emph{prima} di questi operatori senza usare la
+semplicemente mettendo un ritorno-a-capo dopo di esse.  Però non si può mettere
+un ritorno-a-capo @emph{prima} di questi operatori senza usare la
 continuazione tramite la barra inversa (@pxref{Istruzioni/Righe}).
 
 @cindex @code{!} (punto esclamativo) @subentry operatore @code{!}
 @cindex punto esclamativo (@code{!}) @subentry operatore @code{!}
-@cindex ritorno a capo
+@cindex ritorno-a-capo
 @cindex variabili @subentry di tipo indicatore (@dfn{flag})
 @cindex @dfn{flag} (indicatore), variabili di tipo
 Il valore reale di un'espressione che usa l'operatore @samp{!} è uno
@@ -15217,8 +15200,8 @@ per maggiori informazioni sui vettori.
 @cindex @command{gawk} @subentry continuazione di riga in
 Come estensione minore di @command{gawk},
 un'istruzione che usa @samp{?:} si può continuare mettendo
-semplicemente un ritorno a capo dopo i due caratteri.
-Tuttavia, se si mette un ritorno a capo @emph{prima} dei due
+semplicemente un ritorno-a-capo dopo i due caratteri.
+Tuttavia, se si mette un ritorno-a-capo @emph{prima} dei due
 caratteri, la continuazione non funziona, se non si aggiunge anche la barra inversa
 (@pxref{Istruzioni/Righe}).
 Se viene specificata l'opzione @option{--posix}
@@ -16404,7 +16387,7 @@ con il criterio di ricerca.  Quindi, schematicamente, un programma
 @cindex @code{@{@}} (parentesi graffe) @subentry azioni e
 @cindex parentesi @subentry graffe (@code{@{@}}) @subentry azioni e
 @cindex separatore di istruzioni @subentry nelle azioni
-@cindex ritorno a capo @subentry separatore di istruzioni nelle azioni
+@cindex ritorno-a-capo @subentry separatore di istruzioni nelle azioni
 @cindex @code{;} (punto e virgola) @subentry separare istruzioni nelle azioni
 @cindex punto e virgola (@code{;}) @subentry separare istruzioni nelle azioni
 Un'azione consiste di una o più @dfn{istruzioni} @command{awk}, racchiuse
@@ -16488,7 +16471,7 @@ corrispondenti istruzioni in C.
 @cindex corpo @subentry nelle azioni
 @cindex @code{@{@}} (parentesi graffe) @subentry istruzioni, raggruppare
 @cindex parentesi @subentry graffe (@code{@{@}}) @subentry istruzioni, raggruppare
-@cindex ritorno a capo @subentry separatore di istruzioni nelle azioni
+@cindex ritorno-a-capo @subentry separatore di istruzioni nelle azioni
 @cindex @code{;} (punto e virgola) @subentry separare istruzioni nelle azioni
 @cindex punto e virgola (@code{;}) @subentry separare istruzioni nelle azioni
 Tutte le istruzioni di controllo iniziano con parole chiave speciali, come
@@ -16641,10 +16624,10 @@ valore di @code{i}
 e il ciclo viene ripetuto.  Il ciclo termina quando @code{i} assume il
 valore quattro.
 
-Un ritorno a capo non è richiesto tra la condizione e il corpo del ciclo;
+Un ritorno-a-capo non è richiesto tra la condizione e il corpo del ciclo;
 tuttavia, se lo si mette, il programma è di più facile comprensione,
 a meno che il corpo del ciclo non sia un'istruzione composta, oppure se è
-qualcosa di molto semplice.  Neppure il ritorno a capo dopo la parentesi graffa
+qualcosa di molto semplice.  Neppure il ritorno-a-capo dopo la parentesi graffa
 aperta che inizia l'istruzione composta è necessario, ma il
 programma è di lettura più difficile se lo si omette.
 
@@ -17556,7 +17539,7 @@ spazio.
 @item ORS
 Il separatore dei record in output.  Viene stampato alla fine di ogni
 istruzione @code{print}.  Il suo valore di default è @code{"\n"},
-il carattere di ritorno a capo.
+il carattere di ritorno-a-capo.
 (@xref{Separatori di output}.)
 
 @cindex @code{PREC} (variabile)
@@ -17579,7 +17562,7 @@ IEEE 754; @pxref{Impostare modo di arrotondare}).
 @cindex record @subentry separatore di
 @item @code{RS}
 Il separatore tra record in input.  Il suo valore di default è una stringa
-contenente il solo carattere di ritorno a capo, il che significa che un record in input
+contenente il solo carattere di ritorno-a-capo, il che significa che un record in input
 consiste di una sola riga di testo.
 Il suo valore può essere anche la stringa nulla, nel qual caso i record sono
 separati da una o più righe vuote.
@@ -17801,9 +17784,10 @@ volta che si legge un nuovo file
 @end ifnottex
 All'interno di una
 regola @code{BEGIN}, il valore di @code{FILENAME} è @code{""}, perché non si
-sta elaborando alcun file in input.@footnote{Alcune tra le prime implementazioni di Unix
+sta ancora elaborando alcun file in input.@footnote{Alcune
+tra le prime implementazioni di
 @command{awk} inizializzavano @code{FILENAME} a @code{"-"}, anche se
-vi erano @value{DF} da elaborare. Un tale comportamento era incorretto e
+vi erano @value{DF} da elaborare. Un tale comportamento era errato e
 non ci si dovrebbe poter contare nei programmi.}
 @value{DARKCORNER}  Si noti, tuttavia,
 che l'uso di @code{getline} (@pxref{Getline}) all'interno di una regola
@@ -20932,7 +20916,7 @@ in questione è un metacarattere usato nella espressioni regolari.
 
 Si noti, tuttavia, che @code{RS} non influisce sul comportamento di
 @code{split()}.
-Anche se @samp{RS = ""} fa sì che il carattere di ritorno a capo sia un
+Anche se @samp{RS = ""} fa sì che il carattere di ritorno-a-capo sia un
 separatore di campo,
 questo non influenza il modo in cui @code{split()} divide le stringhe.
 
@@ -22218,7 +22202,7 @@ Il mese come numero decimale (01--12).
 Il minuto come numero decimale (00--59).
 
 @item %n
-Un carattere di ritorno a capo (ASCII LF).
+Un carattere di ritorno-a-capo (ASCII LF).
 
 @item %p
 L'equivalente nella lingua locale delle designazioni AM/PM
@@ -30417,7 +30401,7 @@ su questa riga:
 @c file eg/prog/wc.awk
 # per ogni riga...
 @{
-    caratteri += length($0) + 1    # aggiunge il ritorno a capo
+    caratteri += length($0) + 1    # aggiunge il ritorno-a-capo
     byte += mbs_length($0) + 1
     righe++
     parole += NF
@@ -31115,7 +31099,7 @@ distinzione maiuscolo/minuscolo.
 @item
 Le parole sono individuate usando la convenzione @command{awk} secondo cui i
 campi sono separati solo da spazi bianchi.  Altri caratteri nell'input
-(tranne il ritorno a capo) non hanno alcun particolare significato per
+(tranne il ritorno-a-capo) non hanno alcun particolare significato per
 @command{awk}.  Questo significa che i segni di interpunzione sono visti come
 parte di una parola.
 
@@ -31918,7 +31902,7 @@ then
     shift
 fi
 
-# Un ritorno a capo letterale,
+# Un ritorno-a-capo letterale,
 # per formattare correttamente il testo del programma
 n='
 '
@@ -32659,7 +32643,7 @@ di specificare più di un'espressione regolare da trovare,
 in due differenti modi.
 Si può fornire una stringa racchiusa tra apici sulla riga
 di comando, in cui ogni espressione regolare è separata dalla
-successiva da un ritorno a capo.
+successiva da un ritorno-a-capo.
 Oppure si può usare l'opzione @option{-f} per fornire il
 nome di un file che contiene le espressioni regolari da
 cercare, una per riga.
@@ -36830,7 +36814,7 @@ del vettore @code{a}.
 Stampa un testo formattato. Il @var{formato} può includere sequenze di
 protezione, come @samp{\n}
 (@pxref{Sequenze di protezione}).
-Non viene stampato nessun ritorno a capo che non sia stato specificato
+Non viene stampato nessun ritorno-a-capo che non sia stato specificato
 esplicitamente.
 
 @cindex comando del @dfn{debugger} @subentry @code{set}
@@ -46829,7 +46813,7 @@ quando si incontrano spazi e TAB, e questo è il comportamento di
 @command{gawk} se si specifica l'opzione @option{--posix}.  Dal 2013
 il comportamento originario è stato ripristinato, e ora
 il default per separare i campi con l'opzione @option{--posix} ammette
-anche il ritorno a capo come separatore di campi.
+anche il ritorno-a-capo come separatore di campi.
 
 @item
 Continuazione dopo errori [non fatali] con @code{print} e @code{printf}.
@@ -48817,7 +48801,7 @@ In generale, Cygwin fornisce l'ultima versione rilasciata di @command{gawk}.
 Le versioni più recenti di Cygwin aprono tutti i file in modalità binaria.
 Ciò implica che si dovrebbe usare @samp{RS = "\r?\n"} per riuscire a
 gestire file di testo MS-Windows in formato standard, in cui ogni riga
-termina con i due caratteri di ritorno a capo e avanzamento riga.
+termina con i due caratteri di ritorno-a-capo e avanzamento riga.
 
 L'ambiente Cygwin consente l'utilizzo sia dell'operatore @samp{|&}
 che di reti TCP/IP (@pxref{Reti TCP/IP}).
@@ -52479,7 +52463,7 @@ Il valore iniziale, o il punto di partenza, di una sequenza di numeri casuali.
 @cindex ASCII
 @item Sequenze di protezione
 Una speciale sequenza di caratteri usata per descrivere caratteri non
-stampabili, come @samp{\n} (ritorno a capo) o @samp{\033} per il carattere
+stampabili, come @samp{\n} (ritorno-a-capo) o @samp{\033} per il carattere
 ASCII ESC (Escape). (@xref{Sequenze di protezione}).
 
 @item Shell
@@ -52501,7 +52485,7 @@ di tipo @code{float}.
 Il carattere generato premendo la barra spaziatrice sulla tastiera.
 
 @item Spazio vuoto
-Una sequenza di spazi, TAB, o caratteri di ritorno a capo presenti in un
+Una sequenza di spazi, TAB, o caratteri di ritorno-a-capo presenti in un
 record in input o in una stringa.
 
 @item Stringa
