@@ -7944,19 +7944,6 @@ Because @samp{\} is used for quoting in the shell, @command{awk} sees
 characters (@pxref{Escape Sequences}), finally yielding
 a single @samp{\} to use for the field separator.
 
-@c FIXME: Nuke this paragraph for 6.0
-@c @cindex historical features
-As a special case, in compatibility mode
-(@pxref{Options}),
-if the argument to @option{-F} is @samp{t}, then @code{FS} is set to
-the TAB character.  If you type @samp{-F\t} at the
-shell, without any quotes, the @samp{\} gets deleted, so @command{awk}
-figures that you really want your fields to be separated with TABs and
-not @samp{t}s.  Use @samp{-v FS="t"} or @samp{-F"[t]"} on the command line
-if you really do want to separate your fields with @samp{t}s.
-Use @samp{-F '\t'} when not in compatibility mode to specify that TABs
-separate fields.
-
 As an example, let's use an @command{awk} program file called @file{edu.awk}
 that contains the pattern @code{/edu/} and the action @samp{print $1}:
 
@@ -10916,7 +10903,8 @@ This is done using a special @value{FN} of the form:
 @end example
 
 The @var{net-type} is one of @samp{inet}, @samp{inet4}, or @samp{inet6}.
-The @var{protocol} is one of @samp{tcp} or @samp{udp},
+The @var{protocol} must be @samp{tcp},@footnote{UDP networking is no longer
+supported.}
 and the other fields represent the other essential pieces of information
 for making a networking connection.
 These @value{FN}s are used with the @samp{|&} operator for communicating
