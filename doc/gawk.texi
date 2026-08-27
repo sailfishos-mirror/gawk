@@ -534,12 +534,12 @@ particular records in a file and perform operations upon them.
 * Regexp Field Splitting::              Using regexps as the field separator.
 * Single Character Fields::             Making each character a separate
                                         field.
-* Comma Separated Fields::              Working with CSV files.
-* Command Line Field Separator::        Setting @code{FS} from the command
-                                        line.
 * Full Line Fields::                    Making the full line be a single
                                         field.
+* Command Line Field Separator::        Setting @code{FS} from the command
+                                        line.
 * Field Splitting Summary::             Some final points and a summary table.
+* Comma Separated Fields::              Working with CSV files.
 * Constant Size::                       Reading constant width data.
 * Fixed width data::                    Processing fixed-width data.
 * Skipping intervening::                Skipping intervening fields.
@@ -6890,6 +6890,7 @@ used with it do not have to be named on the @command{awk} command line
 * Nonconstant Fields::          Nonconstant Field Numbers.
 * Changing Fields::             Changing the Contents of a Field.
 * Field Separators::            The field separator and how to change it.
+* Comma Separated Fields::      Working with CSV files.
 * Constant Size::               Reading constant width data.
 * Splitting By Content::        Defining Fields By Content
 * Testing field creation::      Checking how @command{gawk} is splitting
@@ -7559,9 +7560,8 @@ with a statement such as @samp{$1 = $1}, as described earlier.
 * Default Field Splitting::      How fields are normally separated.
 * Regexp Field Splitting::       Using regexps as the field separator.
 * Single Character Fields::      Making each character a separate field.
-* Comma Separated Fields::       Working with CSV files.
-* Command Line Field Separator:: Setting @code{FS} from the command line.
 * Full Line Fields::             Making the full line be a single field.
+* Command Line Field Separator:: Setting @code{FS} from the command line.
 * Field Splitting Summary::      Some final points and a summary table.
 @end menu
 
@@ -7812,98 +7812,74 @@ Traditionally, the behavior of @code{FS} equal to @code{""} was not defined.
 In this case, most versions of Unix @command{awk} simply treat the entire record
 as only having one field.
 @value{DARKCORNER}
-In compatibility mode
+In POSIX mode
 (@pxref{Options}),
 if @code{FS} is the null string, then @command{gawk} also
 behaves this way.
 
-@node Comma Separated Fields
-@subsection Working With Comma Separated Value Files
+@node Full Line Fields
+@subsection Making the Full Line Be a Single Field
 
-@cindex comma separated values (CSV) data @subentry records and fields
-@cindex CSV (comma separated values) data @subentry records and fields
-Many commonly-used tools use a comma to separate fields, instead of whitespace.
-This is particularly true of popular spreadsheet programs.  There is no
-universally accepted standard for the format of these files, although
-@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180} lists the common
-practices.
+@cindex Schorr, Andrew
+Occasionally, it's useful to treat the whole input line as a
+single field.  This can be done easily and portably simply by
+setting @code{FS} to @code{"\n"} (a newline):@footnote{Thanks to
+Andrew Schorr for this tip.}
 
-For decades, anyone wishing to work with CSV files and @command{awk}
-had to ``roll their own'' solution.
-(For an example, @pxref{Splitting By Content}).
-In 2023, Brian Kernighan decided to add CSV support to his version of
-@command{awk}.  In order to keep up, @command{gawk} too provides the same
-support as his version.
-To use CSV data, invoke @command{gawk} with either of the
-@option{-k} or @option{--csv} options.
+@example
+awk -F'\n' '@var{program}' @var{files @dots{}}
+@end example
 
-Fields in CSV files are separated by commas.  In order to allow a comma
-to appear inside a field (i.e., as data), the field may be quoted
-by beginning and ending it with double quotes.  In order to allow a double
-quote inside a field, the field @emph{must} be quoted, and two double quotes
-represent an actual double quote.
-The double quote that starts a quoted field must be the first
-character after the comma.
-@ref{table-csv-examples} shows some examples.
+@noindent
+When you do this, @code{$1} is the same as @code{$0}.
 
-@float Table,table-csv-examples
-@caption{Examples of CSV data}
-@multitable @columnfractions .3 .3
-@headitem Input @tab Field Contents
-@item @code{abc def} @tab @code{abc def}
-@item @code{"quoted data"} @tab @code{quoted data}
-@item @code{"quoted, data"} @tab @code{quoted, data}
-@item @code{"She said ""Stop!""."} @tab @code{She said "Stop!".}
-@end multitable
-@end float
+@cindex sidebar @subentry Changing @code{FS} Does Not Affect the Fields
+@cartouche Changing @code{FS} Does Not Affect the Fields
 
-Additionally, and here's where it gets messy, newlines are also
-allowed inside double-quoted fields!
-In order to deal with such things, when processing CSV files,
-@command{gawk} scans the input data looking for newlines that
-are not enclosed in double quotes. Thus, use of the @option{--csv} option
-totally overrides normal record processing with @code{RS} (@pxref{Records}),
-as well as field splitting with any of @code{FS}, @code{FIELDWIDTHS},
-or @code{FPAT}.
+@cindex POSIX @command{awk} @subentry field separators and
+@cindex field separator @subentry POSIX and
+According to the POSIX standard, @command{awk} is supposed to behave
+as if each record is split into fields at the time it is read.
+In particular, this means that if you change the value of @code{FS}
+after a record is read, the values of the fields (i.e., how they were split)
+should reflect the old value of @code{FS}, not the new one.
 
-@cindex Kernighan, Brian @subentry quotes
-@cindex sidebar @subentry Carriage-Return--Line-Feed Line Endings In CSV Files
-@cartouche Carriage-Return--Line-Feed Line Endings In CSV Files
-@quotation
-@code{\r\n} @i{is the invention of the devil.}
-@author Brian Kernighan
-@end quotation
+@cindex dark corner @subentry field separators
+@cindex @command{sed} utility
+@cindex stream editors
+However, many ancient implementations of @command{awk} did not work this way.  Instead,
+they deferred splitting the fields until a field was actually
+referenced.  The fields were split
+using the @emph{current} value of @code{FS}!
+@value{DARKCORNER}
+This behavior can be difficult
+to diagnose. The following example illustrates the difference
+between the two methods:
 
-Many CSV files are imported from systems where the line terminator
-for text files is a carriage-return--line-feed pair
-(CR-LF, @samp{\r} followed by @samp{\n}).
-For ease of use, when processing CSV files, @command{gawk} converts
-CR-LF pairs into a single newline. That is, the @samp{\r} is removed.
+@example
+sed 1q /etc/passwd | awk '@{ FS = ":" ; print $1 @}'
+@end example
 
-This occurs only when a CR is paired with an LF; a standalone CR
-is left alone. This behavior is consistent with Windows systems
-which automatically convert CR-LF in files into a plain LF in memory,
-and also with the commonly available @command{unix2dos} utility program.
+@noindent
+prints:
+
+@example
+root
+@end example
+
+@noindent
+on an incorrect implementation of @command{awk}, whereas correct versions
+print the full first line of the file, something like:
+
+@example
+root:x:0:0:Root:/:
+@end example
+
+@noindent
+(The @command{sed}@footnote{The @command{sed} utility is a ``stream editor.''
+Its behavior is also defined by the POSIX standard.}
+command prints just the first line of @file{/etc/passwd}.)
 @end cartouche
-
-The behavior of the @code{split()} function (not formally discussed
-yet, see @ref{String Functions}) differs slightly when processing CSV
-files. When called with two arguments
-(@samp{split(@var{string}, @var{array})}), @code{split()}
-does CSV-based splitting.  Otherwise, it behaves normally.
-
-If @option{--csv} has been used, @code{PROCINFO["CSV"]} will
-exist. Otherwise, it will not. @xref{Auto-set}.
-
-Finally, if @option{--csv} has been used, assigning a value
-to any of @code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, or
-@code{RS} generates a warning message.
-
-To be clear, @command{gawk} takes
-@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180} as its
-specification for CSV input data.  There are no mechanisms
-for accepting nonstandard CSV data, such as files that use
-a semicolon instead of a comma as the separator.
 
 @node Command Line Field Separator
 @subsection Setting @code{FS} from the Command Line
@@ -7998,70 +7974,6 @@ the entries for users whose full name is not indicated:
 awk -F: '$5 == ""' /etc/passwd
 @end example
 
-@node Full Line Fields
-@subsection Making the Full Line Be a Single Field
-
-@cindex Schorr, Andrew
-Occasionally, it's useful to treat the whole input line as a
-single field.  This can be done easily and portably simply by
-setting @code{FS} to @code{"\n"} (a newline):@footnote{Thanks to
-Andrew Schorr for this tip.}
-
-@example
-awk -F'\n' '@var{program}' @var{files @dots{}}
-@end example
-
-@noindent
-When you do this, @code{$1} is the same as @code{$0}.
-
-@cindex sidebar @subentry Changing @code{FS} Does Not Affect the Fields
-@cartouche Changing @code{FS} Does Not Affect the Fields
-
-@cindex POSIX @command{awk} @subentry field separators and
-@cindex field separator @subentry POSIX and
-According to the POSIX standard, @command{awk} is supposed to behave
-as if each record is split into fields at the time it is read.
-In particular, this means that if you change the value of @code{FS}
-after a record is read, the values of the fields (i.e., how they were split)
-should reflect the old value of @code{FS}, not the new one.
-
-@cindex dark corner @subentry field separators
-@cindex @command{sed} utility
-@cindex stream editors
-However, many ancient implementations of @command{awk} did not work this way.  Instead,
-they deferred splitting the fields until a field was actually
-referenced.  The fields were split
-using the @emph{current} value of @code{FS}!
-@value{DARKCORNER}
-This behavior can be difficult
-to diagnose. The following example illustrates the difference
-between the two methods:
-
-@example
-sed 1q /etc/passwd | awk '@{ FS = ":" ; print $1 @}'
-@end example
-
-@noindent
-prints:
-
-@example
-root
-@end example
-
-@noindent
-on an incorrect implementation of @command{awk}, whereas correct versions
-print the full first line of the file, something like:
-
-@example
-root:x:0:0:Root:/:
-@end example
-
-@noindent
-(The @command{sed}@footnote{The @command{sed} utility is a ``stream editor.''
-Its behavior is also defined by the POSIX standard.}
-command prints just the first line of @file{/etc/passwd}.)
-@end cartouche
-
 @node Field Splitting Summary
 @subsection Field-Splitting Summary
 
@@ -8125,6 +8037,94 @@ do it for you (e.g., @samp{FS = "[c]"}).  In such a case, @code{IGNORECASE}
 does take effect.
 @end cartouche
 
+@node Comma Separated Fields
+@section Working With Comma Separated Value Files
+
+@cindex comma separated values (CSV) data @subentry records and fields
+@cindex CSV (comma separated values) data @subentry records and fields
+Many commonly-used tools use a comma to separate fields, instead of whitespace.
+This is particularly true of popular spreadsheet programs.  There is no
+universally accepted standard for the format of these files, although
+@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180} lists the common
+practices.
+
+For decades, anyone wishing to work with CSV files and @command{awk}
+had to ``roll their own'' solution.
+(For an example, @pxref{Splitting By Content}).
+In 2023, Brian Kernighan decided to add CSV support to his version of
+@command{awk}.  In order to keep up, @command{gawk} too provides the same
+support as his version.
+To use CSV data, invoke @command{gawk} with either of the
+@option{-k} or @option{--csv} options.
+
+Fields in CSV files are separated by commas.  In order to allow a comma
+to appear inside a field (i.e., as data), the field may be quoted
+by beginning and ending it with double quotes.  In order to allow a double
+quote inside a field, the field @emph{must} be quoted, and two double quotes
+represent an actual double quote.
+The double quote that starts a quoted field must be the first
+character after the comma.
+@ref{table-csv-examples} shows some examples.
+
+@float Table,table-csv-examples
+@caption{Examples of CSV data}
+@multitable @columnfractions .3 .3
+@headitem Input @tab Field Contents
+@item @code{abc def} @tab @code{abc def}
+@item @code{"quoted data"} @tab @code{quoted data}
+@item @code{"quoted, data"} @tab @code{quoted, data}
+@item @code{"She said ""Stop!""."} @tab @code{She said "Stop!".}
+@end multitable
+@end float
+
+Additionally, and here's where it gets messy, newlines are also
+allowed inside double-quoted fields!
+In order to deal with such things, when processing CSV files,
+@command{gawk} scans the input data looking for newlines that
+are not enclosed in double quotes. Thus, use of the @option{--csv} option
+totally overrides normal record processing with @code{RS} (@pxref{Records}),
+as well as field splitting with any of @code{FS}, @code{FIELDWIDTHS},
+or @code{FPAT}.
+(The latter two are @command{gawk} extensions, discussed shortly.)
+
+@cindex Kernighan, Brian @subentry quotes
+@cindex sidebar @subentry Carriage-Return--Line-Feed Line Endings In CSV Files
+@cartouche Carriage-Return--Line-Feed Line Endings In CSV Files
+@quotation
+@code{\r\n} @i{is the invention of the devil.}
+@author Brian Kernighan
+@end quotation
+
+Many CSV files are imported from systems where the line terminator
+for text files is a carriage-return--line-feed pair
+(CR-LF, @samp{\r} followed by @samp{\n}).
+For ease of use, when processing CSV files, @command{gawk} converts
+CR-LF pairs into a single newline. That is, the @samp{\r} is removed.
+
+This occurs only when a CR is paired with an LF; a standalone CR
+is left alone. This behavior is consistent with Windows systems
+which automatically convert CR-LF in files into a plain LF in memory,
+and also with the commonly available @command{unix2dos} utility program.
+@end cartouche
+
+The behavior of the @code{split()} function (not formally discussed
+yet, see @ref{String Functions}) differs slightly when processing CSV
+files. When called with two arguments
+(@samp{split(@var{string}, @var{array})}), @code{split()}
+does CSV-based splitting.  Otherwise, it behaves normally.
+
+If @option{--csv} has been used, @code{PROCINFO["CSV"]} will
+exist. Otherwise, it will not. @xref{Auto-set}.
+
+Finally, if @option{--csv} has been used, assigning a value
+to any of @code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, or
+@code{RS} generates a warning message.
+
+To be clear, @command{gawk} takes
+@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180} as its
+specification for CSV input data.  There are no mechanisms
+for accepting nonstandard CSV data, such as files that use
+a semicolon instead of a comma as the separator.
 
 @node Constant Size
 @section Reading Fixed-Width Data
@@ -8595,7 +8595,7 @@ or @code{"FPAT"} if content-based field splitting is being used:
 
 @example
 if ("CSV" in PROCINFO)
-    @var{CSV-based field splitting} @dots{}
+    @var{CSV-based record and field splitting} @dots{}
 else if (PROCINFO["FS"] == "FS")
     @var{regular field splitting} @dots{}
 else if (PROCINFO["FS"] == "FIELDWIDTHS")
@@ -11180,9 +11180,9 @@ intermixed with @command{gawk}'s output comes out in the
 expected order:
 
 @example
-print "something"                       # goes to standard output
-print "something else" | "some-command" # also to standard output
-print "more stuff"                      # and this too
+print "something"                       @ii{Goes to standard output}
+print "something else" | "some-command" @ii{Also to standard output}
+print "more stuff"                      @ii{And this too}
 @end example
 
 There can be a price to pay for this; flushing data down
@@ -13791,9 +13791,9 @@ there are no arguments, just write @samp{()} after the function name.
 The following examples show function calls with and without arguments:
 
 @example
-sqrt(x^2 + y^2)        @ii{one argument}
-atan2(y, x)            @ii{two arguments}
-rand()                 @ii{no arguments}
+sqrt(x^2 + y^2)        @ii{One argument}
+atan2(y, x)            @ii{Two arguments}
+rand()                 @ii{No arguments}
 @end example
 
 @cindex troubleshooting @subentry function call syntax
@@ -14829,8 +14829,8 @@ all.  However, if you omit the action entirely, omit the braces as
 well.  An omitted action is equivalent to @samp{@{ print $0 @}}:
 
 @example
-/foo/  @{ @}     @ii{match @code{foo}, do nothing --- empty action}
-/foo/          @ii{match @code{foo}, print the record --- omitted action}
+/foo/  @{ @}     @ii{Match @code{foo}, do nothing --- empty action}
+/foo/          @ii{Match @code{foo}, print the record --- omitted action}
 @end example
 
 The following types of statements are supported in @command{awk}:
@@ -21618,9 +21618,9 @@ Let's start with using a variable as a scalar:
 
 @example
 BEGIN @{
-    print typeof(a)         # we don't know what a is yet
-    printf("a = %d\n", a)   # use it as a scalar
-    print typeof(a)         # now we know it's not an array
+    print typeof(a)         @ii{We don't know what a is yet}
+    printf("a = %d\n", a)   @ii{Use it as a scalar}
+    print typeof(a)         @ii{Now we know it's not an array}
 @}
 @end example
 
@@ -21645,11 +21645,11 @@ change @code{a} into an array:
 
 @example
 BEGIN @{
-    print typeof(a)               # we don't know what a is yet
-    a[1]                          # make a into an array
-    print typeof(a[1])            # but we don't know what a[1] is yet
-    printf("a[1] = %d\n", a[1])   # use it as a scalar
-    print typeof(a[1])            # now we know it's not an array
+    print typeof(a)               @ii{We don't know what a is yet}
+    a[1]                          @ii{Make a into an array}
+    print typeof(a[1])            @ii{But we don't know what a[1] is yet}
+    printf("a[1] = %d\n", a[1])   @ii{Use it as a scalar}
+    print typeof(a[1])            @ii{Now we know it's not an array}
 @}
 @end example
 
@@ -30607,9 +30607,9 @@ in the @code{PROCINFO} array
 like so:
 
 @example
-command = "sort -nr"           # command, save in convenience variable
-PROCINFO[command, "pty"] = 1   # update PROCINFO
-print @dots{} |& command           # start two-way pipe
+command = "sort -nr"           @ii{Command to run, save in convenience variable}
+PROCINFO[command, "pty"] = 1   @ii{Update PROCINFO}
+print @dots{} |& command           @ii{Start two-way pipe}
 @dots{}
 @end example
 
@@ -35014,8 +35014,8 @@ this looks something like the following:
 
 @example
 @group
-delta = 0.00001                 # for example
-difference = abs(a - b)         # subtract the two values
+delta = 0.00001                 @ii{For example}
+difference = abs(a - b)         @ii{Subtract the two values}
 if (difference < delta)
     # all ok
 else
@@ -35567,9 +35567,9 @@ For example, consider the following program:
 @example
 BEGIN @{
     pi = 3.1416
-    OFMT = "%.f"        # Print value as integer
-    print pi            # ROUNDMODE = "N" by default.
-    ROUNDMODE = "U"     # Now change ROUNDMODE
+    OFMT = "%.f"        @ii{Print value as integer}
+    print pi            @ii{ROUNDMODE = "N" by default.}
+    ROUNDMODE = "U"     @ii{Now change ROUNDMODE}
     print pi
 @}
 @end example
@@ -36794,7 +36794,7 @@ MPFR and GMP values are different from string values, where you can
 @example
 char *p = gawk_malloc(42);      p @ii{``owns'' the memory}
 char *q = p;
-p = NULL;                       @ii{now} q @ii{``owns'' it}
+p = NULL;                       @ii{Now} q @ii{``owns'' it}
 @end example
 
 MPFR and GMP objects are indeed allocated on the stack or dynamically,
@@ -36809,19 +36809,19 @@ to @command{gawk}, by value, as you would a string or a @code{double}.
 Thus, code in an extension should look like this:
 
 @example
-mpz_t part1, part2, answer;             @ii{declare local values}
+mpz_t part1, part2, answer;             @ii{Declare local values}
 
-mpz_set_si(part1, 21);                  @ii{do some computations}
+mpz_set_si(part1, 21);                  @ii{Do some computations}
 mpz_set_si(part2, 21);
 mpz_add(answer, part1, part2);
 @dots{}
 /* assume that result is a parameter of type (awk_value_t *). */
-make_number_mpz(answer, & result);      @ii{set it with final GMP value}
+make_number_mpz(answer, & result);      @ii{Set it with final GMP value}
 
-mpz_clear(part1);                       @ii{release intermediate values}
+mpz_clear(part1);                       @ii{Release intermediate values}
 mpz_clear(part2);
 
-return result;                          @ii{value in @code{answer} managed by @code{gawk}}
+return result;                          @ii{Value in @code{answer} managed by @code{gawk}}
 @end example
 
 @node Registration Functions

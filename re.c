@@ -714,11 +714,29 @@ reflags2str(int flagval)
 		{ RE_NO_SUB, "RE_NO_SUB" },
 		{ 0,	NULL },
 	};
+	static const struct flagtab minrx_values[] = {
+		{ MINRX_REG_EXTENDED, "MINRX_REG_EXTENDED" },
+		{ MINRX_REG_ICASE, "MINRX_REG_ICASE" },
+		{ MINRX_REG_MINIMAL, "MINRX_REG_MINIMAL" },
+		{ MINRX_REG_NEWLINE, "MINRX_REG_NEWLINE" },
+		{ MINRX_REG_NOSUB, "MINRX_REG_NOSUB" },
+		{ MINRX_REG_BRACE_COMPAT, "MINRX_REG_BRACE_COMPAT" },
+		{ MINRX_REG_BRACK_ESCAPE, "MINRX_REG_BRACK_ESCAPE" },
+		{ MINRX_REG_EXTENSIONS_BSD, "MINRX_REG_EXTENSIONS_BSD" },
+		{ MINRX_REG_EXTENSIONS_GNU, "MINRX_REG_EXTENSIONS_GNU" },
+		{ MINRX_REG_NATIVE1B, "MINRX_REG_NATIVE1B" },
+		{ MINRX_REG_MINDISABLE, "MINRX_REG_MINDISABLE" },
+		{ 0,	NULL },
+	};
 
-	if (flagval == RE_SYNTAX_EMACS) /* == 0 */
-		return "RE_SYNTAX_EMACS";
+	if (use_gnu_matchers) {
+		if (flagval == RE_SYNTAX_EMACS) /* == 0 */
+			return "RE_SYNTAX_EMACS";
 
-	return genflags2str(flagval, values);
+		return genflags2str(flagval, values);
+	} else {
+		return genflags2str(flagval, minrx_values);
+	}
 }
 
 /*

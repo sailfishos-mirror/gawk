@@ -1549,7 +1549,7 @@ choose_fs_function:
 	default_FS = false;
 	fs = force_string(FS_node->var_value);
 
-	if (! do_traditional && fs->stlen == 0) {
+	if (! do_posix && fs->stlen == 0) {
 		static bool warned = false;
 
 		set_parser(null_parse_field);
