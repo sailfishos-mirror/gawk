@@ -614,13 +614,13 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Separare campi con @dfn{regexp}::     Usare @dfn{regexp} come separatori.
 * Campi di un solo carattere::          Fare di ogni carattere un campo
                                         separato.
-* Campi separati da virgola::           Lavorare con file CSV.
-* Separatori campo da riga di comando:: Impostare @code{FS} dalla riga di
-                                        comando.
 * Campo intera riga::                   Fare di una riga intera un campo
                                         solo.
+* Separatori campo da riga di comando:: Impostare @code{FS} dalla riga di
+                                        comando.
 * Sommario sulla separazione campi::    Alcuni punti finali e una tavola di
                                         sommario.
+* Campi separati da virgola::           Lavorare con file CSV.
 * Dimensione costante::                 Leggere campi di larghezza costante.
 * Dati di lunghezza fissa::             Elaborare dati di lunghezza fissa.
 * Saltare campi intermedi::             Saltare campi intermedi.
@@ -7673,6 +7673,7 @@ dei file usati con getline (@pxref{Getline}).
 * Cambiare i campi::                 Cambiare il contenuto di un campo.
 * Separatori di campo::              I separatori di campo, e come
                                      cambiarli.
+* Campi separati da virgola::        Lavorare con file CSV.
 * Dimensione costante::              Leggere campi di larghezza costante.
 * Separazione in base al contenuto:: Definire campi dal loro contenuto.
 * Controllare la creazione di campi:: Controllare come @command{gawk} sta
@@ -8383,11 +8384,10 @@ in precedenza.
 * Separare campi con @dfn{regexp}::  Usare @dfn{regexp} come separatori.
 * Campi di un solo carattere::       Fare di ogni carattere un campo
                                      separato.
-* Campi separati da virgola::        Lavorare con file CSV.
-* Separatori campo da riga di comando:: Assegnare @code{FS} dalla riga di
-                                     comando.
 * Campo intera riga::                Far sì che la riga intera sia un
                                      campo solo.
+* Separatori campo da riga di comando:: Impostare @code{FS} dalla riga di
+                                     comando.
 * Sommario sulla separazione campi:: Alcuni punti finali e una tavola di
                                      sommario.
 @end menu
@@ -8650,123 +8650,76 @@ Tradizionalmente, il comportamento di @code{FS} quando è impostato a
 versioni UNIX di @command{awk} trattano l'intero record come se avesse un
 unico campo.
 @value{DARKCORNER}
-In modalità di compatibilità
+In modalità POSIX
 (@pxref{Opzioni}),
 se @code{FS} è la stringa nulla, anche @command{gawk}
 si comporta in questo modo.
 
-@node Campi separati da virgola
-@subsection Lavorare con file CSV
+@node Campo intera riga
+@subsection Fare di una riga intera un campo solo
 
-@cindex CSV (campi separati da virgola) @subentry record e campi
-@cindex dati CSV (campi separati da virgola) @subentry record e campi
-@cindex campi separati da virgola (CSV) @subentry record e campi
-Molti programmi di uso frequente si servono della virgola come separatore
-di campo, invece di usare lo spazio. [Normalmente i file in input
-a @command{gawk} hanno in questo caso come suffisso "csv",
-Comma Separated Value, ovvero Campi separati da virgola.]
-Questo è il caso in particolare per popolari fogli di calcolo.
-Non c'è uno standard accettato da tutti che regoli il formato di tali
-file, sebbene il documento
-@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180}
-elenchi le pratiche normalmente seguite.
+@cindex Schorr, Andrew
+Occasionalmente, è utile trattare l'intera riga in input come un solo campo.
+Questo si può fare facilmente e in modo portabile semplicemente impostando
+@code{FS} a @code{"\n"} (un ritorno-a-capo).@footnote{Grazie ad
+Andrew Schorr per questo suggerimento.}
 
-Per decenni, chi voleva lavorare con file CSV in @command{awk}
-ha dovuto ``trovare da solo'' una soluzione. (Per esempio,
-@pxref{Separazione in base al contenuto}).
-Nel 2023, Brian Kernighan ha deciso di aggiungere un supporto
-per i file CSV alla sua versione di @command{awk}.
-Per restare allo stesso livello, anche @command{gawk} rende
-disponibile lo stesso supporto presente nella versione di Brian.
-Per usare dei file contenenti campi in formato CSV, basta
-chiamare @command{gawk} specificando come opzione
-@option{-k} oppure @option{--csv}.
+@example
+awk -F'\n' '@var{programma}' @var{file @dots{}}
+@end example
 
-I campi nei file CSV sono separati da virgola.  Per consentire la
-presenza di una virgola all'interno di un campo (p.es., come parte
-di un dato), il campo può essere racchiuso fra doppi apici.
-Per consentire un doppio apice all'interno di un campo racchiuso fra
-doppi apici, il campo stesso @emph{deve} essere racchiuso fra doppi apici
-e due doppi apici rappresentano un singolo doppio apice.
-Il doppio apice che segnala l'inizio del campo dev'essere
-il primo carattere dopo la virgola [che segna l'inizio del campo].
-La tabella
-@ref{table-csv-examples} mostra alcuni esempi.
+@noindent
+In questo caso, @code{$1} coincide con @code{$0}.
 
-@float Tabella,table-csv-examples
-@caption{Esempi di dati in file CSV}
-@multitable @columnfractions .3 .3
-@headitem Input @tab Contenuto del campo
-@item @code{abc def} @tab @code{abc def}
-@item @code{"dati tra doppi apici"} @tab @code{dati tra doppi apici}
-@item @code{"dati tra, doppi apici"} @tab @code{dati tra, doppi apici}
-@item @code{"Lei disse ""Basta!""."} @tab @code{Lei disse "Basta!".}
-@item @code{Lei disse "Basta!".} @tab @code{Lei disse "Basta!".}
-@end multitable
-@end float
+@cindex riquadro @subentry Cambiare @code{FS} non incide sui campi
+@cartouche Cambiare @code{FS} non incide sui campi
 
-Inoltre, ed è qui che la situazione si ingarbuglia, all'interno
-di un campo fra doppi apici è consentito anche inserire
-il carattere a-capo!
-Per gestire una tale situazione, quando sta trattando un file CSV
-@command{gawk} analizza il file in input alla ricerca di
-caratteri a-capo che non siano racchiusi fra doppi apici.
-Quindi, se si utilizza l'opzione @option{--csv}, il modo
-di gestire i record utilizzando la variabile @code{RS}
-(@pxref{Record}) non viene utilizzato per nulla. E lo stesso
-dicasi per la divisione in campi effettuata tramite
-@code{FS}, @code{FIELDWIDTHS}, o @code{FPAT}.
+@cindex POSIX @command{awk} @subentry separatore di campo
+@cindex separatore di campo @subentry POSIX e il
+Secondo lo standard POSIX, si suppone che @command{awk} si comporti
+come se ogni record sia stato diviso in campi nel momento in cui è stato
+letto.  In particolare, ciò vuol dire che se si cambia il valore di
+@code{FS} dopo che un record è stato letto, il valore dei campi (cioè
+la loro suddivisione) sarà ancora quello ottenuto usando il precedente
+valore di @code{FS}, non quello nuovo.
 
-@cindex Kernighan, Brian @subentry citazioni di
-@cindex riquadro @subentry Fine riga dei file CSV con ritorno-carrello--a-capo
-@cartouche Fine riga dei file CSV con ritorno-carrello--a-capo
-@quotation
-@code{\r\n} @i{è un'invenzione del diavolo.}
-@author Brian Kernighan
-@end quotation
+@cindex angolo buio @subentry separatore di campo
+@cindex @command{sed} (comando di utilità)
+@cindex comando di utilità @subentry @command{sed}
+@cindex editori di flusso
+Comunque, molte delle prime implementazioni di @command{awk} non
+funzionavano in questo modo.  Invece, rimandavano la divisione dei campi
+fino a quando si faceva effettivamente riferimento a un campo.
+I campi erano divisi usando il valore @emph{corrente} di @code{FS}!
+@value{DARKCORNER}
+Questo comportamento può essere di difficile
+identificazione.  Il seguente esempio illustra la differenza
+tra i due metodi. Lo @dfn{script}
 
-Molti file CSV provengono da sistemi in cui il carattere di
-fine riga per file di testo è costituito dalla coppia di
-caratteri ritorno-carrello--a-capo
-(CR-LF, @samp{\r} seguito da @samp{\n}).
-Per semplificare la vita @command{gawk}, quando tratta
-dei file CSV, converte la coppia di caratteri CR-LF a
-un semplice LF (a-capo). Ovvero, il carattere
-CR (ritorno-carrello) viene eliminato.
+@example
+sed 1q /etc/passwd | awk '@{ FS = ":" ; print $1 @}'
+@end example
 
-Ciò capita solo se viene incontrata una coppia di caratteri
-CR-LF adiacenti; un carattere CR isolato non viene toccato.
-Questo comportamento è consistente con i sistemi Windows,
-che convertono automaticamente la coppia CR-LF in un file
-in un semplice LF in memoria; allo stesso modo si comporta
-il diffuso comando di utilità, @command{unix2dos}.
+@noindent
+stampa:
+
+@example
+@print{} root
+@end example
+
+@noindent
+in un'implementazione non corretta di @command{awk}, mentre le versioni
+corrette stampano l'intera prima riga del file, qualcosa come:
+
+@example
+root:x:0:0:root:/root:/bin/bash
+@end example
+
+@noindent
+(Il comando @command{sed}@footnote{Il comando di utilità @command{sed} è un
+``editore di flusso''.  Anche il suo comportamento è definito dallo standard
+POSIX.} appena visto stampa solo la prima riga di @file{/etc/passwd}.)
 @end cartouche
-
-Il comportamento della funzione @code{split()} (ancora non
-formalmente trattato, vedere @ref{Funzioni per stringhe})
-è leggermente differente quando si abbia a che fare con file CSV.
-Se è chiamata con due argomenti
-(@samp{split(@var{stringa}, @var{vettore})}), @code{split()}
-separa i campi con la logica CSV.
-In tutti gli altri casi, il comportamento è quello normale.
-
-Se si è specificato l'opzione @option{--csv}, l'elemento
-@code{PROCINFO["CSV"]} esisterà, altrimenti non sarà disponibile.
-@xref{Variabili auto-assegnate}.
-
-Infine, se si è specificato @option{--csv}, l'assegnazione di
-un valore a una delle variabili
-@code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, o @code{RS}
-genera un messaggio di avvertimento.
-
-Per amor di chiarezza, @command{gawk} considera come
-autoritativo per il file in input di tipo CSV
-il documento
-@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180}.
-Non ci sono meccanismi che consentono di accettare file CSV
-in input che non rispettino tali specifiche, p.es., dei
-file che usino come carattere che separa i campi un
-punto-e-virgola al posto della virgola.
 
 @node Separatori campo da riga di comando
 @subsection Impostare @code{FS} dalla riga di comando
@@ -8866,72 +8819,6 @@ voci relative agli utenti il cui nome completo non è presente nel file:
 awk -F: '$5 == ""' /etc/passwd
 @end example
 
-@node Campo intera riga
-@subsection Fare di una riga intera un campo solo
-
-@cindex Schorr, Andrew
-Occasionalmente, è utile trattare l'intera riga in input come un solo campo.
-Questo si può fare facilmente e in modo portabile semplicemente impostando
-@code{FS} a @code{"\n"} (un ritorno-a-capo).@footnote{Grazie ad
-Andrew Schorr per questo suggerimento.}
-
-@example
-awk -F'\n' '@var{programma}' @var{file @dots{}}
-@end example
-
-@noindent
-In questo caso, @code{$1} coincide con @code{$0}.
-
-@cindex riquadro @subentry Cambiare @code{FS} non incide sui campi
-@cartouche Cambiare @code{FS} non incide sui campi
-
-@cindex POSIX @command{awk} @subentry separatore di campo
-@cindex separatore di campo @subentry POSIX e il
-Secondo lo standard POSIX, si suppone che @command{awk} si comporti
-come se ogni record sia stato diviso in campi nel momento in cui è stato
-letto.  In particolare, ciò vuol dire che se si cambia il valore di
-@code{FS} dopo che un record è stato letto, il valore dei campi (cioè
-la loro suddivisione) sarà ancora quello ottenuto usando il precedente
-valore di @code{FS}, non quello nuovo.
-
-@cindex angolo buio @subentry separatore di campo
-@cindex @command{sed} (comando di utilità)
-@cindex comando di utilità @subentry @command{sed}
-@cindex editori di flusso
-Comunque, molte delle prime implementazioni di @command{awk} non
-funzionavano in questo modo.  Invece, rimandavano la divisione dei campi
-fino a quando si faceva effettivamente riferimento a un campo.
-I campi erano divisi usando il valore @emph{corrente} di @code{FS}!
-@value{DARKCORNER}
-Questo comportamento può essere di difficile
-identificazione.  Il seguente esempio illustra la differenza
-tra i due metodi. Lo @dfn{script}
-
-@example
-sed 1q /etc/passwd | awk '@{ FS = ":" ; print $1 @}'
-@end example
-
-@noindent
-stampa:
-
-@example
-@print{} root
-@end example
-
-@noindent
-in un'implementazione non corretta di @command{awk}, mentre le versioni
-corrette stampano l'intera prima riga del file, qualcosa come:
-
-@example
-root:x:0:0:root:/root:/bin/bash
-@end example
-
-@noindent
-(Il comando @command{sed}@footnote{Il comando di utilità @command{sed} è un
-``editore di flusso''.  Anche il suo comportamento è definito dallo standard
-POSIX.} appena visto stampa solo la prima riga di @file{/etc/passwd}.)
-@end cartouche
-
 @node Sommario sulla separazione campi
 @subsection Sommario sulla separazione dei campi
 
@@ -9005,10 +8892,123 @@ regolare che lo farà in automatico (p.es., @samp{FS = "[c]"}).  In quel
 caso, @code{IGNORECASE} avrà effetto.
 @end cartouche
 
+@node Campi separati da virgola
+@subsection Lavorare con file CSV
+
+@cindex CSV (campi separati da virgola) @subentry record e campi
+@cindex dati CSV (campi separati da virgola) @subentry record e campi
+@cindex campi separati da virgola (CSV) @subentry record e campi
+Molti programmi di uso frequente si servono della virgola come separatore
+di campo, invece di usare lo spazio. [Normalmente i file in input
+a @command{gawk} hanno in questo caso come suffisso "csv",
+Comma Separated Value, ovvero Campi separati da virgola.]
+Questo è il caso in particolare per popolari fogli di calcolo.
+Non c'è uno standard accettato da tutti che regoli il formato di tali
+file, sebbene il documento
+@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180}
+elenchi le pratiche normalmente seguite.
+
+Per decenni, chi voleva lavorare con file CSV in @command{awk}
+ha dovuto ``trovare da solo'' una soluzione. (Per esempio,
+@pxref{Separazione in base al contenuto}).
+Nel 2023, Brian Kernighan ha deciso di aggiungere un supporto
+per i file CSV alla sua versione di @command{awk}.
+Per restare allo stesso livello, anche @command{gawk} rende
+disponibile lo stesso supporto presente nella sua versione.
+Per usare dei file contenenti campi in formato CSV, basta
+chiamare @command{gawk} specificando come opzione
+@option{-k} oppure @option{--csv}.
+
+I campi nei file CSV sono separati da virgola.  Per consentire la
+presenza di una virgola all'interno di un campo (p.es., come parte
+di un dato), il campo può essere racchiuso fra doppi apici.
+Per consentire un doppio apice all'interno di un campo racchiuso fra
+doppi apici, il campo stesso @emph{deve} essere racchiuso fra doppi apici
+e due doppi apici rappresentano un singolo doppio apice.
+Il doppio apice che segnala l'inizio del campo dev'essere
+il primo carattere dopo la virgola [che segna l'inizio del campo].
+La tabella
+@ref{table-csv-examples} mostra alcuni esempi.
+
+@float Tabella,table-csv-examples
+@caption{Esempi di dati in file CSV}
+@multitable @columnfractions .3 .3
+@headitem Input @tab Contenuto del campo
+@item @code{abc def} @tab @code{abc def}
+@item @code{"dati tra doppi apici"} @tab @code{dati tra doppi apici}
+@item @code{"dati tra, doppi apici"} @tab @code{dati tra, doppi apici}
+@item @code{"Lei disse ""Basta!""."} @tab @code{Lei disse "Basta!".}
+@item @code{Lei disse "Basta!".} @tab @code{Lei disse "Basta!".}
+@end multitable
+@end float
+
+Inoltre, ed è qui che la situazione si ingarbuglia, all'interno
+di un campo fra doppi apici è consentito anche inserire
+il carattere a-capo!
+Per gestire una tale situazione, quando sta trattando un file CSV
+@command{gawk} analizza il file in input alla ricerca di
+caratteri a-capo che non siano racchiusi fra doppi apici.
+Quindi, se si utilizza l'opzione @option{--csv}, il modo
+di gestire i record utilizzando la variabile @code{RS}
+(@pxref{Record}) non viene utilizzato per nulla. E lo stesso
+dicasi per la divisione in campi effettuata tramite
+@code{FS}, @code{FIELDWIDTHS}, o @code{FPAT}.
+(Queste ultime due variabili sono estensioni @command{gawk},
+e saranno trattate più avanti.)
+
+@cindex Kernighan, Brian @subentry citazioni di
+@cindex riquadro @subentry Fine riga dei file CSV con ritorno-carrello--a-capo
+@cartouche Fine riga dei file CSV con ritorno-carrello--a-capo
+@quotation
+@code{\r\n} @i{è un'invenzione del diavolo.}
+@author Brian Kernighan
+@end quotation
+
+Molti file CSV provengono da sistemi in cui il carattere di
+fine riga per file di testo è costituito dalla coppia di
+caratteri ritorno-carrello e ritorno-a-capo
+(CR-LF, @samp{\r} seguito da @samp{\n}).
+Per semplificare la vita @command{gawk}, quando tratta
+dei file CSV, converte la coppia di caratteri CR-LF a
+un semplice LF (a-capo). Ovvero, il carattere
+CR (ritorno-carrello) viene eliminato.
+
+Ciò capita solo se viene incontrata una coppia di caratteri
+CR-LF adiacenti; un carattere CR isolato non viene toccato.
+Questo comportamento è consistente con i sistemi Windows,
+che convertono automaticamente la coppia CR-LF in un file
+in un semplice LF in memoria; allo stesso modo si comporta
+il diffuso comando di utilità, @command{unix2dos}.
+@end cartouche
+
+Il comportamento della funzione @code{split()} (ancora non
+formalmente trattato, vedere @ref{Funzioni per stringhe})
+è leggermente differente quando si abbia a che fare con file CSV.
+Se è chiamata con due argomenti
+(@samp{split(@var{stringa}, @var{vettore})}), @code{split()}
+separa i campi con la logica CSV.
+In tutti gli altri casi, il comportamento è quello normale.
+
+Se si è specificato l'opzione @option{--csv}, la variabile
+@code{PROCINFO["CSV"]} esisterà, altrimenti non sarà disponibile.
+@xref{Variabili auto-assegnate}.
+
+Infine, se si è specificato @option{--csv}, l'assegnazione di
+un valore a una delle variabili
+@code{FS}, @code{FIELDWIDTHS}, @code{FPAT}, o @code{RS}
+genera un messaggio di avvertimento.
+
+Per amor di chiarezza, @command{gawk} considera come
+autoritativo per il file in input di tipo CSV
+il documento
+@uref{https://www.ietf.org/rfc/rfc4180.html, RFC 4180}.
+Non ci sono meccanismi che consentono di accettare file CSV
+in input che non rispettino tali specifiche, p.es., dei
+file che usino come carattere che separa i campi un
+punto-e-virgola al posto della virgola.
 
 @node Dimensione costante
 @section Leggere campi di larghezza costante
-
 
 @cindex campi @subentry di larghezza costante
 @cindex larghezza costante @subentry campi di
@@ -9554,7 +9554,7 @@ oppure @code{"FPAT"} se si una la divisione in campi in base al contenuto:
 
 @example
 if ("CSV" in PROCINFO)
-    @var{divisione in campi secondo le regole CSV} @dots{}
+    @var{divisione in record e campi secondo le regole CSV} @dots{}
 else if (PROCINFO["FS"] == "FS")
     @var{divisione normale in campi} @dots{}
 else if (PROCINFO["FS"] == "FIELDWIDTHS")
@@ -12337,13 +12337,13 @@ un comando, usando le istruzioni @code{print} o @code{printf},
 @command{gawk} scarica l'output verso la @dfn{pipe}.
 Ovvero, l'output non è bufferizzato, ma scritto direttamente.
 Ciò garantisce che l'output della @dfn{pipe}, insieme a quello
-generato da @command{gawk} viene scritto enll'ordine che ci si
+generato da @command{gawk} viene scritto nell'ordine che ci si
 aspetta:
 
 @example
-print "qualcosa"			# va allo standard output
-print "qualcos'altro" | "un-comando"	# anche allo standard output
-print "ulteriori cose"			# come pure questo
+print "qualcosa"			@ii{Va allo standard output}
+print "qualcos'altro" | "un-comando"	@ii{Anch'esso allo standard output}
+print "ulteriori cose"			@ii{Come pure questo}
 @end example
 
 Fare ciò ha un prezzo; scaricare dati nella @dfn{pipe} usa
@@ -15171,9 +15171,9 @@ non ci sono argomenti, basta scrivere @samp{()} dopo il nome della funzione.
 Gli esempi che seguono mostrano chiamate di funzione con e senza argomenti:
 
 @example
-sqrt(x^2 + y^2)        @ii{un argomento}
-atan2(y, x)            @ii{due argomenti}
-rand()                 @ii{nessun argomento}
+sqrt(x^2 + y^2)        @ii{Un argomento}
+atan2(y, x)            @ii{Due argomenti}
+rand()                 @ii{Nessun argomento}
 @end example
 
 @cindex risoluzione di problemi @subentry sintassi della chiamata di funzione
@@ -16329,8 +16329,8 @@ parentesi graffe.  Un'azione omessa equivale a specificare
 @samp{@{ print $0 @}}:
 
 @example
-/pippo/  @{ @}     @ii{se si trova @code{pippo}, non fare nulla --- azione vuota}
-/pippo/          @ii{se si trova @code{pippo}, stampa il record --- azione omessa}
+/pippo/  @{ @}     @ii{Se si trova @code{pippo}, non fare nulla --- azione vuota}
+/pippo/          @ii{Se si trova @code{pippo}, stampa il record --- azione omessa}
 @end example
 
 I seguenti tipi di istruzione sono disponibili in @command{awk}:
@@ -23884,9 +23884,9 @@ Per cominciare, usiamo una variabile come scalare:
 
 @example
 BEGIN @{
-    print typeof(a)         # non sappiamo ancora il tipo variabile
-    printf("a = %d\n", a)   # la usiamo come scalare
-    print typeof(a)         # ora sappiamo che non è un vettore
+    print typeof(a)         @ii{Tipo variabile di a non ancora noto}
+    printf("a = %d\n", a)   @ii{Variabile a usata come scalare}
+    print typeof(a)         @ii{Ora sappiamo che non è un vettore}
 @}
 @end example
 
@@ -23913,11 +23913,11 @@ In aggiunta a ciò, in @command{gawk}, è possibile cambiare
 
 @example
 BEGIN @{
-    print typeof(a)               # non sappiamo ancora il tipo variabile
-    a[1]                          # la definiamo come elemento di vettore
-    print typeof(a[1])            # ma ancora non sappiamo cosa è a[1]
-    printf("a[1] = %d\n", a[1])   # la usiamo come scalare
-    print typeof(a[1])            # ora sappiamo che non è un vettore
+    print typeof(a)               @ii{Tipo variabile di a non ancora noto}
+    a[1]                          @ii{Definita come elemento di vettore}
+    print typeof(a[1])            @ii{Valore di a[1] non ancora noto}
+    printf("a[1] = %d\n", a[1])   @ii{Usata come scalare}
+    print typeof(a[1])            @ii{Ora sappiamo che non è un vettore}
 @}
 @end example
 
@@ -33701,9 +33701,9 @@ speciale nel vettore @code{PROCINFO}
 in questo modo:
 
 @example
-comando = "sort -nr"           # comando, salvato in una variabile
-PROCINFO[comando, "pty"] = 1   # aggiorna PROCINFO
-print @dots{} |& comando       # avvia la @dfn{pipe} bidirezionale
+comando = "sort -nr"           @ii{Comando da eseguire, messo in una variabile}
+PROCINFO[comando, "pty"] = 1   @ii{Aggiorna PROCINFO}
+print @dots{} |& comando           @ii{Avvia @dfn{pipe} bidirezionale}
 @dots{}
 @end example
 
@@ -38594,8 +38594,8 @@ adeguato.  Il codice per far ciò è qualcosa del genere:
 
 @example
 @group
-delta = 0.00001                 # per esempio
-differenza = abs(a - b)         # sottrazione dei due valori
+delta = 0.00001                 @ii{Per esempio}
+differenza = abs(a - b)         @ii{Differenza assoluta fra i due valori}
 if (differenza < delta)
     # va bene
 else
@@ -39202,9 +39202,9 @@ Per esempio,si consideri il seguente programma:
 @example
 BEGIN @{
     pi = 3.1416
-    OFMT = "%.f"        # Stampa il valore come numero intero
-    print pi            # ROUNDMODE = "N" per default.
-    ROUNDMODE = "U"     # Ora si cambia ROUNDMODE
+    OFMT = "%.f"        @ii{Stampa il valore come numero intero}
+    print pi            @ii{ROUNDMODE = "N" per default}
+    ROUNDMODE = "U"     @ii{Ora cambia ROUNDMODE}
     print pi
 @}
 @end example
@@ -40588,7 +40588,7 @@ assegnandogli dei puntatori. Per esempio:
 @example
 char *p = gawk_malloc(42);      p @ii{``possiede'' la memoria}
 char *q = p;
-p = NULL;                       @ii{adesso} q @ii{la ``possiede''}
+p = NULL;                       @ii{Adesso} q @ii{la ``possiede''}
 @end example
 
 Gli oggetti MPFR e GMP sono in effetti allocati sullo @dfn{stack}
@@ -40608,20 +40608,20 @@ Per questo motivo, il codice in un'estensione dovrebbe essere
 simile a questo:
 
 @example
-mpz_t part1, part2, risposta;      @ii{dichiarare valori locali}
+mpz_t parte1, parte2, risposta;         @ii{Dichiarare valori locali}
 
-mpz_set_si(part1, 21);             @ii{fare alcuni calcoli}
-mpz_set_si(part2, 21);
-mpz_add(risposta, part1, part2);
+mpz_set_si(parte1, 21);                 @ii{Fare alcuni calcoli}
+mpz_set_si(parte2, 21);
+mpz_add(risposta, parte1, parte2);
 @dots{}
 /* si suppone che il risultato sia un parametro */
 /* di tipo (awk_value_t *). */
-make_number_mpz(risposta, & risultato); @ii{assegnare valore finale GMP}
+make_number_mpz(risposta, & risultato); @ii{Assegnare valore finale GMP}
 
-mpz_clear(part1);                       @ii{rilasciare valori intermedi}
-mpz_clear(part2);
+mpz_clear(parte1);                      @ii{Rilasciare valori intermedi}
+mpz_clear(parte2);
 
-return risultato;           @ii{valore in @code{risposta} gestito da @code{gawk}}
+return risultato;                       @ii{Valore in @code{risposta} gestito da @code{gawk}}
 @end example
 
 @node Funzioni di registrazione
@@ -40655,7 +40655,7 @@ typedef struct awk_ext_func @{
 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ struct awk_ext_func *finfo);
 @ @ @ @ const size_t max_expected_args;
 @ @ @ @ const size_t min_required_args;
-@ @ @ @ awk_bool_t suppress_lint;  /* vero => niente messaggi se più argomenti di quelli attesi */
+@ @ @ @ awk_bool_t suppress_lint;  /* vero => niente messaggi se troppi argomenti */
 @ @ @ @ void *data;        /* puntatore di tipo opaco
 @ @ @ @                    a ogni informazione ulteriore */
 @} awk_ext_func_t;
