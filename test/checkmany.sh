@@ -6,7 +6,7 @@
 awkprog=$1
 testprog=$2
 srcdir=$3
-CMP=${CMP:-cmp}
+CMP=${CMP:-cmp -s}
 
 if [ "$GAWKLOCALE" ]
 then
