@@ -2163,6 +2163,9 @@ done:
 	}
 
 	if (flags & GENSUB) {
+		unref(NSUB_node->var_value);
+		NSUB_node->var_value = make_number(matches);
+
 		if (matches > 0) {
 			/* return the result string */
 			DEREF(target);
