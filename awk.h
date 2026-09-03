@@ -385,10 +385,6 @@ struct _mpfr_data {
 };
 #endif /* HAVE_MPFR */
 
-/*
- * NOTE - this struct is a rather kludgey -- it is packed to minimize
- * space usage, at the expense of cleanliness.  Alter at own risk.
- */
 typedef struct exp_node {
 	NODETYPE type;
 	enum flagvals {

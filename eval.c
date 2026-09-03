@@ -261,8 +261,8 @@ static const char *const nodetypes[] = {
  */
 
 static struct optypetab {
-	char *desc;
-	char *operator;
+	const char *desc;
+	const char *operator;
 } optypes[] = {
 	{ "Op_illegal", NULL },
 	{ "Op_times", " * " },
