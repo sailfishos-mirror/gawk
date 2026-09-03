@@ -29,8 +29,6 @@
 
 #include "awk.h"
 
-#include <math.h>
-
 #if defined(__STDC__) && __STDC__ < 1	/* VMS weirdness, maybe elsewhere */
 #define signed /**/
 #endif

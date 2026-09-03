@@ -134,9 +134,9 @@ static void parse_args(int argc, char **argv);
 static void set_locale_stuff(void);
 static bool stopped_early = false;
 
-ENUM(do_flag_values) do_flags = DO_FLAG_NONE;
 bool using_persistent_malloc = false;
 const char *persist_file;
+ENUM(do_flag_values) do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
 static int do_binary = false;		/* hands off my data! */
