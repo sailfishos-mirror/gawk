@@ -16170,6 +16170,10 @@ The values indicate what @command{gawk} knows about the identifiers
 after it has finished parsing the program; they are @emph{not} updated
 while the program runs.
 
+@item PROCINFO["nsub"]
+The number of substitutions made by the most recent call
+to the @code{gensub()} function.
+
 @cindex platform running on
 @cindex @code{PROCINFO} array @subentry platform running on
 @item PROCINFO["platform"]
@@ -18511,6 +18515,12 @@ numeric values less than one as if they were one.  If no @var{target}
 is supplied, use @code{$0}.  Return the modified string as the result
 of the function. The original target string is @emph{not} changed.
 
+Starting with version 6.0, @code{gensub()} sets @code{PROCINFO["nsub"]}
+to the number of substitutions that were actually made.
+@code{PROCINFO["nsub"]} will be zero if the regular expression didn't
+match, or if, for a numeric @var{how}, there weren't enough matches
+in the target string.
+
 The returned value is @emph{always} a string, even if the original
 @var{target} was a number or a regexp value.
 
@@ -18540,6 +18550,10 @@ As with @code{sub()}, you must type two backslashes in order
 to get one into the string.
 In the replacement text, the sequence @samp{\0} represents the entire
 matched text, as does the character @samp{&}.
+
+Consider that if, in the previous example, @code{a} had been
+@code{"abc abc"}, @code{b} and @code{a} would have identical contents,
+but @code{PROCINFO["nsub"]} would be one.
 
 The following example shows how you can use the third argument to control
 which match of the regexp should be changed:
@@ -42649,6 +42663,10 @@ sets @code{FS} to a TAB character.
 @item
 Support for UDP in @command{gawk}'s networking was removed
 (@pxref{TCP/IP Networking}).
+
+@item
+@code{gensub()} was changed to set @code{PROCINFO["nsub"]}
+(@pxref{String Functions}).
 
 @end itemize
 
