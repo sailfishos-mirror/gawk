@@ -1820,6 +1820,7 @@ do_sub(int nargs, unsigned int flags)
 	char *mb_indices = NULL;
 	int searchflags = RE_NEED_START;
 	const char *fname = NULL;	// for fatal message, below
+	int nsub = 0;			// actual number of substitutions made
 
 	if ((flags & GENSUB) != 0) {
 		double d;
@@ -2022,6 +2023,9 @@ do_sub(int nargs, unsigned int flags)
 				matches--;
 				goto empty;
 			}
+
+			nsub++;
+
 			/*
 			 * If replacing all occurrences, or this is the
 			 * match we want, copy in the replacement text,
@@ -2163,8 +2167,7 @@ done:
 	}
 
 	if (flags & GENSUB) {
-		unref(NSUB_node->var_value);
-		NSUB_node->var_value = make_number(global ? matches : 1);
+		update_PROCINFO_num("nsub", nsub);
 
 		if (matches > 0) {
 			/* return the result string */

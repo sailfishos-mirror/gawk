@@ -1,5 +1,16 @@
 2026-09-03         Arnold D. Robbins     <arnold@skeeve.com>
 
+	After discussion on the bug-gawk list, instead
+	of an NSUB global variable, use PROCINFO["nsub"].
+
+	* awk.h: Remove declaration of NSUB_node.
+	* main.c (NSUB_node): Removed definition of NSUB_node.
+	(varinit): Removed it from the table.
+	* builtin.c (do_sub): Add a variable nsub to count the actual
+	number of substitutions.  Update PROCINFO instead of NSUB.
+
+2026-09-03         Arnold D. Robbins     <arnold@skeeve.com>
+
 	Pull in some changes from C++ branch and also some cleanups.
 
 	* array.c (do_delete): Add a case to NODETYPE for MEMDEBUG.

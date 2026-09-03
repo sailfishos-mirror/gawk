@@ -65,7 +65,7 @@ NODE *ERRNO_node, *FIELDWIDTHS_node, *FILENAME_node;
 NODE *FNR_node, *FPAT_node, *FS_node, *IGNORECASE_node, *LINT_node;
 NODE *NF_node, *NR_node, *OFMT_node, *OFS_node, *ORS_node, *PROCINFO_node;
 NODE *RLENGTH_node, *RSTART_node, *RS_node, *RT_node, *SUBSEP_node;
-NODE *PREC_node, *ROUNDMODE_node, *NSUB_node;
+NODE *PREC_node, *ROUNDMODE_node;
 NODE *TEXTDOMAIN_node;
 
 long NF;
@@ -816,7 +816,6 @@ static const struct varinit varinit[] = {
 {&PREC_node,	"PREC",		NULL,	DEFAULT_PREC,	NULL,	set_PREC,	false,	NON_STANDARD},
 {&NF_node,	"NF",		NULL,	-1, update_NF, set_NF,	false, 0 },
 {&NR_node,	"NR",		NULL,	0,  update_NR, set_NR,	true, 0 },
-{&NSUB_node,	"NSUB",		NULL,	0,  NULL, NULL,	false, NON_STANDARD },
 {&OFMT_node,	"OFMT",		"%.6g",	0,  NULL, set_OFMT,	true, 0 },
 {&OFS_node,	"OFS",		" ",	0,  NULL, set_OFS,	true, 0 },
 {&ORS_node,	"ORS",		"\n",	0,  NULL, set_ORS,	true, 0 },
