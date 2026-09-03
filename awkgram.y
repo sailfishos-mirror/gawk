@@ -188,8 +188,6 @@ static inline INSTRUCTION *list_append(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_prepend(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_merge(INSTRUCTION *l1, INSTRUCTION *l2);
 
-extern double fmod(double x, double y);
-
 #define YYSTYPE INSTRUCTION *
 %}
 
