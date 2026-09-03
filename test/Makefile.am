@@ -969,6 +969,8 @@ EXTRA_DIST = \
 	nlstringtest.ok \
 	nlstringtest.po \
 	nlstringtest-nogettext.ok \
+	nsub.awk \
+	nsub.ok \
 	fr \
 	noeffect.awk \
 	noeffect.ok \
@@ -1663,6 +1665,7 @@ UNIX_TESTS = \
 	space strftlng
 
 GAWK_EXT_TESTS = \
+	nsub \
 	aadelete1 aadelete2 aarray1 aasort aasorti ar2fn_elnew_sc \
 	ar2fn_elnew_sc2 ar2fn_fmod ar2fn_unxptyp_aref ar2fn_unxptyp_val \
 	argtest arraysort arraysort2 arraytype asortbool asortsymtab \
