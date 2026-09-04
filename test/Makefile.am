@@ -1805,10 +1805,6 @@ NEED_LOCALE_RU = mtchi18n
 
 # Tests that have multipe .ok files
 
-NEED_CHECKMANY = case-check greek-8bit posix-inf \
-	arraytype asortsymtab fmtspcl fnarydel fnparydl numrange \
-	printf-corners rand
-
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
 	clos1way6 close_status dbugeval4 \

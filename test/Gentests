@@ -108,13 +108,6 @@ BEGIN {
 	next
 }
 
-/^NEED_CHECKMANY *=/,/[^\\]$/ {
-	gsub(/(^NEED_CHECKMANY *=|\\$)/,"")
-	for (i = 1; i <= NF; i++)
-		checkmany[$i]
-	next
-}
-
 /^GENTESTS_UNUSED *=/,/[^\\]$/ {
 	gsub(/(^GENTESTS_UNUSED *=|\\$)/,"")
 	for (i = 1; i <= NF; i++)
@@ -261,16 +254,8 @@ function generate(x,	s, i, locale_string)
 	}
 
 	printf "%s", locale_string
-	if (x in checkmany)
-		printf "AWKPATH=\"$(srcdir)\" $(srcdir)/checkmany.sh \"$(AWKPROG)\" \"$@\" \"$(srcdir)\""
-	else
-		printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1", s
-	printf " || echo EXIT CODE: $$? >>_$@\n"
-
-	if (x in checkmany)
-		delete checkmany[x]
-	else
-		printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
+	printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
+	printf "\t@-$(srcdir)/checkmany.sh \"$@\" \"$(srcdir)\"\n\n"
 }
 
 END {
