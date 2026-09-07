@@ -1789,21 +1789,19 @@ NEED_LOCALE_C = \
 	clos1way gsubtst6 range2
 
 NEED_LOCALE_EN = \
+	mbprintf5 \
 	backbigs1 backsmalls1 backsmalls2 case-check commas concat4 dfamb1 greek-equiv \
 	greek-utf gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
 	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 subamp subi18n \
 	unicode1 wideidx wideidx2 widesub widesub2 widesub3 widesub4
 
-# Unused at the moment, since nlstringtest has additional stuff it does
-# NEED_LOCALE_FR =
+NEED_LOCALE_FR = nlstringtest
 
 NEED_LOCALE_GR = greek-8bit
 
 NEED_LOCALE_JP = mbprintf2
 
 NEED_LOCALE_RU = mtchi18n
-
-# Tests that have multipe .ok files
 
 # List of tests that fail on MinGW
 EXPECTED_FAIL_MINGW = \
@@ -2299,12 +2297,6 @@ mixed1::
 	@-$(AWK) -f /dev/null --source 'BEGIN {return junk}' >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
-mbprintf5::
-	@echo $@ $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=en_US.UTF-8; export GAWKLOCALE ; \
-	$(AWK) -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
-
 printfbad2: printfbad2.ok
 	@echo $@
 	@-$(AWK) --lint -f "$(srcdir)"/$@.awk "$(srcdir)"/$@.in 2>&1 | sed 's;$(srcdir)/;;g' >_$@ || echo EXIT CODE: $$?  >>_$@
@@ -2734,12 +2726,6 @@ nsbad_cmd:
 nonfatal1:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk 2>&1 | $(AWK) '{print gensub(/invalid[:].*$$/, "invalid", 1, $$0)}' >_$@ || echo EXIT CODE: $$? >>_$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
-
-nlstringtest::
-	@echo $@ $(ZOS_FAIL)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=fr_FR.UTF-8; export GAWKLOCALE ; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 longwrds:
