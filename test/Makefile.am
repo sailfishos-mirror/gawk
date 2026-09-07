@@ -2742,7 +2742,7 @@ pty2:
 arrdbg:
 	@echo $@
 	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@.ok-mpfr" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && rm -f _$@ $@.ok $@.ok-mpfr
 
 sourcesplit:
 	@echo $@
