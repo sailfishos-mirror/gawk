@@ -1274,18 +1274,11 @@ nonfatal1:
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk 2>&1 | $(AWK) '{print gensub(/invalid[:].*$$/, "invalid", 1, $$0)}' >_$@ || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
-# FIXME
-# 4/2018: On first call to $(CMP), send to /dev/null even with -s for MinGW.
 nlstringtest::
 	@echo $@; $(CHCP) $(ORIGCP) $(ZOS_FAIL)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=FRA_FRA; export GAWKLOCALE ; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-if $(CMP_S) "$(srcdir)"/nlstringtest-nogettext.ok _$@ > /dev/null ; \
-	then \
-		rm -f _$@ ; \
-	else \
-		$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@ ; \
-	fi
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 longwrds:
 	@echo $@; $(CHCP) $(ORIGCP)
