@@ -2733,7 +2733,8 @@ $ @kbd{awk 'BEGIN @{ print "hello" @} # let's be cute'}
 The shell sees that the first two quotes match, and that
 a new quoted object begins at the end of the command line.
 It therefore prompts with the secondary prompt, waiting for more input.
-With BWK @command{awk}, closing the quoted string produces this result:
+With BWK @command{awk}@footnote{In all examples throughout this @value{DOCUMENT},
+@command{nawk} is BWK @command{awk}.}, closing the quoted string produces this result:
 
 @example
 $ @kbd{nawk '@{ print "hello" @} # let's be cute'}
@@ -11445,8 +11446,9 @@ double quotation marks.  For example:
 @cindex strings @subentry length limitations
 @cindex ASCII
 represents the string whose contents are @samp{parrot}.  Strings in
-@command{gawk} can be of any length, and they can contain any of the possible
-eight-bit ASCII characters, including ASCII @sc{nul} (character code zero).
+@command{gawk} can be of any length, and they can contain any character
+in the system's character set (ASCII, EBCDIC, Unicode, or other sets),
+including the @sc{nul} character (one or more bytes with a code of zero).
 Other @command{awk}
 implementations may have difficulty with some character codes.
 
@@ -11482,6 +11484,7 @@ $ @kbd{gawk 'BEGIN @{ print "hello, }
 @print{} gawk: cmd. line:1:               ^ syntax error
 @end example
 
+@cindex BusyBox Awk
 @cindex dark corner @subentry string continuation
 @cindex strings @subentry continuation across lines
 @cindex differences in @command{awk} and @command{gawk} @subentry strings
@@ -11489,7 +11492,7 @@ Although POSIX doesn't define what happens if you use an escaped
 newline, as in the previous C example, all known versions of
 @command{awk} allow you to do so.  Unfortunately, what each one
 does with such a string varies.  @value{DARKCORNER} @command{gawk},
-@command{mawk}, and the OpenSolaris POSIX @command{awk}
+@command{mawk}, BWK @command{awk}, and BusyBox @command{awk}
 (@pxref{Other Versions}) elide the backslash and newline, as in C:
 
 @example
@@ -11501,18 +11504,6 @@ $ @kbd{gawk 'BEGIN @{ print "hello, \}
 @cindex POSIX mode
 In POSIX mode (@pxref{Options}), @command{gawk} does not
 allow escaped newlines.  Otherwise, it behaves as just described.
-
-BWK @command{awk}@footnote{In all examples throughout this @value{DOCUMENT},
-@command{nawk} is BWK @command{awk}.} and BusyBox @command{awk}
-remove the backslash but leave the newline
-intact, as part of the string:
-
-@example
-$ @kbd{nawk 'BEGIN @{ print "hello, \}
-> @kbd{world" @}'}
-@print{} hello,
-@print{} world
-@end example
 
 @node Nondecimal-numbers
 @subsubsection Octal and Hexadecimal Numbers
@@ -11581,7 +11572,7 @@ when working with the built-in bit-manipulation functions;
 see @ref{Bitwise Functions}
 for more information.
 
-Unlike in some early C implementations, @samp{8} and @samp{9} are not
+@samp{8} and @samp{9} are not
 valid in octal constants.  For example, @command{gawk} treats @samp{018}
 as decimal 18:
 
@@ -11602,7 +11593,7 @@ As with integer hexadecimal constants, both @samp{0x} and @samp{0X}
 may be used, and case in the letters @samp{a} through @samp{f}
 does not matter.
 
-Beginning with version 5.4, @command{gawk} supports hexadecimal
+@command{gawk} supports hexadecimal
 floating point values, as constants in @command{awk} program source
 code, with the @code{strtonum()} built-in function, and with the
 @option{--non-decimal-data} command-line option.
@@ -11742,10 +11733,6 @@ the @code{gensub()}, @code{sub()}, and @code{gsub()} functions, as the
 second argument of the @code{match()} function,
 and as the third argument of the @code{split()} and @code{patsplit()} functions
 (@pxref{String Functions}).
-Modern implementations of @command{awk}, including @command{gawk}, allow
-the third argument of @code{split()} to be a regexp constant, but some
-older implementations do not.
-@value{DARKCORNER}
 Because some built-in functions accept regexp constants as arguments,
 confusion can arise when attempting to use regexp constants as arguments
 to user-defined functions (@pxref{User-defined}).  For example:
@@ -11878,7 +11865,7 @@ have regexp type. Such variables can be passed on to user-defined functions,
 without the confusing aspects of computed regular expressions created from
 strings or string constants. They may also be passed through indirect function
 calls (@pxref{Indirect Calls})
-and on to the built-in functions that accept regexp constants.
+to the built-in functions that accept regexp constants.
 
 When used in numeric conversions, strongly typed regexp variables convert
 to zero. When used in string conversions, they convert to the string
@@ -11955,6 +11942,9 @@ is zero if converted to a number.  There is no need to explicitly
 initialize a variable in @command{awk},
 which is what you would do in C and in most other traditional languages.
 
+@command{gawk} also has regexp-typed values. This is discussed briefly
+in the next section, and in more detail in @ref{Strong Regexp Constants}.
+
 @node Assignment Options
 @subsubsection Assigning Variables on the Command Line
 @cindex variables @subentry assigning on command line
@@ -12026,11 +12016,11 @@ Normally, variables assigned on the command line (with or without the
 used as numbers, @command{awk}'s normal automatic conversion of strings
 to numbers takes place, and everything ``just works.''
 
-However, @command{gawk} supports variables whose types are ``regexp''.
+Additionally, @command{gawk} supports variables whose types are ``regexp''.
 You can assign variables of this type using the following syntax:
 
 @example
-gawk -v 're1=@@/foo|bar/' '@dots{}' /path/to/file1 're2=@@/baz|quux/' /path/to/file2
+gawk -v 're1=@@/foo|bar/' '@dots{}' file1 're2=@@/baz|quux/' file2
 @end example
 
 @noindent
@@ -12124,22 +12114,6 @@ b = a ""
 @code{b} has the value @code{"12"}, not @code{"12.00"}.
 @value{DARKCORNER}
 
-@cindex sidebar @subentry Pre-POSIX @command{awk} Used @code{OFMT} for String Conversion
-@cartouche Pre-POSIX @command{awk} Used @code{OFMT} for String Conversion
-@cindex POSIX @command{awk} @subentry @code{OFMT} variable and
-@cindex @code{OFMT} variable
-@cindex portability @subentry new @command{awk} vs.@: old @command{awk}
-@cindex @command{awk} @subentry new vs.@: old @subentry @code{OFMT} variable
-Prior to the POSIX standard, @command{awk} used the value
-of @code{OFMT} for converting numbers to strings.  @code{OFMT}
-specifies the output format to use when printing numbers with @code{print}.
-@code{CONVFMT} was introduced in order to separate the semantics of
-conversion from the semantics of printing.  Both @code{CONVFMT} and
-@code{OFMT} have the same default value: @code{"%.6g"}.  In the vast majority
-of cases, old @command{awk} programs do not change their behavior.
-@xref{Print} for more information on the @code{print} statement.
-@end cartouche
-
 @node Locale influences conversions
 @subsubsection Locales Can Influence Conversion
 
@@ -12165,7 +12139,7 @@ in input data cannot have a thousands separator.  Here are some examples
 indicating the difference in behavior, on a GNU/Linux system:
 
 @example
-$ @kbd{export POSIXLY_CORRECT=1}                        @ii{Force POSIX behavior}
+$ @kbd{export POSIXLY_CORRECT=1}           @ii{Force POSIX behavior}
 $ @kbd{gawk 'BEGIN @{ printf "%g\n", 3.1415927 @}'}
 @print{} 3.14159
 $ @kbd{LC_ALL=en_DK.utf-8 gawk 'BEGIN @{ printf "%g\n", 3.1415927 @}'}
@@ -12327,7 +12301,7 @@ b * int(a / b) + (a % b) == a
 @end example
 
 One possibly undesirable effect of this definition of remainder is that
-@samp{@var{x} % @var{y}} is negative if @var{x} is negative.  Thus:
+@samp{x % y} is negative if @code{x} is negative.  Thus:
 
 @example
 -17 % 8 = -1
@@ -12503,7 +12477,7 @@ value into a variable.  For example, let's assign the value one to the variable
 z = 1
 @end example
 
-After this expression is executed, the variable @code{z} has the value one.
+After this expression executes, the variable @code{z} has the value one.
 Whatever old value @code{z} had before the assignment is forgotten.
 
 Assignments can also store string values.  For example, the
@@ -12716,45 +12690,6 @@ Only the @samp{^=} operator is specified by POSIX.
 For maximum portability, do not use the @samp{**=} operator.
 @end quotation
 
-@cindex sidebar @subentry Syntactic Ambiguities Between @samp{/=} and Regular Expressions
-@cartouche Syntactic Ambiguities Between @samp{/=} and Regular Expressions
-@cindex dark corner @subentry regexp constants @subentry @code{/=} operator and
-@cindex @code{/} (forward slash) @subentry @code{/=} operator @subentry vs.@: @code{/=@dots{}/} regexp constant
-@cindex forward slash (@code{/}) @subentry @code{/=} operator @subentry vs.@: @code{/=@dots{}/} regexp constant
-@cindex regexp constants @subentry @code{/=@dots{}/} @subentry @code{/=} operator and
-
-@c derived from email from  "Nelson H. F. Beebe" <beebe@math.utah.edu>
-@c Date: Mon, 1 Sep 1997 13:38:35 -0600 (MDT)
-
-@cindex dark corner @subentry @code{/=} operator vs.@: @code{/=@dots{}/} regexp constant
-@cindex ambiguity, syntactic: @code{/=} operator vs.@: @code{/=@dots{}/} regexp constant
-@cindex syntactic ambiguity: @code{/=} operator vs.@: @code{/=@dots{}/} regexp constant
-@cindex @code{/=} operator vs.@: @code{/=@dots{}/} regexp constant
-There is a syntactic ambiguity between the @code{/=} assignment
-operator and regexp constants whose first character is an @samp{=}.
-@value{DARKCORNER}
-This is most notable in some commercial @command{awk} versions.
-For example:
-
-@example
-$ @kbd{awk /==/ /dev/null}
-@error{} awk: syntax error at source line 1
-@error{}  context is
-@error{}         >>> /= <<<
-@error{} awk: bailing out at source line 1
-@end example
-
-@noindent
-A workaround is:
-
-@example
-awk '/[=]=/' /dev/null
-@end example
-
-@command{gawk} does not have this problem; BWK @command{awk}
-and @command{mawk} also do not.
-@end cartouche
-
 @node Increment Ops
 @subsection Increment and Decrement Operators
 
@@ -12828,14 +12763,10 @@ as the value of the expression.
 @item --@var{lvalue}
 Decrement @var{lvalue}, returning the new value as the
 value of the expression.
-(This expression is
-like @samp{++@var{lvalue}}, but instead of adding, it subtracts.)
 
 @item @var{lvalue}--
 Decrement @var{lvalue}, returning the @emph{old} value of @var{lvalue}
 as the value of the expression.
-(This expression is
-like @samp{@var{lvalue}++}, but instead of adding, it subtracts.)
 @end table
 
 @cindex sidebar @subentry Operator Evaluation Order
@@ -13408,6 +13339,8 @@ Unless @code{b} happens to be zero or the null string, the @code{if}
 part of the test always succeeds.  Because the operators are
 so similar, this kind of error is very difficult to spot when
 scanning the source code.
+With the @option{--lint} option, @command{gawk} issues a
+warning if you use an assignment as a condition.
 
 The following list of expressions illustrates the kinds of comparisons
 @command{awk} performs, as well as what the result of each comparison is:
@@ -13469,7 +13402,7 @@ x ~ /foo/
 
 @noindent
 has the value one if @code{x} contains @samp{foo}, such as
-@code{"Oh, what a fool am I!"}.
+@samp{Oh, what a fool am I!}.
 
 @cindex @code{~} (tilde), @code{~} operator
 @cindex tilde (@code{~}), @code{~} operator
@@ -13524,7 +13457,7 @@ $ @kbd{gawk --posix 'BEGIN @{ printf("ABC < abc = %s\n",}
 @print{} ABC < abc = FALSE
 @end example
 
-Fortunately, as of August 2016, comparison based on locale
+Fortunately, these days, comparison based on locale
 collating order is no longer required for the @code{==} and @code{!=}
 operators.@footnote{See @uref{https://austingroupbugs.net/view.php?id=1070,
 the Austin Group website}.} However, comparison based on locales is still
@@ -13595,7 +13528,7 @@ if ($0 ~ /edu/ && $0 ~ /li/) print
 
 @cindex side effects @subentry Boolean operators
 The subexpression @var{boolean2} is evaluated only if @var{boolean1}
-is true.  This can make a difference when @var{boolean2} contains
+is true.  This can also make a difference when @var{boolean2} contains
 expressions that have side effects. In the case of @samp{$0 ~ /foo/ &&
 ($2 == bar++)}, the variable @code{bar} is not incremented if there is
 no substring @samp{foo} in the record.
@@ -14081,7 +14014,7 @@ Once upon a time, the locale setting used to affect regexp matching,
 but this is no longer true (@pxref{Ranges and Locales}).
 
 Locales can affect record splitting.  For the normal case of @samp{RS =
-"\n"}, the locale is largely irrelevant.  For other single-character
+"\n"}, the locale is largely irrelevant.  For other single-byte character
 record separators, setting @samp{LC_ALL=C} in the environment will
 give you much better performance when reading records.  Otherwise,
 @command{gawk} has to make several function calls, @emph{per input
@@ -14091,7 +14024,7 @@ Locales can affect how dates and times are formatted (@pxref{Time
 Functions}).  For example, a common way to abbreviate the date September
 4, 2015, in the United States is ``9/4/15.''  In many countries in
 Europe, however, it is abbreviated ``4.9.15.''  Thus, the @samp{%x}
-specification in a @code{"US"} locale might produce @samp{9/4/15},
+specification for @code{strftime()} in a @code{"US"} locale might produce @samp{9/4/15},
 while in a @code{"EUROPE"} locale, it might produce @samp{4.9.15}.
 
 According to POSIX, string comparison is also affected by locales (similar
