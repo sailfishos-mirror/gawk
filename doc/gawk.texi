@@ -661,14 +661,14 @@ particular records in a file and perform operations upon them.
                                         pattern.
 * Ranges::                              Pairs of patterns specify record
                                         ranges.
+* Empty::                               The empty pattern, which matches every
+                                        record.
 * BEGIN/END::                           Specifying initialization and cleanup
                                         rules.
 * Using BEGIN/END::                     How and why to use BEGIN/END rules.
 * I/O And BEGIN/END::                   I/O issues in BEGIN/END rules.
 * BEGINFILE/ENDFILE::                   Two special patterns for advanced
                                         control.
-* Empty::                               The empty pattern, which matches every
-                                        record.
 * Using Shell Variables::               How to use shell variables with
                                         @command{awk}.
 * Action Overview::                     What goes into an action.
@@ -683,13 +683,13 @@ particular records in a file and perform operations upon them.
 * For Statement::                       Another looping statement, that
                                         provides initialization and increment
                                         clauses.
-* Switch Statement::                    Switch/case evaluation for conditional
-                                        execution of statements based on a
-                                        value.
 * Break Statement::                     Immediately exit the innermost
                                         enclosing loop.
 * Continue Statement::                  Skip to the end of the innermost
                                         enclosing loop.
+* Switch Statement::                    Switch/case evaluation for conditional
+                                        execution of statements based on a
+                                        value.
 * Next Statement::                      Stop processing the current input
                                         record.
 * Nextfile Statement::                  Stop processing the current file.
@@ -14152,7 +14152,7 @@ program, and occasionally the format for data read as input.
 @chapter Patterns, Actions, and Variables
 @cindex patterns
 
-As you have already seen, each @command{awk} statement consists of
+As you have already seen, each @command{awk} rule consists of
 a pattern with an associated action.  This chapter describes how
 you build patterns and actions, what kinds of things you can do within
 actions, and @command{awk}'s predefined variables.
@@ -14181,9 +14181,9 @@ building something useful.
 * Regexp Patterns::             Using regexps as patterns.
 * Expression Patterns::         Any expression can be used as a pattern.
 * Ranges::                      Pairs of patterns specify record ranges.
+* Empty::                       The empty pattern, which matches every record.
 * BEGIN/END::                   Specifying initialization and cleanup rules.
 * BEGINFILE/ENDFILE::           Two special patterns for advanced control.
-* Empty::                       The empty pattern, which matches every record.
 @end menu
 
 @cindex patterns @subentry types of
@@ -14193,8 +14193,8 @@ The following is a summary of the types of @command{awk} patterns:
 
 @table @code
 @item /@var{regular expression}/
-A regular expression. It matches when the text of the
-input record fits the regular expression.
+A regular expression. It matches the record when the text of the
+input record matches the regular expression.
 (@xref{Regexp}.)
 
 @item @var{expression}
@@ -14262,34 +14262,6 @@ Comparison expressions, using the comparison operators described in
 @ref{Typing and Comparison},
 are a very common kind of pattern.
 Regexp matching and nonmatching are also very common expressions.
-The left operand of the @samp{~} and @samp{!~} operators is a string.
-The right operand is either a constant regular expression enclosed in
-slashes (@code{/@var{regexp}/}), or any expression whose string value
-is used as a dynamic regular expression
-(@pxref{Computed Regexps}).
-The following example prints the second field of each input record
-whose first field is precisely @samp{li}:
-
-@cindex @code{/} (forward slash) @subentry patterns and
-@cindex forward slash (@code{/}) @subentry patterns and
-@cindex @code{~} (tilde), @code{~} operator
-@cindex tilde (@code{~}), @code{~} operator
-@cindex @code{!} (exclamation point) @subentry @code{!~} operator
-@cindex exclamation point (@code{!}) @subentry @code{!~} operator
-@example
-$ @kbd{awk '$1 == "li" @{ print $2 @}' mail-list}
-@end example
-
-@noindent
-(There is no output, because there is no person with the exact name @samp{li}.)
-Contrast this with the following regular expression match, which
-accepts any record with a first field that contains @samp{li}:
-
-@example
-$ @kbd{awk '$1 ~ /li/ @{ print $2 @}' mail-list}
-@print{} 555-5553
-@print{} 555-6699
-@end example
 
 @cindex regexp constants @subentry as patterns
 @cindex patterns @subentry regexp constants as
@@ -14448,6 +14420,21 @@ As a minor point of interest, although it is poor style,
 POSIX allows you to put a newline after the comma in
 a range pattern.  @value{DARKCORNER}
 
+@node Empty
+@subsection The Empty Pattern
+
+@cindex empty pattern
+@cindex patterns @subentry empty
+An empty (i.e., nonexistent) pattern is considered to match @emph{every}
+input record.  For example, the program:
+
+@example
+awk '@{ print $1 @}' mail-list
+@end example
+
+@noindent
+prints the first field of every record.
+
 @node BEGIN/END
 @subsection The @code{BEGIN} and @code{END} Special Patterns
 
@@ -14472,8 +14459,8 @@ programmers.
 
 @cindex @code{BEGIN} pattern
 @cindex @code{END} pattern
-A @code{BEGIN} rule is executed once only, before the first input record
-is read. Likewise, an @code{END} rule is executed once only, after all the
+A @code{BEGIN} rule executes once only, before the first input record
+is read. Likewise, an @code{END} rule executes once only, after all the
 input is read.  For example:
 
 @example
@@ -14487,47 +14474,41 @@ $ @kbd{awk '}
 
 @cindex @code{BEGIN} pattern @subentry operators and
 @cindex @code{END} pattern @subentry operators and
-This program finds the number of records in the input file @file{mail-list}
+This program finds the number of records in @file{mail-list}
 that contain the string @samp{li}.  The @code{BEGIN} rule prints a title
 for the report.  There is no need to use the @code{BEGIN} rule to
 initialize the counter @code{n} to zero, as @command{awk} does this
 automatically (@pxref{Variables}).
-The second rule increments the variable @code{n} every time a
+The second rule increments @code{n} every time a
 record containing the pattern @samp{li} is read.  The @code{END} rule
 prints the value of @code{n} at the end of the run.
 
 The special patterns @code{BEGIN} and @code{END} cannot be used in ranges
 or with Boolean operators (indeed, they cannot be used with any operators).
 An @command{awk} program may have multiple @code{BEGIN} and/or @code{END}
-rules.  They are executed in the order in which they appear: all the @code{BEGIN}
+rules.  They execute in the order in which they appear: all the @code{BEGIN}
 rules at startup and all the @code{END} rules at termination.
 
 @code{BEGIN} and @code{END} rules may be intermixed with other rules.
-This feature was added in the 1987 version of @command{awk} and is included
-in the POSIX standard.
-The original (1978) version of @command{awk}
-required the @code{BEGIN} rule to be placed at the beginning of the
-program, the @code{END} rule to be placed at the end, and only allowed one of
-each.
-This is no longer required, but it is a good idea to follow this template
-in terms of program organization and readability.
+In terms of program organization and readability,
+it is a good idea to place the @code{BEGIN} rule at the beginning of the
+program, and to place the @code{END} rule at the end.
 
 Multiple @code{BEGIN} and @code{END} rules are useful for writing
 library functions, because each library file can have its own @code{BEGIN} and/or
 @code{END} rule to do its own initialization and/or cleanup.
 The order in which library functions are named on the command line
-controls the order in which their @code{BEGIN} and @code{END} rules are
-executed.  Therefore, you have to be careful when writing such rules in
-library files so that the order in which they are executed doesn't matter.
+controls the order in which their @code{BEGIN} and @code{END} rules
+execute.  Therefore, you have to be careful when writing such rules in
+library files so that the order in which they execute doesn't matter.
 @xref{Options} for more information on
 using library functions.
 @xref{Library Functions},
 for a number of useful library functions.
 
 If an @command{awk} program has only @code{BEGIN} rules and no
-other rules, then the program exits after the @code{BEGIN} rules are
-run.@footnote{The original version of @command{awk} kept
-reading and ignoring input until the end of the file was seen.}  However, if an
+other rules, then the program exits after the @code{BEGIN} rules
+run.  However, if an
 @code{END} rule exists, then the input is read, even if there are
 no other rules in the program.  This is necessary in case the @code{END}
 rule checks the @code{FNR} and @code{NR} variables, or the fields.
@@ -14539,7 +14520,7 @@ rule checks the @code{FNR} and @code{NR} variables, or the fields.
 There are several (sometimes subtle) points to be aware of when doing I/O
 from a @code{BEGIN} or @code{END} rule.
 The first has to do with the value of @code{$0} in a @code{BEGIN}
-rule.  Because @code{BEGIN} rules are executed before any input is read,
+rule.  Because @code{BEGIN} rules execute before any input is read,
 there simply is no input record, and therefore no fields, when
 executing @code{BEGIN} rules.  References to @code{$0} and the fields
 yield a null string or zero, depending upon the context.  One way
@@ -14564,7 +14545,7 @@ is also preserved, although logically one would think that it should be.
 In fact, all of BWK @command{awk}, @command{mawk}, and @command{gawk}
 preserve the value of @code{$0} for use in @code{END} rules.  Be aware,
 however, that some other implementations and many older versions
-of Unix @command{awk} do not.
+of @command{awk} do not.
 
 The third point follows from the first two.  The meaning of @samp{print}
 inside a @code{BEGIN} or @code{END} rule is the same as always:
@@ -14581,9 +14562,9 @@ line is needed in the output, the program should print one explicitly.
 @cindex @code{BEGIN} pattern @subentry @code{next}/@code{nextfile} statements and
 @cindex @code{END} pattern @subentry @code{next}/@code{nextfile} statements and
 Finally, the @code{next} and @code{nextfile} statements are not allowed
-in a @code{BEGIN} rule, because the implicit
+in @code{BEGIN} rules, because the implicit
 read-a-record-and-match-against-the-rules loop has not started yet.  Similarly, those statements
-are not valid in an @code{END} rule, because all the input has been read.
+are not valid in @code{END} rules, because all the input has been read.
 (@xref{Next Statement} and
 @ifnotdocbook
 @pxref{Nextfile Statement}.)
@@ -14619,18 +14600,14 @@ As with the @code{BEGIN} and @code{END} rules
 @ifdocbook
 (see the previous section),
 @end ifdocbook
-@code{BEGINFILE} rules in a program execute in the order they are
-read by @command{gawk}. Similarly, all @code{ENDFILE} rules also execute in
-the order they are read.
+@code{BEGINFILE} and @code{ENDFILE} rules in a program execute in the order they are
+read by @command{gawk}.
 
 The bodies of the @code{BEGINFILE} rules execute just before
 @command{gawk} reads the first record from a file.  @code{FILENAME}
 is set to the name of the current file, and @code{FNR} is set to zero.
-
-Prior to version 5.1.1 of @command{gawk}, as an accident of the
-implementation, @code{$0} and the fields retained any previous values
-they had in @code{BEGINFILE} rules.  Starting with version
-5.1.1, @code{$0} and the fields are cleared, since no record has been
+Before executing a @code{BEGINFILE} rule, @command{gawk} clears
+@code{$0} and the fields, since no record has been
 read yet from the file that is about to be processed.
 
 The @code{BEGINFILE} rule provides you the opportunity to accomplish two tasks
@@ -14647,8 +14624,10 @@ command line.
 @cindex @code{ERRNO} variable @subentry with @code{BEGINFILE} pattern
 @cindex @code{nextfile} statement @subentry @code{BEGINFILE}/@code{ENDFILE} patterns and
 You do this by checking if the @code{ERRNO} variable is not the empty
-string; if so, then @command{gawk} was not able to open the file. In
-this case, your program can execute the @code{nextfile} statement
+string; if so, then @command{gawk} was not able to open the file.
+This makes it possible to catch and process I/O errors at the
+level of the @command{awk} program.
+In this case, your program can execute the @code{nextfile} statement
 (@pxref{Nextfile Statement}).  This causes @command{gawk} to skip
 the file entirely.  Otherwise, @command{gawk} exits with the usual
 fatal error.
@@ -14666,12 +14645,6 @@ the last record in an input file.  For the last input file,
 it will be called before any @code{END} rules.
 The @code{ENDFILE} rule is executed even for empty input files.
 
-Normally, when an error occurs when reading input in the normal
-input-processing loop, the error is fatal.  However, if a @code{BEGINFILE}
-rule is present, the error becomes non-fatal, and instead @code{ERRNO}
-is set.  This makes it possible to catch and process I/O errors at the
-level of the @command{awk} program.
-
 @cindex @code{next} statement @subentry @code{BEGINFILE}/@code{ENDFILE} patterns and
 The @code{next} statement (@pxref{Next Statement}) is not allowed inside
 either a @code{BEGINFILE} or an @code{ENDFILE} rule.  The @code{nextfile}
@@ -14686,21 +14659,6 @@ forms of @code{getline} are allowed.
 @code{BEGINFILE} and @code{ENDFILE} are @command{gawk} extensions.
 In most other @command{awk} implementations, or if @command{gawk} is in
 compatibility mode (@pxref{Options}), they are not special.
-
-@node Empty
-@subsection The Empty Pattern
-
-@cindex empty pattern
-@cindex patterns @subentry empty
-An empty (i.e., nonexistent) pattern is considered to match @emph{every}
-input record.  For example, the program:
-
-@example
-awk '@{ print $1 @}' mail-list
-@end example
-
-@noindent
-prints the first field of every record.
 
 @node Using Shell Variables
 @section Using Shell Variables in Programs
@@ -14718,7 +14676,7 @@ into the body of the @command{awk} program.
 @cindex shells @subentry quoting
 A common method is to use shell quoting to substitute
 the variable's value into the program inside the script.
-For example, consider the following program:
+For example, consider the following shell program:
 
 @example
 @group
@@ -14806,8 +14764,8 @@ all.  However, if you omit the action entirely, omit the braces as
 well.  An omitted action is equivalent to @samp{@{ print $0 @}}:
 
 @example
-/foo/  @{ @}     @ii{Match @code{foo}, do nothing --- empty action}
-/foo/          @ii{Match @code{foo}, print the record --- omitted action}
+/foo/  @{ @}     @ii{Empty action --- match @code{foo}, do nothing}
+/foo/          @ii{Omitted action --- match @code{foo}, print the record}
 @end example
 
 The following types of statements are supported in @command{awk}:
@@ -14884,11 +14842,11 @@ newlines or semicolons.
                                 condition is satisfied.
 * For Statement::               Another looping statement, that provides
                                 initialization and increment clauses.
-* Switch Statement::            Switch/case evaluation for conditional
-                                execution of statements based on a value.
 * Break Statement::             Immediately exit the innermost enclosing loop.
 * Continue Statement::          Skip to the end of the innermost enclosing
                                 loop.
+* Switch Statement::            Switch/case evaluation for conditional
+                                execution of statements based on a value.
 * Next Statement::              Stop processing the current input record.
 * Nextfile Statement::          Stop processing the current file.
 * Exit Statement::              Stop execution of @command{awk}.
@@ -14925,8 +14883,8 @@ else
 
 In this example, if the expression @samp{x % 2 == 0} is true (i.e.,
 if the value of @code{x} is evenly divisible by two), then the first
-@code{print} statement is executed; otherwise, the second @code{print}
-statement is executed.
+@code{print} statement executes; otherwise, the second @code{print}
+statement executes.
 If the @code{else} keyword appears on the same line as @var{then-body} and
 @var{then-body} is not a compound statement (i.e., not surrounded by
 braces), then a semicolon must separate @var{then-body} from
@@ -14952,7 +14910,7 @@ the first thing on its line.
 @cindex loops @seealso{@code{while} statement}
 
 In programming, a @dfn{loop} is a part of a program that can
-be executed two or more times in succession.
+execute two or more times in succession.
 The @code{while} statement is the simplest looping statement in
 @command{awk}.  It repeatedly executes a statement as long as a condition is
 true.  For example:
@@ -15163,6 +15121,139 @@ for (i in array)
 @xref{Scanning an Array}
 for more information on this version of the @code{for} loop.
 
+@node Break Statement
+@subsection The @code{break} Statement
+@cindex @code{break} statement
+@cindex loops @subentry exiting
+@cindex loops @subentry @code{break} statement and
+
+The @code{break} statement serves two purposes.
+One purpose is to break out of the
+@code{switch} statement.
+This is discussed in @ref{Switch Statement}.
+
+The other purpose is that it jumps out of the innermost @code{for},
+@code{while}, or @code{do} loop that encloses it.  The following example
+finds the smallest divisor of any integer, and also identifies prime
+numbers:
+
+@example
+@group
+# find smallest divisor of num
+@{
+    num = $1
+    for (divisor = 2; divisor * divisor <= num; divisor++) @{
+        if (num % divisor == 0)
+            break
+    @}
+@end group
+@group
+    if (num % divisor == 0)
+        printf "Smallest divisor of %d is %d\n", num, divisor
+    else
+        printf "%d is prime\n", num
+@}
+@end group
+@end example
+
+When the remainder is zero in the first @code{if} statement, @command{awk}
+immediately @dfn{breaks out} of the containing @code{for} loop.  This means
+that @command{awk} proceeds immediately to the statement following the loop
+and continues processing.  (This is very different from the @code{exit}
+statement, which stops the entire @command{awk} program.
+@xref{Exit Statement}.)
+
+The following program illustrates how the @var{condition} of a @code{for}
+or @code{while} statement could be replaced with a @code{break} inside
+an @code{if}:
+
+@example
+# find smallest divisor of num
+@{
+    num = $1
+    for (divisor = 2; ; divisor++) @{
+        if (num % divisor == 0) @{
+            printf "Smallest divisor of %d is %d\n", num, divisor
+            break
+        @}
+        if (divisor * divisor > num) @{
+            printf "%d is prime\n", num
+            break
+        @}
+    @}
+@}
+@end example
+
+Note that @code{break} breaks out of only the innermost
+enclosing statement. Thus a @code{break} inside a @code{switch} statement 
+inside a loop only breaks out of the @code{switch}.
+
+@cindex POSIX @command{awk} @subentry @code{break} statement and
+The @code{break} statement has no meaning when
+used outside the body of a loop or @code{switch}.
+Using it outside of a loop causes a syntax error.
+
+@node Continue Statement
+@subsection The @code{continue} Statement
+
+@cindex @code{continue} statement
+Similar to @code{break}, the @code{continue} statement is used only inside
+@code{for}, @code{while}, and @code{do} loops.  It skips
+over the rest of the loop body, causing the next cycle around the loop
+to begin immediately.  Contrast this with @code{break}, which jumps out
+of the loop altogether.
+
+The @code{continue} statement in a @code{for} loop directs @command{awk} to
+skip the rest of the body of the loop and resume execution with the
+@var{increment-expression} of the @code{for} statement.  The following program
+illustrates this fact:
+
+@example
+BEGIN @{
+     for (x = 0; x <= 20; x++) @{
+         if (x == 5)
+             continue
+         printf "%d ", x
+     @}
+     print ""
+@}
+@end example
+
+@noindent
+This program prints all the numbers from 0 to 20---except for 5, for
+which the @code{printf} is skipped.  Because the increment @samp{x++}
+is not skipped, @code{x} does not remain stuck at 5.  Contrast the
+@code{for} loop from the previous example with the following @code{while} loop:
+
+@example
+BEGIN @{
+     x = 0
+     while (x <= 20) @{
+         if (x == 5)
+             continue
+         printf "%d ", x
+         x++
+     @}
+     print ""
+@}
+@end example
+
+@noindent
+This program loops forever once @code{x} reaches 5, because
+the increment (@samp{x++}) is never reached.
+
+@c @cindex @code{continue}, outside of loops
+@c @cindex historical features
+@c @cindex @command{awk} language, POSIX version
+@cindex POSIX @command{awk} @subentry @code{continue} statement and
+@cindex dark corner @subentry @code{continue} statement
+@cindex @command{gawk} @subentry @code{continue} statement in
+@cindex Brian Kernighan's @command{awk}
+The @code{continue} statement has no special meaning with respect to the
+@code{switch} statement, nor does it have any meaning when used outside the
+body of a loop.
+Attempting the latter causes a syntax error.
+
 @node Switch Statement
 @subsection The @code{switch} Statement
 @cindex @code{switch} statement
@@ -15175,9 +15266,10 @@ If @command{gawk} is in compatibility mode (@pxref{Options}),
 it is not available.
 
 The @code{switch} statement allows the evaluation of an expression and
-the execution of statements based on a @code{case} match. Case statements
-are checked for a match in the order they are defined.  If no suitable
-@code{case} is found, the @code{default} section is executed, if supplied.
+the execution of statements based on a @code{case} match.
+@command{gawk} checks case statements
+for a match in the order they are defined.  If no suitable
+@code{case} is found, the @code{default} section executes, if supplied.
 
 Each @code{case} contains a single constant, be it numeric, string,
 or regexp.  The @code{switch} expression is evaluated, and then each
@@ -15237,170 +15329,14 @@ case, which is to call a function named @code{usage()}.
 (The @code{getopt()} function being called here is
 described in @ref{Getopt Function}.)
 
-@node Break Statement
-@subsection The @code{break} Statement
-@cindex @code{break} statement
-@cindex loops @subentry exiting
-@cindex loops @subentry @code{break} statement and
-
-The @code{break} statement serves two purposes.
-One purpose is to break out of the
-@code{switch} statement.
-This was discussed in @ref{Switch Statement}.
-
-The other purpose is that it jumps out of the innermost @code{for},
-@code{while}, or @code{do} loop that encloses it.  The following example
-finds the smallest divisor of any integer, and also identifies prime
-numbers:
-
-@example
-@group
-# find smallest divisor of num
-@{
-    num = $1
-    for (divisor = 2; divisor * divisor <= num; divisor++) @{
-        if (num % divisor == 0)
-            break
-    @}
-@end group
-@group
-    if (num % divisor == 0)
-        printf "Smallest divisor of %d is %d\n", num, divisor
-    else
-        printf "%d is prime\n", num
-@}
-@end group
-@end example
-
-When the remainder is zero in the first @code{if} statement, @command{awk}
-immediately @dfn{breaks out} of the containing @code{for} loop.  This means
-that @command{awk} proceeds immediately to the statement following the loop
-and continues processing.  (This is very different from the @code{exit}
-statement, which stops the entire @command{awk} program.
-@xref{Exit Statement}.)
-
-The following program illustrates how the @var{condition} of a @code{for}
-or @code{while} statement could be replaced with a @code{break} inside
-an @code{if}:
-
-@example
-# find smallest divisor of num
-@{
-    num = $1
-    for (divisor = 2; ; divisor++) @{
-        if (num % divisor == 0) @{
-            printf "Smallest divisor of %d is %d\n", num, divisor
-            break
-        @}
-        if (divisor * divisor > num) @{
-            printf "%d is prime\n", num
-            break
-        @}
-    @}
-@}
-@end example
-
-Note that @code{break} breaks out of only the innermost
-enclosing statement. Thus a @code{break} inside a @code{switch} statement 
-inside a loop only breaks out of the @code{switch}.
-
-@c @cindex @code{break}, outside of loops
-@c @cindex historical features
-@c @cindex @command{awk} language, POSIX version
-@cindex POSIX @command{awk} @subentry @code{break} statement and
-@cindex dark corner @subentry @code{break} statement
-@cindex @command{gawk} @subentry @code{break} statement in
-@cindex Brian Kernighan's @command{awk}
-The @code{break} statement has no meaning when
-used outside the body of a loop or @code{switch}.
-However, although it was never documented,
-historical implementations of @command{awk} treated the @code{break}
-statement outside of a loop as if it were a @code{next} statement
-(@pxref{Next Statement}).
-@value{DARKCORNER}
-Recent versions of BWK @command{awk} no longer allow this usage,
-nor does @command{gawk}.
-
-@node Continue Statement
-@subsection The @code{continue} Statement
-
-@cindex @code{continue} statement
-Similar to @code{break}, the @code{continue} statement is used only inside
-@code{for}, @code{while}, and @code{do} loops.  It skips
-over the rest of the loop body, causing the next cycle around the loop
-to begin immediately.  Contrast this with @code{break}, which jumps out
-of the loop altogether.
-
-The @code{continue} statement in a @code{for} loop directs @command{awk} to
-skip the rest of the body of the loop and resume execution with the
-increment-expression of the @code{for} statement.  The following program
-illustrates this fact:
-
-@example
-BEGIN @{
-     for (x = 0; x <= 20; x++) @{
-         if (x == 5)
-             continue
-         printf "%d ", x
-     @}
-     print ""
-@}
-@end example
-
-@noindent
-This program prints all the numbers from 0 to 20---except for 5, for
-which the @code{printf} is skipped.  Because the increment @samp{x++}
-is not skipped, @code{x} does not remain stuck at 5.  Contrast the
-@code{for} loop from the previous example with the following @code{while} loop:
-
-@example
-BEGIN @{
-     x = 0
-     while (x <= 20) @{
-         if (x == 5)
-             continue
-         printf "%d ", x
-         x++
-     @}
-     print ""
-@}
-@end example
-
-@noindent
-This program loops forever once @code{x} reaches 5, because
-the increment (@samp{x++}) is never reached.
-
-@c @cindex @code{continue}, outside of loops
-@c @cindex historical features
-@c @cindex @command{awk} language, POSIX version
-@cindex POSIX @command{awk} @subentry @code{continue} statement and
-@cindex dark corner @subentry @code{continue} statement
-@cindex @command{gawk} @subentry @code{continue} statement in
-@cindex Brian Kernighan's @command{awk}
-The @code{continue} statement has no special meaning with respect to the
-@code{switch} statement, nor does it have any meaning when used outside the
-body of a loop.  Historical versions of @command{awk} treated a @code{continue}
-statement outside a loop the same way they treated a @code{break}
-statement outside a loop: as if it were a @code{next}
-statement
-@ifset FOR_PRINT
-(discussed in the following section).
-@end ifset
-@ifclear FOR_PRINT
-(@pxref{Next Statement}).
-@end ifclear
-@value{DARKCORNER}
-Recent versions of BWK @command{awk} no longer work this way, nor
-does @command{gawk}.
-
 @node Next Statement
 @subsection The @code{next} Statement
 @cindex @code{next} statement
 
 The @code{next} statement forces @command{awk} to immediately stop processing
-the current record and go on to the next record.  This means that no
-further rules are executed for the current record, and the rest of the
-current rule's action isn't executed.
+the current record and go on to the next record.  This means that
+the rest of the current rule's action isn't executed, and that no further
+rules are executed for the current record,
 
 Contrast this with the effect of the @code{getline} function
 (@pxref{Getline}).  That also causes
@@ -15431,13 +15367,11 @@ NF != 4 @{
 @noindent
 Because of the @code{next} statement,
 the program's subsequent rules won't see the bad record.  The error
-message is redirected to the standard error output stream, as error
-messages should be.
-For more detail, see
-@ref{Special Files}.
+message is redirected to standard error, as error messages should be.
+(For more detail, see @ref{Special Files}.)
 
-If the @code{next} statement causes the end of the input to be reached,
-then the code in any @code{END} rules is executed.
+If the @code{next} statement reaches the end of the input,
+then the code in any @code{END} rules executes.
 @xref{BEGIN/END}.
 
 The @code{next} statement is not allowed inside @code{BEGINFILE} and
