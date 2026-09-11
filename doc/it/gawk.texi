@@ -2988,7 +2988,9 @@ La shell considera il secondo apice singolo come delimitatore del testo
 precedente, e trova che un nuovo testo tra apici ha inizio verso la fine
 della riga di comando.  A causa di ciò emette una richiesta secondaria di
 input, e si mette in attesa di ulteriore input.
-Usando BWK @command{awk}, se si chiude l'ulteriore stringa tra
+Usando BWK @command{awk}@footnote{In tutti gli esempi in questo
+@value{DOCUMENT}, @command{nawk} è chiamato BWK @command{awk}.},
+se si chiude l'ulteriore stringa tra
 apici singoli il risultato è il seguente:
 
 @example
@@ -12655,8 +12657,9 @@ doppi apici.  Per esempio:
 rappresenta la stringa il cui contenuto è la parola @samp{pappagallo}.
 Le stringhe in
 @command{gawk} possono essere di qualsiasi lunghezza, e possono contenere
-tutti i possibili caratteri ASCII a otto bit, compreso il carattere ASCII
-@sc{nul} (carattere con codice zero).
+qualsiasi carattere presente nell'insieme dei caratteri del sistema in uso
+(ASCII, EBCDIC, Unicode o altri insiemi), compreso il carattere ASCII
+@sc{nul} (uno o più byte contenenti zeri binari).
 Altre implementazioni di @command{awk} possono avere difficoltà con alcuni
 particolari codici di carattere.
 
@@ -12692,11 +12695,12 @@ messaggio di errore se si tenta di utilizzarlo.  Per esempio:
 $ @kbd{gawk 'BEGIN @{ print "ciao, }
 > @kbd{mondo" @}'}
 @print{} gawk: riga com.:1: BEGIN @{ print "ciao,
-@print{} gawk: riga com.:1:                ^ stringa non terminata
+@print{} gawk: riga com.:1:                ^ stringa non delimitata
 @print{} gawk: riga com.:1: BEGIN @{ print "ciao,
 @print{} gawk: riga com.:1:                ^ syntax error
 @end example
 
+@cindex BusyBox Awk
 @cindex angolo buio @subentry stringhe @subentry continuazione su più righe
 @cindex stringa @subentry continuazione su più righe
 @cindex differenze tra @command{awk} e @command{gawk} @subentry stringhe
@@ -12705,8 +12709,8 @@ protetto di avanzamento riga, come nell'esempio in linguaggio C
 visto sopra, tutte le versioni di @command{awk} consentono di
 farlo.  Sfortunatamente, quello che una particolare versione di
 @command{awk} fa con una tale stringa non è uniforme.
-@value{DARKCORNER} @command{gawk}, @command{mawk}, e
-OpenSolaris POSIX @command{awk} (@pxref{Altre versioni})
+@value{DARKCORNER} @command{gawk}, @command{mawk},
+BWK @command{awk} e BysyBox (@pxref{Altre versioni})
 tolgono sia la barra inversa che il carattere di
 avanzamento riga, come avviene nel linguaggio C:
 
@@ -12720,20 +12724,6 @@ $ @kbd{gawk 'BEGIN @{ print "ciao, \}
 In modalità POSIX (@pxref{Opzioni}), @command{gawk} non consente
 caratteri protetti di avanzamento riga.  Altrimenti, il
 comportamento è quello descritto sopra.
-
-BKW @command{awk}@footnote{In tutti gli esempi contenuti in
-questo @value{DOCUMENT}, il comando @command{nawk}
-richiama BWK @command{awk}.}
-e BusyBox @command{awk}
-tolgono la barra inversa, ma lasciano indisturbato il carattere
-di avanzamento riga, che fa quindi parte della stringa:
-
-@example
-$ @kbd{nawk 'BEGIN @{ print "ciao, \}
-> @kbd{mondo" @}'}
-@print{} ciao,
-@print{} mondo
-@end example
 
 @node Numeri non-decimali
 @subsubsection Numeri ottali ed esadecimali
@@ -12806,7 +12796,7 @@ si lavora con le funzioni predefinite di manipolazione di bit;
 vedere la @ref{Funzioni a livello di bit}
 per maggiori informazioni.
 
-Diversamente da alcune tra le prime implementazioni di C, @samp{8} e @samp{9}
+@samp{8} e @samp{9}
 non sono cifre valide nelle costanti ottali.  Per esempio, @command{gawk}
 tratta @samp{018} come un 18 decimale:
 
@@ -12828,7 +12818,7 @@ sia @samp{0x} che @samp{0X} possono essere usati, e le cifre
 esadecimali da @samp{a} ad @samp{f} possono essere sia maiuscole
 che minuscole.
 
-A partire dalla versione 5.4, @command{gawk} supporta i valori
+@command{gawk} supporta i valori
 in virgola mobile, espressi con notazione esadecimale, come costanti
 nel codice sorgente, come operandi nella funzione predefinita
 @code{strtonum()} e quando si specifica l'opzione
@@ -12981,10 +12971,6 @@ funzioni @code{gensub()}, @code{sub()}, e @code{gsub()}, come secondo argomento
 della funzione @code{match()},
 e come terzo argomento delle funzioni @code{split()} e @code{patsplit()}
 (@pxref{Funzioni per stringhe}).
-Le moderne implementazioni di @command{awk}, incluso @command{gawk}, permettono
-di usare come terzo argomento di @code{split()} una costante @dfn{regexp}, ma
-alcune implementazioni più vecchie non lo consentono.
-@value{DARKCORNER}
 Poiché alcune funzioni predefinite accettano costanti @dfn{regexp} come
 argomenti, può generare confusione l'uso di costanti @dfn{regexp} come
 argomenti di funzioni definite dall'utente
@@ -13140,8 +13126,8 @@ variabili il cui tipo è @dfn{regexp}.  Tali variabili possono essere passate
 a funzioni definite dall'utente, senza gli inconvenenti che si hanno usando
 espressioni regolari calcolate, a partire da stringhe o da costanti di tipo
 stringa.  Queste variabili possono anche essere passate utilizzando chiamate
-indirette a funzioni (@pxref{Chiamate indirette}) e alle funzioni predefinite
-che accettano costanti di tipo @dfn{regesp}.
+indirette a funzioni (@pxref{Chiamate indirette}) alle funzioni predefinite
+che accettano costanti di tipo @dfn{regexp}.
 
 Quando sono usate per effettuare conversioni numeriche, le variabili
 @dfn{regexp} fortemente tipizzate vengono convertite alla cifra zero.
@@ -13224,10 +13210,14 @@ Alle variabili in @command{awk} possono essere assegnati valori numerici o
 valori di stringa.  Il tipo di valore che una variabile contiene può cambiare
 durante la vita di un programma.  Per default, le variabili sono inizializzate
 alla stringa nulla, che vale zero se viene convertita in un numero.  Non c'è
-alcuna
-necessità di inizializzare esplicitamente una variabile in @command{awk},
+alcuna necessità di inizializzare esplicitamente una variabile in @command{awk},
 come invece occorre fare in C e nella maggior parte dei linguaggi
 tradizionali.
+
+@command{gawk} ha anche valori che sono costanti @dfn{regexp}
+@dfn{fortemente tipizzate}.
+A questo si accenna brevemente nella sezione seguente, e più in dettaglio in
+@ref{Costanti @dfn{regexp} forti}.
 
 @node Opzioni di assegnamento
 @subsubsection Assegnare una variabile dalla riga di comando
@@ -13303,12 +13293,12 @@ Le variabili assegnate sulla riga di comando (sia tramite l'opzione
 sono usate come numeri, viene effettuata la normale conversione automatica
 da stringhe a numeri, e ogni cosa ``funziona come deve''.
 
-Peraltro, @command{gawk} supporta variabili di tipo ``regexp''.
+Inoltre, @command{gawk} supporta variabili di tipo ``regexp''.
 Si possono assegnare valori a variabili di questo tipo usando la
 sintassi seguente:
 
 @example
-gawk -v 're1=@@/pippo|pluto/' '@dots{}' /percorso/al/file1 're2=@@/ciao|salve/' /percorso/al/file2
+gawk -v 're1=@@/pippo|pluto/' '@dots{}' file1 're2=@@/ciao|salve/' file2
 @end example
 
 @noindent
@@ -13408,22 +13398,6 @@ b = a ""
 @code{b} ha valore @code{"12"}, non @code{"12.00"}.
 @value{DARKCORNER}
 
-@cindex riquadro @subentry @command{awk} prima di POSIX usava @code{OFMT} per la conversione di stringhe
-@cartouche @command{awk} prima di POSIX usava @code{OFMT} per la conversione di stringhe
-@cindex POSIX @command{awk} @subentry @code{OFMT} (variabile)
-@cindex @code{OFMT} (variabile)
-@cindex portabilità @subentry nuovo @command{awk} vs.@: vecchio @command{awk}
-@cindex @command{awk} @subentry nuovo @command{awk} vs.@: vecchio @command{awk} @subentry variabile @code{OFMT}
-Prima dello standard POSIX, @command{awk} usava il valore di @code{OFMT} per
-convertire i numeri in stringhe.  @code{OFMT} specifica il formato di output da
-usare per la stampa dei numeri con @code{print}.  @code{CONVFMT} fu introdotto
-per separare la semantica della conversione dalla semantica della stampa.  Sia
-@code{CONVFMT} che @code{OFMT} hanno lo stesso valore di dafault:
-@code{"%.6g"}.  Nella stragrande maggioranza dei casi, i vecchi programmi di
-@command{awk} non cambiano questo comportamento.
-@xref{Print} per maggiori informazioni sull'istruzione @code{print}.
-@end cartouche
-
 @node Localizzazione e conversioni
 @subsubsection Le localizzazioni possono influire sulle conversioni
 
@@ -13452,7 +13426,7 @@ migliaia.  Di seguito sono riportati alcuni esempi che illustrano la differenza
 di comportamento, su un sistema GNU/Linux:
 
 @example
-$ @kbd{export POSIXLY_CORRECT=1}                        @ii{Forzare aderenza a standard POSIX}
+$ @kbd{export POSIXLY_CORRECT=1}      @ii{Forzare aderenza a standard POSIX}
 $ @kbd{gawk 'BEGIN @{ printf "%g\n", 3.1415927 @}'}
 @print{} 3.14159
 $ @kbd{LC_ALL=en_DK.utf-8 gawk 'BEGIN @{ printf "%g\n", 3.1415927 @}'}
@@ -13625,7 +13599,7 @@ b * int(a / b) + (a % b) == a
 @end example
 
 Un possibile effetto indesiderato di questa definizione di resto è che
-@samp{@var{x} % @var{y}} sia negativo se @var{x} è negativo.  Così:
+@samp{x % y} sia negativo se @code{x} è negativo.  Così:
 
 @example
 -17 % 8 = -1
@@ -13806,7 +13780,7 @@ Per esempio, si assegni il valore uno alla variabile @code{z}:
 z = 1
 @end example
 
-Dopo l'esecuzione di quest'espressione, la variabile @code{z} ha il valore
+Dopo aver eseguito quest'espressione, la variabile @code{z} ha il valore
 uno.  Qualsiasi precedente valore di @code{z} prima dell'assegnamento
 viene dimenticato.
 
@@ -14032,46 +14006,6 @@ Soltanto l'operatore  @samp{^=} è definito da POSIX.
 Per avere la massima portabilità, non usare l'operatore @samp{**=}.
 @end quotation
 
-@cindex riquadro @subentry Ambiguità sintattiche tra @samp{/=} e le espressioni regolari
-@cartouche Ambiguità sintattiche tra @samp{/=} e le espressioni regolari
-@cindex angolo buio @subentry costanti @dfn{regexp} @subentry operatore @code{/=} e
-@cindex @code{/} (barra) @subentry operatore @code{/=} @subentry vs.@: costante @dfn{regexp} @code{/=@dots{}/}
-@cindex barra (@code{/}) @subentry operatore @code{/=} @subentry vs.@: costante @dfn{regexp} @code{/=@dots{}/}
-@cindex @dfn{regexp} @subentry costanti @subentry @code{/=@dots{}/}, operatore @code{/=} e
-
-@c derived from email from  "Nelson H. F. Beebe" <beebe@math.utah.edu>
-@c Date: Mon, 1 Sep 1997 13:38:35 -0600 (MDT)
-
-@cindex angolo buio @subentry operatore @code{/=} vs.@: costante @dfn{regexp} @code{/=@dots{}/}
-@cindex ambiguità sintattica: operatore @code{/=} vs.@: costante @dfn{regexp} @code{/=@dots{}/}
-@cindex sintattica @subentry ambiguità: operatore @code{/=} vs.@: costante @dfn{regexp} @code{/=@dots{}/}
-@cindex @code{/=} (uguale) @subentry operatore vs.@: @code{/=@dots{}/} costante @dfn{regexp}
-@cindex uguale (@code{/=}) @subentry operatore vs.@: @code{/=@dots{}/} costante @dfn{regexp}
-C'è un'ambiguità sintattica tra l'operatore di assegnamento @code{/=}
-e le costanti @dfn{regexp} il cui primo carattere sia @samp{=}.
-@value{DARKCORNER}
-Questo è più evidente in alcune versioni commerciali di @command{awk}.
-Per esempio:
-
-@example
-$ @kbd{awk /==/ /dev/null}
-@error{} awk: syntax error at source line 1
-@error{}  context is
-@error{}         >>> /= <<<
-@error{} awk: bailing out at source line 1
-@end example
-
-@noindent
-Un espediente è:
-
-@example
-awk '/[=]=/' /dev/null
-@end example
-
-@command{gawk} non ha questo problema, e neppure lo hanno BWK @command{awk}
-e @command{mawk}.
-@end cartouche
-
 @node Operatori di incremento
 @subsection Operatori di incremento e di decremento
 
@@ -14149,14 +14083,10 @@ come valore dell'espressione.
 @item --@var{lvalue}
 Decrementa @var{lvalue},  restituendo il nuovo valore come
 valore dell'espressione.
-(Quest'espressione è come
-@samp{++@var{lvalue}}, ma invece di aggiungere, sottrae.)
 
 @item @var{lvalue}--
 Decrementa @var{lvalue}, restituendo il @emph{vecchio} valore di @var{lvalue}
 come valore dell'espressione.
-(Quest'espressione è come
-@samp{@var{lvalue}++}, ma invece di aggiungere, sottrae.)
 @end table
 
 @cindex riquadro @subentry Ordine di valutazione degli operatori
@@ -14390,7 +14320,7 @@ a stringa (@dfn{string}) o numero (@dfn{number}), e in seguito da stringa a
 numero o da numero a stringa, nel prosieguo del programma.
 (@command{gawk} prevede anche degli scalari di tipo espressione-regolare
 (@dfn{regexp}), ma per ora possiamo ignorarli;
-@pxref{Costanti @dfn{regexp} forti}.)
+@pxref{Costanti @dfn{regexp} forti}).
 
 Non si può fare molto con le variabili di tipo non-assegnato
 (@dfn{unassigned}), oltre a constatare che ancora non è stato loro
@@ -14758,6 +14688,8 @@ A meno che @code{b} non sia zero o la stringa nulla, la parte @code{if}
 del test ha sempre successo.  Poiché gli operatori sono molto simili,
 questo tipo di errore è molto difficile da individuare
 rileggendo il codice sorgente.
+Se si specifica l'opzione @option{--lint}, @command{gawk} emette un
+avviso quando un assegnamento viene usato come test di condizione.
 
 Il seguente elenco di espressioni illustra il tipo di confronti
 che @command{awk} effettua e il risultato di ciascun confronto:
@@ -14819,7 +14751,7 @@ x ~ /att/
 
 @noindent
 ha il valore uno se @code{x} contiene @samp{att}, come
-@code{"Oh, che matto che sono!"}.
+@code{Oh, che matto che sono!}.
 
 @cindex @code{~} (tilde) @subentry operatore @code{~}
 @cindex tilde (@code{~}) @subentry operatore @code{~}
@@ -14875,7 +14807,8 @@ $ @kbd{gawk --posix 'BEGIN @{ printf("ABC < abc = %s\n",}
 >                             @kbd{("ABC" < "abc" ? "TRUE" : "FALSE")) @}'}
 @print{} ABC < abc = FALSE
 @end example
-Fortunatamente, dal mese di agosto 2016, un confronto basato sull'ordine
+
+Fortunatamente, attualmente, un confronto basato sull'ordine
 di collazione locale non è più richiesto per gli operatori @code{==} e
 @code{!=}.@footnote{Si consulti il sito web
 @uref{https://austingroupbugs.net/view.php?id=1070,
@@ -14949,9 +14882,10 @@ if ($0 ~ /edu/ && $0 ~ /li/) print
 
 @cindex effetti collaterali @subentry operatori booleani
 La sottoespressione @var{booleano2} viene valutata solo se @var{booleano1}
-è vero.  Questo può comportare una differenza laddove @var{booleano2} contenga
-espressioni che hanno effetti collaterali. Nel caso di @samp{$0 ~ /pippo/ &&
-($2 == pluto++)}, la variabile @code{pluto} non viene incrementata se non c'è
+è vero.  Questo può anche fare differenza laddove @var{booleano2}
+contenga espressioni che hanno effetti collaterali.
+Nel caso di @samp{$0 ~ /pippo/ && ($2 == pluto++)},
+la variabile @code{pluto} non viene incrementata se non c'è
 nessuna sottostringa @samp{pippo} nel record.
 
 @item @var{booleano1} || @var{booleano2}
@@ -15472,7 +15406,7 @@ ricerca di corrispondenze tramite @dfn{regexp}, ma ora non è più così
 
 La localizzazione può influire sulla separazione dei record.  Per il caso
 normale di @samp{RS = "\n"}, la localizzazione è generalmente irrilevante.
-Per altri separatori di record di un solo carattere, impostare
+Per altri caratteri separatori di record di un solo byte, impostare
 la variabile d'ambiente @samp{LC_ALL=C}
 garantisce una migliore efficienza nella lettura dei record.  Altrimenti,
 @command{gawk} dovrebbe fare diverse chiamate di funzione, @emph{per ogni
@@ -15481,9 +15415,9 @@ carattere in input}, per determinare la fine del record.
 La localizzazione può influire sulla formattazione delle date e delle ore
 (@pxref{Funzioni di tempo}).  Per esempio, un modo comune per abbreviare la
 data 4 settembre 2015, negli Stati Uniti è ``9/4/15.''  In molti paesi
-dell'Europa, invece, l'abbreviazione è "4.9.15".  Quindi, la specifica di
-formato
-@code{%x} in una localizzazione @code{"US"} potrebbe produrre @samp{9/4/15},
+dell'Europa, invece, l'abbreviazione è "4.9.15".  Quindi, specificare
+il formato @code{%x} per @code{strftime()}
+in una localizzazione @code{"US"} potrebbe produrre @samp{9/4/15},
 mentre in una localizzazione @code{"EUROPA"}, potrebbe produrre @samp{4.9.15}.
 
 Secondo  POSIX, anche il confronto tra stringhe è influenzato dalla
@@ -46715,7 +46649,7 @@ protezione @samp{\x} è ora limitato a due.
 @xref{Sequenze di protezione}.
 
 @item
-Costanti @dfn{regexp} forti nella forma @samp{@@/@dots{}/}
+Costanti @dfn{regexp} fortemente tipizzate nella forma @samp{@@/@dots{}/}
 (@pxref{Costanti @dfn{regexp} forti}).
 
 @item
