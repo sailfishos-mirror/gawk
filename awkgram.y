@@ -669,7 +669,7 @@ statement
 		else
 			$$ = $1;
  	  }
-	| LEX_SWITCH '(' exp r_paren opt_nls l_brace case_statements opt_nls r_brace
+	| LEX_SWITCH '(' exp r_paren opt_nls l_brace case_statements opt_nls { break_allowed--; } r_brace
 	  {
 		INSTRUCTION *dflt, *curr = NULL, *cexp, *cstmt;
 		INSTRUCTION *ip, *nextc, *tbreak;
@@ -763,7 +763,7 @@ statement
 			$1->target_break = tbreak;
 			($1 + 1)->switch_start = cexp->nexti;
 			($1 + 1)->switch_end = cexp->lasti;
-			($1 + 1)->switch_end->comment = $9;
+			($1 + 1)->switch_end->comment = $10;
 		}
 		/* else
 			$1 is NULL */
@@ -774,7 +774,6 @@ statement
 			(void) list_append(cstmt, $8);
 		$$ = list_merge(ip, cstmt);
 
-		break_allowed--;
 		fix_break_continue(ip, tbreak, NULL);
 	  }
 	| LEX_WHILE '(' exp r_paren opt_nls statement
@@ -1059,9 +1058,6 @@ regular_loop:
 non_compound_stmt
 	: LEX_BREAK statement_term
 	  {
-		if (! break_allowed)
-			error_ln($1->source_line,
-				_("`break' is not allowed outside a loop or switch"));
 		$1->target_jmp = NULL;
 		$$ = list_create($1);
 		if ($2 != NULL)
@@ -1069,9 +1065,6 @@ non_compound_stmt
 	  }
 	| LEX_CONTINUE statement_term
 	  {
-		if (! continue_allowed)
-			error_ln($1->source_line,
-				_("`continue' is not allowed outside a loop"));
 		$1->target_jmp = NULL;
 		$$ = list_create($1);
 		if ($2 != NULL)
