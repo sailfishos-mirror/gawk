@@ -2080,12 +2080,12 @@ able to manage a collection of publicly available @command{awk} programs
 and I even solicited contributions.  Making things available on the Internet
 helps keep the @command{gawk} distribution down to manageable size.
 
-The initial collection of material, such as it is, is still available
-at @uref{ftp://ftp.freefriends.org/arnold/Awkstuff}.
-
 In the hopes of doing something broader, I acquired the
 @code{awklang.org} domain.  Late in 2017, a volunteer took on the task
 of managing it.
+
+My initial collection of material, such as it is, is still available
+at @uref{http://awklang.org/oldstuff/}.
 
 If you have written an interesting @command{awk} program that
 you would like to share with the rest of the world, please see
@@ -2228,6 +2228,10 @@ make up the current @command{gawk} ``crack portability team.''  Without
 their hard work and help, @command{gawk} would not be nearly the robust,
 portable program it is today.  It has been and continues to be a pleasure
 working with this team of fine people.
+
+Antonio Colombo, who maintains the Italian translation of this
+@value{DOCUMENT}, deserves special acknowledgement for
+helping keep the documentation clean and clear.
 
 Notable code and documentation contributions were made by
 a number of people. @xref{Contributors} for the full list.
@@ -20545,7 +20549,7 @@ it also enforces the second restriction.
 
 Local variables act like the empty string if referenced where a string
 value is required, and like zero if referenced where a numeric value
-is required. This is the same as the behavior of regular variables that have never been
+is required. This is the same behavior as for regular variables that have never been
 assigned a value.  (There is more to understand about local variables;
 @pxref{Dynamic Typing}.)
 
@@ -20672,29 +20676,6 @@ this program, using our function to format the results, prints:
   21.2
 @end example
 
-This function deletes all the elements in an array (recall that the
-extra whitespace signifies the start of the local variable list):
-
-@example
-@group
-function delarray(a,    i)
-@{
-    for (i in a)
-        delete a[i]
-@}
-@end group
-@end example
-
-When working with arrays, it is often necessary to delete all the elements
-in an array and start over with a new list of elements
-(@pxref{Delete}).
-Instead of having
-to repeat this loop everywhere that you need to clear out
-an array, your program can just call @code{delarray()}.
-(This guarantees portability.  The use of @samp{delete @var{array}} to delete
-the contents of an entire array is a relatively recent@footnote{Late in 2012.}
-addition to the POSIX standard.)
-
 The following is an example of a recursive function.  It takes a string
 as an input parameter and returns the string in reverse order.
 Recursive functions must always have a test that stops the recursion.
@@ -20721,6 +20702,61 @@ this way:
 $ @kbd{echo "Don't Panic!" |}
 > @kbd{gawk -e '@{ print rev($0) @}' -f rev.awk}
 @print{} !cinaP t'noD
+@end example
+
+Another example of a recursive function comes from high-school mathematics.
+The @dfn{factorial} of a number @var{N}, is defined as shown in @ref{table-factorial}:
+
+@float Table,table-factorial
+@caption{Definition of @var{factorial()}}
+@multitable @columnfractions .15 .30
+@headitem Value of N @tab Result
+@item @var{N} @value{LEQ} 0 @tab Error
+@item @var{N} = 1 @tab 1
+@item @var{N} > 1 @tab @var{N * factorial(N @minus{} 1)}
+@end multitable
+@end float
+
+@cindex @code{factorial()} user-defined function
+@cindex user-defined @subentry function @subentry @code{factorial()}
+For @code{factorial()}, the test that stops the recursion is if @var{N}
+equals one. Here's the code:
+
+@example
+# factorial --- print the factorial of N
+
+function factorial(n)
+@{
+    if (n <= 0)
+        return -1   # bad input
+
+    if (n == 1)
+        return n
+
+    return n * factorial(n - 1)
+@}
+
+@{ print factorial($0) @}
+@end example
+
+Here are the results of running this program with BWK @command{awk}
+and @command{gawk}:
+
+@example
+$ @kbd{nawk -f factorial.awk}
+@kbd{4}
+@print{} 24
+@kbd{3}
+@print{} 6
+@kbd{42}
+@print{} 1.40500611775287978877963579759e+51
+$ @kbd{gawk -f factorial.awk}
+@kbd{4}
+@print{} 24
+@kbd{3}
+@print{} 6
+@kbd{42}
+@print{} 1405006117752879788779635797590784832178972610527232
 @end example
 
 The C @code{ctime()} function takes a timestamp and returns it as a string,
@@ -20981,12 +21017,14 @@ function myfunc(str)
 @end group
 @end example
 
+@cindex shadowing, of variables
+@cindex variables @subentry shadowing of
 @noindent
 to change its first argument variable @code{str}, it does @emph{not}
 change the value of @code{foo} in the caller.  The role of @code{foo} in
 calling @code{myfunc()} ended when its value (@code{"bar"}) was computed.
-If @code{str} also exists outside of @code{myfunc()}, the function body
-cannot alter this outer value, because it is shadowed during the
+If a variable named @code{str} also exists outside of @code{myfunc()}, the function body
+cannot alter this outer value, because it is @dfn{shadowed} during the
 execution of @code{myfunc()} and cannot be seen or changed from there.
 
 @cindex call by reference
@@ -21082,7 +21120,7 @@ BEGIN @{
 
 Doing so is bad practice, however.  The called function cannot do
 anything with the additional values being passed to it, so @command{awk}
-evaluates the expressions but then just throws them away.
+evaluates the expressions but then just throws away the results.
 
 More importantly, such a call is confusing for whoever will next read your
 program.@footnote{Said person might even be you, sometime in the future,
@@ -21095,6 +21133,7 @@ to the function, when in fact they are not.
 Because this is such a bad practice, @command{gawk} @emph{unconditionally}
 issues a warning whenever it executes such a function call.  (If you
 don't like the warning, fix your code!  It's incorrect, after all.)
+BWK @command{awk} also warns, and @command{mawk} issues a fatal error message.
 
 @node Return Statement
 @subsection The @code{return} Statement
@@ -21133,6 +21172,9 @@ return ""
 
 @noindent
 which return an explicit null string.
+
+Most versions of @command{awk} issue a fatal error message
+if you use a @code{return} statement outside of a function body.
 
 Sometimes, you want to write a function for what it does, not for
 what it returns.  Such a function corresponds to a @code{void} function
@@ -21423,17 +21465,6 @@ $ @kbd{gawk 'BEGIN @{ print typeof(x["foo"]) @}'}
 @print{} untyped
 @end example
 
-Note that prior to version 5.2, array elements
-that come into existence simply by referencing them
-were different, they were automatically forced to be scalars:
-
-@example
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x) @}'}
-@print{} untyped
-$ @kbd{gawk-5.1.1 'BEGIN @{ print typeof(x["foo"]) @}'}
-@print{} unassigned
-@end example
-
 To sum up, variables and array elements get their nature (array or scalar)
 ``fixed'' upon first use.  This can lead to some weird cases, and it is
 best to avoid taking advantage of @command{gawk}'s dynamic nature, other
@@ -21442,6 +21473,8 @@ elements as function parameters.
 
 @node Shadowed Variables
 @section A Note On Shadowed Variables
+@cindex shadowing, of variables
+@cindex variables @subentry shadowing of
 
 @c Contributed by John Naman <gawker@gmail.com>, October 2024
 
@@ -21484,10 +21517,10 @@ function test(x,   foo)
 @item Solving complex shadowing problems
 The @command{gawk} namespace extension
 provides robust handling of potential name collisions with global 
-variables and functions (@pxref{Namespaces}). Namespaces 
+variables and functions. Namespaces 
 are useful to prevent shadowing by providing identifiers that are
 common to a group of functions and effectively shadowed from being
-referenced by global functions (See @code{FUNCTAB} in @ref{Auto-set}.)
+referenced by global functions (@pxref{Namespaces}).
 @end table
 
 Finally, a shadowing caveat: Variables local to a function are @emph{not}
@@ -21515,7 +21548,8 @@ For example, you may have different kinds of records, each of which
 should be processed differently.
 
 Normally, you would have to use a series of @code{if}-@code{else}
-statements to decide which function to call.  By using @dfn{indirect}
+statements (or a @code{switch} statement)
+to decide which function to call.  By using @dfn{indirect}
 function calls, you can specify the name of the function to call as a
 string variable, and then call the function.  Let's look at an example.
 
@@ -21864,7 +21898,7 @@ processing arrays. This is described in @ref{Walking Arrays}.
 
 Remember that you must supply a leading @samp{@@} in front of an indirect function call.
 
-Starting with version 4.1.2 of @command{gawk}, indirect function
+Indirect function
 calls may also be used with built-in functions and with extension functions
 (@pxref{Dynamic Extensions}). There are some limitations when calling
 built-in functions indirectly, as follows.
@@ -22064,7 +22098,7 @@ does not have a @file{/dev/stderr}, or if you cannot use @command{gawk}.
 @c 12/2000: Thanks to Nelson Beebe for pointing out the output issue.
 @cindex case sensitivity @subentry example programs
 @cindex @code{IGNORECASE} variable @subentry in example programs
-Finally, some of the programs choose to ignore upper- and lowercase
+Some of the programs choose to ignore upper- and lowercase
 distinctions in their input. They do so by assigning one to @code{IGNORECASE}.
 You can achieve almost the same effect@footnote{The effects are
 not identical.  Output of the transformed
@@ -22127,7 +22161,7 @@ name like @code{i} or @code{j} is not a good choice, because user programs
 often use variable names like these for their own purposes.
 
 @cindex programming conventions @subentry private variable names
-The example programs shown in this chapter all start the names of their
+Many of the example programs shown in this chapter start the names of their
 private variables with an underscore (@samp{_}).  Users generally don't use
 leading underscores in their variable names, so this convention immediately
 decreases the chances that the variable names will be accidentally shared
@@ -22192,7 +22226,7 @@ The conventions presented in this section are exactly
 that: conventions. You are not required to write your programs this
 way---we merely recommend that you do so.
 
-Beginning with version 5.0, @command{gawk} provides
+@command{gawk} provides
 a powerful mechanism for solving the problems described in this
 section: @dfn{namespaces}.  Namespaces and their use are described
 in detail in @ref{Namespaces}.
@@ -22372,7 +22406,7 @@ prog.c:5: assertion failed: a <= 5 && b >= 17.1
 @cindex user-defined @subentry function @subentry @code{assert()}
 The C language makes it possible to turn the condition into a string for use
 in printing the diagnostic message.  This is not possible in @command{awk}, so
-this @code{assert()} function also requires a string version of the condition
+our @code{assert()} function also requires a string version of the condition
 that is being tested.
 Following is the function:
 
@@ -22423,7 +22457,7 @@ The purpose of the test in the @code{END} rule is to
 keep any other @code{END} rules from running.  When an assertion fails, the
 program should exit immediately.
 If no assertions fail, then @code{_assert_exit} is still
-false when the @code{END} rule is run normally, and the rest of the
+false when the @code{END} rule runs normally, and the rest of the
 program's @code{END} rules execute.
 For all of this to work correctly, @file{assert.awk} must be the
 first source file read by @command{awk}.
@@ -22472,7 +22506,7 @@ with an @code{exit} statement.
 The way @code{printf} and @code{sprintf()}
 (@pxref{Printf})
 perform rounding often depends upon the system's C @code{sprintf()}
-subroutine.  On many machines, @code{sprintf()} rounding is @dfn{unbiased},
+subroutine.  On many systems, @code{sprintf()} rounding is @dfn{unbiased},
 which means it doesn't always round a trailing .5 up, contrary
 to naive expectations.  In unbiased rounding, .5 rounds to even,
 rather than always up, so 1.5 rounds to 2 but 4.5 rounds to 4.  This means
@@ -22640,10 +22674,6 @@ function _ord_init(    low, high, i, t)
     if (low == "\a") @{    # regular ascii
         low = 0
         high = 127
-    @} else if (sprintf("%c", 128 + 7) == "\a") @{
-        # ascii, mark parity
-        low = 128
-        high = 255
     @} else @{        # ebcdic(!)
         low = 0
         high = 255
@@ -22674,15 +22704,9 @@ defines characters that use the values from 0 to 127.@footnote{ASCII
 has been extended in many countries to use the values from 128 to 255
 for country-specific characters.  If your  system uses these extensions,
 you can simplify @code{_ord_init()} to loop from 0 to 255.}
-In the now distant past,
-at least one minicomputer manufacturer
-@c Pr1me, blech
-used ASCII, but with mark parity, meaning that the leftmost bit in the byte
-is always 1.  This means that on those systems, characters
-have numeric values from 128 to 255.
-Finally, large mainframe systems use the EBCDIC character set, which
+Large mainframe systems use the EBCDIC character set, which
 uses all 256 values.
-There are other character sets in use on some older systems, but
+There are other character sets that were used on some ancient systems, but
 they are not really worth worrying about:
 
 @example
@@ -22718,6 +22742,13 @@ An obvious improvement to these functions is to move the code for the
 written this way initially for ease of development.
 There is a ``test program'' in a @code{BEGIN} rule, to test the
 function.  It is commented out for production use.
+
+For a long time now, the world has been moving to the use of
+the @uref{https://www.unicode.org, Unicode character set}.
+The @command{awk} functions in this subsection don't work
+with Unicode, which is a multi-byte character set.
+With @command{gawk}, you can use the @code{ordchr} extension
+functions; see @ref{Extension Sample Ord}, for more information.
 
 @node Join Function
 @subsection Merging an Array into a String
@@ -22779,10 +22810,7 @@ value.  In this case, @code{join()} uses a single space as a default
 separator for the strings.  If the value is equal to @code{SUBSEP},
 then @code{join()} joins the strings with no separator between them.
 @code{SUBSEP} serves as a ``magic'' value to indicate that there should
-be no separation between the component strings.@footnote{It would
-be nice if @command{awk} had an assignment operator for concatenation.
-The lack of an explicit operator for concatenation makes string operations
-more difficult than they really need to be.}
+be no separation between the component strings.
 
 @node Getlocaltime Function
 @subsection Managing the Time of Day
@@ -22822,7 +22850,7 @@ time formatted in the same way as the @command{date} utility:
 
 # Returns a string in the format of output of date(1)
 # Populates the array argument time with individual values:
-#    time["second"]       -- seconds (0 - 59)
+#    time["second"]       -- seconds (0 - 60)
 #    time["minute"]       -- minutes (0 - 59)
 #    time["hour"]         -- hours (0 - 23)
 #    time["althour"]      -- hours (0 - 12)
@@ -22842,10 +22870,11 @@ time formatted in the same way as the @command{date} utility:
 #    time["weeknum"]      -- week number, Sunday first day
 #    time["altweeknum"]   -- week number, Monday first day
 
-function getlocaltime(time,    ret, now, i)
+function getlocaltime(time, now,    ret, i)
 @{
     # get time once, avoids unnecessary system calls
-    now = systime()
+    if (now == 0)   # no time was passed in
+        now = systime()
 
     # return date(1)-style output
     ret = strftime("%a %b %e %H:%M:%S %Z %Y", now)
@@ -22884,9 +22913,9 @@ The string indices are easier to use and read than the various formats
 required by @code{strftime()}.  The @code{alarm} program presented in
 @ref{Alarm Program}
 uses this function.
-A more general design for the @code{getlocaltime()} function would have
-allowed the user to supply an optional timestamp value to use instead
-of the current time.
+The parameter @code{now} is an optional timestamp value to use instead
+of the current time.  If it's not supplied, the function retrieves
+the current time via a call to @code{systime()}.
 
 @node Readfile Function
 @subsection Reading a Whole File at Once
@@ -23167,7 +23196,7 @@ function tocsv(fields, sep,     i, j, nfields, result)
 @end example
 
 The next function, @code{tocsv_rec()} is a wrapper around
-@code{tocsv()}. Its intended use is for when you want to convert the
+@code{tocsv()}. Use it when you want to convert the
 current input record to CSV format.  The function itself simply copies
 the fields into an array to pass to @code{tocsv()} which does the work.
 It accepts an optional separator character as its first parameter,
@@ -23349,8 +23378,8 @@ work with any POSIX-compliant version of @command{awk}.
 @subsection Rereading the Current File
 
 @cindex files @subentry reading
-Another request for a new built-in function was for a
-function that would make it possible to reread the current file.
+Another request for a new built-in function was for one
+that would make it possible to reread the current file.
 The requesting user didn't want to have to use @code{getline}
 (@pxref{Getline})
 inside a loop.
@@ -23670,7 +23699,7 @@ string that does not begin with @samp{-} ends the options.
 
 @cindex @code{getopt()} function (C library)
 @cindex C library functions @subentry @code{getopt()}
-Modern Unix systems provide a C function named @code{getopt()} for processing
+POSIX systems provide a C function named @code{getopt()} for processing
 command-line arguments.  The programmer provides a string describing the
 one-letter options. If an option requires an argument, it is followed in the
 string with a colon.  @code{getopt()} is also passed the
@@ -23876,15 +23905,15 @@ is a short option, we continue on:
 @c file eg/lib/getopt.awk
     if (argv[Optind] !~ /^--/) @{        # if this is a short option
         if (_opti == 0)
-            _opti = 2
-        thisopt = substr(argv[Optind], _opti, 1)
+            _opti = 2                   # starting point in string
+        thisopt = substr(argv[Optind], _opti, 1)    # current letter
         Optopt = thisopt
         i = index(options, thisopt)
-        if (i == 0) @{
+        if (i == 0) @{                   # unknown option
             if (Opterr)
                 printf("%c -- invalid option\n", thisopt) > "/dev/stderr"
             if (_opti >= length(argv[Optind])) @{
-                Optind++
+                Optind++                # move on to next ARGV element
                 _opti = 0
             @} else
                 _opti++
@@ -23992,7 +24021,8 @@ specification of long options allows an argument to an option
 @c endfile
 @end example
 
-Next, we try to find the current option in @code{longopts}.  The regular
+Next, we try to find the current option in @code{longopts}.
+Long options are separated with commas.  The regular
 expression given to @code{match()}, @code{@w{"(^|,)" thisopt "($|[,:])"}},
 matches this option at the beginning of @code{longopts}, or at the
 beginning of a subsequent long option (the previous long option would
@@ -24381,7 +24411,7 @@ or her own way of splitting records and fields.
 This makes it possible to restore the correct
 field-splitting mechanism later.  The test can only be true for
 @command{gawk}.  It is false if using @code{FS} or @code{FPAT},
-or on some other @command{awk} implementation.
+or on another @command{awk} implementation.
 
 The code that checks for using @code{FPAT}, using @code{using_fpat}
 and @code{PROCINFO["FS"]}, is similar.
@@ -24618,7 +24648,7 @@ we cast it to @code{long} for all cases.)
 
 @item Group Member List
 A comma-separated list of usernames.  These users are members of the group.
-Modern Unix systems allow users to be members of several groups
+POSIX systems allow users to be members of several groups
 simultaneously.  If your system does, then there are elements
 @code{"group1"} through @code{"group@var{N}"} in @code{PROCINFO}
 for those group ID numbers.
@@ -25054,7 +25084,7 @@ Two functions that traverse an array of arrays to any depth
 @item
 In @ref{Empty Files}, we presented the @file{zerofile.awk} program,
 which made use of @command{gawk}'s @code{ARGIND} variable.  Can this
-problem be solved without relying on @code{ARGIND}?  If so, how?
+problem be solved without relying on @code{ARGIND} or @code{ENDFILE}?  If so, how?
 
 @ignore
 # zerofile2.awk --- same thing, portably
@@ -25093,28 +25123,6 @@ END @{
 @item
 As a related challenge, revise that code to handle the case where
 an intervening value in @code{ARGV} is a variable assignment.
-
-@ignore
-@c June 13 2015: Antonio points out that this is answered in the text. Ooops.
-@item
-@ref{Walking Arrays} presented a function that walked a multidimensional
-array to print it out.  However, walking an array and processing
-each element is a general-purpose operation.  Generalize the
-@code{walk_array()} function by adding an additional parameter named
-@code{process}.
-
-Then, inside the loop, instead of printing the array element's index and
-value, use the indirect function call syntax (@pxref{Indirect Calls})
-on @code{process}, passing it the index and the value.
-
-When calling @code{walk_array()}, you would pass the name of a
-user-defined function that expects to receive an index and a value,
-and then processes the element.
-
-Test your new version by printing the array; you should end up with
-output identical to that of the original version.
-@end ignore
-
 @end enumerate
 @c EXCLUDE END
 
@@ -42425,8 +42433,13 @@ the three most widely used freely available versions of @command{awk}
 @item @code{func} keyword @tab X @tab @tab X @tab
 @item @code{nextfile} statement @tab X @tab X @tab X @tab X
 @item @code{RS} as regexp @tab X @tab X @tab X @tab
-@item Time-related functions @tab @tab X @tab X @tab
+@item Time-related functions @tab See text @tab X @tab X @tab
 @end multitable
+
+As a side note, the @code{bsd-features} branch of BWK @command{awk}'s
+@uref{https://github.com/onetrueawk/awk, GitHub repository}
+has the time-related functions, because several BSD
+distributions want them.
 
 @node Ranges and Locales
 @appendixsec Regexp Ranges and Locales: A Long Sad Story
