@@ -10150,7 +10150,7 @@ For @samp{%A},
 uppercase letters are used instead of lowercase ones.
 
 @quotation NOTE
-The current POSIX standard requires support for @samp{%a} and @samp{%A} in
+The POSIX standard requires support for @samp{%a} and @samp{%A} in
 @command{awk}. As far as we know, besides @command{gawk}, the only other
 version of @command{awk} that actually implements it is BWK @command{awk}.
 It's use is thus highly nonportable!
@@ -25329,7 +25329,7 @@ function (@pxref{Getopt Function})
 and the @code{join()} library function
 (@pxref{Join Function}).
 
-The current POSIX version of @command{cut} has options to cut fields based on
+The POSIX version of @command{cut} has options to cut fields based on
 both bytes and characters. This version does not attempt to implement those options,
 as @command{awk} works exclusively in terms of characters.
 
@@ -25526,6 +25526,7 @@ which is stuff in between the desired data.
 @code{flist} lists the fields to print, and @code{t} tracks the
 complete field list, including filler fields:
 
+@c FIXME: 9/26: See notes in printed copy
 @example
 @c file eg/prog/cut.awk
 function set_charlist(    field, i, j, f, g, n, m, t,
@@ -25671,6 +25672,9 @@ Ignore case distinctions in both the pattern and the input data.
 @item -l
 Only print (list) the names of the files that matched, not the lines that matched.
 
+@item -n
+Precede each output line with its line number in the file.
+
 @item -q
 Be quiet.  No output is produced and the exit value indicates whether
 the pattern was matched.
@@ -25697,7 +25701,7 @@ This version uses the @code{getopt()} library function
 The program begins with descriptive comments and then a @code{BEGIN} rule
 that processes the command-line arguments with @code{getopt()}.  The @option{-i}
 (ignore case) option is particularly easy with @command{gawk}; we just use the
-@code{IGNORECASE} predefined variable
+@code{IGNORECASE} variable
 (@pxref{Built-in Variables}):
 
 @cindex @file{egrep.awk} program
@@ -25856,16 +25860,6 @@ using the @samp{!} operator. We then increment @code{fcount} with the value of
 successful or unsuccessful match.  If the line does not match, the
 @code{next} statement just moves on to the next input line.
 
-We make a number of additional tests, but only if we
-are not counting lines.  First, if the user only wants the exit status
-(@code{no_print} is true), then it is enough to know that @emph{one}
-line in this file matched, and we can skip on to the next file with
-@code{nextfile}.  Similarly, if we are only printing @value{FN}s, we can
-print the @value{FN}, and then skip to the next file with @code{nextfile}.
-Finally, each line is printed, with a leading @value{FN},
-optional colon and line number, and the final colon
-if necessary:
-
 @cindex @code{!} (exclamation point) @subentry @code{!} operator
 @cindex exclamation point (@code{!}) @subentry @code{!} operator
 @example
@@ -25882,7 +25876,21 @@ if necessary:
 
     if (! matches)
         next
+@c endfile
+@end example
 
+We make a number of additional tests, but only if we
+are not counting lines.  First, if the user only wants the exit status
+(@code{no_print} is true), then it is enough to know that @emph{one}
+line in this file matched, and we can skip on to the next file with
+@code{nextfile}.  Similarly, if we are only printing @value{FN}s, we can
+print the @value{FN}, and then skip to the next file with @code{nextfile}.
+Finally, each line is printed, with a leading @value{FN},
+optional colon and line number, and the final colon
+if necessary:
+
+@example
+@c file eg/prog/egrep.awk
     if (! count_only) @{
         if (no_print)
             nextfile
@@ -25892,12 +25900,12 @@ if necessary:
             nextfile
         @}
 
-        if (do_filenames)
+        if (do_filenames) @{
             if (line_numbers)
                print FILENAME ":" FNR ":" $0
             else
                print FILENAME ":" $0
-        else
+        @} else
             print
     @}
 @}
@@ -26224,9 +26232,9 @@ Finally, we print the group set and the terminating newline:
 
 @example
 @c file eg/prog/id.awk
-    for (i = 1; i in groupset; i++) @{
-        if (i == 1)
+    if (1 in groupset)
             printf(" groups=")
+    for (i = 1; i in groupset; i++) @{
         group = groupset[i]
         printf("%d", group)
         pw = getgrgid(group)
@@ -26517,7 +26525,7 @@ element for each letter in the suffix.  Each element ranges from 1 to
 26, acting as the index into a string containing all the lowercase
 letters of the English alphabet.
 It is initialized by @code{init_suffix_data()}.
-@code{result} is built up one letter at a time, using each @code{substr()}.
+@code{result} is built up one letter at a time, using @code{substr()}.
 
 @item
 Prepare the data structures for the next time @code{compute_suffix()}
@@ -26897,8 +26905,8 @@ so that the @code{getopt()} function can parse the options:
 
 @example
 @c file eg/prog/uniq.awk
-# As of 2020, '+' can be used as the option character in addition to '-'
-# Previously allowed use of -N to skip fields and +N to skip
+# '+' can be used as the option character in addition to '-'
+# The previously allowed use of -N to skip fields and +N to skip
 # characters is no longer allowed, and not supported by this version.
 
 BEGIN @{
@@ -27019,7 +27027,7 @@ one line is seen, or if @command{uniq} is counting nonrepeated lines
 and only one line is seen, then the line is printed, and @code{count}
 is reset.
 
-Finally, similar logic is used in the @code{END} rule to print the final
+Finally, similar logic is used in the @code{END} rule to print the last
 line of input data:
 
 @example
@@ -27386,7 +27394,7 @@ The first two statements make sure that the line is all lowercase,
 so that, for example, ``The'' and ``the'' compare equal to each other.
 The next statement replaces nonalphanumeric and nonwhitespace characters
 with spaces, so that punctuation does not affect the comparison either.
-The characters are replaced with spaces so that formatting controls
+Why spaces? So that formatting controls
 don't create nonsense words (e.g., the Texinfo @samp{@@code@{NF@}}
 becomes @samp{codeNF} if punctuation is simply deleted).  The record is
 then resplit into fields, yielding just the actual words on the line,
@@ -28536,6 +28544,7 @@ Finally, the single rule handles the printing scheme outlined earlier,
 using @code{print} or @code{printf} as appropriate, depending upon the
 value of @code{RT}.
 
+@c FIXME: 9/2026: Need to decide if we want to keep this section
 @node Igawk Program
 @subsection An Easy Way to Use Library Functions
 
@@ -28801,9 +28810,7 @@ the @value{FN} is concatenated with the name of each directory in
 the path, and an attempt is made to open the generated @value{FN}.
 The only way to test if a file can be read in @command{awk} is to go
 ahead and try to read it with @code{getline}; this is what @code{pathto()}
-does.@footnote{On some very old versions of @command{awk}, the test
-@samp{getline junk < t} can loop forever if the file exists but is empty.}
-If the file can be read, it is closed and the @value{FN}
+does.  If the file can be read, it is closed and the @value{FN}
 is returned:
 
 @ignore
@@ -28820,10 +28827,7 @@ expand_prog='
 
 function pathto(file,    i, t, junk)
 @{
-    if (index(file, "/") != 0)
-        return file
-
-    if (file == "-")
+    if (index(file, "/") != 0 || file == "-")
         return file
 
     for (i = 1; i <= ndirs; i++) @{
@@ -29271,13 +29275,13 @@ Here is the program, @file{shortest-match.awk}:
 
 @c file eg/prog/shortest-match.awk
 BEGIN @{
-    text[1] = "aaaxxxzzz";
+    text[1] = "aaaxxxzzz"
         shortpat[1] = @@/x+?/
         longpat[1] = @@/x+/
-    text[2] = "aaaxxxyzzz";
+    text[2] = "aaaxxxyzzz"
         shortpat[2] = @@/x+?y/
         longpat[2] = @@/x+y/
-    text[3] = "aaaxxxxxxxxxxxxxxxxzzz";
+    text[3] = "aaaxxxxxxxxxxxxxxxxzzz"
         shortpat[3] = @@/(x+?)(x+)(x+?)(x+)/
         longpat[3] = @@/(x+)(x+)(x+)(x+)/
     text[4] = "aaaxyxxyxxyxzzz"
@@ -29401,20 +29405,6 @@ the patterns are separated by newlines. Or you may use the
 @option{-f} option to provide a file containing the patterns,
 one per line.
 Implement both of these features.
-
-@item
-The POSIX version of @command{id} takes options that control which
-information is printed.  Modify the @command{awk} version
-(@pxref{Id Program}) to accept the same arguments and perform in the
-same way.
-
-@item
-The @file{split.awk} program (@pxref{Split Program}) assumes
-that letters are contiguous in the character set,
-which isn't true for EBCDIC systems.
-Fix this problem.
-(Hint: Consider a different way to work through the alphabet,
-without relying on @code{ord()} and @code{chr()}.)
 
 @cindex Kernighan, Brian @subentry quotes
 @item
@@ -29544,10 +29534,13 @@ It contains the following chapters:
 @ref{Advanced Features}
 
 @item
+@ref{Debugger}
+
+@item
 @ref{Internationalization}
 
 @item
-@ref{Debugger}
+@ref{Namespaces}
 
 @item
 @ref{Arbitrary Precision Arithmetic}
@@ -29583,13 +29576,14 @@ to each other.
 First, we look at a command-line option that allows @command{gawk} to recognize
 nondecimal numbers in input data, not just in @command{awk}
 programs.
+Following that, we present a function for creating Boolean-typed values.
 Then, @command{gawk}'s special features for sorting arrays are presented.
 Next, two-way I/O, discussed briefly in earlier parts of this
 @value{DOCUMENT}, is described in full detail, along with the basics
 of TCP/IP networking.  We then see how @command{gawk}
 can @dfn{profile} an @command{awk} program, making it possible to tune
 it for performance.
-Next, we present an experimental feature that allows you to preserve
+Next, we present a feature that allows you to preserve
 the values of @command{awk} variables and arrays between runs of @command{gawk}.
 Finally, we discuss the philosophy behind @command{gawk}'s extension
 mechanism.
@@ -29607,6 +29601,11 @@ national languages.
 @item
 @ref{Debugger}, describes @command{gawk}'s built-in command-line
 debugger for debugging @command{awk} programs.
+
+@item
+@ref{Namespaces}, describes @command{gawk}'s facility for
+isolating library file functions and global variables from
+each other.
 
 @item
 @ref{Arbitrary Precision Arithmetic}, describes how you can use
@@ -29674,9 +29673,8 @@ $ @kbd{echo 0123 123 0x123 | gawk --non-decimal-data '}
 In @ref{Nondecimal-numbers}, we described how octal and hexadecimal values
 may be used in program source code to represent numeric values.
 That section also discussed hexadecimal floating-point values.
-
-As of version 5.4 of @command{gawk}, the @option{--non-decimal-data} option and
-the @code{strtonum()} function accept such values and convert them correctly.
+@command{gawk}'s @option{--non-decimal-data} option and
+@code{strtonum()} function accept such values and convert them correctly.
 For example:
 
 @example

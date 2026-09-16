@@ -22,8 +22,8 @@ function usage()
 # -u    only nonrepeated lines
 # -f n  skip n fields
 # -s n  skip n characters, skip fields first
-# As of 2020, '+' can be used as the option character in addition to '-'
-# Previously allowed use of -N to skip fields and +N to skip
+# '+' can be used as the option character in addition to '-'
+# The previously allowed use of -N to skip fields and +N to skip
 # characters is no longer allowed, and not supported by this version.
 
 BEGIN {
