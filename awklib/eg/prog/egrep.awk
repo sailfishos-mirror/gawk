@@ -88,7 +88,6 @@ ENDFILE {
 
     if (! matches)
         next
-
     if (! count_only) {
         if (no_print)
             nextfile
@@ -98,12 +97,12 @@ ENDFILE {
             nextfile
         }
 
-        if (do_filenames)
+        if (do_filenames) {
             if (line_numbers)
                print FILENAME ":" FNR ":" $0
             else
                print FILENAME ":" $0
-        else
+        } else
             print
     }
 }
