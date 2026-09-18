@@ -18190,7 +18190,6 @@ otherwise, return NaN (``not a number'') on IEEE 754 systems.
 Additionally, @command{gawk} prints a warning message when @code{x}
 is negative.
 
-@cindex Beebe, Nelson H.F.@:
 @cindexawkfunc{rand}
 @cindex random numbers @subentry @code{rand()}/@code{srand()} functions
 @item @code{rand()}
@@ -31624,21 +31623,39 @@ before or after the day in a date, local month abbreviations, and so on.
 All of the above.  (Not too useful in the context of @command{gettext}.)
 @end table
 
-@quotation NOTE
+@cindex sidebar @subentry Locale Environment Variables
+@cartouche Locale Environment Variables
+A number of environment variables affect how the C library and how
+the C @code{gettext()} function work.  For the C library
+(functions such as @code{isalpha()}), the list is as follows:
+
+@table @code
+@cindex @env{LC_ALL} environment variable
+@cindex environment variables @subentry @env{LC_ALL}
+@item LC_ALL
+If this variable is set, it overrides the settings for the
+other locale category variables.
+
+@cindex @env{LC__@var{xxx}} environment variables
+@cindex environment variables @subentry @env{LC__@var{xxx}}
+@item LC_@var{xxx}
+These are variables with the same names as the above-listed locale categories.
+They let you control the behavior for particular aspects of your program.
+They take effect if @env{LC_ALL} is @emph{not} set.
+
+@cindex @env{LANG} environment variable
+@cindex environment variables @subentry @env{LANG}
+@item LANG
+This variable provides the default locale to use if none of the
+@env{LC_@var{xxx}} variables are set.
+@end table
+
 @cindex @env{LANGUAGE} environment variable
 @cindex environment variables @subentry @env{LANGUAGE}
-As described in @ref{Locales}, environment variables with the same
-name as the locale categories (@env{LC_CTYPE}, @env{LC_ALL}, etc.)
-influence @command{gawk}'s behavior (and that of other utilities).
-
-Normally, these variables also affect how the @code{gettext} library
-finds translations.  However, the @env{LANGUAGE} environment variable
-overrides the @env{LC_@var{xxx}} variables. Many GNU/Linux systems
-may define this variable without your knowledge, causing @command{gawk}
-to not find the correct translations.  If this happens to you,
-look to see if @env{LANGUAGE} is defined, and if so, use the shell's
-@command{unset} command to remove it.
-@end quotation
+On systems using the GNU C library, if not in the @code{"C"} locale,
+the @env{LANGUAGE} environment variable, if set, is expected to provide a
+colon-separated list of locale names. @code{gettext()} attempts to
+find message translations in each of these locales in turn.
 
 @cindex @env{GAWK_LOCALE_DIR} environment variable
 @cindex environment variables @subentry @env{GAWK_LOCALE_DIR}
@@ -31646,12 +31663,13 @@ For testing translations of @command{gawk} itself, you can set
 the @env{GAWK_LOCALE_DIR} environment variable. See the documentation
 for the C @code{bindtextdomain()} function and also see
 @ref{Other Environment Variables}.
+@end cartouche
 
 @node Programmer i18n
 @section Internationalizing @command{awk} Programs
 @cindex @command{awk} programs @subentry internationalizing
 
-@command{gawk} provides the following variables for
+@command{gawk} provides the following language features for
 internationalization:
 
 @table @code
@@ -32182,14 +32200,14 @@ Thus, we check the value of @env{$LANGUAGE}:
 
 @example
 $ @kbd{echo $LANGUAGE}
-@print{} en_US.UTF-8
+@print{} en_US
 @end example
 
 @noindent
 We next make the directories:
 
 @example
-$ @kbd{mkdir en_US.UTF-8 en_US.UTF-8/LC_MESSAGES}
+$ @kbd{mkdir en_US en_US/LC_MESSAGES}
 @end example
 
 @cindex @code{.po} files @subentry converting to @code{.mo}
@@ -32208,7 +32226,7 @@ This file must be renamed and placed in the proper directory (using
 the @option{-o} option) so that @command{gawk} can find it:
 
 @example
-$ @kbd{msgfmt guide-mellow.po -o en_US.UTF-8/LC_MESSAGES/guide.mo}
+$ @kbd{msgfmt guide-mellow.po -o en_US/LC_MESSAGES/guide.mo}
 @end example
 
 Finally, we run the program to test it:
@@ -32247,9 +32265,6 @@ complete detail in
 @uref{https://www.gnu.org/software/gettext/manual/,
 @cite{GNU @command{gettext} utilities}}.)
 @end ifnotinfo
-As of this writing, the latest version of GNU @command{gettext} is
-@uref{ftp://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.gz,
-version 0.19.8.1}.
 
 If a translation of @command{gawk}'s messages exists,
 then @command{gawk} produces usage messages, warnings,
@@ -48786,3 +48801,4 @@ TODO:
 * Consider removing all the places where the title `Dr.' occurs.
 * Rethink the use of "pre-defined" and "built-in" with awk special variables.
 * Simplify the "Gory Details" subsection, keeping just the actual current rules.
+* Consider making the i18n chapter into an appendix, since nobody uses the feature.
