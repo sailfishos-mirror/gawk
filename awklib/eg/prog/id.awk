@@ -127,9 +127,9 @@ BEGIN {
         pw = getgrgid(egid)
         print_first_field(pw)
     }
-    for (i = 1; i in groupset; i++) {
-        if (i == 1)
+    if (1 in groupset)
             printf(" groups=")
+    for (i = 1; i in groupset; i++) {
         group = groupset[i]
         printf("%d", group)
         pw = getgrgid(group)
