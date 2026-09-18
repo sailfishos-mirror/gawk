@@ -756,14 +756,14 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         criterio di ricerca.
 * Intervalli::                          Specificare intervalli di record con i
                                         criteri di ricerca.
+* Vuoto::                               Il criterio di ricerca vuoto, che
+                                        corrisponde a ogni record.
 * BEGIN/END::                           Specificare regole di inizio e fine
                                         programma.
 * Usare BEGIN/END::                     Come e perché usare regole BEGIN/END.
 * I/O e BEGIN/END::                     Problemi di I/O nelle regole BEGIN/END.
 * BEGINFILE/ENDFILE::                   Due condizioni speciali per controlli
                                         avanzati.
-* Vuoto::                               Il criterio di ricerca vuoto, che
-                                        corrisponde a ogni record.
 * Usare variabili di shell::            Come usare variabili di shell in
                                         @command{awk}.
 * Panoramica sulle azioni::             Cosa costituisce un'azione.
@@ -779,13 +779,13 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Istruzione for::                      Un'altra istruzione iterativa, che
                                         permette di specificare clausole
                                         iniziali e di incremento.
-* Istruzione switch::                   Valutazione di quale insieme di
-                                        istruzioni eseguire, a seconda del
-                                        valore assunto da una variabile.
 * Istruzione break::                    Uscire subito dal ciclo più interno
                                         in cui ci si trova.
 * Istruzione continue::                 Andare alla fine del ciclo più interno
                                         in cui ci si trova.
+* Istruzione switch::                   Valutazione di quale insieme di
+                                        istruzioni eseguire, a seconda del
+                                        valore assunto da una variabile.
 * Istruzione next::                     Smettere di elaborare il record
                                         corrente.
 * Istruzione nextfile::                 Smettere di elaborare il file
@@ -2082,6 +2082,9 @@ tasti.
 Per amor di brevità, in questo @value{DOCUMENT}, la versione di Brian
 Kernighan di @command{awk} sarà citata come ``BWK @command{awk}.''
 (@xref{Altre versioni} per informazioni su questa e altre versioni.)
+In tutti gli esempi contenuti in questo @value{DOCUMENT}, quando si
+invoca @command{nawk}, si sta usando BWK @command{awk}.
+
 
 @ifset FOR_PRINT
 @quotation NOTA
@@ -2988,9 +2991,7 @@ La shell considera il secondo apice singolo come delimitatore del testo
 precedente, e trova che un nuovo testo tra apici ha inizio verso la fine
 della riga di comando.  A causa di ciò emette una richiesta secondaria di
 input, e si mette in attesa di ulteriore input.
-Usando BWK @command{awk}@footnote{In tutti gli esempi in questo
-@value{DOCUMENT}, @command{nawk} è chiamato BWK @command{awk}.},
-se si chiude l'ulteriore stringa tra
+Usando BWK @command{awk}, se si chiude l'ulteriore stringa tra
 apici singoli il risultato è il seguente:
 
 @example
@@ -8946,10 +8947,10 @@ La tabella
 
 Inoltre, ed è qui che la situazione si ingarbuglia, all'interno
 di un campo fra doppi apici è consentito anche inserire
-il carattere a-capo!
+il carattere ritorno-a-capo!
 Per gestire una tale situazione, quando sta trattando un file CSV
 @command{gawk} analizza il file in input alla ricerca di
-caratteri a-capo che non siano racchiusi fra doppi apici.
+caratteri ritorno-a-capo che non siano racchiusi fra doppi apici.
 Quindi, se si utilizza l'opzione @option{--csv}, il modo
 di gestire i record utilizzando la variabile @code{RS}
 (@pxref{Record}) non viene utilizzato per nulla. E lo stesso
@@ -12696,8 +12697,6 @@ $ @kbd{gawk 'BEGIN @{ print "ciao, }
 > @kbd{mondo" @}'}
 @print{} gawk: riga com.:1: BEGIN @{ print "ciao,
 @print{} gawk: riga com.:1:                ^ stringa non delimitata
-@print{} gawk: riga com.:1: BEGIN @{ print "ciao,
-@print{} gawk: riga com.:1:                ^ syntax error
 @end example
 
 @cindex BusyBox Awk
@@ -15517,10 +15516,10 @@ La localizzazione può influire sul formato dei dati in uscita da un programma
 @node Criteri di ricerca e azioni
 @chapter Criteri di ricerca, azioni e variabili
 @cindex criterio di ricerca
-@cindex @dfn{pattern} @seeentry{criteri di ricerca}
+@cindex @dfn{pattern} @seeentry{criterio di ricerca}
 @cindex espressioni @subentry di ricerca
 
-Come già visto, ogni istruzione @command{awk} consiste di un criterio di
+Come già visto, ogni regola @command{awk} consiste di un criterio di
 ricerca [@dfn{pattern}] a cui è associata un'azione.  Questo capitolo
 descrive come specificare criteri e azioni, cosa è possibile
 fare tramite le azioni e quali sono le variabili predefinite in
@@ -15554,10 +15553,10 @@ costruire qualcosa di utile.
                                         criterio di ricerca.
 * Intervalli::                  Coppie di espressioni regolari per
                                 delimitare una ricerca.
-* BEGIN/END::                   Specificare regole di inizio e fine programma.
-* BEGINFILE/ENDFILE::           Due condizioni speciali per controlli avanzati.
 * Vuoto::                       Il criterio di ricerca vuoto, che
                                 corrisponde a ogni record.
+* BEGIN/END::                   Specificare regole di inizio e fine programma.
+* BEGINFILE/ENDFILE::           Due condizioni speciali per controlli avanzati.
 @end menu
 
 @cindex criterio di ricerca @subentry tipi di
@@ -15570,8 +15569,8 @@ La tabella seguente è un sommario dei tipi di criteri di ricerca in
 
 @table @code
 @item /@var{espressione regolare}/
-Un'espressione regolare.  È verificata quando il testo di un
-record in input corrisponde all'espressione regolare.
+Un'espressione regolare.  È verificata per un record in input quando
+il testo di quel record corrisponde all'espressione regolare.
 @iftex
 (@xrefIl{Espressioni regolari}.)
 @end iftex
@@ -15653,35 +15652,8 @@ in
 @end ifnottex
 @ref{Tipi di variabile e confronti},
 sono un tipo di criterio di ricerca usato frequentemente.
-Anche le @dfn{regexp}, verificate o non verificate, sono tipi di espressioni molto frequenti.
-L'operando a sinistra degli operatori @samp{~} e @samp{!~} è una stringa.
-L'operando di destra è un'espressione regolare costante delimitata da
-barre (@code{/@var{@dfn{regexp}}/}) o qualsiasi espressione il cui valore come
-stringa è usato come un'espressione regolare dinamica
-(@pxref{Espressioni regolari calcolate}).
-L'esempio seguente stampa il secondo campo di ogni record in input
-il cui primo campo sia esattamente @samp{li}:
-
-@cindex @code{/} (barra) @subentry criteri di ricerca e
-@cindex barra (@code{/}) @subentry criteri di ricerca e
-@cindex @code{~} (tilde) @subentry operatore @code{~}
-@cindex tilde (@code{~}) @subentry operatore @code{~}
-@cindex @code{!} (punto esclamativo) @subentry operatore @code{!~}
-@cindex punto esclamativo (@code{!}) @subentry operatore @code{!~}
-@example
-$ @kbd{awk '$1 == "li" @{ print $2 @}' mail-list}
-@end example
-
-@noindent
-(Il programma non stampa alcun output, perché nessuna persona ha come nome esattamente @samp{li}.)
-Vedere la differenza con il seguente confronto di espressione regolare, che
-individua invece qualsiasi record il cui primo campo @emph{contenga} @samp{li}:
-
-@example
-$ @kbd{awk '$1 ~ /li/ @{ print $2 @}' mail-list}
-@print{} 555-5553
-@print{} 555-6699
-@end example
+Anche le @dfn{regexp}, verificate o non verificate,
+sono tipi di espressioni molto frequenti.
 
 @cindex @dfn{regexp} @subentry costanti @subentry come criteri di ricerca
 @cindex criterio di ricerca @subentry costanti @dfn{regexp} come
@@ -15863,6 +15835,22 @@ $ @kbd{echo Yes | gawk '(/1/,/2/) || /Yes/'}
 Come punto di secondaria importanza, nonostante sia stilisticamente poco elegante,
 lo standard POSIX consente di andare a capo dopo la virgola
 in un intervallo di ricerca.  @value{DARKCORNER}
+
+@node Vuoto
+@subsection Il criterio di ricerca vuoto
+
+@cindex vuoto @subentry criterio di ricerca
+@cindex criterio di ricerca @subentry vuoto
+Un criterio di ricerca vuoto (cioè omesso) corrisponde a
+@emph{ogni} record in input.  Per esempio, il programma:
+
+@example
+awk '@{ print $1 @}' mail-list
+@end example
+
+@noindent
+stampa il primo campo di ogni record.
+
 @node BEGIN/END
 @subsection I criteri di ricerca speciali @code{BEGIN} ed @code{END}
 
@@ -15909,13 +15897,13 @@ $ @kbd{awk '}
 @cindex @code{BEGIN} (regola) @subentry operatori e
 @cindex @code{END} (regola) @subentry operatori e
 @cindex regola @subentry @code{END} @subentry operatori e
-Questo programma trova il numero di record nel file in input
+Questo programma trova il numero di record nel file
 @file{mail-list} che contengono la stringa @samp{li}.  La regola @code{BEGIN}
 stampa un titolo per il rapporto.  Non c'è bisogno di usare la regola
 @code{BEGIN} per inizializzare il contatore @code{n} a zero, poiché
 @command{awk} lo fa
 automaticamente (@pxref{Variabili}).
-La seconda regola incrementa la variabile @code{n} ogni volta che si legge
+La seconda regola incrementa @code{n} ogni volta che si legge
 un record che soddisfa il criterio di ricerca @samp{li}.  La regola @code{END}
 stampa il valore di @code{n} alla fine del programma.
 
@@ -15930,13 +15918,9 @@ a fine programma.
 
 Le regole @code{BEGIN} ed @code{END} possono apparire in qualsiasi
 posizione all'interno del programma.
-Questa funzionalità è stata aggiunta nella versione 1987 di @command{awk} ed
-è inclusa nello standard POSIX.
-La versione originale (1978) di @command{awk} richiedeva che la regola
-@code{BEGIN} fosse posta all'inizio del programma, e la regola
-@code{END} alla fine del programma, e solo una regola per tipo era ammessa.
-Ciò non è più obbligatorio, ma è una buona idea continuare a seguire questo
-modello per migliorare l'organizzazione e la leggibilità del programma.
+Dal punto di vista dell'organizzazione del programma e della leggibilità,
+è una buona idea quella di posizionare le regole @code{BEGIN} all'inizio
+del programma, e le regole @code{END} alla fine del programma.
 
 Regole multiple @code{BEGIN} ed @code{END} sono utili per scrivere funzioni
 di libreria, poiché ogni file di una libreria può avere la sua propria
@@ -15957,14 +15941,12 @@ l'ordine in cui tali regole vengono eseguite.
 per parecchie utili funzioni di libreria.
 
 Se un programma @command{awk} ha solo regole @code{BEGIN} e nessun'altra
-regola, il programma esce dopo aver eseguito le regole
-@code{BEGIN}.@footnote{La versione originale di @command{awk} continuava a
-leggere e ignorare i record in input fino alla fine-file.}  Tuttavia, se
-una regola @code{END} esiste, l'intero input è letto, anche se non sono
-presenti altre regole nel programma.  Ciò viene fatto necessariamente
+regola, il programma esce dopo aver eseguito le regole @code{BEGIN}.
+Tuttavia, se una regola @code{END} esiste, l'intero input è letto, anche
+se ci sono altre regole nel programma.  Ciò viene fatto necessariamente
 per permettere che
 la regola @code{END} faccia uso delle variabili @code{FNR} e @code{NR},
-o i campi [dell'ultimo record in input].
+o dei campi [dell'ultimo record in input].
 
 @node I/O e BEGIN/END
 @subsubsection Input/Output dalle regole @code{BEGIN} ed @code{END}
@@ -15978,7 +15960,7 @@ input, non c'è assolutamente alcun record in input, e quindi nessun campo,
 quando si eseguono delle regole @code{BEGIN}.  I riferimento a @code{$0} e ai
 campi restituiscono una stringa nulla o zero, a seconda del contesto.
 Un modo per assegnare un valore effettivo a @code{$0} è di eseguire una
-funzione @code{getline} senza indicare una variabile (@pxref{Getline}).
+funzione @code{getline} senza specificare una variabile (@pxref{Getline}).
 Un altro modo è semplicemente quello di assegnare un valore a @code{$0}.
 
 @cindex Brian Kernighan @subentry @command{awk} di
@@ -15998,8 +15980,8 @@ disponibile anche @code{$0}, sebbene possa apparire logico che sia così.
 In effetti, BWK @command{awk}, @command{mawk} e @command{gawk} mantengono il
 valore di @code{$0} in modo che sia possibile usarlo all'interno delle regole
 @code{END}.  Occorre peraltro tener presente che alcune altre implementazioni
-e parecchie tra le versioni più vecchie di Unix @command{awk} non si
-comportano così.
+e parecchie tra le versioni più vecchie di @command{awk} non si comportano
+così.
 
 Il terzo punto è una conseguenza dei primi due.  Il significato di
 @samp{print}
@@ -16019,9 +16001,9 @@ una esplicitamente.
 @cindex @code{BEGIN} (regola) @subentry istruzioni @code{next}/@code{nextfile} e
 @cindex @code{END} (regola) @subentry istruzioni @code{next}/@code{nextfile} e
 Per finire, le istruzioni @code{next} e @code{nextfile} non sono consentite
-all'interno di una regola @code{BEGIN}, perché il ciclo implicito
+all'interno delle regole @code{BEGIN}, perché il ciclo implicito
 leggi-un-record-e-confrontalo-con-le-regole non è ancora iniziato.
-Analogamente, tali istruzioni non sono valide all'interno di una regola
+Analogamente, tali istruzioni non sono valide all'interno delle regole
 @code{END}, perché tutto l'input è già stato letto.
 (@xref{Istruzione next} e
 @ifnotdocbook
@@ -16061,20 +16043,16 @@ Come con le regole @code{BEGIN} ed @code{END}
 @ifdocbook
 (vedere la sezione precedente),
 @end ifdocbook
-le regole @code{BEGINFILE} in un programma sono eseguite
-nell'ordine in cui sono lette da @command{gawk} e lo stesso viene fatto
-per tutte le regole @code{ENDFILE}.
+le regole @code{BEGINFILE} ed @code{ENDFILE} in un programma sono eseguite
+nell'ordine in cui sono lette da @command{gawk}.
 
 I codici delle regole @code{BEGINFILE} sono eseguiti subito prima che
 @command{gawk} legga il primo record da un file.  La variabile @code{FILENAME}
 è impostata al nome del file corrente e @code{FNR} è impostata a zero.
 
-Prima della versione 5.1.1 di @command{gawk}, per un difetto di
-implementazione, @code{$0} e i campi del record mantenevano nelle regole
-@code{BEGINFILE} il valore che avevano in precedenza.
-A partire dalla versione 5.1.1, sia @code{$0} che i campi del
-record sono impostati alla stringa nulla, poiché nessun record è
-ancora stato letto dal file che sta per essere di essere elaborato.
+Prima di eseguire una regola @code{BEGINFILE}, @command{gawk} azzera
+@code{$0} e i campi, perché non è ancora stato letto alcun record dal
+file che sta per essere elaborato.
 
 La regola @code{BEGINFILE} dà la possibilità di eseguire due compiti
 che sarebbe difficile o impossibile effettuare altrimenti:
@@ -16083,20 +16061,20 @@ che sarebbe difficile o impossibile effettuare altrimenti:
 @item
 Si può verificare che il file sia leggibile.  Di solito, se un file presente
 nella riga dei comandi non può essere aperto in lettura, il programma
-@command{gawk} viene terminato.  Comunque, questo si può evitare, per poi
+@command{gawk} viene terminato.  Comunque, è possibile evitarlo, per poi
 passare a elaborare il file successivo specificato sulla riga dei comandi.
 
 @cindex @command{gawk} @subentry variabile @subentry @code{ERRNO} in
 @cindex @code{ERRNO} (variabile) @subentry con criterio di ricerca @code{BEGINFILE}
 @cindex @code{nextfile} (istruzione) @subentry criteri di ricerca @code{BEGINFILE}/@code{ENDFILE} e
-Questo controllo è fattibile controllando se la variabile @code{ERRNO} è
-diversa dalla stringa nulla; se è questo il caso, @command{gawk} non è
-riuscito ad aprire il file.  In questo caso il programma può eseguire
-un'istruzione @code{nextfile}
-(@pxref{Istruzione nextfile}).  In questo modo @command{gawk} salta
-completamente l'elaborazione di quel file.
-In caso contrario, @command{gawk} termina come al solito con un
-errore fatale.
+Per far questo, occorre controllare se la variabile @code{ERRNO} è
+diversa dalla stringa nulla; in tal caso, @command{gawk} non è
+in grado di aprire il file.  In questo modo è possibile intercettare e
+gestire errori di I/O a livello del programma @command{gawk}.
+In tale situazione il programma può eseguire un'istruzione @code{nextfile}
+(@pxref{Istruzione nextfile}).  In questo modo @command{gawk} non effettua
+alcun elaborazione di quel file.
+Altrimenti, @command{gawk} termina come al solito con un errore fatale.
 
 @item
 Se sono state scritte estensioni che modificano la gestione del record
@@ -16112,13 +16090,6 @@ elaborare l'ultimo record di un file in input.  Per l'ultimo file in input,
 è chiamata prima di ogni regola @code{END}.
 La regola @code{ENDFILE} è eseguita anche per file in input vuoti.
 
-Normalmente, se si verifica un errore di lettura durante il normale
-ciclo di elaborazione dell'input,
-questo è considerato fatale (il programma termina).  Tuttavia, se è presente
-una regola @code{BEGINFILE}, l'errore non è considerato fatale, ma viene
-impostato @code{ERRNO}.  Ciò permette di intercettare ed elaborare errori
-di I/O a livello di programma @command{awk}.
-
 @cindex @code{next} (istruzione) @subentry criteri di ricerca @code{BEGINFILE}/@code{ENDFILE} e
 L'istruzione @code{next} (@pxref{Istruzione next}) non è permessa all'interno
 di una regola @code{BEGINFILE} o @code{ENDFILE}.  L'istruzione @code{nextfile}
@@ -16133,21 +16104,6 @@ di @code{getline} sono permesse.
 @code{BEGINFILE} ed @code{ENDFILE} sono estensioni @command{gawk}.
 In molte altre implementazioni di @command{awk} o se @command{gawk} è in
 modalità compatibile (@pxref{Opzioni}), non sono regole speciali.
-
-@node Vuoto
-@subsection Il criterio di ricerca vuoto
-
-@cindex vuoti @subentry criteri di ricerca
-@cindex criterio di ricerca @subentry vuoto
-Un criterio di ricerca vuoto (cioè omesso) corrisponde a
-@emph{ogni} record in input.  Per esempio, il programma:
-
-@example
-awk '@{ print $1 @}' mail-list
-@end example
-
-@noindent
-stampa il primo campo di ogni record.
 
 @node Usare variabili di shell
 @section Usare variabili di shell in programmi
@@ -16165,9 +16121,9 @@ all'interno di un programma @command{awk}.
 
 @cindex shell @subentry uso di doppio apice nella
 Un modo comune è quello di usare i doppi apici per sostituire il valore della
-variabile nel progamma @command{awk} contenuto nello @dfn{script}:
+variabile nel programma @command{awk} contenuto nello @dfn{script}:
 
-Per esempio, si consideri il programma seguente:
+Per esempio, si consideri il programma di shell seguente:
 
 @example
 @group
@@ -16263,8 +16219,8 @@ parentesi graffe.  Un'azione omessa equivale a specificare
 @samp{@{ print $0 @}}:
 
 @example
-/pippo/  @{ @}     @ii{Se si trova @code{pippo}, non fare nulla --- azione vuota}
-/pippo/          @ii{Se si trova @code{pippo}, stampa il record --- azione omessa}
+/pippo/  @{ @}     @ii{Azione vuota --- se si trova @code{pippo}, non fare nulla}
+/pippo/          @ii{Azione omessa --- se si trova @code{pippo}, stampare il record}
 @end example
 
 I seguenti tipi di istruzione sono disponibili in @command{awk}:
@@ -16356,13 +16312,13 @@ loro con dei ritorni a capo o dei punti e virgola.
 * Istruzione for::              Un'altra istruzione iterativa, che
                                 permette di specificare clausole
                                 iniziali e di incremento.
-* Istruzione switch ::           Valutazione di quale insieme di
-                                 istruzioni eseguire, a seconda del
-                                 valore assunto da una variabile.
 * Istruzione break::             Uscire subito dal ciclo più interno
                                  in cui ci si trova.
 * Istruzione continue::          Andare alla fine del ciclo più interno
                                  in cui ci si trova.
+* Istruzione switch ::           Valutazione di quale insieme di
+                                 istruzioni eseguire, a seconda del
+                                 valore assunto da una variabile.
 * Istruzione next::              Smettere di elaborare il record corrente.
 * Istruzione nextfile::          Smettere di elaborare il file corrente.
 * Istruzione exit::              Interrompere l'esecuzione di @command{awk}.
@@ -16402,8 +16358,8 @@ else
 
 In questo esempio, se l'espressione @samp{x % 2 == 0} è vera (cioè,
 se il valore di @code{x} è esattamente divisibile per due), allora viene
-eseguita la prima istruzione
-@code{print}; altrimenti, viene eseguita la seconda istruzione @code{print}.
+eseguita la prima istruzione @code{print};
+altrimenti, viene eseguita la seconda istruzione @code{print}.
 Se la parola chiave @code{else} sta sulla stessa riga di @var{se-vera-fai}
 e se @var{se-vera-fai} non è un'istruzione composta (cioè, non è racchiusa
 tra parentesi graffe), allora un punto e virgola deve separare
@@ -16657,100 +16613,6 @@ for (i in vettore)
 @xref{Visitare un intero vettore}
 per maggiori informazioni su questa versione del ciclo @code{for}.
 
-@node Istruzione switch
-@subsection L'istruzione @code{switch}
-@cindex @code{switch} (istruzione)
-@cindex @code{case} @subentry parola chiave
-@cindex @code{case} @seealso{@code{switch} (istruzione)}
-@cindex parola @subentry chiave @code{case}
-@cindex @code{default} @subentry parola chiave
-@cindex @code{default} @seealso{@code{switch} (istruzione)}
-@cindex parola @subentry chiave @code{default}
-@cindex @code{break} @subentry parola chiave
-@cindex @code{break} @seealso{@code{switch} (istruzione)}
-@cindex parola @subentry chiave @code{break}
-
-Questa sezione descrive una funzionalità disponibile solo in
-@command{gawk}.
-Se @command{gawk} è in modalità compatibile (@pxref{Opzioni}),
-la funzionalità non è disponibile.
-
-L'istruzione @code{switch} consente di valutare un'espressione e di
-eseguire istruzioni se il valore trovato corrisponde a uno dei @code{case} [casi] previsti.
-Le istruzioni @code{case} sono esaminate per cercare una corrispondenza
-nell'ordine in cui i casi sono definiti nel programma.  Se nessuno dei @code{case}
-corrisponde al valore dell'espressione, viene eseguita la sezione
-@code{default}, se è stata specificata.
-
-Ogni @code{case} contiene una singola costante, che può essere un numero,
-una stringa, o una @dfn{regexp}.  Viene valutata l'espressione @code{switch},
-e poi la costante di ogni @code{case} viene confrontata di volta in volta
-con il valore risultante.
-Il tipo di costante determina come sarà eseguito il confronto: per i tipi
-numerici o stringa si seguono le regole abituali.  Per una costante
-@dfn{regexp} (sia regolare, @code{/pippo/}, che fortemente tipizzata,
-@code{@@/pippo/}) viene effettuato un confronto tra l'espressione e il
-valore di tipo stringa dell'espressione originale.
-Il formato generale dell'istruzione @code{switch} è simile a questo:
-
-@example
-switch (@var{espressione}) @{
-case @var{valore o espressione regolare}:
-    @var{corpo-del-caso}
-default:
-    @var{corpo-del-default}
-@}
-@end example
-
-Il flusso di controllo
-dell'istruzione @code{switch} funziona come per il linguaggio C.  Una volta
-stabilita una corrispondenza con un dato caso, le istruzione che formano il
-corpo del caso sono eseguite, fino a che non venga trovata un'istruzione
-@code{break},
-@code{continue}, @code{next}, @code{nextfile} o @code{exit},
-o fino alla fine dell'istruzione @code{switch} medesima. Per esempio:
-
-@example
-while ((c = getopt(ARGC, ARGV, "aksx")) != -1) @{
-    switch (c) @{
-    case "a":
-        # stampa la dimensione di tutti i file
-        all_files = TRUE;
-        break
-    case "k":
-        BLOCK_SIZE = 1024       # in blocchi da 1 Kbyte
-        break
-    case "s":
-        # fa solo le somme
-        sum_only = TRUE
-        break
-    case "x":
-        # non esce dal filesystem
-        fts_flags = or(fts_flags, FTS_XDEV)
-        break
-    case "?":
-    default:
-        uso()
-        break
-    @}
-@}
-@end example
-
-Si noti che se nessuna delle istruzioni specificate qui arresta l'esecuzione
-di un'istruzione @code{case} per la quale è stata trovata una corrispondenza;
-l'esecuzione continua fino al successivo @code{case} finché
-non viene interrotta. In questo esempio, il
-@code{case} per @code{"?"} esegue quello di @code{default}, che consiste nel
-chiamare una funzione di nome @code{uso()}.
-(La funzione @code{getopt()} qui chiamata è descritta
-@iftex
-nella
-@end iftex
-@ifnottex
-in
-@end ifnottex
-@ref{Funzione getopt}.)
-
 @node Istruzione break
 @subsection L'istruzione @code{break}
 @cindex @code{break} (istruzione)
@@ -16760,7 +16622,7 @@ in
 
 L'istruzione @code{break} ha due scopi.
 Il primo scopo è di uscire da un'istruzione @code{switch}.
-Questo è stato trattato
+Questo è trattato
 @iftex
 nella
 @end iftex
@@ -16830,22 +16692,11 @@ interno dentro il quale si trova.  Quindi un'istruzione
 sia a sua volta all'interno di un ciclo, esce solo dall'istruzione
 @code{switch}.
 
-@c @cindex @code{break}, outside of loops
-@c @cindex historical features
-@c @cindex @command{awk} language, POSIX version
 @cindex POSIX @command{awk} @subentry @code{break} (istruzione)
-@cindex angolo buio @subentry istruzione @subentry @code{break}
-@cindex @command{gawk} @subentry @code{break} (istruzione) in
-@cindex Brian Kernighan @subentry @command{awk} di
 L'istruzione @code{break} non ha significato se
 usata fuori dal corpo di un ciclo o di un'istruzione @code{switch}.
-Tuttavia, anche se la cosa non è mai stata documentata,
-le prime implementazioni di @command{awk} consideravano l'istruzione @code{break}
-esterna a un ciclo come un'istruzione @code{next}
-(@pxref{Istruzione next}).
-@value{DARKCORNER}
-Versioni recenti di BWK @command{awk} non consentono più un tale uso,
-e lo stesso fa @command{gawk}.
+Se la si usa fuori da un ciclo, si ottiene un messaggio di errore
+(dfn{syntax error}).
 
 @node Istruzione continue
 @subsection L'istruzione @code{continue}
@@ -16859,8 +16710,8 @@ del ciclo inizi immediatamente.  Questo comportamento è differente da quello
 di @code{break}, che esce completamente dal ciclo.
 
 L'istruzione @code{continue} in un ciclo @code{for} fa sì che @command{awk}
-ignori il resto del corpo del ciclo e prosegua l'esecuzione con l'espressione
-@var{incremento} dell'istruzione @code{for}.  Il seguente programma
+ignori il resto del corpo del ciclo e prosegua l'esecuzione con
+l'@var{espressione-incremento} dell'istruzione @code{for}.  Il seguente programma
 è un esempio di ciò:
 
 @example
@@ -16906,19 +16757,102 @@ valore 5, poiché l'istruzione di incremento (@samp{x++}) non è mai raggiunta.
 @cindex Brian Kernighan @subentry @command{awk} di
 L'istruzione @code{continue} non ha un significato speciale se appare in
 un'istruzione @code{switch}, e non ha alcun significato se usata fuori dal
-corpo di un ciclo.  Le prime versioni di @command{awk} trattavano le
-istruzioni @code{continue} che erano fuori da un ciclo allo stesso modo con
-cui trattavano l'istruzione @code{break}
-fuori da un ciclo: come se fosse un'istruzione @code{next}
-@ifset FOR_PRINT
-(trattata nella sezione seguente).
-@end ifset
-@ifclear FOR_PRINT
-(@pxref{Istruzione next}).
-@end ifclear
-@value{DARKCORNER}
-Versioni recenti di BWK @command{awk} non consentono più un tale uso,
-e lo stesso vale per @command{gawk}.
+corpo di un ciclo.
+
+@node Istruzione switch
+@subsection L'istruzione @code{switch}
+@cindex @code{switch} (istruzione)
+@cindex @code{case} @subentry parola chiave
+@cindex @code{case} @seealso{@code{switch} (istruzione)}
+@cindex parola @subentry chiave @code{case}
+@cindex @code{default} @subentry parola chiave
+@cindex @code{default} @seealso{@code{switch} (istruzione)}
+@cindex parola @subentry chiave @code{default}
+@cindex @code{break} @subentry parola chiave
+@cindex @code{break} @seealso{@code{switch} (istruzione)}
+@cindex parola @subentry chiave @code{break}
+
+Questa sezione descrive una funzionalità disponibile solo in
+@command{gawk}.
+Se @command{gawk} è in modalità compatibile (@pxref{Opzioni}),
+la funzionalità non è disponibile.
+
+L'istruzione @code{switch} consente di valutare un'espressione e di
+eseguire istruzioni se il valore trovato corrisponde a uno dei casi
+(@code{case}) previsti.
+
+@command{gawk} esamina le istruzioni @code{case}, cercando una corrispondenza,
+nell'ordine in cui i casi sono definiti nel programma.  Se nessuno dei @code{case}
+corrisponde al valore dell'espressione, viene eseguita la sezione
+@code{default}, se esiste.
+
+Ogni @code{case} contiene una singola costante, che può essere un numero,
+una stringa, o una @dfn{regexp}.  Viene valutata l'espressione @code{switch},
+e poi la costante di ogni @code{case} viene confrontata di volta in volta
+con il valore risultante.
+Il tipo di costante determina come sarà eseguito il confronto: per i tipi
+numerici o stringa si seguono le regole abituali.  Per una costante
+@dfn{regexp} (sia regolare, @code{/pippo/}, che fortemente tipizzata,
+@code{@@/pippo/}) viene effettuato un confronto tra l'espressione e il
+valore di tipo stringa dell'espressione originale.
+Il formato generale dell'istruzione @code{switch} è simile a questo:
+
+@example
+switch (@var{espressione}) @{
+case @var{valore o espressione regolare}:
+    @var{corpo-del-caso}
+default:
+    @var{corpo-del-default}
+@}
+@end example
+
+Il flusso di controllo
+dell'istruzione @code{switch} funziona come per il linguaggio C.  Una volta
+stabilita una corrispondenza con un dato caso, le istruzione che formano il
+corpo del caso sono eseguite, fino a che non venga trovata un'istruzione
+@code{break}, @code{continue}, @code{next}, @code{nextfile} o @code{exit},
+o fino alla fine dell'istruzione @code{switch} medesima. Per esempio:
+
+@example
+while ((c = getopt(ARGC, ARGV, "aksx")) != -1) @{
+    switch (c) @{
+    case "a":
+        # stampa la dimensione di tutti i file
+        all_files = TRUE;
+        break
+    case "k":
+        BLOCK_SIZE = 1024       # in blocchi da 1 Kbyte
+        break
+    case "s":
+        # fa solo le somme
+        sum_only = TRUE
+        break
+    case "x":
+        # non esce dal filesystem
+        fts_flags = or(fts_flags, FTS_XDEV)
+        break
+    case "?":
+    default:
+        uso()
+        break
+    @}
+@}
+@end example
+
+Si noti che se nessuna delle istruzioni specificate qui arresta l'esecuzione
+di un'istruzione @code{case} per la quale è stata trovata una corrispondenza;
+l'esecuzione continua fino al successivo @code{case} finché
+non viene interrotta. In questo esempio, il
+@code{case} per @code{"?"} esegue quello di @code{default}, che consiste nel
+chiamare una funzione di nome @code{uso()}.
+(La funzione @code{getopt()} qui chiamata è descritta
+@iftex
+nella
+@end iftex
+@ifnottex
+in
+@end ifnottex
+@ref{Funzione getopt}.)
 
 @node Istruzione next
 @subsection L'istruzione @code{next}
@@ -16927,9 +16861,8 @@ e lo stesso vale per @command{gawk}.
 
 L'istruzione @code{next} fa sì che @command{awk} termini immediatamente
 l'elaborazione del record corrente e proceda a elaborare il record successivo.
-Ciò vuol dire che nessuna delle eventuali regole successive viene eseguita
-per il record corrente e che il resto delle azioni presenti nella
-regola correntemente in esecuzione non viene eseguito.
+Ciò vuol dire che nessuna delle eventuali azioni prevista nella regola corrente
+viene eseguita e che nessuna altra regola viene eseguita per il record corrente.
 
 Si confronti quanto sopra con quel che fa la funzione @code{getline}
 (@pxref{Getline}).  Anch'essa fa sì che @command{awk} legga il record
@@ -16962,12 +16895,12 @@ NF != 4 @{
 @noindent
 Siccome è presente un @code{next},
 le regole successive del programma non elaboreranno i record non validi.
-Il messaggio è ridiretto al flusso in output
-@dfn{standard error}, sul quale vanno scritti i messaggi di errore.
-Per maggiori dettagli, vedere la
-@ref{File speciali}.
+Il messaggio di errore è ridiretto allo @dfn{standard error},
+dove vanno scritti i messaggi di errore.
+(Per maggiori dettagli, vedere la
+@ref{File speciali}.)
 
-Se l'istruzione @code{next} provoca il raggiungimento della fine-file
+Dopo che l'istruzione @code{next} ha raggiunto la fine del file
 in input, vengono eseguite le eventuali regole @code{END} presenti.
 @xref{BEGIN/END}.
 
@@ -17007,11 +16940,11 @@ Alla fine dell'esecuzione dell'istruzione @code{nextfile},
 aggiornato per contenere il nome del successivo @value{DF} elencato sulla riga
 di comando, @code{FNR} è reimpostato a uno, e l'elaborazione riparte con
 la prima regola del programma.
-Se l'istruzione @code{nextfile} raggiunge la fine dei file in input,
+Se l'istruzione @code{nextfile} raggiunge la fine dell'input,
 vengono eseguite le eventuali regole @code{END} presenti.
-Un'eccezione a questo si ha se @code{nextfile} è invocata durante
-l'esecuzione di qualche istruzione all'interno di una regola @code{END};
-in questo caso, il programma viene terminato immediatamente.
+
+Eseguire @code{nextfile}, direttamente o indirettamente, all'interno
+di una regola @code{BEGIN} o @code{END}, provoca un errore fatale.
 @xref{BEGIN/END}.
 
 L'istruzione @code{nextfile} è utile quando ci sono parecchi @value{DF} da
@@ -17045,20 +16978,13 @@ stati aperti tramite ridirezioni.  Non ha niente a che vedere con
 l'elaborazione principale che
 @command{awk} fa dei file elencati in @code{ARGV}.
 
-@quotation NOTA
-Per molti anni, @code{nextfile} è stata
-un'estensione comune. A settembre 2012 si è deciso di
-includerla nello standard POSIX.
-Vedere @uref{https://austingroupbugs.net/view.php?id=607, il sito web dell'Austin Group}.
-@end quotation
-
 @cindex funzione definita dall'utente @subentry istruzioni @code{next}/@code{nextfile} e
 @cindex @code{nextfile} (istruzione) @subentry in funzioni definite dall'utente
 @cindex Brian Kernighan @subentry @command{awk} di
 @cindex @command{mawk} (comando di utilità)
 @cindex comando di utilità @subentry @command{mawk}
-Le versioni correnti di BWK @command{awk} e @command{mawk}
-entrambe prevedono @code{nextfile}.  Tuttavia, non sono consentite istruzioni
+Anche BWK @command{awk} e @command{mawk}
+supportano l'istruzione @code{nextfile}.  Tuttavia, non sono consentite istruzioni
 @code{nextfile} all'interno del corpo delle funzioni
 (@pxref{Funzioni definite dall'utente}).
 @command{gawk} lo permette; una @code{nextfile} all'interno del corpo di una
@@ -17109,10 +17035,9 @@ per un esempio di questo tipo.
 
 @cindex angolo buio @subentry istruzione @subentry @code{exit}
 Se si specifica un argomento all'istruzione @code{exit}, il suo valore è
-usato come codice di ritorno finale dell'elaborazione @command{awk}.  Se non
-viene specificato alcun argomento,
-@code{exit} fa terminare @command{awk} con un codice di ritorno di
-``successo''.
+usato come codice di ritorno finale dell'elaborazione @command{awk}.
+Senza argomento, @code{exit} fa terminare @command{awk} con un
+codice di ritorno di ``successo''.
 Nel caso in cui un argomento
 sia specificato in una prima istruzione @code{exit} e poi @code{exit} sia
 chiamato una seconda volta all'interno di una regola @code{END} senza alcun
@@ -17163,9 +17088,9 @@ programma a meno che non si decida di utilizzarle nel programma.
 Tuttavia, alcune variabili in @command{awk} hanno dei significati speciali
 predefiniti.
 @command{awk} tiene conto di alcune di queste automaticamente, in modo da
-rendere possibile la richiesta ad @command{awk} di fare certe cose nella
-maniera desiderata.  Altre variabili sono impostate automaticamente da
-@command{awk}, in modo da poter comunicare al programma in esecuzione
+rendere possibile la richiesta di fare certe cose nella
+maniera desiderata.  Altre variabili sono impostate automaticamente,
+in modo da poter comunicare al programma in esecuzione
 informazioni sul modo di procedere interno di @command{awk}.
 
 @cindex @command{gawk} @subentry variabili predefinite e
@@ -17238,7 +17163,6 @@ In effetti è la stringa passata come primo argomento alla funzione
 @code{sprintf()}
 (@pxref{Funzioni per stringhe}).
 Il suo valore di default è @code{"%.6g"}.
-@code{CONVFMT} è stata introdotta dallo standard POSIX.
 
 @cindex @command{gawk} @subentry variabile @subentry @code{FIELDWIDTHS} in
 @cindex @code{FIELDWIDTHS} (variabile)
@@ -17301,7 +17225,7 @@ Si può impostare il valore di @code{FS} sulla riga dei comandi usando
 l'opzione @option{-F}:
 
 @example
-awk -F, '@var{programma}' @var{file-in-input}
+awk -F: '@var{programma}' @var{file-in-input}
 @end example
 
 @cindex @command{gawk} @subentry separatore di campo e
@@ -17378,10 +17302,7 @@ si stampa con l'istruzione
 @code{print}.  Funziona passandola
 come primo argomento alla funzione @code{sprintf()}
 (@pxref{Funzioni per stringhe}).
-Il suo valore di default è @code{"%.6g"}.  Le prime versioni di @command{awk}
-usavano @code{OFMT} per specificare il formato da usare per convertire
-numeri in stringhe in espressioni generali; questo compito è ora svolto
-da @code{CONVFMT}.
+Il suo valore di default è @code{"%.6g"}.
 
 @cindex funzione @subentry @code{sprintf()} (variabile) @code{OFMT} e
 @cindex @code{print} (istruzione) @subentry variabile @code{OFMT} e
@@ -17423,17 +17344,19 @@ IEEE 754; @pxref{Impostare modo di arrotondare}).
 @cindex separatore di record
 @cindex record @subentry separatore di
 @item @code{RS}
-Il separatore tra record in input.  Il suo valore di default è una stringa
-contenente il solo carattere di ritorno-a-capo, il che significa che un record in input
-consiste di una sola riga di testo.
+Il separatore tra record in input.  Il suo valore di default è @code{"\n"},
+il carattere di ritorno-a-capo,
+il che significa che un record in input
+consiste in una singola riga di testo.
 Il suo valore può essere anche la stringa nulla, nel qual caso i record sono
 separati da una o più righe vuote.
 Se invece è una @dfn{regexp}, i record sono separati da
 corrispondenze alla @dfn{regexp} nel testo in input.
 (@xref{Record}.)
 
+@cindex estensioni comuni @subentry @code{RS} come @dfn{regexp}
 La possibilità che @code{RS} sia un'espressione regolare
-è un'estensione @command{gawk}.
+è un'estensione comune.
 In molte altre implementazioni @command{awk}, oppure
 se @command{gawk} è in modalità compatibile
 (@pxref{Opzioni}),
@@ -17560,14 +17483,14 @@ valore quando viene aperto il file successivo.
 Un vettore associativo contenente i valori delle variabili d'ambiente.
 Gli indici del vettore sono i nomi delle variabili d'ambiente; gli elementi
 sono i valori della specifica variabile d'ambiente.  Per esempio,
-@code{ENVIRON["HOME"]} potrebbe valere @code{/home/arnold}.
+@code{ENVIRON["HOME"]} potrebbe valere @samp{/home/arnold}.
 
 Per POSIX @command{awk}, le modifiche a questo vettore non cambiano
 le variabili d'ambiente passate a qualsivoglia programma che @command{awk}
 può richiamare tramite una ridirezione
 o usando la funzione @code{system()}.
 
-Tuttavia, a partire dalla versione 4.2, se non si è in
+Tuttavia, se non si è in
 modalità compatibile POSIX, @command{gawk} aggiorna le proprie variabili
 d'ambiente, quando si modifica @code{ENVIRON}, e in questo modo sono
 modificate anche le variabili d'ambiente disponibili ai programmi richiamati.
@@ -17613,7 +17536,7 @@ Il valore può venir tradotto, in localizzazioni diverse dall'inglese.
 Inoltre, @command{gawk} annulla @code{ERRNO} prima di aprire ogni
 file in input presente sulla riga di comando.  Questo consente di controllare
 se il file è accessibile
-all'interno di un criterio di ricerca @code{BEGINFILE}
+all'interno di una regola @code{BEGINFILE}
 (@pxref{BEGINFILE/ENDFILE}).
 
 Per il resto, @code{ERRNO} si comporta analogamente alla variabile C
@@ -17646,12 +17569,7 @@ volta che si legge un nuovo file
 @end ifnottex
 All'interno di una
 regola @code{BEGIN}, il valore di @code{FILENAME} è @code{""}, perché non si
-sta ancora elaborando alcun file in input.@footnote{Alcune
-tra le prime implementazioni di
-@command{awk} inizializzavano @code{FILENAME} a @code{"-"}, anche se
-vi erano @value{DF} da elaborare. Un tale comportamento era errato e
-non ci si dovrebbe poter contare nei programmi.}
-@value{DARKCORNER}  Si noti, tuttavia,
+sta ancora elaborando alcun file in input.  Si noti, tuttavia,
 che l'uso di @code{getline} (@pxref{Getline}) all'interno di una regola
 @code{BEGIN} può implicare l'assegnamento di un valore a @code{FILENAME}.
 
@@ -17732,6 +17650,10 @@ BEGIN @{
 Si tenga presente che questo vettore è diverso dal vettore standard
 @code{ARGV} il quale non include quegli argomenti della riga di comando
 che sono già stati elaborati da @command{gawk} (@pxref{ARGC e ARGV}).
+
+@item PROCINFO["CSV"]
+Questa variabile esisterà se @command{gawk} viene chiamato specificando
+l'opzione @option{--csv} (@pxref{Opzioni}).
 
 @cindex effettivo @subentry @dfn{ID di gruppo} dell'utente di @command{gawk}
 @item PROCINFO["egid"]
@@ -18022,21 +17944,10 @@ print pippo    # stampa 4
 @noindent
 La funzione @code{isarray()} (@pxref{Funzioni per i tipi}) si può usare per
 controllare se un elemento in @code{SYMTAB} è un vettore.
-Inoltre, non è possibile usare l'istruzione @code{delete} con il vettore
-@code{SYMTAB}.
 
-Prima della versione 5.0 di @command{gawk}, era possibile
-usare come indice per @code{SYMTAB} una stringa che non era un
-identificativo già esistente:
-
-@example
-SYMTAB["xxx"] = 5
-print SYMTAB["xxx"]
-@end example
-
-@noindent
-Ciò non è più possibile, e il farlo determina un errore
-fatale, perché il poterlo fare era solo fonte di confusione.
+Non è possibile usare l'istruzione @code{delete} con il vettore @code{SYMTAB}
+e non è possibile aggiungere elementi al vettore; se si prova a farlo, si
+ottiene un errore fatale.
 
 @cindex Schorr, Andrew
 Il vettore @code{SYMTAB} è più interessante di quel che sembra.  Andrew
@@ -18350,7 +18261,7 @@ da @command{awk} al programma.
 I vettori @code{ARGC} e @code{ARGV} rendono disponibili al programma gli
 argomenti della riga di comando.  Una loro modifica all'interno di una regola
 @code{BEGIN} permette di controllare come @command{awk} elaborerà i @value{DF}
-in input.
+specificati.
 
 @end itemize
 
@@ -18409,7 +18320,7 @@ di un vettore.
 @cindex Wall, Larry
 @quotation
 @i{Visitare sequenzialmente un vettore associativo è come tentare di
-lapidare qualcuno usando una mitragliatrice Uzi carica.}
+bastonare a morte qualcuno usando una mitragliatrice Uzi carica.}
 @author Larry Wall
 @end quotation
 
@@ -18418,7 +18329,7 @@ memorizzare gruppi di stringhe o di numeri correlati fra loro.  Ogni vettore di
 @command{awk} deve avere un nome.  I nomi dei vettori hanno la stessa sintassi
 dei nomi di variabile; qualsiasi nome valido di variabile potrebbe essere anche
 un valido nome di vettore.  Un nome però non può essere usato in entrambi i
-modi (come vettore e come variabile) nello stesso programma @command{awk}.
+modi (come vettore e come scalare) nello stesso programma @command{awk}.
 
 I vettori in @command{awk} assomigliano superficialmente ai vettori in altri
 linguaggi di programmazione, ma ci sono differenze fondamentali.  In
@@ -19333,6 +19244,7 @@ $ @kbd{echo 'riga 1}
 @print{} riga 2
 @end example
 
+@noindent
 Sfortunatamente, la prima riga di dati in input non appare
 nell'output!
 
@@ -19390,7 +19302,9 @@ delete @var{vettore}[@var{espressione-indice}]
 Una volta che un elemento di un vettore è stato eliminato, il valore che aveva
 quell'elemento non è più disponibile. È come se quell'elemento non sia
 mai stato referenziato oppure come se non gli sia mai stato assegnato un
-valore.  Il seguente è un esempio di eliminazione di elementi da un vettore:
+valore.
+Il seguente esempio elimina tutti gli elementi di un vettore,
+uno per volta, usando un ciclo:
 
 @example
 for (i in frequenze)
@@ -19398,11 +19312,10 @@ for (i in frequenze)
 @end example
 
 @noindent
-Quest'esempio rimuove tutti gli elementi dal vettore @code{frequenze}.  Una
-volta che un elemento è stato eliminato, una successiva istruzione @code{for}
-che visiti il vettore non troverà quell'elemento, e l'uso dell'operatore
-@code{in} per controllare la presenza di quell'elemento restituisce zero (cioè
-falso):
+Una volta che un elemento è stato eliminato, una successiva istruzione
+@code{for} che visiti il vettore non troverà quell'elemento, e l'uso
+dell'operatore @code{in} per controllare la presenza di quell'elemento
+restituisce zero (ossia falso):
 
 @example
 delete pippo[4]
@@ -19441,27 +19354,17 @@ Tutti gli elementi di un vettore possono essere eliminati con una singola
 istruzione omettendo l'indice nell'istruzione @code{delete},
 in questo modo:
 
-
 @example
 delete @var{vettore}
 @end example
 
 L'uso di questa versione dell'istruzione @code{delete} è circa tre volte più
-efficiente dell'equivalente ciclo che elimina gli elementi uno
-alla volta.
-
-Questa forma dell'istruzione @code{delete} è ammessa anche
-da BWK @command{awk} e da @command{mawk}, e anche da
-diverse altre implementazioni.
-
-@cindex Brian Kernighan @subentry @command{awk} di
-@quotation NOTA
-Per molti anni, l'uso di @code{delete} senza un indice era un'estensione
-comune.  A settembre 2012 si è deciso di includerla nello
-standard POSIX.  Vedere @uref{https://austingroupbugs.net/view.php?id=544,
-il sito dell'Austin Group}.
-@end quotation
-
+efficiente del ciclo equivalente ciclo che elimina gli elementi uno
+per volta.
+ 
+@c 9/2026: Since delete array has been in POSIX since 2012, we no longer
+@c need to offer this advice for portability.
+@ignore
 @cindex portabilità @subentry eliminazione di elementi di un vettore
 @cindex Brennan, Michael
 La seguente istruzione fornisce un modo portabile, anche se non evidente,
@@ -19479,6 +19382,7 @@ La funzione @code{split()}
 dapprima svuota il vettore indicato. La chiamata chiede di dividere
 la stringa nulla. Poiché non c'è nulla da dividere, la
 funzione si limita a svuotare il vettore e poi termina.
+@end ignore
 
 @quotation ATTENZIONE
 L'eliminazione di tutti gli elementi di un vettore non cambia il suo tipo; non
@@ -19639,11 +19543,10 @@ del vettore @code{indici_separati}.
 
 Perciò, se un valore è stato precedentemente memorizzato in
 @code{vettore[1, "pippo"]}, esiste in @code{vettore} un elemento con indice
-@code{"1\034pippo"} (ricordare che il valore di default di @code{SUBSEP}
-è il carattere con codice ottale 034).
+@code{"1\034pippo"}.
 Prima o poi, l'istruzione @code{for} trova quell'indice e fa un'iterazione
 con la variabile @code{indice_combinato} impostata a @code{"1\034pippo"}.
-Poi viene chiamata la funzione @code{split()} in questo modo:
+La funzione @code{split()} è poi chiamata in questo modo:
 
 @example
 split("1\034pippo", indici_separati, "\034")
@@ -20048,11 +19951,14 @@ Restituisce il coseno di @var{x}, con @var{x} in radianti.
 @cindexawkfunc{exp}
 @cindex esponenziale
 @item @code{exp(@var{x})}
-Restituisce l'esponenziale di @var{x} (@code{e ^ @var{x}}) o un messaggio
-di errore se @var{x} è fuori dall'intervallo consentito.
-L'intervallo entro il quale può variare @var{x}
-dipende dalla rappresentazione dei numeri in virgola mobile nella macchina in
-uso.
+Restituisce l'esponenziale di @var{x} (@code{e ^ @var{x}}).
+Se @var{x} è fuori dall'intervallo consentito (come determinato dalla
+funzione di libreria C utilizzata per calcolarlo), @code{exp()}
+restituirà un valore diverso da zero e imposterà la variabile
+@code{ERRNO}.
+In questo caso, @command{gawk} stampa un messaggio di avvertimento.
+L'intervallo entro il quale può variare @var{x} dipende dalla
+rappresentazione dei numeri in virgola mobile nella macchina in uso.
 
 @cindexawkfunc{int}
 @cindex arrotondare @subentry all'intero più vicino
@@ -20071,26 +19977,12 @@ sui sistemi che implementano lo standard IEEE 754.
 Inoltre, @command{gawk} stampa un messaggio di avvertimento qualora @code{x}
 sia negativo.
 
-@cindex Beebe, Nelson H.F.@:
 @cindexawkfunc{rand}
 @cindex numeri @subentry casuali @subentry funzioni @code{rand()}/@code{srand()}
 @item @code{rand()}
 Restituisce un numero casuale.  I valori di @code{rand()} sono
 uniformemente distribuiti tra zero e uno.
-Il valore potrebbe essere zero ma non è mai uno.@footnote{La versione C di
-@code{rand()} in molti sistemi Unix genera notoriamente delle sequenze
-piuttosto mediocri di numeri casuali.  Tuttavia, non è scritto da nessuna
-parte che un'implementazione di @command{awk} debba necessariamente
-usare la funzione @code{rand()} del linguaggio C per implementare
-la versione @command{awk} di @code{rand()}.  In effetti, @command{gawk}
-ha usato per parecchi anni la funzione @code{random()} di BSD, che è
-notevolmente migliore di @code{rand()}, per generare dei numeri casuali.
-Dalla versione 4.1.4, grazie al contributo di Nelson H.F.@: Beebe,
-@command{gawk} usa l'algoritmo di rimescolamento nella scatola
-di Bayes-Durham, che estende in maniera notevole il periodo dopo il
-quale i numeri si ripetono ed elimina le correlazioni a breve distanza
-e a lunga distanza che potrebbero esistere nel generatore originale
-di numeri casuali.}
+Il valore potrebbe essere zero ma non è mai uno.
 
 Spesso servono dei numeri casuali interi invece che frazionari.
 La seguente funzione definita dall'utente può essere usata per ottenere
@@ -20482,9 +20374,9 @@ lunghezza di @code{$0}.
 @quotation NOTA
 In alcune delle prime versioni di @command{awk}, la funzione @code{length()}
 poteva essere richiamata senza alcuna parentesi.  Farlo è considerata
-una cattiva abitudine, sebbene il POSIX standard 2008 lo consenta esplicitamente,
+una cattiva abitudine, sebbene lo standard POSIX lo consenta esplicitamente,
 per compatibilità con la vecchia prassi.  Per garantire la massima
-portabilità ai programmi, è meglio mettere sempre le parentesi.
+portabilità ai programmi, è consigliabile mettere sempre le parentesi.
 @end quotation
 
 @cindex angolo buio @subentry funzione @subentry @code{length()}
@@ -20506,23 +20398,19 @@ $ @kbd{nawk 'BEGIN @{ print length(x) ; x[1] = 1 @}'}
 @end example
 
 @noindent
-Se @option{--lint} è
-stato specificato sulla riga di comando, @command{gawk} emette un
+Se l'opzione @option{--lint} è
+stata specificata sulla riga di comando, @command{gawk} emette un
 avvertimento a questo riguardo.
 
 @cindex numero @subentry di elementi in un vettore
 @cindex vettori @subentry determinare il numero degli elementi
-In @command{gawk} e in parecchie altre implementazioni @command{awk},
-se l'argomento è un vettore, la funzione @code{length()} restituisce il numero
-di elementi nel vettore.
+In aderenza allo standard POSIX 2024, quando l'argomento fornito è
+un vettore, la funzione @code{length()} restituisce il numero
+di elementi nel vettore. (@command{gawk} e numerose altre implementazioni
+supportano questo utilizzo, come estensione, ormai da decenni.)
 Ciò è meno utile di quel che sembra a prima vista, in quanto
 non è affatto detto che il vettore abbia come indici i numeri da 1 al
 numero di elementi che contiene.
-
-Usare la funzione @code{length()} avendo come operando un vettore
-fa parte dello standard POSIX dal 2024.
-Quindi questo utilizzo dovrebbe divenire più portabile con il
-passare del tempo.
 
 @cindexawkfunc{match}
 @cindex stringa @subentry ricercare espressioni regolari in una
@@ -20758,7 +20646,7 @@ in
 @end ifnottex
 @ref{Campi separati da virgola}.  Con tre o quattro argomenti,
 @code{split()} funzione come visto sopra.  La chiamata con quattro
-argomenti non avrebbe senso per i file CSV, poiché ogni elemento
+argomenti non ha senso per i file CSV, poiché ogni elemento
 del vettore @var{separatori} consisterebbe semplicemente in una
 stringa che contiene una virgola.
 
@@ -20782,14 +20670,11 @@ Anche se @samp{RS = ""} fa sì che il carattere di ritorno-a-capo sia un
 separatore di campo,
 questo non influenza il modo in cui @code{split()} divide le stringhe.
 
-@cindex angolo buio @subentry funzione @subentry @code{split()}
-Recenti implementazioni di @command{awk}, incluso @command{gawk},
-consentono che il terzo argomento sia una costante @dfn{regexp}
+Il terzo argomento può essere una costante @dfn{regexp}
 (@w{@code{/}@dots{}@code{/}})
-o anche una stringa.  @value{DARKCORNER}
-Anche lo standard POSIX permette questo.
+o anche una stringa.
 @xref{Espressioni regolari calcolate} per la spiegazione della differenza
-tra l'uso di una costante stringa e l'uso di una costante @dfn{regexp},
+tra l'uso di una costante stringa e l'uso di una costante @dfn{regexp} e
 sulle loro implicazioni riguardo a come scrivere correttamente un programma.
 
 Prima di dividere la stringa, @code{split()} cancella ogni elemento
@@ -20932,7 +20817,7 @@ inserire una barra inversa nella
 stringa, occorre scrivere due barre inverse.  Quindi, occorre scrivere
 @samp{\\&} in una costante stringa per includere un carattere @samp{&}
 nel rimpiazzo.
-Per esempio, quanto segue mostra come rimpiazzare il primo @samp{|} su
+Per esempio, quanto segue rimpiazza il primo @samp{|} su
 ogni riga con un @samp{&}:
 
 @example
@@ -20973,8 +20858,7 @@ la @dfn{regexp} da individuare.
 @item @code{substr(@var{stringa}, @var{inizio}} [@code{, @var{lunghezza}} ]@code{)}
 Restituisce una sottostringa di @var{stringa} lunga @var{lunghezza} caratteri,
 iniziando dal carattere numero @var{inizio}.  Il primo carattere di una
-stringa è il carattere numero uno.@footnote{Questo è differente da
-C e C++, in cui il primo carattere ha il numero zero.}
+stringa è il carattere numero uno.
 Per esempio, @code{substr("Washington", 5, 3)} restituisce @code{"ing"}.
 
 Se @var{lunghezza} non è presente, @code{substr()} restituisce l'intero
@@ -21326,7 +21210,7 @@ ce n'era una sola.  Tuttavia, come nel caso storico, ogni @samp{\} che
 non fa parte di una di queste tre sequenze non è speciale e appare
 nell'output così come è scritto.
 
-@command{gawk} 3.0 e 3.1 seguono queste regole per @code{sub()} e
+@command{gawk} 3.0 e 3.1 seguivano queste regole per @code{sub()} e
 @code{gsub()}.  La revisione dello standard POSIX ha richiesto molto più tempo
 di quel che ci si attendeva.  Inoltre, la proposta del manutentore di
 @command{gawk} è andata persa durante il processo di standardizzazione.  Le
@@ -21561,40 +21445,17 @@ schermo, fin quando non arriva il momento giusto per inviare i
 dati al dispositivo di output).
 Questo è spesso più efficiente che scrivere
 ogni particella di informazione non appena diventa disponibile.  Tuttavia,
-qualche volta è necessario forzare un programma a @dfn{svuotare}
+qualche volta è necessario forzare un programma a svuotare (@dfn{flush})
 i suoi buffer (cioè, inviare l'informazione alla sua destinazione,
 anche se un buffer non è pieno).
 Questo è lo scopo della funzione @code{fflush()}; anche
 @command{gawk} scrive il suo output in un buffer, e la funzione @code{fflush()}
 forza @command{gawk} a svuotare i suoi buffer.
 
-@cindex estensioni comuni @subentry funzione @code{fflush()}
-@cindex Brian Kernighan @subentry @command{awk} di
-Brian Kernighan ha aggiunto @code{fflush()} al suo @command{awk} nell'aprile
-1992.  Per due decenni è rimasta un'estensione comune. A Dicembre
-2012 è stata accettata e inclusa nello standard POSIX.
-Vedere @uref{https://austingroupbugs.net/view.php?id=634, il sito Web dell'Austin Group}.
-
-POSIX standardizza @code{fflush()} come segue: se non c'è alcun
+Se non c'è alcun
 argomento, o se l'argomento è la stringa nulla (@w{@code{""}}),
 @command{awk} svuota i buffer di @emph{tutti} i file in output e di
 @emph{tutte} le @dfn{pipe}.
-
-@quotation NOTA
-Prima della versione 4.0.2, @command{gawk}
-avrebbe svuotato solo i buffer dello standard output se non era
-specificato alcun argomento,
-e svuotato tutti i buffer dei file in output e delle @dfn{pipe} se
-l'argomento era la stringa nulla.
-Questo è stato modificato per essere compatibile con BWK @command{awk},
-nella speranza che standardizzare questa
-funzionalità in POSIX sarebbe stato più agevole (come poi è effettivamente
-successo).
-
-Con @command{gawk},
-si può usare @samp{fflush("/dev/stdout")} se si desidera solo svuotare i
-buffer dello standard output.
-@end quotation
 
 @c @cindex automatic warnings
 @c @cindex warnings, automatic
@@ -21748,83 +21609,19 @@ in
 
 @float Tabella,table-system-return-values
 @caption{Valori codici di ritorno da chiamata a @code{system()}}
-@multitable @columnfractions .40 .60
+@multitable @columnfractions .50 .50
 @headitem Situazione @tab Valore codice di ritorno da @code{system()}
 @item @option{--posix} @tab Valore dalla funzione C @code{system()}
 @item Uscita normale dal comando @tab Codice di ritorno del comando
-@item Terminazione da un segnale @tab 256 + numero segnale "assassino"
-@item Terminazione da un segnale con dump memoria @tab 512 + numero segnale "assassino"
+@item Terminazione comando da segnale @tab 256 + numero segnale "assassino"
+@item Terminazione comando da segnale, dump memoria @tab 512 + numero segnale "assassino"
 @item Qualsiasi tipo di errore @tab @minus{}1
 @end multitable
 @end float
-@end table
 
-A partire dalla versione di agosto 2018, BWK @command{awk} si comporta
+BWK @command{awk} si comporta
 come @command{gawk} per il codice di ritorno della chiamata @code{system()}.
-
-@cindex riquadro @subentry Controllare la bufferizzazione dell'output con @code{system()}
-@cartouche Controllare la bufferizzazione dell'output con @code{system()}
-@cindex buffer @subentry scrivere su disco un
-@cindex bufferizzazione @subentry dell'input/output
-@cindex output @subentry bufferizzazione
-@cindex bufferizzazione @subentry dell'output
-
-La funzione @code{fflush()} consente un controllo esplicito sulla
-bufferizzazione dell'output per singoli file e @dfn{pipe}.
-Tuttavia, il suo utilizzo non è portabile su molte delle meno recenti
-implementazioni di @command{awk}.  Un metodo alternativo per forzare la
-scrittura dell'output è una chiamata a
-@code{system()} che abbia come argomento la stringa nulla:
-
-@example
-system("")   # scrive l'output su disco
-@end example
-
-@noindent
-@command{gawk} tratta questo uso della funzione @code{system()} come un
-caso speciale, e si guarda bene dall'invocare la shell (o un altro
-interprete di comandi) con un comando nullo.
-Quindi, con @command{gawk}, questa maniera di procedere non è solo utile,
-ma è anche efficiente.
-Questo metodo dovrebbe funzionare anche con
-altre implementazioni di @command{awk}, ma non è detto che eviti una
-invocazione non necessaria della shell.  (Altre implementazioni potrebbero
-limitarsi a forzare la scrittura del buffer associato con lo
-standard output, e non necessariamente di tutto l'output bufferizzato.)
-
-Avendo in mente le attese di un programmatore, sarebbe sensato che
-@code{system()} forzi la scrittura su disco di tutto l'output disponibile.
-Il programma seguente:
-
-@example
-BEGIN @{
-     print "prima riga stampata"
-     system("echo system echo")
-     print "seconda riga stampata"
-@}
-@end example
-
-@noindent
-deve stampare:
-
-@example
-prima riga stampata
-system echo
-seconda riga stampata
-@end example
-
-@noindent
-e non:
-
-@example
-system echo
-prima riga stampata
-seconda riga stampata
-@end example
-
-Se @command{awk} non forzasse la scrittura dei suoi buffer prima di
-invocare @code{system()}, l'output sarebbe quest'ultimo (quello non voluto).
-@end cartouche
+@end table
 
 @node Funzioni di tempo
 @subsection Funzioni per gestire marcature temporali
@@ -22128,7 +21925,7 @@ Il formato ``appropriato'' della rappresentazione della data.
 L'anno modulo 100 (le ultime due cifre) come numero decimale (00--99).
 
 @item %Y
-L'anno come numero decimale (p.es., 2015).
+L'anno come numero decimale (p.es., 2028).
 
 @c @cindex RFC 822
 @c @cindex RFC 1036
@@ -22236,29 +22033,26 @@ contenuti nella stringa.  Per esempio:
 
 @example
 $ @kbd{date '+Oggi è %A, %d %B %Y.'}
-@print{} Oggi è lunedì, 22 settembre 2014.
+@print{} Oggi è lunedì, 14 settembre 2026.
 @end example
 
 Ecco la versione @command{gawk} del comando di utilità @command{date}.
-È all'interno di uno @dfn{script} di shell
-per gestire l'opzione @option{-u},
+Accetta l'opzione @option{-u},
 che richiede che @command{date} sia eseguito come se il fuso orario
 fosse impostato a UTC:
 
 @example
-#! /bin/sh
-#
-# date --- simula il comando POSIX 'date'
-
-case $1 in
--u)  TZ=UTC0     # usare UTC
-     export TZ
-     shift ;;
-esac
-
-gawk 'BEGIN  @{
+BEGIN @{
     formato = PROCINFO["strftime"]
+    ora = systime()
+    usa_utc = 0
     codice_di_ritorno = 0
+
+    if (ARGV[1] == "-u") @{
+        usa_utc = 1
+        ARGV[1] = ARGV[2]
+        ARGC--
+    @}
 
     if (ARGC > 2)
         codice_di_ritorno = 1
@@ -22267,18 +22061,10 @@ gawk 'BEGIN  @{
         if (formato ~ /^\+/)
             formato = substr(formato, 2)   # togli il + iniziale
     @}
-    print strftime(formato)
+    print strftime(formato, ora, usa_utc)
     exit codice_di_ritorno
-@}' "$@@"
+@}'
 @end example
-
-Questo @dfn{script} è stato scritto prima che fosse possibile specificare un
-terzo argomento @var{utc-flag} alla funzione di sistema @code{strftime()}.
-Si consideri come sia possibile modificare il programma per essere eseguito
-interamente in @command{awk} e con l'aggiunta della gestione di un'opzione
-@option{-u} per stampare la data e ora in UTC [Coordinated Universal Time,
-in pratica, secondo l'ora di Greenwich].
-@c FIXME: Next edition, revise the program.
 
 @node Funzioni a livello di bit
 @subsection Funzioni per operazioni di manipolazione bit
@@ -22494,13 +22280,12 @@ Gli argomenti devono essere almeno due.
 @end table
 
 @quotation ATTENZIONE
-A partire dalla versione 4.2 di @command{gawk}, gli operandi
+Degli operandi
 negativi non sono consentiti per nessuna di queste funzioni.  Un operando
 negativo produce un errore fatale.  Vedere la nota a lato
 ``Attenzione. Non è tutto oro quel che luccica!'' per maggiori informazioni sul perché.
 
-A partire dalla versione 5.4 di @command{gawk}, quando non si sta
-usando la modalità MPFR
+Quando non si sta usando la modalità MPFR
 @iftex
 (@pxrefil{Calcolo con precisione arbitraria}),
 @end iftex
@@ -22620,9 +22405,7 @@ finché non ci sono più bit.
 
 Se il valore iniziale è zero, viene restituito semplicemente uno @code{"0"}.
 Altrimenti, alla fine, al valore ottenuto vengono aggiunti degli zeri a
-sinistra, per arrivare a stringhe
-di lunghezza multipla di 8, ossia contenenti un numero intero di byte.
-Questo è tipico dei computer moderni.
+sinistra, per arrivare a stringhe lunghe un multiplo di 8 bit.
 
 Il codice principale nella regola @code{BEGIN} mostra la differenza tra
 i valori decimale e ottale dello stesso numero,
@@ -22723,15 +22506,15 @@ Restituisce una delle stringhe seguenti, a seconda del tipo di @var{x}:
 @item "array"
 @var{x} è un vettore.
 
-@item "regexp"
-@var{x} è una @dfn{regexp} fortemente tipizzata
-(@pxref{Costanti @dfn{regexp} forti}).
-
 @item "number"
 @var{x} è un numero.
 
 @item "number|bool"
 @var{x} è un valore di tipo booleano (@pxref{Valori di tipo booleano}).
+
+@item "regexp"
+@var{x} è una @dfn{regexp} fortemente tipizzata
+(@pxref{Costanti @dfn{regexp} forti}).
 
 @item "string"
 @var{x} è una stringa.
@@ -28997,7 +28780,7 @@ esce dopo aver eseguito la stampa:
             @}
         @}
 
-        print ""    # a-capo finale
+        print ""    # ritorno-a-capo finale
         exit 0
     @}
 @c endfile
@@ -30251,7 +30034,8 @@ function endfile(file)
 
 C'è una regola che viene eseguita per ogni riga. Aggiunge la lunghezza
 del record più uno, a @code{caratteri}.  Aggiungere uno alla lunghezza
-del record è necessario, perché il carattere a-capo, che separa i record
+del record è necessario, perché il carattere ritorno-a-capo, che separa
+i record
 tra loro (il valore della variabile @code{RS}) non fa parte del record
 stesso, e quindi non è incluso nella sua lunghezza.  Analogamente, si
 aggiunge la lunghezza del record in byte, più uno, a @code{byte}.
@@ -53913,3 +53697,5 @@ TODO:
   undefined and uninitialized. Introduce the concept of uninitialized
   early on.
 * Consider removing all the places where the title `Dr.' occurs.
+* Rethink the use of "pre-defined" and "built-in" with awk special variables.
+* Simplify the "Gory Details" subsection, keeping just the actual current rules.

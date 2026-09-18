@@ -3,13 +3,13 @@
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # March, 2025
 BEGIN {
-    text[1] = "aaaxxxzzz";
+    text[1] = "aaaxxxzzz"
         shortpat[1] = @/x+?/
         longpat[1] = @/x+/
-    text[2] = "aaaxxxyzzz";
+    text[2] = "aaaxxxyzzz"
         shortpat[2] = @/x+?y/
         longpat[2] = @/x+y/
-    text[3] = "aaaxxxxxxxxxxxxxxxxzzz";
+    text[3] = "aaaxxxxxxxxxxxxxxxxzzz"
         shortpat[3] = @/(x+?)(x+)(x+?)(x+)/
         longpat[3] = @/(x+)(x+)(x+)(x+)/
     text[4] = "aaaxyxxyxxyxzzz"

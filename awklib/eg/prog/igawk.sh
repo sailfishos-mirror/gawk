@@ -85,10 +85,7 @@ expand_prog='
 
 function pathto(file,    i, t, junk)
 {
-    if (index(file, "/") != 0)
-        return file
-
-    if (file == "-")
+    if (index(file, "/") != 0 || file == "-")
         return file
 
     for (i = 1; i <= ndirs; i++) {
