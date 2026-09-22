@@ -2080,12 +2080,15 @@ able to manage a collection of publicly available @command{awk} programs
 and I even solicited contributions.  Making things available on the Internet
 helps keep the @command{gawk} distribution down to manageable size.
 
+However, I wasn't able to do much with it, and the material I collected
+remained uncurated and unattended to.
+
 In the hopes of doing something broader, I acquired the
 @code{awklang.org} domain.  Late in 2017, a volunteer took on the task
 of managing it.
 
-My initial collection of material, such as it is, is still available
-at @uref{http://awklang.org/oldstuff/}.
+My original collection, such as it is, is available from
+@uref{http://awklang.org/oldstuff/}.
 
 If you have written an interesting @command{awk} program that
 you would like to share with the rest of the world, please see
@@ -6415,6 +6418,7 @@ to use parentheses: @samp{(a@{1,2@})?b+}.  This is clear and unambiguous.
 @section Using Bracket Expressions
 @cindex bracket expressions
 @cindex bracket expressions @subentry range expressions
+@cindex bracket expressions @subentry range expressions @subentry character encodings
 @cindex range expressions (regexps)
 @cindex bracket expressions @subentry character lists
 
@@ -6423,7 +6427,7 @@ those listed between the opening and closing square brackets.
 
 Within a bracket expression, a @dfn{range expression} consists of two
 characters separated by a hyphen.  It matches any single character that
-sorts between the two characters, based upon the system's native character
+sorts between the two characters, based upon the system's current character
 set.  For example, @samp{[0-9]} is equivalent to @samp{[0123456789]}.
 (See @ref{Ranges and Locales} for an explanation of how the POSIX
 standard and @command{gawk} have changed over time.  This is mainly
@@ -6431,11 +6435,18 @@ of historical interest.)
 
 With the increasing popularity of the
 @uref{https://www.unicode.org, Unicode character standard},
-there is an additional wrinkle to consider. Octal and hexadecimal
-escape sequences inside bracket expressions are taken to represent
-only single-byte characters (characters whose values fit within
-the range 0--255).  To match a range of characters where the endpoints
-of the range are larger than 255, enter the multibyte encodings of
+there is an additional wrinkle to consider.Octal and hexadecimal
+escape sequences inside bracket expressions
+(@samp{\@var{nnn}} and @samp{\x@var{hh}}) act
+as byte values to be decoded from the current character set's
+encoding into characters in the current character set.
+
+Thus, for example, in a Unicode locale, the integer hexadecimal value @code{0xFF}
+is a valid Unicode character, but the escape sequence @code{\xFF}
+is not a valid UTF-8 encoding, and using that escape sequence
+causes an error.
+To match a range of characters where the endpoints
+of the range are larger than 127, enter the multibyte encodings of
 the characters directly, or use the @code{\u} escape sequence.
 
 @cindex @code{\} (backslash) @subentry in bracket expressions
@@ -11283,7 +11294,7 @@ or @code{PROCINFO["/dev/stdout", "NONFATAL"]}.  For standard error, use
 When attempting to open a TCP/IP socket (@pxref{TCP/IP Networking}),
 @command{gawk} tries multiple times. The @env{GAWK_SOCK_RETRIES}
 environment variable (@pxref{Other Environment Variables}) allows you to
-override @command{gawk}'s builtin default number of attempts.  However,
+override @command{gawk}'s built-in default number of attempts.  However,
 once nonfatal I/O is enabled for a given socket, @command{gawk} only
 retries once, relying on @command{awk}-level code to notice that there
 was a problem.
@@ -29483,16 +29494,13 @@ It contains the following chapters:
 
 @itemize @value{BULLET}
 @item
-@ref{Namespaces}
-
-@item
 @ref{Advanced Features}
 
 @item
-@ref{Debugger}
+@ref{Internationalization}
 
 @item
-@ref{Internationalization}
+@ref{Debugger}
 
 @item
 @ref{Namespaces}
@@ -32355,6 +32363,7 @@ this chapter:
 @table @dfn
 @cindex call stack @subentry explanation of
 @cindex stack frame (debugger)
+@cindex debugger @subentry stack frame
 @item Stack frame
 Programs generally call functions during the course of their execution.
 One function can call another, or a function can call itself (recursion).
@@ -32375,7 +32384,8 @@ call stack, as well as from where each function on the stack was
 invoked. Commands that print the call stack print information about
 each stack frame (as detailed later on).
 
-@cindex breakpoint
+@cindex breakpoint (debugger)
+@cindex debugger @subentry breakpoint
 @item Breakpoint
 During debugging, you often wish to let the program run until it
 reaches a certain point, and then continue execution from there one
@@ -32386,6 +32396,7 @@ take over control of the program's execution.  You can add and remove
 as many breakpoints as you like.
 
 @cindex watchpoint (debugger)
+@cindex debugger @subentry watchpoint
 @item Watchpoint
 A watchpoint is similar to a breakpoint.  The difference is that
 breakpoints are oriented around the code: stop when a certain point in the
@@ -32448,7 +32459,7 @@ to debug command-line programs, only programs contained in files.)
 In our case, we invoke the debugger like this:
 
 @example
-$ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -- -1 inputfile}
+$ @kbd{gawk -D -f getopt.awk -f join.awk -f uniq.awk -- -f 1 inputfile}
 @end example
 
 @cindex @env{AWKPATH} environment variable
@@ -32460,10 +32471,9 @@ this syntax is slightly different from what you are used to.
 With the @command{gawk} debugger, you give the arguments for running the program
 in the command line to the debugger rather than as part of the @code{run}
 command at the debugger prompt.)
-The @option{--} ends @command{gawk}'s command line options. It's not
-strictly necessary here, but it is needed if an option to the @command{awk}
-program conflicts with a @command{gawk} option.
-The @option{-1} is an option to @file{uniq.awk}.
+The @option{--} ends @command{gawk}'s command line options. It's needed
+here because @command{gawk} has its own @option{-f} option.
+The @samp{-f 1} is thus an option to @file{uniq.awk}.
 
 @cindex debugger @subentry prompt
 Instead of immediately running the program on @file{inputfile}, as
@@ -32521,7 +32531,7 @@ the breakpoint, use the @code{b} (breakpoint) command:
 @cindex debugger @subentry commands @subentry @code{b} (@code{break})
 @example
 gawk> @kbd{b are_equal}
-@print{} Breakpoint 1 set at file `awklib/eg/prog/uniq.awk', line 63
+@print{} Breakpoint 1 set at file `uniq.awk', line 72
 @end example
 
 The debugger tells us the file and line number where the breakpoint is.
@@ -32534,9 +32544,8 @@ the breakpoint for the first time:
 gawk> @kbd{r}
 @print{} Starting program:
 @print{} Stopping in Rule ...
-@print{} Breakpoint 1, are_equal(n, m, clast, cline, alast, aline)
-         at `awklib/eg/prog/uniq.awk':63
-@print{} 63          if (fcount == 0 && charcount == 0)
+@print{} Breakpoint 1, are_equal(n, m, clast, cline, alast, aline) at `uniq.awk':72
+@print{} 72          if (fcount == 0 && charcount == 0)
 gawk>
 @end example
 
@@ -32550,13 +32559,12 @@ listing of the current stack frames:
 @cindex debugger @subentry commands @subentry @code{backtrace}
 @example
 gawk> @kbd{bt}
-@print{} #0  are_equal(n, m, clast, cline, alast, aline)
-         at `awklib/eg/prog/uniq.awk':68
-@print{} #1  in main() at `awklib/eg/prog/uniq.awk':88
+@print{} #0	 are_equal(n, m, clast, cline, alast, aline) at `uniq.awk':72
+@print{} #1	in main() at `uniq.awk':97
 @end example
 
 This tells us that @code{are_equal()} was called by the main program at
-line 88 of @file{uniq.awk}.  (This is not a big surprise, because this
+line 97 of @file{uniq.awk}.  (This is not a big surprise, because this
 is the only call to @code{are_equal()} in the program, but in more complex
 programs, knowing who called a function and with what parameters can be
 the key to finding the source of the problem.)
@@ -32624,24 +32632,24 @@ be inside this function.  To investigate further, we must begin
 @example
 @group
 gawk> @kbd{n}
-@print{} 66          if (fcount > 0) @{
+@print{} 75          if (fcount > 0) @{
 @end group
 @end example
 
-This tells us that @command{gawk} is now ready to execute line 66, which
+This tells us that @command{gawk} is now ready to execute line 75, which
 decides whether to give the lines the special ``field-skipping'' treatment
-indicated by the @option{-1} command-line option.  (Notice that we skipped
-from where we were before, at line 63, to here, because the condition
-in line 63, @samp{if (fcount == 0 && charcount == 0)}, was false.)
+indicated by the @samp{-f 1} command-line option.  (Notice that we skipped
+from where we were before, at line 72, to here, because the condition
+in line 72, @samp{if (fcount == 0 && charcount == 0)}, was false.)
 
 Continuing to step, we now get to the splitting of the current and
 last records:
 
 @example
 gawk> @kbd{n}
-@print{} 67              n = split(last, alast)
+@print{} 76              n = split(last, alast)
 gawk> @kbd{n}
-@print{} 68              m = split($0, aline)
+@print{} 77              m = split($0, aline)
 @end example
 
 At this point, we should be curious to see what our records were split
@@ -32661,7 +32669,7 @@ gawk> @kbd{p n m alast aline}
 
 This is kind of disappointing, though.  All we found out is that there
 are five elements in @code{alast}; @code{m} and @code{aline} don't have
-values because we are at line 68 but haven't executed it yet.
+values because we are at line 77 but haven't executed it yet.
 This information is useful enough (we now know that
 none of the words were accidentally left out), but what if we want to see
 inside the array?
@@ -32701,9 +32709,11 @@ or two:
 
 @example
 gawk> @kbd{n}
-@print{} 69              clast = join(alast, fcount, n)
+@print{} 78              clast = join(alast, fcount, n)
 gawk> @kbd{n}
-@print{} 70              cline = join(aline, fcount, m)
+@print{} 79              cline = join(aline, fcount, m)
+gawk> @kbd{n}
+@print{} 84          if (charcount) @{
 @end example
 
 Well, here we are at our error (sorry to spoil the suspense).  What we
@@ -32826,7 +32836,7 @@ Each breakpoint is assigned a number that can be used to delete it from
 the breakpoint list using the @code{delete} command.
 
 With a breakpoint, you may also supply a condition.  This is an
-@command{awk} expression (enclosed in double quotes) that the debugger
+@command{awk} expression @emph{enclosed in double quotes} that the debugger
 evaluates whenever the breakpoint is reached. If the condition is true,
 then the debugger stops execution and prompts for a command. Otherwise,
 it continues executing the program.
@@ -33592,7 +33602,7 @@ and
 
 @cindex debugger @subentry limitations
 We hope you find the @command{gawk} debugger useful and enjoyable to work with,
-but as with any program, especially in its early releases, it still has
+but as with any program, it still has
 some limitations.  A few that it's worth being aware of are:
 
 @itemize @value{BULLET}
@@ -33629,9 +33639,9 @@ programmer, you are expected to know the meaning of
 @item
 The @command{gawk} debugger is designed to be used by running a program (with all its
 parameters) on the command line, as described in @ref{Debugger Invocation}.
-There is no way (as of now) to attach or ``break into'' a running program.
-This seems reasonable for a language that is used mainly for quickly
-executing, short programs.
+There is no way to attach or ``break into'' a running program.
+This seems reasonable for a language that is used mainly for
+quickly-executing, short programs.
 
 @item
 The @command{gawk} debugger only accepts source code supplied with the @option{-f} option.
@@ -33722,8 +33732,8 @@ be added, and of course feel free to try to add them yourself!
 @itemize @value{BULLET}
 @item
 Programs rarely work correctly the first time.  Finding bugs
-is called debugging, and a program that helps you find bugs is a
-debugger.  @command{gawk} has a built-in debugger that works very
+is called @dfn{debugging}, and a program that helps you find bugs is a
+@dfn{debugger}.  @command{gawk} has a built-in debugger that works very
 similarly to the GNU Debugger, GDB.
 
 @item
@@ -33758,13 +33768,6 @@ program being debugged, but occasionally it can.
 @chapter Namespaces in @command{gawk}
 
 This chapter describes a feature that is specific to @command{gawk}.
-
-@quotation CAUTION
-This feature described in this chapter is new.  It is entirely
-possible, and even likely, that there are dark corners (if not bugs)
-still lurking within the implementation. If you find any such,
-please report them (@xref{Bugs}).
-@end quotation
 
 @menu
 * Global Namespace::            The global namespace in standard
@@ -33809,7 +33812,7 @@ are much fewer namespaces in use by any given program, and thus much
 less chance for collisions.)  These facilities are sometimes referred
 to as @dfn{packages} or @dfn{modules}.
 
-Starting with version 5.0, @command{gawk} provides a
+@command{gawk} provides a
 simple mechanism to put functions and global variables into separate namespaces.
 
 @node Qualified Names
@@ -33821,15 +33824,15 @@ simple mechanism to put functions and global variables into separate namespaces.
 @cindex colon (@code{:}) @subentry @code{::} namespace separator
 @cindex component name
 A @dfn{qualified name} is an identifier that includes a namespace name,
-the namespace separator @code{::}, and a @dfn{component} name.  For example, one
+the namespace separator @samp{::}, and a @dfn{component} name.  For example, one
 might have a function named @code{posix::getpid()}.  Here, the namespace
 is @code{posix} and the function name within the namespace (the component)
 is @code{getpid()}.  The namespace and component names are separated by
 a double-colon.  Only one such separator is allowed in a qualified name.
 
 @quotation NOTE
-Unlike C++, the @code{::} is @emph{not} an operator.  No spaces are
-allowed between the namespace name, the @code{::}, and the component name.
+Unlike C++, the @samp{::} is @emph{not} an operator.  No spaces are
+allowed between the namespace name, the @samp{::}, and the component name.
 @end quotation
 
 @cindex qualified name @subentry use of
@@ -33904,6 +33907,9 @@ the current namespace and starts over with an implicit @samp{@@namespace
 directive is seen.  When @command{gawk} finishes processing the included
 file, the saved namespace is restored and processing continues where it
 left off in the original file.
+
+Files included with @code{@@nsinclude} do not have the current namespace
+changed. @xref{Inclusion For Namespaces}, for more information.
 
 @cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive @subentry @code{BEGIN}, @code{BEGINFILE}, @code{END}, @code{ENDFILE} and
 @cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive @subentry @code{BEGIN}, @code{BEGINFILE}, @code{END}, @code{ENDFILE} and
@@ -34269,12 +34275,14 @@ with other important @command{gawk} features.
 @cindex @code{@@} (at-sign) @subentry @code{@@namespace} directive
 @cindex at-sign (@code{@@}) @subentry @code{@@namespace} directive
 @cindex @code{@@namespace} directive @sortas{namespace directive}
-The profiler and pretty-printer (@pxref{Profiling}) have been enhanced
-to understand namespaces and the namespace naming rules presented in
+The profiler and pretty-printer (@pxref{Profiling})
+understand namespaces and the namespace naming rules presented in
 @ref{Naming Rules}.  In particular, the output groups functions in the same
 namespace together, and has @code{@@namespace} directives in front
 of rules as necessary. This allows component names to be
 simple identifiers, instead of using qualified identifiers everywhere.
+Functions in the @code{"awk"} namespace are printed first,
+followed by functions in namespaces, sorted by namespace name.
 
 @cindex namespaces @subentry interaction with @subentry debugger
 @cindex debugger @subentry interaction with namespaces
@@ -34285,11 +34293,11 @@ was adjusted to match.
 
 @cindex namespaces @subentry interaction with @subentry extension API
 @cindex extension API @subentry interaction with namespaces
-The extension API (@pxref{Dynamic Extensions}) has always allowed for
-placing functions into a different namespace, although this was not
-previously implemented.  However, the symbol lookup and symbol update
-routines did not have provision for including a namespace. That has now
-been corrected (@pxref{Symbol table by name}).
+The extension API (@pxref{Dynamic Extensions}) allows for
+placing functions into a different namespace, and
+the symbol lookup and symbol update
+routines have provision for including a namespace.
+(@pxref{Symbol table by name}).
 @xref{Extension Sample Inplace}, for a nice example of an extension that
 leverages a namespace shared by cooperating @command{awk} and C code.
 
@@ -34304,7 +34312,7 @@ one wants to develop libraries of reusable functions or function suites.
 
 @item
 @command{gawk} provides multiple namespaces by using qualified names:
-names consisting of a namespace name, a double colon, @code{::}, and a
+names consisting of a namespace name, a double colon, @samp{::}, and a
 component name.  Namespace names might still possibly conflict, but this
 is true of any language providing namespaces, modules, or packages.
 
