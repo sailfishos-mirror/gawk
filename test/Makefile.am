@@ -1622,6 +1622,7 @@ EXTRA_DIST = \
 	double2.ok-zos \
 	elemnew4.ok-zos \
 	errno.ok-zos \
+	exit.ok-zos \
 	forcenum.ok-zos \
 	getlndir.ok-zos \
 	greek-equiv.ok-zos \
