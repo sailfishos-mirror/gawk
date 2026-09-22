@@ -35,7 +35,7 @@ touch test/Maketests
 find . -name Makefile.in -print | xargs touch
 touch pc/Makefile.tst
 sleep 1
-for i in gawkinet.texi gawk.texi gawkworkflow.texi notes.texi pm-gawk.texi
+for i in gawkinet.texi gawk.texi gawkworkflow.texi gawknotes.texi pm-gawk.texi
 do
 	touch doc/${i%.texi}.info	# file may not be there, can't use *.info
 done
