@@ -24,6 +24,7 @@
  */
 
 #include "awk.h"
+#include <langinfo.h>
 
 #include "localeinfo.h"
 
@@ -653,7 +654,7 @@ resetup()
 bool
 using_utf8(void)
 {
-	return localeinfo.using_utf8;
+	return strcmp(nl_langinfo(CODESET), "UTF-8") == 0;
 }
 
 /* reisstring --- return true if the RE match is a simple string match */
