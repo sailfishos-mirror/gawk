@@ -518,6 +518,7 @@ typedef struct exp_node {
 		REGEX           = 0x080000,	/* this is a typed regex */
 		CONVFMT_FMT	= 0x0100000,	/* string formatted via CONVFMT */
 		OFMT_FMT	= 0x0200000,	/* string formatted via OFMT */
+		UNINIT_WARNED	= 0x0400000,	/* warned that this var is uninitialized */
 	} flags;
 	long valref;
 } NODE;

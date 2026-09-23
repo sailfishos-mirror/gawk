@@ -2,6 +2,18 @@
 
 	* gawkapi.c (api_create_value): Allow AWK_BOOL also.
 
+	Unrelated: Don't warn multiple times about the same
+	unreferenced variable. Also, remove the warning about
+	// looking like a C++ comment.  Thanks to Kpop 2GM
+	<jason.cy.kwan@gmail.com> for the report.
+
+	* awk.h [UNINIT_WARNED]: New flag.
+	* awkgram.y (grammar): For REGEXP, remove warning about C++ comment.
+	* eval.c (flags2str): Add an entry for UNINIT_WARNED.
+	(r_get_lhs): Add check for flag being absent before issuing warning.
+	Set the flag if it was clear.
+	* interpret.h (r_interpret): Op_push* cases. Ditto.
+
 2026-09-20         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* bootstrap.sh: doc/notes.texi is now doc/gawknotes.texi. Ooops.
