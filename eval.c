@@ -459,6 +459,7 @@ flags2str(int flagval)
 		{ REGEX, "REGEX" },
 		{ CONVFMT_FMT, "CONVFMT_FMT" },
 		{ OFMT_FMT, "OFMT_FMT" },
+		{ UNINIT_WARNED, "UNINIT_WARNED" },
 		{ 0,	NULL },
 	};
 
@@ -1203,11 +1204,14 @@ r_get_lhs(NODE *n, bool reference)
 		cant_happen("unexpected variable type %s", nodetype2str(n->type));
 	}
 
-	if (do_lint && reference && var_uninitialized(n))
+	if (do_lint && reference && var_uninitialized(n)
+	    && (n->flags & UNINIT_WARNED) == 0) {
+		n->flags |= UNINIT_WARNED;
 		lintwarn((isparam ?
 			_("reference to uninitialized argument `%s'") :
 			_("reference to uninitialized variable `%s'")),
 				n->vname);
+	}
 	return & n->var_value;
 }
 

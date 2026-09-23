@@ -465,7 +465,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 	      pstr->offsets[byte_idx] = src_idx;
 	    ++src_idx;
 
-	    /* And also cast it to wide char.  */
+	    /* And also convert it to wide char.  */
 	    pstr->wcs[byte_idx++] = (char32_t) ch;
 	    if (__glibc_unlikely (mbclen == (size_t) -1))
 	      pstr->cur_state = prev_st;
