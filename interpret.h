@@ -199,11 +199,13 @@ top:
 
 			switch (m->type) {
 			case Node_var:
-				if (do_lint && var_uninitialized(m))
+				if (do_lint && var_uninitialized(m) && (m->flags & UNINIT_WARNED) == 0) {
+					m->flags |= UNINIT_WARNED;
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
 						_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
+				}
 				m = m->var_value;
 				UPREF(m);
 				PUSH(m);
@@ -212,11 +214,13 @@ top:
 			case Node_var_new:
 uninitialized_scalar:
 				if (op != Op_push_arg_untyped) {	// not isarray() or typeof()
-					if (do_lint)
+					if (do_lint && (m->flags & UNINIT_WARNED) == 0) {
+						m->flags |= UNINIT_WARNED;
 						lintwarn(isparam ?
 							_("reference to uninitialized argument `%s'") :
 							_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
+					}
 
 					// convert very original untyped to scalar
 					m->type = Node_var;
@@ -232,11 +236,13 @@ uninitialized_scalar:
 				break;
 
 			case Node_elem_new:
-				if (do_lint)
+				if (do_lint && (m->flags & UNINIT_WARNED) == 0) {
+					m->flags |= UNINIT_WARNED;
 					lintwarn(isparam ?
 						_("reference to uninitialized argument `%s'") :
 						_("reference to uninitialized variable `%s'"),
-								save_symbol->vname);
+							save_symbol->vname);
+				}
 
 				if (op != Op_push_arg_untyped) {
 					// convert very original untyped to scalar
