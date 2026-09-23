@@ -34401,7 +34401,7 @@ points where @command{gawk} and the POSIX standard are not quite in
 agreement.
 
 @quotation NOTE
-Most users of @command{gawk} can safely skip this chapter.
+Most @command{gawk} users can safely skip this chapter.
 But if you want to do scientific calculations with @command{gawk},
 this is the place to be.
 @end quotation
@@ -34668,8 +34668,7 @@ arithmetic in @command{gawk}.
 @node MPFR On Parole
 @subsection Arbitrary Precision Arithmetic is On Parole!
 
-As of version 5.2,
-arbitrary precision arithmetic in @command{gawk}
+Arbitrary precision arithmetic in @command{gawk}
 is ``on parole.''  The primary @command{gawk} maintainer is no
 longer maintaining it. Fortunately, a volunteer from the development
 team has agreed to take it over.
@@ -34711,8 +34710,8 @@ is available like so:
 
 @example
 $ @kbd{gawk --version}
-@print{} GNU Awk 5.3.1, API 4.0, PMA Avon 8-g1, (GNU MPFR 4.1.0, GNU MP 6.2.1)
-@print{} Copyright (C) 1989, 1991-2024 Free Software Foundation.
+@print{} GNU Awk 5.4.1, API 4.1, PMA Avon 8-g1, (GNU MPFR 4.2.1, GNU MP 6.3.0)
+@print{} Copyright (C) 1989, 1991-2026 Free Software Foundation.
 @dots{}
 @end example
 
@@ -35397,7 +35396,7 @@ For example, consider the following program:
 @example
 BEGIN @{
     pi = 3.1416
-    OFMT = "%.f"        @ii{Print value as integer}
+    OFMT = "%.0f"       @ii{Print value as integer}
     print pi            @ii{ROUNDMODE = "N" by default.}
     ROUNDMODE = "U"     @ii{Now change ROUNDMODE}
     print pi
@@ -35777,7 +35776,7 @@ got where you are, but we don't think that that's where you want to be.''
 
 Recognizing these issues, but attempting to provide compatibility
 with the earlier versions of the standard,
-the 2008 POSIX standard added explicit wording to allow, but not require,
+the POSIX standard has explicit wording to allow, but not require,
 that @command{awk} support hexadecimal floating-point values and
 special values for ``not a number'' and infinity.
 
@@ -35831,8 +35830,8 @@ Thus, @samp{+nan} and @samp{+NaN} are the same.
 
 @cindex POSIX mode
 Besides handling input, @command{gawk} also needs to print ``correct'' values on
-output when a value is either NaN or infinity. Starting with version
-4.2.2, for such values @command{gawk} prints one of the four strings
+output when a value is either NaN or infinity.
+For such values @command{gawk} prints one of the four strings
 just described: @samp{+inf}, @samp{-inf}, @samp{+nan}, or @samp{-nan}.
 Similarly, in POSIX mode, @command{gawk} prints the result of
 the system's C @code{printf()} function using the @samp{%g} format string
@@ -35869,10 +35868,10 @@ Operations are not always truly associative or distributive.
 @end itemize
 
 @item
-Increasing the accuracy can help, but it is not a panacea.
+Increasing the precision can help, but it is not a panacea.
 
 @item
-Often, increasing the accuracy and then rounding to the desired
+Often, increasing the precision and then rounding to the desired
 number of digits produces reasonable results.
 
 @item
