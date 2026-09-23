@@ -1335,6 +1335,7 @@ api_create_value(awk_ext_id_t id, awk_value_t *value,
 	case AWK_STRNUM:
 	case AWK_STRING:
 	case AWK_REGEX:
+	case AWK_BOOL:
 		break;
 	default:
 		/* reject anything other than a simple scalar */

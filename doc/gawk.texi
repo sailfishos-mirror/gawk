@@ -36254,7 +36254,7 @@ the @command{gawk} source code.
 @item
 If your extension uses MPFR facilities, and you wish to receive such
 values from @command{gawk} and/or pass such values to it, you must include the
-@code{<mpfr.h>} header before including @code{<gawkapi.h>}.
+@code{<gmp.h>} and @code{<mpfr.h>} headers before including @code{<gawkapi.h>}.
 
 @item
 The @file{gawkapi.h} file may be included more than once without ill effect.
@@ -36456,7 +36456,7 @@ floating-point value (type @code{mpfr_ptr_t}), and cast it appropriately.
 
 @quotation CAUTION
 Any MPFR or MPZ values that you create and pass to @command{gawk}
-to save are @emph{copied}. This means you are responsible to release
+to save are @emph{copied}. This means you are responsible for releasing
 the storage once you're done with it. See the @code{intdiv} sample
 extension for some example code.
 @end quotation
@@ -36474,7 +36474,7 @@ and in more detail in @ref{Cached values}.
 
 @end table
 
-Scalar values in @command{awk} are numbers, strings, strnums, or typed regexps. The
+Scalar values in @command{awk} are numbers, strings, strnums, Booleans, or typed regexps. The
 @code{awk_value_t} struct represents values.  The @code{val_type} member
 indicates what is in the @code{union}.
 
@@ -36729,7 +36729,8 @@ This function creates an MPFR number value in @code{result}.
 The @code{mpfr} must be from a call to @code{get_mpfr_ptr()}.
 
 @item static inline awk_value_t *
-@itemx make_const_user_input(const char *string, size_t length, awk_value_t *result);
+@itemx make_const_user_input(const char *string, size_t length,
+@itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_value_t@ *result);
 This function is identical to @code{make_const_string()}, but the string is
 flagged as user input that should be treated as a strnum value if the contents
 of the string are numeric.
@@ -37003,6 +37004,8 @@ By default, @command{gawk} reads text files as its input. It uses the value
 of @code{RS} to find the end of an input record, and then uses @code{FS}
 (or @code{FIELDWIDTHS} or @code{FPAT}) to split it into fields (@pxref{Reading Files}).
 Additionally, it sets the value of @code{RT} (@pxref{Built-in Variables}).
+(@command{gawk} can also process CSV data, but that's a side point to
+this discussion.)
 
 If you want, you can provide your own custom input parser.  An input
 parser's job is to return a record to the @command{gawk} record-processing
@@ -37268,7 +37271,7 @@ if you supply a function to get a record, @command{gawk} will
 call it, and will never call the raw read function.
 @end quotation
 
-@command{gawk} ships with a sample extension that reads directories,
+@command{gawk} ships with a sample extension named @code{readdir} that reads directories,
 returning records for each entry in a directory (@pxref{Extension
 Sample Readdir}).  You may wish to use that code as a guide for writing
 your own input parser.
@@ -37323,7 +37326,7 @@ for @code{$1}, and so on through the @code{fields[nf-1]} element containing the 
 A convenience macro @code{awk_fieldwidth_info_size(numfields)} is provided to
 calculate the appropriate size of a variable-length
 @code{awk_fieldwidth_info_t} structure containing @code{numfields} fields. This can
-be used as an argument to @code{malloc()} or in a union to allocate space
+be used as an argument to @code{gawk_malloc()} or in a union to allocate space
 statically. Please refer to the @code{readdir_test} sample extension for an
 example.
 
@@ -37509,6 +37512,7 @@ You register your two-way processor with the following function:
 @item void register_two_way_processor(awk_two_way_processor_t *two_way_processor);
 Register the two-way processor pointed to by @code{two_way_processor} with
 @command{gawk}.
+See the @code{revtwoway} sample extension for example code.
 @end table
 
 @node Printing Messages
@@ -37557,8 +37561,8 @@ error codes in @code{<errno.h>}, and @command{gawk} turns it
 into a (possibly translated) string using the C @code{strerror()} function.
 
 @item void update_ERRNO_string(const char *string);
-Set @code{ERRNO} directly to the string value of @code{ERRNO}.
-@command{gawk} makes a copy of the value of @code{string}.
+Set @code{ERRNO} directly to the string value of @code{string}.
+@command{gawk} makes a copy of @code{string}.
 
 @item void unset_ERRNO(void);
 Unset @code{ERRNO}.
@@ -37812,7 +37816,7 @@ with the @code{count}th argument.  Return true if the actual
 type matches @code{wanted}, and false otherwise.  In the latter
 case, @code{result@w{->}val_type} indicates the actual type
 (@pxref{table-value-types-returned}).  Counts are zero-based---the first
-argument is numbered zero, the second one, and so on. @code{wanted}
+argument is numbered zero, the second is one, and so on. @code{wanted}
 indicates the type of value expected.
 
 @item awk_bool_t set_argument(size_t count, awk_array_t array);
@@ -37878,7 +37882,8 @@ is @emph{not} allowed, nor may this routine be used to update an array.
 This routine cannot be used to update any of the predefined
 variables (such as @code{ARGC} or @code{NF}).
 
-@item awk_bool_t sym_update_ns(const char *name_space, const char *name, awk_value_t *value);
+@item awk_bool_t sym_update_ns(const char *name_space, const char *name,
+@itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_value_t@ *value);
 This is like @code{sym_update()}, but the @code{name_space} parameter allows you
 to specify which namespace @code{name} is part of.  @code{name_space} cannot be
 @code{NULL}. If it is @code{""} or @code{"awk"}, then @code{name} is searched
@@ -37918,7 +37923,8 @@ Return false if the value cannot be retrieved.
 
 @item awk_bool_t sym_update_scalar(awk_scalar_t cookie, awk_value_t *value);
 Update the value associated with a scalar cookie.  Return false if
-the new value is not of type @code{AWK_STRING}, @code{AWK_STRNUM}, @code{AWK_REGEX}, or @code{AWK_NUMBER}.
+the new value is not of type @code{AWK_STRING}, @code{AWK_STRNUM}, @code{AWK_REGEX},
+@code{AWK_BOOL}, or @code{AWK_NUMBER}.
 Here too, the predefined variables may not be updated.
 @end table
 
@@ -38043,7 +38049,7 @@ is what the routines in this section let you do.  The functions are as follows:
 @item awk_bool_t create_value(awk_value_t *value, awk_value_cookie_t *result);
 Create a cached string or numeric value from @code{value} for
 efficient later assignment.  Only values of type @code{AWK_NUMBER}, @code{AWK_REGEX}, @code{AWK_STRNUM},
-and @code{AWK_STRING} are allowed.  Any other type is rejected.
+@code{AWK_BOOL}, and @code{AWK_STRING} are allowed.  Any other type is rejected.
 @code{AWK_UNDEFINED} could be allowed, but doing so would result in
 inferior performance.
 
@@ -38182,8 +38188,8 @@ and @command{gawk}.  Currently there is only one: @code{AWK_ELEMENT_DELETE}.
 Setting it causes @command{gawk} to delete the
 element from the original array upon release of the flattened array.
 
-@item index
-@itemx value
+@item awk_value_t index;
+@itemx awk_value_t value;
 The index and value of the element, respectively.
 @emph{All} memory pointed to by @code{index} and @code{value} belongs to @command{gawk}.
 @end table
@@ -38267,7 +38273,7 @@ create a new array and add elements to it.
 @item awk_bool_t clear_array(awk_array_t a_cookie);
 Clear the array represented by @code{a_cookie}.
 Return false if there was some kind of problem, true otherwise.
-The array remains an array, but after calling this function, it
+The array remains an array, and can be reused, but after calling this function, it
 has no elements. This is equivalent to using the @code{delete}
 statement (@pxref{Delete}).
 
@@ -38295,19 +38301,21 @@ See the next section
 for a discussion of how to
 flatten an array and work with it.
 
+@c FIXME: Consider removing for 6.0
 @item awk_bool_t flatten_array(awk_array_t a_cookie, awk_flat_array_t **data);
 For the array represented by @code{a_cookie}, create an @code{awk_flat_array_t}
 structure and fill it in with @code{AWK_STRING} indices and
 @code{AWK_UNDEFINED} values.
 This is superseded by @code{flatten_array_typed()}.
 It is provided as a macro, and remains for convenience and for source code
-compatibility with the previous version of the API.
+compatibility with earlier versions of the API.
 
 @item awk_bool_t release_flattened_array(awk_array_t a_cookie,
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_flat_array_t *data);
 When done with a flattened array, release the storage using this function.
 You must pass in both the original array cookie and the address of
 the created @code{awk_flat_array_t} structure.
+Elements that were marked for deletion are removed from the array.
 The function returns true upon success, false otherwise.
 @end table
 
@@ -38733,7 +38741,7 @@ If @code{name} is @code{NULL} or @code{name_len} is zero, return
 data for the currently open input file corresponding to @code{FILENAME}.
 (This does not access the @code{filetype} argument, so that may be undefined).
 If the file is not already open, attempt to open it.
-The @code{filetype} argument must be zero-terminated and should be one of:
+The @code{filetype} argument must be a zero-terminated string and should be one of:
 
 @table @code
 @item ">"
@@ -38783,8 +38791,9 @@ the two-way case, the input and output file descriptors may differ.
 To check for success, you must check whether either matches.
 @end table
 
-It is anticipated that this API function will be used to implement I/O
-multiplexing and a socket library.
+This API function is used to implement I/O multiplexing and a
+socket library in @code{gawkextlib}'s @code{socket} extension
+(@pxref{gawkextlib}).
 
 @node Extension API Variables
 @subsection API Variables
@@ -38895,7 +38904,7 @@ the @code{<mpfr.h>} header file, then this macro will be defined to do nothing.
 
 If you have included that file, then this macro compares the MPFR
 and GMP major and minor versions against those of the library you are
-compiling against.  If your libraries are newer than @command{gawk}'s, it
+compiling against.  If your libraries are different from @command{gawk}'s, it
 produces a fatal error message.
 
 The @code{dl_load_func()} macro (@pxref{Extension API Boilerplate})
@@ -39088,7 +39097,7 @@ Numeric values can now have MPFR/MPZ variants
 (@pxref{General Data Types}).
 
 @item
-There are new string types: @code{AWK_REGEX} and @code{AWK_STRNUM}
+There are additional types: @code{AWK_REGEX}, @code{AWK_STRNUM}, and @code{AWK_BOOL}.
 (@pxref{General Data Types}).
 
 @item
@@ -39348,10 +39357,11 @@ int plugin_is_GPL_compatible;
 @cindex programming conventions @subentry @command{gawk} extensions
 By convention, for an @command{awk} function @code{foo()}, the C function
 that implements it is called @code{do_foo()}.  The function should have
-two arguments. The first is an @code{int}, usually called @code{nargs},
+three arguments. The first is an @code{int}, usually called @code{nargs},
 that represents the number of actual arguments for the function.
 The second is a pointer to an @code{awk_value_t} structure, usually named
-@code{result}:
+@code{result}. The third is a pointer a @code{struct awk_ext_func}, which
+can be ignored if not needed:
 
 @example
 @group
@@ -39831,7 +39841,7 @@ In all cases, it clears the @code{statdata} array.
 When the call is successful, @code{stat()} fills the @code{statdata}
 array with information retrieved from the filesystem, as follows:
 
-@multitable @columnfractions .15 .50 .20
+@multitable @columnfractions .15 .45 .25
 @headitem Subscript @tab Field in @code{struct stat} @tab File type
 @item @code{"name"} @tab The @value{FN} @tab All
 @item @code{"dev"} @tab @code{st_dev} @tab All
@@ -40023,7 +40033,7 @@ flags in the @code{FNM} array
 The flags are as follows:
 
 @multitable @columnfractions .25 .75
-@headitem Array element @tab Corresponding flag defined by @code{fnmatch()}
+@headitem Array element @tab Corresponding flag defined by C function @code{fnmatch()}
 @item @code{FNM["CASEFOLD"]} @tab @code{FNM_CASEFOLD}
 @item @code{FNM["FILE_NAME"]} @tab @code{FNM_FILE_NAME}
 @item @code{FNM["LEADING_DIR"]} @tab @code{FNM_LEADING_DIR}
@@ -40201,12 +40211,6 @@ If @code{inplace::suffix} is not an empty string, the original file is
 linked to a backup @value{FN} created by appending that suffix.  Finally,
 the temporary file is renamed to the original @value{FN}.
 
-Note that the use of this feature can be controlled by placing
-@samp{inplace::enable=0} on the command-line prior to listing files that
-should not be processed this way.  You can reenable inplace editing by adding
-an @samp{inplace::enable=1} argument prior to files that should be subject
-to inplace editing.
-
 The @code{inplace::filename} variable serves to keep track of the
 current @value{FN} so as to not invoke @code{inplace::end()} before
 processing the first file.
@@ -40227,7 +40231,15 @@ $ @kbd{gawk -i inplace -v inplace::suffix=.bak '@{ gsub(/foo/, "bar") @}}
 > @kbd{@{ print @}' file1 file2 file3}
 @end example
 
-Please note that, while the extension does attempt to preserve ownership
+@cindex ACLs @seeentry{Access Control Lists}
+@cindex Access Control Lists
+Some systems provide additional facilities for controlling access to a file,
+above and beyond the standard user/group/other permissions defined by POSIX.
+These are often referred to as @dfn{Access Control Lists}, or ACLs.
+Unfortunately, these facilities are not standardized, and differ from one
+operating system to the next.
+
+While the @code{inplace} extension does attempt to preserve ownership
 and permissions, it makes no attempt to copy the ACLs from the original
 file.
 
@@ -40370,7 +40382,7 @@ printf("The numeric value of 'A' is %d\n", ord("A"))
 printf("The string value of 65 is %s\n", chr(65))
 @end example
 
-As of release 5.4 of @command{gawk}, the extension can handle multibyte /
+The extension can handle multibyte /
 wide character sets.  If given an invalid multibyte string, in a UTF-8
 locale, @code{ord()} returns the Unicode ``invalid character'' value,
 @code{0xFFFD}. Otherwise, it returns the numeric value of the first byte
@@ -40625,7 +40637,7 @@ This is how you load the extension.
 
 @cindex @code{gettimeofday()} extension function
 @item the_time = gettimeofday()
-Return the time in seconds that has elapsed since 1970-01-01 UTC as a
+Return the time in seconds that has elapsed since the epoch as a
 floating-point value.  If the time is unavailable on this platform, return
 @minus{}1 and set @code{ERRNO}.  The returned time should have sub-second
 precision, but the actual precision may vary based on the platform.
@@ -40683,7 +40695,7 @@ Some of the more interesting extensions are:
 
 @itemize @value{BULLET}
 @item
-@code{abort} extension. It allows you to exit immediately from your
+@code{abort} extension. This allows you to exit immediately from your
 @command{awk} program without running the @code{END} rules.
 
 @item
@@ -40693,12 +40705,17 @@ can deserialize a JSON string into a @command{gawk} array.
 This extension is interesting since it is written in C++ instead of C.
 
 @item
+@code{mbs} extension.
+This provides several functions that let you work with the bytes
+of a string, instead of working in characters.
+
+@item
 MPFR library extension.
 This provides access to a number of MPFR functions that @command{gawk}'s
 native MPFR support does not.
 
 @item
-Select extension. It provides functionality based on the
+Select extension. This provides functionality based on the
 @code{select()} system call.
 
 @item
