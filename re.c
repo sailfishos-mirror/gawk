@@ -24,6 +24,7 @@
  */
 
 #include "awk.h"
+#include <langinfo.h>
 
 #include "localeinfo.h"
 
