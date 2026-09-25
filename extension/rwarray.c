@@ -221,7 +221,7 @@ write_array(FILE *fp, awk_array_t array)
 	uint32_t count;
 	awk_flat_array_t *flat_array;
 
-	if (! flatten_array(array, & flat_array)) {
+	if (! flatten_array_typed(array, & flat_array, AWK_STRING, AWK_UNDEFINED)) {
 		warning(ext_id, _("write_array: could not flatten array"));
 		return awk_false;
 	}
