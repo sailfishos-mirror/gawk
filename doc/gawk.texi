@@ -6572,6 +6572,8 @@ With the POSIX character classes, you can write
 @code{/[[:alnum:]]/} to match the alphabetic
 and numeric characters in your character set.
 
+@c 9/26: This is obsolete
+@ignore
 @c Thanks to
 @c Date: Tue, 01 Jul 2014 07:39:51 +0200
 @c From: Hermann Peifer <peifer@gmx.eu>
@@ -6583,6 +6585,7 @@ all values numerically between zero and 127, which is the defined
 range of the ASCII character set.  Use a complemented character list
 (@samp{[^\x00-\x7F]}) to match any single-byte characters that are not
 in the ASCII range.
+@end ignore
 
 @cindex bracket expressions @subentry collating elements
 @cindex bracket expressions @subentry non-ASCII
@@ -22759,19 +22762,14 @@ function _ord_init(    low, high, i, t)
 @cindex ASCII
 @cindex EBCDIC
 @cindex Unicode
-@cindex mark parity
 Some explanation of the numbers used by @code{_ord_init()} is worthwhile.
-The most prominent character set in use today is ASCII.@footnote{This
-is changing; many systems use Unicode, a very large character set
-that includes ASCII as a subset.  On systems with full Unicode support,
-a character can occupy up to 32 bits, making simple tests such as
-used here prohibitively expensive.}
-Although an
-8-bit byte can hold 256 distinct values (from 0 to 255), ASCII only
-defines characters that use the values from 0 to 127.@footnote{ASCII
+For many years, the most prominent character set in use was ASCII.
+Although an 8-bit byte can hold 256 distinct values (from 0 to 255), ASCII
+only defines characters that use the values from 0 to 127.@footnote{ASCII
 has been extended in many countries to use the values from 128 to 255
 for country-specific characters.  If your  system uses these extensions,
 you can simplify @code{_ord_init()} to loop from 0 to 255.}
+
 Large mainframe systems use the EBCDIC character set, which
 uses all 256 values.
 There are other character sets that were used on some ancient systems, but
@@ -22811,12 +22809,16 @@ written this way initially for ease of development.
 There is a ``test program'' in a @code{BEGIN} rule, to test the
 function.  It is commented out for production use.
 
-For a long time now, the world has been moving to the use of
-the @uref{https://www.unicode.org, Unicode character set}.
-The @command{awk} functions in this subsection don't work
-with Unicode, which is a multi-byte character set.
+@quotation CAUTION
+Today, most computing systems use the @uref{https://www.unicode.org,
+Unicode character set}.  ASCII is a subset of Unicode.  If you only
+work with ASCII data, you can use these functions.  Otherwise, they
+won't work with Unicode, which is a multi-byte character set.
+@end quotation
+
 With @command{gawk}, you can use the @code{ordchr} extension
-functions; see @ref{Extension Sample Ord}, for more information.
+functions, which can handle Unicode; see @ref{Extension Sample Ord},
+for more information.
 
 @node Join Function
 @subsection Merging an Array into a String
@@ -27121,11 +27123,11 @@ Today, the most popular character set in use is Unicode (of which ASCII
 is a pure subset). Unicode provides tens of thousands of unique characters
 (called @dfn{code points}) to cover most existing human languages, living
 and dead.  (Sadly, proposals to add some nonhuman ones, such as Klingon and
-J.R.R.@: Tolkien's Elvish languages, were not accepted).
+J.@: R.@: R.@: Tolkien's Elvish languages, were not accepted).
 
-To save space in files, Unicode code points are @dfn{encoded}, where each
+To save space in files and in memory, Unicode code points are @dfn{encoded}, where each
 character takes from one to four bytes in the file.  UTF-8 is possibly
-the most popular of such @dfn{multibyte encodings}.
+the most popular of such @dfn{multibyte encodings}, although there are others.
 
 The POSIX standard requires that @command{awk} function in terms
 of characters, not bytes.  Thus in @command{gawk}, @code{length()},
@@ -30391,7 +30393,7 @@ has been read, @command{gawk} terminates the coprocess and exits.
 
 @cindex ASCII
 As a side note, the assignment @samp{LC_ALL=C} in the @command{sort}
-command ensures traditional Unix (ASCII) sorting from @command{sort}.
+command ensures traditional Unix sorting from @command{sort}.
 This is not strictly necessary here, but it's good to know how to do this.
 
 Be careful when closing the @code{"from"} end of a two-way pipe; in this
@@ -43013,7 +43015,7 @@ The interaction of POSIX locales and regexp matching in @command{gawk} has been 
 the years. Today, @command{gawk} implements Rational Range Interpretation, where
 ranges of the form @samp{[a-z]} match @emph{only} the characters numerically between
 @samp{a} through @samp{z} in the machine's native character set.  Usually this is ASCII,
-but it can be EBCDIC on IBM S/390 systems.
+but it can be EBCDIC on IBM S/390x systems.
 
 @item
 Many people have contributed to @command{gawk} development over the years.
@@ -46755,12 +46757,11 @@ See ``Bracket Expression.''
 @item Character Set
 The set of numeric codes used by a computer system to represent the
 characters (letters, numbers, punctuation, etc.) of a particular country
-or place. The most common character set in use today is ASCII (American
-Standard Code for Information Interchange).  Many European
-countries use an extension of ASCII known as ISO-8859-1 (ISO Latin-1).
-The @uref{https://www.unicode.org, Unicode character set} is
-increasingly popular and standard, and is particularly
-widely used on GNU/Linux systems.
+or place. The most common character set in use today is
+the @uref{https://www.unicode.org, Unicode character set},
+of which ASCII (American
+Standard Code for Information Interchange) is a pure subset.  Many European
+countries used to use an extension of ASCII known as ISO-8859-1 (ISO Latin-1).
 
 @cindex Kernighan, Brian
 @cindex Bentley, Jon
