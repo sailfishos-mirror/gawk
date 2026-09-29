@@ -167,7 +167,7 @@ dump_array_and_delete(int nargs, awk_value_t *result, struct awk_ext_func *unuse
 
 	printf("dump_array_and_delete: incoming size is %lu\n", (unsigned long) count);
 
-	if (! flatten_array(value2.array_cookie, & flat_array)) {
+	if (! flatten_array_typed(value2.array_cookie, & flat_array, AWK_STRING, AWK_UNDEFINED)) {
 		printf("dump_array_and_delete: could not flatten array\n");
 		goto out;
 	}
@@ -265,7 +265,7 @@ try_modify_environ(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 		gawk_free(value.str_value.str);
 	}
 
-	if (! flatten_array(environ_array, & flat_array)) {
+	if (! flatten_array_typed(environ_array, & flat_array, AWK_STRING, AWK_UNDEFINED)) {
 		printf("try_modify_environ: could not flatten array\n");
 		goto out;
 	}

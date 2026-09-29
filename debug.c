@@ -3588,7 +3588,7 @@ no_output:
 	if (b != NULL) {
 		int ret;
 		ret = execute_commands(&b->commands);
-		if ((b->flags & BP_TEMP) != 0)
+		if (ret && (b->flags & BP_TEMP) != 0)
 			delete_breakpoint(b);
 		if (ret)	/* resume execution */
 			return;
@@ -5105,9 +5105,11 @@ do_commands(CMDARG *arg, int cmd)
 	c->cmd = cmd;
 
 	/* N.B.: first arg is the command string, see command.y */
-	c->cmd_string = arg->a_string;
-	c->arg = arg->next; /* actual arguments to the command */
-	efree(arg);
+	if (arg != NULL) {
+		c->cmd_string = arg->a_string;
+		c->arg = arg->next; /* actual arguments to the command */
+		efree(arg);
+	}
 
 	/* append to the list */
 	c->prev = commands->prev;
@@ -5125,11 +5127,13 @@ do_commands(CMDARG *arg, int cmd)
 static int
 execute_commands(struct commands_item *commands)
 {
-	struct commands_item *c;
+	struct commands_item *c, *cnext;
 	Func_cmd cmd_ptr;
 	bool ret = false;
 
-	for (c = commands->next; c != commands; c = c->next) {
+	for (c = commands->next; c != commands; c = cnext) {
+		// use a local, in case the command deletes this breakpoint
+		cnext = c->next;
 		if (c->cmd == D_silent)
 			continue;
 		cmd_ptr = get_command(c->cmd);		/* command handler */
