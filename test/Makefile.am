@@ -348,6 +348,8 @@ EXTRA_DIST = \
 	elemnew5.ok \
 	elemnew6.awk \
 	elemnew6.ok \
+	elemnew7.awk \
+	elemnew7.ok \
 	equiv.awk \
 	equiv.in \
 	equiv.ok \
@@ -1682,6 +1684,7 @@ GAWK_EXT_TESTS = \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delmessy delsub \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	elemnew1 elemnew2 elemnew3 elemnew4 equiv errno exit \
+	elemnew7 \
 	fieldwdth forcenum fpat1 fpat2 fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 \
 	fpat9 fpatnull fsfwfs functab1 functab2 functab3 functab6 funlen \
 	fwtest fwtest2 fwtest3 fwtest4 fwtest5 fwtest6 fwtest7 fwtest8 \
