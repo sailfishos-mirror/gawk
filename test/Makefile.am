@@ -680,6 +680,12 @@ EXTRA_DIST = \
 	indirectbuiltin5.ok \
 	indirectbuiltin6.awk \
 	indirectbuiltin6.ok \
+	indirectbuiltin7.awk \
+	indirectbuiltin7.ok \
+	indirectbuiltin8.awk \
+	indirectbuiltin8.ok \
+	indirectbuiltin9.awk \
+	indirectbuiltin9.ok \
 	indirectcall2.awk \
 	indirectcall2.ok \
 	indirectcall3.awk \
@@ -1686,6 +1692,7 @@ GAWK_EXT_TESTS = \
 	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
 	include include2 indirectbuiltin indirectbuiltin3 indirectbuiltin4 \
 	indirectbuiltin5 indirectbuiltin6 indirectcall indirectcall2 \
+	indirectbuiltin7 indirectbuiltin8 indirectbuiltin9 \
 	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintold lintplus lintplus2 \
 	lintplus3 lintset lintsubarray linttypeof lintwarn \

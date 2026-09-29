@@ -233,6 +233,7 @@ GAWK_EXT_TESTS = \
 	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
 	include include2 indirectbuiltin indirectbuiltin3 indirectbuiltin4 \
 	indirectbuiltin5 indirectbuiltin6 indirectcall indirectcall2 \
+	indirectbuiltin7 indirectbuiltin8 indirectbuiltin9 \
 	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintold lintplus lintplus2 \
 	lintplus3 lintset lintsubarray linttypeof lintwarn \
@@ -3275,6 +3276,21 @@ indirectcall:
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 indirectcall2:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+indirectbuiltin7:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+indirectbuiltin8:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+indirectbuiltin9:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@

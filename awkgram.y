@@ -5293,6 +5293,8 @@ make_regnode(NODETYPE type, NODE *exp)
 	n->re_cnt = 1;
 
 	if (type == Node_regex) {
+		if (exp->stptr == NULL)	// can happen in indirect calls
+			return NULL;
 		n->re_reg[0] = make_regexp(exp->stptr, exp->stlen, false, true, false);
 		if (n->re_reg[0] == NULL) {
 			freenode(n);
