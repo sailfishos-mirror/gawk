@@ -21,6 +21,16 @@
 	make sure valref is > 1 before derefing. See elemnew7.awk
 	test case.
 
+	Unrelated:
+
+	* debug.c (do_commands): Check that arg is not NULL. See
+	dbugbadcmd.awk test.
+	(execute_commands): Use a local to walk the list in case the
+	command deletes the breakpoint. See dbugbreak test case.
+	(next_command): Check ret before checking if to delete a temporary
+	breakpoint, as it might already have been deleted. Thanks to
+	valgrind for the catch.
+
 2026-09-29         Henner Zeller         <henner.zeller+gawk@gmail.com>
 
 	* main.c (load_environ): Avoid writing into environment strings.

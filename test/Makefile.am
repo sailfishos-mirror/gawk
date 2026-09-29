@@ -273,6 +273,14 @@ EXTRA_DIST = \
 	dbugarray4.awk \
 	dbugarray4.in \
 	dbugarray4.ok \
+	dbugbadcmd.awk \
+	dbugbadcmd.in \
+	dbugbadcmd-in.txt \
+	dbugbadcmd.ok \
+	dbugbreak.awk \
+	dbugbreak.in \
+	dbugbreak-in.txt \
+	dbugbreak.ok \
 	dbugeval.in \
 	dbugeval.ok \
 	dbugeval2.awk \
@@ -1682,6 +1690,7 @@ GAWK_EXT_TESTS = \
 	clos1way6 colonwarn crlf csv1 csv2 csv3 csvodd \
 	dbugarray1 dbugarray2 dbugarray3 dbugarray4 dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delmessy delsub \
+	dbugbadcmd dbugbreak \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	elemnew1 elemnew2 elemnew3 elemnew4 equiv errno exit \
 	elemnew7 \
@@ -2803,6 +2812,16 @@ indirectbuiltin2:
 	@-for test in 0 1 2 3 4 5 ; do \
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+dbugbadcmd:
+	@echo $@
+	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+dbugbreak:
+	@echo $@
+	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 # Targets generated for other tests:
