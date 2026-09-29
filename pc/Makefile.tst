@@ -221,8 +221,10 @@ GAWK_EXT_TESTS = \
 	clos1way6 colonwarn crlf csv1 csv2 csv3 csvodd \
 	dbugarray1 dbugarray2 dbugarray3 dbugarray4 dbugeval dbugeval2 \
 	dbugeval3 dbugeval4 dbugtypedre1 dbugtypedre2 delmessy delsub \
+	dbugbadcmd dbugbreak \
 	devfd devfd1 devfd2 dfacheck1 dumpvars \
 	elemnew1 elemnew2 elemnew3 elemnew4 equiv errno exit \
+	elemnew7 \
 	fieldwdth forcenum fpat1 fpat2 fpat3 fpat4 fpat5 fpat6 fpat7 fpat8 \
 	fpat9 fpatnull fsfwfs functab1 functab2 functab3 functab6 funlen \
 	fwtest fwtest2 fwtest3 fwtest4 fwtest5 fwtest6 fwtest7 fwtest8 \
@@ -233,6 +235,7 @@ GAWK_EXT_TESTS = \
 	incdupe incdupe2 incdupe3 incdupe4 incdupe5 incdupe6 incdupe7 \
 	include include2 indirectbuiltin indirectbuiltin3 indirectbuiltin4 \
 	indirectbuiltin5 indirectbuiltin6 indirectcall indirectcall2 \
+	indirectbuiltin7 indirectbuiltin8 indirectbuiltin9 \
 	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintold lintplus lintplus2 \
 	lintplus3 lintset lintsubarray linttypeof lintwarn \
@@ -1288,6 +1291,17 @@ indirectbuiltin2:
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+dbugbadcmd:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+dbugbreak:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
 addcomma:
@@ -2982,6 +2996,11 @@ exit:
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(TESTOUTCMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
+elemnew7:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
 fieldwdth:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -3247,6 +3266,21 @@ indirectcall2:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+indirectbuiltin7:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+indirectbuiltin8:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+
+indirectbuiltin9:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 indirectcall3:
 	@echo $@; $(CHCP) $(ORIGCP)

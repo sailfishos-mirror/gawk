@@ -43,6 +43,7 @@
 
 #ifdef GAWK
 #define mbszero(pstate) memset(pstate, 0, sizeof(*(pstate)))
+#define btoc32 btowc
 #endif
 
 /* The sbclen implementation relies on this.  */
@@ -119,10 +120,10 @@ init_localeinfo (struct localeinfo *localeinfo)
 }
 
 /* The set of char32_t values C such that there's a useful locale
-   somewhere where C != towupper (C) && C != towlower (towupper (C)).
+   somewhere where C != c32toupper (C) && C != c32tolower (c32toupper (C)).
    For example, 0x00B5 (U+00B5 MICRO SIGN) is in this table, because
-   towupper (0x00B5) == 0x039C (U+039C GREEK CAPITAL LETTER MU), and
-   towlower (0x039C) == 0x03BC (U+03BC GREEK SMALL LETTER MU).  */
+   c32toupper (0x00B5) == 0x039C (U+039C GREEK CAPITAL LETTER MU), and
+   c32tolower (0x039C) == 0x03BC (U+03BC GREEK SMALL LETTER MU).  */
 static unsigned short int const lonesome_lower[] =
   {
     0x00B5, 0x0131, 0x017F, 0x01C5, 0x01C8, 0x01CB, 0x01F2, 0x0345,
@@ -143,6 +144,18 @@ static unsigned short int const lonesome_lower[] =
 verify (1 + 1 + sizeof lonesome_lower / sizeof *lonesome_lower
         <= CASE_FOLDED_BUFSIZE);
 
+/* Whether char32_t values are Unicode code points.
+   It is OK if only UTF-16 is supported,
+   since this file converts only single-byte encodings to char32_t
+   and in practice these encodings convert to characters in the BMP.  */
+#ifdef GL_CHAR32_T_IS_UNICODE
+# define CHAR32_T_IS_UNICODE GL_CHAR32_T_IS_UNICODE /* uchar-h-c23 */
+#elif defined __STDC_ISO_10646__
+# define CHAR32_T_IS_UNICODE 1 /* glibc, musl libc, Cygwin */
+#else
+# define CHAR32_T_IS_UNICODE 0
+#endif
+
 /* Find the characters equal to C after case-folding, other than C
    itself, and store them into FOLDED.  Return the number of characters
    stored; this is zero if C is WEOF.  */
@@ -152,6 +165,13 @@ case_folded_counterparts (wint_t c, char32_t folded[CASE_FOLDED_BUFSIZE])
 {
   int n = 0;
   wint_t uc = c32toupper (c);
+
+  if (CHAR32_T_IS_UNICODE || 1 < MB_CUR_MAX)
+    {
+      /* char32_t is Unicode, or this is a multibyte locale where
+         it is impractical to look for all case-folded counterparts
+         and where guessing Unicode will not produce false positives
+         though it may miss some case-folded counterparts.  */
       wint_t lc = c32tolower (uc);
       if (uc != c)
         folded[n++] = uc;
@@ -163,5 +183,18 @@ case_folded_counterparts (wint_t c, char32_t folded[CASE_FOLDED_BUFSIZE])
           if (li != lc && li != uc && li != c && c32toupper (li) == uc)
             folded[n++] = li;
         }
+    }
+  else if (c != WEOF)
+    {
+      /* A single-byte locale where it is not known that char32_t is Unicode,
+         and C is not WEOF.  Check all 255 possibilities for counterparts.  */
+        for (int i = 1; i <= UCHAR_MAX; i++)
+          {
+            wint_t li = btoc32 (i);
+            if (li != c && c32toupper (li) == uc)
+              folded[n++] = li;
+          }
+    }
+
   return n;
 }

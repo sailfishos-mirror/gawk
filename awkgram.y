@@ -571,10 +571,7 @@ regexp
 		  $3->lextok = NULL;
 		  len = strlen(re);
 		  if (do_lint) {
-			if (len == 0)
-				lintwarn_ln($3->source_line,
-					_("regexp constant `//' looks like a C++ comment, but is not"));
-			else if (use_gnu_matchers && re[0] == '*' && re[len-1] == '*')
+			if (use_gnu_matchers && re[0] == '*' && re[len-1] == '*')
 				/* possible C comment */
 				lintwarn_ln($3->source_line,
 					_("regexp constant `/%s/' looks like a C comment, but is not"), re);
@@ -5296,6 +5293,8 @@ make_regnode(NODETYPE type, NODE *exp)
 	n->re_cnt = 1;
 
 	if (type == Node_regex) {
+		if (exp->stptr == NULL)	// can happen in indirect calls
+			return NULL;
 		n->re_reg[0] = make_regexp(exp->stptr, exp->stlen, false, true, false);
 		if (n->re_reg[0] == NULL) {
 			freenode(n);
