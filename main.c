@@ -919,18 +919,16 @@ load_environ()
 
 		var = environ[i];
 		val = strchr(var, '=');
-		if (val != NULL)
-			*val++ = '\0';
-		else
+		if (val != NULL) {
+			sub = make_string(var, val - var);
+			val++;
+		} else {
+			sub = make_string(var, strlen(var));
 			val = nullstr;
-		sub = make_string(var, strlen(var));
+		}
 		newval = make_string(val, strlen(val));
 		newval->flags |= USER_INPUT;
 		assoc_set(ENVIRON_node, sub, newval);
-
-		/* restore '=' so that system() gets a valid environment */
-		if (val != nullstr)
-			*--val = '=';
 	}
 	/*
 	 * Put AWKPATH and AWKLIBPATH into ENVIRON if not already there.

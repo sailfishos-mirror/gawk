@@ -867,7 +867,7 @@ do_fts(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	}
 
 	/* flatten pathlist */
-	if (! flatten_array(pathlist.array_cookie, & path_array)) {
+	if (! flatten_array_typed(pathlist.array_cookie, & path_array, AWK_STRING, AWK_UNDEFINED)) {
 		warning(ext_id, _("fts: could not flatten array\n"));
 		goto out;
 	}

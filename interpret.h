@@ -252,7 +252,8 @@ uninitialized_scalar:
 					m->flags &= ~(MPFN | MPZN);
 
 					// set up local param by value
-					DEREF(m);
+					if (m->valref > 1)
+						DEREF(m);
 					m = dupnode(Nnull_string);
 				}
 
