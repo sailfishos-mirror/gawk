@@ -2929,8 +2929,9 @@ do_dcgettext(int nargs)
 	the_result = string;
 	reslen = t1->stlen;
 #endif
+	NODE *ret = make_string(the_result, reslen);
 	DEREF(t1);
-	return make_string(the_result, reslen);
+	return ret;
 }
 
 
@@ -3074,8 +3075,15 @@ do_bindtextdomain(int nargs)
 	}
 
 	the_result = bindtextdomain(domain, directory);
+	if (the_result == NULL)
+		the_result = "";
+
 	if (directory)
 		str_restore(t1, save1);
+
+	// make a copy of the result now, which points into memory about
+	// to be deref'ed.
+	NODE *ret = make_string(the_result, strlen(the_result));
 
 	DEREF(t1);
 	if (t2 != NULL) {
@@ -3083,10 +3091,7 @@ do_bindtextdomain(int nargs)
 		DEREF(t2);
 	}
 
-	if (the_result == NULL)
-		the_result = "";
-
-	return make_string(the_result, strlen(the_result));
+	return ret;
 }
 
 #ifdef SUPPLY_INTDIV
