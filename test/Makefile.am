@@ -2176,7 +2176,7 @@ strftime::
 	@echo $@
 	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
-	@-$(CMP) strftime.ok _$@ && rm -f _$@ strftime.ok || exit 0
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 devfd::
 	@echo $@
@@ -2201,7 +2201,7 @@ tweakfld::
 pid::
 	@echo $@
 	@-AWKPATH="$(srcdir)" AWK=$(AWKPROG) $(SHELL) "$(srcdir)"/pid.sh $$$$ > _`basename $@` ; :
-	@-$(CMP) "$(srcdir)"/pid.ok _`basename $@` && rm -f _`basename $@`
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 strftlng::
 	@echo $@
