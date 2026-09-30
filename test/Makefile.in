@@ -2616,7 +2616,7 @@ strftime::
 	@echo $@
 	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
-	@-$(CMP) strftime.ok _$@ && rm -f _$@ strftime.ok || exit 0
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 devfd::
 	@echo $@
@@ -2641,7 +2641,7 @@ tweakfld::
 pid::
 	@echo $@
 	@-AWKPATH="$(srcdir)" AWK=$(AWKPROG) $(SHELL) "$(srcdir)"/pid.sh $$$$ > _`basename $@` ; :
-	@-$(CMP) "$(srcdir)"/pid.ok _`basename $@` && rm -f _`basename $@`
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 strftlng::
 	@echo $@
@@ -3475,12 +3475,12 @@ clsflnam:
 cmdlinefsbacknl:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 cmdlinefsbacknl2:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 compare2:
 	@echo $@
@@ -4262,7 +4262,7 @@ rand:
 randtest:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 range1:
 	@echo $@
@@ -4702,7 +4702,7 @@ zeroflag:
 fflush:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 getlnhd:
 	@echo $@
@@ -4712,17 +4712,17 @@ getlnhd:
 localenl:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 rtlen:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 rtlen01:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 aadelete1:
 	@echo $@
@@ -4948,7 +4948,7 @@ equiv:
 exit:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 elemnew7:
 	@echo $@
@@ -5389,7 +5389,7 @@ mktime:
 modifiers:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 muldimposix:
 	@echo $@
@@ -5404,7 +5404,7 @@ nastyparm:
 next:
 	@echo $@
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 nondec:
 	@echo $@
