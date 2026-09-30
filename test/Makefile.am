@@ -1633,6 +1633,8 @@ EXTRA_DIST = \
 	cmdlinefsbacknl2.ok-zos \
 	concat4.ok-zos \
 	dbugarray4.ok-zos \
+	dbugbadcmd.ok-zos \
+	dbugbreak.ok-zos \
 	dfamb1.ok-zos \
 	double1.ok-zos \
 	double2.ok-zos \
@@ -2834,6 +2836,7 @@ dbugbreak:
 	@echo $@
 	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
 
 # Targets generated for other tests:
 include Maketests

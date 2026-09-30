@@ -1301,7 +1301,6 @@ dbugbreak:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
-
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
 addcomma:
@@ -2999,7 +2998,7 @@ exit:
 elemnew7:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 fieldwdth:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3270,17 +3269,17 @@ indirectcall2:
 indirectbuiltin7:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 indirectbuiltin8:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 indirectbuiltin9:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 indirectcall3:
 	@echo $@; $(CHCP) $(ORIGCP)
