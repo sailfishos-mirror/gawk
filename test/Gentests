@@ -101,13 +101,6 @@ BEGIN {
 	next
 }
 
-/^NEED_CHECKMANY *=/,/[^\\]$/ {
-	gsub(/(^NEED_CHECKMANY *=|\\$)/,"")
-	for (i = 1; i <= NF; i++)
-		checkmany[$i]
-	next
-}
-
 /^GENTESTS_UNUSED *=/,/[^\\]$/ {
 	gsub(/(^GENTESTS_UNUSED *=|\\$)/,"")
 	for (i = 1; i <= NF; i++)
@@ -125,16 +118,6 @@ BEGIN {
 		locale_tests[cur_locale][$i]
 		all_locale_tests[$i]
  	}
-}
-
-# Tests that fail on z/OS
-/EXPECTED_FAIL_ZOS *=/,/[^\\]$/ {
-	gsub(/(^EXPECTED_FAIL_ZOS *=|\\$)/,"")
-	for (i = 1; i <= NF; i++)
-	{
-		zos_fail[$i]
-	}
-	next
 }
 
 /^[[:alpha:]_][-[:alnum:]_]*:/ {
@@ -234,11 +217,7 @@ function generate(x,	s, i, locale_string)
 		delete files[x".in"]
 	}
 
-	if (x in zos_fail) {
-		printf "\t@echo $@ $(ZOS_FAIL)\n"
-		delete zos_fail[x]
-	} else
-		printf "\t@echo $@\n"
+	printf "\t@echo $@\n"
 
 	# default is the leading tab and @
 	locale_string = "\t@-"
@@ -254,16 +233,8 @@ function generate(x,	s, i, locale_string)
 	}
 
 	printf "%s", locale_string
-	if (x in checkmany)
-		printf "AWKPATH=\"$(srcdir)\" $(srcdir)/checkmany.sh \"$(AWKPROG)\" \"$@\" \"$(srcdir)\""
-	else
-		printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1", s
-	printf " || echo EXIT CODE: $$? >>_$@\n"
-
-	if (x in checkmany)
-		delete checkmany[x]
-	else
-		printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
+	printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
+	printf "\t@-$(srcdir)/checkmany.sh \"$@\" \"$(srcdir)\"\n\n"
 }
 
 END {
@@ -298,9 +269,6 @@ END {
 		for (y in locale_tests[x])
 			if (!(y in targets))
 				printf("WARNING: Locale `%s' target `%s' is missing.\n", x, y) > "/dev/stderr"
-	if ("check_zos" in ENVIRON)
-		for (x in zos_fail)
-			printf "WARNING: check target `%s' for $(ZOS_FAIL).\n", x > "/dev/stderr"
 
 	for (x in files)
 		if (!(x in unused) && \
