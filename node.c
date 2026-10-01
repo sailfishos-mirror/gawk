@@ -512,7 +512,7 @@ make_typed_regex(const char *re, size_t len)
 	exp = make_str_node(re, len, ALREADY_MALLOCED);
 	n = make_regnode(Node_regex, exp);
 	if (n == NULL)
-		fatal(_("could not make typed regex"));
+		fatal(_("could not make typed regexp"));
 
 	n2 = make_string(re, len);
 	n2->typed_re = n;
