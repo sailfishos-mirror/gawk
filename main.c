@@ -1681,6 +1681,8 @@ parse_args(int argc, char **argv)
 		case 'M':
 #ifdef HAVE_MPFR
 			do_flags |= DO_MPFR;
+			if (getenv("GAWK_NO_MPFR_WARN") == NULL)
+				warning(_("MPFR support is deprecated and will be removed in the next major release"));
 #else
 			warning(_("-M ignored: MPFR/GMP support not compiled in"));
 #endif
