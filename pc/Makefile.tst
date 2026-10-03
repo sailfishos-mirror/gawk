@@ -912,7 +912,7 @@ mpfranswer42:
 
 mpfrmemok1:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) -p- -M -f "$(srcdir)"/$@.awk 2>&1 | sed 1d > _$@ || echo EXIT CODE: $$? >> _$@
+	@-$(AWK) -p- -M -f "$(srcdir)"/$@.awk 2>&1 | grep -v 'gawk profile, created' > _$@ || echo EXIT CODE: $$? >> _$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 mpfrsqrt:

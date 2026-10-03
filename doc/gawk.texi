@@ -908,7 +908,7 @@ particular records in a file and perform operations upon them.
 * Computer Arithmetic::                 A quick intro to computer math.
 * Math Definitions::                    Defining terms used.
 * MPFR features::                       The MPFR features in @command{gawk}.
-* MPFR On Parole::                      MPFR features are on parole!
+* MPFR is deprecated::                  MPFR features are deprecated!
 * MPFR Intro::                          MPFR General introduction.
 * FP Math Caution::                     Things to know.
 * Inexactness of computations::         Floating point math is not exact.
@@ -5094,13 +5094,9 @@ is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
-As of
-@command{gawk} version 5.2,
-the arbitrary precision arithmetic feature is ``on parole.''
-This feature is now being
-supported by a volunteer in the development team and not by the primary
-maintainer.  If this situation changes, then the feature will be removed.
-For more information see @ref{MPFR On Parole}.
+As of @command{gawk} version 6.0,
+the arbitrary precision arithmetic feature is deprecated.
+It will be removed in version 6.1.
 
 @node Undocumented
 @section Undocumented Options and Features
@@ -34618,41 +34614,37 @@ This section briefly describes arbitrary-precision
 arithmetic in @command{gawk}.
 
 @menu
-* MPFR On Parole::              MPFR features are on parole!
+* MPFR is deprecated::          MPFR features are deprecated!
 * MPFR Intro::                  MPFR General introduction.
 @end menu
 
-@node MPFR On Parole
-@subsection Arbitrary Precision Arithmetic is On Parole!
+@node MPFR is deprecated
+@subsection Arbitrary Precision Arithmetic is deprecated!
 
-Arbitrary precision arithmetic in @command{gawk}
-is ``on parole.''  The primary @command{gawk} maintainer is no
-longer maintaining it. Fortunately, a volunteer from the development
-team has agreed to take it over.
+Arbitrary precision arithmetic in @command{gawk} is officially
+deprecated. Support for it will be removed in version 6.1 of
+@command{gawk}.
 
-This feature is on parole because its inclusion was a mistake. It has
-led to endless bug reports, misuse of the feature and public abuse of the
-maintainer, for no real increased value.
+@cindex @env{GAWK_NO_MPFR_WARN} environment variable
+@cindex environment variables @subentry @env{GAWK_NO_MPFR_WARN}
+@command{gawk} issues a warning message if you use it.  You may set the
+@env{GAWK_NO_MPFR_WARN} environment variable to disable this warning.
 
-@ignore
-If you use this feature, you should start working now to find a different
-toolset with which to accomplish your goals.@footnote{Of course, you can
-always continue to use a version of @command{gawk} that still supports
-arbitrary precision arithmetic. It simply will be unmaintained.}
+This feature is scheduled for removal because its inclusion was a
+mistake. It has led to endless bug reports, misuse of the feature
+and public abuse of the maintainer, for no real increased value.
+The maintenance burden has simply become too great.
 
-If the feature is very important to you, then consider if you are willing
-to volunteer to maintain it, so that it can continue to be included
-in @command{gawk}. If that is the case, contact the maintainer to discuss it
-with him.  You may do so by submitting a bug report.
-@end ignore
+If you use this feature, you should consider finding a different toolset
+with which to accomplish your goals.@footnote{Of course, you can always
+continue to use a version of @command{gawk} that still supports arbitrary
+precision arithmetic. It simply will be unmaintained.}
 
-If the situation with support changes, the feature will be removed
-from @command{gawk}.
-
-If you use this feature, you should consider finding a different
-toolset with which to accomplish your goals.@footnote{Of course, you can
-always continue to use a version of @command{gawk} that still supports
-arbitrary precision arithmetic. It simply will be unmaintained.}
+Some suggestions are the POSIX-standard @command{bc} utility, the
+@code{mpfr} extension available from the @code{gawkextlib} project
+(@pxref{gawkextlib}), or any of the various ``bignum'' packages available
+for Perl or Python.  You may also use the MPFR and GMP libraries
+directly from C or C++ code.
 
 @node MPFR Intro
 @subsection Arbitrary Precision Introduction
