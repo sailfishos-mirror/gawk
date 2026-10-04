@@ -1027,7 +1027,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Definizioni matematiche::             Altre cose da sapere.
 * Funzionalità MPFR::                   Funzionalità per il calcolo a
                                         precisione arbitraria in @command{gawk}
-* MPFR in libertà vigilata::            Le funzionalità MPFR sono in libertà vigilata!
+* MPFR è deprecata::                    Le funzionalità MPFR sono deprecate!
 * Introduzione a MPFR::                 Introduzione generale a MPFR.
 * Cautela col calcolo in VM::           Cose da sapere.
 * Inesattezza nei calcoli::             La matematica in virgola mobile non è
@@ -2042,7 +2042,7 @@ in genere rappresenta lo standard output del comando.
 L'output del comando, normalmente il suo standard output, è stampato
 @code{in questo modo}.
 @end ifset
-Messaggi di errore e altri output sullo standard error del comando sono
+Messaggi d'errore e altri output sullo standard error del comando sono
 preceduti dal glifo ``@error{}''.  Per esempio:
 
 @example
@@ -2911,7 +2911,7 @@ operativo tratta il resto della riga come un argomento solo, e lo passa ad
 @command{awk}.
 Così facendo il comportamento sarà poco chiaro; con ogni
 probabilità verrà emesso un
-messaggio di errore di qualche tipo da @command{awk}.
+messaggio d'errore di qualche tipo da @command{awk}.
 
 @cindex variabile @subentry @code{ARGC}/@code{ARGV} @subentry portabilità e
 @cindex portabilità @subentry variabile @code{ARGV}
@@ -2977,7 +2977,7 @@ autocontenuti.  Nel far questo, @emph{non} bisogna inserire un apostrofo
 (ossia un apice singolo) in un commento, (o in qualsiasi altra parte del
 vostro programma).  La shell interpreta gli apici singoli come delimitatori
 di chiusura dell'intero programma.  Di conseguenza, solitamente la shell
-emette un messaggio riguardo ad apici presenti in numero dispari, e se
+invia un messaggio riguardo ad apici presenti in numero dispari, e se
 @command{awk} viene comunque eseguito, è probabile che stampi strani
 messaggi di errori di sintassi.
 Per esempio, nel caso seguente:
@@ -4113,7 +4113,7 @@ Fare così ha comunque poco senso; @command{awk} termina
 silenziosamente quando viene fornito un programma vuoto.
 @value{DARKCORNER}
 Se è stato specificato @option{--lint} sulla riga di comando,
-@command{gawk} emette un avviso che avverte
+@command{gawk} invia un avviso per avvertire
 che il programma è vuoto.
 
 @node Opzioni
@@ -4598,19 +4598,9 @@ MPFR ed MP
 @cindex @env{GAWK_NO_MPFR_WARN} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{GAWK_NO_MPFR_WARN}
 @end ignore
-A partire dalla versione 5.2,
+A partire dalla versione 6.0,
 le funzionalità di calcolo con precisione arbitraria in @command{gawk}
-sono ``in libertà vigilata''.
-Il manutentore principale non curerà più la manutenzione di questa
-funzionalità, ma una delle persone del @dfn{team} di sviluppo l'ha presa in
-carico.  Finché questa situazione rimarrà stabile, MPFR continuerà
-a essere supportato.  Se la situazione cambia, il supporto a MPFR sarà
-rimosso da @command{gawk}.
-@ignore
-Se si utilizza quest'opzione, @command{gawk} genera un messaggio di
-avvertimento.  Per evitare di ricevere il messaggio, si definisca la
-variabile d'ambiente @env{GAWK_NO_MPFR_WARN} con un valore qualsiasi.
-@end ignore
+sono deprecate.
 
 @cindex @option{-n} (opzione)
 @cindex opzione @subentry @option{-n}
@@ -4787,7 +4777,7 @@ nel vettore @code{ARGV}, anche se inizia con il segno meno (@code{-}).
 
 In modalità di compatibilità,
 ogni altra opzione, se è stato specificato il testo di un programma,
-è contrassegnata come non valida con un messaggio di avvertimento,
+è contrassegnata come non valida con un messaggio d'avvertimento,
 ma è in ogni caso ignorata.
 
 @cindex @option{-f} (opzione) @subentry usi multipli
@@ -4859,7 +4849,7 @@ diverso: sopprime tutte le estensioni, anche quelle che non confliggono con
 POSIX, e funziona rigorosamente in modalità POSIX.
 Se viene fornita l'opzione @option{--lint} sulla riga di comando e
 @command{gawk} passa alla modalità POSIX a causa di @env{POSIXLY_CORRECT},
-viene emesso un messaggio di avvertimento indicando che è attiva la
+viene inviato un messaggio d'avvertimento indicando che è attiva la
 modalità POSIX.  Normalmente questa variabile si imposta nel file di avvio
 della shell a livello utente.
 Per una shell compatibile con Bourne (come Bash), queste righe andranno
@@ -5240,7 +5230,7 @@ e i vettori di @command{gawk} per la funzionalità ``memoria persistente''
 @cindex variabile d'ambiente @subentry @env{GAWK_READ_TIMEOUT}
 @item GAWK_READ_TIMEOUT
 Specifica per quanto tempo, in millisecondi, @command{gawk}
-aspetta l'input prima di emettere un messaggio di errore.
+aspetta l'input prima di inviare un messaggio d'errore.
 
 @cindex @env{GAWK_SOCK_RETRIES} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{GAWK_SOCK_RETRIES}
@@ -5317,10 +5307,10 @@ Normalmente, viene usato il motore MinRX.
 @item GAWK_MSG_SRC
 Se questa variabile esiste, @command{gawk} include il @value{FN} e il
 numero di riga all'interno del codice sorgente @command{gawk}
-dal quale sono stati generati i messaggi di avvertimento o
-i messaggi di errore grave.  Il suo intento è quello di aiutare a isolare
+dal quale sono stati generati i messaggi d'avvertimento o
+i messaggi d'errore grave.  Il suo intento è quello di aiutare a isolare
 l'origine di un messaggio, poiché ci possono essere più righe di codice che
-producono lo stesso messaggio di avvertimento o di errore.
+producono lo stesso messaggio d'avvertimento o d'errore.
 
 @cindex @env{GAWK_LOCALE_DIR} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{GAWK_LOCALE_DIR}
@@ -5636,15 +5626,9 @@ is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
-La funzionalità di aritmetica a precisione arbitraria è
-``in libertà vigilata''
-a partire dalla versione 5.2 di @command{gawk}.
-Questa funzionalità è ora supportata da un volontario
-che fa parte del gruppo di sviluppo, ma non dal manutentore
-principale.  Se tale situazione cambierà, la funzionalità
-verrà rimossa da @command{gawk}.
-Per ulteriori informazioni, vedere la
-@ref{MPFR in libertà vigilata}.
+A partire dalla versione 6.0 di @command{gawk},
+la funzionalità per il calcolo a precisione arbitraria è deprecata.
+Verrà rimossa nella versione 6.1 di @command{gawk}.
 
 @node Non documentato
 @section Opzioni e funzionalità non documentate
@@ -5741,9 +5725,9 @@ i valori restituiti possono non rimanere fissi.
 Se non si è in modalità POSIX o in modalità compatibile, impostando
 code{LINENO} a un valore numerico, per mezzo dell'opzione @option{-v},
 @command{gawk} aggiunge il valore specificato al numero di riga del
-programma, nei messaggi di errore.  Ciò serve qualora il programma
+programma, nei messaggi d'errore.  Ciò serve qualora il programma
 sia contenuto in uno @dfn{script} Bash,
-per far sì che il messaggio di errore
+per far sì che il messaggio d'errore
 rispecchi il numero di riga corrispondente nello @dfn{script} Bash, invece
 del numero di riga del programma @command{gawk} vero e proprio.
 Vedere l'esempio seguente:
@@ -6183,7 +6167,7 @@ un numero intero, e poi traduce il ``carattere largo''
 così specificato nella codifica multibyte locale corrente.
 Se il valore del ``carattere largo'' specificato non rappresenta un carattere
 valido, il valore diviene @code{?}. @command{gawk} emette in tal caso
-un messaggio di avvertimento.
+un messaggio d'avvertimento.
 
 @cindex @code{\} (barra inversa) @subentry @code{\/} (sequenza di protezione)
 @cindex barra inversa (@code{\}) @subentry @code{\/} (sequenza di protezione)
@@ -7575,7 +7559,7 @@ che viene usato per default.
 
 Se si riscontra la necessità di passare da MinRX al precedente motore
 di gestione delle variabili d'ambiente @emph{per piacere}
-inviate una segnalazione di errore descrivendo quello che risulta
+inviate una segnalazione d'errore descrivendo quello che risulta
 non funzionare (@pxref{Bug}).  È molto importante farlo, perché
 sarà di aiuto ai manutentori e all'autore di MinRX nel correggere
 eventuali problemi trovati.
@@ -9011,7 +8995,7 @@ Se si è specificato l'opzione @option{--csv}, la variabile
 Infine, se si è specificato @option{--csv}, l'assegnazione di
 un valore a una delle variabili
 @code{FS}, @code{FIELDWIDTHS}, @code{FPAT} o @code{RS}
-genera un messaggio di avvertimento.
+genera un messaggio d'avvertimento.
 
 Per amor di chiarezza, @command{gawk} considera come
 autoritativo per il file in input di tipo CSV
@@ -9828,7 +9812,7 @@ restituisce @minus{}1.  In questo caso, @command{gawk} imposta la variabile
 @code{ERRNO} a una stringa che descrive l'errore in questione.
 Il valore può venir tradotto, in localizzazioni diverse dall'inglese.
 
-Se il messaggio di errore @code{ERRNO} indica che l'operazione di I/O può
+Se il messaggio d'errore @code{ERRNO} indica che l'operazione di I/O può
 essere ritentata e la variabile @code{PROCINFO["@var{input}", "RETRY"]} è
 impostata a 1, @code{getline} restituisce un codice di ritorno @minus{}2
 invece che @minus{}1, e si può provare a chiamare ulteriormente
@@ -10367,7 +10351,7 @@ while (getline line < "file.txt" > 0)
     print line
 @end example
 
-Se occorre controllare che il codice di errore sia inferiore a zero
+Se occorre controllare che il codice d'errore sia inferiore a zero
 si deve racchiudere la @code{getline} tra parentesi, per evitare
 che venga interpretata come una ridirezione dell'input:
 
@@ -10513,7 +10497,7 @@ $ @kbd{gawk 'BEGIN @{ PROCINFO["-", "READ_TIMEOUT"] = 5000 @}}
 @end example
 
 In questo caso, la mancata risposta entro cinque secondi dà luogo al seguente
-messaggio di errore:
+messaggio d'errore:
 
 @example
 @c questo è l'output effettivo - Antonio
@@ -10829,7 +10813,7 @@ vuota, si usa @samp{print ""}.
 Per stampare un testo che non cambia, si usi come elemento una costante
 stringa, per esempio @w{@code{"Non v'allarmate"}}.  Dimenticandosi di mettere
 i doppi apici, il testo è preso per un'espressione @command{awk},
-e probabilmente verrà emesso un messaggio di errore.  Occorre tener presente
+e probabilmente verrà emesso un messaggio d'errore.  Occorre tener presente
 che tra ogni coppia di elementi viene stampato uno spazio.
 
 Si noti che l'istruzione @code{print} è un'istruzione, e non
@@ -11289,7 +11273,7 @@ linguaggio C per i numeri interi,
 @command{gawk} usa lo
 specificatore di formato @samp{%g}. Se si specifica l'opzione @option{--lint}
 sulla riga di comando (@pxref{Opzioni}), @command{gawk}
-emette un messaggio di avvertimento.  Altre versioni di @command{awk} possono
+invia un messaggio d'avvertimento.  Altre versioni di @command{awk} possono
 stampare valori non validi, o comportarsi in modo completamente differente.
 @value{DARKCORNER}
 @end quotation
@@ -11521,8 +11505,8 @@ addizionali (@samp{h}, @samp{j}, @samp{l}, @samp{L}, @samp{t} e @samp{z}) nelle
 stringhe di formato di @code{printf}.  Questi modificatori non sono validi
 in @command{awk}.  La maggior parte della implementazioni di @command{awk} li
 ignora senza emettere messaggi.  Se si specifica l'opzione @option{--lint}
-sulla riga di comando (@pxref{Opzioni}), @command{gawk} emette un messaggio
-di avvertimento quando li si usa.  Se si specifica l'opzione @option{--posix},
+sulla riga di comando (@pxref{Opzioni}), @command{gawk} invia un messaggio
+d'avvertimento quando li si usa.  Se si specifica l'opzione @option{--posix},
 il loro uso genera un errore fatale.
 
 @node Esempi su printf
@@ -11820,7 +11804,7 @@ tutto l'output diretto a uno stesso file.
 (Si possono mischiare @samp{>} e @samp{>>}, e la cosa non ha effetti
 negativi, ma mischiare gli operatori è considerato cattivo stile in
 @command{awk}.  Se invocato con l'opzione @option{--lint}, @command{gawk}
-emette un messaggio di avvertimento quando entrambi gli
+invia un messaggio d'avvertimento quando entrambi gli
 operatori vengono usati per uno stesso file aperto.)
 
 @cindex differenze tra @command{awk} e @command{gawk} @subentry limitazioni di implementazione
@@ -11888,16 +11872,16 @@ error}.  A questi flussi aperti (e a tutti gli altri file aperti o
 Questi flussi sono, per default, associati alla tastiera e allo schermo,
 ma spesso sono ridiretti, nella shell, utilizzando gli operatori
 @samp{<}, @samp{<<}, @samp{>}, @samp{>>}, @samp{>&} e @samp{|}.
-Lo standard error è tipicamente usato per scrivere messaggi di errore;
+Lo standard error è tipicamente usato per scrivere messaggi d'errore;
 la ragione per cui ci sono due flussi distinti,
 standard output e standard error, è per poterli ridirigere indipendentemente
 l'uno dall'altro.
 
-@cindex differenze tra @command{awk} e @command{gawk} @subentry messaggi di errore
+@cindex differenze tra @command{awk} e @command{gawk} @subentry messaggi d'errore
 @cindex gestione errori
 @cindex errori @subentry gestione degli
 Nelle tradizionali implementazioni di @command{awk}, il solo modo per
-scrivere un messaggio di errore allo
+scrivere un messaggio d'errore allo
 standard error in un programma @command{awk} è il seguente:
 
 @example
@@ -11911,7 +11895,7 @@ processo @command{awk}.
 @c 8/2014: Mike Brennan says not to cite this as inefficient. So, fixed.
 Questo è molto poco elegante, e richiede anche di innescare un processo
 separato.  Per questo chi scrive programmi @command{awk} spesso
-non usa questo metodo.  Invece, invia i messaggi di errore allo
+non usa questo metodo.  Invece, invia i messaggi d'errore allo
 schermo, in questo modo:
 
 @example
@@ -11961,7 +11945,7 @@ Lo standard error output (descrittore di file 2).
 @end table
 
 Usando questa funzionalità
-la maniera corretta di scrivere un messaggio di errore diviene quindi:
+la maniera corretta di scrivere un messaggio d'errore diviene quindi:
 
 @example
 print "Ho trovato un errore grave!" > "/dev/stderr"
@@ -12260,7 +12244,7 @@ argomento una stringa che non rappresenta un file, una @dfn{pipe} o un
 coprocesso che sia stato aperto mediante una ridirezione.  In quel caso,
 @code{close()} restituisce un codice di ritorno negativo, che indica un
 errore. Inoltre, @command{gawk} imposta @code{ERRNO}
-a una stringa che indica il tipo di errore.
+a una stringa che indica il tipo d'errore.
 
 Si noti anche che @samp{close(NOME_FILE)} non ha effetti ``magici'' sul ciclo
 implicito che legge ogni record dei file indicati nella riga di comando.
@@ -12702,7 +12686,7 @@ Lo standard POSIX afferma esplicitamente che
 il carattere di avanzamento riga
 non è consentito all'interno di costanti di tipo stringa.
 E in effetti, tutte le implementazioni di @command{awk} emettono un
-messaggio di errore se si tenta di utilizzarlo.  Per esempio:
+messaggio d'errore se si tenta di utilizzarlo.  Per esempio:
 
 @example
 $ @kbd{gawk 'BEGIN @{ print "ciao, }
@@ -14697,7 +14681,7 @@ else
 @noindent
 A meno che @code{b} non sia zero o la stringa nulla, la parte @code{if}
 del test ha sempre successo.  Poiché gli operatori sono molto simili,
-questo tipo di errore è molto difficile da individuare
+questo tipo d'errore è molto difficile da individuare
 rileggendo il codice sorgente.
 Se si specifica l'opzione @option{--lint}, @command{gawk} emette un
 avviso quando un assegnamento viene usato come test di condizione.
@@ -16707,7 +16691,7 @@ sia a sua volta all'interno di un ciclo, esce solo dall'istruzione
 @cindex POSIX @command{awk} @subentry @code{break} (istruzione)
 L'istruzione @code{break} non ha significato se
 usata fuori dal corpo di un ciclo o di un'istruzione @code{switch}.
-Se la si usa fuori da un ciclo, si ottiene un messaggio di errore
+Se la si usa fuori da un ciclo, si ottiene un messaggio d'errore
 (dfn{syntax error}).
 
 @node Istruzione continue
@@ -16907,8 +16891,8 @@ NF != 4 @{
 @noindent
 Siccome è presente un @code{next},
 le regole successive del programma non elaboreranno i record non validi.
-Il messaggio di errore è ridiretto allo @dfn{standard error},
-dove vanno scritti i messaggi di errore.
+Il messaggio d'errore è ridiretto allo @dfn{standard error},
+dove vanno scritti i messaggi d'errore.
 (Per maggiori dettagli, vedere la
 @ref{File speciali}.)
 
@@ -17058,7 +17042,7 @@ argomento, @command{awk} usa il codice di ritorno specificato in precedenza.
 @xref{Codice di ritorno} per maggiori informazioni.
 
 @cindex convenzioni di programmazione @subentry istruzione @code{exit}
-Per esempio, si supponga che si sia verificata una condizione di errore
+Per esempio, si supponga che si sia verificata una condizione d'errore
 difficile o impossibile da gestire.  Convenzionalmente, i programmi la
 segnalano terminando con un codice di ritorno diverso da zero.  Un programma
 @command{awk} può farlo usando un'istruzione @code{exit} con un argomento
@@ -17151,7 +17135,7 @@ che i file in input e i file in output,
 rispettivamente, devono usare
 I/O binario.  Una stringa @code{"rw"} o @code{"wr"} indica che tutti i file
 devono usare I/O binario.  Ogni altro valore di stringa è trattato come
-@code{"rw"}, ma @command{gawk} genera un messaggio di avvertimento.
+@code{"rw"}, ma @command{gawk} genera un messaggio d'avvertimento.
 @code{BINMODE} è descritto in maggior
 dettaglio
 @iftex
@@ -17673,7 +17657,7 @@ Il valore restituito dalla chiamata di sistema @code{getegid()}.
 
 @item PROCINFO["errno"]
 Il valore della variabile C @code{ERRNO} quando @code{ERRNO} è impostato
-al messaggio di errore a essa associato.
+al messaggio d'errore a essa associato.
 
 @cindex @dfn{ID effettivo} dell'utente di @command{gawk}
 @item PROCINFO["euid"]
@@ -19355,7 +19339,7 @@ if (4 in pippo)
 Non è un errore eliminare un elemento che non esiste.
 Tuttavia, se viene data l'opzione @option{--lint} sulla riga di comando
 (@pxref{Opzioni}),
-@command{gawk} emette un messaggio di avvertimento quando viene eliminato un
+@command{gawk} invia un messaggio d'avvertimento quando viene eliminato un
 elemento che non è presente in un vettore.
 
 @cindex vettori @subentry eliminare l'intero contenuto
@@ -19968,7 +19952,7 @@ Se @var{x} è fuori dall'intervallo consentito (come determinato dalla
 funzione di libreria C utilizzata per calcolarlo), @code{exp()}
 restituirà un valore diverso da zero e imposterà la variabile
 @code{ERRNO}.
-In questo caso, @command{gawk} stampa un messaggio di avvertimento.
+In questo caso, @command{gawk} stampa un messaggio d'avvertimento.
 L'intervallo entro il quale può variare @var{x} dipende dalla
 rappresentazione dei numeri in virgola mobile nella macchina in uso.
 
@@ -19986,7 +19970,7 @@ Per esempio, @code{int(3)} è 3, @code{int(3.9)} è 3, @code{int(-3.9)}
 Restituisce il logaritmo naturale di @var{x}, se @var{x} è positivo;
 altrimenti, restituisce NaN (``Not a Number'',[Non un Numero])
 sui sistemi che implementano lo standard IEEE 754.
-Inoltre, @command{gawk} stampa un messaggio di avvertimento qualora @code{x}
+Inoltre, @command{gawk} stampa un messaggio d'avvertimento qualora @code{x}
 sia negativo.
 
 @cindexawkfunc{rand}
@@ -20055,7 +20039,7 @@ Restituisce il seno di @var{x}, con @var{x} espresso in radianti.
 @cindex radice quadrata
 @item @code{sqrt(@var{x})}
 Restituisce la radice quadrata positiva di @var{x}.
-@command{gawk} stampa un messaggio di avvertimento
+@command{gawk} stampa un messaggio d'avvertimento
 se @var{x} è un numero negativo.  Quindi, @code{sqrt(4)} vale 2.
 
 @cindexawkfunc{srand}
@@ -20293,7 +20277,7 @@ In questo caso, @code{$0} è la stringa obiettivo di default.
 Se l'argomento @var{come} è una stringa che non inizia con @samp{g} o
 @samp{G}, o se è un numero minore o uguale a zero, si effettua solo una
 sostituzione.  Se @var{come} è zero, @command{gawk} emette
-un messaggio di avvertimento.
+un messaggio d'avvertimento.
 
 Se @var{regexp} non viene trovata in @var{obiettivo}, il valore
 restituito da @code{gensub()}
@@ -20411,8 +20395,8 @@ $ @kbd{nawk 'BEGIN @{ print length(x) ; x[1] = 1 @}'}
 
 @noindent
 Se l'opzione @option{--lint} è
-stata specificata sulla riga di comando, @command{gawk} emette un
-avvertimento a questo riguardo.
+stata specificata sulla riga di comando, @command{gawk} invia un
+messaggio d'avvertimento a questo riguardo.
 
 @cindex numero @subentry di elementi in un vettore
 @cindex vettori @subentry determinare il numero degli elementi
@@ -21481,7 +21465,7 @@ solo se tutti i buffer sono stati svuotati con successo.  Altrimenti,
 è @minus{}1, e @command{gawk} avvisa riguardo al @var{nome_file}
 che ha problemi.
 
-@command{gawk} invia anche un messaggio di avvertimento se si tenta di svuotare i
+@command{gawk} invia anche un messaggio d'avvertimento se si tenta di svuotare i
 buffer di un file o @dfn{pipe} che era stato aperto in lettura
 (p.es., con @code{getline}),
 o se @var{nome_file} non è un file, una @dfn{pipe} o un coprocesso aperto.
@@ -21627,7 +21611,7 @@ in
 @item Uscita normale dal comando @tab Codice di ritorno del comando
 @item Terminazione comando da segnale @tab 256 + numero segnale "assassino"
 @item Terminazione comando da segnale, dump memoria @tab 512 + numero segnale "assassino"
-@item Qualsiasi tipo di errore @tab @minus{}1
+@item Qualsiasi tipo d'errore @tab @minus{}1
 @end multitable
 @end float
 
@@ -23006,7 +22990,7 @@ la parentesi aperta che apre la lista degli argomenti.  Se per errore si
 lasciano dei caratteri bianchi, @command{awk} li interpreterebbe come se
 s'intendesse concatenare una variabile con un'espressione tra parentesi.
 Tuttavia, poiché si è usato un nome di funzione e non un nome di variabile,
-verrebbe emesso un messaggio di errore.
+verrebbe emesso un messaggio d'errore.
 @end quotation
 
 @node Campo di validità variabili
@@ -23276,7 +23260,7 @@ Se si specifica l'opzione @option{--lint}
 
 @cindex portabilità @subentry istruzione @code{next} in funzioni definite dall'utente
 @cindex @code{next} (istruzione) @subentry in funzioni definite dall'utente
-Alcune implementazione di @command{awk} emettono un messaggio di errore
+Alcune implementazione di @command{awk} emettono un messaggio d'errore
 se si usa l'istruzione @code{next}
 o @code{nextfile}
 (@pxref{Istruzione next}, e
@@ -23320,7 +23304,7 @@ che quei valori siano importanti per la funzione, mentre in realtà non
 lo sono affatto.
 
 Poiché questa pratica non è affatto raccomandabile, @command{gawk}
-manda @emph{sempre} un messaggio di avvertimento quando si trova a
+manda @emph{sempre} un messaggio d'avvertimento quando si trova a
 eseguire una tale chiamata di funzione.  (Se non si vuole ricevere
 il messaggio, occorre modificare il codice!  In fondo, non è
 corretto).
@@ -23358,7 +23342,7 @@ Quindi, se il flusso di esecuzione raggiunge la fine del corpo della
 funzione, tecnicamente la funzione
 restituisce un valore indeterminato.
 In pratica, restituisce anche qui un valore non inizializzato.  @command{awk}
-@emph{non} emette alcun messaggio di avvertimento se si usa
+@emph{non} invia alcun messaggio d'avvertimento se si usa
 il valore restituito da una tale funzione.
 
 In entrambi i casi (ritornare senza restituire un'espressione e arrivare
@@ -24416,7 +24400,7 @@ Riscrivere questi programmi per implementazioni di @command{awk} diverse
 
 @itemize @value{BULLET}
 @item
-I messaggi di errore diagnostici sono inviati a @file{/dev/stderr}.
+I messaggi d'errore diagnostici sono inviati a @file{/dev/stderr}.
 Usare @samp{| "cat 1>&2"} al posto di @samp{> "/dev/stderr"} se il sistema
 in uso non ha un @file{/dev/stderr}, o se non è possibile usare
 @command{gawk}.
@@ -26241,9 +26225,9 @@ trovare il primo argomento sulla riga di comando che non sia un'opzione.
 Il valore (di tipo stringa) dell'argomento di un'opzione.
 
 @item opterr
-Solitamente @code{getopt()} stampa un messaggio di errore quando trova un'opzione
+Solitamente @code{getopt()} stampa un messaggio d'errore quando trova un'opzione
 non valida.  Impostando @code{opterr} a zero si disabilita questa funzionalità.
-(un'applicazione potrebbe voler stampare un proprio messaggio di errore.)
+(un'applicazione potrebbe voler stampare un proprio messaggio d'errore.)
 
 @item optopt
 La lettera che rappresenta l'opzione sulla riga di comando.
@@ -26444,7 +26428,7 @@ usato dal programma principale.
 Se @code{unaopz} non è nella stringa delle opzioni @code{opzioni},
 si tratta di un'opzione
 non valida.  Se @code{Opterr} è diverso da zero, @code{getopt()} stampa un
-messaggio di errore sullo @dfn{standard error} che è simile al messaggio
+messaggio d'errore sullo @dfn{standard error} che è simile al messaggio
 emesso dalla versione C di @code{getopt()}.
 
 Poiché l'opzione non è valida, è necessario tralasciarla e passare al successivo
@@ -26550,8 +26534,8 @@ virgola) e, comunque, o alla fine della stringa @code{opzioni_lunghe}
 Utilizzando quest'espressione regolare, si controlla che l'opzione
 corrente è presente oppure no in @code{opzioni_lunghe} (anche nel caso
 in cui la stringa @code{opzioni_lunghe} non sia stata specificata, il test
-darà un risultato negativo).  In caso di errore, si può stampare un
-messaggio di errore e poi restituire @code{"?"}.
+darà un risultato negativo).  In caso d'errore, si può stampare un
+messaggio d'errore e poi restituire @code{"?"}.
 Si continua poi:
 
 @example
@@ -28316,7 +28300,7 @@ Funziona in modo quieto.  Non produce alcun output ma il codice di ritorno
 indica se il criterio di ricerca ha trovato almeno una corrispondenza.
 
 @item -s
-Funziona in silenzio.  Non si produce alcun messaggio di errore per i file
+Funziona in silenzio.  Non si produce alcun messaggio d'errore per i file
 che non è stato possibile leggere.
 
 @item -v
@@ -28370,7 +28354,7 @@ da implementare con @command{gawk}; basta usare la variabile
 #    -l    stampa solo nomi file
 #    -n    aggiungi numeri riga in output
 #    -q    quieto - usa solo il codice di ritorno
-#    -s    silenzioso - non stampa messaggi di errore
+#    -s    silenzioso - non stampa messaggi d'errore
 #    -v    inverte test, successo se espressione non viene trovata
 #    -x    l'intera riga deve corrispondere
 #
@@ -28416,7 +28400,7 @@ riga di comando che non sia un'opzione se non è fornito esplicitamente
 alcun criterio di ricerca tramite l'opzione @option{-e}.
 Se il criterio di ricerca è la stringa nulla, ciò significa che non
 è stato fornito alcun criterio, quindi è necessario stampare un
-messaggio di errore e terminare il programma.
+messaggio d'errore e terminare il programma.
 Gli argomenti della riga di comando fino ad
 @code{ARGV[Optind]} vengono cancellati,
 in modo che @command{awk} non tenti di elaborarli come file.  Se
@@ -28456,7 +28440,7 @@ e se l'opzione @option{-s} era stata specificata.
 In tal caso, è necessario passare al file successivo
 [di solito, perché questo file non è leggibile].
 Altrimenti @command{gawk} termina l'esecuzione
-con un messaggio di errore:
+con un messaggio d'errore:
 
 @example
 @c file eg/prog/egrep.awk
@@ -29205,7 +29189,7 @@ passare da @samp{abz} ad @samp{aca}.
 @item
 Si deve poter determinare se abbiamo utilizzato tutti i prefissi,
 in modo che, nel caso ci siano ulteriori dati (da suddividere), si
-possa stampare un messaggio di errore e terminare il programma.
+possa stampare un messaggio d'errore e terminare il programma.
 Il trucco è di gestire una tale situazione @emph{dopo} aver usato
 l'ultimo suffisso disponibile, e non quando viene generato l'ultimo
 suffisso stesso.
@@ -29215,7 +29199,7 @@ Il calcolo è gestito da @code{calcola_suffisso()}.
 Tale funzione è chiamata ogni volta che si deve aprire un nuovo file.
 
 Il flusso della funzione è piuttosto tortuoso, perché si vuole generare
-diciamo fino a @samp{zzzz} e utilizzarlo, ed emettere un messaggio di errore
+diciamo fino a @samp{zzzz} e utilizzarlo, ed inviare un messaggio d'errore
 solo dopo che tutti i suffissi di @code{nome-output-file} sono stati
 utilizzati.  I passi logici da seguire sono questi:
 
@@ -31244,7 +31228,7 @@ END @{
 @end example
 
 Per finire, la funzione @code{@w{fine_file_inattesa()}} stampa un
-appropriato messaggio di errore ed esce:
+appropriato messaggio d'errore ed esce:
 
 @example
 @c file eg/prog/extract.awk
@@ -31376,7 +31360,7 @@ imposta @code{ARGV[1]} e @code{ARGV[2]} alla stringa nulla, per impedire che
 vengano considerati dei @value{FNS}
 (@pxref{ARGC e ARGV}).
 
-La funzione @code{sintassi()} stampa un messaggio di errore ed esce.
+La funzione @code{sintassi()} stampa un messaggio d'errore ed esce.
 Per finire, l'unica regola gestisce lo schema di stampa delineato più sopra,
 usando @code{print} o @code{printf} come richiesto, a seconda del valore di
 @code{RT}.
@@ -31542,7 +31526,7 @@ Se nessuno degli argomenti
 @option{-f}, @option{--file}, @option{-Wfile}, @option{--source},
 o @option{-Wsource} è stato fornito, il primo argomento che non è un'opzione
 dovrebbe essere il programma @command{awk}.  Se non ci sono argomenti rimasti
-sulla riga di comando, @command{igawk} stampa un messaggio di errore ed esce.
+sulla riga di comando, @command{igawk} stampa un messaggio d'errore ed esce.
 Altrimenti, il primo argomento è aggiunto in fondo a @code{programma}.
 In qualsiasi caso, dopo che gli argomenti sono stati elaborati,
 la variabile di shell
@@ -31734,12 +31718,12 @@ l'altra.  Righe che non iniziano con @code{@@include} sono stampate così come
 sono.
 Se la riga inizia con @code{@@include}, il @value{FN} è in @code{$2}.
 La funzione @code{percorso()} è chiamata per generare il percorso completo.
-Se questo non riesce, il programma stampa un messaggio di errore e continua.
+Se questo non riesce, il programma stampa un messaggio d'errore e continua.
 
 Subito dopo occorre controllare se il file sia già stato incluso.  Il vettore
 @code{gia_fatto} è indicizzato dal nome completo di ogni @value{FN} incluso
 e tiene traccia per noi di questa informazione.  Se un file viene visto più
-volte, viene stampato un messaggio di avvertimento.  Altrimenti il nuovo
+volte, viene stampato un messaggio d'avvertimento.  Altrimenti il nuovo
 @value{FN} è aggiunto alla pila e l'elaborazione continua.
 
 Infine, quando @code{getline} giunge alla fine del file in input, il file
@@ -33531,7 +33515,7 @@ E ora, magicamente, funziona!
 @cindex file @subentry speciali @subentry @code{/inet4/@dots{}} (in @command{gawk})
 @cindex @code{/inet6/@dots{}}, file speciali (in @command{gawk})
 @cindex file @subentry speciali @subentry @code{/inet6/@dots{}} (in @command{gawk})
-@cindex @code{EMR.ED} (codice di errore di fantasia)
+@cindex @code{EMR.ED} (codice d'errore di fantasia)
 @ifnotdocbook
 @ignore
 @c This is how I remembered it...
@@ -34188,7 +34172,7 @@ al comando @command{configure}, in fase di compilazione di
 @cindex variabile d'ambiente @subentry @env{PMA_VERBOSITY}
 Si può impostare la variabile d'ambiente @env{PMA_VERBOSITY} a un
 valore compreso fra zero e tre, per controllare quante informazioni
-di debug e segnalazioni di errore verranno stampate dall'allocatore
+di debug e segnalazioni d'errore verranno stampate dall'allocatore
 di memoria persistente.
 @command{gawk} imposta il valore di default a uno.  Vedere il
 codice sorgente @file{support/pma.c} per comprendere il comportamento
@@ -34250,7 +34234,7 @@ completamente.
 mentre si sta usando la memoria persistente.
 Tuttavia, @command{gawk} controlla se un'estensione sia stata caricata da un
 percorso differente rispetto alla volta precedente, e in tal caso
-emette un messaggio di errore fatale ed esce.
+invia un messaggio d'errore fatale ed esce.
 
 @item
 @command{gawk} manda un messaggio di avviso se la versione corrente
@@ -34340,7 +34324,7 @@ Quella versione aggiungeva un'opzione (obbligatoria!)
 @option{--persist=@var{file}} per specificare in quale file andavano
 immagazzinati i dati persistenti.
 Versioni precedenti di @command{gawk} riconoscevano tale opzione,
-ma emettevano un messaggio fatale di errore per chiedere
+ma inviavano un messaggio fatale d'errore per chiedere
 all'utente di usare in alternativa la variabile
 @env{GAWK_PERSIST_FILE}.  A partire dalla versione 6.0
 @command{gawk} non riconosce più quest'opzione.
@@ -34352,7 +34336,7 @@ la persistenza delle funzioni definite dall'utente.
 Il manutentore si riserva il diritto di togliere la funzionalità
 della memoria persistente, se divenisse troppo pesante da
 manutenere.@footnote{Il che avverrebbe se la funzionalità
-generasse troppe segnalazioni di errore, o troppe strane
+generasse troppe segnalazioni d'errore, o troppe strane
 differenze nel comportamento rispetto a quando @command{gawk}
 viene eseguito normalmente.}
 @end quotation
@@ -34545,7 +34529,7 @@ bisogno di ulteriori modifiche al file sorgente.
 significa fornire i dati necessari perché un programma
 internazionalizzato sia in grado di funzionare con una data lingua.
 Questi termini si riferiscono comunemente a funzionalità quali la lingua
-usata per stampare messaggi di errore, quella usata per leggere
+usata per stampare messaggi d'errore, quella usata per leggere
 risposte, e alle informazioni
 relative al modo di leggere e di stampare dati di tipo numerico o valutario.
 
@@ -38136,48 +38120,45 @@ Questa sezione descrive brevemente l'aritmetica a precisione arbitraria
 disponibile in @command{gawk}.
 
 @menu
-* MPFR in libertà vigilata::  Le funzionalità MPFR sono in libertà vigilata!
+* MPFR è deprecata::            Le funzionalità MPFR sono deprecate!
 * Introduzione a MPFR::         Introduzione generale a MPFR.
 @end menu
 
-@node MPFR in libertà vigilata
-@subsection L'aritmetica a precisione arbitraria è in libertà vigilata!
+@node MPFR è deprecata
+@subsection Le funzionalità MPFR sono deprecate!
 
 L'aritmetica a precisione arbitraria in @command{gawk}
-è in ``libertà vigilata''.  Fortunatamente, un volontario fra quelli
-del @dfn{team} di manutenzione ha deciso di farsi carico della manutenzione.
+è ufficialmente deprecata.
+Il supporto a tale funzionalità verrà rimosso a partire dalla versione 6.1
+di @command{gawk}.
 
-Questa funzionalità è in libertà vigilata perché è stato un errore
-aggiungerla.
-Tale supporto ha generato moltissime segnalazioni di problemi,
-la funzionalità è stata abusata, e anche il manutentore di @command{gawk}
-ha subito pubblici abusi, senza un effettivo vantaggio per tutti.
+@cindex @env{GAWK_NO_MPFR_WARN} (variabile d'ambiente)
+@cindex variabile d'ambiente @subentry @env{GAWK_NO_MPFR_WARN}
+@command{gawk} invia un messaggio d'avvertimento quando viene usata.
+Si può impostare la variabile d'ambiente @env{GAWK_NO_MPFR_WARN}
+per evitare di ricevere il messaggio.
 
-@ignore
-Se si usa questa funzionalità, si dovrebbe iniziare a lavorare fin da ora
-per trova un differente insieme di strumenti software per raggiungere
-gli obiettivi desiderati.@footnote{Naturalmente, nulla vieta di continuare
+Si prevede di rimuovere questa funzionalità perché, in primo luogo,
+è stato un errore includerla.  Ha generato una quantità enorme di 
+problemi con il codice, la funzionalità è stata usata a sproposito
+e il manutentore di @command{gawk} è stato pubblicamente insultato,
+a fronte di un vantaggio minimo per gli utilizzatori.
+L'onere della manutenzione è semplicemente divenuto troppo elevato.
+
+Se si sta usando questa funzionalità, si dovrebbe considerare l'opzione
+di trovare un differente strumento software con cui raggiungere gli
+obiettivi desiderati.@footnote{Naturalmente, nulla vieta di continuare
 a usare una versione di @command{gawk} che ancora fornisce la possibilità
 di usare l'aritmetica a precisione arbitraria.
 Semplicemente, tale versione non verrà più aggiornata.}
 
-Se ritenete molto importante questa funzionalità, prendete in esame la
-possibilità di offrirvi volontari per mantenerla, in modo che continui a
-rimanere disponibile in @command{gawk}.  Se siete disposti a farlo, contattate
-il manutentore per discutere la cosa con lui.
-Ciò può essere fatto inviando una segnalazione di bug.
-@end ignore
-
-Se la situazione riguardo al supporto subirà ulteriori variazioni, la
-funzionalità verrà rimossa da @command{gawk}.
-
-Chi fa uso di questa funzionalità, dovrebbe prendere in considerazione
-l'idea di trovare un differente insieme di strumenti software con
-cui conseguire lo stesso obiettivo.@footnote{Naturalmente, si può sempre
-continuare a usare una versione di @command{gawk} che ancora supporta
-l'aritmetica a precisione arbitraria.  Va tenuto presente che tale
-versione non sarà più manutenuta.}
-
+Fra le alternative possibili, citiamo qui il programma di utilità
+standard POSIX @command{bc}, l'estensione @code{mpfr} resa disponibile dal
+progetto @code{gawkextlib} (@pxref{gawkextlib}) o uno qualsiasi degli
+svariati pacchetti software ``bignum'' (grandi numeri) disponibili nei
+linguaggi Perl o Python.  È anche possibile usare direttamente le funzioni
+di libreria MPFR e GMP da un codice sorgente C o C++.
+  
 @node Introduzione a MPFR
 @subsection Introduzione all'aritmetica a precisione arbitraria
 
@@ -39443,7 +39424,7 @@ compatibile con la licenza GNU GPL (@pxref{Copia}).
 Per far sapere a @command{gawk} che la licenza è quella corretta,
 l'estensione deve definire il simbolo globale
 @code{plugin_is_GPL_compatibile}.  Se tale simbolo non è stato definito,
-@command{gawk} termina con un messaggio di errore fatale al momento del
+@command{gawk} termina con un messaggio d'errore fatale al momento del
 caricamente dell'estensione.
 
 Il tipo dichiarato per il suddetto simbolo dev'essere @code{int}.  Esso non
@@ -39669,7 +39650,7 @@ Processori bidirezionali
 Tutti questi elementi sono spiegati dettagliatamente nel resto di questo capitolo.
 
 @item
-Stampare messaggi fatali, di avvertimento e quelli generati dall'opzione
+Stampare messaggi fatali, d'avvertimento e quelli generati dall'opzione
 ``lint''.
 
 @item
@@ -39847,7 +39828,7 @@ questione.
 In ogni caso, se la richiesta e il tipo effettivo della variabile non
 corrispondono, la funzione di accesso restituisce ``false'' e fornisce il
 tipo proprio della variabile, in modo che l'estensione possa, p.es.,
-stampare un messaggio di errore
+stampare un messaggio d'errore
 (del tipo ``ricevuto uno scalare, invece del vettore previsto'').
 
 @c This is documented in the header file and needs some expanding upon.
@@ -40180,7 +40161,7 @@ il risultato sarebbe molto probabilmente differente da quello atteso.
 Tre macro di utilità possono essere usate per allocare memoria
 tramite @code{gawk_malloc()}, @code{gawk_calloc}, e
 @code{gawk_realloc()}.  Se l'allocazione non riesce, @command{gawk}
-termina l'esecuzione con un messaggio di errore fatale.
+termina l'esecuzione con un messaggio d'errore fatale.
 Queste macro dovrebbero essere usate come se fossero dei richiami a
 procedure che non restituiscono un codice di ritorno:
 
@@ -40201,7 +40182,7 @@ quando si chiama @code{gawk_malloc()}.
 Il numero totale di byte da allocare.
 
 @item message
-Un messaggio da anteporre all'eventuale messaggio di errore fatale.
+Un messaggio da anteporre all'eventuale messaggio d'errore fatale.
 Questo è solitamente il nome della funzione che sta usando la macro.
 @end table
 
@@ -40445,15 +40426,15 @@ Questo è per utilità del codice chiamante all'interno di
 Questo è il massimo numero di argomenti che la funzione si aspetta di
 ricevere.
 Se chiamata con un numero di argomenti maggiore di questo, e se è stato
-richiesto il controllo @dfn{lint}, @command{gawk} stampa un messaggio di
-avvertimento.  Per ulteriori informazioni, vedere la descrizione di
+richiesto il controllo @dfn{lint}, @command{gawk} stampa un messaggio
+d'avvertimento.  Per ulteriori informazioni, vedere la descrizione di
 @code{suppress_lint}, più avanti in questa lista.
 
 @item const size_t min_required_args;
 Questo è il minimo numero di argomenti che la funzione si aspetta di
 ricevere.
 Se è chiamata con un numero inferiore di argomenti, @command{gawk}
-stampa un messaggio di errore fatale ed esce.
+stampa un messaggio d'errore fatale ed esce.
 
 @item awk_bool_t suppress_lint;
 Questo @dfn{flag} dice a @command{gawk} di non stampare un messaggio
@@ -40524,7 +40505,7 @@ Impostare @code{max_expected_args} al massimo atteso.
 Impostare @code{suppress_lint} ad @code{awk_false}.
 Nella funzione di estensione, controllare che @code{num_actual_args} non
 ecceda @code{f->max_expected_args}.  Se il massimo è superato, stampare
-un messaggio di errore fatale.
+un messaggio d'errore fatale.
 @end table
 
 @node Funzioni di exit callback
@@ -41163,7 +41144,7 @@ Vedere l'estensione di esempio @code{revtwoway} per un esempio di codice.
 @cindex messaggi @subentry stampare dalle estensioni
 @cindex estensioni @subentry stampare messaggi dalle
 
-È possibile stampare diversi tipi di messaggi di avvertimento da
+È possibile stampare diversi tipi di messaggi d'avvertimento da
 un'estensione, come qui spiegato.  Si noti che, per queste funzioni,
 si deve fornire l'ID di estensione ricevuto da @command{gawk}
 al momento in cui l'estensione è stata caricata:@footnote{Poiché l'API usa solo
@@ -41177,16 +41158,16 @@ ISO C 99, che nasconderebbero quel parametro. Un vero peccato!}
 Stampa un messaggio e poi @command{gawk} termina immediatamente l'esecuzione.
 
 @item void nonfatal(awk_ext_id_t id, const char *format, ...);
-Stampa un messaggio di errore non-fatale.
+Stampa un messaggio d'errore non-fatale.
 
 @item void warning(awk_ext_id_t id, const char *format, ...);
-Stampa un messaggio di avvertimento.
+Stampa un messaggio d'avvertimento.
 
 @item void lintwarn(awk_ext_id_t id, const char *format, ...);
-Stampa un messaggio di avvertimento ``lint''.  Normalmente questo equivale a
-stampare un messaggio di avvertimento, ma se @command{gawk} era stato
+Stampa un messaggio d'avvertimento ``lint''.  Normalmente questo equivale a
+stampare un messaggio d'avvertimento, ma se @command{gawk} era stato
 invocato specificando l'opzione @samp{--lint=fatal},
-gli avvertimenti di @dfn{lint} diventano messaggi di errore fatali.
+gli avvertimenti di @dfn{lint} diventano messaggi d'errore fatali.
 @end table
 
 Tutte queste funzioni sono per il resto simili alla famiglia di funzioni
@@ -41202,8 +41183,8 @@ Le seguenti funzioni consentono l'aggiornamento della variabile
 
 @table @code
 @item void update_ERRNO_int(int errno_val);
-Imposta @code{ERRNO} alla stringa equivalente del codice di errore
-in @code{errno_val}.  Il valore dovrebbe essere uno dei codici di errore
+Imposta @code{ERRNO} alla stringa equivalente del codice d'errore
+in @code{errno_val}.  Il valore dovrebbe essere uno dei codici d'errore
 definiti in @code{<errno.h>}, e @command{gawk} lo trasforma in una stringa
 (qualora possibile, tradotta) usando la funzione C @code{strerror()}.
 
@@ -41226,7 +41207,7 @@ il campo del risultato @code{awk_value_t}.
 Altrimenti, la funzione restituisce @dfn{false}, e il campo @code{val_type}
 indica il tipo di valore disponibile.
 A quel punto si può, a seconda di quel che richiede la situazione,
-stampare un messaggio di errore oppure ripetere la
+stampare un messaggio d'errore oppure ripetere la
 richiesta specificando il tipo di valore che risulta disponibile.  Questo
 comportamento è riassunto
 @iftex
@@ -42108,7 +42089,7 @@ dump_array_and_delete(int nargs, awk_value_t *risultato)
 La funzione poi prosegue un passo per volta, come segue.  Il primo passo è
 ricuperare il nome del vettore, passato come primo argomento, seguito dal
 vettore stesso. Se una di queste operazioni non riesce, viene stampato un
-messaggio di errore e si ritorna al chiamante:
+messaggio d'errore e si ritorna al chiamante:
 
 @example
     /* trasforma in un vettore piatto il vettore
@@ -42505,7 +42486,7 @@ Una @dfn{pipe} aperta in input.
 Un coprocesso bidirezionale.
 @end table
 
-In caso di errore, restituisce il valore @code{awk_false}.
+In caso d'errore, restituisce il valore @code{awk_false}.
 Altrimenti, restituisce
 @code{awk_true}, insieme a ulteriori informazioni sulla ridirezione
 nei puntatori @code{ibufp} e @code{obufp}.
@@ -42925,13 +42906,13 @@ di errore fatale ed esce.
 
 @item
 Carica le funzioni definite in @code{func_table}.
-Se qualche caricamento non riesce, stampa un messaggio di
-avvertimento ma continua l'esecuzione.
+Se qualche caricamento non riesce, stampa un messaggio
+d'avvertimento ma continua l'esecuzione.
 
 @item
 Se il puntatore @code{init_func} non è @code{NULL}, chiama la
 funzione da esso puntata.  Se questa restituisce @code{awk_false}, stampa un
-messaggio di avvertimento.
+messaggio d'avvertimento.
 
 @item
 Se @code{ext_version} non è @code{NULL}, registra la
@@ -42982,7 +42963,7 @@ l'ampiezza dei campi
 (@pxref{Analizzatori di input}).
 
 @item
-Le estensioni possono inviare messaggi di errore non fatali
+Le estensioni possono inviare messaggi d'errore non fatali
 (@pxref{Stampare messaggi}).
 
 @item
@@ -43535,7 +43516,7 @@ Poi, ottiene le informazioni relative al file.  Se la funzione chiamata
     clear_array(vettore);
 
     /* chiama stat per il file;
-       in caso di errore,
+       in caso d'errore,
        imposta ERRNO e ritorna */
     ret = statfunc(nome, & sbuf);
 @group
@@ -43745,7 +43726,7 @@ Questo è il modo per caricare l'estensione.
 @item @code{risultato = chdir("/qualche/directory")}
 La funzione @code{chdir()} invoca a sua volta la chiamata di sistema
 @code{chdir()} per cambiare la directory corrente.  Restituisce zero
-se tutto va bene o un valore minore di zero in caso di errore.
+se tutto va bene o un valore minore di zero in caso d'errore.
 In quest'ultimo caso, viene aggiornata la variabile @code{ERRNO}.
 
 @cindex @code{stat()} (estensione)
@@ -43753,8 +43734,8 @@ In quest'ultimo caso, viene aggiornata la variabile @code{ERRNO}.
 @item @code{risultato = stat("/qualche/percorso", statdata} [@code{, follow}]@code{)}
 La funzione @code{stat()} invoca a sua volta la chiamata di sistema
 @code{stat()}.
-Restituisce zero se tutto va bene o un valore minore di zero in caso di
-errore.
+Restituisce zero se tutto va bene o un valore minore di zero in caso
+d'errore.
 In quest'ultimo caso, viene aggiornata la variabile @code{ERRNO}.
 
 Per default, viene usata la chiamata di sistema @code{lstat()}.
@@ -43830,7 +43811,7 @@ Questo dovrebbe essere l'@dfn{OR} @dfn{bit} a @dfn{bit} di uno o più dei
 seguenti valori dei @dfn{flag} costanti predefiniti.
 Almeno uno dei due @dfn{flag} @code{FTS_LOGICAL}
 o @code{FTS_PHYSICAL} dev'essere impostato; in caso contrario
-@code{fts()} restituisce una segnalazione di errore e imposta @code{ERRNO}.
+@code{fts()} restituisce una segnalazione d'errore e imposta @code{ERRNO}.
 I @dfn{flag} sono:
 
 @c nested table
@@ -43901,7 +43882,7 @@ argomento
 di sistema @code{stat()} per il file non è riuscita.
 
 @item "error"
-Se qualche tipo di errore si verifica durante l'elaborazione, il vettore
+Se qualche tipo d'errore si verifica durante l'elaborazione, il vettore
 conterrà anche un elemento con chiave @code{"error"}, che è una stringa
 che descrive l'errore.
 @end table
@@ -44019,7 +44000,7 @@ Questo è il modo per caricare l'estensione.
 Questa funzione crea un nuovo processo. Il valore restituito è zero nel
 processo ``figlio'' e il numero che identifica il nuovo processo
 (@dfn{pid}) nel processo ``padre'', o @minus{}1
-in caso di errore. In quest'ultimo caso, @code{ERRNO} indica il problema.
+in caso d'errore. In quest'ultimo caso, @code{ERRNO} indica il problema.
 Nel processo figlio, gli elementi @code{PROCINFO["pid"]} e
 @code{PROCINFO["ppid"]} vengono aggiornati per riflettere i valori corretti.
 
@@ -44183,7 +44164,7 @@ La variabile @code{inplace::filename} serve per tener traccia del nome del
 file corrente, in modo da non eseguire la funzione @code{inplace::end()} prima
 di aver elaborato il primo file.
 
-Se si verifica un errore, l'estensione emette un messaggio di errore fatale
+Se si verifica un errore, l'estensione invia un messaggio d'errore fatale
 per terminare l'elaborazione immediatamente, senza danneggiare il
 file originale.
 
@@ -44241,7 +44222,7 @@ dell'operazione @samp{numeratore % denominatore}, troncato verso lo zero, in
 modo da ottenere un numero intero.  Se si tenta una divisione per zero, si
 ottiene un errore fatale.
 Il codice di ritorno, @samp{esito}, vale zero, se la divisione riesce, oppure
-@minus{}1 in caso di errore.
+@minus{}1 in caso d'errore.
 @end table
 
 Questa funzione è stata preparata avendo in mente numeri interi di lunghezza
@@ -44444,8 +44425,8 @@ Per default, se non è possibile aprire una directory (p.es., per problemi
 di autorizzazione), @command{gawk} termina l'esecuzione.
 Come per i file normali, questa situazione può
 essere gestita usando una regola @code{BEGINFILE} che controlli il
-contenuto della variabile @code{ERRNO} e stampi un messaggio di
-errore oppure gestisca il problema in qualche altro modo.
+contenuto della variabile @code{ERRNO} e stampi un messaggio
+d'errore oppure gestisca il problema in qualche altro modo.
 
 Ecco un esempio:
 
@@ -44630,7 +44611,7 @@ Questo è il modo per caricare l'estensione.
 @cindex estensione @subentry @code{readfile()}
 @item risultato = readfile("/qualche/percorso")
 L'argomento è il nome del file da leggere.  Il valore restituito è una
-stringa contenente l'intero contenuto del file richiesto.  In caso di errore,
+stringa contenente l'intero contenuto del file richiesto.  In caso d'errore,
 la funzione restituisce la stringa nulla e imposta @code{ERRNO}.
 
 @item BEGIN @{ PROCINFO["readfile"] = 1 @}
@@ -44706,7 +44687,7 @@ i cui risultati vengono poi restituiti, e contengono il numero di
 secondi passato dall'inizio del tempo in Unix (01 gennaio 1970),
 nel fuso orario del computer, a prescindere da qualsiasi specificazione
 di fuso orario contenuta negli argomenti passati alla funzione.
-Altrimenti, in caso di errore, viene restituito @minus{}1.
+Altrimenti, in caso d'errore, viene restituito @minus{}1.
 @end table
 
 @node Esempio di estensione API Test
@@ -44881,7 +44862,7 @@ dei processori di output,
 e dei processori bidirezionali)
 
 @item
-Stampare messaggi fatali, non fatali, di avvertimento, e avvertimenti ``lint''
+Stampare messaggi fatali, non fatali, d'avvertimento, e avvertimenti ``lint''
 
 @item
 Aggiornare @code{ERRNO} o annullarlo
@@ -45455,7 +45436,7 @@ Chiamate indirette di funzione
 
 @item
 La possibilità di ignorare directory specificate sulla riga di comando,
-emettendo un messaggio di avvertimento
+inviando un messaggio d'avvertimento
 (@pxref{Directory su riga di comando})
 
 @item
@@ -45850,7 +45831,7 @@ Nuove variabili (@pxref{Variabili predefinite}):
 nel vettore @code{ARGV}.
 
 @item
-@code{ERRNO}, che contiene il messaggio di errore del sistema quando
+@code{ERRNO}, che contiene il messaggio d'errore del sistema quando
 @code{getline} restituisce @minus{}1 o @code{close()} non termina con successo.
 @end itemize
 
@@ -46285,7 +46266,7 @@ in notazione breve, per poter essere usate negli @dfn{script} di shell @samp{#!}
 
 @item
 I nomi di directory che appaiono sulla riga di comando generano adesso
-un messaggio di errore, ma non interrompono l'elaborazione, a meno che non
+un messaggio d'errore, ma non interrompono l'elaborazione, a meno che non
 siano state specificate le opzioni @option{--posix} o @option{--traditional}
 (@pxref{Directory su riga di comando}).
 
@@ -46548,7 +46529,7 @@ La funzione @code{get_file()} è in grado di accedere
 a ridirezioni in fase di @dfn{open}.
 
 @item
-La funzione @code{nonfatal()} per generare messaggi di errore non fatali
+La funzione @code{nonfatal()} per generare messaggi d'errore non fatali
 (che non provocano la fine del programma).
 
 @item
@@ -46706,7 +46687,7 @@ Il supporto per il sistema OSF/1 è stato rimosso.
 @ignore
 @item
 L'opzione non documentata @option{--nostalgia} è stata rimossa;
-innescava segnalazioni di errore, specie in alcune distribuzioni GNU/Linux.
+innescava segnalazioni d'errore, specie in alcune distribuzioni GNU/Linux.
 @end ignore
 
 @end itemize
@@ -47979,8 +47960,8 @@ possono essere configurate e compilate.
 Disabilitare i controlli @dfn{lint} all'interno di @command{gawk}.
 L'opzione @option{--lint}
 (@pxref{Opzioni})
-è accettata, ma non fa nulla, e non emette alcun messaggio di
-avvertimento.
+è accettata, ma non fa nulla, e non invia alcun messaggio
+d'avvertimento.
 Analogamente, se si imposta la variabile @code{LINT}
 (@pxref{Variabili modificabili dall'utente})
 questa non ha alcun effetto sul programma @command{awk} in esecuzione.
@@ -48383,7 +48364,7 @@ la modalità binaria è impostata sia in lettura che in scrittura.
 @item
 @code{BINMODE=@var{stringa-non-nulla}} equivale a specificare
 @samp{BINMODE=3} (cioè, nessuna conversione in
-lettura e scrittura).  Tuttavia, @command{gawk} emette un messaggio di
+lettura e scrittura).  Tuttavia, @command{gawk} invia un messaggio di
 avviso se la stringa non è @code{"rw"} o @code{"wr"}.
 @end itemize
 
@@ -48910,7 +48891,7 @@ da qualche ulteriore funzionalità disponibile solo in @command{gawk}.
 
 @item
 Qualcosa di evidentemente sbagliato, come un @dfn{dump}, [ossia una
-fine programma inattesa con segnalazione di errore].
+fine programma inattesa con segnalazione d'errore].
 
 @item
 Quando questo @value{DOCUMENT} è poco chiaro o ambiguo riguardo
@@ -48951,7 +48932,7 @@ richiesta farebbe perdere la compatibilità all'indietro.
 Ciò vale anche per le differenze nel comportamento tra @command{gawk}
 e i compilatori e gli interpretatori di altri linguaggi, come, per
 esempio, descrizioni più dettagliate di quello che è il problema
-quando viene emesso un messaggio di errore di sintassi.
+quando viene emesso un messaggio d'errore di sintassi.
 
 @item
 Problemi di documentazioni nella forma ``il manuale non spiega come
@@ -49084,7 +49065,7 @@ Lo @dfn{script} @command{gawkbug} spedisce un messaggio di posta elettronica a
 @EMAIL{bug-gawk@@gnu.org,bug (trattino) gawk (chiocciola) gnu (punto) org}.
 
 I manutentori di @command{gawk} sono i destinatari, e riceveranno la
-segnalazione di errore.
+segnalazione d'errore.
 @emph{Non} spedite messaggi di posta elettronica direttamente ai manutentori;
 è preferibile usare l'indirizzo sopra fornito perché quella
 mailing list rimane in archivio presso il Progetto GNU.
@@ -49902,7 +49883,7 @@ incluse in questa appendice.
 @item
 Le segnalazioni di errori (bug) dovrebbero essere spedite tramite email a
 @EMAIL{bug-gawk@@gnu.org, bug (trattino) gawk (chiocciola) gnu (punto) org}.
-Le segnalazioni di errore dovrebbero essere scritte
+Le segnalazioni d'errore dovrebbero essere scritte
 in inglese e dovrebbero specificare la versione di @command{gawk} in uso, come
 è stata compilata, un breve programma e un @value{DF} che permettono di
 riprodurre il problema.
@@ -50877,7 +50858,7 @@ con numeri interi sono talmente trasparenti che non sono neppure documentati!)
 
 In più, tutte le funzioni nell'API controllano che i puntatori ai parametri
 passati loro in input non siano @code{NULL}.  Se lo sono, viene emesso un
-messaggio di errore.  (È bene che il codice di estensione verifichi
+messaggio d'errore.  (È bene che il codice di estensione verifichi
 che i puntatori ricevuti da @command{gawk} non siano @code{NULL}.  Ciò non
 dovrebbe succedere, ma gli sviluppatori di @command{gawk} sono solo degli
 esseri umani, e capita anche a loro di commettere degli errori, di tanto in
