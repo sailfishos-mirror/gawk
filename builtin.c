@@ -2896,6 +2896,12 @@ do_dcgettext(int nargs)
 
 	check_args_min_max(nargs, "dcgettext", 1, 3);
 
+	static bool warned = false;
+	if (! warned) {
+		warned = true;
+		warning(_("%s is deprecated and will be removed in the next major release"), "dcgettext");
+	}
+
 	if (nargs == 3) {	/* third argument */
 		tmp = POP_STRING();
 		if (do_lint && (fixtype(tmp)->flags & STRING) == 0)
@@ -2969,6 +2975,12 @@ do_dcngettext(int nargs)
 	bool saved_end = false;
 
 	check_args_min_max(nargs, "dcngettext", 3, 5);
+
+	static bool warned = false;
+	if (! warned) {
+		warned = true;
+		warning(_("%s is deprecated and will be removed in the next major release"), "dcngettext");
+	}
 
 	if (nargs == 5) {	/* fifth argument */
 		tmp = POP_STRING();
@@ -3066,6 +3078,12 @@ do_bindtextdomain(int nargs)
 	const char *the_result;
 
 	check_args_min_max(nargs, "bindtextdomain", 1, 2);
+
+	static bool warned = false;
+	if (! warned) {
+		warned = true;
+		warning(_("%s is deprecated and will be removed in the next major release"), "bindtextdomain");
+	}
 
 	t1 = t2 = NULL;
 	/* set defaults */
