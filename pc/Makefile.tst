@@ -631,7 +631,7 @@ strftime::
 	@echo $@; $(CHCP) $(ORIGCP)
 	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && $(RM) $@.ok
 
 devfd::
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -1225,11 +1225,6 @@ pty2:
 	*) AWKPATH="$(srcdir)" $(AWK) -f $@.awk | od -c | $(AWK) '{ $$1 = $$1 ; print }' >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ ; \
 	$(srcdir)/checkmany.sh "$@" "$(srcdir)" ;; \
 	esac
-
-arrdbg:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@.ok-mpfr" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && rm -f _$@ $@.ok $@.ok-mpfr
 
 sourcesplit:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3888,6 +3883,11 @@ unicode1:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+arrdbg:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 double1:
