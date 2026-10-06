@@ -1289,12 +1289,12 @@ indirectbuiltin2:
 
 dbugbadcmd:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) --debug="$(srcdir)/$@-in.txt" -f $@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 dbugbreak:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) --debug="$(srcdir)/$@-in.txt" -f $@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
