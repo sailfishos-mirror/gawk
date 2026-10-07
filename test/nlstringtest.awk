@@ -1,8 +1,8 @@
 BEGIN {
   n = 2
   TEXTDOMAIN = "nlstringtest"
-  bindtextdomain ("./")
-#  bindtextdomain (ARGV[1])
+#  bindtextdomain ("./")
+  bindtextdomain (ARGV[1])
 
   printf dcngettext ("a piece of cake", "%d pieces of cake", n) "\n", n
 

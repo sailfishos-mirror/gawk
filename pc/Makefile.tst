@@ -344,7 +344,8 @@ NEED_LOCALE_EN = \
 	mbstr1 mbstr2 mtchi18n2 ordchr posix_compare printhuge reint2 rri1 subamp \
 	subi18n unicode1 wideidx wideidx2 widesub widesub2 widesub3 widesub4
 
-NEED_LOCALE_FR = nlstringtest
+
+# NEED_LOCALE_FR =
 NEED_LOCALE_GR = greek-8bit
 NEED_LOCALE_JP = mbprintf2
 NEED_LOCALE_RU = mtchi18n
@@ -1273,6 +1274,12 @@ indirectbuiltin2:
 	@-for test in 0 1 2 3 4 5 ; do \
 	AWKPATH="$(srcdir)" $(AWK) -v test=$$test -f $@.awk ; \
 	done > _$@ 2>&1 || exit 0
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+nlstringtest:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=FRA_FRA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk "$(srcdir)" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 dbugbadcmd:
@@ -4012,12 +4019,6 @@ mtchi18n:
 mtchi18n2:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
-	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
-
-nlstringtest:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=FRA_FRA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
