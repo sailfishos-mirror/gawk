@@ -3079,12 +3079,6 @@ do_bindtextdomain(int nargs)
 
 	check_args_min_max(nargs, "bindtextdomain", 1, 2);
 
-	static bool warned = false;
-	if (! warned) {
-		warned = true;
-		warning(_("%s is deprecated and will be removed in the next major release"), "bindtextdomain");
-	}
-
 	t1 = t2 = NULL;
 	/* set defaults */
 	directory = NULL;
@@ -3112,6 +3106,14 @@ do_bindtextdomain(int nargs)
 	the_result = bindtextdomain(domain, directory);
 	if (the_result == NULL)
 		the_result = "";
+
+	// Do this *after* bindtextdomain() is called.
+	// Otherwise, things don't work.
+	static bool warned = false;
+	if (! warned) {
+		warned = true;
+		warning(_("%s is deprecated and will be removed in the next major release"), "bindtextdomain");
+	}
 
 	if (directory)
 		str_restore(t1, save1);
