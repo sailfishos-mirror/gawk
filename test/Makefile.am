@@ -2154,6 +2154,11 @@ inftest::
 	@-$(AWK) -f "$(srcdir)"/inftest.awk | sed "s/inf/Inf/g" >_$@ || echo EXIT CODE: $$? >> _$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
+arrdbg:
+	@echo $@
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk 2>&1 | grep -v memory: >_$@ || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
 getline2::
 	@echo $@
 	@-$(AWK) -f "$(srcdir)"/getline2.awk "$(srcdir)"/getline2.awk "$(srcdir)"/getline2.awk >_$@ || echo EXIT CODE: $$? >> _$@
