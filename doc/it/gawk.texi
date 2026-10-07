@@ -4594,13 +4594,15 @@ MPFR ed MP
 (@pxref{Calcolo con precisione arbitraria}).
 @end ifnottex
 
-@ignore
 @cindex @env{GAWK_NO_MPFR_WARN} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{GAWK_NO_MPFR_WARN}
-@end ignore
-A partire dalla versione 6.0,
-le funzionalità di calcolo con precisione arbitraria in @command{gawk}
-sono deprecate.
+
+A partire dalla versione 6.0 di @command{gawk},
+le funzionalità di calcolo con precisione arbitraria sono deprecate.
+Verranno rimosse nella versione 6.1 di @command{gawk}.
+Se si usa quest'opzione, @command{gawk} invia un messaggio d'avvertimento.
+Assegnando un valore qualsiasi alla variabile d'ambiente
+@env{GAWK_NO_MPFR_WARN} si può evitare di ricevere il messaggio.
 
 @cindex @option{-n} (opzione)
 @cindex opzione @subentry @option{-n}
@@ -5626,9 +5628,18 @@ is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
-A partire dalla versione 6.0 di @command{gawk},
-la funzionalità per il calcolo a precisione arbitraria è deprecata.
-Verrà rimossa nella versione 6.1 di @command{gawk}.
+A partire dalla versione 6.0 di @command{gawk}, le seguenti 
+funzionalità sono deprecate e verranno rimosse nella
+versione 6.1 di @command{gawk}.
+
+@itemize @bullet
+@item
+L'opzione @option{-S}/@option{--sandbox} per lavorare in ``modalità sandbox''.
+
+@item
+La funzionalità di calcolo con precisione arbitraria, richiesta tramite
+l'opzione @option{-M}/@option{--bignum}.
+@end itemize
 
 @node Non documentato
 @section Opzioni e funzionalità non documentate
@@ -8992,10 +9003,10 @@ Se si è specificato l'opzione @option{--csv}, la variabile
 @code{PROCINFO["CSV"]} esisterà, altrimenti non sarà disponibile.
 @xref{Variabili auto-assegnate}.
 
-Infine, se si è specificato @option{--csv}, l'assegnazione di
+Infine, se si è specificato @option{--csv}, quando si'assegna
 un valore a una delle variabili
 @code{FS}, @code{FIELDWIDTHS}, @code{FPAT} o @code{RS}
-genera un messaggio d'avvertimento.
+@command{gawk} invia un messaggio d'avvertimento.
 
 Per amor di chiarezza, @command{gawk} considera come
 autoritativo per il file in input di tipo CSV

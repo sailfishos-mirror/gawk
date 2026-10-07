@@ -7,9 +7,9 @@ testprog=$1
 srcdir=$2
 CMP=${CMP:-cmp -s}
 
-for ok in $srcdir/$testprog.ok*
+for ok in ./$testprog.ok* $srcdir/$testprog.ok*
 do
-	if ${CMP} _$testprog $ok
+	if test -f $ok && ${CMP} _$testprog $ok
 	then
 		rm -f _$testprog
 		exit 0
