@@ -84,6 +84,8 @@ EXTRA_DIST = \
 	arraytype.ok \
 	arraytype.ok-mpfr \
 	arrdbg.awk \
+	arrdbg.ok \
+	arrdbg.ok-mpfr \
 	arrymem1.awk \
 	arrymem1.ok \
 	arryref2.awk \
@@ -2170,7 +2172,7 @@ strftime::
 	@echo $@
 	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && $(RM) $@.ok
 
 devfd::
 	@echo $@
@@ -2746,11 +2748,6 @@ pty2:
 	$(srcdir)/checkmany.sh "$@" "$(srcdir)" ;; \
 	esac
 
-arrdbg:
-	@echo $@
-	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@.ok-mpfr" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && rm -f _$@ $@.ok $@.ok-mpfr
-
 sourcesplit:
 	@echo $@
 	@-AWKPATH="$(srcdir)" $(AWK) --source='BEGIN { a = 5;' --source='print a }' >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -2814,12 +2811,12 @@ indirectbuiltin2:
 
 dbugbadcmd:
 	@echo $@
-	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) --debug="$(srcdir)/$@-in.txt" -f $@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 dbugbreak:
 	@echo $@
-	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) --debug="$(srcdir)/$@-in.txt" -f $@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 

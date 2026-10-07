@@ -628,7 +628,7 @@ strftime::
 	@echo $@; $(CHCP) $(ORIGCP)
 	@TZ=GMT0; export TZ; \
 	$(AWK) -v OUTPUT=_$@ -v DATECMD="$(DATE)" -f "$(srcdir)"/strftime.awk || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && $(RM) $@.ok
 
 devfd::
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -1214,11 +1214,6 @@ pty2:
 	$(srcdir)/checkmany.sh "$@" "$(srcdir)" ;; \
 	esac
 
-arrdbg:
-	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) -v "okfile=./$@.ok" -v "mpfr_okfile=./$@.ok-mpfr" -f "$(srcdir)"/$@.awk | grep array_f >_$@ || echo EXIT CODE: $$? >> _$@
-	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)" && rm -f _$@ $@.ok $@.ok-mpfr
-
 sourcesplit:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) --source='BEGIN { a = 5;' --source='print a }' >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
@@ -1282,12 +1277,12 @@ indirectbuiltin2:
 
 dbugbadcmd:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) --debug="$(srcdir)/$@-in.txt" -f $@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 dbugbreak:
 	@echo $@; $(CHCP) $(ORIGCP)
-	@-$(AWK) --debug="$(srcdir)/$@-in.txt" -f "$(srcdir)"/$@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-AWKPATH="$(srcdir)" $(AWK) --debug="$(srcdir)/$@-in.txt" -f $@.awk < "$(srcdir)/$@.in" >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 Gt-dummy:
 # file Maketests, generated from Makefile.am by the Gentests program
@@ -3871,6 +3866,11 @@ unicode1:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
 	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+arrdbg:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 double1:
