@@ -355,7 +355,7 @@ if (--val) \
 	do { \
 		if (! prog_running) { \
 			d_error(_("%s:%d:%s: program not running"), \
-				__FILE__, __LINE__, __func__); \
+				"debug.c", __LINE__, __func__); \
 			return false; \
 		} \
 	} while (false)
