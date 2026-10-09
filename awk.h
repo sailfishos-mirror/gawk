@@ -874,20 +874,44 @@ typedef struct exp_instruction {
 	OPCODE opcode;
 } INSTRUCTION;
 
+/* Op_func, Op_func_call, Op_indirect_func_call */
 #define func_name       d.name
 
+/*
+ * Op_push*, Op_{plus,minus,times,exp,quotient,mod}_i
+ * Op_store_sub, Op_store_var, Op_assign_concat, Op_match_rec,
+ * Op_nomatch, Op_match
+ */
 #define memory          d.dn
+
+/* Op_builtin, Op_subscript */
 #define builtin         d.fptr
+
+/* Op_ext_builtin, Op_indirect_func_call */
 #define extfunc         d.efptr
+
+/* In awkgram.y, for builtin functions */
 #define builtin_idx     d.dl
 
+/*
+ * Op_store_sub, Op_concat, Op_K_delete, Op_in_array,
+ * Op_builtin, Op_ext_builtin, Op_sub_builtin, Op_K_print*,
+ * Op_indirect_func_call, Op_func_call.
+ */
 #define expr_count      x.xl
 
+/* Op_ext_builtin, Op_indirect_func_call, Op_func_call */
 #define c_function	x.exf
 
-#define target_continue d.di
+/*
+ * Op_newfile, Op_get_record, Op_K_next, Op_line_range
+ * Op_cond_pair, Op_K_break, Op_K_continue, Op_jmp,
+ * Op_jmp_false, Op_jmp_true.
+ */
 #define target_jmp      d.di
-#define target_break    x.xi
+
+#define target_continue d.di	// alias for target_jmp!
+#define target_break    x.xi	// used when pretty-printing and debugging
 
 /* Op_sub_builtin */
 #define sub_flags       d.dl
@@ -895,12 +919,11 @@ typedef struct exp_instruction {
 #define GENSUB          0x02	/* builtin is gensub */
 #define LITERAL         0x04	/* target is a literal string */
 
-
 /* Op_K_exit */
 #define target_end      d.di
 #define target_atexit   x.xi
 
-/* Op_newfile, Op_K_getline, Op_nextfile */
+/* Op_newfile, Op_K_getline, Op_K_nextfile */
 #define target_endfile	x.xi
 
 /* Op_newfile */
@@ -923,13 +946,14 @@ typedef struct exp_instruction {
 #define in_rule         x.xl
 #define source_file     d.name
 
- /* Op_K_case, Op_K_default */
+/* Op_K_case, Op_K_default */
 #define case_stmt       x.xi
 #define case_exp        d.di
 #define stmt_start      case_exp
 #define stmt_end        case_stmt
 #define match_exp       x.xl
 
+/* Used during parsing of bookean expressions */
 #define target_stmt     x.xi
 
 /* Op_K_switch */
