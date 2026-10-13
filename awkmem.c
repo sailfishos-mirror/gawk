@@ -127,8 +127,8 @@ free_bc_internal(INSTRUCTION *cp)
 			unref(m);
 		break;
 	case Op_illegal:
-		cant_happen("unexpected opcode %s", opcode2str(cp->opcode));
 	default:
+		cant_happen("unexpected opcode %s", opcode2str(cp->opcode));
 		break;
 	}
 }
