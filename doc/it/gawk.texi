@@ -4504,7 +4504,7 @@ nell'output.
 @cindex dati CSV (campi separati da virgola) @subentry @option{--csv}
 @item @option{-k}
 @itemx @option{--csv}
-Richiede un trattamento speciale per file CSV [valori separati da virgola].
+Richiede un trattamento speciale per file CSV (Campi Separati da Virgola).
 @xref{Campi separati da virgola}.
 Quest'opzione non può essere usata insieme all'opzione @option{--posix}.
 Se lo si fa, viene generato un errore fatale.
@@ -45304,6 +45304,16 @@ La possibilità di eliminare completamente un vettore con l'istruzione
 
 @end itemize
 
+Lo standard POSIX 2024 standard ha introdotto le seguenti modifiche:
+
+@itemize @value{BULLET}
+@item
+La possibilità di avere un vettore come argomento alla funzione
+@code{length()}
+(@pxref{Funzioni per stringhe}).
+
+@end itemize
+
 @xref{Estensioni comuni} per una lista delle estensioni comuni
 non previste nello standard POSIX.
 
@@ -45341,6 +45351,11 @@ L'uso di @code{func} come abbreviazione di @code{function}
 La funzione predefinita @code{fflush()} per forzare la scrittura dei buffer
 in output
 (@pxref{Funzioni di I/O})
+
+@item
+Il supporto per gestire in input file di tipo CSV 
+(Campi Separati da Virgola) 
+@xref{Campi separati da virgola}.
 
 @ignore
 @item
@@ -45388,7 +45403,9 @@ Le variabili
 @code{FPAT},
 @code{IGNORECASE},
 @code{LINT},
+@code{PREC},
 @code{PROCINFO},
+@code{ROUNDMODE},
 @code{RT}
 e
 @code{TEXTDOMAIN}
@@ -45499,11 +45516,6 @@ Aderenza allo standard POSIX per le funzioni @code{gsub()} e @code{sub()}
 se è stata specificata l'opzione @option{--posix}
 
 @item
-La funzione @code{length()} accetta come argomento il nome di un vettore
-e restituisce il numero di elementi nel vettore
-(@pxref{Funzioni per stringhe})
-
-@item
 Il terzo argomento opzionale della funzione @code{match()}
 per contenere eventuali sottoespressioni individuate all'interno di una
 @dfn{regexp}
@@ -45589,6 +45601,7 @@ La variabile d'ambiente @env{AWKLIBPATH} per specificare un percorso di ricerca
 per l'opzione @option{-l} della riga di comando
 (@pxref{Opzioni})
 
+@c FIXME: Recheck this list against 6.0 and 6.1.
 @item
 Le opzioni brevi
 @option{-b},
@@ -45652,92 +45665,6 @@ and
 @end itemize
 
 @c       new ports
-
-@item
-Il supporto per i seguenti sistemi obsoleti è stato rimosso dal codice
-sorgente e dalla documentazione di @command{gawk} versione 4.0:
-
-@c nested table
-@itemize @value{MINUS}
-@item
-Amiga
-
-@item
-Atari
-
-@item
-BeOS
-
-@item
-Cray
-
-@item
-MIPS RiscOS
-
-@item
-MS-DOS con il compilatore Microsoft
-
-@item
-MS-Windows con il compilatore Microsoft
-
-@item
-NeXT
-
-@item
-SunOS 3.x, Sun 386 (Road Runner)
-
-@item
-Tandem (non-POSIX)
-
-@item
-Compilatore pre-standard VAX C per VAX/VMS
-
-@item
-GCC per Alpha non è stato verificato da parecchio tempo.
-
-@end itemize
-
-@item
-Il supporto per i seguenti sistemi obsoleti è stato rimosso dal codice
-di @command{gawk} versione 4.1:
-
-@c nested table
-@itemize @value{MINUS}
-@item
-Ultrix
-@end itemize
-
-@item
-Il supporto per i seguenti sistemi obsoleti è stato rimosso dal codice
-sorgente e dalla documentazione di
-@command{gawk} versione 4.2:
-
-@c nested table
-@itemize @value{MINUS}
-@item
-MirBSD
-
-@item
-GNU/Linux su Alpha
-@end itemize
-
-@item
-Il supporto per i seguenti sistemi è stato rimosso dal
-codice sorgente @command{gawk} a partire dalla versione 5.2:
-
-
-@c nested table
-@itemize @value{MINUS}
-@item
-OS/2
-
-@item
-DJGPP
-
-@item
-VAX/VMS
-
-@end itemize
 
 @item
 Il supporto per le opzioni @option{--lint-old} e @option{--re-interval}
@@ -45939,6 +45866,7 @@ L'opzione @option{--lint-old} per
 ottenere messaggi relativi a costrutti non disponibili
 nell'implementazione di @command{awk} per Unix Version 7
 (@pxref{V7/SVR3.1}).
+@c FIXME: Removed in 6.0
 
 @item
 L'opzione @option{-m} da BWK @command{awk}.  (Brian lavorava
@@ -45949,6 +45877,7 @@ rimossa, sia dal suo @command{awk} che da @command{gawk}.
 L'opzione @option{--re-interval} per consentire di specificare
 espressioni di intervallo nelle @dfn{regexp}
 (@pxref{Operatori di espressioni regolari}).
+@c FIXME: Removed in 6.0
 
 @item
 L'opzione @option{--traditional} aggiunta come maniera più intuitiva
@@ -46408,7 +46337,7 @@ L'opzione @option{-R} è stata rimossa.
 @end itemize
 
 @item
-Supporto per il calcolo ad alta precisione con MPFR
+Supporto per il calcolo a precisione arbitraria con MPFR
 @iftex
 (@pxrefil{Calcolo con precisione arbitraria}).
 @end iftex
@@ -46490,15 +46419,15 @@ La funzione @code{mktime()} ora accetta un secondo argomento opzionale
 La funzione @code{typeof()} (@pxref{Funzioni per i tipi}).
 
 @item
-Le ottimizzazioni sono abilitate per default.  Si usi @option{-s} /
-@option{--no-optimize} per non effettuare ottimizzazioni.
+Le ottimizzazioni sono abilitate per default.  Si usi l'opzione
+@option{-s} / @option{--no-optimize} per non effettuare ottimizzazioni.
 
 @item
 Per molti anni, lo standard POSIX richiedeva che la separazione dei campi
-di un record fosse fatta per default
+di un record fosse fatta per default solo
 quando si incontrano spazi e TAB, e questo è il comportamento di
-@command{gawk} se si specifica l'opzione @option{--posix}.  Dal 2013
-il comportamento originario è stato ripristinato, e ora
+@command{gawk} se si specificava l'opzione @option{--posix}.  Dal 2013
+il comportamento precedente a questo è stato ripristinato, e quindi ora
 il default per separare i campi con l'opzione @option{--posix} ammette
 anche il ritorno-a-capo come separatore di campi.
 
@@ -46835,6 +46764,7 @@ le tre versioni liberamente disponibili più usate di @command{awk}
 @item @code{delete} senza indici @tab X @tab X @tab X @tab X
 @item Funzione @code{fflush()} @tab X @tab X @tab X @tab X
 @item Parola chiave @code{func} @tab X @tab @tab X @tab
+@item Vettore come argomento di @code{length()} @tab X @tab X @tab X @tab X
 @item Istruzione @code{nextfile} @tab X @tab X @tab X @tab X
 @item @code{RS} come @dfn{regexp} @tab X @tab X @tab X @tab
 @item Funzioni gestione data/ora @tab @tab X @tab X @tab
@@ -46947,13 +46877,12 @@ intervalli "come si faceva prima di POSIX", a meno che non si specifichi
 l'opzione @option{--posix} (@pxref{Opzioni}).@footnote{Ed
 è così che è nata la Campagna per l'Interpretazione Razionale degli
 Intervalli (in inglese, RRI [@dfn{Rational Range Interpretation}]).
-Un certo
-numero di strumenti GNU hanno già implementato questa modifica o
-lo faranno presto.  Grazie a Karl Berry per aver coniato la frase
+Un certo numero di strumenti GNU hanno da allora implementato questa modifica.
+Grazie a Karl Berry per aver coniato la frase
 ``Rational Range Interpretation''.}
 
 Fortunatamente, un po' prima del rilascio definitivo della versione 4.0 di
-@command{gawk}, il manutentore ha appreso che lo standard 2008 aveva
+@command{gawk}, il manutentore ha appreso che lo standard POSIX 2008 aveva
 modificato la definizione di intervallo, e che, al di fuori delle
 localizzazioni @code{"C"} e @code{"POSIX"}, il significato di espressione
 di intervallo era ora
@@ -47258,7 +47187,7 @@ resto del team di sviluppo.
 @cindex Malmberg, John
 @item
 John Malmberg ha apportato miglioramenti significativi alla versione
-OpenVMS e alla relativa documentazione.
+OpenVMS e alla relativa documentazione, e ne cura la manutenzione.
 
 @cindex Colombo, Antonio
 @item
@@ -47305,6 +47234,9 @@ Ulteriori modifiche sono state fatte per la versione System V Release 4, nel
 1989.
 Dopo di allora, sono state apportate ulteriori modifiche minori,
 per implementare lo standard POSIX.
+Nel 2023, il supporto ai file in input di tipo CSV
+(Campi Separati da Virgola) è stato aggiunto a BWK @command{awk},
+e in seguito anche a @command{gawk}.
 
 @item
 L'@command{awk} di Brian Kernighan prevede un piccolo numero di estensioni
@@ -47326,7 +47258,8 @@ in @command{gawk} è stata causa di malintesi nel corso degli anni.  Oggi
 intervalli nella forma @samp{[a-z]} individuano @emph{solo} i caratteri
 numericamente compresi tra
 @samp{a} e @samp{z} nella rappresentazione nativa dei caratteri in quella
-particolare macchina.  Normalmente quella in uso è quella ASCII,
+particolare macchina.  Normalmente quella in uso è quella ASCII
+o Unicode,
 ma può essere EBCDIC sui sistemi IBM S/390x.
 
 @item
@@ -49566,28 +49499,36 @@ in questo modo si andrebbero a sostituire copie di altre applicazioni nella
 directory @file{/usr/local/bin} del sistema corrente.  Per ulteriori
 informazioni, vedere @uref{https://busybox.net, la pagina principale del progetto}.
 
+@cindex MKS
+@cindex Mortice Kern Systems
+@item MKS @command{awk}
+Negli anni '80 e '90, Mortice Kern Systems (MKS) forniva strumenti software Unix
+da usare su PC e su altri sistemi non-POSIX.  Fra tali strumenti c'era anche
+un'implementazione di @command{awk}.
+
 @cindex OpenSolaris
 @cindex Solaris @subentry versione POSIX @command{awk}
 @cindex codice sorgente @subentry Solaris @command{awk}
 @cindex sorgente @subentry codice @subentry Solaris @command{awk}
 @item POSIX @command{awk} per OpenSolaris
-Le versioni di @command{awk} in @file{/usr/xpg4/bin} e @file{/usr/xpg6/bin} su
-Solaris sono @dfn{grosso modo} conformi allo standard POSIX.  Sono basate sul
-comando @command{awk} preparato per i PC dalla ditta Mortice Kern.  È stato
-possibile compilare e far funzionare questo codice sotto GNU/Linux dopo 1--2
-ore di lavoro.  Rendere questo codice più generalmente portabile (usando gli
-strumenti GNU Autoconf e/o Automake) richiederebbe ulteriore lavoro, che non è
-stato fin qui compiuto, almeno per quel che risulta a chi scrive.
+In ambiente Solaris, a partire da MKS @command{awk}, venne ricavata una versione
+compatibile con lo standard POSIX, che può essere trovata nelle directory
+@file{/usr/xpg4/bin} e @file{/usr/xpg6/bin} sui sistemi Solaris.
+Il codice sorgente di quella versione è stato resto disponibile quando il
+sistema operativo Solaris divenne @dfn{open-source} per un periodo di tempo,
+nei primi anni 2000.
 
-@cindex Illumos @subentry @command{awk} conforme a POSIX e
-@cindex codice sorgente @subentry Illumos @command{awk}
-@cindex sorgente @subentry codice @subentry Illumos @command{awk}
-Il codice sorgente era un tempo disponibile dal sito web OpenSolaris.
-Tuttavia, il progetto è terminato, e il sito web chiuso.  Fortunatamente,
-il progetto
-@uref{https://wiki.illumos.org/display/illumos/illumos+Home, Illumos}
-mette a disposizione questa implementazione.  Si possono vedere i singoli file in
-@uref{https://github.com/joyent/illumos-joyent/blob/master/usr/src/cmd/awk_xpg4}.
+Oggi, il codice sorgente è disponibile nel progetto
+@uref{https://github.com/illumos/illumos-gate, Illumos} su GitHub;
+lo si può trovare nella directory @file{/usr/src/cmd/awk_xpg4}.
+
+È stato possibile compilare e far funzionare questo codice sotto GNU/Linux con
+alcune ore di lavoro.  Rendere questo codice più generalmente portabile (usando gli
+strumenti GNU Autoconf e/o Automake) richiederebbe ulteriore lavoro, che non è
+stato fin qui compiuto.  Riteniamo che possa essere compilato ed eseguito su
+ogni sistema compatibile con lo standard POSIX, ma non sono stati fatti test in
+merito.  Quest'ultima versione è disponibile all'indirizzo
+@uref{https://github.com/arnoldrobbins/mksawk}.
 
 @cindex @command{libmawk} (interpretatore)
 @cindex codice sorgente @subentry @command{libmawk} (interpretatore)
@@ -49605,7 +49546,7 @@ Questo è un interprete @command{awk} incorporabile, derivato da
 Mircea Neacsu ha creato un interpretatore @command{awk}
 incorporabile, basato su BWK @command{awk}.  È disponibile
 nel sito @uref{https://github.com/neacsum/awk}.
-Una breve esposizione di come utilizzarlo si può trovare all'indirizzo
+Una breve esposizione su come utilizzarlo si può trovare all'indirizzo
 @uref{https://www.codeproject.com/Articles/5264205/Embedding-AWK-in-a-C-program}.
 
 @cindex Ramming, J.@: Christopher

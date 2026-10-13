@@ -1603,6 +1603,7 @@ parse_args(int argc, char **argv)
 
 		case 'g':
 			do_flags |= DO_INTL;
+			warning(_("translation functions are deprecated and will be removed in the next major release"));
 			break;
 
 		case 'G':	// FIXME: command line option is temporary
