@@ -45,6 +45,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define API_COMPAT_GAWK_5
 #include "gawkapi.h"
 
 #include "gettext.h"
@@ -128,13 +129,13 @@ do_inplace_begin(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	fflush(stdout);
 
 	if (state.tname)
-		fatal(ext_id, _("inplace::begin: in-place editing already active"));
+		fatal(ext_id, _("inplace::begin: in-place editing already active"), "");
 
 	if (nargs != 2)
 		fatal(ext_id, _("inplace::begin: expects 2 arguments but called with %d"), nargs);
 
 	if (! get_argument(0, AWK_STRING, &filename))
-		fatal(ext_id, _("inplace::begin: cannot retrieve 1st argument as a string filename"));
+		fatal(ext_id, _("inplace::begin: cannot retrieve 1st argument as a string filename"), "");
 
 	/*
 	 * N.B. In the current implementation, the 2nd suffix arg is not used
@@ -211,14 +212,14 @@ do_inplace_end(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 		fatal(ext_id, _("inplace::end: expects 2 arguments but called with %d"), nargs);
 
 	if (! get_argument(0, AWK_STRING, &filename))
-		fatal(ext_id, _("inplace::end: cannot retrieve 1st argument as a string filename"));
+		fatal(ext_id, _("inplace::end: cannot retrieve 1st argument as a string filename"), "");
 
 	if (! get_argument(1, AWK_STRING, &suffix))
 		suffix.str_value.str = NULL;
 
 	if (! state.tname) {
 		if (! invalid_filename(&filename.str_value))
-			warning(ext_id, _("inplace::end: in-place editing not active"));
+			warning(ext_id, _("inplace::end: in-place editing not active"), "");
 		return make_number(0, result);
 	}
 

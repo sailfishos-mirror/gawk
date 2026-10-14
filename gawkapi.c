@@ -43,16 +43,13 @@ static NODE *ns_lookup(const char *name_space, const char *name, char **full_nam
  */
 
 static awk_bool_t
-api_get_argument(awk_ext_id_t id, size_t count,
-			awk_valtype_t wanted, awk_value_t *result)
+api_get_argument(size_t count, awk_valtype_t wanted, awk_value_t *result)
 {
 #ifdef DYNAMIC
 	NODE *arg;
 
 	if (result == NULL)
 		return awk_false;
-
-	(void) id;
 
 	/* set up default result */
 	memset(result, 0, sizeof(*result));
@@ -111,15 +108,11 @@ scalar:
 /* api_set_argument --- convert an argument to an array */
 
 static awk_bool_t
-api_set_argument(awk_ext_id_t id,
-		size_t count,
-		awk_array_t new_array)
+api_set_argument(size_t count, awk_array_t new_array)
 {
 #ifdef DYNAMIC
 	NODE *arg;
 	NODE *array = (NODE *) new_array;
-
-	(void) id;
 
 	if (array == NULL || array->type != Node_var_array)
 		return awk_false;
@@ -237,11 +230,9 @@ awk_value_to_node(const awk_value_t *retval)
 /* api_fatal --- print a fatal message and exit */
 
 static void
-api_fatal(awk_ext_id_t id, const char *format, ...)
+api_fatal(const char *format, ...)
 {
 	va_list args;
-
-	(void) id;
 
 	va_start(args, format);
 	err(true, _("fatal: "), format, args);
@@ -251,11 +242,9 @@ api_fatal(awk_ext_id_t id, const char *format, ...)
 /* api_nonfatal --- print a non fatal error message */
 
 static void
-api_nonfatal(awk_ext_id_t id, const char *format, ...)
+api_nonfatal(const char *format, ...)
 {
 	va_list args;
-
-	(void) id;
 
 	va_start(args, format);
 	err(false, _("error: "), format, args);
@@ -265,11 +254,9 @@ api_nonfatal(awk_ext_id_t id, const char *format, ...)
 /* api_warning --- print a warning message */
 
 static void
-api_warning(awk_ext_id_t id, const char *format, ...)
+api_warning(const char *format, ...)
 {
 	va_list args;
-
-	(void) id;
 
 	va_start(args, format);
 	err(false, _("warning: "), format, args);
@@ -279,11 +266,9 @@ api_warning(awk_ext_id_t id, const char *format, ...)
 /* api_lintwarn --- print a lint warning message and exit if appropriate */
 
 static void
-api_lintwarn(awk_ext_id_t id, const char *format, ...)
+api_lintwarn(const char *format, ...)
 {
 	va_list args;
-
-	(void) id;
 
 	va_start(args, format);
 	if (lintfunc == r_fatal) {
@@ -297,10 +282,8 @@ api_lintwarn(awk_ext_id_t id, const char *format, ...)
 /* api_register_input_parser --- register an input_parser; for opening files read-only */
 
 static void
-api_register_input_parser(awk_ext_id_t id, awk_input_parser_t *input_parser)
+api_register_input_parser(awk_input_parser_t *input_parser)
 {
-	(void) id;
-
 	if (input_parser == NULL)
 		return;
 
@@ -309,11 +292,8 @@ api_register_input_parser(awk_ext_id_t id, awk_input_parser_t *input_parser)
 
 /* api_register_output_wrapper --- register an output wrapper, for writing files / two-way pipes */
 
-static void api_register_output_wrapper(awk_ext_id_t id,
-		awk_output_wrapper_t *output_wrapper)
+static void api_register_output_wrapper(awk_output_wrapper_t *output_wrapper)
 {
-	(void) id;
-
 	if (output_wrapper == NULL)
 		return;
 
@@ -323,11 +303,8 @@ static void api_register_output_wrapper(awk_ext_id_t id,
 /* api_register_two_way_processor --- register a processor for two way I/O */
 
 static void
-api_register_two_way_processor(awk_ext_id_t id,
-		awk_two_way_processor_t *two_way_processor)
+api_register_two_way_processor(awk_two_way_processor_t *two_way_processor)
 {
-	(void) id;
-
 	if (two_way_processor == NULL)
 		return;
 
@@ -339,21 +316,16 @@ api_register_two_way_processor(awk_ext_id_t id,
 /* api_update_ERRNO_int --- update ERRNO with an integer value */
 
 static void
-api_update_ERRNO_int(awk_ext_id_t id, int errno_val)
+api_update_ERRNO_int(int errno_val)
 {
-	(void) id;
-
 	update_ERRNO_int(errno_val);
 }
 
 /* api_update_ERRNO_string --- update ERRNO with a string value */
 
 static void
-api_update_ERRNO_string(awk_ext_id_t id,
-			const char *string)
+api_update_ERRNO_string(const char *string)
 {
-	(void) id;
-
 	if (string == NULL)
 		return;
 
@@ -363,10 +335,8 @@ api_update_ERRNO_string(awk_ext_id_t id,
 /* api_unset_ERRNO --- unset ERRNO */
 
 static void
-api_unset_ERRNO(awk_ext_id_t id)
+api_unset_ERRNO()
 {
-	(void) id;
-
 	unset_ERRNO();
 }
 
@@ -374,12 +344,9 @@ api_unset_ERRNO(awk_ext_id_t id)
 /* api_add_ext_func --- add a function to the interpreter, returns true upon success */
 
 static awk_bool_t
-api_add_ext_func(awk_ext_id_t id,
-		const char *name_space,
+api_add_ext_func(const char *name_space,
 		awk_ext_func_t *func)
 {
-	(void) id;
-
 	if (func == NULL)
 		return awk_false;
 
@@ -420,13 +387,10 @@ run_ext_exit_handlers(int exitval)
 /* api_awk_atexit --- add an exit call back */
 
 static void
-api_awk_atexit(awk_ext_id_t id,
-		void (*funcp)(void *data, int exit_status),
+api_awk_atexit(void (*funcp)(void *data, int exit_status),
 		void *arg0)
 {
 	struct ext_exit_handler *p;
-
-	(void) id;
 
 	if (funcp == NULL)
 		return;
@@ -778,8 +742,7 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 /* api_sym_lookup --- look up a symbol */
 
 static awk_bool_t
-api_sym_lookup(awk_ext_id_t id,
-		const char *name_space,
+api_sym_lookup(const char *name_space,
 		const char *name,
 		awk_valtype_t wanted,
 		awk_value_t *result)
@@ -808,8 +771,7 @@ api_sym_lookup(awk_ext_id_t id,
 /* api_sym_lookup_scalar --- retrieve the current value of a scalar */
 
 static awk_bool_t
-api_sym_lookup_scalar(awk_ext_id_t id,
-			awk_scalar_t cookie,
+api_sym_lookup_scalar(awk_scalar_t cookie,
 			awk_valtype_t wanted,
 			awk_value_t *result)
 {
@@ -828,8 +790,7 @@ api_sym_lookup_scalar(awk_ext_id_t id,
 /* api_sym_update --- update a symbol's value, see gawkapi.h for semantics */
 
 static awk_bool_t
-api_sym_update(awk_ext_id_t id,
-		const char *name_space,
+api_sym_update(const char *name_space,
 		const char *name,
 		awk_value_t *value)
 {
@@ -927,9 +888,7 @@ api_sym_update(awk_ext_id_t id,
 /* api_sym_update_scalar --- update a scalar cookie */
 
 static awk_bool_t
-api_sym_update_scalar(awk_ext_id_t id,
-			awk_scalar_t cookie,
-			awk_value_t *value)
+api_sym_update_scalar(awk_scalar_t cookie, awk_value_t *value)
 {
 	NODE *node = (NODE *) cookie;
 
@@ -1041,8 +1000,7 @@ valid_subscript_type(awk_valtype_t valtype)
  */
 
 static awk_bool_t
-api_get_array_element(awk_ext_id_t id,
-		awk_array_t a_cookie,
+api_get_array_element(awk_array_t a_cookie,
 		const awk_value_t *const index,
 		awk_valtype_t wanted,
 		awk_value_t *result)
@@ -1085,9 +1043,9 @@ api_get_array_element(awk_ext_id_t id,
  */
 
 static awk_bool_t
-api_set_array_element(awk_ext_id_t id, awk_array_t a_cookie,
-					const awk_value_t *const index,
-					const awk_value_t *const value)
+api_set_array_element(awk_array_t a_cookie,
+			const awk_value_t *const index,
+			const awk_value_t *const value)
 {
 	NODE *array = (NODE *)a_cookie;
 	NODE *tmp;
@@ -1153,8 +1111,7 @@ remove_element(NODE *array, NODE *subscript)
  */
 
 static awk_bool_t
-api_del_array_element(awk_ext_id_t id,
-		awk_array_t a_cookie, const awk_value_t* const index)
+api_del_array_element(awk_array_t a_cookie, const awk_value_t* const index)
 {
 	NODE *array, *sub;
 
@@ -1179,8 +1136,7 @@ api_del_array_element(awk_ext_id_t id,
  */
 
 static awk_bool_t
-api_get_element_count(awk_ext_id_t id,
-		awk_array_t a_cookie, size_t *count)
+api_get_element_count(awk_array_t a_cookie, size_t *count)
 {
 	NODE *node = (NODE *) a_cookie;
 
@@ -1194,7 +1150,7 @@ api_get_element_count(awk_ext_id_t id,
 /* api_create_array --- create a new array cookie to which elements may be added */
 
 static awk_array_t
-api_create_array(awk_ext_id_t id)
+api_create_array()
 {
 	NODE *n;
 
@@ -1208,7 +1164,7 @@ api_create_array(awk_ext_id_t id)
 /* api_clear_array --- clear out an array */
 
 static awk_bool_t
-api_clear_array(awk_ext_id_t id, awk_array_t a_cookie)
+api_clear_array(awk_array_t a_cookie)
 {
 	NODE *node = (NODE *) a_cookie;
 
@@ -1224,9 +1180,9 @@ api_clear_array(awk_ext_id_t id, awk_array_t a_cookie)
 /* api_destroy_array --- destroy an array */
 
 static awk_bool_t
-api_destroy_array(awk_ext_id_t id, awk_array_t a_cookie)
+api_destroy_array(awk_array_t a_cookie)
 {
-	if (! api_clear_array(id, a_cookie))
+	if (! api_clear_array(a_cookie))
 		return awk_false;
 	freenode((NODE *) a_cookie);
 	return awk_true;
@@ -1235,8 +1191,7 @@ api_destroy_array(awk_ext_id_t id, awk_array_t a_cookie)
 /* api_flatten_array_typed --- flatten out an array so that it can be looped over easily. */
 
 static awk_bool_t
-api_flatten_array_typed(awk_ext_id_t id,
-		awk_array_t a_cookie,
+api_flatten_array_typed(awk_array_t a_cookie,
 		awk_flat_array_t **data,
 		awk_valtype_t index_type, awk_valtype_t value_type)
 {
@@ -1290,9 +1245,7 @@ api_flatten_array_typed(awk_ext_id_t id,
  */
 
 static awk_bool_t
-api_release_flattened_array(awk_ext_id_t id,
-		awk_array_t a_cookie,
-		awk_flat_array_t *data)
+api_release_flattened_array(awk_array_t a_cookie, awk_flat_array_t *data)
 {
 	NODE *array = (NODE *) a_cookie;
 	NODE **list;
@@ -1327,8 +1280,7 @@ api_release_flattened_array(awk_ext_id_t id,
 /* api_create_value --- create a cached value */
 
 static awk_bool_t
-api_create_value(awk_ext_id_t id, awk_value_t *value,
-		awk_value_cookie_t *result)
+api_create_value(awk_value_t *value, awk_value_cookie_t *result)
 {
 	if (value == NULL || result == NULL)
 		return awk_false;
@@ -1351,7 +1303,7 @@ api_create_value(awk_ext_id_t id, awk_value_t *value,
 /* api_release_value --- release a cached value */
 
 static awk_bool_t
-api_release_value(awk_ext_id_t id, awk_value_cookie_t value)
+api_release_value(awk_value_cookie_t value)
 {
 	NODE *val = (NODE *) value;
 
@@ -1365,8 +1317,8 @@ api_release_value(awk_ext_id_t id, awk_value_cookie_t value)
 /* api_get_file --- return a handle to an existing or newly opened file */
 
 static awk_bool_t
-api_get_file(awk_ext_id_t id, const char *name, size_t namelen, const char *filetype,
-		int fd, const awk_input_buf_t **ibufp, const awk_output_buf_t **obufp)
+api_get_file(const char *name, size_t namelen, const char *filetype,
+	int fd, const awk_input_buf_t **ibufp, const awk_output_buf_t **obufp)
 {
 	const struct redirect *f;
 	int flag;	/* not used, sigh */
@@ -1469,14 +1421,12 @@ static struct version_info *vi_head;
 /* api_register_ext_version --- add an extension version string to the list */
 
 static void
-api_register_ext_version(awk_ext_id_t id, const char *version)
+api_register_ext_version(const char *version)
 {
 	struct version_info *info;
 
 	if (version == NULL)
 		return;
-
-	(void) id;
 
 	emalloc(info, struct version_info *, sizeof(struct version_info));
 	info->version = version;
