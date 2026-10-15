@@ -304,7 +304,7 @@ typedef struct awk_two_way_processor {
 	awk_const struct awk_two_way_processor *awk_const next;  /* for use by gawk */
 } awk_two_way_processor_t;
 
-#define gawk_api_major_version 5
+#define gawk_api_major_version 6
 #define gawk_api_minor_version 0
 
 /* Current version of the API. */
