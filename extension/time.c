@@ -80,8 +80,7 @@ vms_fake_nanosleep(struct timespec *rqdly, struct timespec *rmdly)
 #define N_(msgid) msgid
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "time extension: version 1.2";
+static const char *ext_version = "time extension: version 1.3";
 static awk_bool_t init_time(void);
 static awk_bool_t (*init_func)(void) = init_time;
 
@@ -249,7 +248,7 @@ do_strptime(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 	if (do_lint) {
 		if (nargs == 0) {
-			lintwarn(ext_id, _("strptime: called with no arguments"));
+			lintwarn(_("strptime: called with no arguments"));
 			make_number(-1.0, result);
 			goto done0;
 		}

@@ -88,7 +88,7 @@ init_extension_list(void)
 void
 load_ext(const char *name, const char *lib_name)
 {
-	int (*install_func)(const gawk_api_t *const, awk_ext_id_t);
+	int (*install_func)(const gawk_api_t *const);
 	void *dl;
 	int flags = RTLD_LAZY;
 	int *gpl_compat;
@@ -116,13 +116,13 @@ load_ext(const char *name, const char *lib_name)
 		fatal(_("load_ext: library `%s': does not define `plugin_is_GPL_compatible': %s"),
 				lib_name, dlerror());
 
-	install_func = (int (*)(const gawk_api_t *const, awk_ext_id_t))
+	install_func = (int (*)(const gawk_api_t *const))
 				dlsym(dl, INIT_FUNC);
 	if (install_func == NULL)
 		fatal(_("load_ext: library `%s': cannot call function `%s': %s"),
 				lib_name, INIT_FUNC, dlerror());
 
-	if (install_func(& api_impl, NULL /* ext_id */) == 0)
+	if (install_func(& api_impl) == 0)
 		warning(_("load_ext: library `%s' initialization routine `%s' failed"),
 				lib_name, INIT_FUNC);
 }

@@ -1,9 +1,5 @@
 /*
  * fnmatch.c - Provide an interface to fnmatch(3) routine
- *
- * Arnold Robbins
- * arnold@skeeve.com
- * Written 7/2012
  */
 
 /*
@@ -94,8 +90,7 @@
 #endif
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "fnmatch extension: version 1.0";
+static const char *ext_version = "fnmatch extension: version 1.1";
 
 static awk_bool_t init_fnmatch(void);
 static awk_bool_t (*init_func)(void) = init_fnmatch;
@@ -121,17 +116,17 @@ do_fnmatch(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 #ifdef HAVE_FNMATCH
 	if (! get_argument(0, AWK_STRING, & pattern)) {
-		warning(ext_id, _("fnmatch: could not get first argument"));
+		warning(_("fnmatch: could not get first argument"));
 		goto out;
 	}
 
 	if (! get_argument(1, AWK_STRING, & string)) {
-		warning(ext_id, _("fnmatch: could not get second argument"));
+		warning(_("fnmatch: could not get second argument"));
 		goto out;
 	}
 
 	if (! get_argument(2, AWK_NUMBER, & flags)) {
-		warning(ext_id, _("fnmatch: could not get third argument"));
+		warning(_("fnmatch: could not get third argument"));
 		goto out;
 	}
 
@@ -144,7 +139,7 @@ do_fnmatch(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 out:
 #else
-	fatal(ext_id, _("fnmatch is not implemented on this system\n"));
+	fatal(_("fnmatch is not implemented on this system\n"));
 #endif
 	return result;
 }
@@ -176,7 +171,7 @@ init_fnmatch(void)
 	int i;
 
 	if (! sym_update("FNM_NOMATCH", make_number(FNM_NOMATCH, & value))) {
-		warning(ext_id, _("fnmatch init: could not add FNM_NOMATCH variable"));
+		warning(_("fnmatch init: could not add FNM_NOMATCH variable"));
 		errors++;
 	}
 
@@ -186,7 +181,7 @@ init_fnmatch(void)
 				strlen(flagtable[i].name), & index);
 		(void) make_number(flagtable[i].value, & value);
 		if (! set_array_element(new_array, & index, & value)) {
-			warning(ext_id, _("fnmatch init: could not set array element %s"),
+			warning(_("fnmatch init: could not set array element %s"),
 					flagtable[i].name);
 			errors++;
 		}
@@ -196,7 +191,7 @@ init_fnmatch(void)
 	the_array.array_cookie = new_array;
 
 	if (! sym_update("FNM", & the_array)) {
-		warning(ext_id, _("fnmatch init: could not install FNM array"));
+		warning(_("fnmatch init: could not install FNM array"));
 		errors++;
 	}
 

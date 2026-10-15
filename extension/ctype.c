@@ -1,7 +1,5 @@
 /*
  * ctype.c - Provide ctype functions for gawk.
- *
- * February 2026.
  */
 
 /*
@@ -50,8 +48,7 @@
 static awk_bool_t ctype_init(void);
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "ctype extension: version 1.0";
+static const char *ext_version = "ctype extension: version 1.1";
 static awk_bool_t (*init_func)(void) = ctype_init;
 
 int plugin_is_GPL_compatible;
@@ -87,11 +84,11 @@ do_ ## sbfunc(int nargs, awk_value_t *result, struct awk_ext_func *unused) \
 		else if (the_char.val_type == AWK_STRING) \
 			char_val = the_char.str_value.wstr[0]; \
 		else { \
-			warning(ext_id, _("%s: could not get argument"), # sbfunc); \
+			warning(_("%s: could not get argument"), # sbfunc); \
 			goto out; \
 		} \
 	} else { \
-		warning(ext_id, _("%s: could not get argument"), # sbfunc); \
+		warning(_("%s: could not get argument"), # sbfunc); \
 		goto out; \
 	} \
  \
@@ -131,7 +128,7 @@ do_ ## sbfunc(int nargs, awk_value_t *result, struct awk_ext_func *unused) \
 	awk_value_t the_char; \
  \
 	if (! get_argument(0, AWK_NUMBER, & the_char)) { \
-		warning(ext_id, _("%s: could not get argument"), # sbfunc); \
+		warning(_("%s: could not get argument"), # sbfunc); \
 		goto out; \
 	} \
  \

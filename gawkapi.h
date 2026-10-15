@@ -473,8 +473,6 @@ typedef struct awk_ext_func {
 	void *data;		/* opaque pointer to any extra state */
 } awk_ext_func_t;
 
-typedef void *awk_ext_id_t;	/* opaque type for extension id */
-
 /*
  * The API into gawk. Lots of functions here. We hope that they are
  * logically organized.
@@ -879,18 +877,10 @@ typedef struct gawk_api {
 #define set_argument(count, new_array) \
 	(api->api_set_argument(count, new_array))
 
-#ifdef API_COMPAT_GAWK_5
-#define fatal(id, str, ...)	api->api_fatal(str, __VA_ARGS__)
-#define nonfatal(id, str, ...)	api->api_nonfatal(str, __VA_ARGS__)
-#define warning(id, str, ...)	api->api_warning(str, __VA_ARGS__)
-#define lintwarn(id, str, ...)	api->api_lintwarn(str, __VA_ARGS__)
-#else
 #define fatal		api->api_fatal
 #define nonfatal	api->api_nonfatal
 #define warning		api->api_warning
 #define lintwarn	api->api_lintwarn
-#endif
-#define _api_warn(str, ...)	api->api_lintwarn(str, __VA_ARGS__)
 
 #define register_input_parser(parser)	(api->api_register_input_parser(parser))
 #define register_output_wrapper(wrapper) (api->api_register_output_wrapper(wrapper))
@@ -1114,10 +1104,9 @@ make_bool(awk_bool_t boolval, awk_value_t *result)
  * The return value should be zero on failure and non-zero on success.
  *
  * For the macros to work, the function should save api_p in a global
- * variable named 'api' and save id in a global variable named 'ext_id'.
- * In addition, a global function pointer named 'init_func' should be
- * defined and set to either NULL or an initialization function that
- * returns non-zero on success or zero upon failure.
+ * variable named 'api'.  In addition, a global function pointer named
+ * 'init_func' should be defined and set to either NULL or an initialization
+ * function that returns non-zero on success or zero upon failure.
  */
 
 extern int dl_load(const gawk_api_t *const api_p);
@@ -1175,7 +1164,7 @@ int dl_load(const gawk_api_t *const api_p)  \
 		if (func_table[i].name == NULL) \
 			break; \
 		if (! add_ext_func(name_space, & func_table[i])) { \
-			_api_warn(#extension ": could not add %s", \
+			warning(#extension ": could not add %s", \
 					func_table[i].name); \
 			errors++; \
 		} \
@@ -1183,7 +1172,7 @@ int dl_load(const gawk_api_t *const api_p)  \
 \
 	if (init_func != NULL) { \
 		if (! init_func()) { \
-			_api_warn("%s: initialization function failed", #extension); \
+			warning("%s: initialization function failed", #extension); \
 			errors++; \
 		} \
 	} \
