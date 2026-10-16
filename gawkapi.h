@@ -877,10 +877,18 @@ typedef struct gawk_api {
 #define set_argument(count, new_array) \
 	(api->api_set_argument(count, new_array))
 
+#ifdef API_COMPAT_GAWK_5
+#define fatal(id, ...)		api->api_fatal(__VA_ARGS__)
+#define nonfatal(id, ...)	api->api_nonfatal(__VA_ARGS__)
+#define warning(id, ...)	api->api_warning(__VA_ARGS__)
+#define lintwarn(id, ...)	api->api_lintwarn(__VA_ARGS__)
+typedef void *awk_ext_id_t;
+#else
 #define fatal		api->api_fatal
 #define nonfatal	api->api_nonfatal
 #define warning		api->api_warning
 #define lintwarn	api->api_lintwarn
+#endif
 
 #define register_input_parser(parser)	(api->api_register_input_parser(parser))
 #define register_output_wrapper(wrapper) (api->api_register_output_wrapper(wrapper))
@@ -1164,7 +1172,7 @@ int dl_load(const gawk_api_t *const api_p)  \
 		if (func_table[i].name == NULL) \
 			break; \
 		if (! add_ext_func(name_space, & func_table[i])) { \
-			warning(#extension ": could not add %s", \
+			api->api_warning(#extension ": could not add %s", \
 					func_table[i].name); \
 			errors++; \
 		} \
@@ -1172,7 +1180,7 @@ int dl_load(const gawk_api_t *const api_p)  \
 \
 	if (init_func != NULL) { \
 		if (! init_func()) { \
-			warning("%s: initialization function failed", #extension); \
+			api->api_warning("%s: initialization function failed", #extension); \
 			errors++; \
 		} \
 	} \
