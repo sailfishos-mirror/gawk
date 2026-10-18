@@ -1180,7 +1180,7 @@ int dl_load(const gawk_api_t *const api_p)  \
 \
 	if (init_func != NULL) { \
 		if (! init_func()) { \
-			api->api_warning("%s: initialization function failed", #extension); \
+			api->api_warning(#extension ": initialization function failed"); \
 			errors++; \
 		} \
 	} \
