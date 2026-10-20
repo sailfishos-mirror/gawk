@@ -1022,8 +1022,7 @@ do_mktime(int nargs)
 		lintwarn(_("%s: received non-string argument"), "mktime");
 	t1 = force_string(t1);
 
-	save = t1->stptr[t1->stlen];
-	t1->stptr[t1->stlen] = '\0';
+	str_terminate(t1, save);
 
 	count = sscanf(t1->stptr, "%ld %d %d %d %d %d %d",
 		        & year, & month, & day,
@@ -1040,7 +1039,7 @@ do_mktime(int nargs)
 		|| (month < 1 || month > 12) ))
 			lintwarn(_("mktime: at least one of the values is out of the default range"));
 
-	t1->stptr[t1->stlen] = save;
+	str_restore(t1, save);
 	DEREF(t1);
 
 	if (count < 6
@@ -1086,8 +1085,7 @@ do_system(int nargs)
 
 	if (cmd && *cmd) {
 		/* insure arg to system is zero-terminated */
-		save = cmd[tmp->stlen];
-		cmd[tmp->stlen] = '\0';
+		str_terminate(tmp, save);
 
 		os_restore_mode(fileno(stdin));
 
@@ -1110,7 +1108,7 @@ do_system(int nargs)
 		if ((BINMODE & BINMODE_INPUT) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
 
-		cmd[tmp->stlen] = save;
+		str_restore(tmp, save);
 	}
 	DEREF(tmp);
 	return make_number(ret);
@@ -2841,9 +2839,9 @@ localecategory_from_argument(NODE *t)
 		int low, high, i, mid;
 		char *category;
 		int lc_cat = -1;
+		char save;
 
-		char save = t->stptr[t->stlen];
-		t->stptr[t->stlen] = '\0';
+		str_terminate(t, save);
 		category = t->stptr;
 
 		/* binary search the table */
@@ -2862,7 +2860,7 @@ localecategory_from_argument(NODE *t)
 				break;
 			}
 		}
-		t->stptr[t->stlen] = save;
+		str_restore(t, save);
 		if (lc_cat == -1)	/* not there */
 			fatal(_("dcgettext: `%s' is not a valid locale category"), category);
 
@@ -2997,8 +2995,7 @@ do_dcngettext(int nargs)
 		if (do_lint && (fixtype(t3)->flags & STRING) == 0)
 			lintwarn(_("%s: received non-string fourth argument"), "dcngettext");
 		domain = t3->stptr;
-		save = domain[t3->stlen];
-		domain[t3->stlen] = '\0';
+		str_terminate(t3, save);
 		saved_end = true;
 	} else
 		domain = TEXTDOMAIN;
@@ -3042,7 +3039,7 @@ do_dcngettext(int nargs)
 	str_restore(t1, save1);
 	str_restore(t2, save2);
 	if (saved_end)
-		domain[t3->stlen] = save;
+		str_restore(t3, save);
 	if (t3 != NULL)
 		DEREF(t3);
 #else
@@ -3090,8 +3087,7 @@ do_bindtextdomain(int nargs)
 		if (do_lint && (fixtype(t2)->flags & STRING) == 0)
 			lintwarn(_("%s: received non-string second argument"), "bindtextdomain");
 		domain = (const char *) t2->stptr;
-		save = t2->stptr[t2->stlen];
-		t2->stptr[t2->stlen] = '\0';
+		str_terminate(t2, save);
 	}
 
 	/* first argument */
@@ -3124,7 +3120,7 @@ do_bindtextdomain(int nargs)
 
 	DEREF(t1);
 	if (t2 != NULL) {
-		t2->stptr[t2->stlen] = save;
+		str_restore(t2, save);
 		DEREF(t2);
 	}
 

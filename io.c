@@ -1242,8 +1242,7 @@ do_close(int nargs)
 		char save;
 
 		tmp2 = POP_STRING();
-		save = tmp2->stptr[tmp2->stlen];
-		tmp2->stptr[tmp2->stlen] = '\0';
+		str_terminate(tmp2, save);
 		if (strcasecmp(tmp2->stptr, "to") == 0)
 			how = CLOSE_TO;
 		else if (strcasecmp(tmp2->stptr, "from") == 0)
@@ -1252,7 +1251,7 @@ do_close(int nargs)
 			DEREF(tmp2);
 			fatal(_("close: second argument must be `to' or `from'"));
 		}
-		tmp2->stptr[tmp2->stlen] = save;
+		str_restore(tmp2, save);
 		DEREF(tmp2);
 	}
 

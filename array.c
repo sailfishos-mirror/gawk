@@ -890,8 +890,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 
 	s = force_string(s);
 	sort_str = s->stptr;
-	save = s->stptr[s->stlen];
-	s->stptr[s->stlen] = '\0';
+	str_terminate(s, save);
 	if (s->stlen == 0) {		/* default sorting */
 		if (ctxt == ASORT)
 			sort_str = "@val_type_asc";
@@ -939,7 +938,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 
 	/* sorting happens inside assoc_list */
 	list = assoc_list(array, sort_str, ctxt);
-	s->stptr[s->stlen] = save;
+	str_restore(s, save);
 	DEREF(s);
 
 	num_elems = assoc_length(array);

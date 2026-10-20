@@ -163,11 +163,11 @@ top:
 			if (! do_traditional && (m->flags & INTLSTR) != 0) {
 				char *orig, *trans, save;
 
-				save = m->stptr[m->stlen];
-				m->stptr[m->stlen] = '\0';
+				str_terminate(m, save);
 				orig = m->stptr;
 				trans = dgettext(TEXTDOMAIN, orig);
-				m->stptr[m->stlen] = save;
+				str_restore(m, save);
+
 				if (trans != orig)	// got a translation
 					m = make_string(trans, strlen(trans));
 				else
