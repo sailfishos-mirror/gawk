@@ -1144,68 +1144,6 @@ void init_btowc_cache()
 	}
 }
 
-#define BLOCKCHUNK 100
-
-struct block_header nextfree[BLOCK_MAX] = {
-	{ NULL, sizeof(NODE), "node" },
-	{ NULL, sizeof(BUCKET), "bucket" },
-};
-
-#ifdef MEMDEBUG
-
-void *
-r_getblock(int id)
-{
-	void *res;
-	emalloc(res, void *, nextfree[id].size);
-	nextfree[id].active++;
-	if (nextfree[id].highwater < nextfree[id].active)
-		nextfree[id].highwater = nextfree[id].active;
-	return res;
-}
-
-void
-r_freeblock(void *p, int id)
-{
-	nextfree[id].active--;
-	free(p);
-}
-
-#else
-
-/* more_blocks --- get more blocks of memory and add to the free list;
-	size of a block must be >= sizeof(struct block_item)
- */
-
-void *
-more_blocks(int id)
-{
-	struct block_item *freep, *np, *next;
-	char *p, *endp;
-	size_t size;
-
-	size = nextfree[id].size;
-
-	assert(size >= sizeof(struct block_item));
-	emalloc(freep, struct block_item *, BLOCKCHUNK * size);
-	p = (char *) freep;
-	endp = p + BLOCKCHUNK * size;
-
-	for (np = freep; ; np = next) {
-		next = (struct block_item *) (p += size);
-		if (p >= endp) {
-			np->freep = NULL;
-			break;
-		}
-		np->freep = next;
-	}
-	nextfree[id].freep = freep->freep;
-	nextfree[id].highwater += BLOCKCHUNK;
-	return freep;
-}
-
-#endif
-
 /* make_bool_node --- make a boolean-valued node */
 
 extern NODE *

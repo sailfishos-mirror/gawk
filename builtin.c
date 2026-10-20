@@ -3175,17 +3175,7 @@ do_typeof(int nargs)
 					 * time
 					 */
 					long hw = nextfree[i].highwater;
-					long active;
-#ifdef MEMDEBUG
-					active = nextfree[i].active;
-#else
-					active = hw;
-					{
-						struct block_item *ip;
-						for (ip = nextfree[i].freep; ip; ip = ip->freep)
-							active--;
-					}
-#endif
+					long active = nextfree[i].active;
 
 #define SETVAL(X, V) {	\
 	size_t l = nl + sizeof(#X);	\

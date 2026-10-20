@@ -168,3 +168,91 @@ free_bcpool(INSTRUCTION_POOL *pl)
 	for (i = 0; i < MAX_INSTRUCTION_ALLOC; i++)
 		free_bc_mempool(& pl->pool[i], i + 1);
 }
+
+#define BLOCKCHUNK 100
+
+struct block_header nextfree[BLOCK_MAX] = {
+	{ NULL, sizeof(NODE), "node" },
+	{ NULL, sizeof(BUCKET), "bucket" },
+};
+
+#ifdef MEMDEBUG
+
+void *
+r_getblock(int id)
+{
+	void *res;
+	ezalloc(res, void *, nextfree[id].size);
+	nextfree[id].active++;
+	if (nextfree[id].highwater < nextfree[id].active)
+		nextfree[id].highwater = nextfree[id].active;
+	return res;
+}
+
+void
+r_freeblock(void *p, int id)
+{
+	nextfree[id].active--;
+	free(p);
+}
+
+#else
+
+static struct block_item *more_blocks(int id);
+
+void *
+r_getblock(int id)
+{
+	struct block_item *bp = nextfree[id].freep;
+	if (bp != NULL)
+		nextfree[id].freep = bp->freep;
+	else
+		bp = more_blocks(id);
+
+	memset(bp, '\0', nextfree[i].size);
+	return bp;
+}
+
+void
+r_freeblock(void *p, int id)
+{
+	struct block_item *bp = (struct block_item *) p;
+
+	bp->freep = nextfree[id].freep;
+	nextfree[id].freep = bp;
+}
+
+
+/* 
+ * more_blocks --- get more blocks of memory and add to the free list;
+ * size of a block must be >= sizeof(struct block_item)
+ */
+
+static struct block_item *
+more_blocks(int id)
+{
+	struct block_item *freep, *np, *next;
+	char *p, *endp;
+	size_t size;
+
+	size = nextfree[id].size;
+
+	assert(size >= sizeof(struct block_item));
+	emalloc(freep, struct block_item *, BLOCKCHUNK * size);
+	p = (char *) freep;
+	endp = p + BLOCKCHUNK * size;
+
+	for (np = freep; ; np = next) {
+		next = (struct block_item *) (p += size);
+		if (p >= endp) {
+			np->freep = NULL;
+			break;
+		}
+		np->freep = next;
+	}
+	nextfree[id].freep = freep->freep;
+	nextfree[id].highwater += BLOCKCHUNK;
+	return freep;
+}
+
+#endif

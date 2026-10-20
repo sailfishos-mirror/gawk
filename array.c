@@ -649,10 +649,10 @@ do_delete(NODE *symbol, int nsubs)
 			free(val->stptr);
 
 		mpfr_unset(val);
-#ifdef MEMDEBUG
+
 		memset(val, 0, sizeof(NODE));
 		val->type = (NODETYPE) 0xbaad;
-#endif
+
 		freenode(val);
 	} else {
 		unref(val);

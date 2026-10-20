@@ -1184,14 +1184,14 @@ struct block_item {
 	struct block_item *freep;
 };
 
+// This and nextfree, below, have to be global because
+// PMA needs to save the info. Sigh.
 struct block_header {
 	struct block_item *freep;
 	size_t size;
 	const char *name;
 	long highwater;
-#ifdef MEMDEBUG
 	long active;
-#endif
 };
 
 enum block_id {
@@ -1458,24 +1458,12 @@ DEREF(NODE *r)
 #define get_lhs(n, r)	 (n)->type == Node_var && ! var_uninitialized(n) ? \
 				&((n)->var_value) : r_get_lhs((n), (r))
 
-#ifdef MEMDEBUG
-
 extern void *r_getblock(int id);
 extern void r_freeblock(void *, int id);
 #define getblock(p, id, ty)	(void) (p = (ty) r_getblock(id))
 #define freeblock(p, id)	(void) (r_freeblock(p, id))
 
-#else /* MEMDEBUG */
-
-#define getblock(p, id, ty)  (void) ((p = (ty) nextfree[id].freep) ? \
-			(ty) (nextfree[id].freep = ((struct block_item *) p)->freep) \
-			: (p = (ty) more_blocks(id)))
-#define freeblock(p, id)	 (void) (((struct block_item *) p)->freep = nextfree[id].freep, \
-					nextfree[id].freep = (struct block_item *) p)
-
-#endif /* MEMDEBUG */
-
-#define getnode(n)	getblock(n, BLOCK_NODE, NODE *), memset(n, 0, sizeof(NODE))
+#define getnode(n)	getblock(n, BLOCK_NODE, NODE *)
 #ifdef HAVE_MPR
 #define freenode(n)	(n->mpfr_data != NULL ? free(n->mpfr_data), n->mpfr_data = NULL : 0, freeblock(n, BLOCK_NODE))
 #else
@@ -1857,7 +1845,6 @@ extern NODE *r_dupnode(NODE *n);
 extern NODE *make_str_node(const char *s, size_t len, int flags);
 extern NODE *make_bool_node(bool value);
 extern NODE *make_typed_regex(const char *re, size_t len);
-extern void *more_blocks(int id);
 extern enum escape_results parse_escape(const char **string_ptr, const char **escseq, size_t *nbytes);
 extern NODE *str2wstr(NODE *n, size_t **ptr);
 extern NODE *wstr2str(NODE *n);
