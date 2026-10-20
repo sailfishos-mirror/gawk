@@ -746,10 +746,10 @@ out0:
 	obuf = NULL;
 out:
 	if (cpbuf.buf != cpbuf.stackbuf)
-		efree(cpbuf.buf);
+		free(cpbuf.buf);
 
 	if (obuf != NULL)
-		efree(obuf);
+		free(obuf);
 
 	if (r == NULL)
 		gawk_exit(EXIT_FATAL);

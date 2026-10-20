@@ -95,7 +95,7 @@ free_bc_internal(INSTRUCTION *cp)
 	switch(cp->opcode) {
 	case Op_func_call:
 		if (cp->func_name != NULL)
-			efree(cp->func_name);
+			free(cp->func_name);
 		break;
 	case Op_push_re:
 	case Op_match_rec:
@@ -115,7 +115,7 @@ free_bc_internal(INSTRUCTION *cp)
 	case Op_token:
 		/* token lost during error recovery in yyparse */
 		if (cp->lextok != NULL)
-			efree(cp->lextok);
+			free(cp->lextok);
 		break;
 	case Op_push_i:
 		m = cp->memory;
@@ -127,8 +127,10 @@ free_bc_internal(INSTRUCTION *cp)
 			unref(m);
 		break;
 	case Op_illegal:
-	default:
 		cant_happen("unexpected opcode %s", opcode2str(cp->opcode));
+	default:
+		// Do nothing! Most opcodes don't have anything
+		// special that needs to be done upon being released.
 		break;
 	}
 }
@@ -150,7 +152,7 @@ free_bc_mempool(struct instruction_mem_pool *pool, int size)
 				free_bc_internal(cp);
 		}
 		next = block->next;
-		efree(block);
+		free(block);
 		first = false;
 	}
 }

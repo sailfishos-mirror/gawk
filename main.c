@@ -411,11 +411,11 @@ main(int argc, char **argv)
 			dash_v_errs += (arg_assign(preassigns[i].val, true) == false);
 		else	/* PRE_ASSIGN_FS */
 			cmdline_fs(preassigns[i].val);
-		efree(preassigns[i].val);
+		free(preassigns[i].val);
 	}
 
 	if (preassigns != NULL)
-		efree(preassigns);
+		free(preassigns);
 
 	if ((BINMODE & BINMODE_INPUT) != 0)
 		if (os_setbinmode(fileno(stdin), O_BINARY) == -1)
@@ -1056,7 +1056,7 @@ load_procinfo()
 		update_PROCINFO_num(name, value);
 	}
 	if (groupset) {
-		efree(groupset);
+		free(groupset);
 		groupset = NULL;
 	}
 #endif
@@ -1413,7 +1413,7 @@ init_groupset()
 	ngroups = getgroups(ngroups, groupset);
 	/* same thing here, give up but keep going */
 	if (ngroups == -1) {
-		efree(groupset);
+		free(groupset);
 		ngroups = 0;
 		groupset = NULL;
 	}
@@ -1848,7 +1848,7 @@ void
 set_current_namespace(const char *new_namespace)
 {
 	if (current_namespace != awk_namespace)
-		efree((void *) current_namespace);
+		free((void *) current_namespace);
 
 	current_namespace = new_namespace;
 }

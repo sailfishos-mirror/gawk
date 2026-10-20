@@ -218,7 +218,7 @@ static void
 pp_free(NODE *n)
 {
 	if ((n->flags & CAN_FREE) != 0)
-		efree(n->pp_str);
+		free(n->pp_str);
 	freenode(n);
 }
 
@@ -355,7 +355,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 				if ((m->flags & INTLSTR) != 0) {
 					char *tmp = str;
 					str = pp_group3("_", tmp, "");
-					efree(tmp);
+					free(tmp);
 				}
 				pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			}
@@ -409,7 +409,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 				t2 = pp_pop(); /* r.h.s. */
 				fprintf(prof_fp, "%s%s%s%s", t1->pp_str, tmp,
 									op2str(pc->opcode), t2->pp_str);
-				efree(tmp);
+				free(tmp);
 				goto cleanup;
 
 			case Op_assign_concat:
@@ -417,7 +417,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 				t1 = pp_pop();
 				tmp = pp_group3(t2->pp_str, op2str(Op_concat), t1->pp_str);
 				fprintf(prof_fp, "%s%s%s", t2->pp_str, op2str(Op_assign), tmp);
-				efree(tmp);
+				free(tmp);
 cleanup:
 				pp_free(t2);
 				pp_free(t1);
@@ -436,7 +436,7 @@ cleanup:
 			tmp = pp_list(pc->sub_count, op2str(pc->opcode), ", ");
 			t1 = pp_pop();
 			str = pp_group3(t1->pp_str, tmp, "");
-			efree(tmp);
+			free(tmp);
 			pp_free(t1);
 			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
@@ -484,7 +484,7 @@ cleanup:
 			else
 				tmp = pp_string(m->stptr, m->stlen, '"');
 			str = pp_group3(t1->pp_str, op2str(pc->opcode), tmp);
-			efree(tmp);
+			free(tmp);
 			pp_free(t1);
 			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			break;
@@ -574,14 +574,14 @@ cleanup:
 			t2 = pp_pop(); /* r.h.s. */
 			assignment = pp_group3(t1->pp_str, op2str(pc->opcode), t2->pp_str);
 			final = pp_group3("$", assignment, "");
-			efree(assignment);
+			free(assignment);
 			pp_free(t2);
 			pp_free(t1);
 			if (pc->opcode == Op_store_field_exp)
 				pp_push(pc->opcode, final, CAN_FREE, NULL);
 			else {
 				fprintf(prof_fp, "%s", final);
-				efree(final);
+				free(final);
 				if ((flags & IN_FOR_HEADER) == 0)
 					pc = end_line(pc);
 			}
@@ -602,7 +602,7 @@ cleanup:
 				char *sub;
 				sub = pp_list(pc->expr_count, NULL, pc->expr_count > 1 ? "][" : ", ");
 				fprintf(prof_fp, "%s %s[%s]", op2str(Op_K_delete), array, sub);
-				efree(sub);
+				free(sub);
 			} else
 				fprintf(prof_fp, "%s %s", op2str(Op_K_delete), array);
 			if ((flags & IN_FOR_HEADER) == 0)
@@ -624,7 +624,7 @@ cleanup:
 			if (pc->expr_count > 1) {
 				sub = pp_list(pc->expr_count, "()", ", ");
 				str = pp_group3(sub, op2str(Op_in_array), array);
-				efree(sub);
+				free(sub);
 			} else {
 				t2 = pp_pop();
 				if (prec_level(t2->type) < prec_level(Op_in_array)) {
@@ -669,7 +669,7 @@ cleanup:
 				fname = "gensub";
 			tmp = pp_list(pc->expr_count, "()", ", ");
 			str = pp_group3(fname, tmp, "");
-			efree(tmp);
+			free(tmp);
 			pp_push(Op_sub_builtin, str, CAN_FREE, pc->comment);
 		}
 			break;
@@ -687,7 +687,7 @@ cleanup:
 				if (pc->expr_count > 0) {
 					tmp = pp_list(pc->expr_count, "()", ", ");
 					str = pp_group3(fname, tmp, "");
-					efree(tmp);
+					free(tmp);
 				} else
 					str = pp_group3(fname, "()", "");
 				pp_push(Op_builtin, str, CAN_FREE, pc->comment);
@@ -729,7 +729,7 @@ cleanup:
 				pp_free(t1);
 			} else
 				fprintf(prof_fp, "%s%s", op2str(pc->opcode), tmp);
-			efree(tmp);
+			free(tmp);
 			if ((flags & IN_FOR_HEADER) == 0)
 				pc = end_line(pc);
 			break;
@@ -771,12 +771,12 @@ cleanup:
 			} else if (m->type == Node_val && (m->flags & REGEX) != 0) {
 				restr = pp_typed_regex(m->stptr, m->stlen, '/');
 				str = pp_group3(txt, op2str(pc->opcode), restr);
-				efree(restr);
+				free(restr);
 			} else {
 				NODE *re = m->re_exp;
 				restr = pp_string(re->stptr, re->stlen, '/');
 				str = pp_group3(txt, op2str(pc->opcode), restr);
-				efree(restr);
+				free(restr);
 			}
 			pp_free(t1);
 			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
@@ -803,7 +803,7 @@ cleanup:
 					str = pp_group3(t2->pp_str, redir2str(pc->redir_type), tmp);
 				else
 					str = pp_group3(tmp, redir2str(pc->redir_type), t2->pp_str);
-				efree(tmp);
+				free(tmp);
 				pp_free(t2);
 			} else
 				str = tmp;
@@ -826,7 +826,7 @@ cleanup:
 			if (pcount > 0) {
 				tmp = pp_list(pcount, "()", ", ");
 				str = pp_group3(pre, fname, tmp);
-				efree(tmp);
+				free(tmp);
 			} else
 				str = pp_group3(pre, fname, "()");
 			if (pc->opcode == Op_indirect_func_call) {
@@ -836,7 +836,7 @@ cleanup:
 
 			pp_push(pc->opcode, str, CAN_FREE, pc->comment);
 			if (malloced)
-				efree((void *) fname);
+				free((void *) fname);
 		}
 			break;
 
@@ -1306,7 +1306,7 @@ pp_string_fp(Func_print print_func, FILE *fp, const char *in_str,
 			count = 0;
 		}
 	}
-	efree(s);
+	free(s);
 }
 
 #if defined(SIGHUP) || defined(SIGUSR1)
@@ -1657,7 +1657,7 @@ pp_parenthesize(NODE *sp)
 	p[len + 1] = ')';
 	p[len + 2] = '\0';
 	if ((sp->flags & CAN_FREE) != 0)
-		efree(sp->pp_str);
+		free(sp->pp_str);
 	sp->pp_str = p;
 	sp->pp_len += 2;
 	sp->flags |= CAN_FREE;

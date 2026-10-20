@@ -960,7 +960,7 @@ do_strftime(int nargs)
 	}
 	ret = make_string(bufp, buflen);
 	if (bufp != buf)
-		efree(bufp);
+		free(bufp);
 done:
 	if (t1) {
 		str_restore(t1, save);
@@ -1667,10 +1667,10 @@ do_match(int nargs)
 				}
 			}
 
-			efree(buf);
+			free(buf);
 		}
 		if (wc_indices != NULL)
-			efree(wc_indices);
+			free(wc_indices);
 	} else {		/* match failed */
 		rstart = 0;
 		rlength = -1;
@@ -2154,13 +2154,13 @@ do_sub(int nargs, unsigned int flags)
 	textlen = bp - buf;
 
 	if (mb_indices != NULL)
-		efree(mb_indices);
+		free(mb_indices);
 
 done:
 	DEREF(rep_node);
 
 	if ((matches == 0 || (flags & LITERAL) != 0) && buf != NULL) {
-		efree(buf);
+		free(buf);
 		buf = NULL;
 	}
 
@@ -2342,7 +2342,7 @@ call_match(int nargs)
 		if (regex->type == Node_elem_new)
 			elem_new_reset(regex);
 		else if (regex->vname != NULL)
-			efree(regex->vname);
+			free(regex->vname);
 		memset(regex, 0, sizeof(*regex));
 		regex->type = Node_dynregex;
 		regex->re_exp = dupnode(Nnull_string);
@@ -2357,7 +2357,7 @@ call_match(int nargs)
 		if (text->type == Node_elem_new)
 			elem_new_reset(text);
 		else if (text->vname != NULL)
-			efree(text->vname);
+			free(text->vname);
 		text = dupnode(Nnull_string);
 	}
 

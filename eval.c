@@ -1190,7 +1190,7 @@ r_get_lhs(NODE *n, bool reference)
 		break;
 
 	case Node_elem_new:
-		efree(n->stptr);
+		free(n->stptr);
 		n->stptr = NULL;
 		n->stlen = 0;
 		n->type = Node_var;
@@ -1448,7 +1448,7 @@ restore_frame(NODE *fp)
 	}
 
 	if (frame_ptr->stack != NULL)
-		efree(frame_ptr->stack);
+		free(frame_ptr->stack);
 	ri = frame_ptr->reti;     /* execution in calling frame
 	                           * resumes from ri->nexti.
 	                           */
@@ -1479,7 +1479,7 @@ free_arrayfor(NODE *r)
 			n = list[--num_elems];
 			unref(n);
 		}
-		efree(list);
+		free(list);
 	}
 	freenode(r);
 }
@@ -1835,7 +1835,7 @@ pop_exec_state(int *rule, char **src, long *sz)
 	if (sz != NULL)
 		*sz = es->stack_size;
 	exec_state_stack.next = es->next;
-	efree(es);
+	free(es);
 	return cp;
 }
 
@@ -1937,7 +1937,7 @@ elem_new_reset(NODE *n)
 	assert(n->type == Node_elem_new);
 
 	if (n->elemnew_vname != NULL) {
-		efree(n->elemnew_vname);
+		free(n->elemnew_vname);
 		n->elemnew_vname = NULL;
 	}
 	n->elemnew_parent = NULL;

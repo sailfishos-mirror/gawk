@@ -359,7 +359,7 @@ source
 
 		if (! include_source($1, & srcfile))
 			YYABORT;
-		efree($1->lextok);
+		free($1->lextok);
 		bcfree($1);
 		$$ = (INSTRUCTION *) srcfile;
 	  }
@@ -376,7 +376,7 @@ library
 
 		if (! load_library($1, & srcfile))
 			YYABORT;
-		efree($1->lextok);
+		free($1->lextok);
 		bcfree($1);
 		$$ = (INSTRUCTION *) srcfile;
 	  }
@@ -488,7 +488,7 @@ func_name
 		char *qname = qualify_name(name, strlen(name));
 
 		if (qname != name) {
-			efree((void *)name);
+			free((void *)name);
 			$1->lextok = qname;
 		}
 		$$ = $1;
@@ -724,7 +724,7 @@ statement
 		}
 
 		if (case_values != NULL)
-			efree(case_values);
+			free(case_values);
 
 		ip = $3;
 		if (do_pretty_print) {
@@ -902,7 +902,7 @@ statement
 				$8->lasti->expr_count = 0;
 				if ($1 != NULL)
 					bcfree($1);
-				efree(var_name);
+				free(var_name);
 				bcfree($3);
 				bcfree($4);
 				bcfree($5);
@@ -1856,7 +1856,7 @@ non_post_simp_exp
 					n->numbr = (double) (n->stlen == 0);
 					n->flags &= ~(STRCUR|STRING);
 					n->flags |= (NUMCUR|NUMBER);
-					efree(n->stptr);
+					free(n->stptr);
 					n->stptr = NULL;
 					n->stlen = 0;
 				} else
@@ -2008,7 +2008,7 @@ direct_func_call
 		char *qname = qualify_name(name, strlen(name));
 
 		if (qname != name) {
-			efree((char *) name);
+			free((char *) name);
 			$1->func_name = qname;
 		}
 
@@ -2575,7 +2575,7 @@ yyerror(const char *m, ...)
 	strcpy(bp, mesg);
 	err(false, "", buf, args);
 	va_end(args);
-	efree(buf);
+	free(buf);
 	/* we don't use fatal(), that changes the exit status to 2 */
 	exit(EXIT_FAILURE);
 }
@@ -2781,8 +2781,8 @@ parse_program(INSTRUCTION **pcode, bool from_eval)
 void
 free_srcfile(SRCFILE *thisfile)
 {
-	efree(thisfile->src);
-	efree(thisfile);
+	free(thisfile->src);
+	free(thisfile);
 }
 
 /* do_add_srcfile --- add one item to srcfiles */
@@ -2860,7 +2860,7 @@ add_srcfile(enum srctype stype, char *src, SRCFILE *thisfile, bool *already_incl
 						      : _("already loaded shared library `%s'"),
 						    src);
 				}
-				efree(path);
+				free(path);
 				if (already_included)
 					*already_included = true;
 				return NULL;
@@ -3021,7 +3021,7 @@ next_sourcefile()
 		sourcefile->fd = INVALID_HANDLE;
 	}
 	if (sourcefile->buf != NULL) {
-		efree(sourcefile->buf);
+		free(sourcefile->buf);
 		sourcefile->buf = NULL;
 		sourcefile->lexptr_begin = NULL;
 	}
@@ -4877,7 +4877,7 @@ dump_vars(const char *fname)
 
 	vars = variable_list();
 	print_vars(vars, fprintf, fp);
-	efree(vars);
+	free(vars);
 	if (fp != stdout && fp != stderr && fclose(fp) != 0)
 		warning(_("%s: close failed: %s"), fname, strerror(errno));
 }
@@ -4890,7 +4890,7 @@ dump_funcs()
 	NODE **funcs;
 	funcs = function_list(true);
 	(void) foreach_func(funcs, (int (*)(INSTRUCTION *, void *)) pp_func, (void *) 0);
-	efree(funcs);
+	free(funcs);
 }
 
 
@@ -4908,7 +4908,7 @@ shadow_funcs()
 
 	funcs = function_list(true);
 	(void) foreach_func(funcs, (int (*)(INSTRUCTION *, void *)) parms_shadow, & shadow);
-	efree(funcs);
+	free(funcs);
 
 	/* End with fatal if the user requested it.  */
 	if (shadow && lintfunc == r_fatal)
@@ -5024,7 +5024,7 @@ install_function(char *fname, INSTRUCTION *fi, INSTRUCTION *plist)
 		char **pnames;
 		pnames = check_params(fname, pcount, plist);	/* frees plist */
 		f->fparms = make_params(pnames, pcount);
-		efree(pnames);
+		free(pnames);
 		install_params(f);
 	}
 	return 0;
@@ -5173,8 +5173,8 @@ free_mem:
 	for (i = 0; i < HASHSIZE; i++) {
 		for (fp = ftable[i]; fp != NULL; fp = next) {
 			next = fp->next;
-			efree(fp->name);
-			efree(fp);
+			free(fp->name);
+			free(fp);
 		}
 		ftable[i] = NULL;
 	}
@@ -5215,7 +5215,7 @@ variable(int location, char *name, NODETYPE type)
 		/* not found */
 		return install_symbol(name, type);
 	}
-	efree(name);
+	free(name);
 	return r;
 }
 
@@ -6835,14 +6835,14 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 
 	if (do_traditional || do_posix) {
 		error_ln(ns->source_line, _("@namespace is a gawk extension"));
-		efree(ns->lextok);
+		free(ns->lextok);
 		bcfree(ns);
 		return;
 	}
 
 	if (! is_valid_identifier(ns->lextok)) {
 		error_ln(ns->source_line, _("namespace name `%s' must meet identifier naming rules"), ns->lextok);
-		efree(ns->lextok);
+		free(ns->lextok);
 		bcfree(ns);
 		return;
 	}
@@ -6851,7 +6851,7 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 
 	if (mid >= 0) {
 		error_ln(ns->source_line, _("using reserved identifier `%s' as a namespace is not allowed"), ns->lextok);
-		efree(ns->lextok);
+		free(ns->lextok);
 		bcfree(ns);
 		return;
 	}
@@ -6859,7 +6859,7 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 	// Actual changing of namespace is done earlier.
 	// See comments in the production and in yylex().
 
-	efree(ns->lextok);
+	free(ns->lextok);
 
 	// save info and push on front of list of namespaces seen
 	push_ns_onto_namespace_chain(comment);

@@ -337,9 +337,9 @@ destroy_symbol(NODE *r)
 			/* function parameters of type Node_param_list */
 			for (i = 0; i < pcount; i++) {
 				n = r->fparms + i;
-				efree(n->param);
+				free(n->param);
 			}
-			efree(r->fparms);
+			free(r->fparms);
 		}
 		break;
 
@@ -360,7 +360,7 @@ destroy_symbol(NODE *r)
 		break;	/* use break so that storage is freed */
 	}
 
-	efree(r->vname);
+	free(r->vname);
 	freenode(r);
 }
 
@@ -520,7 +520,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		table[count++] = symbol_table;
 	}
 
-	efree(list);
+	free(list);
 
 	if (sort && count > 1)
 		qsort(table, count, sizeof(NODE *), comp_symbol);	/* Shazzam! */
@@ -725,7 +725,7 @@ load_symbols()
 				}
 			}
 		}
-		efree(list);
+		free(list);
 	}
 
 	unref(user);
@@ -796,7 +796,7 @@ check_param_names(void)
 		}
 	}
 
-	efree(list);
+	free(list);
 	return result;
 }
 
@@ -901,12 +901,12 @@ free_context(AWK_CONTEXT *ctxt, bool keep_globals)
 	for (s = & ctxt->srcfiles; s != & ctxt->srcfiles; s = sn) {
 		sn = s->next;
 		if (s->stype != SRC_CMDLINE && s->stype != SRC_STDIN)
-			efree(s->fullpath);
-		efree(s->src);
-		efree(s);
+			free(s->fullpath);
+		free(s->src);
+		free(s);
 	}
 
-	efree(ctxt);
+	free(ctxt);
 }
 
 /* current_pools --- return the current set of instruction pools */

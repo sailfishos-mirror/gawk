@@ -264,7 +264,7 @@ r_format_val(const char *format, int index, int fmtflag, NODE *s)
 		s->flags = oflags;
 		s->stlen = r->stlen;
 		if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-			efree(s->stptr);
+			free(s->stptr);
 		s->stptr = r->stptr;
 #ifdef HAVE_MPFR
 		s->strndmode = MPFR_round_mode;
@@ -295,7 +295,7 @@ r_format_val(const char *format, int index, int fmtflag, NODE *s)
 #endif
 	}
 	if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-		efree(s->stptr);
+		free(s->stptr);
 	emalloc(s->stptr, char *, s->stlen + 1);
 	memcpy(s->stptr, sp, s->stlen + 1);
 no_malloc:
@@ -542,7 +542,7 @@ r_unref(NODE *tmp)
 #endif
 
 	if ((tmp->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-		efree(tmp->stptr);
+		free(tmp->stptr);
 
 	if ((tmp->flags & REGEX) != 0) {
 		refree(tmp->typed_re->re_reg[0]);
@@ -555,10 +555,10 @@ r_unref(NODE *tmp)
 	mpfr_unset(tmp);
 
 	if (tmp->type == Node_elem_new && tmp->elemnew_vname != NULL)
-		efree(tmp->elemnew_vname);
+		free(tmp->elemnew_vname);
 	else if ((tmp->type == Node_var || tmp->type == Node_var_new)
 			&& tmp->vname != NULL)
-		efree(tmp->vname);
+		free(tmp->vname);
 
 	free_wstr(tmp);
 	freenode(tmp);
@@ -989,7 +989,7 @@ wstr2str(NODE *n)
 	*cp = '\0';
 
 	/* N.B. caller just created n with make_string, so this free is safe */
-	efree(n->stptr);
+	free(n->stptr);
 	n->stptr = newval;
 	n->stlen = cp - newval;
 
@@ -1005,7 +1005,7 @@ r_free_wstr(NODE *n)
 
 	if ((n->flags & WSTRCUR) != 0) {
 		assert(n->wstptr != NULL);
-		efree(n->wstptr);
+		free(n->wstptr);
 	}
 	n->wstptr = NULL;
 	n->wstlen = 0;
@@ -1225,4 +1225,18 @@ make_bool_node(bool value)
 	val->stfmt = STFMT_UNUSED;
 
 	return val;
+}
+
+/* boolval --- return true/false based on awk's criteria */
+
+bool
+boolval(NODE *t)
+{
+	if (t->type == Node_var)	// could have come from converted Node_elem_new
+		t = t->var_value;
+
+	(void) fixtype(t);
+	if ((t->flags & NUMBER) != 0)
+		return ! is_zero(t);
+	return (t->stlen > 0);
 }

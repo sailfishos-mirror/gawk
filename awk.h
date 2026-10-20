@@ -1494,18 +1494,6 @@ extern void r_freeblock(void *, int id);
 #define	cant_happen(format, ...)	r_fatal("internal error: file %s, line %d: " format, \
 				__FILE__, __LINE__, __VA_ARGS__)
 
-#ifdef USE_REAL_MALLOC
-#define	emalloc(var,ty,x)	(void) (var = (ty) malloc((size_t)(x)))
-#define	ezalloc(var,ty,x)	(void) (var = (ty) calloc((size_t)(x), 1))
-#define	erealloc(var,ty,x)	(void) (var = (ty) realloc((void *) var, (size_t)(x)))
-#else
-#define	emalloc(var,ty,x)	(void) (var = (ty) emalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
-#define	ezalloc(var,ty,x)	(void) (var = (ty) ezalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
-#define	erealloc(var,ty,x)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), __func__, #var, __FILE__, __LINE__))
-#endif
-
-#define efree(p)	free(p)
-
 #define fatal		(*(set_loc(__FILE__, __LINE__), r_fatal))
 
 extern jmp_buf fatal_tag;
@@ -1887,6 +1875,7 @@ extern void init_btowc_cache();
 extern bool out_of_range(NODE *n);
 extern char *format_nan_inf(NODE *n, char format);
 extern bool is_ieee_magic_val(const char *val);
+extern bool boolval(NODE *t);
 /* re.c */
 extern Regexp *make_regexp(char *s, size_t len, bool ignorecase, bool dfa, bool canfatal);
 extern int research(Regexp *rp, char *str, int start, size_t len, int flags);
@@ -2183,78 +2172,7 @@ fixtype(NODE *n)
 	return n;
 }
 
-/* boolval --- return true/false based on awk's criteria */
-
-/*
- * In awk, a value is considered to be true if it is nonzero _or_
- * non-null. Otherwise, the value is false.
- */
-
-static inline bool
-boolval(NODE *t)
-{
-	if (t->type == Node_var)	// could have come from converted Node_elem_new
-		t = t->var_value;
-
-	(void) fixtype(t);
-	if ((t->flags & NUMBER) != 0)
-		return ! is_zero(t);
-	return (t->stlen > 0);
-}
-
-/* emalloc_real --- malloc with error checking */
-
-static inline void *
-emalloc_real(size_t count, const char *where, const char *var, const char *file, int line)
-{
-	void *ret;
-
-	if (count == 0)
-		fatal("%s:%d: emalloc called with zero bytes", file, line);
-
-	ret = (void *) malloc(count);
-	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
-			file, line, where, var, count, strerror(errno));
-
-	return ret;
-}
-
-/* ezalloc_real --- malloc zero-filled bytes with error checking */
-
-static inline void *
-ezalloc_real(size_t count, const char *where, const char *var, const char *file, int line)
-{
-	void *ret;
-
-	if (count == 0)
-		fatal("%s:%d: ezalloc called with zero bytes", file, line);
-
-	ret = (void *) calloc(1, count);
-	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
-			file, line, where, var, count, strerror(errno));
-
-	return ret;
-}
-
-/* erealloc_real --- realloc with error checking */
-
-static inline void *
-erealloc_real(void *ptr, size_t count, const char *where, const char *var, const char *file, int line)
-{
-	void *ret;
-
-	if (count == 0)
-		fatal("%s:%d: erealloc called with zero bytes", file, line);
-
-	ret = (void *) realloc(ptr, count);
-	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot reallocate %zu bytes of memory: %s"),
-			file, line, where, var, count, strerror(errno));
-
-	return ret;
-}
+#include "awkmem.h"
 
 /* make_number_node --- make node with the given flags */
 

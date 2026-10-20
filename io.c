@@ -680,10 +680,10 @@ iop_close(IOBUF *iop)
 			 * corrupted and that references to $0 and fields work.
 			 */
 		}
-		efree(iop->buf);
+		free(iop->buf);
 		iop->buf = NULL;
 	}
-	efree(iop);
+	free(iop);
 	return ret == -1 ? 1 : 0;
 }
 
@@ -896,7 +896,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 		new_rp = true;
 		if (save_rp != NULL) {
 			rp = save_rp;
-			efree(rp->value);
+			free(rp->value);
 		} else
 			emalloc(rp, struct redirect *, sizeof(struct redirect));
 		emalloc(newstr, char *, explen + 1);
@@ -2418,7 +2418,7 @@ use_pipes:
 	/* stderr does NOT get dup'ed onto child's stdout */
 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
 		     qcmd = quote_cmd(str), NULL);
-	efree(qcmd);
+	free(qcmd);
 
 	/* restore stdin and stdout */
 	close(1);
@@ -2699,7 +2699,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 
 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
 		     qcmd = quote_cmd(cmd), NULL);
-	efree(qcmd);
+	free(qcmd);
 
 	/* restore stdout */
 	close(1);
@@ -3060,7 +3060,7 @@ do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)
 		if (stat(path, stb) == 0)
 			return path;
 		*errcode = errno;
-		efree(path);
+		free(path);
 		return NULL;
 	}
 
@@ -3080,7 +3080,7 @@ do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)
 
 	/* not found, give up */
 	*errcode = errno;
-	efree(path);
+	free(path);
 	return NULL;
 }
 
@@ -3116,7 +3116,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 		emalloc(file_ext, char *, src_len + suffix_len + 1);
 		sprintf(file_ext, "%s%s", src, EXTLIB_SUFFIX);
 		path = do_find_source(file_ext, stb, errcode, pi);
-		efree(file_ext);
+		free(file_ext);
 		if (path == NULL)
 			errno = save_errno;
 		return path;
@@ -3143,7 +3143,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 		emalloc(file_awk, char *, strlen(src) + sizeof(DEFAULT_FILETYPE) + 1);
 		sprintf(file_awk, "%s%s", src, DEFAULT_FILETYPE);
 		path = do_find_source(file_awk, stb, errcode, pi);
-		efree(file_awk);
+		free(file_awk);
 		if (path == NULL) {
 			errno = save_errno;
 #ifdef VMS
@@ -4306,8 +4306,8 @@ iopflags2str(int flag)
 static void
 free_rp(struct redirect *rp)
 {
-	efree(rp->value);
-	efree(rp);
+	free(rp->value);
+	free(rp);
 }
 
 /* inetfile --- return true for a /inet special file, set other values */
@@ -4485,7 +4485,7 @@ get_read_timeout(IOBUF *iop)
 		if (full_idx == NULL || strcmp(name, last_name) != 0) {
 			val = in_PROCINFO(name, "READ_TIMEOUT", & full_idx);
 			if (last_name != NULL)
-				efree((void *) last_name);
+				free((void *) last_name);
 			last_name = estrdup(name, strlen(name));
 		} else	/* use cached full index */
 			val = in_array(PROCINFO_node, full_idx);
@@ -4787,7 +4787,7 @@ gawk_popen_write_close(FILE *fp)
 #ifdef PIPE_HASH_SIZE
 		if (parent != NULL) {
 			parent->next = wp->next;
-			efree(wp);
+			free(wp);
 		}
 #endif
 		return status;

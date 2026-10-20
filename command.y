@@ -113,7 +113,7 @@ input
 		if (lexptr_begin != NULL) {
 			if (input_from_tty && lexptr_begin[0] != '\0')
 				add_history(lexptr_begin);
-			efree(lexptr_begin);
+			free(lexptr_begin);
 			lexptr_begin = NULL;
 		}
 		if (arg_list != NULL) {
@@ -295,7 +295,7 @@ command
 		if (idx < 0)
 			yyerror(_("info: invalid option - `%s'"), $2->a_string);
 		else {
-			efree($2->a_string);
+			free($2->a_string);
 			$2->a_string = NULL;
 			$2->type = D_argument;
 			$2->a_argument = argtab[idx].value;
@@ -373,7 +373,7 @@ command
 		if (idx < 0)
 			yyerror(_("trace: invalid option - `%s'"), $2->a_string);
 		else {
-			efree($2->a_string);
+			free($2->a_string);
 			$2->a_string = NULL;
 			$2->type = D_argument;
 			$2->a_argument = argtab[idx].value;
@@ -475,7 +475,7 @@ func_name
 			yyerror(_("no such function - `%s'"), $1->a_string);
 		else {
 			$1->type = D_func;
-			efree($1->a_string);
+			free($1->a_string);
 			$1->a_string = NULL;
 			$1->a_node = n;
 		}
@@ -531,7 +531,7 @@ enable_args
 		if (idx < 0)
 			yyerror(_("enable: invalid option - `%s'"), $1->a_string);
 		else {
-			efree($1->a_string);
+			free($1->a_string);
 			$1->a_string = NULL;
 			$1->type = D_argument;
 			$1->a_argument = argtab[idx].value;
@@ -739,7 +739,7 @@ nls
 		if (lexptr_begin != NULL) {
 			if (input_from_tty && lexptr_begin[0] != '\0')
 				add_history(lexptr_begin);
-			efree(lexptr_begin);
+			free(lexptr_begin);
 			lexptr_begin = NULL;
 		}
 	  }
@@ -992,7 +992,7 @@ free_cmdarg(CMDARG *list)
 		case D_array:
 		case D_string:
 			if (arg->a_string != NULL)
-				efree(arg->a_string);
+				free(arg->a_string);
 			break;
 		case D_node:
 		case D_field:
@@ -1001,7 +1001,7 @@ free_cmdarg(CMDARG *list)
 		default:
 			break;
 		}
-		efree(arg);
+		free(arg);
 	}
 }
 
@@ -1182,7 +1182,7 @@ again:
 		while ((c = *++lexptr) != '"') {
 			if (lexptr == lexend) {
 err:
-				efree(str);
+				free(str);
 				yyerror(_("unterminated string"));
 				return '\n';
 			}
@@ -1405,7 +1405,7 @@ concat_args(CMDARG *arg, int count)
 		p += n->stlen;
 	}
 	str[len] = '\0';
-	efree(tmp);
+	free(tmp);
 	return make_str_node(str, len, ALREADY_MALLOCED);
 }
 
@@ -1682,7 +1682,7 @@ variable_generator(const char *text, int state)
 	if (! state) {	/* first time */
 		textlen = strlen(text);
 		if (vars != NULL)
-			efree(vars);
+			free(vars);
 		vars = variable_list();
 		idx = 0;
 		func = get_function();  /* function in current context */
@@ -1723,9 +1723,9 @@ history_expand_line(char **line)
 	using_history();
 	ret = history_expand(*line, &expansion);
 	if (ret < 0 || ret == 2)
-		efree(expansion);
+		free(expansion);
 	else {
-		efree(*line);
+		free(*line);
 		*line = expansion;
 	}
 }

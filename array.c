@@ -341,7 +341,7 @@ force_array(NODE *symbol, bool canfatal)
 		symbol->elemnew_parent = NULL;
 		elem_new_vname = symbol->elemnew_vname;
 		symbol->elemnew_vname = NULL;
-		efree(symbol->stptr);
+		free(symbol->stptr);
 		symbol->stptr = NULL;
 		symbol->stlen = 0;
 		/* fall through */
@@ -640,13 +640,13 @@ do_delete(NODE *symbol, int nsubs)
 		adjust_fcall_stack(val, nsubs);  /* fix function call stack; See above. */
 		assoc_clear(val);
 		/* cleared a sub-array, free Node_var_array */
-		efree(val->vname);
+		free(val->vname);
 		freenode(val);
 	} else if (val->type == Node_elem_new) {
 		adjust_fcall_stack(val, nsubs);  /* fix function call stack; See above. */
 		elem_new_reset(val);
 		if ((val->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-			efree(val->stptr);
+			free(val->stptr);
 
 		mpfr_unset(val);
 #ifdef MEMDEBUG
@@ -690,7 +690,7 @@ do_delete_loop(NODE *symbol, NODE **lhs)
 
 	unref(*lhs);
 	*lhs = list[0];
-	efree(list);
+	free(list);
 
 	/* blast the array in one shot */
 	adjust_fcall_stack(symbol, 0);
@@ -948,7 +948,7 @@ asort_actual(int nargs, sort_context_t ctxt)
  		if (dest != NULL && dest != array)
  			assoc_clear(dest);
 		if (list != NULL)
-			efree(list);
+			free(list);
  		return make_number(0.0);
  	}
 
@@ -1030,7 +1030,7 @@ asort_actual(int nargs, sort_context_t ctxt)
 		}
 	}
 
-	efree(list);
+	free(list);
 
 	if (result != dest) {
 		/* dest == NULL or dest == array */
