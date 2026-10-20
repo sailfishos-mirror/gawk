@@ -91,7 +91,7 @@ AWKOBJ1 = array.obj,awkgram.obj,builtin.obj,cint_array.obj,\
 
 AWKOBJ2 = int_array.obj,io.obj,localeinfo.obj,main.obj,mpfr.obj,msg.obj,\
 	node.obj,random.obj,re.obj,minrx.obj,regex.obj,replace.obj,\
-	str_array.obj,symbol.obj,version.obj,printf.obj
+	str_array.obj,symbol.obj,version.obj,printf.obj,awkmem.obj
 
 AWKOBJ3 = dynarray_at_failure.obj,dynarrray_emplace_enlarge.obj,\
       dynarrray_finalize.obj,dynarrray_resize.obj
@@ -188,6 +188,7 @@ dynarrray_resize.obj : $(MALLOC)dynarray_resize.c $(MALLOC)dynarray.h
     $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
       $(MALLOC)dynarray_resize.c
 
+awkmem.obj      : awkmem.c
 ext.obj		: ext.c
 eval.obj	: eval.c
 field.obj	: field.c
