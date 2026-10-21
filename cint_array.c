@@ -327,7 +327,7 @@ cint_clear(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
 		}
 	}
 
-	efree(symbol->nodes);
+	free(symbol->nodes);
 	symbol->ainit(symbol, NULL);	/* re-initialize symbol */
 	return NULL;
 }
@@ -364,14 +364,14 @@ cint_remove(NODE *symbol, NODE *subs)
 	symbol->table_size--;
 
 	if (xn == NULL && symbol->table_size == 0) {
-		efree(symbol->nodes);
+		free(symbol->nodes);
 		symbol->ainit(symbol, NULL);	/* re-initialize array 'symbol' */
 	} else if(xn != NULL && symbol->table_size == xn->table_size) {
 		/* promote xn to symbol */
 
 		xn->flags &= ~XARRAY;
 		xn->parent_array = symbol->parent_array;
-		efree(symbol->nodes);
+		free(symbol->nodes);
 		*symbol = *xn;
 		freenode(xn);
 	}
@@ -840,7 +840,7 @@ tree_clear(NODE *tree)
 		freenode(tn);
 	}
 
-	efree(tree->nodes);
+	free(tree->nodes);
 	memset(tree, '\0', sizeof(NODE));
 	tree->type = Node_array_tree;
 }
@@ -874,7 +874,7 @@ tree_remove(NODE *symbol, NODE *tree, long k)
 
 	/* one less item in array */
 	if (--tree->table_size == 0) {
-		efree(tree->nodes);
+		free(tree->nodes);
 		memset(tree, '\0', sizeof(NODE));
 		tree->type = Node_array_tree;
 	}
@@ -1099,12 +1099,12 @@ leaf_clear(NODE *array)
 			continue;
 		if (r->type == Node_var_array) {
 			assoc_clear(r);		/* recursively clear all sub-arrays */
-			efree(r->vname);
+			free(r->vname);
 			freenode(r);
 		} else
 			unref(r);
 	}
-	efree(array->nodes);
+	free(array->nodes);
 	array->nodes = NULL;
 	array->array_size = array->table_size = 0;
 }
@@ -1122,7 +1122,7 @@ leaf_remove(NODE *symbol, NODE *array, long k)
 		return false;
 	*lhs = NULL;
 	if (--array->table_size == 0) {
-		efree(array->nodes);
+		free(array->nodes);
 		array->nodes = NULL;
 		symbol->array_capacity -= array->array_size;
 		array->array_size = 0;	/* sanity */

@@ -35,7 +35,6 @@ static NODE *symbol_list;
 static void (*install_func)(NODE *) = NULL;
 static NODE *make_symbol(const char *name, NODETYPE type);
 static NODE *install(const char *name, NODE *parm, NODETYPE type);
-static void free_bcpool(INSTRUCTION_POOL *pl);
 static NODE *get_name_from_awk_ns(const char *name);
 
 static AWK_CONTEXT *curr_ctxt = NULL;
@@ -338,9 +337,9 @@ destroy_symbol(NODE *r)
 			/* function parameters of type Node_param_list */
 			for (i = 0; i < pcount; i++) {
 				n = r->fparms + i;
-				efree(n->param);
+				free(n->param);
 			}
-			efree(r->fparms);
+			free(r->fparms);
 		}
 		break;
 
@@ -361,7 +360,7 @@ destroy_symbol(NODE *r)
 		break;	/* use break so that storage is freed */
 	}
 
-	efree(r->vname);
+	free(r->vname);
 	freenode(r);
 }
 
@@ -521,7 +520,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		table[count++] = symbol_table;
 	}
 
-	efree(list);
+	free(list);
 
 	if (sort && count > 1)
 		qsort(table, count, sizeof(NODE *), comp_symbol);	/* Shazzam! */
@@ -726,7 +725,7 @@ load_symbols()
 				}
 			}
 		}
-		efree(list);
+		free(list);
 	}
 
 	unref(user);
@@ -797,67 +796,8 @@ check_param_names(void)
 		}
 	}
 
-	efree(list);
+	free(list);
 	return result;
-}
-
-static INSTRUCTION_POOL *pools;
-
-/*
- * For best performance, the INSTR_CHUNK value should be divisible by all
- * possible sizes, i.e. 1 through MAX_INSTRUCTION_ALLOC. Otherwise, there
- * will be wasted space at the end of the block.
- */
-#define INSTR_CHUNK (2*3*21)
-
-struct instruction_block {
-	struct instruction_block *next;
-	INSTRUCTION i[INSTR_CHUNK];
-};
-
-/* bcfree --- deallocate instruction */
-
-void
-bcfree(INSTRUCTION *cp)
-{
-	assert(cp->pool_size >= 1 && cp->pool_size <= MAX_INSTRUCTION_ALLOC);
-
-	cp->opcode = Op_illegal;
-	cp->nexti = pools->pool[cp->pool_size - 1].free_list;
-	pools->pool[cp->pool_size - 1].free_list = cp;
-}
-
-/* bcalloc --- allocate a new instruction */
-
-INSTRUCTION *
-bcalloc(OPCODE op, int size, int srcline)
-{
-	INSTRUCTION *cp;
-	struct instruction_mem_pool *pool;
-
-	assert(size >= 1 && size <= MAX_INSTRUCTION_ALLOC);
-	pool = &pools->pool[size - 1];
-
-	if (pool->free_list != NULL) {
-		cp = pool->free_list;
-		pool->free_list = cp->nexti;
-	} else if (pool->free_space && pool->free_space + size <= & pool->block_list->i[INSTR_CHUNK]) {
-		cp = pool->free_space;
-		pool->free_space += size;
-	} else {
-		struct instruction_block *block;
-		emalloc(block, struct instruction_block *, sizeof(struct instruction_block));
-		block->next = pool->block_list;
-		pool->block_list = block;
-		cp = &block->i[0];
-		pool->free_space = &block->i[size];
-	}
-
-	memset(cp, 0, size * sizeof(INSTRUCTION));
-	cp->pool_size = size;
-	cp->opcode = op;
-	cp->source_line = srcline;
-	return cp;
 }
 
 /* new_context --- create a new execution context. */
@@ -879,7 +819,6 @@ new_context()
 static void
 set_context(AWK_CONTEXT *ctxt)
 {
-	pools = & ctxt->pools;
 	symbol_list = & ctxt->symbols;
 	srcfiles = & ctxt->srcfiles;
 	rule_list = & ctxt->rule_list;
@@ -962,94 +901,20 @@ free_context(AWK_CONTEXT *ctxt, bool keep_globals)
 	for (s = & ctxt->srcfiles; s != & ctxt->srcfiles; s = sn) {
 		sn = s->next;
 		if (s->stype != SRC_CMDLINE && s->stype != SRC_STDIN)
-			efree(s->fullpath);
-		efree(s->src);
-		efree(s);
+			free(s->fullpath);
+		free(s->src);
+		free(s);
 	}
 
-	efree(ctxt);
+	free(ctxt);
 }
 
-/* free_bc_internal --- free internal memory of an instruction. */
+/* current_pools --- return the current set of instruction pools */
 
-static void
-free_bc_internal(INSTRUCTION *cp)
+INSTRUCTION_POOL *
+current_pools(void)
 {
-	NODE *m;
-
-	switch(cp->opcode) {
-	case Op_func_call:
-		if (cp->func_name != NULL)
-			efree(cp->func_name);
-		break;
-	case Op_push_re:
-	case Op_match_rec:
-	case Op_match:
-	case Op_nomatch:
-		m = cp->memory;
-		if (m->re_reg[0] != NULL)
-			refree(m->re_reg[0]);
-		if (m->re_reg[1] != NULL)
-			refree(m->re_reg[1]);
-		if (m->re_exp != NULL)
-			unref(m->re_exp);
-		if (m->re_text != NULL)
-			unref(m->re_text);
-		freenode(m);
-		break;
-	case Op_token:
-		/* token lost during error recovery in yyparse */
-		if (cp->lextok != NULL)
-			efree(cp->lextok);
-		break;
-	case Op_push_i:
-		m = cp->memory;
-		unref(m);
-		break;
-	case Op_store_var:
-		m = cp->initval;
-		if (m != NULL)
-			unref(m);
-		break;
-	case Op_illegal:
-		cant_happen("unexpected opcode %s", opcode2str(cp->opcode));
-	default:
-		break;
-	}
-}
-
-/* free_bc_mempool --- free a single pool */
-
-static void
-free_bc_mempool(struct instruction_mem_pool *pool, int size)
-{
-	bool first = true;
-	struct instruction_block *block, *next;
-
-	for (block = pool->block_list; block; block = next) {
-		INSTRUCTION *cp, *end;
-
-		end = (first ? pool->free_space : & block->i[INSTR_CHUNK]);
-		for (cp = & block->i[0]; cp + size <= end; cp += size) {
-			if (cp->opcode != Op_illegal)
-				free_bc_internal(cp);
-		}
-		next = block->next;
-		efree(block);
-		first = false;
-	}
-}
-
-
-/* free_bcpool --- free list of instruction memory pools */
-
-static void
-free_bcpool(INSTRUCTION_POOL *pl)
-{
-	int i;
-
-	for (i = 0; i < MAX_INSTRUCTION_ALLOC; i++)
-		free_bc_mempool(& pl->pool[i], i + 1);
+	return & curr_ctxt->pools;
 }
 
 /* is_all_upper --- return true if name is all uppercase letters */

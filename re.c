@@ -512,9 +512,9 @@ refree(Regexp *rp)
 		dfafree(rp->dfareg);
 		free(rp->dfareg);
 	}
-	efree(rp->mre_regs);
+	free(rp->mre_regs);
 	minrx_regfree(& rp->mre_pat);
-	efree(rp);
+	free(rp);
 }
 
 /* get_minrx_regerror --- return the error as a string, hide ugly POSIX interface */

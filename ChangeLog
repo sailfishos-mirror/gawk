@@ -1,3 +1,37 @@
+2026-10-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Memory management cleanups:
+
+	* awk.h (efree): Removed the macro.
+	(boolval): Add declaration, remove body.
+	* awkmem.c (free_bc_internal): Don't fatal out on unknown opcodes;
+	for those it means there's nothing special to do.
+	* node.c (boolval): Moved to here.
+	* Global: Change efree() to free().
+	* Makefile.am (base_sources): Add awkmem.c.
+	* array.c, builtin.c, eval.c, interpret.h, io.c: Replace manual
+	saving and restoration of last character in a string with calls
+	to str_terminate() and str_restore().
+
+	More cleanups:
+
+	* array.c (do_delete): Remove MEMDEBUG ifdefs; just always
+	clear the node.
+	* awk.h: Clean up MEMDEBUG stuff.
+	(getblock): Always call r_getblock().
+	(freeblock): Always call r_freeblock().
+	(getnode): Don't zero out the node, that's moved into r_getblock().
+	(more_blocks): Remove declaration.
+	(freenode): Simplify.
+	* node.c (nextfree, r_getblock, r_freeblock, more_blocks): Moved
+	into awkmem.c.
+	* awkmem.c (nextfree, r_getblock, r_freeblock, more_blocks): Moved
+	to here.  Move debug versions here, make them functions. r_getblock()
+	zeroes out the memory. more_blocks() is now static here.
+	Move freeing of mpfr data into r_freeblock() so that awk.h is clean.
+	* builtin.c (do_typeof): Clean up MEMDEBUG. The `active' member
+	is always there now, just use it.
+
 2026-10-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* NEWS: Updated.
