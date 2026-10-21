@@ -1458,8 +1458,6 @@ DEREF(NODE *r)
 #define get_lhs(n, r)	 (n)->type == Node_var && ! var_uninitialized(n) ? \
 				&((n)->var_value) : r_get_lhs((n), (r))
 
-extern void *r_getblock(int id);
-extern void r_freeblock(void *, int id);
 #define getblock(p, id, ty)	(void) (p = (ty) r_getblock(id))
 #define freeblock(p, id)	(void) (r_freeblock(p, id))
 
@@ -1481,6 +1479,18 @@ extern void r_freeblock(void *, int id);
 
 #define	cant_happen(format, ...)	r_fatal("internal error: file %s, line %d: " format, \
 				__FILE__, __LINE__, __VA_ARGS__)
+
+#ifdef USE_REAL_MALLOC
+#define	emalloc(var,ty,x)	(void) (var = (ty) malloc((size_t)(x)))
+#define	ezalloc(var,ty,x)	(void) (var = (ty) calloc((size_t)(x), 1))
+#define	erealloc(var,ty,x)	(void) (var = (ty) realloc((void *) var, (size_t)(x)))
+#else
+#define	emalloc(var,ty,x)	(void) (var = (ty) emalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
+#define	ezalloc(var,ty,x)	(void) (var = (ty) ezalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
+#define	erealloc(var,ty,x)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), __func__, #var, __FILE__, __LINE__))
+#endif
+
+#define efree(p)	free(p)
 
 #define fatal		(*(set_loc(__FILE__, __LINE__), r_fatal))
 
@@ -1909,6 +1919,8 @@ extern void pma_save_free_lists(void);
 extern INSTRUCTION *bcalloc(OPCODE op, int size, int srcline);
 extern void bcfree(INSTRUCTION *);
 extern void free_bcpool(INSTRUCTION_POOL *pl);
+extern void *r_getblock(int id);
+extern void r_freeblock(void *, int id);
 
 /* floatcomp.c */
 #ifdef HAVE_UINTMAX_T
@@ -2159,7 +2171,59 @@ fixtype(NODE *n)
 	return n;
 }
 
-#include "awkmem.h"
+/* emalloc_real --- malloc with error checking */
+
+static inline void *
+emalloc_real(size_t count, const char *where, const char *var, const char *file, int line)
+{
+	void *ret;
+
+	if (count == 0)
+		fatal("%s:%d: emalloc called with zero bytes", file, line);
+
+	ret = (void *) malloc(count);
+	if (ret == NULL)
+		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
+			file, line, where, var, count, strerror(errno));
+
+	return ret;
+}
+
+/* ezalloc_real --- malloc zero-filled bytes with error checking */
+
+static inline void *
+ezalloc_real(size_t count, const char *where, const char *var, const char *file, int line)
+{
+	void *ret;
+
+	if (count == 0)
+		fatal("%s:%d: ezalloc called with zero bytes", file, line);
+
+	ret = (void *) calloc(1, count);
+	if (ret == NULL)
+		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
+			file, line, where, var, count, strerror(errno));
+
+	return ret;
+}
+
+/* erealloc_real --- realloc with error checking */
+
+static inline void *
+erealloc_real(void *ptr, size_t count, const char *where, const char *var, const char *file, int line)
+{
+	void *ret;
+
+	if (count == 0)
+		fatal("%s:%d: erealloc called with zero bytes", file, line);
+
+	ret = (void *) realloc(ptr, count);
+	if (ret == NULL)
+		fatal(_("%s:%d:%s: %s: cannot reallocate %zu bytes of memory: %s"),
+			file, line, where, var, count, strerror(errno));
+
+	return ret;
+}
 
 /* make_number_node --- make node with the given flags */
 
