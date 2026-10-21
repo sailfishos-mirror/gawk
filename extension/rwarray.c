@@ -1,11 +1,5 @@
 /*
  * rwarray.c - Builtin functions to binary read / write arrays to a file.
- *
- * Arnold Robbins
- * May 2009
- * Redone June 2012
- * Improved September 2017
- * GMP/MPFR support added November 2021
  */
 
 /*
@@ -67,8 +61,7 @@
 #define MINOR 1
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "rwarray extension: version 2.1";
+static const char *ext_version = "rwarray extension: version 2.2";
 static awk_bool_t (*init_func)(void) = NULL;
 
 int plugin_is_GPL_compatible;
@@ -141,7 +134,7 @@ write_backend(awk_value_t *result, awk_array_t array, const char *name)
 
 	/* filename is first arg */
 	if (! get_argument(0, AWK_STRING, & filename)) {
-		warning(ext_id, _("%s: first argument is not a string"), name);
+		warning(_("%s: first argument is not a string"), name);
 		errno = EINVAL;
 		goto done1;
 	}
@@ -185,7 +178,7 @@ do_writea(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	awk_value_t array;
 
 	if (! get_argument(1, AWK_ARRAY, & array)) {
-		warning(ext_id, _("writea: second argument is not an array"));
+		warning(_("writea: second argument is not an array"));
 		errno = EINVAL;
 		update_ERRNO_int(errno);
 		make_number(0.0, result);
@@ -202,7 +195,7 @@ do_writeall(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	awk_value_t array;
 
 	if (! sym_lookup("SYMTAB", AWK_ARRAY, & array)) {
-		warning(ext_id, _("writeall: unable to find SYMTAB array"));
+		warning(_("writeall: unable to find SYMTAB array"));
 		errno = EINVAL;
 		update_ERRNO_int(errno);
 		make_number(0.0, result);
@@ -222,7 +215,7 @@ write_array(FILE *fp, awk_array_t array)
 	awk_flat_array_t *flat_array;
 
 	if (! flatten_array_typed(array, & flat_array, AWK_STRING, AWK_UNDEFINED)) {
-		warning(ext_id, _("write_array: could not flatten array"));
+		warning(_("write_array: could not flatten array"));
 		return awk_false;
 	}
 
@@ -238,7 +231,7 @@ write_array(FILE *fp, awk_array_t array)
 	}
 
 	if (! release_flattened_array(array, flat_array)) {
-		warning(ext_id, _("write_array: could not release flattened array"));
+		warning(_("write_array: could not release flattened array"));
 		return awk_false;
 	}
 
@@ -303,7 +296,7 @@ write_value(FILE *fp, awk_value_t *val)
 	default:
 		/* XXX can this happen? */
 		code = htonl(VT_UNDEFINED);
-		warning(ext_id, _("array value has unknown type %d"), val->val_type);
+		warning(_("array value has unknown type %d"), val->val_type);
 		break;
 	}
 
@@ -394,7 +387,7 @@ write_number(FILE *fp, awk_value_t *val)
 				return awk_false;
 		}
 #else
-		fatal(ext_id, _("rwarray extension: received GMP/MPFR value but compiled without GMP/MPFR support."));
+		fatal(_("rwarray extension: received GMP/MPFR value but compiled without GMP/MPFR support."));
 #endif
 	}
 	// all the OK cases fall through to here
@@ -433,12 +426,12 @@ free_value(awk_value_t *v)
 			break;
 #endif /* HAVE_MPFR */
 		default:
-			warning(ext_id, _("cannot free number with unknown type %d"), v->num_type);
+			warning(_("cannot free number with unknown type %d"), v->num_type);
 			break;
 		}
 		break;
 	default:
-		warning(ext_id, _("cannot free value with unhandled type %d"), v->val_type);
+		warning(_("cannot free value with unhandled type %d"), v->val_type);
 		break;
 	}
 }
@@ -477,9 +470,9 @@ do_poke(awk_element_t *e)
 
 	if (! sym_update_ns(ns, ident, & e->value)) {
 		if (ns[0])
-			warning(ext_id, _("readall: unable to set %s::%s"), ns, ident);
+			warning(_("readall: unable to set %s::%s"), ns, ident);
 		else
-			warning(ext_id, _("readall: unable to set %s"), ident);
+			warning(_("readall: unable to set %s"), ident);
 		return awk_false;
 	}
 	return awk_true;
@@ -521,7 +514,7 @@ read_one(FILE *fp, awk_array_t array)
 {
 	if (! clear_array(array)) {
 		errno = ENOMEM;
-		warning(ext_id, _("reada: clear_array failed"));
+		warning(_("reada: clear_array failed"));
 		return awk_false;
 	}
 
@@ -544,7 +537,7 @@ read_backend(awk_value_t *result, awk_array_t array, const char *name, awk_bool_
 
 	/* filename is first arg */
 	if (! get_argument(0, AWK_STRING, & filename)) {
-		warning(ext_id, _("%s: first argument is not a string"), name);
+		warning(_("%s: first argument is not a string"), name);
 		errno = EINVAL;
 		goto done1;
 	}
@@ -607,7 +600,7 @@ do_reada(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	awk_value_t array;
 
 	if (! get_argument(1, AWK_ARRAY, & array)) {
-		warning(ext_id, _("reada: second argument is not an array"));
+		warning(_("reada: second argument is not an array"));
 		errno = EINVAL;
 		update_ERRNO_int(errno);
 		make_number(0.0, result);
@@ -644,7 +637,7 @@ read_array(FILE *fp, awk_array_t array)
 		if (read_elem(fp, & new_elem, &vs)) {
 			/* add to array */
 			if (! set_array_element_by_elem(array, & new_elem)) {
-				warning(ext_id, _("read_array: set_array_element failed"));
+				warning(_("read_array: set_array_element failed"));
 				return awk_false;
 			}
 		} else
@@ -754,7 +747,7 @@ read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs)
 			break;
 		default:
 			/* this cannot happen! */
-			warning(ext_id, _("treating recovered value with unknown type code %d as a string"), code);
+			warning(_("treating recovered value with unknown type code %d as a string"), code);
 			value->val_type = AWK_STRING;
 			break;
 		}
@@ -827,7 +820,7 @@ read_number(FILE *fp, awk_value_t *value, uint32_t code, value_storage *vs)
 			value = make_number_mpfr(vs->mpfr_val, value);
 		}
 #else
-		fatal(ext_id, _("rwarray extension: GMP/MPFR value in file but compiled without GMP/MPFR support."));
+		fatal(_("rwarray extension: GMP/MPFR value in file but compiled without GMP/MPFR support."));
 #endif
 	}
 

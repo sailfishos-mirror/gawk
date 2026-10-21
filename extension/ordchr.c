@@ -1,14 +1,5 @@
 /*
  * ordchr.c - Builtin functions that provide ord() and chr() functions.
- *
- * Arnold Robbins
- * arnold@skeeve.com
- * 8/2001
- * Revised 6/2004
- * Revised 5/2012
- * Revised 6/2025
- * Revised 12/2025
- * Revised 3/2026
  */
 
 /*
@@ -53,8 +44,7 @@
 #define N_(msgid) msgid
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "ordchr extension: version 2.0";
+static const char *ext_version = "ordchr extension: version 2.1";
 static awk_bool_t (*init_func)(void) = NULL;
 
 int plugin_is_GPL_compatible;
@@ -76,7 +66,7 @@ do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 			ret = str.str_value.wstr[0];
 		}
 	} else if (do_lint)
-		lintwarn(ext_id, _("ord: first argument is not a string"));
+		lintwarn(_("ord: first argument is not a string"));
 
 	/* Set the return value */
 	return make_number(ret, result);
@@ -114,7 +104,7 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 		}
 	} else if (do_lint)
-		lintwarn(ext_id, _("chr: first argument is not a number"));
+		lintwarn(_("chr: first argument is not a number"));
 
 done:
 	if (mb_str != NULL)

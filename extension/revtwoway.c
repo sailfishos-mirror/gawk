@@ -1,9 +1,5 @@
 /*
  * revtwoway.c --- Provide a two-way processor that reverses lines.
- *
- * Arnold Robbins
- * arnold@skeeve.com
- * Written 8/2012
  */
 
 /*
@@ -48,8 +44,7 @@
 #define N_(msgid) msgid
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "revtwoway extension: version 1.0";
+static const char *ext_version = "revtwoway extension: version 1.1";
 
 static awk_bool_t init_revtwoway(void);
 static awk_bool_t (*init_func)(void) = init_revtwoway;

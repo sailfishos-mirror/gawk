@@ -1486,8 +1486,6 @@ DEREF(NODE *r)
 #define	erealloc(var,ty,x)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), __func__, #var, __FILE__, __LINE__))
 #endif
 
-#define efree(p)	free(p)
-
 #define fatal		(*(set_loc(__FILE__, __LINE__), r_fatal))
 
 extern jmp_buf fatal_tag;
