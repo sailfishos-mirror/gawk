@@ -1,8 +1,5 @@
 /*
  * fork.c - Provide fork and waitpid functions for gawk.
- *
- * Revised 6/2004
- * Revised 5/2012 for new extension API.
  */
 
 /*
@@ -48,8 +45,7 @@
 #define N_(msgid) msgid
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "fork extension: version 1.0";
+static const char *ext_version = "fork extension: version 1.1";
 static awk_bool_t (*init_func)(void) = NULL;
 
 int plugin_is_GPL_compatible;
@@ -88,7 +84,7 @@ do_fork(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 		if (sym_lookup("PROCINFO", AWK_ARRAY, & procinfo)) {
 			if (procinfo.val_type != AWK_ARRAY) {
 				if (do_lint)
-					lintwarn(ext_id, _("fork: PROCINFO is not an array!"));
+					lintwarn(_("fork: PROCINFO is not an array!"));
 			} else {
 				array_set_numeric(procinfo.array_cookie, "pid", getpid());
 				array_set_numeric(procinfo.array_cookie, "ppid", getppid());

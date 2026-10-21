@@ -1,13 +1,5 @@
 /*
  * readdir.c --- Provide an input parser to read directories
- *
- * Arnold Robbins
- * arnold@skeeve.com
- * Written 7/2012
- *
- * Andrew Schorr and Arnold Robbins: further fixes 8/2012.
- * Simplified 11/2012.
- * Improved 3/2019.
  */
 
 /*
@@ -75,8 +67,7 @@
 #endif
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "readdir extension: version 3.0";
+static const char *ext_version = "readdir extension: version 3.1";
 
 static awk_bool_t init_readdir(void);
 static awk_bool_t (*init_func)(void) = init_readdir;
@@ -299,7 +290,7 @@ dir_take_control_of(awk_input_buf_t *iobuf)
 	}
 #endif
 	if (dp == NULL) {
-		warning(ext_id, _("dir_take_control_of: %s: opendir/fdopendir failed: %s"),
+		warning(_("dir_take_control_of: %s: opendir/fdopendir failed: %s"),
 				iobuf->name, strerror(errno));
 		update_ERRNO_int(errno);
 		return awk_false;

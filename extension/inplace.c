@@ -45,6 +45,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define API_COMPAT_GAWK_5
 #include "gawkapi.h"
 
 #include "gettext.h"

@@ -975,6 +975,7 @@ particular records in a file and perform operations upon them.
 * Using Internal File Ops::             How to use an external extension.
 * Extension Samples::                   The sample extensions that ship with
                                         @command{gawk}.
+* Extension Character Type Functions::  Character Type Functions
 * Extension Sample File Functions::     The file functions sample.
 * Extension Sample Fnmatch::            An interface to @code{fnmatch()}.
 * Extension Sample Fork::               An interface to @code{fork()} and
@@ -35616,6 +35617,15 @@ When @option{--sandbox} is specified, extensions are disabled
 (@pxref{Options}).
 @end quotation
 
+@quotation NOTE
+The extension API has been simplified for @command{gawk} 6.0.  If you
+have existing extensions, you will need to modify them slightly in
+order to compile them.  With the pending deprecation of MPFR support
+in @command{gawk} (@pxref{MPFR is deprecated}), be prepared for further
+simplifications to the API in the next major release.
+The details are given in @ref{API Changes Over Time}.
+@end quotation
+
 @menu
 * Extension Intro::             What is an extension.
 * Plugin License::              A note about licensing.
@@ -36048,11 +36058,6 @@ that use them.
 The general-purpose types and structures are as follows:
 
 @table @code
-@item typedef void *awk_ext_id_t;
-A value of this type is received from @command{gawk} when an extension is loaded.
-That value must then be passed back to @command{gawk} as the first parameter of
-each API function.
-
 @item #define awk_const @dots{}
 This macro expands to @samp{const} when compiling an extension,
 and to nothing when compiling @command{gawk} itself.  This makes
@@ -36068,8 +36073,8 @@ A simple Boolean type.
 @item typedef struct awk_string @{
 @itemx @ @ @ @ char *str;@ @ @ @ @ @ /* data */
 @itemx @ @ @ @ size_t len;@ @ @ @ @ /* length thereof, in chars */
-@itemx x@ @ @ @ int32_t *wstr;@ @ @ /* wide char data */
-@itemx x@ @ @ @ size_t wlen;@ @ @ @ /* length thereof, in int32_t */
+@itemx @ @ @ @ int32_t *wstr;@ @ /* wide char data */
+@itemx @ @ @ @ size_t wlen;@ @ @ @ /* length thereof, in int32_t */
 @itemx @} awk_string_t;
 This represents a mutable string. @command{gawk}
 owns the memory pointed to if it supplied
@@ -36083,7 +36088,7 @@ encoded value and the wide character string value supplied.  (As mentioned
 earlier, strings are maintained using the current multibyte encoding.)
 If you create a string and pass it to @code{gawk}, you should do it
 in the @code{str} and @code{len} members, and set the @code{wstr} and
-@code{wlen} members to @code{NULL}.
+@code{wlen} members to @code{NULL} and zero, respectively.
 
 @item typedef enum @{
 @itemx @ @ @ @ AWK_UNDEFINED,
@@ -36291,7 +36296,7 @@ unrelated version of @code{malloc()}, unexpected behavior would
 likely result.
 
 Three convenience macros may be used for allocating storage
-from @code{gawk_malloc()}, @code{gawk_calloc}, and
+from @code{gawk_malloc()}, @code{gawk_calloc()}, and
 @code{gawk_realloc()}. If the allocation fails, they cause @command{gawk}
 to exit with a fatal error message.  They should be used as if they were
 procedure calls that do not return a value:
@@ -36398,7 +36403,8 @@ flagged as user input that should be treated as a strnum value if the contents
 of the string are numeric.
 
 @item static inline awk_value_t *
-@itemx make_malloced_user_input(const char *string, size_t length, awk_value_t *result);
+@itemx make_malloced_user_input(const char *string, size_t length,
+@itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_value_t@ *result);
 This function is identical to @code{make_malloced_string()}, but the string is
 flagged as user input that should be treated as a strnum value if the contents
 of the string are numeric.
@@ -37183,23 +37189,19 @@ See the @code{revtwoway} sample extension for example code.
 @cindex messages from extensions
 
 You can print different kinds of warning messages from your
-extension, as described here.  Note that for these functions,
-you must pass in the extension ID received from @command{gawk}
-when the extension was loaded:@footnote{Because the API uses only ISO C 90
-features, it cannot make use of the ISO C 99 variadic macro feature to hide
-that parameter. More's the pity.}
+extension, as described here.
 
 @table @code
-@item void fatal(awk_ext_id_t id, const char *format, ...);
+@item void fatal(const char *format, ...);
 Print a message and then cause @command{gawk} to exit immediately.
 
-@item void nonfatal(awk_ext_id_t id, const char *format, ...);
+@item void nonfatal(const char *format, ...);
 Print a nonfatal error message.
 
-@item void warning(awk_ext_id_t id, const char *format, ...);
+@item void warning(const char *format, ...);
 Print a warning message.
 
-@item void lintwarn(awk_ext_id_t id, const char *format, ...);
+@item void lintwarn(const char *format, ...);
 Print a ``lint warning.''  Normally this is the same as printing a
 warning message, but if @command{gawk} was invoked with @samp{--lint=fatal},
 then lint warnings become fatal error messages.
@@ -38261,7 +38263,6 @@ in the symbol table:
 #include "gawkapi.h"
 
 static const gawk_api_t *api;   /* for convenience macros to work */
-static awk_ext_id_t ext_id;
 static const char *ext_version = "testarray extension: version 1.0";
 
 int plugin_is_GPL_compatible;
@@ -38631,9 +38632,9 @@ of @command{gawk} with the following macro:
 
 @table @code
 @item check_mpfr_version(extension)
-The @code{extension} is the extension id passed to all the other macros
-and functions defined in @file{gawkapi.h}.  If you have not included
-the @code{<mpfr.h>} header file, then this macro will be defined to do nothing.
+The @code{extension} parameter is the name of the extension as a C
+identifier.  If you have not included the @code{<mpfr.h>} header file,
+then this macro will be defined to do nothing.
 
 If you have included that file, then this macro compares the MPFR
 and GMP major and minor versions against those of the library you are
@@ -38698,7 +38699,6 @@ int plugin_is_GPL_compatible;
 
 static gawk_api_t *const api;
 @end group
-static awk_ext_id_t ext_id;
 static const char *ext_version = NULL; /* or @dots{} = "some string" */
 
 static awk_ext_func_t func_table[] = @{
@@ -38741,11 +38741,6 @@ will not load it (@pxref{Plugin License}).
 This global @code{static} variable should be set to point to
 the @code{gawk_api_t} pointer that @command{gawk} passes to your
 @code{dl_load()} function.  This variable is used by all of the macros.
-
-@item static awk_ext_id_t ext_id;
-This global static variable should be set to the @code{awk_ext_id_t}
-value that @command{gawk} passes to your @code{dl_load()} function.
-This variable is used by all of the macros.
 
 @item static const char *ext_version = NULL; /* or @dots{} = "some string" */
 This global @code{static} variable should be set either
@@ -38860,8 +38855,35 @@ The @code{get_file()} API is added
 
 @item
 The @code{gawk_mb_cur_max} and @code{gawk_codeset} variables are added,
-along with the @code{mbstowcs()} and @code{wcstombs()} functions.
+along with the @code{mbstowcs()} and @code{wcstombs()} functions
+(@pxref{Extension String Conversions}).
 @end itemize
+
+For @command{gawk} version 6.0, the @code{awk_ext_id_t} type was removed.
+This is transparent to most extension code, but requires that you
+do the following:
+
+@itemize @bullet
+@item
+Remove any variables of type @code{awk_ext_id_t}.
+
+@item
+Remove the first parameter in calls to @code{fatal()},
+@code{nonfatal()}, @code{warning()}, and @code{lintwarn()}.
+@end itemize
+
+Other than these changes, the API remains source-code compatible
+with the previous version.
+
+If updating your code is onerous, you may define
+the macro @code{API_COMPAT_GAWK_5} before including @code{"gawkapi.h"}
+in your extension code, and then recompile.  This one-line fix
+is a short-term work-around that will be removed in the next major release.
+The @code{inplace} sample extension in the @command{gawk} distribution
+demonstrates this.
+
+For the next major release, understand that everything in the API
+related to MPFR and GMP will be removed.
 
 @node Finding Extensions
 @section How @command{gawk} Finds Extensions
@@ -39082,7 +39104,6 @@ to make use of the API macros and boilerplate code
 #include "stack.h"
 
 static const gawk_api_t *api;    /* for convenience macros to work */
-static awk_ext_id_t ext_id;
 static awk_bool_t init_filefuncs(void);
 static awk_bool_t (*init_func)(void) = init_filefuncs;
 static const char *ext_version = "filefuncs extension: version 1.0";
@@ -39527,6 +39548,7 @@ for production use (e.g., the @code{filefuncs}, @code{readdir}, and
 shows how to use the extension API.
 
 @menu
+* Extension Character Type Functions:: Character Type Functions
 * Extension Sample File Functions::   The file functions sample.
 * Extension Sample Fnmatch::          An interface to @code{fnmatch()}.
 * Extension Sample Fork::             An interface to @code{fork()} and other
@@ -39545,6 +39567,84 @@ shows how to use the extension API.
                                       and @code{sleep()}.
 * Extension Sample API Tests::        Tests for the API.
 @end menu
+
+@node Extension Character Type Functions
+@subsection Character Type Functions
+
+The @code{ctype} extension provides 14 different functions, as follows:
+
+
+@table @asis
+@item @code{@@load "ctype"}
+This is how you load the extension.
+
+@item @code{result = isalnum(value)}
+Return true if @code{value} is alphanumeric.
+
+@item @code{result = isalpha(value)}
+Return true if @code{value} is alphabetic.
+
+@item @code{result = isblank(value)}
+Return true if @code{value} is a space or TAB.
+
+@item @code{result = iscntrl(value)}
+Return true if @code{value} is a control character.
+
+@item @code{result = isdigit(value)}
+Return true if @code{value} is numeric.
+
+@item @code{result = isgraph(value)}
+Return true if @code{value} is printable and visible.
+
+@item @code{result = islower(value)}
+Return true if @code{value} is a lower-case character.
+
+@item @code{result = ispunct(value)}
+Return true if @code{value} is punctuation.
+
+@item @code{result = isprint(value)}
+Return true if @code{value} is printable.
+
+@item @code{result = isspace(value)}
+Return true if @code{value} is a space character.
+
+@item @code{result = isupper(value)}
+Return true if @code{value} is an upper-case character.
+
+@item @code{result = isxdigit(value)}
+Return true if @code{value} is a hexadecimal character.
+
+@item @code{result = tolower_i(@var{value})}
+Return the lower-case equivalent of @var{value}.
+
+@item @code{result = toupper_i(@var{value})}
+Return the upper-case equivalent of @var{value}.
+@end table
+
+The first 12 functions perform the standard character type tests (see
+@emph{ctype}(3) for more information).
+
+If passed a numeric value, they test the result of the corresponding C
+function in the current locale on the given value.
+
+If passed a string value, they apply the test to the first character in
+the string.
+
+The functions use the corresponding @emph{ctype}(3) or @emph{wctype}(3)
+functions, depending upon if the current locale is eight-bit or multibyte;
+this is transparent to the @command{awk} programmer.
+
+The final two functions convert the case of the character value passed
+as their argument. These functions accept and return numeric code point
+values, not strings.
+
+Here is a simple example:
+
+@example
+@@load "ctype"
+@dots{}
+print "65 is alphabetic:", isalpha(65) ? "true" : "false"
+@end example
 
 @node Extension Sample File Functions
 @subsection File-Related Functions

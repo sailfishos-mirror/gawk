@@ -1,7 +1,5 @@
 /*
  * readfile.c - Read an entire file into a string.
- *
- * Arnold Robbins
  */
 
 /*
@@ -53,8 +51,7 @@
 #endif
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "readfile extension: version 2.0";
+static const char *ext_version = "readfile extension: version 2.1";
 static awk_bool_t init_readfile();
 static awk_bool_t (*init_func)(void) = init_readfile;
 
@@ -122,7 +119,7 @@ do_readfile(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 		make_malloced_string(text, sbuf.st_size, result);
 		goto done;
 	} else if (do_lint)
-		lintwarn(ext_id, _("readfile: called with wrong kind of argument"));
+		lintwarn(_("readfile: called with wrong kind of argument"));
 
 done:
 	/* Set the return value */

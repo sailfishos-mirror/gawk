@@ -1,7 +1,5 @@
 /*
  * locale.c - Provide getlocale function and variables for gawk.
- *
- * February 2026.
  */
 
 /*
@@ -47,8 +45,7 @@
 static awk_bool_t locale_init(void);
 
 static const gawk_api_t *api;	/* for convenience macros to work */
-static awk_ext_id_t ext_id;
-static const char *ext_version = "locale extension: version 1.0";
+static const char *ext_version = "locale extension: version 1.1";
 static awk_bool_t (*init_func)(void) = locale_init;
 
 int plugin_is_GPL_compatible;
@@ -110,7 +107,7 @@ locale_init(void)
 	for (int i = 0; valtab[i].name != NULL; i++) {
 		make_number(valtab[i].value, & new_val);
 		if (! sym_update(valtab[i].name, & new_val)) {
-			warning(ext_id, _("locale: failed to install %s"),
+			warning(_("locale: failed to install %s"),
 					valtab[i].name);
 			return awk_false;
 		}
@@ -118,7 +115,7 @@ locale_init(void)
 
 	make_number(MB_CUR_MAX, & new_val);
 	if (! sym_update("MB_CUR_MAX", & new_val)) {
-		warning(ext_id, _("locale: failed to install MB_CUR_MAX"));
+		warning(_("locale: failed to install MB_CUR_MAX"));
 		return awk_false;
 	}
 
@@ -134,7 +131,7 @@ do_getlocale(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 	awk_value_t category;
 	if (! get_argument(0, AWK_NUMBER, & category)) {
-		warning(ext_id, _("getlocale: could not get category argument"));
+		warning(_("getlocale: could not get category argument"));
 		make_const_string("", 0, result);
 		goto out;
 	}
