@@ -19246,6 +19246,7 @@ This is shown in
 @caption{@command{gawk} rules for @code{sub()} and backslash}
 @multitable @columnfractions .20 .20 .60
 @headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
+@item @code{\\\\\\\} @tab @code{\\\\} @tab A literal @samp{\\} (see text)
 @item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
 @item @code{@ @ \\\\&} @tab @code{@ \\&} @tab A literal @samp{\}, followed by the matched text
 @item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab A literal @samp{&}
@@ -19254,58 +19255,14 @@ This is shown in
 @end multitable
 @end float
 
-@ignore
-@float Table,table-sub-proposed
-@caption{@command{gawk} rules for @code{sub()} and backslash}
-@tex
-\vbox{\bigskip
-% We need more characters for escape and tab ...
-\catcode`_ = 0
-\catcode`! = 4
-% ... since this table has lots of &'s and \'s, so we unspecialize them.
-\catcode`\& = \other \catcode`\\ = \other
-_halign{_hfil#!_qquad_hfil#!_qquad#_hfil_cr
-    You type!@code{sub()} sees!@code{sub()} generates_cr
-_hrulefill!_hrulefill!_hrulefill_cr
-@code{\\\\\\&}!     @code{\\\&}!A literal @samp{\&}_cr
-@code{\\\\&}!     @code{\\&}!A literal @samp{\}, followed by the matched text_cr
-  @code{\\&}!      @code{\&}!A literal @samp{&}_cr
-  @code{\\q}!      @code{\q}!A literal @samp{\q}_cr
- @code{\\\\}!      @code{\\}!@code{\\}_cr
-}
-_bigskip}
-@end tex
-@ifdocbook
-@multitable @columnfractions .20 .20 .60
-@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
-@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
-@item @code{\\\\&}   @tab @code{\\&}  @tab A literal @samp{\}, followed by the matched text
-@item @code{\\&}     @tab @code{\&}   @tab A literal @samp{&}
-@item @code{\\q}     @tab @code{\q}   @tab A literal @samp{\q}
-@item @code{\\\\}    @tab @code{\\}   @tab @code{\\}
-@end multitable
-@end ifdocbook
-@ifnottex
-@ifnotdocbook
-@display
- You type         @code{sub()} sees         @code{sub()} generates
- --------         ----------         ---------------
-@code{\\\\\\&}           @code{\\\&}            A literal @samp{\&}
-  @code{\\\\&}            @code{\\&}            A literal @samp{\}, followed by the matched text
-    @code{\\&}             @code{\&}            A literal @samp{&}
-    @code{\\q}             @code{\q}            A literal @samp{\q}
-   @code{\\\\}             @code{\\}            @code{\\}
-@end display
-@end ifnotdocbook
-@end ifnottex
-@end float
-@end ignore
-
 In a nutshell, at the runtime level, there are now three special sequences
 of characters (@samp{\\\&}, @samp{\\&}, and @samp{\&}) whereas historically
 there was only one.  However, as in the historical case, any @samp{\} that
 is not part of one of these three sequences is not special and appears
-in the output literally.
+in the output literally. (There are actually four special sequences:
+@samp{\\\\} is output as @samp{\\}.  @command{gawk} scans for the longest
+sequences first, yielding possibly surprising results when you have
+a very large number of backslashes.)
 
 @command{gawk} 3.0 and 3.1 followed these rules for @code{sub()} and
 @code{gsub()}.  The POSIX standard took much longer to be revised than
@@ -19330,53 +19287,6 @@ These rules are presented in @ref{table-posix-sub}.
 @item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\}
 @end multitable
 @end float
-
-@ignore
-@float Table,table-posix-sub
-@caption{POSIX rules for @code{sub()} and @code{gsub()}}
-@tex
-\vbox{\bigskip
-% We need more characters for escape and tab ...
-\catcode`_ = 0
-\catcode`! = 4
-% ... since this table has lots of &'s and \'s, so we unspecialize them.
-\catcode`\& = \other \catcode`\\ = \other
-_halign{_hfil#!_qquad_hfil#!_qquad#_hfil_cr
-    You type!@code{sub()} sees!@code{sub()} generates_cr
-_hrulefill!_hrulefill!_hrulefill_cr
-@code{\\\\\\&}!     @code{\\\&}!A literal @samp{\&}_cr
-@code{\\\\&}!     @code{\\&}!A literal @samp{\}, followed by the matched text_cr
-  @code{\\&}!      @code{\&}!A literal @samp{&}_cr
-  @code{\\q}!      @code{\q}!A literal @samp{\q}_cr
- @code{\\\\}!      @code{\\}!@code{\}_cr
-}
-_bigskip}
-@end tex
-@ifdocbook
-@multitable @columnfractions .20 .20 .60
-@headitem You type @tab @code{sub()} sees @tab @code{sub()} generates
-@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
-@item @code{\\\\&}   @tab @code{\\&}  @tab A literal @samp{\}, followed by the matched text
-@item @code{\\&}     @tab @code{\&}   @tab A literal @samp{&}
-@item @code{\\q}     @tab @code{\q}   @tab A literal @samp{\q}
-@item @code{\\\\}    @tab @code{\\}   @tab @code{\}
-@end multitable
-@end ifdocbook
-@ifnottex
-@ifnotdocbook
-@display
- You type         @code{sub()} sees         @code{sub()} generates
- --------         ----------         ---------------
-@code{\\\\\\&}           @code{\\\&}            A literal @samp{\&}
-  @code{\\\\&}            @code{\\&}            A literal @samp{\}, followed by the matched text
-    @code{\\&}             @code{\&}            A literal @samp{&}
-    @code{\\q}             @code{\q}            A literal @samp{\q}
-   @code{\\\\}             @code{\\}            @code{\}
-@end display
-@end ifnotdocbook
-@end ifnottex
-@end float
-@end ignore
 
 The only case where the difference is noticeable is the last one: @samp{\\\\}
 is seen as @samp{\\} and produces @samp{\} instead of @samp{\\}.
@@ -19414,56 +19324,6 @@ as shown in @ref{table-gensub-escapes}.
 @item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab A literal @samp{q}
 @end multitable
 @end float
-
-@ignore
-@float Table,table-gensub-escapes
-@caption{Escape sequence processing for @code{gensub()}}
-@tex
-\vbox{\bigskip
-% We need more characters for escape and tab ...
-\catcode`_ = 0
-\catcode`! = 4
-% ... since this table has lots of &'s and \'s, so we unspecialize them.
-\catcode`\& = \other \catcode`\\ = \other
-_halign{_hfil#!_qquad_hfil#!_qquad#_hfil_cr
-    You type!@code{gensub()} sees!@code{gensub()} generates_cr
-_hrulefill!_hrulefill!_hrulefill_cr
-      @code{&}!           @code{&}!The matched text_cr
-    @code{\\&}!          @code{\&}!A literal @samp{&}_cr
-   @code{\\\\}!          @code{\\}!A literal @samp{\}_cr
-  @code{\\\\&}!         @code{\\&}!A literal @samp{\}, then the matched text_cr
-@code{\\\\\\&}!        @code{\\\&}!A literal @samp{\&}_cr
-    @code{\\q}!          @code{\q}!A literal @samp{q}_cr
-}
-_bigskip}
-@end tex
-@ifdocbook
-@multitable @columnfractions .20 .20 .60
-@headitem You type @tab @code{gensub()} sees @tab @code{gensub()} generates
-@item @code{&}       @tab @code{&}    @tab The matched text
-@item @code{\\&}     @tab @code{\&}   @tab A literal @samp{&}
-@item @code{\\\\}    @tab @code{\\}   @tab A literal @samp{\}
-@item @code{\\\\&}   @tab @code{\\&}  @tab A literal @samp{\}, then the matched text
-@item @code{\\\\\\&} @tab @code{\\\&} @tab A literal @samp{\&}
-@item @code{\\q}     @tab  @code{\q}  @tab A literal @samp{q}
-@end multitable
-@end ifdocbook
-@ifnottex
-@ifnotdocbook
-@display
-  You type          @code{gensub()} sees         @code{gensub()} generates
-  --------          -------------         ------------------
-      @code{&}                    @code{&}            The matched text
-    @code{\\&}                   @code{\&}            A literal @samp{&}
-   @code{\\\\}                   @code{\\}            A literal @samp{\}
-  @code{\\\\&}                  @code{\\&}            A literal @samp{\}, then the matched text
-@code{\\\\\\&}                 @code{\\\&}            A literal @samp{\&}
-    @code{\\q}                   @code{\q}            A literal @samp{q}
-@end display
-@end ifnotdocbook
-@end ifnottex
-@end float
-@end ignore
 
 Because of the complexity of the lexical- and runtime-level processing
 and the special cases for @code{sub()} and @code{gsub()},
