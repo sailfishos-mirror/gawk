@@ -22,11 +22,13 @@
 	(freeblock): Always call r_freeblock().
 	(getnode): Don't zero out the node, that's moved into r_getblock().
 	(more_blocks): Remove declaration.
+	(freenode): Simplify.
 	* node.c (nextfree, r_getblock, r_freeblock, more_blocks): Moved
 	into awkmem.c.
 	* awkmem.c (nextfree, r_getblock, r_freeblock, more_blocks): Moved
 	to here.  Move debug versions here, make them functions. r_getblock()
 	zeroes out the memory. more_blocks() is now static here.
+	Move freeing of mpfr data into r_freeblock() so that awk.h is clean.
 	* builtin.c (do_typeof): Clean up MEMDEBUG. The `active' member
 	is always there now, just use it.
 

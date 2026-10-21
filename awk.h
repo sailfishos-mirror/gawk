@@ -1462,11 +1462,7 @@ DEREF(NODE *r)
 #define freeblock(p, id)	(void) (r_freeblock(p, id))
 
 #define getnode(n)	getblock(n, BLOCK_NODE, NODE *)
-#ifdef HAVE_MPR
-#define freenode(n)	(n->mpfr_data != NULL ? free(n->mpfr_data), n->mpfr_data = NULL : 0, freeblock(n, BLOCK_NODE))
-#else
 #define freenode(n)	freeblock(n, BLOCK_NODE)
-#endif
 
 #define getbucket(b) 	getblock(b, BLOCK_BUCKET, BUCKET *)
 #define freebucket(b)	freeblock(b, BLOCK_BUCKET)

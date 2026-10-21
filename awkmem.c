@@ -192,6 +192,14 @@ r_getblock(int id)
 void
 r_freeblock(void *p, int id)
 {
+#ifdef HAVE_MPFR
+	NODE *n = (NODE *) p;
+
+	if (id == BLOCK_NODE && n->mpfr_data != NULL) {
+		free(n->mpfr_data);
+		n->mpfr_data = NULL;
+	}
+#endif
 	nextfree[id].active--;
 	free(p);
 }
@@ -209,7 +217,7 @@ r_getblock(int id)
 	else
 		bp = more_blocks(id);
 
-	memset(bp, '\0', nextfree[i].size);
+	memset(bp, '\0', nextfree[id].size);
 	return bp;
 }
 
@@ -218,6 +226,14 @@ r_freeblock(void *p, int id)
 {
 	struct block_item *bp = (struct block_item *) p;
 
+#ifdef HAVE_MPFR
+	NODE *n = (NODE *) p;
+
+	if (id == BLOCK_NODE && n->mpfr_data != NULL) {
+		free(n->mpfr_data);
+		n->mpfr_data = NULL;
+	}
+#endif
 	bp->freep = nextfree[id].freep;
 	nextfree[id].freep = bp;
 }
