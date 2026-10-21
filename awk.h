@@ -874,20 +874,44 @@ typedef struct exp_instruction {
 	OPCODE opcode;
 } INSTRUCTION;
 
+/* Op_func, Op_func_call, Op_indirect_func_call */
 #define func_name       d.name
 
+/*
+ * Op_push*, Op_{plus,minus,times,exp,quotient,mod}_i
+ * Op_store_sub, Op_store_var, Op_assign_concat, Op_match_rec,
+ * Op_nomatch, Op_match
+ */
 #define memory          d.dn
+
+/* Op_builtin, Op_subscript */
 #define builtin         d.fptr
+
+/* Op_ext_builtin, Op_indirect_func_call */
 #define extfunc         d.efptr
+
+/* In awkgram.y, for builtin functions */
 #define builtin_idx     d.dl
 
+/*
+ * Op_store_sub, Op_concat, Op_K_delete, Op_in_array,
+ * Op_builtin, Op_ext_builtin, Op_sub_builtin, Op_K_print*,
+ * Op_indirect_func_call, Op_func_call.
+ */
 #define expr_count      x.xl
 
+/* Op_ext_builtin, Op_indirect_func_call, Op_func_call */
 #define c_function	x.exf
 
-#define target_continue d.di
+/*
+ * Op_newfile, Op_get_record, Op_K_next, Op_line_range
+ * Op_cond_pair, Op_K_break, Op_K_continue, Op_jmp,
+ * Op_jmp_false, Op_jmp_true.
+ */
 #define target_jmp      d.di
-#define target_break    x.xi
+
+#define target_continue d.di	// alias for target_jmp!
+#define target_break    x.xi	// used when pretty-printing and debugging
 
 /* Op_sub_builtin */
 #define sub_flags       d.dl
@@ -895,12 +919,11 @@ typedef struct exp_instruction {
 #define GENSUB          0x02	/* builtin is gensub */
 #define LITERAL         0x04	/* target is a literal string */
 
-
 /* Op_K_exit */
 #define target_end      d.di
 #define target_atexit   x.xi
 
-/* Op_newfile, Op_K_getline, Op_nextfile */
+/* Op_newfile, Op_K_getline, Op_K_nextfile */
 #define target_endfile	x.xi
 
 /* Op_newfile */
@@ -923,13 +946,14 @@ typedef struct exp_instruction {
 #define in_rule         x.xl
 #define source_file     d.name
 
- /* Op_K_case, Op_K_default */
+/* Op_K_case, Op_K_default */
 #define case_stmt       x.xi
 #define case_exp        d.di
 #define stmt_start      case_exp
 #define stmt_end        case_stmt
 #define match_exp       x.xl
 
+/* Used during parsing of bookean expressions */
 #define target_stmt     x.xi
 
 /* Op_K_switch */
@@ -1160,14 +1184,14 @@ struct block_item {
 	struct block_item *freep;
 };
 
+// This and nextfree, below, have to be global because
+// PMA needs to save the info. Sigh.
 struct block_header {
 	struct block_item *freep;
 	size_t size;
 	const char *name;
 	long highwater;
-#ifdef MEMDEBUG
 	long active;
-#endif
 };
 
 enum block_id {
@@ -1434,29 +1458,11 @@ DEREF(NODE *r)
 #define get_lhs(n, r)	 (n)->type == Node_var && ! var_uninitialized(n) ? \
 				&((n)->var_value) : r_get_lhs((n), (r))
 
-#ifdef MEMDEBUG
-
-extern void *r_getblock(int id);
-extern void r_freeblock(void *, int id);
 #define getblock(p, id, ty)	(void) (p = (ty) r_getblock(id))
 #define freeblock(p, id)	(void) (r_freeblock(p, id))
 
-#else /* MEMDEBUG */
-
-#define getblock(p, id, ty)  (void) ((p = (ty) nextfree[id].freep) ? \
-			(ty) (nextfree[id].freep = ((struct block_item *) p)->freep) \
-			: (p = (ty) more_blocks(id)))
-#define freeblock(p, id)	 (void) (((struct block_item *) p)->freep = nextfree[id].freep, \
-					nextfree[id].freep = (struct block_item *) p)
-
-#endif /* MEMDEBUG */
-
-#define getnode(n)	getblock(n, BLOCK_NODE, NODE *), memset(n, 0, sizeof(NODE))
-#ifdef HAVE_MPR
-#define freenode(n)	(n->mpfr_data != NULL ? free(n->mpfr_data), n->mpfr_data = NULL : 0, freeblock(n, BLOCK_NODE))
-#else
+#define getnode(n)	getblock(n, BLOCK_NODE, NODE *)
 #define freenode(n)	freeblock(n, BLOCK_NODE)
-#endif
 
 #define getbucket(b) 	getblock(b, BLOCK_BUCKET, BUCKET *)
 #define freebucket(b)	freeblock(b, BLOCK_BUCKET)
@@ -1845,7 +1851,6 @@ extern NODE *r_dupnode(NODE *n);
 extern NODE *make_str_node(const char *s, size_t len, int flags);
 extern NODE *make_bool_node(bool value);
 extern NODE *make_typed_regex(const char *re, size_t len);
-extern void *more_blocks(int id);
 extern enum escape_results parse_escape(const char **string_ptr, const char **escseq, size_t *nbytes);
 extern NODE *str2wstr(NODE *n, size_t **ptr);
 extern NODE *wstr2str(NODE *n);
@@ -1863,6 +1868,7 @@ extern void init_btowc_cache();
 extern bool out_of_range(NODE *n);
 extern char *format_nan_inf(NODE *n, char format);
 extern bool is_ieee_magic_val(const char *val);
+extern bool boolval(NODE *t);
 /* re.c */
 extern Regexp *make_regexp(char *s, size_t len, bool ignorecase, bool dfa, bool canfatal);
 extern int research(Regexp *rp, char *str, int start, size_t len, int flags);
@@ -1891,13 +1897,12 @@ extern void install_params(NODE *func);
 extern void remove_params(NODE *func);
 extern void release_all_vars(void);
 extern int foreach_func(NODE **table, int (*)(INSTRUCTION *, void *), void *);
-extern INSTRUCTION *bcalloc(OPCODE op, int size, int srcline);
-extern void bcfree(INSTRUCTION *);
 extern AWK_CONTEXT *new_context(void);
 extern void push_context(AWK_CONTEXT *ctxt);
 extern void pop_context();
 extern int in_main_context();
 extern void free_context(AWK_CONTEXT *ctxt, bool keep_globals);
+extern INSTRUCTION_POOL *current_pools(void);
 extern NODE **variable_list();
 extern NODE **function_list(bool sort);
 extern void print_vars(NODE **table, Func_print print_func, FILE *fp);
@@ -1905,6 +1910,13 @@ extern bool check_param_names(void);
 extern bool is_all_upper(const char *name);
 extern void pma_mpfr_check(void);
 extern void pma_save_free_lists(void);
+
+/* awkmem.c */
+extern INSTRUCTION *bcalloc(OPCODE op, int size, int srcline);
+extern void bcfree(INSTRUCTION *);
+extern void free_bcpool(INSTRUCTION_POOL *pl);
+extern void *r_getblock(int id);
+extern void r_freeblock(void *, int id);
 
 /* floatcomp.c */
 #ifdef HAVE_UINTMAX_T
@@ -2153,25 +2165,6 @@ fixtype(NODE *n)
 	if ((n->flags & INTIND) != 0)
 		return force_string(n);
 	return n;
-}
-
-/* boolval --- return true/false based on awk's criteria */
-
-/*
- * In awk, a value is considered to be true if it is nonzero _or_
- * non-null. Otherwise, the value is false.
- */
-
-static inline bool
-boolval(NODE *t)
-{
-	if (t->type == Node_var)	// could have come from converted Node_elem_new
-		t = t->var_value;
-
-	(void) fixtype(t);
-	if ((t->flags & NUMBER) != 0)
-		return ! is_zero(t);
-	return (t->stlen > 0);
 }
 
 /* emalloc_real --- malloc with error checking */

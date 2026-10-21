@@ -889,11 +889,11 @@ api_sym_update(awk_ext_id_t id,
 	if (   (node->flags & NO_EXT_SET) != 0
 	    || is_off_limits_var(full_name)) {	/* most built-in vars not allowed */
 		node->flags |= NO_EXT_SET;
-		efree((void *) full_name);
+		free((void *) full_name);
 		return awk_false;
 	}
 
-	efree((void *) full_name);
+	free((void *) full_name);
 
 	if (value->val_type == AWK_ARRAY) {
 		if (node->type == Node_var_new) {
@@ -954,7 +954,7 @@ api_sym_update_scalar(awk_ext_id_t id,
 
 			/* r_unref: */
 			if ((r->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-				efree(r->stptr);
+				free(r->stptr);
 			free_wstr(r);
 
 			/* r_make_number: */
@@ -973,7 +973,7 @@ api_sym_update_scalar(awk_ext_id_t id,
 
 			/* r_unref: */
 			if ((r->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-				efree(r->stptr);
+				free(r->stptr);
 
 			mpfr_unset(r);
 			free_wstr(r);
@@ -1139,7 +1139,7 @@ remove_element(NODE *array, NODE *subscript)
 	if (val->type == Node_var_array) {
 		assoc_clear(val);
 		/* cleared a sub-array, free Node_var_array */
-		efree(val->vname);
+		free(val->vname);
 		freenode(val);
 	} else
 		unref(val);
@@ -1318,8 +1318,8 @@ api_release_flattened_array(awk_ext_id_t id,
 		unref(list[i]);
 	}
 
-	efree(list);
-	efree(data);
+	free(list);
+	free(data);
 
 	return awk_true;
 }
@@ -1710,7 +1710,7 @@ ns_lookup(const char *name_space, const char *name, char **fullname)
 	if (fullname != NULL)
 		*fullname = buf;
 	else
-		efree((void *) buf);
+		free((void *) buf);
 
 	return f;
 }

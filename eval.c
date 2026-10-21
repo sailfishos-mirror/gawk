@@ -522,11 +522,8 @@ posix_compare(NODE *s1, NODE *s2)
 		char save1, save2;
 		const char *p1, *p2;
 
-		save1 = s1->stptr[s1->stlen];
-		s1->stptr[s1->stlen] = '\0';
-
-		save2 = s2->stptr[s2->stlen];
-		s2->stptr[s2->stlen] = '\0';
+		str_terminate(s1, save1);
+		str_terminate(s2, save2);
 
 		p1 = s1->stptr;
 		p2 = s2->stptr;
@@ -553,8 +550,8 @@ posix_compare(NODE *s1, NODE *s2)
 			}
 		}
 
-		s1->stptr[s1->stlen] = save1;
-		s2->stptr[s2->stlen] = save2;
+		str_restore(s1, save1);
+		str_restore(s2, save2);
 #ifdef __MINGW32__
 	} else {
 		/* Similar logic, using wide characters */
@@ -627,16 +624,18 @@ cmp_nodes(NODE *t1, NODE *t2, bool use_strcmp)
 	if (IGNORECASE) {
 		const unsigned char *cp1 = (const unsigned char *) t1->stptr;
 		const unsigned char *cp2 = (const unsigned char *) t2->stptr;
-		char save1 = t1->stptr[t1->stlen];
-		char save2 = t2->stptr[t2->stlen];
+		char save1, save2;
+
+		str_terminate(t1, save1);
+		str_terminate(t2, save2);
 
 
 		if (gawk_mb_cur_max > 1) {
 			t1->stptr[t1->stlen] = t2->stptr[t2->stlen] = '\0';
 			ret = strncasecmpmbs((const unsigned char *) cp1,
 					     (const unsigned char *) cp2, l);
-			t1->stptr[t1->stlen] = save1;
-			t2->stptr[t2->stlen] = save2;
+			str_restore(t1, save1);
+			str_restore(t2, save2);
 		} else {
 			/* Could use tolower() here; see discussion above. */
 			for (ret = 0; l-- > 0 && ret == 0; cp1++, cp2++)
@@ -913,8 +912,7 @@ fmt_index(NODE *n)
 		emalloc(fmt_list, NODE **, fmt_num*sizeof(*fmt_list));
 	n = force_string(n);
 
-	save = n->stptr[n->stlen];
-	n->stptr[n->stlen] = '\0';
+	str_terminate(n, save);
 
 	while (ix < fmt_hiwater) {
 		if (cmp_nodes(fmt_list[ix], n, true) == 0)
@@ -929,7 +927,7 @@ fmt_index(NODE *n)
 			  : n == OFMT_node->var_value ? "O"
 			  : "", n->stptr);
 
-	n->stptr[n->stlen] = save;
+	str_restore(n, save);
 
 	if (fmt_hiwater >= fmt_num) {
 		fmt_num *= 2;
@@ -1190,7 +1188,7 @@ r_get_lhs(NODE *n, bool reference)
 		break;
 
 	case Node_elem_new:
-		efree(n->stptr);
+		free(n->stptr);
 		n->stptr = NULL;
 		n->stlen = 0;
 		n->type = Node_var;
@@ -1448,7 +1446,7 @@ restore_frame(NODE *fp)
 	}
 
 	if (frame_ptr->stack != NULL)
-		efree(frame_ptr->stack);
+		free(frame_ptr->stack);
 	ri = frame_ptr->reti;     /* execution in calling frame
 	                           * resumes from ri->nexti.
 	                           */
@@ -1479,7 +1477,7 @@ free_arrayfor(NODE *r)
 			n = list[--num_elems];
 			unref(n);
 		}
-		efree(list);
+		free(list);
 	}
 	freenode(r);
 }
@@ -1835,7 +1833,7 @@ pop_exec_state(int *rule, char **src, long *sz)
 	if (sz != NULL)
 		*sz = es->stack_size;
 	exec_state_stack.next = es->next;
-	efree(es);
+	free(es);
 	return cp;
 }
 
@@ -1937,7 +1935,7 @@ elem_new_reset(NODE *n)
 	assert(n->type == Node_elem_new);
 
 	if (n->elemnew_vname != NULL) {
-		efree(n->elemnew_vname);
+		free(n->elemnew_vname);
 		n->elemnew_vname = NULL;
 	}
 	n->elemnew_parent = NULL;

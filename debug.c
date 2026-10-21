@@ -405,7 +405,7 @@ g_readline(const char *prompt)
 		*p++ = buf[0];
 	}
 	if (n == -1 || (n == 0 && p == line)) {
-		efree(line);
+		free(line);
 		return NULL;
 	}
 	*p = '\0';
@@ -464,7 +464,7 @@ find_lines(SRCFILE *s)
 		}
 		ofs += n;
 	}
-	efree(buf);
+	free(buf);
 
 	if (n == -1) {
 		d_error(_("cannot read source file `%s': %s"),
@@ -517,11 +517,11 @@ source_find(char *src)
 		for (s = srcfiles->next; s != srcfiles; s = s->next) {
 			if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 			    		&& files_are_same(path, s)) {
-				efree(path);
+				free(path);
 				return s;
 			}
 		}
-		efree(path);
+		free(path);
 	}
 
 	d_error(_("cannot find source file named `%s': %s"), src, strerror(errno_val));
@@ -550,7 +550,7 @@ print_lines(char *src, int start_line, int nlines)
 	if (fstat(s->fd, &sbuf) == 0 && s->mtime < sbuf.st_mtime) {
 		fprintf(out_fp, _("warning: source file `%s' modified since program compilation.\n"),
 				src);
-		efree(s->line_offset);
+		free(s->line_offset);
 		s->line_offset = NULL;
 		s->mtime = sbuf.st_mtime;
 
@@ -879,7 +879,7 @@ do_info(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 			gprintf(out_fp, _("All defined variables:\n\n"));
 			print_vars(table, gprintf, out_fp);
 		}
-		efree(table);
+		free(table);
 		break;
 
 	case A_FUNCTIONS:
@@ -894,7 +894,7 @@ do_info(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 			            (int (*)(INSTRUCTION *, void *)) print_function,
 			            &pf_data);
 		}
-		efree(table);
+		free(table);
 		break;
 
 	case A_DISPLAY:
@@ -1166,7 +1166,7 @@ print_array(volatile NODE *arr, char *arr_name)
 
 	for (i = 0; i < num_elems; i++)
 		unref(list[i]);
-	efree(list);
+	free(list);
 
 	return ret;
 }
@@ -1409,7 +1409,7 @@ delete_item(struct list_item *d)
 	if (IS_SUBSCRIPT(d)) {
 		for (i = 0; i < d->num_subs; i++)
 			unref(d->subs[i]);
-		efree(d->subs);
+		free(d->subs);
 	} else if (IS_FIELD(d))
 		unref(d->symbol);
 
@@ -1426,11 +1426,11 @@ delete_item(struct list_item *d)
 
 	free_context(d->cndn.ctxt, false);
 	if (d->cndn.expr != NULL)
-		efree(d->cndn.expr);
+		free(d->cndn.expr);
 
 	d->next->prev = d->prev;
 	d->prev->next = d->next;
-	efree(d);
+	free(d);
 }
 
 /* add_item --- craete a watch/display item and add it to the list */
@@ -2224,12 +2224,12 @@ delete_breakpoint(BREAKPOINT *b)
 
 	free_context(b->cndn.ctxt, false);
 	if (b->cndn.expr != NULL)
-		efree(b->cndn.expr);
+		free(b->cndn.expr);
 
 	/* remove from list */
 	b->next->prev = b->prev;
 	b->prev->next = b->next;
-	efree(b);
+	free(b);
 }
 
 /* find_breakpoint --- find the breakpoint structure from a breakpoint number */
@@ -4251,7 +4251,7 @@ do_dump_instructions(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 		(void) foreach_func(funcs,
 		                     (int (*)(INSTRUCTION *, void *)) print_code,
 		                     &pf_data);
-		efree(funcs);
+		free(funcs);
 		fclose(fp);
 		return false;
 	}
@@ -4267,7 +4267,7 @@ do_dump_instructions(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 		                    (int (*)(INSTRUCTION *, void *)) print_code,
 		                     &pf_data);
 	}
-	efree(funcs);
+	free(funcs);
 	return false;
 }
 
@@ -4784,7 +4784,7 @@ unserialize_list_item(struct list_item *list, char **pstr, int *pstr_len, int fi
 		char *name;
 		name = estrdup(pstr[2], pstr_len[2]);
 		symbol = find_symbol(name, NULL);
-		efree(name);
+		free(name);
 		if (symbol == NULL)
 			return NULL;
 		cnt = 3;
@@ -4817,7 +4817,7 @@ unserialize_list_item(struct list_item *list, char **pstr, int *pstr_len, int fi
 			char *expr;
 			expr = estrdup(pstr[cnt], pstr_len[cnt]);
 			if (parse_condition(D_watch, l->number, expr) != 0)
-				efree(expr);
+				free(expr);
 		}
 		if (num > list->number)   /* update list number counter */
 			list->number = num;
@@ -4842,7 +4842,7 @@ unserialize_breakpoint(char **pstr, int *pstr_len, int field_cnt)
 
 	src = estrdup(pstr[0], pstr_len[0]);
 	s = source_find(src);
-	efree(src);
+	free(src);
 	if (s == NULL)
 		return NULL;
 	src = s->src;
@@ -4867,7 +4867,7 @@ unserialize_breakpoint(char **pstr, int *pstr_len, int field_cnt)
 		char *expr;
 		expr = estrdup(pstr[7], pstr_len[7]);
 		if (parse_condition(D_break, b->number, expr) != 0)
-			efree(expr);
+			free(expr);
 	}
 
 	if (b->number > watch_list.number)  /* watch and break has same number counter */
@@ -4888,7 +4888,7 @@ unserialize_option(char **pstr, int *pstr_len, int field_cnt ATTRIBUTE_UNUSED)
 
 			value = estrdup(pstr[1], pstr_len[1]);
 			(*(opt->assign))(value);
-			efree(value);
+			free(value);
 			return ((struct dbg_option *) opt);
 		}
 	}
@@ -4977,7 +4977,7 @@ prompt_yes_no(const char *mesg, char res_true, int res_default, FILE *fp)
 		if (in_str == NULL)	/* EOF */
 			exit(EXIT_FAILURE);
 		ret = (*in_str == res_true);
-		efree(in_str);
+		free(in_str);
 	}
 	return ret;
 }
@@ -5040,11 +5040,11 @@ has_break_or_watch_point(int *pnum, bool any)
 static void
 delete_commands_item(struct commands_item *c)
 {
-	efree(c->cmd_string);
+	free(c->cmd_string);
 	free_cmdarg(c->arg);
 	c->next->prev = c->prev;
 	c->prev->next = c->next;
-	efree(c);
+	free(c);
 }
 
 /* do_commands --- commands command */
@@ -5108,7 +5108,7 @@ do_commands(CMDARG *arg, int cmd)
 	if (arg != NULL) {
 		c->cmd_string = arg->a_string;
 		c->arg = arg->next; /* actual arguments to the command */
-		efree(arg);
+		free(arg);
 	}
 
 	/* append to the list */
@@ -5249,7 +5249,7 @@ do_print_f(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 		unref(r);
 	}
 done:
-	efree(tmp);
+	free(tmp);
 	return false;
 }
 
@@ -5353,7 +5353,7 @@ set_gawk_output(const char *file)
 	if (output_fp != stdout) {
 		if (output_fp != stderr) {
 			fclose(output_fp);
-			efree((void*) output_file);
+			free((void*) output_file);
 		}
 		output_fp = stdout;
 		output_is_tty = os_isatty(fileno(stdout));
@@ -5424,7 +5424,7 @@ set_gawk_output(const char *file)
 static void
 set_prompt(const char *value)
 {
-	efree((void *) dgawk_prompt);
+	free((void *) dgawk_prompt);
 	dgawk_prompt = estrdup(value, strlen(value));
 	dbg_prompt = dgawk_prompt;
 }
@@ -5783,7 +5783,7 @@ do_eval(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 			*sp++ = (NODE *) 0;
 		}
 		if (pcount == 0) {
-			efree(this_frame->stack);
+			free(this_frame->stack);
 			this_frame->stack = NULL;
 		} /* else
 				restore_frame() will free it */
@@ -5913,7 +5913,7 @@ parse_condition(int type, int num, char *expr)
 
 out:
 	if (cndn->expr != NULL)
-		efree(cndn->expr);
+		free(cndn->expr);
 	free_context(cndn->ctxt, false);
 	cndn->code = code;
 	cndn->expr = expr;
@@ -6007,8 +6007,8 @@ pop_cmd_src()
 	if (cs->close_func && cs->fd != INVALID_HANDLE)
 		cs->close_func(cs->fd);
 	if (cs->str != NULL)
-		efree(cs->str);
-	efree(cs);
+		free(cs->str);
+	free(cs);
 
 	input_fd = cmd_src->fd;
 	input_from_tty = cmd_src->is_tty;

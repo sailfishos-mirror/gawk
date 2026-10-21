@@ -330,7 +330,7 @@ int_clear(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
 				r = b->aivalue[j];
 				if (r->type == Node_var_array) {
 					assoc_clear(r);	/* recursively clear all sub-arrays */
-					efree(r->vname);
+					free(r->vname);
 					freenode(r);
 				} else
 					unref(r);
@@ -340,7 +340,7 @@ int_clear(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
 		symbol->buckets[i] = NULL;
 	}
 	if (symbol->buckets != NULL)
-		efree(symbol->buckets);
+		free(symbol->buckets);
 	symbol->ainit(symbol, NULL);	/* re-initialize symbol */
 	return NULL;
 }
@@ -427,13 +427,13 @@ removed:
 
 	symbol->table_size--;
 	if (xn == NULL && symbol->table_size == 0) {
-		efree(symbol->buckets);
+		free(symbol->buckets);
 		symbol->ainit(symbol, NULL);	/* re-initialize array 'symbol' */
 	} else if (xn != NULL && symbol->table_size == xn->table_size) {
 		/* promote xn (str_array) to symbol */
 		xn->flags &= ~XARRAY;
 		xn->parent_array = symbol->parent_array;
-		efree(symbol->buckets);
+		free(symbol->buckets);
 		*symbol = *xn;
 		freenode(xn);
 	}
@@ -865,5 +865,5 @@ grow_int_table(NODE *symbol)
 			freebucket(chain);
 		}
 	}
-	efree(old);
+	free(old);
 }

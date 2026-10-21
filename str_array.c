@@ -255,7 +255,7 @@ str_clear(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
 			r = b->ahvalue;
 			if (r->type == Node_var_array) {
 				assoc_clear(r);	/* recursively clear all sub-arrays */
-				efree(r->vname);
+				free(r->vname);
 				freenode(r);
 			} else
 				unref(r);
@@ -266,7 +266,7 @@ str_clear(NODE *symbol, NODE *subs ATTRIBUTE_UNUSED)
 	}
 
 	if (symbol->buckets != NULL)
-		efree(symbol->buckets);
+		free(symbol->buckets);
 	symbol->ainit(symbol, NULL);	/* re-initialize symbol */
 	return NULL;
 }
@@ -312,7 +312,7 @@ str_remove(NODE *symbol, NODE *subs)
 			/* one less element in array */
 			if (--symbol->table_size == 0) {
 				if (symbol->buckets != NULL)
-					efree(symbol->buckets);
+					free(symbol->buckets);
 				symbol->ainit(symbol, NULL);	/* re-initialize symbol */
 			}
 
@@ -708,7 +708,7 @@ grow_table(NODE *symbol)
 			new[hash1] = chain;
 		}
 	}
-	efree(old);
+	free(old);
 }
 
 

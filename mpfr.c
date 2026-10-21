@@ -454,7 +454,7 @@ mpg_format_val(const char *format, int index, int fmtflag, NODE *s)
 	s->flags = oflags;
 	s->stlen = r->stlen;
 	if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
-		efree(s->stptr);
+		free(s->stptr);
 	s->stptr = r->stptr;
 	s->flags &= ~(CONVFMT_FMT|OFMT_FMT);
 	s->flags |= STRCUR | fmtflag;
@@ -1040,7 +1040,7 @@ free_intval(NODE *t, mpz_ptr pz)
 {
 	if ((t->flags & MPZN) == 0) {
 		mpz_clear(pz);
-		efree(pz);
+		free(pz);
 	}
 }
 

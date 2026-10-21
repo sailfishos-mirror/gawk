@@ -113,6 +113,7 @@ $ cc mpfr.c
 $ cc str_array.c
 $ cc symbol.c
 $ cc printf.c
+$ cc awkmem.c
 $ cc [.vms]vms_misc.c
 $ cc [.vms]vms_popen.c
 $ cc [.vms]vms_fwrite.c
@@ -132,7 +133,7 @@ gawkmisc.obj,getopt.obj,getopt1.obj,io.obj,localeinfo.obj
 main.obj,msg.obj,node.obj
 random.obj,re.obj,regex.obj,replace.obj,version.obj,eval.obj,profile.obj
 command.obj,debug.obj,int_array.obj,cint_array.obj,gawkapi.obj,mpfr.obj
-str_array.obj,symbol.obj,printf.obj
+str_array.obj,symbol.obj,printf.obj,awkmem.obj
 []vms_misc.obj,vms_popen.obj,vms_fwrite.obj,vms_args.obj
 []vms_gawk.obj,vms_cli.obj,gawk_cmd.obj,vms_crtl_init.obj
 psect_attr=environ,noshr	!extern [noshare] char **
