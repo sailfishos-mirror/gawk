@@ -2,9 +2,9 @@
 # gendocs.sh -- generate a GNU manual in many formats.  This script is
 #   mentioned in maintain.texi.  See the help message below for usage details.
 
-scriptversion=2023-07-12.10
+scriptversion=2026-07-17.17
 
-# Copyright 2003-2023 Free Software Foundation, Inc.
+# Copyright 2003-2026 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,14 +66,14 @@ generate_html=true
 generate_info=true
 generate_tex=true
 outdir=manual
-source_extra=
+unset source_extra
 split=node
 srcfile=
 texarg="-t @finalout"
 
 version="gendocs.sh $scriptversion
 
-Copyright 2023 Free Software Foundation, Inc.
+Copyright 2026 Free Software Foundation, Inc.
 There is NO warranty.  You may redistribute this software
 under the terms of the GNU General Public License.
 For more information about these matters, see the files named COPYING."
@@ -167,7 +167,7 @@ while test $# -gt 0; do
     --html)      shift; default_htmlarg=false; htmlarg=$1;;
     --info)      shift; infoarg=$1;;
     --no-ascii)  generate_ascii=false;;
-    --no-html)   generate_ascii=false;;
+    --no-html)   generate_html=false;;
     --no-info)   generate_info=false;;
     --no-tex)    generate_tex=false;;
     --source)    shift; source_extra=$1;;
@@ -229,11 +229,13 @@ if test ! -r $GENDOCS_TEMPLATE_DIR/gendocs_template; then
   exit 1
 fi
 
-# Function to return size of $1 in something resembling kilobytes.
+# Output $1's size like "7.1 MiB" if du is GNU, "7425707 bytes" otherwise.
 calcsize()
 {
-  size=`ls -ksl $1 | awk '{print $1}'`
-  echo $size
+  duout=`LC_ALL=C du -h --apparent-size -- "$1" 2>/dev/null` ||
+    duout=`LC_ALL=C wc -c <"$1"`
+  set x $duout
+  printf '%s\n' "$2" | sed 's/[^0-9.].*/ &iB/; s/[0-9]$/& bytes/'
 }
 
 # copy_images OUTDIR HTML-FILE...
@@ -256,8 +258,8 @@ BEGIN {
 /<img src="(.*?)"/g && ++$need{$1};
 
 END {
-  #print "$me: @{[keys %need]}\n";  # for debugging, show images found.
-  FILE: for my $f (keys %need) {
+  #print "$me: @{[sort keys %need]}\n";  # for debugging, show images found.
+  FILE: for my $f (sort keys %need) {
     for my $d (@dirs) {
       if (-f "$d/$f") {
         use File::Basename;
@@ -288,7 +290,7 @@ echo "Making output for $srcfile"
 echo " in `pwd`"
 mkdir -p "$outdir/"
 
-# ␌
+# 
 if $generate_info; then
   cmd="$SETLANG $MAKEINFO -o $PACKAGE.info $commonarg $infoarg \"$srcfile\""
   echo "Generating info... ($cmd)"
@@ -301,7 +303,7 @@ if $generate_info; then
   # separately on the web.
 fi  # end info
 
-# ␌
+# 
 if $generate_tex; then
   cmd="$SETLANG $TEXI2DVI $dirargs $texarg \"$srcfile\""
   printf "\nGenerating dvi... (%s)\n" "$cmd"
@@ -320,7 +322,7 @@ if $generate_tex; then
   ls -l "$outdir/$PACKAGE.pdf"
 fi # end tex (dvi + pdf)
 
-# ␌
+# 
 if $generate_ascii; then
   opt="-o $PACKAGE.txt --no-split --no-headers $commonarg"
   cmd="$SETLANG $MAKEINFO $opt \"$srcfile\""
@@ -333,7 +335,7 @@ if $generate_ascii; then
   ls -l "$outdir/$PACKAGE.txt" "$outdir/$PACKAGE.txt.gz"
 fi
 
-# ␌
+# 
 
 if $generate_html; then
 # Split HTML at level $1.  Used for texi2html.
@@ -346,10 +348,12 @@ html_split()
   split_html_dir=$PACKAGE.html
   (
     cd ${split_html_dir} || exit 1
-    ln -sf ${PACKAGE}.html index.html
+    test -f index.html || test ! -f ${PACKAGE}.html ||
+      ln -s ${PACKAGE}.html index.html
     tar -czf "$abs_outdir/${PACKAGE}.html_$1.tar.gz" -- *.html
   )
-  eval html_$1_tgz_size=`calcsize "$outdir/${PACKAGE}.html_$1.tar.gz"`
+  size=`calcsize "$outdir/${PACKAGE}.html_$1.tar.gz"`
+  eval html_$1_tgz_size=\$size
   rm -f "$outdir"/html_$1/*.html
   mkdir -p "$outdir/html_$1/"
   mv ${split_html_dir}/*.html "$outdir/html_$1/"
@@ -388,8 +392,8 @@ if test -z "$use_texi2html"; then
     cd $split_html_dir || exit 1
     tar -czf "$abs_outdir/$PACKAGE.html_$split.tar.gz" -- *
   )
-  eval \
-    html_${split}_tgz_size=`calcsize "$outdir/$PACKAGE.html_$split.tar.gz"`
+  size=`calcsize "$outdir/$PACKAGE.html_$split.tar.gz"`
+  eval html_${split}_tgz_size=\$size
   rm -rf "$outdir/html_$split/"
   mv $split_html_dir "$outdir/html_$split/"
   du -s "$outdir/html_$split/"
@@ -412,18 +416,56 @@ else # use texi2html:
 fi
 fi # end html
 
-# ␌
+# 
 printf "\nMaking .tar.gz for sources...\n"
 d=`dirname $srcfile`
 (
-  cd "$d"
-  srcfiles=`ls -d *.texinfo *.texi *.txi *.eps $source_extra 2>/dev/null` || true
-  tar czfh "$abs_outdir/$PACKAGE.texi.tar.gz" $srcfiles
-  ls -l "$abs_outdir/$PACKAGE.texi.tar.gz"
-)
+  cd "$d" || exit
+
+  # Set PATS to a list of globbing patterns that expand to
+  # file names to be put into the .tar.gz for sources.
+  # Omit patterns that do not expand to file names.
+  pats=
+
+  if case `eval $MAKEINFO --version | sed -e 's/^[^0-9]*//' -e 1q` in \
+       [1-6]* | 7.[01]*) false;; \
+       *) true;; \
+     esac \
+  ; then
+
+    for pat in '*.eps'; do
+      for file in $pat; do
+        test "$file" = "$pat" && test ! -e "$file" || pats="$pats $pat"
+        break
+      done
+    done
+
+    # if $MAKEINFO is recent enough, use --trace-includes on the
+    # $srcfile to get the included files of the targeted manual only
+    base=`basename "$srcfile"`
+
+    cmd="$SETLANG $MAKEINFO $commonarg --trace-includes \"$base\""
+    eval "$cmd" \
+    | tar -czhf "$abs_outdir/$PACKAGE.texi.tar.gz" \
+        --verbatim-files-from -T- -- "$base" $pats \
+        ${source_extra+"$source_extra"} \
+    && ls -l "$abs_outdir/$PACKAGE.texi.tar.gz"
+  else
+    for pat in '*.texinfo' '*.texi' '*.txi' '*.eps'; do
+     for file in $pat; do
+       test "$file" = "$pat" && test ! -e "$file" || pats="$pats $pat"
+       break
+      done
+    done
+
+    tar -czhf "$abs_outdir/$PACKAGE.texi.tar.gz" \
+       -- $pats ${source_extra+"$source_extra"} \
+    && ls -l "$abs_outdir/$PACKAGE.texi.tar.gz"
+  fi
+) || exit
 texi_tgz_size=`calcsize "$outdir/$PACKAGE.texi.tar.gz"`
 
-# ␌
+# 
 # Do everything again through docbook.
 if test -n "$docbook"; then
   opt="-o - --docbook $commonarg"
@@ -463,7 +505,7 @@ if test -n "$docbook"; then
   mv $PACKAGE-db.pdf "$outdir/"
 fi
 
-# ␌
+# 
 printf "\nMaking index.html for %s...\n" "$PACKAGE"
 if test -z "$use_texi2html"; then
   if test x$split = xnode; then
@@ -517,8 +559,9 @@ $GENDOCS_TEMPLATE_DIR/gendocs_template >"$outdir/index.html"
 echo "Done, see $outdir/ subdirectory for new files."
 
 # Local variables:
-# eval: (add-hook 'before-save-hook 'time-stamp)
+# eval: (add-hook 'before-save-hook 'time-stamp nil t)
 # time-stamp-start: "scriptversion="
-# time-stamp-format: "%:y-%02m-%02d.%02H"
+# time-stamp-format: "%Y-%02m-%02d.%02H"
+# time-stamp-time-zone: "UTC0"
 # time-stamp-end: "$"
 # End:
