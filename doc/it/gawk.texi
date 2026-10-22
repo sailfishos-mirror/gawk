@@ -1057,7 +1057,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Tipi di dati generali::               I tipi di dati.
 * Funzioni di allocazione memoria::     Funzioni per allocare memoria.
 * Funzioni costruttrici::               Funzioni per creare valori.
-* API e gestione valori MPFR e GMP::    Gestione valori MPFR e GMP.
+* API e gestione valori MPFR e GMP::    Gestire valori MPFR e GMP.
 * Funzioni di registrazione::           Funzioni per registrare cose con
                                         @command{gawk}.
 * Funzioni di estensione::              Registrare funzioni di estensione.
@@ -1100,6 +1100,7 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Usare operazioni interne file::       Come usare un'estensione esterna.
 * Esempi di estensione::                Le estensioni di esempio incluse con
                                         @command{gawk}.
+* Funzioni di estensione sul tipo di carattere:: Funzioni sul tipo di carattere.
 * Esempio di estensione funzioni file:: Funzioni relative ai file.
 * Esempio di estensione Fnmatch::       Un'interfaccia a @code{fnmatch()}.
 * Esempio di estensione Fork::          Un'interfaccia a @code{fork()} e
@@ -5631,7 +5632,7 @@ is thus essentially a place holder,
 in case some option becomes obsolete in a future version of @command{gawk}.
 @end ignore
 
-A partire dalla versione 6.0 di @command{gawk}, le seguenti 
+A partire dalla versione 6.0 di @command{gawk}, le seguenti
 funzionalità sono deprecate e verranno rimosse nella
 versione 6.1 di @command{gawk}.
 
@@ -19325,7 +19326,7 @@ for (i in frequenze)
 Una volta che un elemento è stato eliminato, una successiva istruzione
 @code{for} che visiti il vettore non troverà quell'elemento, e l'uso
 dell'operatore @code{in} per controllare la presenza di quell'elemento
-restituisce zero (ossia falso):
+restituisce zero (ossia "falso"):
 
 @example
 delete pippo[4]
@@ -21159,6 +21160,7 @@ in
 @caption{Regole @command{gawk} per @code{sub()} e barra inversa}
 @multitable @columnfractions .20 .20 .60
 @headitem Immissione @tab @code{sub()} vede @tab @code{sub()} genera
+@item @code{\\\\\\\} @tab @code{\\\\} @tab Una barra inversa @samp{\\} letterale (vedere il testo)
 @item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
 @item @code{@ @ \\\\&} @tab @code{@ \\&} @tab Il carattere @samp{\}, seguito dal testo individuato
 @item @code{@ @ @ @ \\&} @tab @code{@ @ \&} @tab Il carattere @samp{&}
@@ -21167,58 +21169,15 @@ in
 @end multitable
 @end float
 
-@ignore
-@float Tabella,table-sub-proposed
-@caption{Regole @command{gawk} per @code{sub()} e barra inversa}
-@tex
-\vbox{\bigskip
-% We need more characters for escape and tab ...
-\catcode`_ = 0
-\catcode`! = 4
-% ... since this table has lots of &'s and \'s, so we unspecialize them.
-\catcode`\& = \other \catcode`\\ = \other
-_halign{_hfil#!_qquad_hfil#!_qquad#_hfil_cr
-   Immissione!@code{sub()} vede!@code{sub()} genera_cr
-_hrulefill!_hrulefill!_hrulefill_cr
-@code{\\\\\\&}!     @code{\\\&}!I caratteri @samp{\&}_cr
-@code{\\\\&}!     @code{\\&}!Il carattere @samp{\}, seguito dal testo individuato_cr
-  @code{\\&}!      @code{\&}!Il carattere @samp{&}_cr
-  @code{\\q}!      @code{\q}!I caratteri @samp{\q}_cr
- @code{\\\\}!      @code{\\}!@code{\\}_cr
-}
-_bigskip}
-@end tex
-@ifdocbook
-@multitable @columnfractions .20 .20 .60
-@headitem Immissione @tab @code{sub()} vede @tab @code{sub()} genera
-@item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
-@item @code{\\\\&}   @tab @code{\\&}  @tab Il carattere @samp{\}, seguito dal testo individuato
-@item @code{\\&}     @tab @code{\&}   @tab Il carattere @samp{&}
-@item @code{\\q}     @tab @code{\q}   @tab I caratteri @samp{\q}
-@item @code{\\\\}    @tab @code{\\}   @tab @code{\\}
-@end multitable
-@end ifdocbook
-@ifnottex
-@ifnotdocbook
-@display
-Immissione              @code{sub()} vede         @code{sub()} genera
----------         ----------         ---------------
-@code{\\\\\\&}           @code{\\\&}            Il carattere @samp{\&}
-  @code{\\\\&}            @code{\\&}            Il carattere @samp{\}, seguito dal testo individuato
-    @code{\\&}             @code{\&}            Il carattere @samp{&}
-    @code{\\q}             @code{\q}            I caratteri @samp{\q}
-   @code{\\\\}             @code{\\}            @code{\\}
-@end display
-@end ifnotdocbook
-@end ifnottex
-@end float
-@end ignore
-
 In breve, al momento dell'esecuzione, ci sono ora tre sequenze speciali
 di caratteri (@samp{\\\&}, @samp{\\&}, e @samp{\&}) mentre tradizionalmente
 ce n'era una sola.  Tuttavia, come nel caso storico, ogni @samp{\} che
 non fa parte di una di queste tre sequenze non è speciale e appare
-nell'output così come è scritto.
+nell'output così come è scritto.  (In realtà le sequenze speciali sono
+quattro: @samp{\\\\} viene stampato come @samp{\\}.  @command{gawk}
+cerca per prima cosa la sequenza più lunga e ciò può generare
+risultati sorprendenti, nel caso ci sia un numero elevato di
+barre inverse.)
 
 @command{gawk} 3.0 e 3.1 seguivano queste regole per @code{sub()} e
 @code{gsub()}.  La revisione dello standard POSIX ha richiesto molto più tempo
@@ -21252,53 +21211,6 @@ in
 @item @code{@ @ @ \\\\} @tab @code{@ @ \\} @tab @code{\}
 @end multitable
 @end float
-
-@ignore
-@float Tabella,table-posix-sub
-@caption{Regole POSIX per @code{sub()} e @code{gsub()}}
-@tex
-\vbox{\bigskip
-% We need more characters for escape and tab ...
-\catcode`_ = 0
-\catcode`! = 4
-% ... since this table has lots of &'s and \'s, so we unspecialize them.
-\catcode`\& = \other \catcode`\\ = \other
-_halign{_hfil#!_qquad_hfil#!_qquad#_hfil_cr
-   Immissione!@code{sub()} vede!@code{sub()} genera_cr
-_hrulefill!_hrulefill!_hrulefill_cr
-@code{\\\\\\&}!     @code{\\\&}!I caratteri @samp{\&}_cr
-@code{\\\\&}!     @code{\\&}!Il carattere @samp{\}, seguito dal testo individuato_cr
-  @code{\\&}!      @code{\&}!Il carattere @samp{&}_cr
-  @code{\\q}!      @code{\q}!I caratteri @samp{\q}_cr
- @code{\\\\}!      @code{\\}!@code{\}_cr
-}
-_bigskip}
-@end tex
-@ifdocbook
-@multitable @columnfractions .20 .20 .60
-@headitemImmissione @tab @code{sub()} vede @tab @code{sub()} genera
-@item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
-@item @code{\\\\&}   @tab @code{\\&}  @tab Il carattere @samp{\}, seguito dal testo individuato
-@item @code{\\&}     @tab @code{\&}   @tab I caratteri @samp{&}
-@item @code{\\q}     @tab @code{\q}   @tab I caratteri @samp{\q}
-@item @code{\\\\}    @tab @code{\\}   @tab @code{\}
-@end multitable
-@end ifdocbook
-@ifnottex
-@ifnotdocbook
-@display
-Immissione         @code{sub()} vede         @code{sub()} genera
----------         ----------         ---------------
-@code{\\\\\\&}           @code{\\\&}            I caratteri @samp{\&}
-  @code{\\\\&}            @code{\\&}            Il carattere @samp{\}, seguito dal testo individuato
-    @code{\\&}             @code{\&}            Il carattere @samp{&}
-    @code{\\q}             @code{\q}            I caratteri @samp{\q}
-   @code{\\\\}             @code{\\}            @code{\}
-@end display
-@end ifnotdocbook
-@end ifnottex
-@end float
-@end ignore
 
 Il solo caso in cui la differenza è rilevante è l'ultimo: @samp{\\\\}
 è visto come @samp{\\} e produce @samp{\} invece che @samp{\\}.
@@ -21347,56 +21259,6 @@ in
 @item @code{@ @ @ @ \\q} @tab @code{@ @ \q} @tab Il carattere @samp{q}
 @end multitable
 @end float
-
-@ignore
-@float Tabella,table-gensub-escapes
-@caption{Elaborazione sequenze di protezione in @code{gensub()}}
-@tex
-\vbox{\bigskip
-% We need more characters for escape and tab ...
-\catcode`_ = 0
-\catcode`! = 4
-% ... since this table has lots of &'s and \'s, so we unspecialize them.
-\catcode`\& = \other \catcode`\\ = \other
-_halign{_hfil#!_qquad_hfil#!_qquad#_hfil_cr
-   Immissione!@code{gensub()} vede!@code{gensub()} genera_cr
-_hrulefill!_hrulefill!_hrulefill_cr
-      @code{&}!           @code{&}!Il testo individuato_cr
-    @code{\\&}!          @code{\&}!Il carattere @samp{&}_cr
-   @code{\\\\}!          @code{\\}!Il carattere @samp{\}_cr
-  @code{\\\\&}!         @code{\\&}!Il carattere @samp{\}, seguito dal testo individuato_cr
-@code{\\\\\\&}!        @code{\\\&}!I caratteri @samp{\&}_cr
-    @code{\\q}!          @code{\q}!Il carattere @samp{q}_cr
-}
-_bigskip}
-@end tex
-@ifdocbook
-@multitable @columnfractions .20 .20 .60
-@headitem Immissione @tab @code{gensub()} vede @tab @code{gensub()} genera
-@item @code{&}       @tab @code{&}    @tab Il testo individuato
-@item @code{\\&}     @tab @code{\&}   @tab Il carattere @samp{&}
-@item @code{\\\\}    @tab @code{\\}   @tab Il carattere @samp{\}
-@item @code{\\\\&}   @tab @code{\\&}  @tab Il carattere @samp{\}, seguito dal testo individuato
-@item @code{\\\\\\&} @tab @code{\\\&} @tab I caratteri @samp{\&}
-@item @code{\\q}     @tab  @code{\q}  @tab Il carattere @samp{q}
-@end multitable
-@end ifdocbook
-@ifnottex
-@ifnotdocbook
-@display
- Immissione          @code{gensub()} vede         @code{gensub()} genera
- ---------          -------------         ------------------
-      @code{&}                    @code{&}            Il testo individuato
-    @code{\\&}                   @code{\&}            Il carattere @samp{&}
-   @code{\\\\}                   @code{\\}            Il carattere @samp{\}
-  @code{\\\\&}                  @code{\\&}            Il carattere @samp{\}, seguito dal testo individuato
-@code{\\\\\\&}                 @code{\\\&}            I caratteri @samp{\&}
-    @code{\\q}                   @code{\q}            Il carattere @samp{q}
-@end display
-@end ifnotdocbook
-@end ifnottex
-@end float
-@end ignore
 
 A causa della complessità dell'elaborazione a livello lessicale e in fase
 di esecuzione, e dei casi speciali di @code{sub()} e @code{gsub()},
@@ -22502,8 +22364,8 @@ vettore di vettori
 @cindexgawkfunc{isarray}
 @cindex scalare o vettore
 @item isarray(@var{x})
-Restituisce il valore 'vero' se @var{x} è un vettore. Altrimenti, restituisce
-'falso'.
+Restituisce "true" [vero] se @var{x} è un vettore.
+Altrimenti, restituisce "false" [falso].
 
 @cindexgawkfunc{typeof}
 @cindex variabili @subentry tipi di
@@ -24775,8 +24637,7 @@ prog.c:5: asserzione falsa: `a <= 5 && b >= 17.1'
 @cindex @code{assert()} @subentry funzione definita dall'utente
 @cindex funzione definita dall'utente @subentry @code{assert()}
 Il linguaggio C rende possibile trasformare questa condizione in una stringa
-da
-usare per stampare il messaggio di diagnosi.  Ciò in @command{awk} non è
+da usare per stampare il messaggio di diagnosi.  Ciò in @command{awk} non è
 possibile, per cui la funzione @code{assert()} scritta in @command{awk}
 richiede anche una descrizione
 della condizione da verificare, in formato stringa.
@@ -26959,9 +26820,9 @@ Far questo è necessario, poiché queste funzioni potrebbero essere chiamate da
 qualsiai parte all'interno di un programma dell'utente, e l'utente può
 suddividere i record in campi a suo piacimento.
 Ciò rende possibile ripristinare il corretto meccanismo di suddivisione dei
-campi in un secondo momento.  La verifica può restituire solo @dfn{vero} per
+campi in un secondo momento.  La verifica può restituire solo "true" [vero] per
 @command{gawk}.
-Il risultato può essere @dfn{falso} se si usa
+Il risultato può essere "false" [false] se si usa
 @code{FS} o @code{FPAT},
 o in qualche altra implementazione di @command{awk}.
 
@@ -29308,9 +29169,10 @@ function inizializza_suffisso(  i)
 @c endfile
 @end example
 
-La funzione @code{all_ultimo_file()} restituisce "vero" se @code{Indice_suff}
-descrive un suffisso in cui tutti i caratteri sono @samp{z}, e lo fa
-controllando che tutti gli elementi del vettore valgano 26:
+La funzione @code{all_ultimo_file()} restituisce "true" [vero] se
+@code{Indice_suff} descrive un suffisso in cui tutti i caratteri sono
+@samp{z}, e lo fa controllando che tutti gli elementi del vettore valgano
+26:
 
 @example
 @c file eg/prog/split.awk
@@ -34284,7 +34146,7 @@ di Terence Kelly.
 L'ultima versione del codice sorgente e del manuale utente
 saranno sempre disponibili in questo sito.
 Kelly può essere contattato direttamente via email a:
-@EMAIL{terence.patrick.kelly@@proton.me, terence.patrick.kelly AT proton.me}, 
+@EMAIL{terence.patrick.kelly@@proton.me, terence.patrick.kelly AT proton.me},
 Altri suoi indirizzi email secondary sono:
 @EMAIL{tpkelly@@acm.org, tpkelly (chiocciola) acm.org},
 @EMAIL{tpkelly@@cs.princeton.edu, tpkelly (chiocciola) cs.princeton.edu}, e
@@ -38169,7 +38031,7 @@ Si può impostare la variabile d'ambiente @env{GAWK_NO_MPFR_WARN}
 per evitare di ricevere il messaggio.
 
 Si prevede di rimuovere questa funzionalità perché, in primo luogo,
-è stato un errore includerla.  Ha generato una quantità enorme di 
+è stato un errore includerla.  Ha generato una quantità enorme di
 problemi con il codice, la funzionalità è stata usata a sproposito
 e il manutentore di @command{gawk} è stato pubblicamente insultato,
 a fronte di un vantaggio minimo per gli utilizzatori.
@@ -38188,7 +38050,7 @@ progetto @code{gawkextlib} (@pxref{gawkextlib}) o uno qualsiasi degli
 svariati pacchetti software ``bignum'' (grandi numeri) disponibili nei
 linguaggi Perl o Python.  È anche possibile usare direttamente le funzioni
 di libreria MPFR e GMP da un codice sorgente C o C++.
-  
+
 @node Introduzione a MPFR
 @subsection Introduzione all'aritmetica a precisione arbitraria
 
@@ -38465,10 +38327,10 @@ per cui il risultato è @code{NaN}.
 
 I valori NaN sono strani.  In particolare, non possono essere confrontati
 con altri numeri in virgola mobile; ogni confronto di questo tipo, eccetto
-quello ``non uguale a'', restituisce il valore ``falso''.
+quello ``non uguale a'', restituisce "false" [falso].
 I valori NaN sono talmente differenti da altri valori che perfino il
 confronto di due valori NaN identici fra loro con @code{!=} restituisce
-il valore ``vero''!
+il valore "true" [vero]!
 
 I valori NaN possono anche avere un segno (positivo o negativo),
 anche se dipende dall'implementazione quale segno viene restituito
@@ -39395,6 +39257,15 @@ disponibili
 (@pxref{Opzioni}).
 @end quotation
 
+@quotation NOTA
+L'estensione API è stata semplificata nella versione 6.0 di @command{gawk}.
+Le estensioni esistenti dovranno essere leggermente modificare in modo da
+poterle compilare.  Con la deprecazione del supporto MPFR in command{gawk}
+(@pxref{MPFR è deprecata}), ci sono in vista ulteriori semplificazioni
+all'API nella prossima versione principale di @command{gawk}.
+I dettagli si possono trova in @ref{Modifiche dell'API nel tempo}.
+@end quotation
+
 @menu
 * Introduzione alle estensioni:: Cos'è un'estensione.
 * Licenza delle estensioni::    Una nota riguardo al tipo di licenza.
@@ -39626,7 +39497,7 @@ Questa (non breve) sezione descrive l'API in dettaglio.
 * Tipi di dati generali::                 I tipi di dati.
 * Funzioni di allocazione memoria::       Funzioni per allocare memoria.
 * Funzioni costruttrici::                 Funzioni per creare valori.
-* API e gestione valori MPFR e GMP::      Gestione valori MPFR e GMP.
+* API e gestione valori MPFR e GMP::      Gestire valori MPFR e GMP.
 * Funzioni di registrazione::             Funzioni per registrare cose con
                                           @command{gawk}.
 * Stampare messaggi::                     Funzioni per stampare messaggi.
@@ -39642,7 +39513,7 @@ Questa (non breve) sezione descrive l'API in dettaglio.
 * Variabili dell'estensione API::         Variabili fornite dall'API.
 * Codice predefinito di un'estensione API:: Codice predefinito di
                                            interfaccia API.
-* Modifiche dall'API nel tempo::          Come l'API è cambiata nel tempo.
+* Modifiche dell'API nel tempo::          Come l'API è cambiata nel tempo.
 @end menu
 
 @node Intro funzioni estensione API
@@ -39856,7 +39727,7 @@ Quando la richiesta è
 questione.
 
 In ogni caso, se la richiesta e il tipo effettivo della variabile non
-corrispondono, la funzione di accesso restituisce ``false'' e fornisce il
+corrispondono, la funzione di accesso restituisce "false" [falso] e fornisce il
 tipo proprio della variabile, in modo che l'estensione possa, p.es.,
 stampare un messaggio d'errore
 (del tipo ``ricevuto uno scalare, invece del vettore previsto'').
@@ -39896,11 +39767,6 @@ che ne fanno uso.
 I tipi di dati e le strutture di uso generale sono le seguenti:
 
 @table @code
-@item typedef void *awk_ext_id_t;
-Un valore di questo tipo è trasmesso da @command{gawk} a un'estensione nel
-momento in cui viene caricata.  Tale valore dev'essere restituito
-a @command{gawk} come primo parametro di ogni funzione API.
-
 @item #define awk_const @dots{}
 Questa macro genera delle @samp{costanti} nel momento in cui si compila
 un'estensione, e non genera nulla quando si compila il comando @command{gawk}
@@ -39913,13 +39779,13 @@ necessità.
 @itemx @ @ @ @ awk_false = 0,
 @itemx @ @ @ @ awk_true
 @itemx @} awk_bool_t;
-Un semplice tipo di variabile booleana.
+Una semplice variabile di tipo booleano.
 
 @item typedef struct awk_string @{
 @itemx @ @ @ @ char *str;@ @ @ @ @ /* dati in formato multibyte */
 @itemx @ @ @ @ size_t len;@ @ @ @ /* lunghezza degli stessi, in caratteri */
-@itemx x@ @ @ @ int32_t *wstr;@ @ @ /* dati in formato caratteri estesi */
-@itemx x@ @ @ @ size_t wlen;@ @ @ @ /* lunghezza degli stessi, in int32_t */
+@itemx @ @ @ @ int32_t *wstr;@ @ /* wide char data */
+@itemx @ @ @ @ size_t wlen;@ @ @ @ /* lunghezza degli stessi, in int32_t */
 @itemx @} awk_string_t;
 Questo rappresenta una stringa modificabile. @command{gawk} è responsabile
 per la gestione della memoria utilizzata, se ha fornito il valore della
@@ -39933,7 +39799,7 @@ puù sopra, le stringhe sono gestite usando la codifica multibyte corrente.)
 Se si crea una stringa e la si passa a @code{gawk}, dovrebbe essere quella
 negli elementi @code{str} e @code{len} [multibyte], e si devono impostare
 gli elementi @code{wstr} e @code{wlen} [caratteri estesi] alla stringa
-@code{NULL}.
+@code{NULL} e a zero, rispettivamente.
 
 @item typedef enum @{
 @itemx @ @ @ @ AWK_UNDEFINED,
@@ -40189,7 +40055,7 @@ della memoria acquisita tramite una differente versione di @code{malloc()},
 il risultato sarebbe molto probabilmente differente da quello atteso.
 
 Tre macro di utilità possono essere usate per allocare memoria
-tramite @code{gawk_malloc()}, @code{gawk_calloc}, e
+tramite @code{gawk_malloc()}, @code{gawk_calloc()}, e
 @code{gawk_realloc()}.  Se l'allocazione non riesce, @command{gawk}
 termina l'esecuzione con un messaggio d'errore fatale.
 Queste macro dovrebbero essere usate come se fossero dei richiami a
@@ -40264,7 +40130,8 @@ Questa funzione mette il valore di una stringa nella variabile
 Viene restituito il puntatore @code{risultato}.
 
 @item static inline awk_value_t *
-@itemx make_malloced_string(const char *stringa, size_t lunghezza, awk_value_t *risultato);
+@itemx make_malloced_user_input(const char *stringa, size_t lunghezza,
+@itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_value_t@ *risultato);
 Questa funzione mette il valore di una stringa nella variabile
 @code{awk_value_t} puntata da @code{risultato}. Si presuppone che
 @code{stringa} sia un valore @samp{char *}
@@ -40489,7 +40356,7 @@ estensione va registrata con @command{gawk} usando questa funzione dell'API:
 
 @table @code
 @item awk_bool_t add_ext_func(const char *name_space, awk_ext_func_t *func);
-Questa funzione restituisce il valore @dfn{true} se ha successo,
+Questa funzione restituisce "true" [vero] se ha successo,
 oppure @dfn{false} in caso contrario.
 Il parametro @code{name_space} indica lo spazio-dei-nomi in cui porre
 la funzione
@@ -40626,7 +40493,7 @@ all'estensione intera):
 Questa funzione esamina l'informazione disponibile in @code{iobuf}
 (che vedremo tra poco).  Basandosi su tale informazione,
 decide se l'analizzatore di input personalizzato andrà usato per questo file.
-Se questo è il caso, dovrebbe restituire @dfn{true}.  Altrimenti, restituirà
+Se questo è il caso, dovrebbe restituire "true" [vero].  Altrimenti, restituirà
 @dfn{false}.  Nessuno stato (valori di variabili, etc.) dovrebbe venire
 modificato all'interno di @command{gawk}.
 
@@ -40635,9 +40502,9 @@ Quando @command{gawk} decide di passare il controllo del file a questo
 analizzatore di input, richiamerà questa funzione.
 Questa funzione a sua volta deve assegnare un valore ad alcuni campi
 nella struttura @code{awk_input_buf_t} e assicurarsi che
-alcune condizioni siano verificate.  Dovrebbe poi restituire @dfn{true}.
+alcune condizioni siano verificate.  Dovrebbe poi restituire "true" [vero].
 Se si verifica un errore di qualche tipo, i campi in questione non dovrebbero
-venire riempiti, e la funzione dovrebbe restituire @dfn{false}; in questo caso
+venire riempiti, e la funzione dovrebbe restituire "false" [falso]; in questo caso
 @command{gawk} non utilizzerà più l'analizzatore personalizzato di input.
 I dettagli sono descritti più avanti.
 @end table
@@ -40769,7 +40636,7 @@ file, dal fatto che il descrittore di file sia valido o no,
 dalle informazioni contenute in @code{struct stat} o da una qualsiasi
 combinazione di questi fattori.
 
-Una volta che @code{@var{XXX}_can_take_file()} restituisce @dfn{true}, e
+Una volta che @code{@var{XXX}_can_take_file()} restituisce "true" [vero], e
 @command{gawk} ha deciso di usare l'analizzatore personalizzato, viene
 chiamata la funzione @code{@var{XXX}_take_control_of()}.  Tale funzione
 si occupa di riempire il campo @code{get_record} oppure il campo
@@ -41008,7 +40875,7 @@ Questo è il nome del processore di output.
 @item awk_bool_t (*can_take_file)(const awk_output_buf_t *outbuf);
 Questo è il puntatore a una funzione che esamina l'informazione contenuta
 nella struttura @code{awk_output_buf_t} puntata da @code{outbuf}.
-Dovrebbe restituire @dfn{true} se il processore di output vuole elaborare
+Dovrebbe restituire "true" [vero] se il processore di output vuole elaborare
 il file, e @dfn{false} in caso contrario.
 Nessuno stato (valori di variabili, etc.) dovrebbe essere modificato
 all'interno di @command{gawk}.
@@ -41017,7 +40884,7 @@ all'interno di @command{gawk}.
 La funzione puntata da questo campo viene chiamata quando @command{gawk}
 decide di consentire al processore di output di prendere il controllo del file.
 Dovrebbe riempire in maniera appropriata dei campi nella struttura
-@code{awk_output_buf_t}, come descritto sotto, e restituire @dfn{true} se
+@code{awk_output_buf_t}, come descritto sotto, e restituire "true" [vero] se
 ha successo, @dfn{false} in caso contrario.
 
 @item awk_const struct output_wrapper *awk_const next;
@@ -41136,7 +41003,7 @@ I campi sono i seguenti:
 Il nome del processore bidirezionale.
 
 @item awk_bool_t (*can_take_two_way)(const char *nome);
-La funzione puntata da questo campo dovrebbe restituire @dfn{true} se
+La funzione puntata da questo campo dovrebbe restituire "true" [vero] se
 vuole gestire l'I/O bidirezionale per questo @value{FN}.
 La funzione non dovrebbe modificare alcuno stato (valori di variabili, etc.)
 all'interno di @command{gawk}.
@@ -41175,25 +41042,19 @@ Vedere l'estensione di esempio @code{revtwoway} per un esempio di codice.
 @cindex estensioni @subentry stampare messaggi dalle
 
 È possibile stampare diversi tipi di messaggi d'avvertimento da
-un'estensione, come qui spiegato.  Si noti che, per queste funzioni,
-si deve fornire l'ID di estensione ricevuto da @command{gawk}
-al momento in cui l'estensione è stata caricata:@footnote{Poiché l'API usa solo
-funzionalità previste dal
-compilatore ISO C 90, non è possibile usare le macro di tipo variadico
-(che accettano un numero variabile di argomenti) disponibili nel compilatore
-ISO C 99, che nasconderebbero quel parametro. Un vero peccato!}
+un'estensione, come qui spiegato.
 
 @table @code
-@item void fatal(awk_ext_id_t id, const char *format, ...);
+@item void fatal(const char *format, ...);
 Stampa un messaggio e poi @command{gawk} termina immediatamente l'esecuzione.
 
-@item void nonfatal(awk_ext_id_t id, const char *format, ...);
+@item void nonfatal(const char *format, ...);
 Stampa un messaggio d'errore non-fatale.
 
-@item void warning(awk_ext_id_t id, const char *format, ...);
+@item void warning(const char *format, ...);
 Stampa un messaggio d'avvertimento.
 
-@item void lintwarn(awk_ext_id_t id, const char *format, ...);
+@item void lintwarn(const char *format, ...);
 Stampa un messaggio d'avvertimento ``lint''.  Normalmente questo equivale a
 stampare un messaggio d'avvertimento, ma se @command{gawk} era stato
 invocato specificando l'opzione @samp{--lint=fatal},
@@ -41232,9 +41093,9 @@ Annulla il valore di @code{ERRNO}.
 Tutte le funzioni che restituiscono valori da @command{gawk}
 funzionano allo stesso modo.  Si fornisce un campo @code{awk_valtype_t}
 per indicare il tipo di valore che ci si aspetta.  Se il valore disponibile
-corrisponde a quello richiesto, la funzione restituisce @dfn{true} e riempie
+corrisponde a quello richiesto, la funzione restituisce "true" [vero] e riempie
 il campo del risultato @code{awk_value_t}.
-Altrimenti, la funzione restituisce @dfn{false}, e il campo @code{val_type}
+Altrimenti, la funzione restituisce "false" [falso], e il campo @code{val_type}
 indica il tipo di valore disponibile.
 A quel punto si può, a seconda di quel che richiede la situazione,
 stampare un messaggio d'errore oppure ripetere la
@@ -41483,7 +41344,7 @@ passati all'estensione. Esse sono:
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_valtype_t desiderato,
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_value_t *risultato);
 Riempie la struttura @code{awk_value_t} puntata da @code{risultato}
-con l'argomento numero @code{count}.  Restituisce @dfn{true} se il tipo
+con l'argomento numero @code{count}.  Restituisce "true" [vero] se il tipo
 dell'argomento corrisponde
 a quello specificato in @code{desiderato}, e @dfn{false} in caso contrario.
 In quest'ultimo caso,
@@ -41495,7 +41356,8 @@ argomento ha il numero zero, il secondo ha il numero uno, e così via.
 
 @item awk_bool_t set_argument(size_t count, awk_array_t array);
 Converte un parametro di tipo indefinito in un vettore; ciò permette la
-chiamata per riferimento per i vettori.  Restituisce @dfn{false} se @code{count} è troppo elevato,
+chiamata per riferimento per i vettori.
+Restituisce "false" [falso] se @code{count} è troppo elevato,
 o se il tipo di argomento è diverso da @dfn{undefined}.
 @xref{Manipolazione di vettori}
 per ulteriori informazioni riguardo alla creazione di vettori.
@@ -41535,7 +41397,7 @@ Riempie la struttura @code{awk_value_t} puntata da @code{risultato}
 con il valore della variabile il cui nome è nella stringa @code{nome},
 che è una normale stringa di caratteri C.
 @code{desiderato} indica il tipo di valore atteso.
-La funzione restituisce @dfn{true} se il tipo effettivo della variabile è quello
+La funzione restituisce "true" [vero] se il tipo effettivo della variabile è quello
 specificato in @code{desiderato}, e @dfn{false} in caso contrario.
 In quest'ultimo caso, @code{risultato>val_type} indica il tipo effettivo
 della variabile
@@ -41559,7 +41421,7 @@ nel codice C.
 Aggiorna la variabile il cui nome è contenuto nella stringa @code{nome},
 che è una normale stringa di caratteri C.
 La variabile è aggiunta alla Tabella dei simboli di @command{gawk},
-se non è già presente.  Restituisce @dfn{true} se tutto è andato bene, e
+se non è già presente.  restituisce "true" [vero] se tutto è andato bene, e
 @dfn{false} in caso contrario.
 
 La modifica del tipo (da scalare a vettoriale o viceversa) di una variabile
@@ -41610,11 +41472,11 @@ Ottiene il valore corrente di uno @dfn{scalar cookie}.
 Una volta ottenuto lo @dfn{scalar cookie} usando @code{sym_lookup()}, si
 può usare questa funzione per accedere al valore della variabile in modo
 più efficiente.
-Restituisce @dfn{false} se il valore non è disponibile.
+restituisce "false" [falso] se il valore non è disponibile.
 
 @item awk_bool_t sym_update_scalar(awk_scalar_t cookie, awk_value_t *valore);
 Aggiorna il valore associato con uno @dfn{scalar cookie}.
-Restituisce @dfn{false} se il nuovo valore non è del tipo @code{AWK_STRING},
+restituisce "false" [falso] se il nuovo valore non è del tipo @code{AWK_STRING},
 @code{AWK_STRNUM}, @code{AWK_REGEX} @code{AWK_BOOL} o @code{AWK_NUMBER}.
 Anche in questo caso, le variabili predefinite non possono essere aggiornate.
 @end table
@@ -41948,7 +41810,7 @@ Le funzioni seguenti permettono di gestire singoli elementi di un vettore:
 Per il vettore rappresentato da @code{a_cookie}, restituisce in @code{*count}
 il numero di elementi in esso contenuti.  Ogni sottovettore è conteggiato come
 se fosse un solo elemento.
-Restituisce @dfn{false} se si verifica un errore.
+restituisce "false" [falso] se si verifica un errore.
 
 @item awk_bool_t get_array_element(awk_array_t a_cookie,
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ const awk_value_t *const index,
@@ -41957,7 +41819,7 @@ Restituisce @dfn{false} se si verifica un errore.
 Per il vettore rappresentato da @code{a_cookie}, restituisce in @code{*risultato}
 il valore dell'elemento il cui indice è @code{index}.
 @code{desiderato} specifica il tipo di valore che si vuole ritrovare.
-Restituisce @dfn{false} se @code{desiderato} non coincide con il tipo di dato o
+restituisce "false" [falso] se @code{desiderato} non coincide con il tipo di dato o
 se @code{index} non è nel vettore (@pxref{table-value-types-returned}).
 
 Il valore per @code{index} può essere numerico, nel qual caso @command{gawk}
@@ -41991,7 +41853,7 @@ il valore @code{value} da @code{element}. Questa è una macro di utilità.
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ const awk_value_t* const index);
 Elimina dal vettore, rappresentato da @code{a_cookie}, l'elemento con
 l'indice specificato.
-Restituisce @dfn{true} se l'elemento è stato rimosso o @dfn{false} se
+restituisce "true" [vero] se l'elemento è stato rimosso o @dfn{false} se
 l'elemento non era presente nel vettore.
 @end table
 
@@ -42005,16 +41867,16 @@ creare un nuovo vettore e aggiungervi elementi.
 
 @item awk_bool_t clear_array(awk_array_t a_cookie);
 Svuota il vettore rappresentato da @code{a_cookie}.
-Restituisce @dfn{false} in presenza di qualche tipo di problema, @dfn{true}
-in caso contrario.  Il vettore in quanto tale resta disponibile
+restituisce "false" [falso] in presenza di qualche tipo di problema, @dfn{true}
+[vero] in caso contrario.  Il vettore in quanto tale resta disponibile
 e può essere utilizzato ancora, ma non ha alcun elemento.
 Questo equivale a usare l'istruzione @code{delete} (@pxref{Cancellazione}).
 
 @item awk_bool_t destroy_array(awk_array_t a_cookie);
 Svuota il vettore rappresentato da @code{a_cookie} e rilascia il vettore
 allocato da @code{create_array}.
-Restituisce @dfn{false} in presenza di qualche tipo di problema, @dfn{true}
-in caso contrario.
+restituisce "false" [falso] in presenza di qualche tipo di problema, @dfn{true}
+[vero] in caso contrario.
 Il vettore non esiste più e non può essere più usato.
 
 @item awk_bool_t flatten_array_typed(awk_array_t a_cookie,
@@ -42025,7 +41887,7 @@ Per il vettore rappresentato da @code{a_cookie}, crea una struttura
 @code{awk_flat_array_t} e la riempie con indici e valori del tipo richiesto.
 Imposta il puntatore il cui indirizzo è passato in @code{data} per puntare a
 questa struttura.
-Restituisce @dfn{true} se tutto va bene o @dfn{false} in caso contrario.
+restituisce "true" [vero] se tutto va bene o @dfn{false} in caso contrario.
 @ifset FOR_PRINT
 Vedere la prossima sezione
 @end ifset
@@ -42050,7 +41912,7 @@ memoria usando questa funzione.  Occorre fornire sia il cookie del vettore
 originale, sia l'indirizzo della struttura da liberare,
 @code{awk_flat_array_t}.
 Eventuali elementi contrassegnati come ``da rimuovere'' sono rimossi dal vettore.
-La funzione restituisce @dfn{true} se tutto va bene, @dfn{false} in caso contrario.
+La funzione restituisce "true" [vero] se tutto va bene, @dfn{false} in caso contrario.
 @end table
 
 @node Appiattimento di vettori
@@ -42343,7 +42205,6 @@ Tabella dei simboli:
 #include "gawkapi.h"
 
 static const gawk_api_t *api;   /* per far funzionare le macro di utilità */
-static awk_ext_id_t ext_id;
 static const char *ext_version = "testarray extension: version 1.0";
 
 int plugin_is_GPL_compatible;
@@ -42516,7 +42377,7 @@ Una @dfn{pipe} aperta in input.
 Un coprocesso bidirezionale.
 @end table
 
-In caso d'errore, restituisce il valore @code{awk_false}.
+In caso d'errore, restituisce @code{awk_false} [falso].
 Altrimenti, restituisce
 @code{awk_true}, insieme a ulteriori informazioni sulla ridirezione
 nei puntatori @code{ibufp} e @code{obufp}.
@@ -42749,9 +42610,9 @@ Si può controllare se le versioni di MPFR e GMP dell'utente corrispondono
 a quelle contenute in @command{gawk} con le seguenti macro:
 
 @table @code
-@item check_mpfr_version(extension)
-La @code{extension} è l'ID dell'estensione, passato a tutte le altre macro
-e funzioni definite in @file{gawkapi.h}.  Se il file di intestazione
+@item check_mpfr_version(estensione)
+Il parametro @code{estensione} è il nome dell'estensione sotto forma di
+identificatore del linguaggio C. Se il file di intestazione
 @code{<mpfr.h>} non è stato incluso, questa macro verrà definita in
 modo da non fare nulla.
 
@@ -42836,7 +42697,6 @@ int plugin_is_GPL_compatible;
 
 static gawk_api_t *const api;
 @end group
-static awk_ext_id_t ext_id;
 static const char *ext_version = NULL; /* o @dots{} = "qualche stringa" */
 
 static awk_ext_func_t func_table[] = @{
@@ -42882,11 +42742,6 @@ puntare al puntatore
 @code{gawk_api_t} che @command{gawk} passa alla funzione (dell'estensione)
 @code{dl_load()}.  Questa variabile è usata da tutte le macro.
 
-@item static awk_ext_id_t ext_id;
-Questa variabile globale @code{static} dovrebbe essere impostata al valore
-@code{awk_ext_id_t} che @command{gawk} passa alla funzione @code{dl_load()}.
-Questa variabile è usata da tutte le macro.
-
 @item static const char *ext_version = NULL; /* o @dots{} = "qualche stringa" */
 Questa variabile globale @code{static} dovrebbe essere impostata
 a @code{NULL} oppure puntare a una stringa che contiene il nome e la
@@ -42907,7 +42762,7 @@ Se qualche lavoro di inizializzazione è necessario, si dovrebbe definire una
 funzione all'uopo (crea variabili, apre file, etc.)
 e poi definire il puntatore @code{init_func} che punti alla funzione
 stessa.
-La funzione dovrebbe restituire @code{awk_@dfn{false}} se non va a buon fine
+La funzione dovrebbe restituire @code{awk_false} [falso] se non va a buon fine
 o @code{awktrue} se tutto va bene.
 
 Se un'inizializzazione non è necessaria, si definisca il puntatore e
@@ -42941,7 +42796,7 @@ d'avvertimento ma continua l'esecuzione.
 
 @item
 Se il puntatore @code{init_func} non è @code{NULL}, chiama la
-funzione da esso puntata.  Se questa restituisce @code{awk_false}, stampa un
+funzione da esso puntata.  Se questa restituisce @code{awk_false} [falso], stampa un
 messaggio d'avvertimento.
 
 @item
@@ -42949,7 +42804,7 @@ Se @code{ext_version} non è @code{NULL}, registra la
 stringa di versione con @command{gawk}.
 @end enumerate
 
-@node Modifiche dall'API nel tempo
+@node Modifiche dell'API nel tempo
 @subsection Come l'API è cambiata nel tempo
 
 L'API è cambiata col passare del tempo dalla sua prima implementazione,
@@ -43007,8 +42862,36 @@ dell'indice e quello dei valori
 
 @item
 Sono state aggiunte le variabili @code{gawk_mb_cur_max} e @code{gawk_codeset},
-come pure le funzioni @code{mbstowcs()} e @code{wcstombs()}.
+come pure le funzioni @code{mbstowcs()} e @code{wcstombs()}
+(@pxref{Conversione stringhe nelle estensioni}).
 @end itemize
+
+Nella versione 6.0 di @command{gawk}0, il tipo di variabile @code{awk_ext_id_t}
+è stato rimosso.  Ciò non ha conseguenze per la maggior parte del codice
+dell'estensione, ma richiede di effettuare le seguenti azioni:
+
+@itemize @bullet
+@item
+Togliere ogni variabile di tipo @code{awk_ext_id_t}.
+
+@item
+Togliere il primo parametro dalle chiamate a @code{fatal()},
+@code{nonfatal()}, @code{warning()} e @code{lintwarn()}.
+@end itemize
+
+A parte le modifiche sopra descritte, l'API rimane compatibile, a livello di
+codice sorgente, con la precedente versione della stessa.
+
+Se l'aggiornamento del codice sorgente risulta pesante, si può definire la
+macro @code{API_COMPAT_GAWK_5} prima di includere @code{"gawkapi.h"}
+nel sorgente dell'estensione, e poi ricompilare.  Questa scorciatoia è
+da considerare una soluzione provvisoria, che sarà rimossa nella prossima
+versione principle di @command{gawk}.
+L'estensione di esempio @code{inplace}, disponibile nella distribuzione
+di @command{gawk} può servire per vedere come fare.
+
+Nella prossima versione principale di @command{gawk}, resta inteso che
+qualsiasi codice dell'API faccia un riferimento ad MPFR e a GMP sarà rimosso.
 
 @node Trovare le estensioni
 @section Come @command{gawk} trova le estensioni compilate
@@ -43249,7 +43132,6 @@ per usare le macro dell'API e il codice predefinito
 
 static const gawk_api_t *api;    /* per consentire il funzionamento
                                     delle macro di utilità */
-static awk_ext_id_t ext_id;
 static awk_bool_t init_filefuncs(void);
 static awk_bool_t (*init_func)(void) = init_filefuncs;
 static const char *ext_version = "filefuncs extension: version 1.0";
@@ -43719,6 +43601,7 @@ Altre sono state scritte principalmente per mostrare come
 si usa l'estensione API.
 
 @menu
+* Funzioni di estensione sul tipo di carattere:: Funzioni sul tipo di carattere.
 * Esempio di estensione funzioni file:: L'esempio che usa funzioni file.
 * Esempio di estensione Fnmatch::       Un'interfaccia a @code{fnmatch()}.
 * Esempio di estensione Fork::          Un'interfaccia a @code{fork()} e
@@ -43740,6 +43623,87 @@ si usa l'estensione API.
                                       e @code{sleep()}.
 * Esempio di estensione API Test::    Test per l'API.
 @end menu
+
+@node Extension Funzioni di estensione sul tipo di carattere
+@subsection Funzioni sul tipo di carattere
+
+L'estensione @code{ctype} fornisce 14 funzioni distinte, qui elencate:
+
+
+@table @asis
+@item @code{@@load "ctype"}
+In questo modo si carica l'estensione.
+
+@item @code{result = isalnum(valore)}
+Restituisce "true" [vero] se @code{valore} è alfanumerico.
+
+@item @code{result = isalpha(valore)}
+Restituisce "true" [vero] se @code{valore} è alfabetico.
+
+@item @code{result = isblank(valore)}
+Restituisce "true" [vero] se @code{valore} è uno spazio o una tabulazione [<Tab>].
+
+@item @code{result = iscntrl(valore)}
+Restituisce "true" [vero] se @code{valore} è un carattere di controllo.
+
+@item @code{result = isdigit(valore)}
+Restituisce "true" [vero] se @code{valore} è numerico.
+
+@item @code{result = isgraph(valore)}
+Restituisce "true" [vero] se @code{valore} è stampabile e visualizzabile.
+
+@item @code{result = islower(valore)}
+Restituisce "true" [vero] se @code{valore} è un carattere minuscolo.
+
+@item @code{result = ispunct(valore)}
+Restituisce "true" [vero] se @code{valore} è un segno di interpunzione.
+
+@item @code{result = isprint(valore)}
+Restituisce "true" [vero] se @code{valore} è stampabile.
+
+@item @code{result = isspace(valore)}
+Restituisce "true" [vero] se @code{valore} è il carattere "spazio".
+
+@item @code{result = isupper(valore)}
+Restituisce "true" [vero] se @code{valore} è un carattere maiuscolo.
+
+@item @code{result = isxdigit(valore)}
+Restituisce "true" [vero] se @code{valore} è un carattere esadecimale.
+
+@item @code{result = tolower_i(@var{valore})}
+Restituisce l'equivalente di @var{valore}, in lettere minuscole.
+
+@item @code{result = toupper_i(@var{valore})}
+Restituisce l'equivalente di @var{valore}, in lettere maiuscole.
+@end table
+
+Le prime 12 funzioni eseguono i test standard per determinare il tipo
+di carattere (vedere @emph{ctype}(3) per ulteriori informazioni).
+
+Se a una di queste funzioni viene passato un valore numerico, viene
+testato il risultato della funzione corrispondente in linguaggio C,
+nella localizzazione corrente, sul valore dato.
+
+Se a una di queste funzioni viene passato un valore di tipo stringa, viene
+testato il risultato della funzione corrispondente in linguaggio C,
+applicato al primo carattere della stringa.
+
+Le funzioni fanno uso delle funzioni del linguaggio C @emph{ctype}(3)
+o @emph{wctype}(3), a seconda che la localizzazione corrente rappresenti
+i caratteri con un byte, o con più di un byte; la cosa non deve preoccupare
+chi programma in @command{awk}.
+
+Le due funzioni finali convertono in minuscolo o minuscolo il carattere
+che viene loro passato come argomento.  Queste funzioni accettano e
+restituiscono valori numerici dei punti di codice, non stringhe.
+
+Ecco un esempio semplice:
+
+@example
+@@load "ctype"
+@dots{}
+print "65 è alfabetico:", isalpha(65) ? "vero" : "falso"
+@end example
 
 @node Esempio di estensione funzioni file
 @subsection Funzioni relative ai file
@@ -45366,8 +45330,8 @@ in output
 (@pxref{Funzioni di I/O})
 
 @item
-Il supporto per gestire in input file di tipo CSV 
-(Campi Separati da Virgola) 
+Il supporto per gestire in input file di tipo CSV
+(Campi Separati da Virgola)
 @xref{Campi separati da virgola}.
 
 @ignore
