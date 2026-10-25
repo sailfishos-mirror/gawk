@@ -112,8 +112,11 @@ function fix_recipe_for_cmp(test,	i, string)
 
 	for (i in recipe_lines) {
 		string = recipe_lines[i]
-		if (string ~ /\$\(CMP\)/ && test in testoutcmp) {
+		if (string ~ /\$\(CMP\)/) {
 			gsub(/\$\(CMP\)/, "$(TESTOUTCMP)", string)
+			recipe_lines[i] = string
+		} else if (string ~ /checkmany\.sh/) {
+			gsub(/\$\(srcdir\)\/checkmany.sh/, "CMP=$(TESTOUTCMP) &", string)
 			recipe_lines[i] = string
 		}
 	}
