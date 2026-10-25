@@ -1280,8 +1280,10 @@ calc_exp(double x1, double x2)
 	if ((lx = x2) == x2) {		/* integer exponent */
 		if (lx == 0)
 			return 1;
-		return (lx > 0) ? calc_exp_posint(x1, lx)
-				: 1.0 / calc_exp_posint(x1, -lx);
+		if (lx > 0)
+			return calc_exp_posint(x1, lx);
+		if (lx >= -LONG_MAX)
+			return 1.0 / calc_exp_posint(x1, -lx);
 	}
 	return (double) pow((double) x1, (double) x2);
 }

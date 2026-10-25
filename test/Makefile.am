@@ -956,6 +956,8 @@ EXTRA_DIST = \
 	nastyparm.ok \
 	negexp.awk \
 	negexp.ok \
+	negexp2.awk \
+	negexp2.ok \
 	negrange.awk \
 	negrange.ok \
 	negtime.awk \
@@ -1713,6 +1715,7 @@ BASIC_TESTS = \
 	manglprm match4 match5 matchbadarg1 matchbadarg2 matchuninitialized \
 	math membug1 memleak memleak4 messages minusstr mmap8k \
 	nasty nasty2 negexp negrange nested nfldstr nfloop nfneg nfset nlfldsep \
+	negexp2 \
 	nlinstr nlstrina noeffect nofile nofmtch noloop1 noloop2 nonl noparms \
 	nors nulinsrc nulrsend numindex numrange numstr1 numsubstr \
 	octsub ofmt ofmta ofmtbig ofmtfidl ofmts ofmtstrnum ofs1 onlynl opasnidx \
