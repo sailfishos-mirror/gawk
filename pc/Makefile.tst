@@ -185,6 +185,7 @@ BASIC_TESTS = \
 	manglprm match4 match5 matchbadarg1 matchbadarg2 matchuninitialized \
 	math membug1 memleak memleak4 messages minusstr mmap8k \
 	nasty nasty2 negexp negrange nested nfldstr nfloop nfneg nfset nlfldsep \
+	negexp2 \
 	nlinstr nlstrina noeffect nofile nofmtch noloop1 noloop2 nonl noparms \
 	nors nulinsrc nulrsend numindex numrange numstr1 numsubstr \
 	octsub ofmt ofmta ofmtbig ofmtfidl ofmts ofmtstrnum ofs1 onlynl opasnidx \
@@ -2050,6 +2051,11 @@ nfset:
 nlfldsep:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+negexp2:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 nlinstr:
