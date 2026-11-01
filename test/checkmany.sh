@@ -7,13 +7,26 @@ testprog=$1
 srcdir=$2
 CMP=${CMP:-cmp -s}
 
-for ok in ./$testprog.ok* $srcdir/$testprog.ok*
+dirlist="$srcdir"
+if [ "$srcdir" != "." ]
+then
+	dirlist="$dirlist ."
+fi
+
+for dir in $dirlist
 do
-	if test -f $ok && ${CMP} _$testprog $ok
-	then
-		rm -f _$testprog
-		exit 0
-	fi
+	for ok in $dir/$testprog.ok*
+	do
+		if test -f $ok
+		then
+			# Don't print output, let make diffout handle it
+			if /bin/sh -c "${CMP} $ok _$testprog" > /dev/null 2>&2
+			then
+				rm -f _$testprog
+				exit 0
+			fi
+		fi
+	done
 done
 
 exit 1

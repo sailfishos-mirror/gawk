@@ -698,7 +698,7 @@ GNU General Public License for more details.\n\
 \n");
 	static const char blurb_part3[] =
 	  N_("You should have received a copy of the GNU General Public License\n\
-along with this program. If not, see http://www.gnu.org/licenses/.\n");
+along with this program. If not, see <https://www.gnu.org/licenses/>.\n");
 
 	/* multiple blurbs are needed for some brain dead compilers. */
 	printf(_(blurb_part1), UPDATE_YEAR);	/* Last update year */
