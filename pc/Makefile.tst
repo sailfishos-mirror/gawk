@@ -756,7 +756,7 @@ redfilnm::
 space::
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-$(AWK) -f ' ' "$(srcdir)"/space.awk >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@ || echo EXIT CODE: $$? >> _$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 rsnulbig::
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -840,7 +840,7 @@ beginfile1::
 beginfile2:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-( cd "$(srcdir)" && LC_ALL=C AWK="$(abs_builddir)/$(AWKPROG)" $(abs_srcdir)/$@.sh $(abs_srcdir)/$@.in ) > _$@ 2>&1 || echo EXIT CODE: $$? >> _$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 dumpvars::
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -878,7 +878,7 @@ profile5:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) --pretty=_$@ -f $@.awk 2> _$@.err
 	@-cat _$@.err >> _$@ ; rm -f _$@.err
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 profile6:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -1458,7 +1458,7 @@ assignnumfield2:
 assignnumfield3:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 back89:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -1693,7 +1693,7 @@ fldterm:
 fmtmix:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 fnamedat:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -1897,7 +1897,7 @@ hex3:
 hsprint:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 inpref:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -2263,7 +2263,7 @@ prec:
 printf-corners:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 printf0:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3000,7 +3000,7 @@ equiv:
 exit:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-$(LOCALES) AWK="$(AWKPROG) $(GAWK_TEST_ARGS)" "$(srcdir)"/$@.sh  > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 elemnew7:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3190,7 +3190,7 @@ gsubind:
 hexfloat:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 icasefs:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3546,7 +3546,7 @@ patsplit:
 posix:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 printfbad1:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3905,7 +3905,7 @@ double1:
 double2:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 inf-nan-torture:
 	@echo $@; $(CHCP) $(ORIGCP)
@@ -3955,7 +3955,7 @@ commas:
 fmttest:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-CMP=$(TESTOUTCMP) $(srcdir)/checkmany.sh "$@" "$(srcdir)"
+	@-CMP="$(TESTOUTCMP") $(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 fnarydel:
 	@echo $@; $(CHCP) $(ORIGCP)
