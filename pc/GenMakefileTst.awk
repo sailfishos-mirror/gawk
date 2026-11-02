@@ -116,7 +116,7 @@ function fix_recipe_for_cmp(test,	i, string)
 			gsub(/\$\(CMP\)/, "$(TESTOUTCMP)", string)
 			recipe_lines[i] = string
 		} else if (string ~ /checkmany\.sh/) {
-			gsub(/\$\(srcdir\)\/checkmany.sh/, "CMP=\"$(TESTOUTCMP\") &", string)
+			gsub(/\$\(srcdir\)\/checkmany.sh/, "CMP=\"$(TESTOUTCMP)\" &", string)
 			recipe_lines[i] = string
 		}
 	}
