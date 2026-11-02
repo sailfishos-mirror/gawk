@@ -1018,7 +1018,8 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
                                         spazio-dei-nomi.
 * Spazio-dei-nomi e funzionalità::      Lo spazio-dei-nomi e le altre
                                         funzionalità di @command{gawk}.
-* Sommario sugli spazi-dei-nomi::       Sommario sugli spazi-dei-nomi.
+* Sommario sullo spazio-dei-nomi::      Sommario sullo spazio-dei-nomi.
+* Esercizi sullo spazio-dei-nomi::      Un esercizio sullo spazio-dei-nomi.
 * Aritmetica del computer::             Una rapida introduzione alla matematica del
                                         computer.
 * Definizioni matematiche::             Altre cose da sapere.
@@ -10632,7 +10633,7 @@ come dati usabili da un programma @command{awk}.
 
 @sp 2
 @node Sommario di Input
-@section Sommario di Input
+@section Sommario
 
 @itemize @value{BULLET}
 @item
@@ -37048,7 +37049,8 @@ Questo capitolo descrive una funzionalità disponibile solo in
                                         spazio-dei-nomi.
 * Spazio-dei-nomi e funzionalità::      Lo spazio-dei-nomi e le altre
                                         funzionalità di @command{gawk}.
-* Sommario sugli spazi-dei-nomi::      Sommario sugli spazi-dei-nomi.
+* Sommario sullo spazio-dei-nomi::      Sommario sullo spazio-dei-nomi.
+* Esercizi sullo spazio-dei-nomi::      Un esercizio sullo spazio-dei-nomi.
 @end menu
 
 @node Spazio-dei-nomi globale
@@ -37650,7 +37652,7 @@ un'estensione che sfrutta uno spazio-dei-nomi condiviso fra del
 codice scritto in C e del codice @command{awk}, che collaborano
 fra loro.
 
-@node Sommario sugli spazi-dei-nomi
+@node Sommario sullo spazio-dei-nomi
 @section Sommario
 
 @itemize @value{BULLET}
@@ -37703,6 +37705,150 @@ all'indietro.  I programmi che non usano degli spazi-dei-nomi
 non dovrebbero avere alcuna differenza di comportamento quando sono eseguiti
 su una versione di @command{gawk} che abbia la funzionalità spazio-dei-nomi.
 @end itemize
+
+@node Esercizi sullo spazio-dei-nomi
+@section Un esercizio sullo spazio-dei-nomi
+
+@enumerate
+@item
+Scrivere una versione della funzione @code{gensub()} nel linguaggio
+@command{awk}, usando le funzioni @code{match()} e @code{substr()}.
+La funzione si chiamerà @code{gensub2()} e ogni sua funzione ausiliaria
+risiederà nello spazio-dei-nomi @code{gensub2()}, mentre la funzione
+@code{gensub2()} resterà nello spazio-dei-nomi @code{awk}.
+Fornire un programma di test in una regola @code{BEGIN}.
+La soluzione preparata dall'autore è inclusa nella distribuzione
+@command{gawk}.
+@end enumerate
+
+@c FIXME: Revise for when Andy updates gensub() in master for 6.0.
+@ignore
+@c file eg/lib/gensub2.awk
+#! /usr/bin/gawk -f
+
+# gensub2 --- Fare quello che fa gensub(), ma impostare anche
+# la variabile NSUB0 al numero di sostituzioni effettuate.
+# Ciò può tornare utile nella preparazione di funzioni e in fase
+# di esplorazione.
+#
+# L'implementazione fa affidamento su alcune funzionalità
+# disponibili solo in gawk.
+
+# Per passarla in produzione, le istruzioni "print" e gli
+# assegnamenti a "target" andrebbero resi dei commenti.
+
+@@namespace "gensub2"
+
+BEGIN @{
+    target = "abc"
+    print target, "--->", awk::gensub2("b+", "FOO", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("b+", "FOO", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("q", "FOO", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("q", "FOO", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("b", "X", 2, target), ", NSUB0 =", awk::NSUB0, awk::gensub("b", "X", 2, target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("x*", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("x*", "X", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("b*", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("b*", "X", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("c", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("c", "X", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("c+", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("c+", "X", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("x*$", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("x*$", "X", "g", target), "NSUB =", PROCINFO["nsub"]
+    print target, "--->", awk::gensub2("(a)(b)(c)", "& - \\3\\2\\1 - &", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("(a)(b)(c)", "& - \\3\\2\\1 - &", "g", target), "NSUB =", PROCINFO["nsub"]
+    $0 = target; print $0, "--->", awk::gensub2("(a)(b)(c)", "& - \\3\\2\\1 - &", "g"), ", NSUB0 =", awk::NSUB0, awk::gensub("(a)(b)(c)", "& - \\3\\2\\1 - &", "g"), "NSUB =", PROCINFO["nsub"]
+    target = "abbbc"
+    print target, "--->", awk::gensub2("b", "X", 2, target), ", NSUB0 =", awk::NSUB0, awk::gensub("b", "X", 2, target), "NSUB =", PROCINFO["nsub"]
+@}
+
+function calcola_rimpiazza(rimpiazzo, corrispondenze,  risultato, caratteri, i, j, k)
+@{
+    j = split(rimpiazzo, caratteri, "")
+    for (i = 1; i <= j; i++) @{
+        if (caratteri[i] == "\\") @{
+            if (index("0123456789", caratteri[i+1]) != 0) @{
+                k = caratteri[i+1] + 0
+                risultato = risultato corrispondenze[k]
+            @} else @{
+                risultato = risultato caratteri[i+1]  # testo letterale
+            @}
+            i++
+        @} else if (caratteri[i] == "&") @{
+            risultato = risultato corrispondenze[0]  # intero testo
+        @} else @{
+            risultato = risultato caratteri[i]    # testo letterale
+        @}
+    @}
+    return risultato
+@}
+
+@@namespace "awk"
+
+function gensub2(regexp, rimpiazzo, come, obiettivo,       # parametri
+                 nuova_stringa, fine_stringa, nonzeroflag, # variabili
+		 globale, quale, contatore, stringa,       # locali
+		 corrispondenze, cambio, vero, falso)
+@{
+    vero = 1; falso = 0
+    NSUB0 = 0
+
+    if (typeof(obiettivo) == "untyped")
+        obiettivo = $0
+
+    globale = (come == "g" || come == "G")
+    quale = 1
+    if (! globale)
+        quale = come + 0
+    if (quale <= 0)
+        quale = 1
+
+    fine_stringa = nonzeroflag = falso
+    stringa = obiettivo
+    while (match(stringa, regexp, corrispondenze)) @{
+        contatore++
+        if (! globale && contatore != quale) @{
+            nuova_stringa = nuova_stringa substr(stringa, 1, RSTART + RLENGTH - 1)
+            stringa = substr(stringa, RSTART + RLENGTH)
+            continue
+        @}
+
+        cambio = gensub2::calcola_rimpiazza(rimpiazzo, corrispondenze)
+
+        if (RLENGTH > 0) @{ # caso semplice
+            nonzeroflag = vero
+            if (RSTART == 1) @{ # corrispondenza a inizio stringa
+                nuova_stringa = nuova_stringa cambio
+            @} else @{
+                nuova_stringa = nuova_stringa substr(stringa, 1, RSTART-1) cambio
+            @}
+            stringa = substr(stringa, RSTART+RLENGTH)
+            NSUB0++
+        @} else if (nonzeroflag) @{
+	    # l'ultima corrispondenza era più lunga di zero
+	    # e, al carattere corrente, troviamo una corrispondenza
+	    # di lunghezza zero, che in realtà non vogliamo,
+	    # e che quindi ignoriamo
+            nuova_stringa = nuova_stringa substr(stringa, 1, 1)
+            stringa = substr(stringa, 2)
+            nonzeroflag = falso
+        @} else @{
+            # corrispondenza di lunghezza zero
+            NSUB0++
+            if (RSTART == 1) @{
+                nuova_stringa = nuova_stringa cambio substr(stringa, 1, 1)
+                stringa = substr(stringa, 2)
+            @} else @{
+                return nuova_stringa stringa cambio
+            @}
+        @}
+        if (length(stringa) == 0) @{
+            if (fine_stringa)
+                break
+            else
+                fine_stringa = vero
+        @}
+    @}
+    if (length(stringa) > 0)
+        nuova_stringa = nuova_stringa stringa # resto della stringa
+
+    return nuova_stringa
+@}
+@c endfile
+@end ignore
 
 @node Calcolo con precisione arbitraria
 @chapter Calcolo con precisione arbitraria con @command{gawk}
