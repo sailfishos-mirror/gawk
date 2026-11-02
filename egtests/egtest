@@ -198,6 +198,17 @@ do_ftrans() {
 	      gawk -f ftrans.awk -f $testpgm wc.awk cut.awk pi.awk
 }
 
+do_gensub2() {
+	echo "*"
+	echo "* gensub2 is a replacement of gensub written in gawk"
+	echo "*"
+	echo "* NSUB0 is the number of substitutions made by gensub2"
+	echo "* the second half of the line tells what gensub does"
+	echo "*"
+	echo "gawk -f gensub2.awk"
+	      gawk -f gensub2.awk
+}
+
 do_gen_float_table() {
 	# the programs are in test-programs
 	echo "*"
@@ -384,15 +395,6 @@ do_inplace() {
 	      cat $testdata
 }
 
-do_intdiv0() {
-	echo "*"
-	echo "BEGIN { intdiv0(123456789,45678,res); for ( i in res ) print i,res[i] ; print res[\"quotient\"]*45678+res[\"remainder\"] ; exit; }" >$testpgm
-	echo "cat $testpgm"
-	      cat $testpgm
-	echo "gawk -f $testpgm -f intdiv0.awk"
-	      gawk -f $testpgm -f intdiv0.awk
-}
-
 do_inventory_shipped() {
 	echo "*"
 	echo "* inventory-shipped is used as input to a few sample programs"
@@ -505,8 +507,8 @@ do_pi() {
 	echo "gawk ' \$1==\"cifre\"  { print \$1,\$2,60; next } { print } ' pi.awk > $testpgm"
 	      gawk '  $1=="cifre"    { print $1,$2,60; next   } { print } ' pi.awk > $testpgm
 	fi
-	echo "gawk -M -v PREC=1000 -f intdiv0.awk  -f $testpgm"
-	      gawk -M -v PREC=1000 -f intdiv0.awk  -f $testpgm
+	echo "gawk -M -v PREC=1000 -f $testpgm"
+	      gawk -M -v PREC=1000 -f $testpgm
 	echo "3141592653589793238462643383279502884197169399375105820974944 ...from the Internet"
 }
 
@@ -592,8 +594,8 @@ do_round() {
 
 do_sample() {
 	echo "*"
-	echo "* Tested by test_csv"
-	do_test_csv
+	echo "* Tested by quoted_csv"
+	do_quoted_csv
 }
 
 do_shellquote() {
@@ -1035,12 +1037,15 @@ do
 		wait_go_ahead
 		continue
 	fi
+	#
+	# every other $subcmd does nothing
+	#
 	if [ "$subcmd" != "" ]
 	then
 		continue
 	fi
-	#
-	# every other $subcmd does nothing
+	# what remains is a list of one or more tests to be performed
+	# each test is performed in a function named do_testname()
 	#echo $sublst
 	for i in $sublst
 	do

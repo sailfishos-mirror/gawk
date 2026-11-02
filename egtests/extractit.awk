@@ -52,26 +52,6 @@ BEGIN    { IGNORECASE = 1 }
             print riga > file_corrente
             continue
         }
-        # gestisci istruzioni che convertono caratteri accentati
-        if (index(riga, "gsub(\"@@") > 0) {
-            gsub("@{","{",riga)
-            gsub("@}","}",riga)
-            gsub("@@","@",riga)
-            print riga > file_corrente
-            continue
-        }
-        # istruzioni che convertono caratteri accentati
-        gsub("@`a","à",riga)
-        gsub("@`e","è",riga)
-        gsub("@'e","é",riga)
-        gsub("@`{@dotless{i}}","ì",riga)
-        gsub("@`o","ò",riga)
-        gsub("@`u","ù",riga)
-        # riga contiene ancora caratteri @?
-        if (index(riga, "@") == 0) {
-            print riga > file_corrente
-            continue
-        }
         n = split(riga, a, "@")
         # if a[1] == "", vuol dire riga che inizia per @,
         # non salvare un @
