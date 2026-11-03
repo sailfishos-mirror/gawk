@@ -1596,13 +1596,13 @@ choose_fs_function:
 		FS_re_yes_case = FS_re_no_case = FS_regexp = NULL;
 
 		if (buf[0] != '\0') {
-			FS_re_yes_case = make_regexp(buf, strlen(buf), false, true, true);
-			FS_re_no_case = make_regexp(buf, strlen(buf), true, true, true);
+			FS_re_yes_case = make_regexp(buf, strlen(buf), false, true);
+			FS_re_no_case = make_regexp(buf, strlen(buf), true, true);
 			FS_regexp = (IGNORECASE ? FS_re_no_case : FS_re_yes_case);
 			set_parser(re_parse_field);
 		} else if (parse_field == re_parse_field) {
-			FS_re_yes_case = make_regexp(fs->stptr, fs->stlen, false, true, true);
-			FS_re_no_case = make_regexp(fs->stptr, fs->stlen, true, true, true);
+			FS_re_yes_case = make_regexp(fs->stptr, fs->stlen, false, true);
+			FS_re_no_case = make_regexp(fs->stptr, fs->stlen, true, true);
 			FS_regexp = (IGNORECASE ? FS_re_no_case : FS_re_yes_case);
 		} else
 			FS_re_yes_case = FS_re_no_case = FS_regexp = NULL;
@@ -1731,8 +1731,8 @@ set_fpat_function:
 		refree(FPAT_re_no_case);
 		FPAT_re_yes_case = FPAT_re_no_case = FPAT_regexp = NULL;
 
-		FPAT_re_yes_case = make_regexp(fpat->stptr, fpat->stlen, false, true, true);
-		FPAT_re_no_case = make_regexp(fpat->stptr, fpat->stlen, true, true, true);
+		FPAT_re_yes_case = make_regexp(fpat->stptr, fpat->stlen, false, true);
+		FPAT_re_no_case = make_regexp(fpat->stptr, fpat->stlen, true, true);
 		FPAT_regexp = (IGNORECASE ? FPAT_re_no_case : FPAT_re_yes_case);
 	}
 }

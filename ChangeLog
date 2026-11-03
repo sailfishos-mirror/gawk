@@ -1,3 +1,40 @@
+2026-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Remove the regex and dfa matchers from gawk.
+
+	* NEWS: Updated.
+	* awk.h (struct Regexp): Simplified.
+	Removed include of dfa.h and regex.h.
+	(re_restart, re_reend, re_subpatstart, re_subpatend,
+	re_numsubpats): Removed declarations.
+	(RESTART, REEND, SUBPATSTART, SUBPATEND,
+	NUMSUBPATS): Macros are once again inline code.
+	(use_gnu_matchers): Removed.
+	(make_regexp): Removed `dfa' boolean parameter. All calls adjusted.
+	* awkgram.y [GRAMMAR]: Remove lint check for /*...*/ regexp.
+	(make_regnode): Adjust call to make_regexp().
+	* builtin.c (do_sub): Adjust call to research().
+	* field.c (chose_fs_function): Adjust calls to make_regexp().
+	(set_fpat_function): Ditto.
+	* io.c (set_RS): Ditto.
+	* main.c (use_gnu_matchers): Remove definition.
+	(main): Remove check for GAWK_GNU_MATCHERS env var.
+	(parse_args): Remove 'G' option and case.
+	* re.c (syn): Provide an enum instead of the old regex type.
+	(localeinfo): Removed, along with include of localeinfo.h.
+	(make_regexp): Removed `dfa' boolean parameter. Don't check
+	for GAWK_NO_DFA_any more.  Remove all code associated with
+	regex and dfa.
+	(research): Remove all code associated with regex and dfa.
+	(refree): Ditto.
+	(dfaerror, dfawarn): Removed.
+	(re_cache_get): Adjust calls to make_regexp().
+	(re_setup): Simplified to just set syn based on command line options.
+	(reflags2str): Remove stuff for regex/dfa.
+	(re_restart, re_reend, re_subpatstart, re_subpatend,
+	re_numsubpats): Removed.
+	(minrxcomplags2str): Removed, it was redundant.
+
 2026-11-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* main.c (copyleft): Use https in the license URL and enclose
