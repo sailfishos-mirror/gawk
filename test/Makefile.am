@@ -1654,6 +1654,7 @@ EXTRA_DIST = \
 	ignrcas2.ok-zos \
 	inf-nan-torture.ok-zos \
 	iolint.ok-zos \
+	negexp2.ok-zos \
 	nofile.ok-zos \
 	nonfatal2.ok-zos \
 	numrange.ok-zos \
