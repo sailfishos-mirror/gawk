@@ -2889,12 +2889,14 @@ do_dcgettext(int nargs)
 	char *string;
 	char *the_result;
 	size_t reslen;
+
+	check_args_min_max(nargs, "dcgettext", 1, 3);
+
 #if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT
 	int lc_cat;
 	char *domain;
 	char save1 = '\0', save2 = '\0';
 
-	check_args_min_max(nargs, "dcgettext", 1, 3);
 
 	if (nargs == 3) {	/* third argument */
 		tmp = POP_STRING();
@@ -2962,13 +2964,13 @@ do_dcngettext(int nargs)
 	char *the_result;
 	size_t reslen;
 
+	check_args_min_max(nargs, "dcngettext", 3, 5);
+
 #if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT
 	int lc_cat;
 	char *domain;
 	char save = '\0', save1 = '\0', save2 = '\0';
 	bool saved_end = false;
-
-	check_args_min_max(nargs, "dcngettext", 3, 5);
 
 	if (nargs == 5) {	/* fifth argument */
 		tmp = POP_STRING();

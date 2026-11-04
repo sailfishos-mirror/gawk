@@ -1974,7 +1974,8 @@ POP_SCALAR()
 		t->var_value = Nnull_string;
 		t->var_value->valref++;
 		t = t->var_value;
-		DEREF(n);
+		if (n->valref > 1)
+			DEREF(n);
 	}
 
 	return t;
