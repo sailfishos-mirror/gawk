@@ -654,7 +654,11 @@ resetup()
 bool
 using_utf8(void)
 {
-	return strcmp(nl_langinfo(CODESET), "UTF-8") == 0;
+	const char *locale = nl_langinfo(CODESET);
+	if (locale == NULL)
+		return false;
+
+	return strcmp(locale, "UTF-8") == 0;
 }
 
 /* reisstring --- return true if the RE match is a simple string match */
