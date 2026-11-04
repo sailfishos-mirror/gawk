@@ -284,6 +284,8 @@ uninitialized_scalar:
 				PUSH(m);
 		 		break;
 			}
+			if (m->type == Node_var_new)
+				UPREF(m);
  			/* fall through */
 		case Op_push_array:
 			PUSH(pc->memory);
