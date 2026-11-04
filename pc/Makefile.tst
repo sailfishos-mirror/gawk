@@ -239,6 +239,7 @@ GAWK_EXT_TESTS = \
 	include include2 indirectbuiltin indirectbuiltin3 indirectbuiltin4 \
 	indirectbuiltin5 indirectbuiltin6 indirectcall indirectcall2 \
 	indirectbuiltin7 indirectbuiltin8 indirectbuiltin9 \
+	indirectbuiltin10 \
 	indirectcall3 intarray iolint isarrayunset \
 	lint lintexp lintindex lintint lintlength lintplus lintplus2 lintplus3 \
 	lintset lintsubarray linttypeof lintwarn \
@@ -3285,6 +3286,11 @@ indirectbuiltin8:
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 indirectbuiltin9:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+indirectbuiltin10:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
