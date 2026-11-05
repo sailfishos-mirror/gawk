@@ -279,6 +279,7 @@ EXTRA_DIST = \
 	dbugbadcmd.in \
 	dbugbadcmd-in.txt \
 	dbugbadcmd.ok \
+	dbugbadcmd.ok-msys \
 	dbugbreak.awk \
 	dbugbreak.in \
 	dbugbreak-in.txt \
