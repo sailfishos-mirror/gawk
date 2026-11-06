@@ -139,25 +139,11 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libsupport_a_AR = $(AR) $(ARFLAGS)
 libsupport_a_LIBADD =
-am__libsupport_a_SOURCES_DIST = attribute.h cdefs.h dfa.c dfa.h \
-	dynarray.h flexmember.h getopt.c getopt.h getopt1.c \
-	getopt_int.h idx.h intprops.h intprops-internal.h \
-	libc-config.h localeinfo.c localeinfo.h minrx.c minrx.h \
-	random.c random.h regex.c regex.h verify.h xalloc.h \
-	malloc/dynarray.h malloc/dynarray_at_failure.c \
-	malloc/dynarray_emplace_enlarge.c malloc/dynarray_finalize.c \
-	malloc/dynarray_resize.c malloc/dynarray_resize_clear.c pma.c \
-	pma.h
-am__dirstamp = $(am__leading_dot)dirstamp
+am__libsupport_a_SOURCES_DIST = getopt.c getopt.h getopt1.c \
+	getopt_int.h minrx.c minrx.h random.c random.h pma.c pma.h
 @USE_PERSISTENT_MALLOC_TRUE@am__objects_1 = pma.$(OBJEXT)
-am_libsupport_a_OBJECTS = dfa.$(OBJEXT) getopt.$(OBJEXT) \
-	getopt1.$(OBJEXT) localeinfo.$(OBJEXT) minrx.$(OBJEXT) \
-	random.$(OBJEXT) regex.$(OBJEXT) \
-	malloc/dynarray_at_failure.$(OBJEXT) \
-	malloc/dynarray_emplace_enlarge.$(OBJEXT) \
-	malloc/dynarray_finalize.$(OBJEXT) \
-	malloc/dynarray_resize.$(OBJEXT) \
-	malloc/dynarray_resize_clear.$(OBJEXT) $(am__objects_1)
+am_libsupport_a_OBJECTS = getopt.$(OBJEXT) getopt1.$(OBJEXT) \
+	minrx.$(OBJEXT) random.$(OBJEXT) $(am__objects_1)
 libsupport_a_OBJECTS = $(am_libsupport_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -174,14 +160,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/dfa.Po ./$(DEPDIR)/getopt.Po \
-	./$(DEPDIR)/getopt1.Po ./$(DEPDIR)/localeinfo.Po \
-	./$(DEPDIR)/minrx.Po ./$(DEPDIR)/pma.Po ./$(DEPDIR)/random.Po \
-	./$(DEPDIR)/regex.Po malloc/$(DEPDIR)/dynarray_at_failure.Po \
-	malloc/$(DEPDIR)/dynarray_emplace_enlarge.Po \
-	malloc/$(DEPDIR)/dynarray_finalize.Po \
-	malloc/$(DEPDIR)/dynarray_resize.Po \
-	malloc/$(DEPDIR)/dynarray_resize_clear.Po
+am__depfiles_remade = ./$(DEPDIR)/getopt.Po ./$(DEPDIR)/getopt1.Po \
+	./$(DEPDIR)/minrx.Po ./$(DEPDIR)/pma.Po ./$(DEPDIR)/random.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -364,24 +344,13 @@ EXTRA_DIST = \
 	charset.c \
 	charset.h \
 	pma.h \
-	pma.c \
-	regcomp.c \
-	regex_internal.c \
-	regex_internal.h \
-	regexec.c \
-	malloc/dynarray-skeleton.c
+	pma.c
 
 
 # what to make and install
 noinst_LIBRARIES = libsupport.a
-libsupport_a_SOURCES = attribute.h cdefs.h dfa.c dfa.h dynarray.h \
-	flexmember.h getopt.c getopt.h getopt1.c getopt_int.h idx.h \
-	intprops.h intprops-internal.h libc-config.h localeinfo.c \
-	localeinfo.h minrx.c minrx.h random.c random.h regex.c regex.h \
-	verify.h xalloc.h malloc/dynarray.h \
-	malloc/dynarray_at_failure.c malloc/dynarray_emplace_enlarge.c \
-	malloc/dynarray_finalize.c malloc/dynarray_resize.c \
-	malloc/dynarray_resize_clear.c $(am__append_1)
+libsupport_a_SOURCES = getopt.c getopt.h getopt1.c getopt_int.h \
+	minrx.c minrx.h random.c random.h $(am__append_1)
 
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f
@@ -424,22 +393,6 @@ $(am__aclocal_m4_deps):
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-malloc/$(am__dirstamp):
-	@$(MKDIR_P) malloc
-	@: > malloc/$(am__dirstamp)
-malloc/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) malloc/$(DEPDIR)
-	@: > malloc/$(DEPDIR)/$(am__dirstamp)
-malloc/dynarray_at_failure.$(OBJEXT): malloc/$(am__dirstamp) \
-	malloc/$(DEPDIR)/$(am__dirstamp)
-malloc/dynarray_emplace_enlarge.$(OBJEXT): malloc/$(am__dirstamp) \
-	malloc/$(DEPDIR)/$(am__dirstamp)
-malloc/dynarray_finalize.$(OBJEXT): malloc/$(am__dirstamp) \
-	malloc/$(DEPDIR)/$(am__dirstamp)
-malloc/dynarray_resize.$(OBJEXT): malloc/$(am__dirstamp) \
-	malloc/$(DEPDIR)/$(am__dirstamp)
-malloc/dynarray_resize_clear.$(OBJEXT): malloc/$(am__dirstamp) \
-	malloc/$(DEPDIR)/$(am__dirstamp)
 
 libsupport.a: $(libsupport_a_OBJECTS) $(libsupport_a_DEPENDENCIES) $(EXTRA_libsupport_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libsupport.a
@@ -448,24 +401,15 @@ libsupport.a: $(libsupport_a_OBJECTS) $(libsupport_a_DEPENDENCIES) $(EXTRA_libsu
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f malloc/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dfa.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt1.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localeinfo.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minrx.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pma.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/random.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regex.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@malloc/$(DEPDIR)/dynarray_at_failure.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@malloc/$(DEPDIR)/dynarray_emplace_enlarge.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@malloc/$(DEPDIR)/dynarray_finalize.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@malloc/$(DEPDIR)/dynarray_resize.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@malloc/$(DEPDIR)/dynarray_resize_clear.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -603,8 +547,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f malloc/$(DEPDIR)/$(am__dirstamp)
-	-rm -f malloc/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -614,19 +556,11 @@ clean: clean-am
 clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/dfa.Po
-	-rm -f ./$(DEPDIR)/getopt.Po
+		-rm -f ./$(DEPDIR)/getopt.Po
 	-rm -f ./$(DEPDIR)/getopt1.Po
-	-rm -f ./$(DEPDIR)/localeinfo.Po
 	-rm -f ./$(DEPDIR)/minrx.Po
 	-rm -f ./$(DEPDIR)/pma.Po
 	-rm -f ./$(DEPDIR)/random.Po
-	-rm -f ./$(DEPDIR)/regex.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_at_failure.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_emplace_enlarge.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_finalize.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_resize.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_resize_clear.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-local distclean-tags
@@ -672,19 +606,11 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/dfa.Po
-	-rm -f ./$(DEPDIR)/getopt.Po
+		-rm -f ./$(DEPDIR)/getopt.Po
 	-rm -f ./$(DEPDIR)/getopt1.Po
-	-rm -f ./$(DEPDIR)/localeinfo.Po
 	-rm -f ./$(DEPDIR)/minrx.Po
 	-rm -f ./$(DEPDIR)/pma.Po
 	-rm -f ./$(DEPDIR)/random.Po
-	-rm -f ./$(DEPDIR)/regex.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_at_failure.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_emplace_enlarge.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_finalize.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_resize.Po
-	-rm -f malloc/$(DEPDIR)/dynarray_resize_clear.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

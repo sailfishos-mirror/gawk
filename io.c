@@ -4237,8 +4237,8 @@ set_RS()
 	} else if ((RS->stlen > 1 || (RS->flags & REGEX) != 0) && ! do_posix) {
 		static bool warned = false;
 
-		RS_re[0] = make_regexp(RS->stptr, RS->stlen, false, true, true);
-		RS_re[1] = make_regexp(RS->stptr, RS->stlen, true, true, true);
+		RS_re[0] = make_regexp(RS->stptr, RS->stlen, false, true);
+		RS_re[1] = make_regexp(RS->stptr, RS->stlen, true, true);
 		RS_regexp = RS_re[IGNORECASE];
 
 		if (first_time || ! do_csv)

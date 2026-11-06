@@ -36,46 +36,19 @@ EXTRA_DIST = \
 	charset.c \
 	charset.h \
 	pma.h \
-	pma.c \
-	regcomp.c \
-	regex_internal.c \
-	regex_internal.h \
-	regexec.c \
-	malloc/dynarray-skeleton.c
+	pma.c
 
 # what to make and install
 noinst_LIBRARIES = libsupport.a
 libsupport_a_SOURCES = \
-	attribute.h \
-	cdefs.h \
-	dfa.c \
-	dfa.h \
-	dynarray.h \
-	flexmember.h \
 	getopt.c \
 	getopt.h \
 	getopt1.c \
 	getopt_int.h \
-	idx.h \
-	intprops.h \
-	intprops-internal.h \
-	libc-config.h \
-	localeinfo.c \
-	localeinfo.h \
 	minrx.c \
 	minrx.h \
 	random.c \
-	random.h \
-	regex.c \
-	regex.h \
-	verify.h \
-	xalloc.h \
-	malloc/dynarray.h \
-	malloc/dynarray_at_failure.c \
-	malloc/dynarray_emplace_enlarge.c  \
-	malloc/dynarray_finalize.c \
-	malloc/dynarray_resize.c \
-	malloc/dynarray_resize_clear.c
+	random.h
 
 if USE_PERSISTENT_MALLOC
 libsupport_a_SOURCES += pma.c pma.h

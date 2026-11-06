@@ -518,7 +518,6 @@ particular records in a file and perform operations upon them.
 * Bracket Expressions::                 What can go between @samp{[...]}.
 * Computed Regexps::                    Using Dynamic Regexps.
 * Case-sensitivity::                    How to do case-insensitive matching.
-* Choosing Matchers::                   Selecting the regexp matcher.
 * Regexp Summary::                      Regular expressions summary.
 * Records::                             Controlling how data is split into
                                         records.
@@ -4775,14 +4774,6 @@ files one line at a time, instead of reading in blocks. This exists
 for debugging problems on filesystems on non-POSIX operating systems
 where I/O is performed in records, not in blocks.
 
-@cindex @env{GAWK_GNU_MATCHERS} environment variable
-@cindex environment variables @subentry @env{GAWK_GNU_MATCHERS}
-@item GAWK_GNU_MATCHERS
-If this variable exists, then @command{gawk} switches to using GNU
-@code{regex} and @code{dfa} for regexp matching.  Normally, the MinRX
-matcher is used.
-@strong{NOTE:} Use of this variable will eventually go away.
-
 @cindex @env{GAWK_MSG_SRC} environment variable
 @cindex environment variables @subentry @env{GAWK_MSG_SRC}
 @item GAWK_MSG_SRC
@@ -4799,19 +4790,6 @@ same warning or error message.
 This specifies the location of compiled message object files
 for @command{gawk} itself. This is passed to the @code{bindtextdomain()}
 function when @command{gawk} starts up.
-
-@cindex @env{GAWK_NO_DFA} environment variable
-@cindex environment variables @subentry @env{GAWK_NO_DFA}
-@item GAWK_NO_DFA
-If this variable exists, @emph{and} @env{GAWK_GNU_MATCHERS} also exists
-in the environment, then
-@command{gawk} does not use the DFA regexp matcher
-for ``does it match'' kinds of tests. This can cause @command{gawk}
-to be slower. Its purpose is to help isolate differences between the
-@code{regex} and @code{dfa} regexp matchers. (There aren't
-supposed to be differences, but occasionally theory and practice don't
-coordinate with each other.)
-@strong{NOTE:} Use of this variable will eventually go away.
 
 @cindex @env{GAWK_STACKSIZE} environment variable
 @cindex environment variables @subentry @env{GAWK_STACKSIZE}
@@ -5319,7 +5297,6 @@ regular expressions work, we present more complicated instances.
 * Bracket Expressions::         What can go between @samp{[...]}.
 * Computed Regexps::            Using Dynamic Regexps.
 * Case-sensitivity::            How to do case-insensitive matching.
-* Choosing Matchers::           Selecting the regexp matcher.
 * Regexp Summary::              Regular expressions summary.
 @end menu
 
@@ -6392,10 +6369,7 @@ Here, the results are identical; both the nature of the string
 to be matched and the POSIX longest-leftmost rule, cause this to happen.
 @end enumerate
 
-@c FIXME: Update this when the GNU matchers are finally gone.
-The MinRX regular expression matching engine, which is @command{gawk}'s
-default matcher (@pxref{Choosing Matchers}), supports the shortest-match
-operators.  The older GNU matchers do not.  Also, when invoked with the
+Note that when invoked with the
 @option{--traditional} option, shortest-match operators are not supported,
 since traditional @command{awk} does not have these operators.
 
@@ -6772,52 +6746,6 @@ right thing.}
 The value of @code{IGNORECASE} has no effect if @command{gawk} is in
 compatibility mode (@pxref{Options}).
 Case is always significant in compatibility mode.
-
-@node Choosing Matchers
-@section Selecting the Regexp Matching Engine
-
-Release 5.4.0 of @command{gawk} introduced a new
-regular expression matching engine, named
-@uref{https://github.com/mikehaertel/minrx, MinRX}.
-
-MinRX is fully compliant with the POSIX standard for Extended Regular
-Expressions (EREs), including the additional features needed by
-@command{awk} and @command{gawk}.  Of note is full compliance with the
-leftmost-longest submatch rules, and support for non-greedy operators.
-
-MinRX is also a little stricter than the original matchers are in terms
-of accepting valid regular expression syntax when specifying a regexp.
-(These restrictions apply to corner cases that should not come up in
-day-to-day use.)
-
-Previously, @command{gawk} used GNU @code{regex} and @code{dfa}
-from GNULIB. These matchers are fast and generally robust, albeit not
-fully POSIX compliant.  MinRX replaces both of them.
-
-Because regular expression matching is such a fundamental part of what
-@command{awk} programs do, introducing a new regular expression engine
-has some risk associated with it.  To alleviate the risk, for the
-term of one major release, @command{gawk} continues to provide access
-to the original regexp matchers should that be needed.
-
-@cindex environment variables @subentry @env{GAWK_GNU_MATCHERS}
-If the environment variable @env{GAWK_GNU_MATCHERS} exists, then
-@command{gawk} switches to using GNU @code{regex} and @code{dfa},
-as previously.  Otherwise, the MinRX matcher is the default and
-that is what it uses.
-
-Should you find a need to switch from MinRX to the original matchers,
-@emph{please} submit a bug report describing what did not work
-(@pxref{Bugs}).  Doing so is very important, as it will help the
-maintainers and the MinRX author fix any issues that are found.
-
-After one major release, the old matchers, and the use of the
-@env{GAWK_GNU_MATCHERS} environment variable, will be removed
-from @command{gawk}.
-
-This will considerably reduce the maintenance burden for the maintainer:
-it should be possible to remove on the order of 27 source files from
-the distribution once the GNU matchers are gone.
 
 @node Regexp Summary
 @section Summary
@@ -42417,8 +42345,7 @@ The @option{--enable-O3} option to @command{configure} was added
 
 @item
 Use of the new MinRX regular expression matcher as the default
-matching engine
-(@pxref{Choosing Matchers}).
+matching engine.
 This brings full POSIX compliance to @command{gawk}'s
 regular expression matching.
 
@@ -42489,6 +42416,10 @@ sets @code{FS} to a TAB character.
 @item
 Support for UDP in @command{gawk}'s networking was removed
 (@pxref{TCP/IP Networking}).
+
+@item
+The GNU @code{regex} and @code{dfa} matchers were removed
+from @command{gawk}.
 
 @item
 @code{gensub()} was changed to set @code{PROCINFO["nsub"]}
