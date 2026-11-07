@@ -581,12 +581,13 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Non documentato::                     Opzioni e funzionalità non documentate.
 * Sommario invocazione::                Sommario di come eseguire
                                         @command{awk}.
-* Uso di regexp::                 Usare espressioni regolari.
+* Uso di regexp::                        Usare espressioni regolari.
 * Più lungo da sinistra::               Quanto è lungo il testo individuato.
 * Sequenze di protezione::              Come scrivere caratteri non stampabili.
 * Operatori di espressioni regolari::   Operatori di espressioni regolari.
 * Dettagli sugli operatori di regexp::  Descrizione dettagliata.
-* Operatori di regexp GNU::             Operatori @dfn{regexp} propri del software GNU.
+* Operatori di regexp GNU::             Operatori @dfn{regexp} propri del
+                                        software GNU.
 * Espressioni di intervallo::           Note sulle espressioni di intervallo.
 * Operatori non-avidi::                 Operatori per trovare corrispondenza
                                         minima di POSIX 2024.
@@ -594,8 +595,6 @@ Copyright dell'edizione italiana @copyright{} 2016 -- Free Software Foundation, 
 * Espressioni regolari calcolate::      Usare @dfn{regexp} dinamiche.
 * Maiuscolo-Minuscolo::                 Fare confronti ignorando
                                         maiuscolo/minuscolo.
-* Scegliere il motore per @dfn{regexp}:: Scegliere come gestire le
-                                        espressioni regolari.
 * Sommario espressioni regolari::       Sommario delle espressioni regolari.
 * Record::                              Controllare come i dati sono suddivisi
                                         in record.
@@ -5298,14 +5297,6 @@ volta, anziché a blocchi.  Questa variabile è presente
 per problemi di debug su filesystem di sistemi operativi non POSIX,
 dove l'I/O è elaborato a record, non a blocchi.
 
-@cindex @env{GAWK_GNU_MATCHERS} (variabile d'ambiente)
-@cindex variabile d'ambiente @subentry @env{GAWK_GNU_MATCHERS}
-@item GAWK_GNU_MATCHERS
-Se questa variabile esiste, @command{gawk} utilizza i software
-GNU @code{regex} e @code{dfa} per gestire le espressioni regolari.
-Normalmente, viene usato il motore MinRX.
-@strong{NOTA:} L'utilizzo di questa variabile è destinato a venir meno.
-
 @cindex @env{GAWK_MSG_SRC} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{GAWK_MSG_SRC}
 @item GAWK_MSG_SRC
@@ -5323,19 +5314,6 @@ Questa variabile specifica la posizione dei file oggetto compilati
 contenenti la traduzione dei messaggi emessi da @command{gawk} stesso.
 Questa variabile è passata alla funzione @code{bindtextdomain()} nella
 fase di inizializzazione di @command{gawk}.
-
-@cindex @env{GAWK_NO_DFA} (variabile d'ambiente)
-@cindex variabile d'ambiente @subentry @env{GAWK_NO_DFA}
-@item GAWK_NO_DFA
-Se questa variabile esiste, @emph{ed esiste pure} la variabile
-@env{GAWK_GNU_MATCHERS} @command{gawk} non usa il riconoscitore di
-espressioni regolari GNU DFA per i tipi di test di corrispondenza.
-Questo può causare un rallentamento di @command{gawk}.
-Il suo intento è quello di aiutare a isolare le differenze tra i due
-riconoscitori di espressioni regolari @code{regex} e @code{dfa}
-che @command{gawk} usa internamente (non dovrebbero esserci differenze,
-ma a volte la teoria non coincide con la pratica).
-@strong{NOTA:} L'utilizzo di questa variabile è destinato a venir meno.
 
 @cindex @env{GAWK_STACKSIZE} (variabile d'ambiente)
 @cindex variabile d'ambiente @subentry @env{GAWK_STACKSIZE}
@@ -5912,8 +5890,6 @@ complesse.
 * Espressioni regolari calcolate::      Usare @dfn{regexp} dinamiche.
 * Maiuscolo-Minuscolo::                 Fare confronti ignorando
                                         maiuscolo/minuscolo.
-* Scegliere il motore per @dfn{regexp}::   Scegliere come gestire le
-                                        espressioni regolari.
 * Sommario espressioni regolari::       Sommario delle espressioni regolari.
 @end menu
 
@@ -7113,14 +7089,9 @@ quale si cerca una corrispondenza che la regola POSIX "la più lunga
 a partire da sinistra", fanno sì che ciò accada.
 @end enumerate
 
-@c FIXME: Update this when the GNU matchers are finally gone.
-Il motore MinRX che esamina le espressioni regolari, che è quello usato
-per default da @command{gawk}, supporta gli operatori ``non-avidi''
-(@pxref{Scegliere il motore per @dfn{regexp}}).
-Il precedente motore GNU non li supporta.  Inoltre, quando si invoca
-@command{gawk} con l'opzione @option{--traditional}, gli operatori
-``non-avidi'' non sono supportati, poiché @command{awk} non prevede tali
-operatori.
+Quando si invoca @command{gawk} con l'opzione @option{--traditional},
+gli operatori ``non-avidi'' non sono supportati, poiché @command{awk}
+non prevede tali operatori.
 
 @quotation NOTA
 Aggiungere un carattere @samp{?} in fondo a un'espressione di ricerca
@@ -7533,59 +7504,6 @@ Il valore di @code{IGNORECASE} non ha effetto se @command{gawk} è in
 modalità compatibile (@pxref{Opzioni}).
 Il tipo di carattere (maiuscolo o minuscolo) è sempre rilevante in modalità
 compatibile.
-
-@node Scegliere il motore per @dfn{regexp}
-@section Scegliere come gestire le espressioni regolari
-
-La versione 5.4.0 di @command{gawk} ha introdotto un
-nuovo motore per gestire le espressioni regolari, noto come
-@uref{https://github.com/mikehaertel/minrx, MinRX}.
-
-MinRX è pienamente conforme allo standard POSIX per le
-Espressioni Regolari Estese (ERE), comprese le ulteriori
-funzionalità necessarie per @command{awk} e @command{gawk}.
-Da notare la piena compatibilità con le regole per individuare
-la sotto-corrispondenza minima-massima, e il supporto per
-gli operatori non-avidi.
-
-MinRX è anche un po' più rigido rispetto al software usato in precedenza
-nell'accettare come valide alcune forme sintattiche nelle espressioni
-regolari.  (Tali restrizioni si applicano ad alcuni casi-limite che non
-dovrebbero ricorrere nell'uso normale.)
-
-In passato, @command{gawk} usava i software GNU @code{regex} e @code{dfa},
-da GNULIB.  Tali motori sono veloci e generalmente robusti, malgrado non
-siano pienamente conformi allo standard POSIX.  MinRX li sostituisce entrambi.
-
-Poiché l'individuazione di espressioni regolari è una parte fondamentale di
-ciò che i programmi @command{awk} fanno, l'introduzione di un nuovo motore
-per gestore le espressioni regolari comporta qualche rischio.
-Per alleviare tale rischio, per la durata di almeno una versione principale
-@command{gawk} continua a consentire l'utilizzo del motore precedente di
-gestione delle espressioni regolai, nel caso ciò sia necessario.
-
-@cindex @env{GAWK_GNU_MATCHERS} (variabile d'ambiente)
-@cindex variabile d'ambiente @subentry @env{GAWK_GNU_MATCHERS}
-Se esiste la variabile d'ambiente @env{GAWK_GNU_MATCHERS},
-@command{gawk} torna a usare i software GNU @code{regex} e @code{dfa},
-come fatto in precedenza.  Altrimenti, il motore MinRX è quello
-che viene usato per default.
-
-Se si riscontra la necessità di passare da MinRX al precedente motore
-di gestione delle variabili d'ambiente @emph{per piacere}
-inviate una segnalazione d'errore descrivendo quello che risulta
-non funzionare (@pxref{Bug}).  È molto importante farlo, perché
-sarà di aiuto ai manutentori e all'autore di MinRX nel correggere
-eventuali problemi trovati.
-
-Dopo una versione principale, i motori precedentemente in uso
-e l'utilizzo della variabile d'ambiente @env{GAWK_GNU_MATCHERS},
-saranno rimossi da @command{gawk}.
-
-Ciò permetterà una considerevole riduzione del carico di codice
-gestito dal manutentore: dovrebbe essere possibile eliminare
-qualcosa come 27 file sorgente dalla distribuzione, dopo aver tolto
-il supporto per i motori GNU per le espressioni regolari.
 
 @node Sommario espressioni regolari
 @section Sommario
@@ -46768,9 +46686,8 @@ La Versione 5.4 ha aggiunto le seguenti funzionalità:
 (@pxref{Ulteriori opzioni di configurazione}).
 
 @item
-Utilizzo del nuovo motore di gestione delle espressioni regolari
-MinRX, come default
-(@pxref{Scegliere il motore per @dfn{regexp}}).
+Utilizzo esclusivo del motore di gestione delle espressioni regolari
+MinRX.
 In questo modo la gestione delle espressioni regolari in
 @command{gawk} è pienamente conforme allo standard POSIX.
 
@@ -46855,6 +46772,10 @@ non imposta più la variabile @code{FS} al carattere di tabulazione (<Tab>).
 Il supporto per usare il protocollo di rete UDP con @command{gawk} è stato
 rimosso.
 (@pxref{Reti TCP/IP}).
+
+@item
+I motori GNU @code{regex} e @code{dfa} precedentemente usati per
+gestire le espressioni regolari, sono stati rimossi da @command{gawk}.
 
 @end itemize
 
