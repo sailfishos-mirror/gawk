@@ -14628,10 +14628,6 @@ use---without requiring the quoting tricks at every point in the program.
 
 @node Action Overview
 @section Actions
-@c @cindex action, definition of
-@c @cindex curly braces
-@c @cindex action, curly braces
-@c @cindex action, separating statements
 @cindex actions
 
 An @command{awk} program or script consists of a series of
@@ -16429,7 +16425,7 @@ use of shell quoting.  It is easier to pass a shell variable into
 variable.
 
 @item
-Actions consist of statements enclosed in curly braces. Statements
+Actions consist of statements enclosed in braces. Statements
 are built up from expressions, control statements, compound statements,
 input and output statements, and deletion statements.
 
@@ -41155,6 +41151,10 @@ originally appeared in his version of @command{awk}:
 
 @itemize @value{BULLET}
 @item
+The @samp{\u} escape sequence
+(@pxref{Escape Sequences})
+
+@item
 The @samp{**} and @samp{**=} operators
 (@pxref{Arithmetic Ops}
 and
@@ -41166,7 +41166,7 @@ The use of @code{func} as an abbreviation for @code{function}
 
 @item
 The @code{fflush()} built-in function for flushing buffered output
-(@pxref{I/O Functions})
+(now standard, @pxref{I/O Functions})
 
 @item
 Support for Comma Separated Values (CSV) input files
@@ -42361,7 +42361,7 @@ resetting the namespace to @samp{awk}
 
 @item
 The ability to call @code{length()} on an array is no longer
-an extension, as it became part of POSIX in 2004
+an extension, as it became part of POSIX in 2024
 (@pxref{String Functions}).
 
 @item
@@ -42690,7 +42690,6 @@ Juan Grigera
 provided a port to Windows32 systems.
 (This is no longer supported.)
 
-
 @cindex Hankerson, Darrel
 @item
 For many years,
@@ -42919,7 +42918,7 @@ This appendix provides instructions for installing @command{gawk} on the
 various platforms that are supported by the developers.  The primary
 developer supports GNU/Linux (and Unix), whereas the other ports are
 contributed.
-@xref{Bugs}
+See the @file{README} file in the distribution
 for the email addresses of the people who maintain
 the respective ports.
 
@@ -42963,7 +42962,7 @@ Copy it from someone else who already has it.
 Retrieve @command{gawk}
 from the Internet host
 @code{ftp.gnu.org}, in the directory @file{/gnu/gawk}.
-Both anonymous @command{ftp} and @code{http} access are supported.
+Both anonymous @command{ftp} and @code{https} access are supported.
 If you have the @command{wget} program, you can use a command like
 the following:
 
@@ -43124,9 +43123,6 @@ by @command{makeinfo} to produce an Info or HTML file.
 The @file{Makefile} takes care of this processing and produces
 printable output via @command{texi2dvi} or @command{texi2pdf}.
 
-@item doc/gawk.info
-The generated Info file for this @value{DOCUMENT}.
-
 @item doc/gawkinet.texi
 The Texinfo source file for
 @ifinfo
@@ -43140,9 +43136,8 @@ It should be processed with @TeX{}
 to produce a printed document and
 with @command{makeinfo} to produce an Info or HTML file.
 
-@item doc/gawkinet.info
-The generated Info file for
-@cite{@value{GAWKINETTITLE}}.
+@item doc/gawknotes.texi
+A start at describing the @command{gawk} internals.
 
 @item doc/gawkworkflow.texi
 The Texinfo source file for
@@ -43157,10 +43152,6 @@ It should be processed with @TeX{}
 to produce a printed document and
 with @command{makeinfo} to produce an Info or HTML file.
 
-@item doc/gawkworkflow.info
-The generated Info file for
-@cite{@value{GAWKWORKFLOWTITLE}}.
-
 @item doc/pm-gawk.texi
 The Texinfo source file for
 @ifinfo
@@ -43174,9 +43165,8 @@ It should be processed with @TeX{}
 to produce a printed document and
 with @command{makeinfo} to produce an Info or HTML file.
 
-@item doc/pm-gawk.info
-The generated Info file for
-@cite{@value{PMGAWKTITLE}}.
+@item doc/*.info
+The generated Info files for the previously listed Texinfo files.
 
 @item doc/pm-gawk.1
 The @command{troff} source for a manual page describing the
@@ -43193,10 +43183,6 @@ neither @command{igawk} nor @file{igawk.1} are installed.)
 Files for the Italian translation of this @value{DOCUMENT}, produced and
 contributed by Antonio Colombo and Marco Curreli.
 
-@item doc/Makefile.in
-The input file used during the configuration process to generate the
-actual @file{Makefile} for creating the documentation.
-
 @item Makefile.am
 @itemx */Makefile.am
 Files used by the GNU Automake software for generating
@@ -43204,6 +43190,7 @@ the @file{Makefile.in} files used by Autoconf and
 @command{configure}.
 
 @item Makefile.in
+@itemx */Makefile.in
 @itemx aclocal.m4
 @itemx build-aux/*
 @itemx configh.in
@@ -43213,12 +43200,12 @@ the @file{Makefile.in} files used by Autoconf and
 @itemx missing_d/*
 @itemx m4/*
 These files and subdirectories are used when configuring and compiling
-@command{gawk} for various Unix systems.  Most of them are explained
+@command{gawk} for various systems.  Most of them are explained
 in @ref{Unix Installation}. The rest are there to support the main
 infrastructure.
 
 @item po/*
-The @file{po} library contains message translations.
+The @file{po} directory contains message translations.
 
 @item awklib/extract.awk
 @itemx awklib/Makefile.am
@@ -43295,7 +43282,7 @@ to configure @command{gawk} for your system yourself.
 @end menu
 
 The normal installation steps should work on all modern commercial
-Unix-derived systems, GNU/Linux, BSD-based systems, and the Cygwin
+Unix-derived systems, GNU/Linux, BSD-based systems, macOS, and the Cygwin
 environment for MS-Windows.
 
 After you have extracted the @command{gawk} distribution, @command{cd}
@@ -43319,7 +43306,7 @@ the Free Software Foundation's website}.)
 To configure @command{gawk}, simply run @command{configure}:
 
 @example
-sh ./configure
+./configure
 @end example
 
 This produces a @file{Makefile} and @file{config.h} tailored to your system.
@@ -43334,7 +43321,7 @@ variables on the command line, such as @code{CC} and @code{CFLAGS}, when
 running @command{configure}:
 
 @example
-CC=cc CFLAGS=-g sh ./configure
+CC=cc CFLAGS=-g ./configure
 @end example
 
 @noindent
@@ -43375,7 +43362,7 @@ to have been set up previously as a user who is allowed to run the
 Use of the MPFR library with @command{gawk}
 is an optional feature: if you have the MPFR and GMP libraries already installed
 when you configure and build @command{gawk},
-@command{gawk} automatically will be able to use them.
+@command{gawk} automatically uses them.
 
 You can install these libraries from source code by fetching them
 from the GNU distribution site at @code{ftp.gnu.org}.
@@ -43397,8 +43384,9 @@ The distribution contains shell startup files @file{gawk.sh} and
 the @env{AWKPATH} and @env{AWKLIBPATH} environment variables.
 On a Fedora GNU/Linux system, these files should be installed in @file{/etc/profile.d};
 on other platforms, the appropriate location may be different.
+The files are:
 
-@table @command
+@table @file
 
 @cindex @command{gawkpath_default} shell function
 @cindex shell function @subentry @command{gawkpath_default}
@@ -43465,10 +43453,12 @@ Similarly, setting the @code{LINT} variable
 (@pxref{User-modified})
 has no effect on the running @command{awk} program.
 
-When used with the GNU Compiler Collection's (GCC's)
+@c stats of as 11/2026
+On GNU/Linux x86_64 systems
+when used with the GNU Compiler Collection's (GCC's)
 automatic dead-code-elimination, this option
-cuts almost 23K bytes off the size of the @command{gawk}
-executable on GNU/Linux x86_64 systems.  Results on other systems and
+cuts 44K bytes off the size of the stripped @command{gawk} executable,
+and almost 120K bytes off the size of the unstripped executable.  Results on other systems and
 with other compilers are likely to vary.
 Using this option may bring you some slight performance improvement.
 
@@ -43511,7 +43501,7 @@ without their conflicting with one another.
 @end table
 
 Use the command @samp{./configure --help} to see the full list of
-options supplied by @command{configure}.
+@command{configure}'s options.
 
 @node Configuration Philosophy
 @appendixsubsec The Configuration Process
@@ -43593,29 +43583,28 @@ installed in order to format the reference card and the manual page
 (@pxref{Distribution contents}).  Managing this process is beyond the
 scope of this @value{DOCUMENT}.
 
-Assuming you have all you need, then the following commands produce the
+Assuming you have all you need, then the following command in
+the top level directory produces the
 PDF versions of the documentation:
 
 @example
-cd doc
 make pdf
 @end example
 
 @noindent
-This creates PDF versions of all three Texinfo documents included
-in the distribution, as well as of the manual page and the reference card.
+This creates PDF versions of all the Texinfo documents included
+in the distribution, as well as of the manual pages and the reference card.
 
 @cindex documentation @subentry building @subentry HTML
 Similarly, if you have a recent enough version of @command{makeinfo},
 you can make the HTML version of the manuals with:
 
 @example
-cd doc
 make html
 @end example
 
 @noindent
-This creates HTML versions of all three Texinfo documents included
+This creates HTML versions of all the Texinfo documents included
 in the distribution.
 
 @node Non-Unix Installation
@@ -43664,7 +43653,7 @@ is that provided by Eli Zaretskii's @uref{https://sourceforge.net/projects/ezwin
 ``ezwinports''} project.  Install the compiled @command{gawk} from there.
 
 @node PC Compiling
-@appendixsubsubsec Compiling @command{gawk} for PC Operating Systems
+@appendixsubsubsec Compiling @command{gawk} for MS-Windows
 
 @command{gawk} can be compiled for Windows32 using MinGW (Windows32).
 The file @file{README_d/README.pc} in the @command{gawk} distribution
@@ -43693,13 +43682,14 @@ necessary for correct operation of Gawk on Windows, in particular for
 displaying translated messages.
 
 @node PC Using
-@appendixsubsubsec Using @command{gawk} on PC Operating Systems
+@appendixsubsubsec Using @command{gawk} on MS-Windows
 @cindex operating systems @subentry PC, @command{gawk} on
 @cindex PC operating systems, @command{gawk} on
 
 Information in this section applies to the MinGW port of
 @command{gawk} for MS-Windows.  @xref{Cygwin} for information about
 the Cygwin port.
+@xref{MSYS} for information about using @command{gawk} with MSYS.
 
 @cindex search paths
 @cindex search paths @subentry for source files
@@ -43744,15 +43734,16 @@ known as @dfn{codepage 65001}.
 @cindex characters outside of BMP, and @command{gawk} on MS-Windows
 The MinGW build of @command{gawk} for MS-Windows supports multibyte
 characters according to the codepage defined by the current system
-locale, and it also includes (starting with version 5.4) reasonable
+locale, and it also includes reasonable
 support for text encoded in UTF-8.  When the system's codepage is
 anything other than 65001, @command{gawk} uses the functions from the
 MS-Windows C runtime library to convert between multibyte and
 wide-character representation of text, and for character
 classification and collation; this is in most cases limited to
 characters inside the Unicode Basic Multilingual Plane
-(@acronym{BMP}), due to the limitations of the Windows runtime.  By
-contrast, if the system's codepage is set to 65001, @command{gawk}
+(@acronym{BMP}), due to the limitations of the Windows runtime.
+
+By contrast, if the system's codepage is set to 65001, @command{gawk}
 attempts to support the full range of Unicode codepoints, including
 the @acronym{BMP} and all the 16 Supplementary Planes defined by
 Unicode, by using its own conversion and classification routines
@@ -43767,7 +43758,7 @@ codepoints internally.  Thus on Windows, to make sure @command{awk} programs
 written for POSIX systems which handle multibyte non-ASCII text work
 correctly on MS-Windows, you should use codepage 65001.
 
-As a special feature, @command{gawk} version 5.4 and later will use
+As a special feature, @command{gawk} version 5.4 and later use
 UTF-8 internally even when the system-wide codepage is something other
 than 65001, if @command{gawk} detects that the Windows terminal window
 in which it runs uses codepage 65001 for console output.  (Unlike on
@@ -43907,7 +43898,7 @@ make && make check
 @end example
 
 When compared to GNU/Linux on the same system, the @samp{configure}
-step on Cygwin takes considerably longer.  However, it does finish,
+step on Cygwin may take considerably longer.  However, it does finish,
 and then the @samp{make} proceeds as usual.
 
 @cindex installing @command{gawk} @subentry Cygwin
@@ -44212,7 +44203,14 @@ The example below is for @command{gawk} redirecting data to the OpenVMS
 $ @kbd{sort = "@@device:[dir]vms_gawk_sort.com"}
 @end example
 
-The command file needs to be of the format in the example below.
+The command file needs to look like this:
+
+@example
+$!'f$verify(0,0)'
+$ sort := sort
+$ define/user sys$input sys$command:
+$ sort sys$input: sys$output:
+@end example
 
 The first line inhibits the passed input data from also showing up in the
 output.  It must be in the format in the example.
@@ -44226,13 +44224,6 @@ to the command.
 
 The last line runs the actual command.  It must be the last command as the data
 redirected from @command{gawk} will be read when the command file ends.
-
-@example
-$!'f$verify(0,0)'
-$ sort := sort
-$ define/user sys$input sys$command:
-$ sort sys$input: sys$output:
-@end example
 
 @node OpenVMS GNV
 @appendixsubsubsec The OpenVMS GNV Project
@@ -44250,7 +44241,7 @@ To be compatible and share common code with GNV projects, all
 OpenVMS-specific defines and prototypes for @command{gawk} are in the process of
 being moved to @file{vms/config_vms.h}.  The @file{vms} directory will have
 missing or updated system header files and any replacement routines that will
-hide most of the differences between OpenVMS and Linux.  This is intended to
+hide most of the differences between OpenVMS and GNU/Linux.  The intent is to
 make @command{gawk} easier to maintain.
 
 The file @file{vms/gawk_build_steps.txt} in the distribution documents
@@ -44469,7 +44460,9 @@ email list is archived at the GNU Project.
 If you are using OpenVMS or the MinGW build of @command{gawk},
 the @command{gawkbug} script won't be available.  Please send
 the previously listed information directly in an email to
-the bug list.  Please send any test program or data files
+the bug list.
+
+For all operating systems, please send any test program or data files
 as attachments, instead of inline in the email, to avoid
 their being mangled by various mail systems.
 
@@ -44649,8 +44642,7 @@ just have to live with @command{gawk} as it is.
 If you have questions related to @command{awk} programming, or why @command{gawk}
 behaves a certain way, or any other @command{awk}- or @command{gawk}-related issue,
 please @emph{do not} send it to the bug reporting address.
-
-As of July, 2021, there is a separate mailing list for this purpose:
+There is a separate mailing list for this purpose:
 @EMAIL{help-gawk@@gnu.org, help dash gawk at gnu dot org}.
 Anything that is not a bug report should be sent to that list.
 
@@ -44726,10 +44718,10 @@ The people maintaining the various @command{gawk} ports are:
 
 @item OpenVMS @tab John Malmberg, @EMAIL{wb8tyw@@qsl.net,wb8tyw at qsl dot net}
 
-@item z/OS (OS/390) @tab Daniel Richard G.@: @EMAIL{skunk@@iSKUNK.ORG,skunk at iSKUNK dot ORG}
+@item z/OS (OS/390) @tab Daniel Richard G., @EMAIL{skunk@@iSKUNK.ORG,skunk at iSKUNK dot ORG}
 @end multitable
 
-If your bug is also reproducible under Unix, send a copy of your
+If your bug is also reproducible on a POSIX system, send a copy of your
 report to the @EMAIL{bug-gawk@@gnu.org,bug dash gawk at gnu dot org} email list as well.
 
 @node Other Versions
@@ -44872,7 +44864,7 @@ since approximately 2021.
 @cindex @command{pawk} (profiling version of Brian Kernighan's @command{awk})
 @cindex source code @subentry @command{pawk} (profiling version of Brian Kernighan's @command{awk})
 @item @command{pawk}
-Nelson H.F.@: Beebe at the University of Utah has modified
+Nelson H.F.@: Beebe at the University of Utah modified
 BWK @command{awk} to provide timing and profiling information.
 It is different from @command{gawk} with the @option{--profile} option
 (@pxref{Profiling})
@@ -44952,24 +44944,6 @@ software engineering exercise.
 This is an embeddable @command{awk} interpreter. For more information,
 see @uref{https://code.google.com/p/qse/}. The source can be found at
 @uref{https://code.google.com/archive/p/qse/source/default/source}.
-
-@c It's been gone for at least a year, no reason to document it
-@ignore
-@cindex QuikTrim Awk
-@cindex source code @subentry QuikTrim Awk
-@item @command{QTawk}
-This is an independent implementation of @command{awk} distributed
-under the GPL. It has a large number of extensions over standard
-@command{awk} and may not be 100% syntactically compatible with it.
-See @uref{http://www.quiktrim.org/QTawk.html} for more information,
-including the manual. The download link there is out of date; see
-@uref{http://www.quiktrim.org/#AdditionalResources} for the latest
-download link.
-
-The project may also be frozen; no new code changes have been made
-since approximately 2014.
-And, as of January, 2025, the QuikTrim websites were not reachable.
-@end ignore
 
 @cindex Gardner, Ray
 @cindex @command{wak} (@command{awk} implementation)
@@ -45143,6 +45117,9 @@ at @uref{https://github.com/e36freak/awk-libs}.
 An interesting collection of @command{gawk} extensions is
 available @uref{https://github.com/su8/gawk-extensions}.
 
+@xref{gawkextlib} for information on useful C and C++
+extensions for @command{gawk}.
+
 @node Installation summary
 @appendixsec Summary
 
@@ -45166,16 +45143,19 @@ the file.
 
 @item
 @command{gawk} may be built on non-POSIX systems as well. The currently
-supported systems are MS-Windows using
-MSYS, MSYS2, MinGW, and Cygwin,
-and OpenVMS.
+supported systems are MS-Windows (using
+MSYS, MSYS2, MinGW, and Cygwin),
+OpenVMS, and z/OS.
 Instructions for each system are included in this appendix.
+(Cygwin, MSYS, MSYS2, and z/OS act like POSIX systems when configuring
+and building @command{gawk}.)
 
 @item
 Bug reports should be sent via email to @EMAIL{bug-gawk@@gnu.org, bug dash gawk at gnu dot org}.
 Bug reports should be in English and should include the version of @command{gawk},
 how it was compiled, and a short program and @value{DF} that demonstrate
 the problem.
+Use the @command{buggawk} program to report bugs, if you have it.
 
 @item
 Non-bug emails should be sent to @EMAIL{help-gawk@@gnu.org, help dash gawk at gnu dot org}.
@@ -45290,11 +45270,6 @@ Once you have made changes, you can use @samp{git diff} to produce a
 patch, and send that to the @command{gawk} maintainer; see @ref{Bugs},
 for how to do that.
 
-Once upon a time there was Git--CVS gateway for use by people who could
-not install Git. However, this gateway no longer works, so you may have
-better luck using a more modern version control system like Bazaar,
-that has a Git plug-in for working with Git repositories.
-
 @node Adding Code
 @appendixsubsec Adding New Features
 
@@ -45308,7 +45283,7 @@ make it possible to include them:
 
 @enumerate 1
 @item
-Discuss the proposed new feature with the @command{gawk} maintainer.
+Discuss the proposed new feature with me.
 The bug list may be used for this.  Even if I don't
 wish to include your feature, be aware that you are still free to
 add it and distribute your own ``fork'' of @command{gawk}.
@@ -45341,6 +45316,12 @@ for information on getting the latest version of @command{gawk}.)
 @item
 Do the work yourself. Code created via Large Language Models (LLMs)
 will not be accepted.
+
+@item
+Read the @command{gawk} workflow documentation in order
+to understand how to work with the development team.
+This is the file @file{doc/gawkworkflow.texi} in the
+distribution.
 
 @item
 @ifnotinfo
@@ -45515,7 +45496,7 @@ your code in the public domain and submit a signed statement to that
 effect, or assign the copyright in your code to the FSF.
 Both of these actions are easy to do and @emph{many} people have done so
 already. If you have questions, please contact me, or
-@EMAIL{gnu@@gnu.org, gnu at gnu dot org}.
+@EMAIL{assign@@gnu.org, assign at gnu dot org}.
 
 @item
 When doing a port, bear in mind that your code must coexist peacefully
@@ -45656,7 +45637,7 @@ That is the point of the @file{bootstrap.sh} file.  It touches the
 various other files in the right order such that
 
 @example
-# The canonical incantation for building GNU software:
+# The canonical incantation for building gawk:
 ./bootstrap.sh && ./configure && make
 @end example
 
@@ -45745,20 +45726,6 @@ Because of the @samp{https://} URL, you may have to supply the
 the file.
 @end quotation
 
-@c @item
-@ignore
-These days the maintainer uses Ubuntu 12.04 which is medium current, but
-he is already doing the above for Automake, Autoconf, and @command{bison}.
-@end ignore
-
-@ignore
-(C. Rant: Recent Linux versions with GNOME 3 really suck. What
-    are all those people thinking?  Fedora 15 was such a bust it drove
-    me to Ubuntu, but Ubuntu 11.04 and 11.10 are totally unusable from
-    a UI perspective. Bleah.)
-@end ignore
-@c @end enumerate
-
 @ignore
 @item
 If someone still feels really strongly about all this, then perhaps they
@@ -45795,6 +45762,7 @@ wget https://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-@var{branchname}.t
 
 @noindent
 to retrieve a snapshot of the given branch.
+@c FIXME: 12 Nov 2026: This just hanged for me, ....
 
 @node Future Extensions
 @appendixsec Probable Future Extensions
@@ -45861,7 +45829,6 @@ different limits.
 
 @multitable @columnfractions .40 .60
 @headitem Item @tab Limit
-@item Characters in a character class @tab 2^(number of bits per byte)
 @item Length of input record in bytes @tab @code{ULONG_MAX}
 @item Length of output record @tab Unlimited
 @item Length of source line @tab Unlimited
@@ -45873,9 +45840,10 @@ different limits.
 @item Numeric values @tab Double-precision floating point (if not using MPFR)
 @item Size of a field in bytes @tab @code{ULONG_MAX}
 @item Size of a literal string in bytes @tab @code{ULONG_MAX}
-@item Size of a printf string in bytes @tab @code{ULONG_MAX}
+@item Size of a @code{printf} string in bytes @tab @code{ULONG_MAX}
 @end multitable
 
+@c FIXME: Move to separate doc along with the extension chapter
 @node Extension Design
 @appendixsec Extension API Design
 
@@ -45981,6 +45949,7 @@ arrays of arrays).
 
 Some additional important goals were:
 
+@c FIXME: 6.0 - C 99
 @itemize @value{BULLET}
 @item
 The API should use only features in ISO C 90, so that extensions
@@ -46063,7 +46032,7 @@ In order to avoid these issues, the @command{gawk} developers chose
 to start with the simplest, most basic features that are still truly useful.
 
 Another decision is that although @command{gawk} provides nice things like
-MPFR, and arrays indexed internally by integers, these features are not
+arrays indexed internally by integers, these features are not
 being brought out to the API in order to keep things simple and close to
 traditional @command{awk} semantics.  (In fact, arrays indexed internally
 by integers are so transparent that they aren't even documented!)
@@ -46130,7 +46099,7 @@ the @code{xgawk} project, and provide binary compatibility going forward.
 
 @item
 The previous extension mechanism is no longer supported and was
-removed from the code base with the 4.2 release.
+removed from the code base.
 
 @end itemize
 
@@ -46253,8 +46222,8 @@ This step corresponds to @command{awk}'s @code{END} rule
 (@pxref{BEGIN/END}).
 
 After the cake comes out of the oven, you still have to wrap it in
-plastic wrap to keep anyone from tasting it, as well as wash
-the mixing bowls and utensils.
+plastic wrap to keep anyone from tasting it, put it in the
+refrigerator, and wash the mixing bowls and utensils.
 @end table
 
 @cindex algorithms
@@ -46375,7 +46344,7 @@ standard for C.  This standard became an ISO standard in 1990.
 In 1999, a revised ISO C standard was approved and released.
 Where it makes sense, POSIX @command{awk} is compatible with 1999 ISO C.
 
-
+@c FIXME: Keep this chapter?
 @node Glossary
 @unnumbered Glossary
 
@@ -46433,10 +46402,10 @@ it can be something passed to a @dfn{function} inside a program, e.g.
 inside @command{awk}.
 
 In the latter case, an argument can be passed to a function in two ways.
-Either it is given to the called function by value, i.e., a copy of the
+Either it is given to the called function @dfn{by value}, i.e., a copy of the
 value of the variable is made available to the called function, but the
 original variable cannot be modified by the function itself; or it is
-given by reference, i.e., a pointer to the interested variable is passed to
+given @dfn{by reference}, i.e., a pointer to the interested variable is passed to
 the function, which can then directly modify it. In @command{awk}
 scalars are passed by value, and arrays are passed by reference.
 See ``Pass By Value/Reference.''
@@ -46506,6 +46475,7 @@ computing power of the computer itself.  Most computers nowadays use 64
 bits for representing integer numbers in their registers, but 32-bit,
 16-bit and 8-bit registers have been widely used in the past.
 @xref{Nondecimal-numbers}.
+
 @item Bit
 Short for ``Binary Digit.''
 All values in computer memory ultimately reduce to binary digits: values
@@ -46519,9 +46489,7 @@ functions described in
 @ref{Bitwise Functions}.
 
 Computers are often defined by how many bits they use to represent integer
-values.  Typical systems are 32-bit systems, but 64-bit systems are
-becoming increasingly popular, and 16-bit systems have essentially
-disappeared.
+values. 64-bit systems are the current norm.
 
 @item Boolean Expression
 Named after the English mathematician Boole. See also ``Logical Expression.''
@@ -46651,6 +46619,11 @@ It was written in @command{awk}
 by Brian Kernighan and Jon Bentley, and is available from
 @uref{https://netlib.org/typesetting/chem}.
 
+@item Comma Separated Values
+A commonly used file format wherein fields are separated by
+commas, and fields containing commas or quotes are quoted
+in a special fashion.
+
 @item Comparison Expression
 A relation that is either true or false, such as @samp{a < b}.
 Comparison expressions are used in @code{if}, @code{while}, @code{do},
@@ -46679,7 +46652,7 @@ or @samp{d}.
 See ``Bracket Expression.''
 
 @item Compound Statement
-A series of @command{awk} statements, enclosed in curly braces.  Compound
+A series of @command{awk} statements, enclosed in braces.  Compound
 statements may be nested.
 (@xref{Statements}.)
 
@@ -46755,8 +46728,8 @@ Doug
 @item Coprocess
 A subordinate program with which two-way communications is possible.
 
-@item Curly Braces
-See ``Braces.''
+@item CSV
+See ``Comma Separated Values.''
 
 @cindex dark corner @subentry definition of
 @item Dark Corner
@@ -46845,7 +46818,7 @@ called fields.  If the pieces are of fixed length, you can use the built-in
 variable @code{FIELDWIDTHS} to describe their lengths.
 If you wish to specify the contents of fields instead of the field
 separator, you can use the predefined variable @code{FPAT} to do so.
-(@xref{Field Separators},
+(@xref{Field Separators}, and see
 @ref{Constant Size},
 and
 @ref{Splitting By Content}.)
@@ -46868,12 +46841,13 @@ are controlled by the format strings contained in the predefined variables
 
 @item Fortran
 Shorthand for FORmula TRANslator, one of the first programming languages
-available for scientific calculations. It was created by John Backus,
+available for scientific calculations. It was created by a team led by John Backus,
 and has been available since 1957. It is still in use today.
 
 @item Free Documentation License
 This document describes the terms under which this @value{DOCUMENT}
-is published and may be copied. (@xref{GNU Free Documentation License}.)
+is published and may be copied. (See
+@uref{https://www.gnu.org/licenses/fdl-1.3.en.html}.)
 
 @cindex FSF (Free Software Foundation)
 @cindex Free Software Foundation (FSF)
@@ -46895,7 +46869,7 @@ A part of an @command{awk} program that can be invoked from every point of
 the program, to perform a task.  @command{awk} has several built-in
 functions.
 Users can define their own functions in every part of the program.
-Function can be recursive, i.e., they may invoke themselves.
+Functions can be recursive, i.e., they may invoke themselves.
 @xref{Functions}.
 In @command{gawk} it is also possible to have functions shared
 among different programs, and included where required using the
@@ -46913,7 +46887,8 @@ The GNU implementation of @command{awk}.
 @cindex GPL (General Public License)
 @item General Public License
 This document describes the terms under which @command{gawk} and its source
-code may be distributed. (@xref{Copying}.)
+code may be distributed.
+(See @uref{https://www.gnu.org/licenses/gpl-3.0.en.html}.)
 
 @item GMT
 ``Greenwich Mean Time.''
@@ -46934,13 +46909,18 @@ A variant of the GNU system using the Linux kernel, instead of the
 Free Software Foundation's Hurd kernel.
 The Linux kernel is a stable, efficient, full-featured clone of Unix that has
 been ported to a variety of architectures.
-It is most popular on PC-class systems, but runs well on a variety of
-other systems too.
 The Linux kernel source code is available under the terms of the GNU General
 Public License, which is perhaps its most important aspect.
 
 @item GPL
 See ``General Public License.''
+
+@item Greedy/Non-greedy regular expression
+A regular expression is termed @dfn{greedy} if it matches
+the longest possible amount of text. By default, regexps are greedy.
+A @dfn{non-greedy} regexp matches the shortest possible text; this
+is done with special operators.
+@xref{Non-greedy operators}.
 
 @item Hexadecimal
 Base 16 notation, where the digits are @code{0}--@code{9} and
@@ -47026,6 +47006,7 @@ meaning.  Keywords are reserved and may not be used as variable names.
 @code{function},
 @code{func},
 @code{if},
+@code{in},
 @code{next},
 @code{nextfile},
 @code{switch},
@@ -47076,6 +47057,11 @@ regexp describes the contents of the string, it is said to @dfn{match} it.
 Characters used within a regexp that do not stand for themselves.
 Instead, they denote regular expression operations, such as repetition,
 grouping, or alternation.
+
+@item Namespace
+A mechanism for grouping related variables and functions together
+such that their names do not conflict with other variables and functions
+that have the same name.  @xref{Namespaces}.
 
 @item Nesting
 Nesting is where information is organized in layers, or where objects
@@ -47137,7 +47123,7 @@ The name for a series of standards
 that specify a Portable Operating System interface.  The ``IX'' denotes
 the Unix heritage of these standards.  The main standard of interest for
 @command{awk} users is
-@cite{IEEE Standard for Information Technology, Standard 1003.1@sup{TM}-2024}.
+@cite{IEEE Standard for Information Technology, Standard 1003.1@sup{TM}-@value{POSIXYEAR}}.
 The @value{POSIXYEAR} POSIX standard can be found online at
 @url{@value{POSIXURL}/}.
 
@@ -47183,7 +47169,7 @@ a variable is used in more than one place, only one copy of the value
 itself is kept, and the associated reference count is increased when the
 same value is used by an additional variable, and decreased when the related
 variable is no longer in use. When the reference count goes to zero,
-the memory space used to store the value of the variable is freed.
+the memory space used to store the value is freed.
 
 @item Regexp
 See ``Regular Expression.''
@@ -47202,12 +47188,17 @@ slashes, such as @code{/foo/}.  This regular expression is chosen
 when you write the @command{awk} program and cannot be changed during
 its execution. (@xref{Regexp Usage}.)
 
+@command{gawk} supports strongly-typed regular expression constants,
+written as @code{@@/foo/}.  @xref{Strong Regexp Constants}.
+
 @item Regular Expression Operators
 See ``Metacharacters.''
 
+@c FIXME: 6.1, remove this item
 @item Rounding
 Rounding the result of an arithmetic operation can be tricky.
-More than one way of rounding exists, and in @command{gawk}
+More than one way of rounding exists, and in
+@command{gawk}, when using MPFR,
 it is possible to choose which method should be used in a program.
 @xref{Setting the rounding mode}.
 
@@ -47259,8 +47250,7 @@ expressions, and function calls have side effects.
 An internal representation of numbers that can have fractional parts.
 Single precision numbers keep track of fewer digits than do double precision
 numbers, but operations on them are sometimes less expensive in terms of CPU time.
-This is the type used by some ancient versions of @command{awk} to store
-numeric values.  It is the C type @code{float}.
+It is the C type @code{float}.
 
 @item Space
 The character generated by hitting the space bar on the keyboard.
@@ -47293,6 +47283,7 @@ string}.  Constant strings are written with double quotes in the
 The character generated by hitting the @kbd{TAB} key on the keyboard.
 It usually expands to up to eight spaces upon output.
 
+@c FIXME: 6.1, remove this item
 @item Text Domain
 A unique name that identifies an application.
 Used for grouping messages that are translated at runtime
