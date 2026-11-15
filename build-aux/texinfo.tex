@@ -3,7 +3,7 @@
 % Load plain if necessary, i.e., if running under initex.
 \expandafter\ifx\csname fmtname\endcsname\relax\input plain\fi
 %
-\def\texinfoversion{2026-06-14.21}
+\def\texinfoversion{2026-10-21.20}
 %
 % Copyright 1985, 1986, 1988, 1990-2026 Free Software Foundation, Inc.
 %
@@ -153,6 +153,9 @@
 \ifx\putwordDefopt\undefined    \gdef\putwordDefopt{User Option}\fi
 \ifx\putwordDeffunc\undefined   \gdef\putwordDeffunc{Function}\fi
 
+% scratch count register
+\newcount\countA
+
 % Give the space character the catcode for a space.
 \def\spaceisspace{\catcode`\ =10\relax}
 
@@ -181,6 +184,10 @@
   spell-ing spell-ings
   stand-alone strong-est time-stamp time-stamps which-ever white-space
   wide-spread wrap-around
+}
+
+\def\txiwarning#1{%
+  \message{^^J\linenumber Warning: #1^^J}%
 }
 
 % Sometimes it is convenient to have everything in the transcript file
@@ -226,6 +233,25 @@
   \removelastskip\penalty-100\medskip\fi\fi}
 \def\bigbreak{\ifnum\lastpenalty<10000\par\ifdim\lastskip<\bigskipamount
   \removelastskip\penalty-200\bigskip\fi\fi}
+
+% Define \newwrite to be identical to plain tex's \newwrite
+% except not \outer, so it can be used within macros and \if's.
+\edef\newwrite{\makecsname{ptexnewwrite}}
+
+% We need a feature of e-TeX, \scantokens, to do macros right, and for
+% one or two other purposes.
+% We arrange to emulate it with a temporary file in ordinary TeX.
+\ifx\eTeXversion\thisisundefined
+  \newwrite\macscribble
+  \def\scantokens#1{%
+    \toks0={#1}%
+    \immediate\openout\macscribble=\jobname.tmp
+    \immediate\write\macscribble{\the\toks0}%
+    \immediate\closeout\macscribble
+    \input \jobname.tmp
+  }
+\fi
+
 
 % Output routine
 %
@@ -769,18 +795,20 @@ where each line of input produces a line of output.}
 \def\includezzz#1{%
   \pushthisfilestack
   \def\thisfile{#1}%
+  \includecheckspace\thisfile
   {%
     \makevalueexpandable  % we want to expand any @value in FILE.
     \turnoffactive        % and allow special characters in the expansion
     \indexnofonts         % Allow `@@' and other weird things in file names.
     \wlog{texinfo.tex: doing @include of #1^^J}%
-    \edef\temp{\noexpand\input #1 }%
+    \edef\temp{\noexpand\input \thisfile }%
     %
     % This trickery is to read FILE outside of a group, in case it makes
     % definitions, etc.
     \expandafter
   }\temp
   \popthisfilestack
+  \def\thisfile{#1}% for @thisfile command
 }
 \def\filenamecatcodes{%
   \catcode`\\=\other
@@ -794,6 +822,21 @@ where each line of input produces a line of output.}
   \catcode`-=\other
   \catcode`\`=\other
   \catcode`\'=\other
+}
+
+% \includecheckspace\FILENAME - if there is a space in the expansion of
+% \FILENAME, wrap the expansion in braces
+\def\includecheckspace#1{%
+  \expandafter\includecheckspacezz\expandafter#1#1 \includecheckspacezz}
+
+\def\includecheckspacezz#1#2 #3\includecheckspacezz{%
+  \def\tmp{#3}%
+  \ifx\tmp\empty
+    % no space in the file name
+  \else
+    % there is a space in the file name
+    \edef#1{{#1}}%
+  \fi
 }
 
 \def\pushthisfilestack{%
@@ -867,15 +910,20 @@ where each line of input produces a line of output.}
 %
 \def\asisword{asis} % no translation, these are keywords
 \def\noneword{none}
+% Set - active for the comparison, as it is active in the main processing
+{\catcode`\-=\active \gdef\minustwoword{-2}}
 %
 \parseargdef\paragraphindent{%
   \def\temp{#1}%
   \ifx\temp\asisword
   \else
-    \ifx\temp\noneword
-      \defaultparindent = 0pt
+    \ifx\temp\minustwoword % -2 represents asis as integer
     \else
-      \defaultparindent = #1em
+      \ifx\temp\noneword
+        \defaultparindent = 0pt
+      \else
+        \defaultparindent = #1em
+      \fi
     \fi
   \fi
   \parindent = \defaultparindent
@@ -980,7 +1028,6 @@ where each line of input produces a line of output.}
 \newtoks\toksD
 \newbox\boxA
 \newbox\boxB
-\newcount\countA
 \newif\ifpdf
 \newif\ifpdfmakepagedest
 
@@ -1191,6 +1238,25 @@ with PDF output, and none of those formats could be found.  (.eps cannot
 be supported due to the design of the PDF format; use regular TeX (DVI
 output) for that.)}
 
+% Some improvement on what \indexnofonts gives us
+\def\pdfoutlinedefs{%
+  \def\U##1{\csname uni:##1\endcsname}%
+  \def\result##1{\U{21D2}}%
+  \def\expansion##1{\U{21A6}}%
+  \def\print##1{\U{22A3}}%
+  \def\error##1{[error]}%
+  \def\equiv##1{\U{2261}}%
+  \def\point##1{\U{22C6}}%
+  \def\leq##1{\U{2264}}%
+  \def\geq##1{\U{2265}}%
+  \def\copyright##1{\U{00A9}}%
+  \def\registeredsymbol##1{\U{00AE}}%
+  \def\pounds##1{\U{00A3}}%
+  \def\textdegree##1{\U{00B0}}%
+  \def\euro##1{\U{20AC}}%
+  \def\bullet##1{\U{2022}}%
+}
+
 % definitions for pdftex or luatex with pdf output
 \ifpdf
   % Strings in PDF outlines can either be ASCII, or encoded in UTF-16BE
@@ -1201,6 +1267,7 @@ output) for that.)}
   % \DeclareUnicodeCharacter and we access them here.
   %
   \def\defpdfoutlinetextunicode#1{%
+    \pdfoutlinedefs
     \def\pdfoutlinetext{#1}%
     %
     % Make UTF-8 sequences expand to UTF-16 definitions.
@@ -1225,8 +1292,10 @@ output) for that.)}
       % to UTF-16 is somewhat slow (and uses more space).
       \global\let\pdfoutlinetext\pdfoutlinetextchecked
     \else
+      \utfbytespdffalse \utfeightbytestrue % Produce UTF-8 sequences
       \passthroughcharstrue % pass UTF-8 sequences unaltered
       \xdef\pdfoutlinetext{\pdfoutlinetext}%
+      \utfbytespdftrue \utfeightbytesfalse % Now produce UTF-16 sequences
       \expandafter\expandutfsixteen\expandafter{\pdfoutlinetext}\pdfoutlinetext
     \fi
   }%
@@ -1234,9 +1303,13 @@ output) for that.)}
   \catcode2=1 % begin-group character
   \catcode3=2 % end-group character
   %
-  % argument should be pure UTF-8 with no control sequences.  convert to
-  % UTF-16BE by inserting null bytes before bytes < 128 and expanding
-  % UTF-8 multibyte sequences to saved UTF-16BE sequences.
+  % Convert contents of #1 to UTF-16BE, saving result in control sequence
+  % named in #2.  #1 must be pure UTF-8 with no control sequences.  We convert
+  % to UTF-16BE by inserting null bytes before bytes < 128 and expanding
+  % UTF-8 multibyte sequences to saved UTF-16BE sequences.  Note that we cannot
+  % use control sequences in #1 because we pass it to \scantokens in a context
+  % where there is no escape character.  This allows us to place \, @, { and
+  % } in section titles without restriction.
   \def\expandutfsixteen#1#2{%
     \bgroup \asciitounicode
     \passthroughcharsfalse
@@ -3374,6 +3447,10 @@ end
     \mathunderscore
     \let\\ = \mathbackslash
     \mathactive
+    % set the catcodes of space and newline to the default values in case we are inside
+    % @example or similar.
+    \spaceisspace
+    \catcode`\^^M=5
     % make the texinfo accent commands work in math mode
     \let\"=\ddot
     \let\'=\acute
@@ -3388,7 +3465,12 @@ end
     \let\mathopsup=\sup
   $\expandafter\finishmath\fi
 }
-\def\finishmath#1{#1$\endgroup}  % Close the group opened by \tex.
+
+% Take the braced argument to @math.
+% We use \scantokens to allow input like "@section @math{\nabla^2}" to work.
+% Otherwise, the catcode of \ is fixed when the line argument is taken.
+% Finally, close the group opened by \tex.
+\def\finishmath#1{\scantokens{#1}$\endgroup}
 
 % Some active characters (such as <) are spaced differently in math.
 % We have to reset their definitions in case the @math was an argument
@@ -4893,10 +4975,6 @@ $$%
 
 \message{indexing,}
 % Index generation facilities
-
-% Define \newwrite to be identical to plain tex's \newwrite
-% except not \outer, so it can be used within macros and \if's.
-\edef\newwrite{\makecsname{ptexnewwrite}}
 
 % \newindex {IX} defines an index named IX.
 % It automatically defines \IXindex such that
@@ -6407,7 +6485,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 % (e.g., figures), q.v.  By default (before any chapter), that is empty.
 \let\chaplevelprefix = \empty
 %
-\outer\parseargdef\chapter{\numhead0{#1}} % normally numhead0 calls chapterzzz
+\parseargdef\chapter{\numhead0{#1}} % normally numhead0 calls chapterzzz
 \def\chapterzzz#1{%
   % section resetting is \global in case the chapter is in a group, such
   % as an @include file.
@@ -6431,7 +6509,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
   \global\let\subsubsection = \numberedsubsubsec
 }
 
-\outer\parseargdef\appendix{\apphead0{#1}} % normally calls appendixzzz
+\parseargdef\appendix{\apphead0{#1}} % normally calls appendixzzz
 %
 \def\appendixzzz#1{%
   \global\secno=0 \global\subsecno=0 \global\subsubsecno=0
@@ -6451,7 +6529,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 }
 
 % normally unnmhead0 calls unnumberedzzz:
-\outer\parseargdef\unnumbered{\unnmhead0{#1}}
+\parseargdef\unnumbered{\unnmhead0{#1}}
 \def\unnumberedzzz#1{%
   \global\advance\unnumberedno by 1
   %
@@ -6481,7 +6559,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 }
 
 % @centerchap is like @unnumbered, but the heading is centered.
-\outer\parseargdef\centerchap{%
+\parseargdef\centerchap{%
   \let\centerparametersmaybe = \centerparameters
   \unnmhead0{#1}%
   \let\centerparametersmaybe = \relax
@@ -8333,30 +8411,17 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 % these should not use \errmessage; the glibc manual, at least, actually
 % has such constructs (when documenting function pointers).
 \def\badparencount{%
-  \message{Warning: unbalanced parentheses in @def...}%
+  \txiwarning{unbalanced parentheses in @def...}%
   \global\parencount=0
 }
 \def\badbrackcount{%
-  \message{Warning: unbalanced square brackets in @def...}%
+  \txiwarning{unbalanced square brackets in @def...}%
   \global\brackcount=0
 }
 
 
 \message{macros,}
 % @macro.
-
-% To do this right we need a feature of e-TeX, \scantokens,
-% which we arrange to emulate with a temporary file in ordinary TeX.
-\ifx\eTeXversion\thisisundefined
-  \newwrite\macscribble
-  \def\scantokens#1{%
-    \toks0={#1}%
-    \immediate\openout\macscribble=\jobname.tmp
-    \immediate\write\macscribble{\the\toks0}%
-    \immediate\closeout\macscribble
-    \input \jobname.tmp
-  }
-\fi
 
 % Used at the time of macro expansion.
 % Argument is macro body with arguments substituted
@@ -8509,7 +8574,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
      \fi
   \fi
   \if1\csname ismacro.\the\macname\endcsname
-     \message{Warning: redefining \the\macname}%
+     \txiwarning{redefining \the\macname}%
   \else
      \expandafter\ifx\csname \the\macname\endcsname \relax
      \else \errmessage{Macro name \the\macname\space already defined}\fi
@@ -9126,12 +9191,19 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 }
 \def\wordTop{Top}
 
-% Until the next @node, @part or @bye command, divert output to a box that
-% is not output.
+% Until the next @node, top-level section command, @part or @bye command,
+% divert output to a box that is not output.
 \def\ignorenode{\setbox\dummybox\vbox\bgroup
-\def\part{\egroup\part}%
-\def\node{\egroup\node}%
-\ignorenodebye
+  % redefine top-level commands to close the dummy
+  % box and restart processing.
+  \def\restartat##1{\def##1{\egroup##1}}%
+  \restartat\part
+  \restartat\node
+  \restartat\chapter
+  \restartat\centerchap
+  \restartat\unnumbered
+  \restartat\appendix
+  \ignorenodebye
 }
 
 {\let\bye\relax
@@ -9145,7 +9217,9 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 % type (Ynumbered, Yappendix, Ynothing).  #2 is the section title.
 %
 \def\donoderef#1#2{%
-  \ifx\lastnode\empty\else
+  \ifx\lastnode\empty
+    \setrefshadow{#1}{#2}%
+  \else
     \setref{\lastnode}{#1}{#2}%
     \global\let\lastnode=\empty
     \setnodeseenonce
@@ -9190,6 +9264,9 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 %
 \def\setref#1#2#3{%
   \pdfmkdest{#1}%
+  \dosetref{#1}{#2}{#3}{xrdef}%
+}
+\def\dosetref#1#2#3#4{%
   \iflinks
     {%
       \requireauxfile
@@ -9197,16 +9274,36 @@ might help (with 'rm \jobname.?? \jobname.??s')%
       % match definition in \xrdef, \refx, \xrefX.
       \def\value##1{##1}%
       \edef\writexrdef##1##2{%
-	\write\auxfile{@xrdef{#1-% #1 of \setref, expanded by the \edef
+	\write\auxfile{@#4{#1-% #1 of \setref, expanded by the \edef
 	  ##1}{##2}}% these are parameters of \writexrdef
       }%
       \toks0 = {#3}%
       \immediate \writexrdef{title}{\the\toks0 }%
-      \immediate \writexrdef{snt}{\csname #2\endcsname}% \Ynumbered etc.
-      \safewhatsit{\writexrdef{pg}{\folio}}% will be written later, at \shipout
+      \immediate \writexrdef{snt}{\csname #2\endcsname}%
+      \safewhatsit{\writexrdef{pg}{\folio}}%
     }%
   \fi
 }
+
+% Similar to \setref, but used for targets created by sectioning commands.
+% Write information about this target using @xrshad instead of @xrdef.
+\def\setrefshadow#1#2{%
+  % For PDF, output the target with \pdfdest.
+  % Temporarily suppress pdfTeX warning for trying to output two targets
+  % with the same name.
+  \pdfsuppresswarningdupdest1
+  \pdfmkdest{\pdfshadowprefix#2}%
+  \pdfsuppresswarningdupdest0
+  \dosetref{#2}{#1}{#2}{xrshad}%
+}
+
+% Primitive introduced in pdfTeX 1.40.13.  Supply dummy definition for
+% older versions or when not running with pdfTeX.
+\ifx\pdfsuppresswarningdupdest\thisisundefined
+  \def\pdfsuppresswarningdupdest#1{}%
+\fi
+
+\def\pdfshadowprefix{XXSHADOW-}
 
 % @xrefautosectiontitle on|off says whether @section(ing) names are used
 % automatically in xrefs, if the third arg is not explicitly specified.
@@ -9253,7 +9350,20 @@ might help (with 'rm \jobname.?? \jobname.??s')%
   \def\infofilename{\ignorespaces #4}%
   \setbox\infofilenamebox = \hbox{\infofilename\unskip}%
   %
-  \startxreflink{#1}{#4}%
+  \ifdim \wd\printedmanualbox = 0pt
+    \checkshadowactive{#1}\countA
+    \expandafter\ifnum\countA = 1
+      \startxreflink{\pdfshadowprefix#1}{}%
+    \else\expandafter\ifnum\countA = 2
+      \txiwarning{ambiguous xref to #1}%
+      \startxreflink{}{}%
+    \else
+      \startxreflink{#1}{}%
+    \fi\fi
+  \else
+    \startxreflink{#1}{#4}%
+  \fi
+  %
   \getrefx{#1-title}\Xthisreftitle
   %
   % Float references are printed completely differently: "Figure 1.2"
@@ -9519,16 +9629,73 @@ might help (with 'rm \jobname.?? \jobname.??s')%
   \fi
 }
 
+\def\xrdefctxt{%
+  % Context for expanding the node or anchor name to remove control sequences.
+  % \turnoffactive stops 8-bit characters being changed to commands
+  % like @'e.
+  \indexnofonts
+  \turnoffactive
+  \def\value##1{##1}%
+  \mathchardefdummies
+}
+
+% Add some dummy definitions for commands defined with \mathchardef in
+% plain.tex.
+% A manual file for Blitz++, blitz.texi, used these commands in section
+% titles.  This means they can make their way into target names, and so
+% they need fully expandable definitions.
+% Hopefully the number of such definitions we will need to make will remain
+% quite low.
+\def\mathchardefdummies{%
+  \definedummyword\nabla
+  \definedummyword\times
+  \definedummyword\cdot
+}
+
 % Set #2 to xref string #1
 \def\getrefx#1#2{%
   \requireauxfile
   {%
-    \indexnofonts
-    \turnoffactive
-    \def\value##1{##1}%
+    \xrdefctxt
     \expandafter\global\expandafter\let\expandafter#2\csname XR#1\endcsname
+    \ifx#2\relax
+      % try a shadow definition
+      \expandafter\global\expandafter\let\expandafter#2\csname SXR#1\endcsname
+      \ifx#2\empty
+        \let#2\relax
+      \fi
+    \fi
   }%
 }
+
+% Check if shadow definitions are active for target name #1, setting the
+% count register sequence in #2 to:
+%  1 if they are active
+%  0 if they are not
+%  2 if multiple definitions were made
+\def\checkshadowactive#1#2{%
+  \requireauxfile
+  {%
+    \xrdefctxt
+    \expandafter\global\expandafter\let\expandafter\tmp\csname XR#1-title\endcsname
+  }%
+  \ifx\tmp\relax
+    % a real definition was not made
+    {%
+      \xrdefctxt
+      \expandafter\global\expandafter\let\expandafter\tmp\csname SXR#1-title\endcsname
+    }%
+    \ifx\tmp\relax
+      #2=0 % no definitions made
+    \else\ifx\tmp\empty
+      #2=2 % shadow definitions were disabled
+    \else
+      #2=1 % yes, shadow definitions are active
+    \fi\fi
+  \else
+    #2=0 % no, a real definition was made.
+  \fi
+}%
 
 % This is the macro invoked by entries in the aux file.  Define a control
 % sequence for a cross-reference target (we prepend XR to the control sequence
@@ -9536,14 +9703,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
 % type, we have more work to do.
 %
 \def\xrdef#1#2{%
-  {% Expand the node or anchor name to remove control sequences.
-   % \turnoffactive stops 8-bit characters being changed to commands
-   % like @'e.  \refx does the same to retrieve the value in the definition.
-    \indexnofonts
-    \turnoffactive
-    \def\value##1{##1}%
-    \xdef\safexrefname{#1}%
-  }%
+  {\xrdefctxt \xdef\safexrefname{#1}}%
   %
   \bgroup
     \expandafter\gdef\csname XR\safexrefname\endcsname{#2}%
@@ -9573,6 +9733,24 @@ might help (with 'rm \jobname.?? \jobname.??s')%
       {\safexrefname}}%
   \fi
   \ignorespaces % ignore ends of line in aux file
+}
+
+% Like \xrdef, but used for "shadow" definitions.
+\def\xrshad#1#2{%
+  {\xrdefctxt \xdef\safexrefname{#1}}%
+  \bgroup
+    \expandafter\ifx\csname XR\safexrefname\endcsname\relax
+      \expandafter\ifx\csname SXR\safexrefname\endcsname\relax
+        % safe to make shadow definition.
+        \expandafter\gdef\csname SXR\safexrefname\endcsname{#2}%
+      \else
+        % earlier shadow definition.  disable.
+        \expandafter\gdef\csname SXR\safexrefname\endcsname{}%
+      \fi
+    \else
+      % blocked by node or anchor definition
+    \fi
+  \egroup
 }
 
 % If working on a large document in chapters, it is convenient to
@@ -9971,6 +10149,14 @@ might help (with 'rm \jobname.?? \jobname.??s')%
   % We can't be used inside a paragraph.
   \par
   %
+  % Allow a page break with a ragged page bottom.  This could help to reduce
+  % interparagraph spacing if a large float doesn't fit on the current page.
+  %
+  \penalty 0
+  \vskip 0pt plus 5\baselineskip
+  \penalty 1000
+  \vskip 0pt plus -5\baselineskip
+  %
   \vtop\bgroup
     \def\floattype{#1}%
     \def\floatlabel{#2}%
@@ -10156,7 +10342,7 @@ might help (with 'rm \jobname.?? \jobname.??s')%
   \expandafter\ifx\csname floatlist\safefloattype\endcsname \relax
     \ifhavexrefs
       % if the user said @listoffloats foo but never @float foo.
-      \message{\linenumber No `\safefloattype' floats to list.}%
+      \txiwarning{no floats to list for type: \safefloattype}%
     \fi
   \else
     \begingroup
@@ -10433,7 +10619,7 @@ directory should work if nowhere else does.}
     \else
       \ifx \declaredencoding \ascii
       \else
-        \message{Warning: XeTeX with non-UTF-8 encodings cannot handle %
+        \txiwarning{XeTeX with non-UTF-8 encodings cannot handle %
         non-ASCII characters in auxiliary files.}%
       \fi
     \fi
@@ -10712,7 +10898,7 @@ directory should work if nowhere else does.}
 \gdef\UTFviiiDefined#1{%
   \ifx #1\relax
     \ifutfviiidefinedwarning
-      \message{\linenumber Unicode char \string #1 not defined for Texinfo}%
+      \txiwarning{Unicode char \string #1 not defined for Texinfo}%
     \fi
   \else
     \expandafter #1%
@@ -10879,8 +11065,12 @@ directory should work if nowhere else does.}
   \fi
 }
 
+% Whether a Unicode character yields UTF-16 bytes.
 \newif\ifutfbytespdf
 \utfbytespdffalse
+
+\newif\ifutfeightbytes
+\utfeightbytesfalse
 
 % For UTF-8 byte sequences (TeX, e-TeX and pdfTeX),
 % provide a definition macro to replace a Unicode character;
@@ -10899,20 +11089,22 @@ directory should work if nowhere else does.}
     \begingroup
       \parseXMLCharref
       %
-      % Completely expand \UTFviiiTmp, which looks like:
+      % Completely expand \UTFviiiTmp\UTFviiiSeq, which looks like:
       % 1.  \UTFviiiTwoOctetsName B1 B2
       % 2.  \csname u8:B1 \string B2 \endcsname
       % 3.  \u8: B1 B2  (a single control sequence token)
-      \xdef\UTFviiiTmp{\UTFviiiTmp}%
+      \xdef\UTFviiiName{\expandafter\UTFviiiTmp\UTFviiiSeq}%
       %
       \ifpdf
         \toksA={#2}%
         \utfsixteentotoks\toksB{#1}%
-        \expandafter\xdef\UTFviiiTmp{%
+        \toksC=\expandafter{\UTFviiiSeq}%
+        \expandafter\xdef\UTFviiiName{%
           \noexpand\ifutfbytespdf\noexpand\utfbytes{\the\toksB}%
-          \noexpand\else\the\toksA\noexpand\fi}%
+          \noexpand\else\noexpand\ifutfeightbytes\the\toksC
+          \noexpand\else\the\toksA\noexpand\fi\noexpand\fi}%
       \else
-        \expandafter\gdef\UTFviiiTmp{#2}%
+        \expandafter\gdef\UTFviiiName{#2}%
       \fi
       %
       \expandafter\ifx\csname uni:#1\endcsname \relax \else
@@ -10920,12 +11112,12 @@ directory should work if nowhere else does.}
       \fi
       %
       % define an additional control sequence for this code point.
-      \expandafter\globallet\csname uni:#1\endcsname \UTFviiiTmp
+      \expandafter\globallet\csname uni:#1\endcsname \UTFviiiName
     \endgroup}
   %
   % Given the value in \countUTFz as a Unicode code point, set
-  % \UTFviiiTmp to one of the \UTVviii*OctetsName macros followed by
-  % the corresponding UTF-8 sequence.
+  % \UTFviiiTmp to one of the \UTVviii*OctetsName macros.
+  % Put the corresponding UTF-8 sequence in \UTFviiiSeq.
   \gdef\parseXMLCharref{%
     \ifnum\countUTFz < "20\relax
       \errhelp = \EMsimple
@@ -10964,7 +11156,7 @@ directory should work if nowhere else does.}
     \uccode `#1\countUTFx
     \countUTFz = \countUTFy}
 
-  % Used to put a UTF-8 byte sequence into \UTFviiiTmp
+  % Used to put a UTF-8 byte sequence into \UTFviiiTmp and \UTFviiiSeq.
   % #1 is the increment for \countUTFz to yield a the first byte of the UTF-8
   %    sequence.
   % #2 is one of the \UTFviii*OctetsName macros.
@@ -10974,7 +11166,8 @@ directory should work if nowhere else does.}
   \gdef\parseUTFviiiB#1#2#3#4{%
     \advance\countUTFz by "#10\relax
     \uccode `#3\countUTFz
-    \uppercase{\gdef\UTFviiiTmp{#2#3#4}}}
+    \gdef\UTFviiiTmp{#2}%
+    \uppercase{\gdef\UTFviiiSeq{#3#4}}}
 \endgroup
 
 % Used in \DefineSortKey as temporary definitions of \UTFviiiTwoOctetsName etc.
@@ -11005,7 +11198,7 @@ directory should work if nowhere else does.}
     % 3.  \noexpand\sort: B1 B2
     % 4.  \sort: B1 B2 (a single control sequence token)
     %
-    \xdef\UTFviiiTmp{\UTFviiiTmp}%
+    \xdef\UTFviiiTmp{\expandafter\UTFviiiTmp\UTFviiiSeq}%
   \egroup
   \expandafter\gdef\UTFviiiTmp{#2}%
 }
