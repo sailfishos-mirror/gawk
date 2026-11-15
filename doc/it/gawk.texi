@@ -50511,21 +50511,17 @@ dovrebbero essere sempre compilabili.
 È stato proposto poi di lanciare ogni notte uno @dfn{script} tramite il
 comando di utilità @command{cron} per creare archivi in formato @command{tar}
 contenenti tutto ``il codice sorgente.''  Il problema in questo caso è che
-ci sono differenti alberi di sorgenti, che corrispondono ai vari rami!
+ci sono più alberi di sorgenti, uno per ognuno dei vari rami!
 Quindi gli archivi notturni in questione non sono una risposta valida, anche
 per il fatto che il deposito Git può rimanere senza alcuna modifica
 significativa per settimane intere.
 
-Fortunatamente, il server Git può rispondere a questa esigenza.  Per ogni
-dato ramo chiamato @var{nome-ramo}, basta usare:
-
-@example
-wget https://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-@var{nome-ramo}.tar.gz
-@end example
-
-@noindent
-per ottenere una copia utilizzabile del ramo in questione.
-@c FIXME: 12 Nov 2026: This just hanged for me, ....
+In passato, il server Git era in grado di fornire un file tar con
+il contenuto di un singolo ramo della distribuione di @command{gawk}.
+Questa funzione è stata rimossa a causa dei @dfn{chatbot} AI che
+estraggono dati dal server.  La cosa migliore da farsi è, quindi,
+quella di clonare il deposito Git e di selezionare
+(@command{git checkout}) il ramo al quale si è interessati.
 
 @node Future estensioni
 @appendixsec Probabili estensioni future
