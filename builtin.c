@@ -475,11 +475,7 @@ do_index(int nargs)
 					ret = pos - s1->wstptr + 1;	/* 1-based */
 				goto out;
 			} else {
-				/*
-				 * Could use tolower(*p1) == tolower(*p2) here.
-				 * See discussion in eval.c as to why not.
-				 */
-				if (casetable[(unsigned char)*p1] == casetable[(unsigned char)*p2]
+				if (tolower((unsigned char)*p1) == tolower((unsigned char)*p2)
 				    && (l2 == 1 || strncasecmp(p1, p2, l2) == 0)) {
 					ret = 1 + s1->stlen - l1;
 					break;
