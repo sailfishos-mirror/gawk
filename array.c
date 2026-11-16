@@ -1099,7 +1099,7 @@ cmp_strings(const NODE *n1, const NODE *n2)
 			size_t count = lmin;
 
 			for (ret = 0; count-- > 0 && ret == 0; cp1++, cp2++)
-				ret = casetable[*cp1] - casetable[*cp2];
+				ret = tolower(*cp1) - tolower(*cp2);
 		}
 		if (ret != 0)
 			return ret;

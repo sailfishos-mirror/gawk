@@ -307,10 +307,6 @@ main(int argc, char **argv)
 	/* init the cache for checking bytes if they're characters */
 	init_btowc_cache();
 
-	/* set up the single byte case table */
-	if (gawk_mb_cur_max == 1)
-		load_casetable();
-
 	/* check for POSIXLY_CORRECT environment variable */
 	if (! do_posix && getenv("POSIXLY_CORRECT") != NULL) {
 		do_flags |= DO_POSIX;

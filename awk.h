@@ -1331,8 +1331,6 @@ extern const char *defpath;
 extern const char *deflibpath;
 extern const char envsep;
 
-extern char casetable[];	/* for case-independent regexp matching */
-
 extern const char awk_namespace[];	/* "awk" */
 extern const char *current_namespace;
 extern bool namespace_changed;
@@ -1637,7 +1635,6 @@ extern const char *redflags2str(int);
 extern const char *flags2str(int);
 extern const char *genflags2str(int flagval, const struct flagtab *tab);
 extern const char *nodetype2str(NODETYPE type);
-extern void load_casetable(void);
 extern double calc_exp(double x1, double x2);
 extern const char *opcode2str(OPCODE type);
 extern const char *op2str(OPCODE type);
