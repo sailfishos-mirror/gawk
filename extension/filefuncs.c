@@ -63,6 +63,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <unistd.h>
 
 #ifdef HAVE_SYS_PARAM_H

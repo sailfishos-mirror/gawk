@@ -1,8 +1,8 @@
 #! /usr/bin/gawk -f
 
-# gensub2 --- Do what gensub() does, but also set NSUB0 to the
-# number of substitutions made.  This is useful for prototyping
-# and exploration.
+# gensub2 --- Do what gensub() does, but also set result["nsub"] to the
+# number of substitutions made, and result["nmatch"] to the number of
+# matches.  This is useful for prototyping and exploration.
 #
 # The implementation relies on a number of features specific to gawk.
 
@@ -13,18 +13,29 @@
 
 BEGIN {
     target = "abc"
-    print target, "--->", awk::gensub2("b+", "FOO", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("b+", "FOO", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("q", "FOO", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("q", "FOO", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("b", "X", 2, target), ", NSUB0 =", awk::NSUB0, awk::gensub("b", "X", 2, target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("x*", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("x*", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("b*", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("b*", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("c", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("c", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("c+", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("c+", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("x*$", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("x*$", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("(a)(b)(c)", "& - \\3\\2\\1 - &", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("(a)(b)(c)", "& - \\3\\2\\1 - &", "g", target), "NSUB =", PROCINFO["nsub"]
-    $0 = target; print $0, "--->", awk::gensub2("(a)(b)(c)", "& - \\3\\2\\1 - &", "g"), ", NSUB0 =", awk::NSUB0, awk::gensub("(a)(b)(c)", "& - \\3\\2\\1 - &", "g"), "NSUB =", PROCINFO["nsub"]
+    runtest("b+", "FOO", "g", target)
+    runtest("q", "FOO", "g", target)
+    runtest("b", "X", 2, target)
+    runtest("x*", "X", "g", target)
+    runtest("b*", "X", "g", target)
+    runtest("c", "X", "g", target)
+    runtest("c+", "X", "g", target)
+    runtest("x*$", "X", "g", target)
+
+    $0 = target
+    runtest("(a)(b)(c)", "& - \\3\\2\\1 - &", "g")  # no target
+
     target = "abbbc"
-    print target, "--->", awk::gensub2("b", "X", 2, target), ", NSUB0 =", awk::NSUB0, awk::gensub("b", "X", 2, target), "NSUB =", PROCINFO["nsub"]
+    runtest("b", "X", 2, target)
+}
+
+function runtest(regex, replace, how, target,   result, stats)
+{
+    if (awk::typeof(target) == "untyped")
+        target = $0
+            
+    result = awk::gensub2(regex, replace, how, target, stats)
+    printf("%s ---> %s, nmatch = %d, nsub = %d\n", target, result, stats["nmatch"], stats["nsub"])
 }
 
 function compute_replace(replace, matches,  result, chars, i, j, k)
@@ -36,9 +47,9 @@ function compute_replace(replace, matches,  result, chars, i, j, k)
                 k = chars[i+1] + 0
                 result = result matches[k]
             } else {
-                result = result chars[i+1]  # literal text
-            }
-            i++
+            result = result chars[i+1]  # literal text
+        }
+        i++
         } else if (chars[i] == "&") {
             result = result matches[0]  # entire text
         } else {
@@ -50,16 +61,18 @@ function compute_replace(replace, matches,  result, chars, i, j, k)
 
 @namespace "awk"
 
-function gensub2(regex, replace, how, target,       # parameters
+function gensub2(regex, replace, how, target, stats,       # parameters
                  newstr, eosflag, nonzeroflag, global,  # locals
-                 which, count, str, matches, repl,
+                 which, count, str, matches, repl, nsub,
                  true, false)
 {
     true = 1; false = 0
-    NSUB0 = 0
+    nsub = 0
 
     if (typeof(target) == "untyped")
         target = $0
+
+    delete stats
 
     global = (how == "g" || how == "G")
     which = 1
@@ -88,7 +101,7 @@ function gensub2(regex, replace, how, target,       # parameters
                 newstr = newstr substr(str, 1, RSTART-1) repl
             }
             str = substr(str, RSTART+RLENGTH)
-            NSUB0++
+            nsub++
         } else if (nonzeroflag) {
             # last match was non-zero in length, and at the
             # current character, we get a zero length match,
@@ -98,7 +111,7 @@ function gensub2(regex, replace, how, target,       # parameters
             nonzeroflag = false
         } else {
             # zero-length match
-            NSUB0++
+            nsub++
             if (RSTART == 1) {
                 newstr = newstr repl substr(str, 1, 1)
                 str = substr(str, 2)
@@ -115,6 +128,9 @@ function gensub2(regex, replace, how, target,       # parameters
     }
     if (length(str) > 0)
         newstr = newstr str # rest of string
+
+    stats["nmatch"] = count
+    stats["nsub"] = nsub
 
     return newstr
 }
