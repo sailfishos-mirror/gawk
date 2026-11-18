@@ -49,7 +49,6 @@ make_regexp(char *s, size_t len, bool ignorecase, bool canfatal)
 	const char *end = s + len;
 	char *dest;
 	int c;
-	static bool first = true;
 	int i;
 	static bool nul_warned = false;
 	char save;
@@ -326,8 +325,6 @@ int
 research(Regexp *rp, char *str, int start,
 	 size_t len, int flags)
 {
-	const char *ret = str;
-	bool try_backref = false;
 	bool need_start;
 	bool no_bol;
 	bool need_sub;
