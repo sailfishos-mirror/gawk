@@ -5073,6 +5073,10 @@ be removed in version 6.1:
 
 @itemize @bullet
 @item
+The @option{-g}/@option{--gen-pot} option and the translations functions
+for internationalizing @command{gawk} programs.
+
+@item
 The @option{-S}/@option{--sandbox} option for ``sandbox mode.''
 
 @item
@@ -31000,7 +31004,7 @@ a (mandatory!) option @option{--persist=@var{file}} to specify the file
 for storing the persistent heap.
 Previous versions of @command{gawk} recognized this option and issued
 a fatal error message explaining that the @env{GAWK_PERSIST_FILE}
-environment variable should be used instead.  As of release 6.0.0,
+environment variable should be used instead.
 @command{gawk} no longer recognizes that option.
 
 The prototype only supported persistent data; it did not
@@ -34152,14 +34156,13 @@ Provide tests in a @code{BEGIN} rule.
 The author's solution is included in @command{gawk} distribution.
 @end enumerate
 
-@c FIXME: Revise for when Andy updates gensub() in master for 6.0.
 @ignore
 @c file eg/lib/gensub2.awk
 #! /usr/bin/gawk -f
 
-# gensub2 --- Do what gensub() does, but also set NSUB0 to the
-# number of substitutions made.  This is useful for prototyping
-# and exploration.
+# gensub2 --- Do what gensub() does, but also set result["nsub"] to the
+# number of substitutions made, and result["nmatch"] to the number of
+# matches.  This is useful for prototyping and exploration.
 #
 # The implementation relies on a number of features specific to gawk.
 
@@ -34170,18 +34173,29 @@ The author's solution is included in @command{gawk} distribution.
 
 BEGIN @{
     target = "abc"
-    print target, "--->", awk::gensub2("b+", "FOO", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("b+", "FOO", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("q", "FOO", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("q", "FOO", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("b", "X", 2, target), ", NSUB0 =", awk::NSUB0, awk::gensub("b", "X", 2, target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("x*", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("x*", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("b*", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("b*", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("c", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("c", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("c+", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("c+", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("x*$", "X", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("x*$", "X", "g", target), "NSUB =", PROCINFO["nsub"]
-    print target, "--->", awk::gensub2("(a)(b)(c)", "& - \\3\\2\\1 - &", "g", target), ", NSUB0 =", awk::NSUB0, awk::gensub("(a)(b)(c)", "& - \\3\\2\\1 - &", "g", target), "NSUB =", PROCINFO["nsub"]
-    $0 = target; print $0, "--->", awk::gensub2("(a)(b)(c)", "& - \\3\\2\\1 - &", "g"), ", NSUB0 =", awk::NSUB0, awk::gensub("(a)(b)(c)", "& - \\3\\2\\1 - &", "g"), "NSUB =", PROCINFO["nsub"]
+    runtest("b+", "FOO", "g", target)
+    runtest("q", "FOO", "g", target)
+    runtest("b", "X", 2, target)
+    runtest("x*", "X", "g", target)
+    runtest("b*", "X", "g", target)
+    runtest("c", "X", "g", target)
+    runtest("c+", "X", "g", target)
+    runtest("x*$", "X", "g", target)
+
+    $0 = target
+    runtest("(a)(b)(c)", "& - \\3\\2\\1 - &", "g")  # no target
+
     target = "abbbc"
-    print target, "--->", awk::gensub2("b", "X", 2, target), ", NSUB0 =", awk::NSUB0, awk::gensub("b", "X", 2, target), "NSUB =", PROCINFO["nsub"]
+    runtest("b", "X", 2, target)
+@}
+
+function runtest(regex, replace, how, target,   result, stats)
+@{
+    if (awk::typeof(target) == "untyped")
+        target = $0
+            
+    result = awk::gensub2(regex, replace, how, target, stats)
+    printf("%s ---> %s, nmatch = %d, nsub = %d\n", target, result, stats["nmatch"], stats["nsub"])
 @}
 
 function compute_replace(replace, matches,  result, chars, i, j, k)
@@ -34193,9 +34207,9 @@ function compute_replace(replace, matches,  result, chars, i, j, k)
                 k = chars[i+1] + 0
                 result = result matches[k]
             @} else @{
-                result = result chars[i+1]  # literal text
-            @}
-            i++
+            result = result chars[i+1]  # literal text
+        @}
+        i++
         @} else if (chars[i] == "&") @{
             result = result matches[0]  # entire text
         @} else @{
@@ -34207,16 +34221,18 @@ function compute_replace(replace, matches,  result, chars, i, j, k)
 
 @@namespace "awk"
 
-function gensub2(regex, replace, how, target,       # parameters
+function gensub2(regex, replace, how, target, stats,       # parameters
                  newstr, eosflag, nonzeroflag, global,  # locals
-                 which, count, str, matches, repl,
+                 which, count, str, matches, repl, nsub,
                  true, false)
 @{
     true = 1; false = 0
-    NSUB0 = 0
+    nsub = 0
 
     if (typeof(target) == "untyped")
         target = $0
+
+    delete stats
 
     global = (how == "g" || how == "G")
     which = 1
@@ -34245,7 +34261,7 @@ function gensub2(regex, replace, how, target,       # parameters
                 newstr = newstr substr(str, 1, RSTART-1) repl
             @}
             str = substr(str, RSTART+RLENGTH)
-            NSUB0++
+            nsub++
         @} else if (nonzeroflag) @{
             # last match was non-zero in length, and at the
             # current character, we get a zero length match,
@@ -34255,7 +34271,7 @@ function gensub2(regex, replace, how, target,       # parameters
             nonzeroflag = false
         @} else @{
             # zero-length match
-            NSUB0++
+            nsub++
             if (RSTART == 1) @{
                 newstr = newstr repl substr(str, 1, 1)
                 str = substr(str, 2)
@@ -34272,6 +34288,9 @@ function gensub2(regex, replace, how, target,       # parameters
     @}
     if (length(str) > 0)
         newstr = newstr str # rest of string
+
+    stats["nmatch"] = count
+    stats["nsub"] = nsub
 
     return newstr
 @}
@@ -36044,10 +36063,11 @@ The @file{gawkapi.h} file may be included more than once without ill effect.
 Doing so, however, is poor coding practice.
 
 @item
-Starting with release 6.0 of @command{gawk}, the API is allowed
+The API is allowed
 to use ISO C 99 features.  Concretely, this is seen in the use
 of the @code{int32_t} type, and in the use of the @code{inline}
-keyword for the ``constructor'' functions.
+keyword for the ``constructor'' functions, as well as in the
+messaging macros.
 
 @item
 All pointers filled in by @command{gawk} point to memory
@@ -36077,7 +36097,7 @@ characters are allowed.
 The multibyte encoded version of the string (@code{char *}) is maintained
 using the current multibyte
 encoding (as defined by @env{LC_@var{xxx}} environment variables).
-As of release 6.0 of @command{gawk}, string values also include
+String values also include
 the wide character version of the original string. This value
 is also represented with a pointer (@code{int32_t *)} and a length.
 The API does @emph{not} use either the @code{wchar_t} type or the
@@ -36177,9 +36197,9 @@ in the @code{str} and @code{len} members, and set the @code{wstr} and
 @itemx @ @ @ @ AWK_REGEX,
 @itemx @ @ @ @ AWK_STRNUM,
 @itemx @ @ @ @ AWK_ARRAY,
+@itemx @ @ @ @ AWK_BOOL,
 @itemx @ @ @ @ AWK_SCALAR,@ @ @ @ @ @ @ @ @ /* opaque access to a variable */
 @itemx @ @ @ @ AWK_VALUE_COOKIE,@ @ @ /* for updating a previously created value */
-@itemx @ @ @ @ AWK_BOOL
 @itemx @} awk_valtype_t;
 This @code{enum} indicates the type of a value.
 It is used in the following @code{struct}.
@@ -36187,12 +36207,12 @@ It is used in the following @code{struct}.
 @item typedef struct awk_value @{
 @itemx @ @ @ @ awk_valtype_t   val_type;
 @itemx @ @ @ @ union @{
-@itemx @ @ @ @ @ @ @ @ awk_string_t@ @ @ @ @ @ @ s;
 @itemx @ @ @ @ @ @ @ @ awknum_t@ @ @ @ @ @ @ @ @ @ @ n;
+@itemx @ @ @ @ @ @ @ @ awk_string_t@ @ @ @ @ @ @ s;
 @itemx @ @ @ @ @ @ @ @ awk_array_t@ @ @ @ @ @ @ @ a;
+@itemx @ @ @ @ @ @ @ @ awk_bool_t@ @ @ @ @ @ @ @ @ b;
 @itemx @ @ @ @ @ @ @ @ awk_scalar_t@ @ @ @ @ @ @ scl;
 @itemx @ @ @ @ @ @ @ @ awk_value_cookie_t@ vc;
-@itemx @ @ @ @ @ @ @ @ awk_bool_t@ @ @ @ @ @ @ @ @ b;
 @itemx @ @ @ @ @} u;
 @itemx @} awk_value_t;
 An ``@command{awk} value.''
@@ -36222,8 +36242,8 @@ type of numeric value that is being worked with.  It is declared at the
 top level of the file so that it works correctly for C++ as well as for C.
 
 @item typedef struct awk_number @{
-@itemx @ @ @ @ double d;
 @itemx @ @ @ @ enum AWK_NUMBER_TYPE type;
+@itemx @ @ @ @ double d;
 @itemx @ @ @ @ void *ptr;
 @itemx @} awk_number_t;
 This represents a numeric value.  Internally, @command{gawk} stores
@@ -36240,9 +36260,11 @@ floating-point value (type @code{mpfr_ptr_t}), and cast it appropriately.
 
 @quotation CAUTION
 Any MPFR or MPZ values that you create and pass to @command{gawk}
-to save are @emph{copied}. This means you are responsible for releasing
+to save are @emph{copied}. This means you are responsible to release
 the storage once you're done with it. See the @code{intdiv} sample
 extension for some example code.
+
+Also note that support for MPFR and MPZ will be removed in @command{gawk} 6.1.
 @end quotation
 
 @item typedef void *awk_scalar_t;
@@ -36266,6 +36288,8 @@ Representing numbers is easy---the API uses a C @code{double}.  Strings
 require more work. Because @command{gawk} allows embedded @sc{nul} bytes
 in string values, a string must be represented as a pair containing a
 data pointer and length. This is the @code{awk_string_t} type.
+For the same reason, a (pointer, count) pair is used for the
+wide-character data.
 
 A strnum (numeric string) value is represented as a string and consists
 of user input data that appears to be numeric.
@@ -36300,8 +36324,8 @@ read, but it remains @emph{your} responsibility to make sure that
 the @code{val_type} member correctly reflects the type of the value in
 the @code{awk_value_t} struct.
 
-Conceptually, the first three members of the @code{union} (number, string,
-and array) are all that is needed for working with @command{awk} values.
+Conceptually, the number, string, and array members of the @code{union}
+are all that is needed for working with @command{awk} values.
 However, because the API provides routines for accessing and changing
 the value of a global scalar variable only by using the variable's name,
 there is a performance penalty: @command{gawk} must find the variable
@@ -36467,13 +36491,14 @@ pointed to by @code{result}.
 @item static inline awk_value_t *
 @itemx make_number_mpz(void *mpz, awk_value_t *result);
 This function creates a GMP number value in @code{result}.
-The @code{mpz} must be from a call to @code{get_mpz_ptr()}
-(and thus be of real underlying type @code{mpz_ptr}).
+@strong{NOTE:} This function is deprecated and will be
+removed in @command{gawk} 6.1.
 
 @item static inline awk_value_t *
 @itemx make_number_mpfr(void *mpfr, awk_value_t *result);
 This function creates an MPFR number value in @code{result}.
-The @code{mpfr} must be from a call to @code{get_mpfr_ptr()}.
+@strong{NOTE:} This function is deprecated and will be
+removed in @command{gawk} 6.1.
 
 @item static inline awk_value_t *
 @itemx make_const_user_input(const char *string, size_t length,
@@ -38045,7 +38070,7 @@ See the next section
 for a discussion of how to
 flatten an array and work with it.
 
-@c FIXME: Consider removing for 6.0
+@c FIXME: Remove for 6.1
 @item awk_bool_t flatten_array(awk_array_t a_cookie, awk_flat_array_t **data);
 For the array represented by @code{a_cookie}, create an @code{awk_flat_array_t}
 structure and fill it in with @code{AWK_STRING} indices and
@@ -38053,6 +38078,9 @@ structure and fill it in with @code{AWK_STRING} indices and
 This is superseded by @code{flatten_array_typed()}.
 It is provided as a macro, and remains for convenience and for source code
 compatibility with earlier versions of the API.
+In order to use this macro, you must define
+the macro @code{API_COMPAT_GAWK_5} before including @code{"gawkapi.h"},
+and @code{flatten_array()} will be removed at the next major release.
 
 @item awk_bool_t release_flattened_array(awk_array_t a_cookie,
 @itemx @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ awk_flat_array_t *data);
@@ -38541,7 +38569,9 @@ socket library in @code{gawkextlib}'s @code{socket} extension
 @node Extension String Conversions
 @subsection String Conversion Functions and Variables
 
-Two variables provide information related to the current locale:
+When converting back and forth between multibyte and wide-character
+encodings, it's useful to have information about the locale.
+Two variables provide such information:
 
 @table @code
 @item int gawk_mb_cur_max;
@@ -38550,7 +38580,7 @@ on GLIBC systems at least, the @code{MB_CUR_MAX} macro hides a
 function call. As this value doesn't change during any particular
 execution of @command{gawk}, it's much more efficient to retrieve
 it once, instead of many times. This is particularly true should the
-value need to be used inside a loop.
+value need to be needed inside a loop.
 
 @item const char *gawk_codeset;
 The name of the current codeset (for example, @code{"UTF-8"}).
@@ -38607,7 +38637,8 @@ length of the new multibyte encoded character string, in units of bytes.
 @c end nested table
 @end table
 
-The @code{ordchr} sample extension makes use of these facilities.
+The @code{ordchr} sample extension makes use of these facilities
+(@pxref{Extension Sample Ord}).
 
 @node Extension API Variables
 @subsection API Variables
@@ -38724,6 +38755,11 @@ produces a fatal error message.
 The @code{dl_load_func()} macro (@pxref{Extension API Boilerplate})
 calls @code{check_mpfr_version()}.
 @end table
+
+@quotation CAUTION
+All of the API variables and macros named in this section will
+be removed in @command{gawk} 6.1.
+@end quotation
 
 @node Extension API Informational Variables
 @subsubsection Informational Variables
@@ -39169,6 +39205,7 @@ to make use of the API macros and boilerplate code
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <unistd.h>
 
 #include <sys/types.h>
@@ -40765,6 +40802,9 @@ flattening an array for easy C-style looping over all its indices and elements)
 @end itemize
 
 @item
+Converting strings between multibyte and wide-character representations.
+
+@item
 The API defines a number of standard data types for representing
 @command{awk} values, array elements, and arrays.
 
@@ -41394,7 +41434,7 @@ The @env{AWKLIBPATH} environment variable for specifying a path search for
 the @option{-l} command-line option
 (@pxref{Options})
 
-@c FIXME: Recheck this list against 6.0 and 6.1.
+@c FIXME: Recheck this list against 6.1.
 @item
 The
 @option{-b},
@@ -41407,6 +41447,8 @@ The
 @option{-g},
 @option{-h},
 @option{-i},
+@option{-I},
+@option{-k},
 @option{-l},
 @option{-L},
 @option{-M},
@@ -41416,7 +41458,6 @@ The
 @option{-O},
 @option{-p},
 @option{-P},
-@option{-r},
 @option{-s},
 @option{-S},
 @option{-t},
@@ -41429,6 +41470,7 @@ and the
 @option{--bignum},
 @option{--characters-as-bytes},
 @option{--copyright},
+@option{--csv},
 @option{--debug},
 @option{--dump-variables},
 @option{--exec},
@@ -41438,7 +41480,6 @@ and the
 @option{--help},
 @option{--include},
 @option{--lint},
-@option{--lint-old},
 @option{--load},
 @option{--non-decimal-data},
 @option{--optimize},
@@ -41446,9 +41487,9 @@ and the
 @option{--posix},
 @option{--pretty-print},
 @option{--profile},
-@option{--re-interval},
 @option{--sandbox},
 @option{--source},
+@option{--trace},
 @option{--traditional},
 @option{--use-lc-numeric},
 and
@@ -41652,7 +41693,7 @@ The @option{--lint-old} option to
 warn about constructs that are not available in
 the original Version 7 Unix version of @command{awk}
 (@pxref{V7/SVR3.1}).
-@c FIXME: Removed in 6.0
+(This option is no longer supported).
 
 @item
 The @option{-m} option from BWK @command{awk}.  (Brian was
@@ -41662,7 +41703,7 @@ both his @command{awk} and from @command{gawk}.
 @item
 The @option{--re-interval} option to provide interval expressions in regexps
 (@pxref{Regexp Operators}).
-@c FIXME: Removed in 6.0
+(This option is no longer supported).
 
 @item
 The @option{--traditional} option was added as a better name for
@@ -45943,10 +45984,9 @@ arrays of arrays).
 
 Some additional important goals were:
 
-@c FIXME: 6.0 - C 99
 @itemize @value{BULLET}
 @item
-The API should use only features in ISO C 90, so that extensions
+The API should use only features in ISO C 99, so that extensions
 can be written using the widest range of C and C++ compilers. The header
 should include the appropriate @samp{#ifdef __cplusplus} and @samp{extern "C"}
 magic so that a C++ compiler could be used.  (If using C++, the runtime

@@ -346,9 +346,11 @@ enum AWK_NUMBER_TYPE {
  * See the manual for further discussion.
  */
 
+// FIXME: In 6.1, pointer and AWK_NUMBER_TYPE will go away.
+// Maybe this whole struct will go away, and only doubles will remain.
 typedef struct awk_number {
-	double d;	/* always populated in data received from gawk */
 	enum AWK_NUMBER_TYPE type;
+	double d;	/* always populated in data received from gawk */
 	void *ptr;	/* either NULL or mpfr_ptr or mpz_ptr */
 } awk_number_t;
 
@@ -375,9 +377,9 @@ typedef enum {
 	AWK_REGEX,
 	AWK_STRNUM,
 	AWK_ARRAY,
+	AWK_BOOL,
 	AWK_SCALAR,		/* opaque access to a variable */
 	AWK_VALUE_COOKIE,	/* for updating a previously created value */
-	AWK_BOOL
 } awk_valtype_t;
 
 /*
@@ -387,12 +389,12 @@ typedef enum {
 typedef struct awk_value {
 	awk_valtype_t	val_type;
 	union {
-		awk_string_t	s;
 		awk_number_t	n;
+		awk_string_t	s;
 		awk_array_t	a;
+		awk_bool_t      b;
 		awk_scalar_t	scl;
 		awk_value_cookie_t vc;
-		awk_bool_t      b;
 	} u;
 #define str_value	u.s
 #define strnum_value	str_value
@@ -401,9 +403,9 @@ typedef struct awk_value {
 #define num_type	u.n.type
 #define num_ptr		u.n.ptr
 #define array_cookie	u.a
+#define bool_value	u.b
 #define scalar_cookie	u.scl
 #define value_cookie	u.vc
-#define bool_value	u.b
 } awk_value_t;
 
 /*
@@ -883,6 +885,8 @@ typedef struct gawk_api {
 #define warning(id, ...)	api->api_warning(__VA_ARGS__)
 #define lintwarn(id, ...)	api->api_lintwarn(__VA_ARGS__)
 typedef void *awk_ext_id_t;
+#define flatten_array(array, data) \
+	flatten_array_typed(array, data, AWK_STRING, AWK_UNDEFINED)
 #else
 #define fatal		api->api_fatal
 #define nonfatal	api->api_nonfatal
@@ -941,9 +945,6 @@ typedef void *awk_ext_id_t;
 
 #define flatten_array_typed(array, data, index_type, value_type) \
 	(api->api_flatten_array_typed(array, data, index_type, value_type))
-
-#define flatten_array(array, data) \
-	flatten_array_typed(array, data, AWK_STRING, AWK_UNDEFINED)
 
 #define release_flattened_array(array, data) \
 	(api->api_release_flattened_array(array, data))
