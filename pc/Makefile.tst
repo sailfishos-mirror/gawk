@@ -248,6 +248,7 @@ GAWK_EXT_TESTS = \
 	nsawk1a nsawk1b nsawk1c nsawk2a nsawk2b nsbad nsbad2 nsbad3 nsbad_cmd \
 	nsforloop nsfuncrecurse nsidentifier nsindirect1 nsindirect2 nsprof1 \
 	nsprof2 nsprof3 octdec patsplit \
+	nsub \
 	posix printfbad1 printfbad2 printfbad3 printfbad4 printhuge procinfs \
 	profile0 profile1 profile2 profile3 profile4 profile5 profile6 \
 	profile7 profile8 profile9 profile10 profile11 profile12 profile13 \
@@ -3535,6 +3536,11 @@ octdec:
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 patsplit:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+nsub:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"

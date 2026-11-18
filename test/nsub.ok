@@ -1,0 +1,11 @@
+gensub(/b+/, "FOO", g, "abc") ---> "aFOOc", nmatch = 1, nsub = 1
+gensub(/q/, "FOO", g, "abc") ---> "abc", nmatch = 0, nsub = 0
+gensub(/b/, "X", 2, "abc") ---> "abc", nmatch = 1, nsub = 0
+gensub(/x*/, "X", g, "abc") ---> "XaXbXcX", nmatch = 4, nsub = 4
+gensub(/b*/, "X", g, "abc") ---> "XaXcX", nmatch = 3, nsub = 3
+gensub(/c/, "X", g, "abc") ---> "abX", nmatch = 1, nsub = 1
+gensub(/c+/, "X", g, "abc") ---> "abX", nmatch = 1, nsub = 1
+gensub(/x*$/, "X", g, "abc") ---> "abcX", nmatch = 1, nsub = 1
+gensub(/b/, "X", 2, "abbbc") ---> "abXbc", nmatch = 2, nsub = 1
+gensub(/(a)(b)(c)/, "& - \3\2\1 - &", g, "abc") ---> "abc - cba - abc", nmatch = 1, nsub = 1
+gensub(/(a)(b)(c)/, "& - \3\2\1 - &", g, "abc") ---> "abbbc", nmatch = 0, nsub = 0

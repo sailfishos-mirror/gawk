@@ -18278,14 +18278,17 @@ arguments, but doing so only makes sense if you're also supplying the third argu
 @cindexgawkfunc{gensub}
 @cindex search and replace in strings
 @cindex substitute in string
-@item @code{gensub(@var{regexp}, @var{replacement}, @var{how}} [@code{, @var{target}}]@code{) #}
+@item @code{gensub(@var{regexp}, @var{replacement}, @var{how}} [@code{, @var{target}} [@code{, @var{stats}}] ]@code{) #}
 Search the target string @var{target} for matches of the regular
 expression @var{regexp}.  If @var{how} is a string beginning with
 @samp{g} or @samp{G} (short for ``global''), then replace all matches
 of @var{regexp} with @var{replacement}.  Otherwise, treat @var{how}
 as a number indicating which match of @var{regexp} to replace.  Treat
 numeric values less than one as if they were one.  If no @var{target}
-is supplied, use @code{$0}.  Return the modified string as the result
+is supplied, use @code{$0}.
+If @code{stats} is supplied, it must be an array, and it's filled in
+as described shortly.
+Return the modified string as the result
 of the function. The original target string is @emph{not} changed.
 
 The returned value is @emph{always} a string, even if the original
@@ -18317,6 +18320,19 @@ As with @code{sub()}, you must type two backslashes in order
 to get one into the string.
 In the replacement text, the sequence @samp{\0} represents the entire
 matched text, as does the character @samp{&}.
+
+Starting with @command{gawk} version 6.0, @code{gensub()} clears the
+@code{stats} array, and then sets @code{stats["nsub"]} to the number of
+substitutions that were actually made, and @code{stats["nmatch"]} to the
+number of matches found.  @code{stats["nsub"]} and @code{stats["nmatch"]}
+will both be zero if the regular expression didn't match, or if, for a
+numeric @var{how}, there weren't enough matches in the target string.
+@code{stats["nmatch"]} only counts as high as the numeric value of
+@var{how}; it's most useful for global matches.
+
+Consider that if, in the previous example, @code{a} had been
+@code{"abc abc"}, @code{b} and @code{a} would have identical contents,
+but @code{stats["nsub"]} would be one.
 
 The following example shows how you can use the third argument to control
 which match of the regexp should be changed:
@@ -42363,6 +42379,12 @@ function, and with the @option{--non-decimal-data} option
 @item
 Support for UDP in @command{gawk}'s networking was marked as obsolete
 (@pxref{TCP/IP Networking}).
+
+@item
+@code{gensub()} was changed to allow an optional fifth array
+parameter in which to record statistics about the matches
+and the substitutions.
+(@pxref{String Functions}).
 
 @item
 The MinGW port of @command{gawk} for MS-Windows gained support for

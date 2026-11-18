@@ -1816,13 +1816,24 @@ do_sub(int nargs, unsigned int flags)
 	char *mb_indices = NULL;
 	int searchflags = RE_NEED_START;
 	const char *fname = NULL;	// for fatal message, below
+	NODE *ret_arr = NULL;
+	int nsub = 0;
 
 	if ((flags & GENSUB) != 0) {
 		double d;
 		NODE *glob_flag;
 
 		fname = "gensub";
-		check_exact_args(nargs, "gensub", 4);
+		check_args_min_max(nargs, fname, 4, 5);
+
+		if (nargs == 5) {
+			ret_arr = POP_PARAM();
+			if (ret_arr->type != Node_var_array)
+				fatal(_("gensub: fifth argument is not an array"));
+		  	check_symtab_functab(ret_arr, "gensub",
+				_("%s: cannot use %s as fifth argument"));
+			assoc_clear(ret_arr);
+		}
 
 		tmp = PEEK(3);
 		rp = re_update(tmp);
@@ -2018,6 +2029,9 @@ do_sub(int nargs, unsigned int flags)
 				matches--;
 				goto empty;
 			}
+
+			nsub++;
+
 			/*
 			 * If replacing all occurrences, or this is the
 			 * match we want, copy in the replacement text,
@@ -2159,6 +2173,13 @@ done:
 	}
 
 	if (flags & GENSUB) {
+		if (ret_arr) {
+			NODE *tmp = make_string("nsub", 4);
+			assoc_set(ret_arr, tmp, make_number(nsub));
+
+			tmp = make_string("nmatch", 6);
+			assoc_set(ret_arr, tmp, make_number(matches));
+		}
 		if (matches > 0) {
 			/* return the result string */
 			DEREF(target);

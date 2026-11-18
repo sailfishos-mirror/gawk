@@ -2261,7 +2261,7 @@ static const struct token tokentab[] = {
 {"for",		Op_K_for,	 LEX_FOR,	BREAK|CONTINUE,	0,	0},
 {"func",	Op_func, 	LEX_FUNCTION,	NOT_POSIX,	0,	0},
 {"function",	Op_func, 	LEX_FUNCTION,	0,		0,	0},
-{"gensub",	Op_sub_builtin,	 LEX_BUILTIN,	GAWKX|A(3)|A(4), 0,	0},
+{"gensub",	Op_sub_builtin,	 LEX_BUILTIN,	GAWKX|A(3)|A(4)|A(5), 0,	0},
 {"getline",	Op_K_getline_redir,	 LEX_GETLINE,	0,	0,	0},
 {"gsub",	Op_sub_builtin,	 LEX_BUILTIN,	A(2)|A(3), 0,	0},
 {"if",		Op_K_if,	 LEX_IF,	0,		0,	0},
@@ -4592,8 +4592,17 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 				(void) mk_expression_list(subn,
 						list_append(list_create(ip), instruction(Op_field_spec)));
 			}
-
-			r->expr_count = count_expressions(&subn, false);
+			else if (nexp == 5) {
+				arg = subn->nexti;	/* 1st arg list */
+				arg = arg->lasti->nexti; /* 2nd */
+				arg = arg->lasti->nexti; /* 3rd */
+				arg = arg->lasti->nexti; /* 4th */
+				arg = arg->lasti->nexti; /* 5th arg list */
+				ip = arg->lasti;
+				if (ip == arg->nexti && ip->opcode == Op_push)
+					ip->opcode = Op_push_array;
+			}
+			r->expr_count = count_expressions(& subn, false);
 			return list_append(subn, r);
 		}
 	}
