@@ -176,6 +176,8 @@ EXTRA_DIST = \
 	badbuild.awk \
 	badbuild.in \
 	badbuild.ok \
+	badbyte.awk \
+	badbyte.ok \
 	beginfile1.awk \
 	beginfile1.ok \
 	beginfile2.in \
@@ -1699,6 +1701,7 @@ BASIC_TESTS = \
 	aryprm7 aryprm8 aryprm9 arysubnm aryunasgn asgext assignnumfield \
 	assignnumfield2 assignnumfield3 awkpath \
 	back89 backgsub badassign1 badbuild \
+	badbyte \
 	callparam case-check childin clobber close_status closebad clsflnam \
 	cmdlinefsbacknl cmdlinefsbacknl2 compare compare2 concat1 concat2 concat3 \
 	concat4 concat5 convfmt \
