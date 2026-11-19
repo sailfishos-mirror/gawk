@@ -1,7 +1,7 @@
 #! /usr/bin/gawk -f
 
-# gensub2 --- Do what gensub() does, but also set result["nsub"] to the
-# number of substitutions made, and result["nmatch"] to the number of
+# gensub2 --- Do what gensub() does, but also set stats["nsub"] to the
+# number of substitutions made, and stats["nmatch"] to the number of
 # matches.  This is useful for prototyping and exploration.
 #
 # The implementation relies on a number of features specific to gawk.

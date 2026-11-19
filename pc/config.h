@@ -41,9 +41,6 @@
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
-/* Define to 1 if bool, true and false work as per C2023. */
-#undef HAVE_C_BOOL
-
 /* Define to 1 if C supports variable-length arrays. */
 #undef HAVE_C_VARARRAYS
 
@@ -106,12 +103,6 @@
 /* Define to 1 if you have the `isblank' function. */
 #undef HAVE_ISBLANK
 
-/* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
-#define HAVE_LANGINFO_CODESET 1
-
-/* Define if your <locale.h> file defines LC_MESSAGES. */
-#undef HAVE_LC_MESSAGES
-
 /* Define to 1 if you have the <libintl.h> header file. */
 #undef HAVE_LIBINTL_H
 
@@ -121,7 +112,7 @@
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
 
-/* Define to 1 if the system has the type 'long long int'. */
+/* Define to 1 if the system has the type `long long int'. */
 #undef HAVE_LONG_LONG_INT
 
 /* Define to 1 if you have the `lstat' function. */
@@ -186,9 +177,6 @@
 
 /* Define to 1 if you have the <spawn.h> header file. */
 #undef HAVE_SPAWN_H
-
-/* Define to 1 if you have the <stdbool.h> header file. */
-#define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stddef.h> header file. */
 #ifdef __GNUC__
@@ -300,7 +288,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
-/* Define to 1 if the system has the type 'unsigned long long int'. */
+/* Define to 1 if the system has the type `unsigned long long int'. */
 #undef HAVE_UNSIGNED_LONG_LONG_INT
 
 /* Define to 1 if you have the `waitpid' function. */
@@ -340,7 +328,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.4.2"
+#define PACKAGE_STRING "GNU Awk 5.4.60"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -349,7 +337,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.4.2"
+#define PACKAGE_VERSION "5.4.60"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -370,9 +358,6 @@
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #define STDC_HEADERS 1
-
-/* enable built-in intdiv0 function */
-#undef SUPPLY_INTDIV
 
 /* some systems define this type here */
 #undef TIME_T_IN_SYS_TYPES_H
@@ -477,7 +462,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.4.2"
+#define VERSION "5.4.60"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
@@ -559,29 +544,6 @@
 /* Define to the widest unsigned integer type if <stdint.h> and <inttypes.h>
    do not define. */
 #undef uintmax_t
-
-#if !(defined __cplusplus \
-      ? 1 \
-      : (defined __clang__ \
-         ? __STDC_VERSION__ >= 202000L && __clang_major__ >= 15 \
-         : (defined __GNUC__ \
-            ? __STDC_VERSION__ >= 202000L && __GNUC__ >= 13 \
-            : defined HAVE_C_BOOL)))
-# if !defined __cplusplus && !defined __bool_true_false_are_defined
-#  if HAVE_STDBOOL_H
-#   include <stdbool.h>
-#  else
-#   if defined __SUNPRO_C
-#    error "<stdbool.h> is not usable with this configuration. To make it usable, add -D_STDC_C99= to $CC."
-#   else
-#    error "<stdbool.h> does not exist on this platform. Use gnulib module 'stdbool-c99' instead of gnulib module 'stdbool'."
-#   endif
-#  endif
-# endif
-# if !true
-#  define true (!false)
-# endif
-#endif
 
 #include "custom.h"
 
