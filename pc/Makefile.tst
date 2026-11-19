@@ -167,6 +167,7 @@ BASIC_TESTS = \
 	aryprm7 aryprm8 aryprm9 arysubnm aryunasgn asgext assignnumfield \
 	assignnumfield2 assignnumfield3 awkpath \
 	back89 backgsub badassign1 badbuild \
+	badbyte \
 	callparam case-check childin clobber close_status closebad clsflnam \
 	cmdlinefsbacknl cmdlinefsbacknl2 compare compare2 concat1 concat2 concat3 \
 	concat4 concat5 convfmt \
@@ -1479,6 +1480,11 @@ badassign1:
 badbuild:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  < "$(srcdir)"/$@.in >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+badbyte:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 callparam:
