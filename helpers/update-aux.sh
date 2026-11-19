@@ -20,3 +20,4 @@ do
 		fi
 	done
 done
+cp doc/texinfo.tex doc/it/texinfo.tex
