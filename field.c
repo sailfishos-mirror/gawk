@@ -306,7 +306,7 @@ set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *fw)
 
 	/* buffer management: */
 	if (databuf_size == 0) {	/* first time */
-		ezalloc(databuf, char *, INITIAL_SIZE);
+		emalloc(databuf, char *, INITIAL_SIZE);
 		databuf_size = INITIAL_SIZE;
 	}
 	/*
@@ -341,7 +341,6 @@ set_record(const char *buf, size_t cnt, const awk_fieldwidth_info_t *fw)
 
 	unref(fields_arr[0]);
 	getnode(n);
-	memset(n, '\0', sizeof(NODE));
 	n->stptr = databuf;
 	n->stlen = cnt;
 	n->valref = 1;
@@ -670,6 +669,7 @@ null_parse_field(long up_to,	/* parse only up to this field number */
 
 	if (gawk_mb_cur_max > 1) {
 		mbstate_t mbs;
+
 		memset(&mbs, 0, sizeof(mbstate_t));
 		for (; nf < up_to && scan < end;) {
 			size_t mbclen = mbrlen(scan, end-scan, &mbs);
@@ -821,6 +821,7 @@ comma_parse_field(long up_to,	/* parse only up to this field number */
 
 	for (; nf < up_to;) {
 		char *new_end = newfield;
+
 		memset(newfield, '\0', buflen);
 
 		while (*scan != comma && scan < end) {

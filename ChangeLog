@@ -1,3 +1,15 @@
+2026-11-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Get serious about dynamic memory.  All allocations
+	zero out the allocated memory.
+
+	* awk.h (ezalloc_real): Renamed to emalloc_real.
+	Old emalloc_real removed.
+	(ezalloc): Macro removed.
+	* All files: Replace ezalloc with emalloc.
+	Remove calls to memset to zero after allocations as
+	that's now done by emalloc and by getblock.
+
 2026-11-20         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* debug.c: Use ezalloc() everywhere. Fixes possible memory

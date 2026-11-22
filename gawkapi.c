@@ -1155,7 +1155,6 @@ api_create_array()
 	NODE *n;
 
 	getnode(n);
-	memset(n, 0, sizeof(NODE));
 	null_array(n);
 
 	return (awk_array_t) n;
@@ -1209,7 +1208,7 @@ api_flatten_array_typed(awk_array_t a_cookie,
 	alloc_size = sizeof(awk_flat_array_t) +
 			(array->table_size - 1) * sizeof(awk_element_t);
 
-	ezalloc(*data, awk_flat_array_t *, alloc_size);
+	emalloc(*data, awk_flat_array_t *, alloc_size);
 
 	list = assoc_list(array, "@unsorted", ASORTI);
 
@@ -1444,7 +1443,6 @@ api_mbstowcs(const char *str, size_t len, size_t *wlen)
 
 	NODE *n;
 	getnode(n);
-	memset(n, 0, sizeof(NODE));
 
 	n->stptr = (char *) str;
 	n->stlen = len;
@@ -1470,7 +1468,6 @@ api_wcstombs(const int32_t *wstr, size_t wlen, size_t *len)
 
 	NODE *n;
 	getnode(n);
-	memset(n, 0, sizeof(NODE));
 
 	n->wstptr = (char32_t *) wstr;
 	n->wstlen = wlen;

@@ -957,7 +957,7 @@ static CMDARG *
 mk_cmdarg(enum argtype type)
 {
 	CMDARG *arg;
-	ezalloc(arg, CMDARG *, sizeof(CMDARG));
+	emalloc(arg, CMDARG *, sizeof(CMDARG));
 	arg->type = type;
 	return arg;
 }

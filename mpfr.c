@@ -251,7 +251,7 @@ void
 mpg_zero(NODE *n)
 {
 	if (n->mpfr_data == NULL)
-		ezalloc(n->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+		emalloc(n->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
 	if (is_mpg_float(n)) {
 		mpfr_clear(n->mpg_numbr);
 		n->flags &= ~MPFN;
@@ -279,7 +279,7 @@ force_mpnum(NODE *n, bool do_nondec, bool use_locale)
 	}
 
 	if (n->mpfr_data == NULL)
-		ezalloc(n->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+		emalloc(n->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
 
 	cp = n->stptr;
 	cpend = n->stptr + n->stlen;

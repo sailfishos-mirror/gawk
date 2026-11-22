@@ -1127,7 +1127,7 @@ setup_frame(INSTRUCTION *pc)
 	arg_count = (pc + 1)->expr_count;
 
 	if (pcount > 0) {
-		ezalloc(sp, NODE **, pcount * sizeof(NODE *));
+		emalloc(sp, NODE **, pcount * sizeof(NODE *));
 	}
 
 	/* check for extra args */
@@ -1144,7 +1144,6 @@ setup_frame(INSTRUCTION *pc)
 
 	for (i = 0, j = arg_count - 1; i < pcount; i++, j--) {
 		getnode(r);
-		memset(r, 0, sizeof(NODE));
 		sp[i] = r;
 
 		if (i >= arg_count) {
@@ -1233,7 +1232,6 @@ setup_frame(INSTRUCTION *pc)
 
 	/* setup new frame */
 	getnode(frame_ptr);
-	memset(frame_ptr, '\0', sizeof(NODE));
 	frame_ptr->type = Node_frame;
 	frame_ptr->stack = sp;
 	frame_ptr->prev_frame_size = (stack_ptr - stack_bottom); /* size of the previous stack frame */
@@ -1571,8 +1569,8 @@ void
 PUSH_CODE(INSTRUCTION *cp)
 {
 	NODE *r;
+
 	getnode(r);
-	memset(r, '\0', sizeof(NODE));
 	r->type = Node_instruction;
 	r->code_ptr = cp;
 	PUSH(r);
@@ -1725,7 +1723,6 @@ init_interpret()
 
 	/* initialize frame pointer */
 	getnode(frame_ptr);
-	memset(frame_ptr, '\0', sizeof(NODE));
 	frame_ptr->type = Node_frame;
 	frame_ptr->stack = NULL;
 	frame_ptr->func_node = NULL;	/* in main */
