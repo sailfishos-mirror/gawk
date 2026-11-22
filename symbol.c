@@ -65,11 +65,9 @@ static void
 init_the_tables(void)
 {
 	getnode(global_table);
-	memset(global_table, '\0', sizeof(NODE));
 	null_array(global_table);
 
 	getnode(param_table);
-	memset(param_table, '\0', sizeof(NODE));
 	null_array(param_table);
 
 	installing_specials = true;
@@ -100,7 +98,6 @@ init_symbol_table()
 
 		// save the pointers for the next time.
 		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers));
-		memset(root_pointers, 0, sizeof(struct root_pointers));
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
 		root_pointers->symbol_table = symbol_table;
@@ -119,7 +116,6 @@ init_symbol_table()
 
 		// still need to set this one up as usual
 		getnode(param_table);
-		memset(param_table, '\0', sizeof(NODE));
 		null_array(param_table);
 		if (strcmp(root_pointers->version_string, version_string) != 0)
 			warning(_("%s was created by version `%s', but the current version is `%s'"),
@@ -225,7 +221,7 @@ make_params(char **pnames, int pcount)
 	if (pcount <= 0 || pnames == NULL)
 		return NULL;
 
-	ezalloc(parms, NODE *, pcount * sizeof(NODE));
+	emalloc(parms, NODE *, pcount * sizeof(NODE));
 
 	for (i = 0, p = parms; i < pcount; i++, p++) {
 		p->type = Node_param_list;
@@ -373,7 +369,6 @@ make_symbol(const char *name, NODETYPE type)
 	NODE *r;
 
 	getnode(r);
-	memset(r, '\0', sizeof(NODE));
 	if (type == Node_var_array)
 		null_array(r);
 	else if (type == Node_var)
@@ -610,7 +605,6 @@ append_symbol(NODE *r)
 	NODE *p;
 
 	getnode(p);
-	memset(p, '\0', sizeof(NODE));
 	p->lnode = r;
 	p->rnode = symbol_list->rnode;
 	symbol_list->rnode = p;
@@ -663,7 +657,6 @@ load_symbols()
 	aptr = assoc_lookup(PROCINFO_node, tmp);
 
 	getnode(sym_array);
-	memset(sym_array, '\0', sizeof(NODE));	/* PPC Mac OS X wants this */
 	null_array(sym_array);
 
 	unref(tmp);
@@ -807,7 +800,7 @@ new_context()
 {
 	AWK_CONTEXT *ctxt;
 
-	ezalloc(ctxt, AWK_CONTEXT *, sizeof(AWK_CONTEXT));
+	emalloc(ctxt, AWK_CONTEXT *, sizeof(AWK_CONTEXT));
 	ctxt->srcfiles.next = ctxt->srcfiles.prev = & ctxt->srcfiles;
 	ctxt->rule_list.opcode = Op_list;
 	ctxt->rule_list.lasti = & ctxt->rule_list;

@@ -92,8 +92,8 @@ NODE *
 make_array()
 {
 	NODE *array;
+
 	getnode(array);
-	memset(array, '\0', sizeof(NODE));
 	array->type = Node_var_array;
 	array->array_funcs = & null_array_func;
 	/* vname, flags, and parent_array not set here */

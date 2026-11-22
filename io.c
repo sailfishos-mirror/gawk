@@ -2992,7 +2992,7 @@ init_awkpath(path_info *pi)
 			max_path++;
 
 	// +3 --> 2 for null entries at front and end of path, 1 for NULL end of list
-	ezalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *));
+	emalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *));
 
 	start = path;
 	i = 0;
@@ -3422,7 +3422,7 @@ iop_alloc(int fd, const char *name, int errno_val)
 {
 	IOBUF *iop;
 
-	ezalloc(iop, IOBUF *, sizeof(IOBUF));
+	emalloc(iop, IOBUF *, sizeof(IOBUF));
 
 	iop->public.fd = fd;
 	iop->public.name = name;

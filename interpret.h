@@ -1092,7 +1092,6 @@ mod:
 
 arrayfor:
 			getnode(r);
-			memset(r, '\0', sizeof(NODE));
 			r->type = Node_arrayfor;
 			r->for_list = list;
 			r->for_list_size = num_elems;		/* # of elements in list */

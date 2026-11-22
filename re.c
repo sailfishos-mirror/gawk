@@ -268,7 +268,7 @@ make_regexp(char *s, size_t len, bool ignorecase, bool canfatal)
 	*dest = '\0';
 	len = dest - buf;
 
-	ezalloc(rp, Regexp *, sizeof(*rp));
+	emalloc(rp, Regexp *, sizeof(*rp));
 
 	int flags = MINRX_REG_EXTENDED | MINRX_REG_BRACK_ESCAPE |
 			MINRX_REG_BRACE_COMPAT | MINRX_REG_NATIVE1B;

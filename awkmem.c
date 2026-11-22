@@ -182,7 +182,7 @@ void *
 r_getblock(int id)
 {
 	void *res;
-	ezalloc(res, void *, nextfree[id].size);
+	emalloc(res, void *, nextfree[id].size);
 	nextfree[id].active++;
 	if (nextfree[id].highwater < nextfree[id].active)
 		nextfree[id].highwater = nextfree[id].active;

@@ -1684,7 +1684,6 @@ add_thousands(const char *original)
 	char *dest;
 
 	emalloc(newbuf, char *, new_len);
-	memset(newbuf, '\0', new_len);
 
 #if defined(HAVE_LOCALE_H)
 	new_len = orig_len + (orig_len * strlen(loc.thousands_sep)) + 1; 	// worst case

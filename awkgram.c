@@ -5077,7 +5077,7 @@ yyerror(const char *m, ...)
 	count = strlen(mesg) + 1;
 	if (lexptr != NULL)
 		count += (lexeme - thisline) + 2;
-	ezalloc(buf, char *, count+1);
+	emalloc(buf, char *, count+1);
 
 	bp = buf;
 
@@ -5311,7 +5311,7 @@ do_add_srcfile(enum srctype stype, char *src, char *path, SRCFILE *thisfile)
 {
 	SRCFILE *s;
 
-	ezalloc(s, SRCFILE *, sizeof(SRCFILE));
+	emalloc(s, SRCFILE *, sizeof(SRCFILE));
 	s->src = estrdup(src, strlen(src));
 	s->fullpath = path;
 	s->stype = stype;
@@ -7642,7 +7642,7 @@ func_use(const char *name, enum defref how)
 
 	/* not in the table, fall through to allocate a new one */
 
-	ezalloc(fp, struct fdesc *, sizeof(struct fdesc));
+	emalloc(fp, struct fdesc *, sizeof(struct fdesc));
 	emalloc(fp->name, char *, len + 1);
 	strcpy(fp->name, name);
 	fp->next = ftable[ind];
@@ -7756,7 +7756,6 @@ make_regnode(NODETYPE type, NODE *exp)
 
 	assert(type == Node_regex || type == Node_dynregex);
 	getnode(n);
-	memset(n, 0, sizeof(NODE));
 	n->type = type;
 	n->re_cnt = 1;
 

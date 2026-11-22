@@ -1464,11 +1464,9 @@ DEREF(NODE *r)
 
 #ifdef USE_REAL_MALLOC
 #define	emalloc(var,ty,x)	(void) (var = (ty) malloc((size_t)(x)))
-#define	ezalloc(var,ty,x)	(void) (var = (ty) calloc((size_t)(x), 1))
 #define	erealloc(var,ty,x)	(void) (var = (ty) realloc((void *) var, (size_t)(x)))
 #else
 #define	emalloc(var,ty,x)	(void) (var = (ty) emalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
-#define	ezalloc(var,ty,x)	(void) (var = (ty) ezalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
 #define	erealloc(var,ty,x)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), __func__, #var, __FILE__, __LINE__))
 #endif
 
@@ -2150,7 +2148,7 @@ fixtype(NODE *n)
 	return n;
 }
 
-/* emalloc_real --- malloc with error checking */
+/* emalloc_real --- malloc zero-filled bytes with error checking */
 
 static inline void *
 emalloc_real(size_t count, const char *where, const char *var, const char *file, int line)
@@ -2159,24 +2157,6 @@ emalloc_real(size_t count, const char *where, const char *var, const char *file,
 
 	if (count == 0)
 		fatal("%s:%d: emalloc called with zero bytes", file, line);
-
-	ret = (void *) malloc(count);
-	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
-			file, line, where, var, count, strerror(errno));
-
-	return ret;
-}
-
-/* ezalloc_real --- malloc zero-filled bytes with error checking */
-
-static inline void *
-ezalloc_real(size_t count, const char *where, const char *var, const char *file, int line)
-{
-	void *ret;
-
-	if (count == 0)
-		fatal("%s:%d: ezalloc called with zero bytes", file, line);
 
 	ret = (void *) calloc(1, count);
 	if (ret == NULL)
@@ -2210,14 +2190,14 @@ static inline NODE *
 make_number_node(unsigned int flags)
 {
 	NODE *r;
+
 	getnode(r);
-	memset(r, 0, sizeof(*r));
 	r->type = Node_val;
 	r->valref = 1;
 	r->flags = (flags|MALLOC|NUMBER|NUMCUR);
 #ifdef HAVE_MPFR
 	if (do_mpfr)
-		ezalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+		emalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
 #endif
 	return r;
 }

@@ -325,7 +325,7 @@ r_dupnode(NODE *n)
 
 #ifdef HAVE_MPFR
 	if (do_mpfr) {
-		ezalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
+		emalloc(r->mpfr_data, struct _mpfr_data *, sizeof(struct _mpfr_data));
 		if ((n->flags & MPZN) != 0) {
 			mpz_init(r->mpg_i);
 			mpz_set(r->mpg_i, n->mpg_i);
@@ -406,8 +406,8 @@ NODE *
 make_str_node(const char *s, size_t len, int flags)
 {
 	NODE *r;
+
 	getnode(r);
-	memset(r, '\0', sizeof(NODE));
 	r->type = Node_val;
 	r->numbr = 0;
 	r->flags = (MALLOC|STRING|STRCUR);
@@ -831,7 +831,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * Create the array.
 	 */
 	if (ptr != NULL) {
-		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1));
+		emalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1));
 	}
 
 	/*

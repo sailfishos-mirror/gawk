@@ -367,7 +367,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_MPFR
 	if (do_mpfr) {
-		ezalloc(Nnull_string->mpfr_data, struct _mpfr_data *,
+		emalloc(Nnull_string->mpfr_data, struct _mpfr_data *,
 				sizeof(struct _mpfr_data));
 		mpz_init(Nnull_string->mpg_i);
 		Nnull_string->flags = (MALLOC|STRCUR|STRING|MPZN|NUMCUR|NUMBER);
@@ -951,7 +951,6 @@ load_procinfo_argv()
 
 	// build the sub-array first
 	getnode(argv_array);
- 	memset(argv_array, '\0', sizeof(NODE));  /* valgrind wants this */
 	null_array(argv_array);
 	argv_array->parent_array = PROCINFO_node;
 	argv_array->vname = estrdup("argv", 4);
@@ -1199,7 +1198,7 @@ arg_assign(char *arg, bool initing)
 		// typed regex
 		size_t len = strlen(cp) - 3;
 
-		ezalloc(cp2, char *, len + 1);
+		emalloc(cp2, char *, len + 1);
 		memcpy(cp2, cp + 2, len);
 
 		it = make_typed_regex(cp2, len);
