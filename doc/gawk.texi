@@ -34181,7 +34181,7 @@ function runtest(regex, replace, how, target,   result, stats)
         target = $0
             
     result = awk::gensub2(regex, replace, how, target, stats)
-    printf("%s ---> %s, nmatch = %d, nsub = %d\n", target, result, stats["nmatch"], stats["nsub"])
+    printf("%d. %s ---> %s, nmatch = %d, nsub = %d\n", ++Count, target, result, stats["nmatch"], stats["nsub"])
 @}
 
 function compute_replace(replace, matches,  result, chars, i, j, k)
@@ -34262,6 +34262,8 @@ function gensub2(regex, replace, how, target, stats,       # parameters
                 newstr = newstr repl substr(str, 1, 1)
                 str = substr(str, 2)
             @} else @{
+                stats["nmatch"] = count
+                stats["nsub"] = nsub
                 return newstr str repl
             @}
         @}
