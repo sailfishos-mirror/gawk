@@ -4591,8 +4591,7 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 				ip->memory = set_profile_text(make_number(0.0), "0", 1);
 				(void) mk_expression_list(subn,
 						list_append(list_create(ip), instruction(Op_field_spec)));
-			}
-			else if (nexp == 5) {
+			} else if (nexp == 5) {
 				arg = subn->nexti;	/* 1st arg list */
 				arg = arg->lasti->nexti; /* 2nd */
 				arg = arg->lasti->nexti; /* 3rd */
@@ -4602,6 +4601,7 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 				if (ip == arg->nexti && ip->opcode == Op_push)
 					ip->opcode = Op_push_array;
 			}
+
 			r->expr_count = count_expressions(& subn, false);
 			return list_append(subn, r);
 		}
