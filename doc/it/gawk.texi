@@ -32847,7 +32847,7 @@ Poiché questo non sempre è opportuno, @code{asort()} accetta un
 secondo argomento:
 
 @example
-@var{populate the array} orig
+@var{riempi il vettore} orig
 n = asort(orig, dest)
 for (i = 1; i <= n; i++)
     @var{fai qualcosa con} dest[i]
@@ -37682,7 +37682,7 @@ function runtest(regexp, rimpiazzo, come, obiettivo,   risultato, statistiche)
         obiettivo = $0
             
     risultato = awk::gensub2(regexp, rimpiazzo, come, obiettivo, statistiche)
-    printf("%s ---> %s, nmatch = %d, nsub = %d\n", obiettivo, risultato, statistiche["nmatch"], statistiche["nsub"])
+    printf("%2.1d. %s ---> %s, nmatch = %d, nsub = %d\n", ++Contatore, obiettivo, risultato, statistiche["nmatch"], statistiche["nsub"])
 @}
 
 function calcola_rimpiazza(rimpiazzo, corrispondenze,  risultato, caratteri, i, j, k)
@@ -37764,6 +37764,8 @@ function gensub2(regexp, rimpiazzo, come, obiettivo, statistiche, # parametri
                 nuova_stringa = nuova_stringa cambio substr(stringa, 1, 1)
                 stringa = substr(stringa, 2)
             @} else @{
+                statistiche["nmatch"] = contatore
+                statistiche["nsub"] = nsub
                 return nuova_stringa stringa cambio
             @}
         @}
