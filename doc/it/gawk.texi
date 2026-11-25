@@ -20147,7 +20147,7 @@ se si specifica anche il terzo argomento.
 @cindexgawkfunc{gensub}
 @cindex cercare e rimpiazzare in stringhe
 @cindex sostituzione in stringa
-@item @code{gensub(@var{regexp}, @var{rimpiazzo}, @var{come}} [@code{, @var{obiettivo}}]@code{) #}
+@item @code{gensub(@var{regexp}, @var{rimpiazzo}, @var{come}} [@code{, @var{obiettivo}} [@code{, @var{statistiche}}] ]@code{) #}
 Ricerca nella stringa @var{obiettivo} delle corrispondenze
 all'espressione regolare @var{regexp}.
 Se @var{come} è una stringa che inizia
@@ -20157,8 +20157,11 @@ ogni occorrenza di @var{regexp} con la stringa
 quale corrispondenza di @var{regexp} va rimpiazzata.  Valori numerici
 inferiori a uno vengono gestiti come se avessero il valore uno.
 Se non si specifica il nome dell'@var{obiettivo}, si
-opera su @code{$0}.  La funzione restituisce come risultato la stringa
-modificata, e la stringa originale di partenza @emph{non} viene modificata.
+opera su @code{$0}.
+Se viene specificato un vettore @code{statistiche}, verrà riempito
+come descritto più sotto.
+La funzione restituisce come risultato la stringa modificata
+e la stringa originale di partenza @emph{non} viene modificata.
 
 Il valore restituito è @emph{sempre} una stringa, anche se il
 valore dell'@var{obiettivo} era un numero o una @dfn{regexp}.
@@ -20190,6 +20193,21 @@ una come componente della stringa.
 Nel testo di rimpiazzo, la sequenza @samp{\0} rappresenta l'intero testo
 corrispondente, e lo stesso vale per
 il carattere @samp{&}.
+
+@code{gensub()} cancella il contenuto del vettore
+@code{statistiche}, e poi imposta la variabile @code{statistiche["nsub"]}
+al numero di sostituzioni che sono state realmente effettuate, 
+e la variabile @code{statistiche["nmatch"]} al numero di corrispondenze
+trovate.  @code{statistiche["nsub"]} e @code{statistiche["nmatch"]}
+saranno entrambi a zero se l'espressione regolare non individua alcuna
+corrispondenza o se, per un valore numerico di @var{come}, non c'era
+un numero sufficiente di corrispondenze nella stringa esaminata.
+@code{statistiche["nmatch"]} arriva a contare al massimo fino al valore
+numerico di @var{come}; ciò è molto utile nelle corrispondenze globali.
+
+Consider that if, in the previous example, @code{a} had been
+@code{"abc abc"}, @code{b} and @code{a} would have identical contents,
+but @code{statistiche["nsub"]} would be one.
 
 Il seguente esempio mostra come è possibile usare il terzo argomento
 per controllare quale corrispondenza
@@ -46772,6 +46790,12 @@ con la funzione @code{strtonum()} e con l'opzione
 Il supporto per il protocollo UDP nelle connessioni di rete di
 @command{gawk} è segnalato come obsoleto.
 (@pxref{Reti TCP/IP}).
+
+@item
+@code{gensub()} è stato modificato per consentire come quinto argomento
+un vettore opzionale in cui riportare la statistica riguardo al
+numero di corrispondenze e al numero di sostituzioni effettuate.
+(@pxref{Funzioni per stringhe}).
 
 @item
 La versione MinGW di @command{gawk} per l'ambiente MS-Windows
