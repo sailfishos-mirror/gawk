@@ -188,6 +188,7 @@ EXTRA_DIST = \
 	case-check.ok \
 	case-check.ok2 \
 	case-check.ok3 \
+	case-check.ok4 \
 	callparam.awk \
 	callparam.ok \
 	charasbytes.awk \
