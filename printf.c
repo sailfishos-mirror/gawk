@@ -926,23 +926,23 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 		chbuf = (flags->format == 'X' ? Uchbuf : lchbuf);
 
 		if (tmpval < 0) {
+			if (tmpval <= INTMAX_MIN) {
+				flags->format = 'g';
+				free((void *) buf);
+				*used_float = true;
+
+				return format_float(arg, flags);
+			}
 			uval = (uintmax_t) (intmax_t) tmpval;
-			if ((AWKNUM)(intmax_t)uval != double_to_int(tmpval)) {
-				flags->format = 'g';
-				free((void *) buf);
-				*used_float = true;
-
-				return format_float(arg, flags);
-			}
 		} else {
-			uval = (uintmax_t) tmpval;
-			if ((AWKNUM)uval != double_to_int(tmpval)) {
+			if (tmpval >= UINTMAX_MAX) {
 				flags->format = 'g';
 				free((void *) buf);
 				*used_float = true;
 
 				return format_float(arg, flags);
 			}
+			uval = (uintmax_t) tmpval;
 		}
 
 		// generate the digits backwards.
