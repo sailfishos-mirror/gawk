@@ -1709,7 +1709,7 @@ add_thousands(const char *original)
 	do {
 		*dest++ = *src--;
 		if (loc.grouping[ii] && ++jj == loc.grouping[ii]) {
-			if (src >= original) {	/* only add if more digits coming */
+			if (src >= original && isdigit(*src)) {	/* only add if more digits coming */
 				const char *ts = loc.thousands_sep;
 				int k;
 

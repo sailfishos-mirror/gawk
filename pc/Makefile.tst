@@ -273,6 +273,7 @@ INET_TESTS = inetdayu inetdayt inetechu inetecht
 MACHINE_TESTS = double1 double2 inf-nan-torture intformat
 LOCALE_CHARSET_TESTS = \
 	asort asorti backbigs1 backsmalls1 backsmalls2 commas fmttest fnarydel \
+	commas2 \
 	fnparydl greek-8bit jarebug lc_num1 mbfw1 mbprintf1 mbprintf2 mbprintf3 \
 	mbprintf4 mbprintf5 mbstr1 mbstr2 mtchi18n mtchi18n2 nlstringtest rebt8b2 \
 	rtlenmb sort1 sprintfc
@@ -346,6 +347,7 @@ NEED_LOCALE_C = \
 
 NEED_LOCALE_EN = \
 	mbprintf5 \
+	commas2 \
 	backbigs1 backsmalls1 backsmalls2 case-check commas concat4 dfamb1 greek-equiv \
 	greek-utf gsubnulli18n ignrcas2 lc_num1 mbfw1 mbprintf1 mbprintf3 mbprintf4 \
 	mbstr1 mbstr2 mtchi18n2 posix_compare printhuge reint2 rri1 subamp subi18n \
@@ -3972,6 +3974,12 @@ fmttest:
 fnarydel:
 	@echo $@; $(CHCP) $(ORIGCP)
 	@-AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
+	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
+
+commas2:
+	@echo $@; $(CHCP) $(ORIGCP)
+	@-[ -z "$$GAWKLOCALE" ] && GAWKLOCALE=ENU_USA; export GAWKLOCALE; $(CHCP) 65001; \
+	AWKPATH="$(srcdir)" $(AWK) -f $@.awk  >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
 	@-$(srcdir)/checkmany.sh "$@" "$(srcdir)"
 
 fnparydl:
