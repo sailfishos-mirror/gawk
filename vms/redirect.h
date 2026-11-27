@@ -37,9 +37,6 @@
 #define optarg		gnu_optarg
 #define optind		gnu_optind
 #define optopt		gnu_optopt
-#define regcomp		gnu_regcomp
-#define regexec		gnu_regexec
-#define regerror	gnu_regerror
 #ifndef VMS_POSIX
 #define strftime	gnu_strftime	/* always use missing/strftime.c */
 #define strcasecmp	gnu_strcasecmp

@@ -2,24 +2,18 @@
 #
 # usage:
 #  $ MMS /Description=[.vms]Descrip.MMS gawk
-#	possibly add `/Macro=("GNUC=1")' to compile with GNU C,
-#	or add `/Macro=("GNUC=1","DO_GNUC_SETUP=1")' to compile with GNU C
-#	on a system where GCC is not installed as a defined command,
-#	or add `/Macro=("VAXC=1")' to compile with VAX C,
-#	or add `/Macro=("VAXC=1","CC=cc/VAXC")' to compile with VAX C on
-#	a system which has DEC C installed as the default compiler.
 #
 # gawk.exe :
-#	This is the default target.  DEC C has become the default compiler.
+#	This is the default target.  DEC C is the only supported compiler.
 #
 # awkgram.c :
-#	If you don't have bison but do have VMS POSIX or DEC/Shell,
-#	change the PARSER and PARSERINIT macros to use yacc.  If you don't
-#	have either yacc or bison, you'll have to make sure that the
-#	distributed version of "awkgram.c" has its modification date later
+#	If you don't have either yacc or bison, you'll have to make sure that
+#	the distributed version of "awkgram.c" has its modification date later
 #	than the date of "awkgram.y", so that MMS won't try to build that
 #	target.  If you use bison and it is already defined system-wide,
-#	comment out the PARSERINIT definition.
+#	you will need to edit  PARSERINIT definition.
+#	Currenty not being built or tested with yacc or bison and relying
+#	on the gawk pre-built files.
 #
 # command.c :
 #	Similar to awkgram.c; built from command.y with yacc or bison.
@@ -35,10 +29,9 @@
 #	_The_GAWK_Manual_ from gawk.texi.  You'll need to use a device
 #	specific post-processor on gawk.dvi in order to get printable data.
 #	The full output is approximately 325 pages.
-#
+#       Currently buiding of gawk.dvi is not being done.
 
 # location of various source files, relative to the 'main' directory
-MALLOC = sys$disk:[.support.malloc]
 SUPPORT = sys$disk:[.support]
 VMSDIR	= sys$disk:[.vms]
 DOCDIR	= sys$disk:[.doc]
@@ -51,26 +44,19 @@ MAKEFILE = $(VMSDIR)Descrip.MMS
 # a comma separated list of macros to define
 # Do not specify _POSIX_EXIT here, other tricks are used for this.
 CDEFS	= "GAWK","HAVE_CONFIG_H"
-
-# neither GNUC nor VAXC, assume DECC (same for either VAX or Alpha)
-.ifdef __VAX__
-CFLOAT  =
-.else
 CFLOAT	= /float=ieee/ieee_mode=denorm_results
-.endif
 CNAME	= /NAME=(AS_IS,SHORT)
 CC	= cc/DECC/Prefix=All/NESTED_INCLUDE=NONE$(CFLOAT)
 CINC1   = sys$disk:[],sys$disk:[.VMS],$(SUPPORT)
 CFLAGS	= /Incl=($(CINC1))/Obj=[]/Def=($(CDEFS))$(CNAME) $(CCFLAGS)
 CEFLAGS = /Incl=($(CINC1),[.missing_d],[.extension])$(CNAME) $(CCFLAGS)
-LIBS	=	# DECC$SHR instead of VAXCRTL, no special link option needed
 
 
 PARSER	= bison
-PARSERINIT = set command gnu_bison:[000000]bison
+PARSERINIT = set command gnv$gnu:[vms_bin]bison.cld
 #PARSER	= yacc
-#PARSERINIT = yacc := posix/run/path=posix """/bin/yacc"
-#PARSERINIT = yacc := $shell$exe:yacc
+#PARSERINIT = yacc := $gnv$gnu:[bin]yacc"
+
 
 # this is used for optional target 'install.help'
 HELPLIB = sys$help:helplib.hlb
@@ -86,23 +72,16 @@ NOOP = continue
 # object files
 GAWKOBJ = eval.obj,profile.obj
 AWKOBJ1 = array.obj,awkgram.obj,builtin.obj,cint_array.obj,\
-	command.obj,debug.obj,dfa.obj,ext.obj,field.obj,\
+	command.obj,debug.obj,ext.obj,field.obj,\
 	floatcomp.obj,gawkapi.obj,gawkmisc.obj,getopt.obj,getopt1.obj
 
-AWKOBJ2 = int_array.obj,io.obj,localeinfo.obj,main.obj,mpfr.obj,msg.obj,\
-	node.obj,random.obj,re.obj,minrx.obj,regex.obj,replace.obj,\
+AWKOBJ2 = int_array.obj,io.obj,main.obj,mpfr.obj,msg.obj,\
+	node.obj,random.obj,re.obj,minrx.obj,replace.obj,\
 	str_array.obj,symbol.obj,version.obj,printf.obj,awkmem.obj
 
-AWKOBJ3 = dynarray_at_failure.obj,dynarrray_emplace_enlarge.obj,\
-      dynarrray_finalize.obj,dynarrray_resize.obj
-
-.ifdef __VAX__
-# Currently failing to compile on vax/vms with this error:
-# %RMS-W-RTB, 257 byte record too large for user's buffer
+# VAX/VMS restricts each macro in this line only expand to
+# 256 characters.
 AWKOBJS = $(AWKOBJ1),$(AWKOBJ2)
-.else
-AWKOBJS = $(AWKOBJ1),$(AWKOBJ2),$(AWKOBJ3)
-.endif
 
 
 # VMSOBJS
@@ -148,8 +127,8 @@ gawk.opt : $(MAKEFILE) config.h         # create linker options file
       $ @$(VMSDIR)gawk_ident.com
 
 $(VMSCODE)	: awk.h config.h $(VMSDIR)redirect.h $(VMSDIR)vms.h
-$(AWKOBJS)	: awk.h gettext.h $(SUPPORT)regex.h \
-		  $(SUPPORT)dfa.h config.h $(VMSDIR)redirect.h
+$(AWKOBJS)	: awk.h gettext.h $(SUPPORT)minrx.h \
+		  config.h $(VMSDIR)redirect.h
 $(GAWKOBJ)	: awk.h config.h $(VMSDIR)redirect.h
 
 #-----------------------------------------------------------------------------
@@ -163,30 +142,6 @@ builtin.obj	: builtin.c floatmagic.h $(SUPPORT)random.h
 cint_array.obj	: cint_array.c
 command.obj	: command.c cmd.h
 debug.obj	: debug.c cmd.h
-dfa.obj		: $(SUPPORT)dfa.c $(SUPPORT)dfa.h
-
-
-# MMS 4.0 gets MMS$SOURCE wrong for the $(MALLOC) and $(SUPPORT) paths.
-dynarray_at_failure.obj : $(MALLOC)dynarray_at_failure.c $(MALLOC)dynarray.h
-    $define/user malloc $(MALLOC)
-    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
-      $(MALLOC)dynarray_at_failure.c
-
-dynarrray_emplace_enlarge.obj : $(MALLOC)dynarray_emplace_enlarge.c \
-       $(MALLOC)dynarray.h
-    $define/user malloc $(MALLOC)
-    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
-      $(MALLOC)dynarray_emplace_enlarge.c
-
-dynarrray_finalize.obj : $(MALLOC)dynarray_finalize.c $(MALLOC)dynarray.h
-    $define/user malloc $(MALLOC)
-    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
-      $(MALLOC)dynarray_finalize.c
-
-dynarrray_resize.obj : $(MALLOC)dynarray_resize.c $(MALLOC)dynarray.h
-    $define/user malloc $(MALLOC)
-    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
-      $(MALLOC)dynarray_resize.c
 
 awkmem.obj      : awkmem.c
 ext.obj		: ext.c
@@ -199,9 +154,7 @@ getopt.obj	: $(SUPPORT)getopt.c
 getopt1.obj	: $(SUPPORT)getopt1.c
 int_array.obj	: int_array.c
 io.obj		: io.c
-localeinfo.obj  : $(SUPPORT)localeinfo.c
 main.obj    : main.c
-minrx.obj   : $(SUPPORT)minrx.c
 msg.obj		: msg.c
 mpfr.obj	: mpfr.c
 node.obj	: node.c
@@ -210,16 +163,12 @@ profile.obj	: profile.c
 random.obj	: $(SUPPORT)random.c $(SUPPORT)random.h
 re.obj		: re.c
 
-# MMS 4.0 gets MMS$SOURCE wrong for the $(MALLOC) and $(SUPPORT) paths.
-regex.obj	: $(SUPPORT)regex.c $(SUPPORT)regcomp.c \
-		  $(SUPPORT)regex_internal.c $(SUPPORT)regexec.c \
-		  $(SUPPORT)regex.h $(SUPPORT)regex_internal.h \
-                  $(MALLOC)dynarray.h
-    $define/user malloc $(MALLOC)
+# MMS 4.0 gets MMS$SOURCE wrong for the $(SUPPORT) paths.
+minrx.obj	: $(SUPPORT)minrx.c \
+		  $(SUPPORT)minrx.h
     $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
-      $(SUPPORT)regex.c
+      $(SUPPORT)minrx.c
 
-regexec.obj : $(SUPPORT)regexec.c
 str_array.obj	: str_array.c
 symbol.obj	: symbol.c
 version.obj	: version.c
@@ -258,7 +207,7 @@ replace.obj	: replace.c
 #     @- if f$search("command_tab.c").nes."" then \
 #            rename/new_vers command_tab.c $@
 
-# changing to be manually maintained.
+# changing to be manually maintained for now.
 config_vms.h : $(VMSDIR)generate_config_vms_h_gawk.com
       $ copy sys$disk:[.vms]config_vms.h sys$disk:[]config_vms.h
 #     $ @$(VMSDIR)generate_config_vms_h_gawk.com
@@ -274,13 +223,8 @@ install.help	: $(VMSDIR)gawk.hlp
 	library/help $(HELPLIB) $< /log
 
 
-# Build dynamic extensions - Alpha/Itanium only.
-.ifdef __VAX__
-# VAX not complete yet.
-plug_opt = [.VMS.VAX]gawk_plugin_xfer.opt
-.else
+# Build dynamic extensions
 plug_opt = [.vms]gawk_plugin.opt
-.endif
 
 ext_gawkdirfd_h = [.extension]gawkdirfd.h config.h nonposix.h
 
@@ -367,39 +311,39 @@ time.obj : [.extension]time.c config.h gawkapi.h
 
 # miscellaneous other targets
 tidy :
-      - if f$search("*.*;-1").nes."" then  purge
-      - if f$search("[.*]*.*;-1").nes."" then  purge [.*]
+	- if f$search("*.*;-1").nes."" then  purge
+	- if f$search("[.*]*.*;-1").nes."" then  purge [.*]
 
 clean :
-      - if f$search ("*.obj")    .nes. "" then delete *.obj;*
-      - if f$search ("*.lis")    .nes. "" then delete *.lis;*
-      - if f$search ("gawk.opt") .nes. "" then delete gawk.opt;*
+	- if f$search ("*.obj")    .nes. "" then delete *.obj;*
+	- if f$search ("*.lis")    .nes. "" then delete *.lis;*
+	- if f$search ("gawk.opt") .nes. "" then delete gawk.opt;*
 
 spotless : clean tidy
-      - if f$search("config.h").nes."" then delete config.h;*
-      - if f$search("config_vms.h").nes."" then delete config_vms.h;*
-      - if f$search("gawk.exe").nes."" then  delete gawk.exe;*
-      - if f$search("*.dsf").nes."" then  delete *.dsf;*
-      - if f$search("*.map").nes."" then  delete *.map;*
-      - if f$search("*.pcsi$desc").nes."" then  delete *.pcsi$desc;*
-      - if f$search("*.pcsi$text").nes."" then  delete *.pcsi$text;*
-      - if f$search("gawk*_src.bck").nes."" then  delete gawk*_src.bck;*
-      - if f$search("*.release_notes").nes."" then  delete *.release_notes;*
-      - if f$search("filefuncs.exe").nes."" then  delete filefuncs.exe;*
-      - if f$search("fnmatch.exe").nes."" then  delete fnmatch.exe;*
-      - if f$search("inplace.exe").nes."" then  delete inplace.exe;*
-      - if f$search("ordchr.exe").nes."" then  delete ordchr.exe;*
-      - if f$search("readdir.exe").nes."" then  delete readdir.exe;*
-      - if f$search("revoutput.exe").nes."" then  delete revoutput.exe;*
-      - if f$search("revtwoway.exe").nes."" then  delete revtwoway.exe;*
-      - if f$search("rwarray.exe").nes."" then  delete rwarray.exe;*
-      - if f$search("testext.exe").nes."" then  delete testext.exe;*
-      - if f$search("time.exe").nes."" then  delete time.exe;*
-      - if f$search("gawk_verb.cld").nes."" then  delete gawk_verb.cld;*
-      - if f$search("gawk.dvi").nes."" then  delete gawk.dvi;*
-      - if f$search("[.doc]texindex.exe").nes."" then \
+	- if f$search("config.h").nes."" then delete config.h;*
+	- if f$search("config_vms.h").nes."" then delete config_vms.h;*
+	- if f$search("gawk.exe").nes."" then  delete gawk.exe;*
+	- if f$search("*.dsf").nes."" then  delete *.dsf;*
+	- if f$search("*.map").nes."" then  delete *.map;*
+	- if f$search("*.pcsi$desc").nes."" then  delete *.pcsi$desc;*
+	- if f$search("*.pcsi$text").nes."" then  delete *.pcsi$text;*
+	- if f$search("gawk*_src.bck").nes."" then  delete gawk*_src.bck;*
+	- if f$search("*.release_notes").nes."" then  delete *.release_notes;*
+	- if f$search("filefuncs.exe").nes."" then  delete filefuncs.exe;*
+	- if f$search("fnmatch.exe").nes."" then  delete fnmatch.exe;*
+	- if f$search("inplace.exe").nes."" then  delete inplace.exe;*
+	- if f$search("ordchr.exe").nes."" then  delete ordchr.exe;*
+	- if f$search("readdir.exe").nes."" then  delete readdir.exe;*
+	- if f$search("revoutput.exe").nes."" then  delete revoutput.exe;*
+	- if f$search("revtwoway.exe").nes."" then  delete revtwoway.exe;*
+	- if f$search("rwarray.exe").nes."" then  delete rwarray.exe;*
+	- if f$search("testext.exe").nes."" then  delete testext.exe;*
+	- if f$search("time.exe").nes."" then  delete time.exe;*
+	- if f$search("gawk_verb.cld").nes."" then  delete gawk_verb.cld;*
+	- if f$search("gawk.dvi").nes."" then  delete gawk.dvi;*
+	- if f$search("[.doc]texindex.exe").nes."" then \
             delete [.doc]texindex.exe;*
-      - if f$search("[.cxx_repository]*.*;").nes."" then \
+	- if f$search("[.cxx_repository]*.*;").nes."" then \
             delete [.cxx_repository]*.*;*
 
 #

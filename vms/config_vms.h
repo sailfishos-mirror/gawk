@@ -252,5 +252,7 @@ static void vms_exit(int status) {
 #undef HAVE_TERMIOS_H
 #endif
 
+/* Supress noses about non DECC known pragmas */
+#pragma message disable (unknownpragma)
 
 #endif /* __CONFIG_VMS_H__ */

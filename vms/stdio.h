@@ -22,6 +22,16 @@
 
 #include <vms_fake_path/stdio.h>
 
+/* The snprintf not handling -0.0 on IA64 as expected */
+#if defined(__ia64) || defined(__ia64__)
+int vms_snprintf(char *str, size_t size, const char *format, ...);
+#ifdef snprintf
+#undef snprintf
+#endif
+#define snprintf vms_snprintf
+#endif /* __ia64 || __ia64__ */
+
+
 /* These are broken in some versions of the CRTL */
 #define vms_feof_unlocked(fp) ((*fp) ? \
   (((unsigned int)((*(fp))->_flag) & _IOEOF) != 0): 0 )

@@ -289,7 +289,7 @@ $		list = "genpot gensub gensub2 getlndir gnuops2 gnuops3" -
 		  + " incdupe incdupe2 incdupe3 incdupe4 incdupe5" -
 		  + " incdupe6 incdupe7 include2 indirectbuiltin indirectcall"
 $		gosub list_of_tests
-$		list = "lint lintold lintwarn" -
+$		list = "lint lintwarn" -
 		  + " match1 match2 match3 manyfiles mbprintf3 mbstr1 mbstr2" -
 		  + " nastyparm next nondec nondec2" -
 		  + " patsplit posix printfbad1 printfbad2 printfbad3" -
@@ -587,6 +587,10 @@ $	old_rm = rm
 $	rm = "continue ! "
 $	gawk -f 'test'.awk 'test'.in >_'test'.tmp
 $	rm = old_rm
+$	! Not currently able to verify mixed stderr/stdout
+$	skip_reason = "Test verification currently broken"
+$	gosub junit_report_skip
+$	return
 $	! gawk subprocesses creating new generation of stdout
 $	! instead of appending to open one.
 $	cmp 'test'.ok sys$disk:[]_'test'.tmp;1
@@ -762,25 +766,31 @@ $   then
 $       rm _'test'*.err;*
 $   endif
 $   define/user sys$error _'test'.err
-$	gawk -f 'test'.awk 1 < 'test'.in > _'test'.tmp
+$   gawk -f 'test'.awk 1 < 'test'.in > _'test'.tmp
 $   define/user sys$error _'test'_2.err
-$	gawk -f 'test'.awk 2 < 'test'.in > _'test'_2.tmp
+$   gawk -f 'test'.awk 2 < 'test'.in > _'test'_2.tmp
 $   define/user sys$error _'test'_3.err
-$	gawk -f 'test'.awk 3 < 'test'.in > _'test'_3.tmp
-$	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
-$	then
-$	    delete sys$disk:[]_'test'_%.tmp;2
-$	endif
-$	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
-$	then
-$	    delete sys$disk:[]_'test'.tmp;2
-$	endif
-$	append -
+$   gawk -f 'test'.awk 3 < 'test'.in > _'test'_3.tmp
+$   define/user sys$error _'test'_4.err
+$   gawk -f 'test'.awk 4 < 'test'.in > _'test'_4.tmp
+$   define/user sys$error _'test'_5.err
+$   gawk -f 'test'.awk 5 < 'test'.in > _'test'_5.tmp
+$   if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
+$   then
+$       delete sys$disk:[]_'test'_%.tmp;2
+$   endif
+$   if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
+$   then
+$	delete sys$disk:[]_'test'.tmp;2
+$   endif
+$   append -
        sys$disk:[]_'test'.tmp,sys$disk:[]_'test'.err,-
 	   sys$disk:[]_'test'_2.tmp,sys$disk:[]_'test'_2.err,-
-	   sys$disk:[]_'test'_3.tmp -
-	   _'test'_3.err
-$	cmp 'test'.ok sys$disk:[]_'test'_3.err;1
+	   sys$disk:[]_'test'_3.tmp,sys$disk:[]_'test'_3.err,-
+	   sys$disk:[]_'test'_4.tmp,sys$disk:[]_'test'_4.err,-
+	   sys$disk:[]_'test'_5.tmp -
+	   _'test'_5.err
+$	cmp 'test'.ok sys$disk:[]_'test'_5.err;1
 $	if $status
 $	then
 $	    rm _'test'*.tmp;*
@@ -1018,7 +1028,11 @@ $!
 $rscompat:
 $	echo "''test'"
 $	test_class = "basic"
-$	gawk --traditional -f 'test'.awk 'test'.in >_'test'.tmp
+$	if f$search("sys$disk:[]_''test'.tmp;") .nes. ""
+$	then
+$	    delete sys$disk:[]_'test'.tmp;*
+$	endif
+$	gawk -f 'test'.awk --posix 'test'.in >_'test'.tmp
 $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'.tmp;2
@@ -1994,7 +2008,7 @@ $	return
 $
 $reginttrad:	echo "''test'"
 $	test_class = "basic"
-$	gawk --traditional -r -f 'test'.awk >_'test'.tmp
+$	gawk --traditional -f 'test'.awk >_'test'.tmp
 $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'.tmp;2
@@ -2081,7 +2095,7 @@ $
 $reint:		echo "reint"
 $	test_class = "gawk_ext"
 $       set noOn
-$	gawk --re-interval -f reint.awk reint.in >_reint.tmp
+$	gawk -f reint.awk reint.in >_reint.tmp
 $       gawk_status = $status
 $       set On
 $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
@@ -2305,22 +2319,6 @@ $	cmp lint.ok sys$disk:[]_lint.tmp
 $	if $status
 $	then
 $	    rm _lint.tmp;
-$	    gosub junit_report_pass
-$	else
-$	    gosub junit_report_fail_diff
-$	endif
-$	return
-$
-$lintold:	echo "lintold"
-$	test_class = "gawk_ext"
-$	AWKPATH_srcdir
-$       set noOn
-$	gawk -f lintold.awk --lint-old <lintold.in >_lintold.tmp 2>&1
-$       set on
-$	cmp lintold.ok sys$disk:[]_lintold.tmp
-$	if $status
-$	then
-$	    rm _lintold.tmp;
 $	    gosub junit_report_pass
 $	else
 $	    gosub junit_report_fail_diff
@@ -2700,7 +2698,7 @@ $	return
 $
 $gsubtst3:	echo "gsubtst3"
 $	test_class = "basic"
-$	gawk --re-interval -f gsubtst3.awk gsubtst3.in >_gsubtst3.tmp
+$	gawk -f gsubtst3.awk gsubtst3.in >_gsubtst3.tmp
 $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'.tmp;2
@@ -3396,7 +3394,7 @@ $reint2:	echo "reint2"
 $	test_class = "gawk_ext"
 $	gosub define_gawklocale
 $       set noOn
-$	gawk --re-interval -f reint2.awk reint2.in >_reint2.tmp
+$	gawk -f reint2.awk reint2.in >_reint2.tmp
 $	gawk_status = $status
 $	set On
 $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
@@ -3786,10 +3784,6 @@ $profile2:  echo "''test'"
 $	test_class = "gawk_ext"
 $	gawk --profile -v "sortcmd=SORT sys$input: sys$output:" -
 			-f xref.awk dtdgport.awk > _NL:
-$!  Test passes, but verification failing.
-$   skip_reason = "Verification bug in VMS 9.2-2 edit/sum access violation
-$   gosub junit_report_skip
-$   return
 $	! sed <awkprof.out 1,2d >_profile2.tmp
 $	sumslp awkprof.out /update=sys$input: /output=_'test'.tmp
 -1,2

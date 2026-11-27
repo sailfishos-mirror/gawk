@@ -73,7 +73,7 @@ static char * vms_reformat(const char *format)
         errno = EINVAL;
         return NULL;
       }
-    new_format = malloc(format_len);
+    new_format = malloc(format_len + 1);
     if (new_format == NULL)
         return NULL;
     old_f = format;
@@ -164,3 +164,28 @@ int vms_fprintf(FILE* stream, const char *format, ...) {
     free(new_format);
     return result;
 }
+
+/* The snprintf() routine is not handling -0 properly so patching
+   the special case that gawk uses for now
+ */
+#if defined(__ia64) || defined(__ia64__)
+int vms_snprintf(char *str, size_t size, const char *format, ...) {
+    int result;
+    va_list args;
+    va_start(args, format);
+
+    if (strcmp(format, "%.0f") == 0) {
+        double val = va_arg(args, double);
+        va_end(args);
+        if (val == 0.0) {
+            memset(&val, 0, sizeof(val));
+        }
+        return snprintf(str, size, "%.0f", val);
+    }
+
+    result = vsnprintf(str, size, format, args);
+    va_end(args);
+    return result;
+}
+#endif /* __ia64 || __ia64__ */
+
