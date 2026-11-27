@@ -925,26 +925,20 @@ format_integer_digits(NODE *arg, struct flags *flags, bool *used_float)
 		// octal or hex or unsigned decimal
 		chbuf = (flags->format == 'X' ? Uchbuf : lchbuf);
 
-		// FIXME: This should be simplified more.
-		if (tmpval < 0) {
-			if (tmpval <= INTMAX_MIN) {
-				flags->format = 'g';
-				free((void *) buf);
-				*used_float = true;
+		// check for out of range
+		if (tmpval <= INTMAX_MIN || tmpval >= UINTMAX_MAX) {
+			flags->format = 'g';
+			free((void *) buf);
+			*used_float = true;
 
-				return format_float(arg, flags);
-			}
-			uval = (uintmax_t) (intmax_t) tmpval;
-		} else {
-			if (tmpval >= UINTMAX_MAX) {
-				flags->format = 'g';
-				free((void *) buf);
-				*used_float = true;
-
-				return format_float(arg, flags);
-			}
-			uval = (uintmax_t) tmpval;
+			return format_float(arg, flags);
 		}
+
+		// get the integer value
+		if (tmpval < 0)
+			uval = (uintmax_t) (intmax_t) tmpval;
+		else
+			uval = (uintmax_t) tmpval;
 
 		// generate the digits backwards.
 		do {
